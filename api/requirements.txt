@@ -1,0 +1,5 @@
+pytest
+Flask
+Flask-Cors
+requests
+Werkzeug
