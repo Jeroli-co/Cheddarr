@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from './chedarr.png';
+import logo from './cheddarr.png';
 import './App.css';
 
 function App() {
