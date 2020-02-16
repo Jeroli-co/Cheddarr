@@ -15,18 +15,22 @@ def create_app():
     """
     return _create_app(
         DevConfig if get_debug_flag() else ProdConfig,
+        "development.cfg" if get_debug_flag() else None,
+        instance_relative_config=True if get_debug_flag() else False,
         template_folder=TEMPLATE_FOLDER,
         static_folder=STATIC_FOLDER,
     )
 
 
-def _create_app(config_object: BaseConfig, **kwargs):
+def _create_app(config_object: BaseConfig, config_filename, **kwargs):
     """Creates a Flask application.
     :param object config_object: The config class to use.
     :param dict kwargs: Extra kwargs to pass to the Flask constructor.
     """
     app = Flask(__name__, **kwargs)
     app.config.from_object(config_object)
+    if config_filename:
+        app.config.from_pyfile(config_filename)
     register_blueprints(app)
     CORS(app, resources={r"/*": {"origins": app.config["CLIENT_ADDR"]}})
     return app

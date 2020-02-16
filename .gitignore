@@ -314,6 +314,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+#Flask
+instance/
 ### react ###
 .DS_*
 **/*.backup.*
