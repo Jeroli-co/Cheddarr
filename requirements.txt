@@ -3,3 +3,4 @@ Flask
 Flask-Cors
 requests
 Werkzeug
+gunicorn
