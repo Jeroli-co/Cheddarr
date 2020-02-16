@@ -11,7 +11,6 @@ server = Blueprint(
 @server.route("/", methods=["GET"])
 @server.route("/<path:path>", methods=["GET"])
 def index(path=None):
-    print(TEMPLATE_FOLDER)
     return render_template("index.html")
 
 
