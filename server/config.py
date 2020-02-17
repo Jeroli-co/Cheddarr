@@ -25,14 +25,15 @@ class ProdConfig(BaseConfig):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
+    FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN", "domain")
     ENV = "production"
     DEBUG = get_boolean_env("FLASK_DEBUG", False)
-    CLIENT_ADDR = ["https://cheddarr.herokuapp.com"]
+    CLIENT_ADDR = FLASK_DOMAIN
 
     ##########################################################################
     # session/cookies                                                        #
     ##########################################################################
-    SESSION_COOKIE_DOMAIN = os.environ.get("FLASK_DOMAIN", "cheddarr.herokuapp.com")
+    SESSION_COOKIE_DOMAIN = FLASK_DOMAIN
     SESSION_COOKIE_SECURE = get_boolean_env("SESSION_COOKIE_SECURE", True)
 
 
@@ -54,4 +55,4 @@ class TestConfig(BaseConfig):
     TESTING = True
     DEBUG = True
     SERVER_NAME = "127.0.0.1:5000"
-    CLIENT_ADDR = "*"
+    CLIENT_ADDR = ["*"]
