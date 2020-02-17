@@ -18,7 +18,7 @@ class BaseConfig(object):
     # flask                                                                  #
     ##########################################################################
     DEBUG = get_boolean_env("FLASK_DEBUG", False)
-    SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "not-secret-key")  # FIXME
+    SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "not-secret-key")
 
 
 class ProdConfig(BaseConfig):
