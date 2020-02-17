@@ -12,9 +12,7 @@ function App() {
           href="https://reactjs.org"
           target="_blank"
           rel="noopener noreferrer"
-        >
-          GROSSE APP EN PERSPECTIVE !
-        </a>
+        >GROSSE APP EN PERSPECTIVE !</a>
       </header>
     </div>
   );
