@@ -6,7 +6,7 @@ from server.config import TestConfig
 
 @pytest.fixture(autouse=True, scope="session")
 def app():
-    app = _create_app(TestConfig, "testing.cfg", instance_relative_config=True)
+    app = _create_app(TestConfig)
     ctx = app.app_context()
     ctx.push()
     yield app

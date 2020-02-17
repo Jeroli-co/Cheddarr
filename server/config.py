@@ -54,4 +54,4 @@ class TestConfig(BaseConfig):
     TESTING = True
     DEBUG = True
     SERVER_NAME = "127.0.0.1:5000"
-    CLIENT_ADDR = ["http://127.0.0.1:4200", "http://localhost:4200"]
+    CLIENT_ADDR = "*"
