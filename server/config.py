@@ -20,12 +20,26 @@ class BaseConfig(object):
     DEBUG = get_boolean_env("FLASK_DEBUG", False)
     SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "not-secret-key")
 
+    ##########################################################################
+    # session/cookies                                                        #
+    ##########################################################################
+    SESSION_TYPE = "redis"
+    SESSION_PROTECTION = "strong"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_HTTPONLY = True
+
+    ##########################################################################
+    # database                                                               #
+    ##########################################################################
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 class ProdConfig(BaseConfig):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
-    FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN", "domain")
+    FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN")
     ENV = "production"
     DEBUG = get_boolean_env("FLASK_DEBUG", False)
     CLIENT_ADDR = FLASK_DOMAIN
@@ -35,6 +49,11 @@ class ProdConfig(BaseConfig):
     ##########################################################################
     SESSION_COOKIE_DOMAIN = FLASK_DOMAIN
     SESSION_COOKIE_SECURE = get_boolean_env("SESSION_COOKIE_SECURE", True)
+
+    ##########################################################################
+    # database                                                               #
+    ##########################################################################
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
 
 class DevConfig(BaseConfig):
@@ -50,9 +69,15 @@ class DevConfig(BaseConfig):
     ##########################################################################
     SESSION_COOKIE_SECURE = False
 
+    ##########################################################################
+    # database                                                               #
+    ##########################################################################
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+
 
 class TestConfig(BaseConfig):
     TESTING = True
     DEBUG = True
     SERVER_NAME = "127.0.0.1:5000"
     CLIENT_ADDR = ["*"]
+    SQLALCHEMY_DATABASE_URI = "sqlite://"  # :memory:
