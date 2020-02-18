@@ -1,6 +1,6 @@
 import os
 
-APP_NAME = "Cheddarr"
+FLASK_APP = "cheddarr"
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
 STATIC_FOLDER = os.environ.get(
@@ -23,7 +23,7 @@ class BaseConfig(object):
     ##########################################################################
     # session/cookies                                                        #
     ##########################################################################
-    SESSION_TYPE = "redis"
+    SESSION_TYPE = "sqlalchemy"
     SESSION_PROTECTION = "strong"
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True
@@ -53,7 +53,7 @@ class ProdConfig(BaseConfig):
     ##########################################################################
     # database                                                               #
     ##########################################################################
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(PROJECT_ROOT, "dev.db")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
 
 class DevConfig(BaseConfig):
@@ -72,7 +72,7 @@ class DevConfig(BaseConfig):
     ##########################################################################
     # database                                                               #
     ##########################################################################
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(PROJECT_ROOT, "dev.db")
 
 
 class TestConfig(BaseConfig):
