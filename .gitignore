@@ -336,4 +336,7 @@ sketch
 # Ignore all local history of files
 .history
 
+##Databases
+*.db
+
 # End of https://www.gitignore.io/api/node,react,python,jetbrains,visualstudiocode

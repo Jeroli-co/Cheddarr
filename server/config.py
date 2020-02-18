@@ -53,7 +53,7 @@ class ProdConfig(BaseConfig):
     ##########################################################################
     # database                                                               #
     ##########################################################################
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(PROJECT_ROOT, "dev.db")
 
 
 class DevConfig(BaseConfig):
@@ -80,4 +80,4 @@ class TestConfig(BaseConfig):
     DEBUG = True
     SERVER_NAME = "127.0.0.1:5000"
     CLIENT_ADDR = ["*"]
-    SQLALCHEMY_DATABASE_URI = "sqlite://"  # :memory:
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"

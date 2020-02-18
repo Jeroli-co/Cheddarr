@@ -1,9 +1,10 @@
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_cors import CORS
-from server.index import server
 from flask_sqlalchemy import SQLAlchemy
-from .config import (
+
+
+from server.config import (
     STATIC_FOLDER,
     TEMPLATE_FOLDER,
     BaseConfig,
@@ -29,7 +30,7 @@ def create_app():
     )
 
 
-def _create_app(config_object: BaseConfig, config_filename=None, **kwargs):
+def _create_app(config_object: BaseConfig, **kwargs):
     """Creates a Flask application.
     :param object config_object: The config class to use.
     :param dict kwargs: Extra kwargs to pass to the Flask constructor.
@@ -37,16 +38,23 @@ def _create_app(config_object: BaseConfig, config_filename=None, **kwargs):
     app = Flask(__name__, **kwargs)
     app.config.from_object(config_object)
 
+    db.init_app(app)
     register_blueprints(app)
-    configure_database(app)
+    register_commands(app)
 
     CORS(app, resources={r"/*": {"origins": app.config["CLIENT_ADDR"]}})
     return app
 
 
 def register_blueprints(app):
-    app.register_blueprint(server)
+    from server.auth import auth
+    from server.site import site
+
+    app.register_blueprint(site)
+    app.register_blueprint(auth)
 
 
-def configure_database(app):
-    db.init_app(app)
+def register_commands(app):
+    from server.commands import init_db
+
+    app.cli.add_command(init_db)
