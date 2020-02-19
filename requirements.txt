@@ -4,5 +4,5 @@ Flask-Cors
 requests
 Werkzeug
 gunicorn
-pymongo
-dnspython
+Flask-SQLAlchemy
+psycopg2-binary

@@ -1,10 +1,18 @@
-import os
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_cors import CORS
-from pymongo import MongoClient
-from server.index import server
-from .config import STATIC_FOLDER, TEMPLATE_FOLDER, BaseConfig, DevConfig, ProdConfig
+from flask_sqlalchemy import SQLAlchemy
+
+
+from server.config import (
+    STATIC_FOLDER,
+    TEMPLATE_FOLDER,
+    BaseConfig,
+    DevConfig,
+    ProdConfig,
+)
+
+db = SQLAlchemy()
 
 
 def create_app():
@@ -17,34 +25,36 @@ def create_app():
     dev = get_debug_flag()
     return _create_app(
         DevConfig if dev else ProdConfig,
-        "development.cfg" if dev else None,
-        instance_relative_config=True if dev else False,
         template_folder=TEMPLATE_FOLDER,
         static_folder=STATIC_FOLDER,
     )
 
 
-def _create_app(config_object: BaseConfig, config_filename, **kwargs):
+def _create_app(config_object: BaseConfig, **kwargs):
     """Creates a Flask application.
     :param object config_object: The config class to use.
     :param dict kwargs: Extra kwargs to pass to the Flask constructor.
     """
     app = Flask(__name__, **kwargs)
     app.config.from_object(config_object)
-    if config_filename:
-        app.config.from_pyfile(config_filename)
-    register_blueprints(app)
 
-    mongo_db_uri = os.environ.get("MONGODB_URI") or app.config["MONGODB_URI"]
-    if mongo_db_uri is None:
-        app.config["dbClient"] = MongoClient()
-    else:
-        app.config["dbClient"] = MongoClient(mongo_db_uri, ssl=True)
-    app.config["db"] = app.config["dbClient"][os.environ.get("DB") or app.config["DB"]]
-    print(app.config["dbClient"])
+    db.init_app(app)
+    register_blueprints(app)
+    register_commands(app)
+
     CORS(app, resources={r"/*": {"origins": app.config["CLIENT_ADDR"]}})
     return app
 
 
 def register_blueprints(app):
-    app.register_blueprint(server)
+    from server.auth import auth
+    from server.site import site
+
+    app.register_blueprint(site)
+    app.register_blueprint(auth)
+
+
+def register_commands(app):
+    from server.commands import init_db
+
+    app.cli.add_command(init_db)

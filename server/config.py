@@ -1,6 +1,6 @@
 import os
 
-APP_NAME = "Cheddarr"
+FLASK_APP = "cheddarr"
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
 STATIC_FOLDER = os.environ.get(
@@ -18,22 +18,42 @@ class BaseConfig(object):
     # flask                                                                  #
     ##########################################################################
     DEBUG = get_boolean_env("FLASK_DEBUG", False)
-    SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "not-secret-key")  # FIXME
+    SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "not-secret-key")
+
+    ##########################################################################
+    # session/cookies                                                        #
+    ##########################################################################
+    SESSION_TYPE = "sqlalchemy"
+    SESSION_PROTECTION = "strong"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_HTTPONLY = True
+
+    ##########################################################################
+    # database                                                               #
+    ##########################################################################
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class ProdConfig(BaseConfig):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
+    FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN")
     ENV = "production"
     DEBUG = get_boolean_env("FLASK_DEBUG", False)
-    CLIENT_ADDR = ["https://cheddarr.herokuapp.com"]
+    CLIENT_ADDR = FLASK_DOMAIN
 
     ##########################################################################
     # session/cookies                                                        #
     ##########################################################################
-    SESSION_COOKIE_DOMAIN = os.environ.get("FLASK_DOMAIN", "cheddarr.herokuapp.com")
+    SESSION_COOKIE_DOMAIN = FLASK_DOMAIN
     SESSION_COOKIE_SECURE = get_boolean_env("SESSION_COOKIE_SECURE", True)
+
+    ##########################################################################
+    # database                                                               #
+    ##########################################################################
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
 
 class DevConfig(BaseConfig):
@@ -49,9 +69,15 @@ class DevConfig(BaseConfig):
     ##########################################################################
     SESSION_COOKIE_SECURE = False
 
+    ##########################################################################
+    # database                                                               #
+    ##########################################################################
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(PROJECT_ROOT, "dev.db")
+
 
 class TestConfig(BaseConfig):
     TESTING = True
     DEBUG = True
     SERVER_NAME = "127.0.0.1:5000"
-    CLIENT_ADDR = ["http://127.0.0.1:4200", "http://localhost:4200"]
+    CLIENT_ADDR = ["*"]
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
