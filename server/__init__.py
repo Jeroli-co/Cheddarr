@@ -1,6 +1,5 @@
 from flask.app import Flask
 from flask.helpers import get_debug_flag
-from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -42,7 +41,6 @@ def _create_app(config_object: BaseConfig, **kwargs):
     register_blueprints(app)
     register_commands(app)
 
-    CORS(app, resources={r"/*": {"origins": app.config["CLIENT_ADDR"]}})
     return app
 
 

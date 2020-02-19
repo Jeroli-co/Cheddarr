@@ -42,7 +42,6 @@ class ProdConfig(BaseConfig):
     FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN")
     ENV = "production"
     DEBUG = get_boolean_env("FLASK_DEBUG", False)
-    CLIENT_ADDR = FLASK_DOMAIN
 
     ##########################################################################
     # session/cookies                                                        #
@@ -62,7 +61,6 @@ class DevConfig(BaseConfig):
     ##########################################################################
     ENV = "development"
     DEBUG = get_boolean_env("FLASK_DEBUG", True)
-    CLIENT_ADDR = ["http://127.0.0.1:4200", "http://localhost:4200"]
 
     ##########################################################################
     # session/cookies                                                        #
@@ -79,5 +77,4 @@ class TestConfig(BaseConfig):
     TESTING = True
     DEBUG = True
     SERVER_NAME = "127.0.0.1:5000"
-    CLIENT_ADDR = ["*"]
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
