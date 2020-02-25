@@ -6,7 +6,7 @@ import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
 import axios from 'axios';
 
-axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfCookieName = 'csrf_token';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 
 ReactDOM.render(
