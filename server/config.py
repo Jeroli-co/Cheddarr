@@ -78,3 +78,4 @@ class TestConfig(BaseConfig):
     DEBUG = True
     SERVER_NAME = "127.0.0.1:5000"
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    WTF_CSRF_ENABLED = False

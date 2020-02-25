@@ -1,7 +1,9 @@
 from flask.app import Flask
 from flask.helpers import get_debug_flag
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect, generate_csrf
+
 from server.config import (
     STATIC_FOLDER,
     TEMPLATE_FOLDER,
@@ -12,6 +14,7 @@ from server.config import (
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 
 def create_app():
@@ -38,9 +41,16 @@ def _create_app(config_object: BaseConfig, **kwargs):
     app.config.from_object(config_object)
 
     db.init_app(app)
+    csrf.init_app(app)
     register_blueprints(app)
     register_commands(app)
     register_login_manager(app)
+
+    @app.after_request
+    def set_csrf_cookie(response):
+        if response:
+            response.set_cookie("csrf_token", generate_csrf())
+        return response
 
     return app
 
