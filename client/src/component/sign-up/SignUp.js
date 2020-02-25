@@ -15,10 +15,9 @@ function SignUp() {
   async function onSubmit(data) {
   	console.log(data);
   	const fd = new FormData();
-		for(let [name, value] of data) {
-			fd.append(name, value);
-		}
-  	console.log(fd);
+  	Object.keys(data).forEach(key => {
+  	  fd.append(key, data[key]);
+    });
   	const res = await axios.post(apiUrl + '/sign-up', fd);
   	console.log(res);
   }
