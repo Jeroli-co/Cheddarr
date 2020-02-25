@@ -6,7 +6,7 @@ import {Link} from "react-router-dom";
 import { useForm } from 'react-hook-form'
 import axios from "axios";
 
-const apiUrl = 'http://localhost:5000';
+const apiUrl = 'http://localhost:5000/api';
 
 function SignUp() {
 
