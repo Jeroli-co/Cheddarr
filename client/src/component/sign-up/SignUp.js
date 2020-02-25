@@ -18,8 +18,6 @@ function SignUp() {
   	Object.keys(data).forEach(key => {
   	  fd.append(key, data[key]);
     });
-  	axios.defaults.xsrfCookieName = 'csrftoken';
-		axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
   	const res = await axios.post(apiUrl + '/sign-up', fd);
   	console.log(res);
   }
