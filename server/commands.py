@@ -7,5 +7,6 @@ from server import db
 @with_appcontext
 def init_db():
     """Initialize database"""
+    db.drop_all()
     db.create_all()
     click.echo("Initialized database")

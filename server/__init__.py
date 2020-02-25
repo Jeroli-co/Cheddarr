@@ -1,8 +1,7 @@
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_sqlalchemy import SQLAlchemy
-
-
+from flask_login import LoginManager
 from server.config import (
     STATIC_FOLDER,
     TEMPLATE_FOLDER,
@@ -12,6 +11,7 @@ from server.config import (
 )
 
 db = SQLAlchemy()
+login_manager = LoginManager()
 
 
 def create_app():
@@ -40,6 +40,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
     db.init_app(app)
     register_blueprints(app)
     register_commands(app)
+    register_login_manager(app)
 
     return app
 
@@ -56,3 +57,14 @@ def register_commands(app):
     from server.commands import init_db
 
     app.cli.add_command(init_db)
+
+
+def register_login_manager(app):
+    from server.auth.models import User
+
+    login_manager.init_app(app)
+    login_manager.login_view = "auth.login"
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(user_id)
