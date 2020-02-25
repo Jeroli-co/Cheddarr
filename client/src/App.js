@@ -1,19 +1,18 @@
 import React from 'react';
-import logo from './cheddarr.png';
+import {Route} from "react-router";
 import './App.css';
+import Navbar from "./component/navbar/Navbar";
+import Home from "./home/Home";
+import SignIn from "./component/sign-in/SignIn";
+import SignUp from "./component/sign-up/SignUp";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >GROSSE APP EN PERSPECTIVE !</a>
-      </header>
+      <Navbar/>
+      <Route exact path='/' component={Home} />
+      <Route exact path='/sign-in' component={SignIn} />
+      <Route exact path='/sign-up' component={SignUp} />
     </div>
   );
 }
