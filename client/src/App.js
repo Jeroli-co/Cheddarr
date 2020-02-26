@@ -1,15 +1,20 @@
+import { config } from '@fortawesome/fontawesome-svg-core';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+import axios from "axios";
+import Cookies from "js-cookie";
 import React, { useState } from 'react';
-import {Route} from "react-router";
+import { Route } from "react-router";
 import './App.css';
 import Navbar from "./component/navbar/Navbar";
-import Home from "./home/Home";
 import SignIn from "./component/sign-in/SignIn";
 import SignUp from "./component/sign-up/SignUp";
 import { userContext } from "./context/userContext";
-import axios from "axios";
-import Cookies from "js-cookie";
+import Home from "./home/Home";
+
 
 function App() {
+
+  config.autoAddCss = false
 
   const initialState = {
     user: {},
@@ -53,11 +58,11 @@ function App() {
             });
           }
         })
-			.catch((error) => {
-				console.log(error);
-				// 409 EXIST DEJA
-				// 500 INTERNAL ERROR probleme de validation du form
-			});
+        .catch((error) => {
+          console.log(error);
+          // 409 EXIST DEJA
+          // 500 INTERNAL ERROR probleme de validation du form
+        });
     } else {
       console.log('Already authenticated');
     }
@@ -69,7 +74,7 @@ function App() {
   return (
     <div className="App">
       <userContext.Provider value={user}>
-        <Navbar/>
+        <Navbar />
         <Route exact path='/' component={Home} />
         <Route exact path='/sign-in' component={SignIn} />
         <Route exact path='/sign-up' component={SignUp} />

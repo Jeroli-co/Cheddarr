@@ -2,6 +2,7 @@ from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 
 from server.config import (
@@ -42,6 +43,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
     db.init_app(app)
     csrf.init_app(app)
+    Talisman(app)
     register_blueprints(app)
     register_commands(app)
     register_login_manager(app)

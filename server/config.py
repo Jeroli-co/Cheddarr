@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 FLASK_APP = "cheddarr"
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -23,11 +24,7 @@ class BaseConfig(object):
     ##########################################################################
     # session/cookies                                                        #
     ##########################################################################
-    SESSION_TYPE = "sqlalchemy"
-    SESSION_PROTECTION = "strong"
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = True
-    REMEMBER_COOKIE_HTTPONLY = True
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     ##########################################################################
     # database                                                               #
@@ -47,7 +44,6 @@ class ProdConfig(BaseConfig):
     # session/cookies                                                        #
     ##########################################################################
     SESSION_COOKIE_DOMAIN = FLASK_DOMAIN
-    SESSION_COOKIE_SECURE = get_boolean_env("SESSION_COOKIE_SECURE", True)
 
     ##########################################################################
     # database                                                               #
@@ -61,11 +57,6 @@ class DevConfig(BaseConfig):
     ##########################################################################
     ENV = "development"
     DEBUG = get_boolean_env("FLASK_DEBUG", True)
-
-    ##########################################################################
-    # session/cookies                                                        #
-    ##########################################################################
-    SESSION_COOKIE_SECURE = False
 
     ##########################################################################
     # database                                                               #
