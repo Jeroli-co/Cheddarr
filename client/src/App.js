@@ -17,9 +17,9 @@ function App() {
       token: "",
       expirationDate: null
     },
-    logout: logOut(),
+    logout: logOut,
     signUp: signUp,
-    isAuthenticated: isAuthenticated()
+    isAuthenticated: isAuthenticated
   };
 
   const [user, setUser] = useState(initialState);
