@@ -61,12 +61,12 @@ const Navbar = () => {
 
 										{
 											isAuthenticated ? (
-													<Link className="button is-rounded is-primary" onClick={signOut} to="/">
+													<div className="button is-rounded is-primary" onClick={signOut} to="/">
 														<span className="icon">
 															<FontAwesomeIcon icon={faSignOutAlt}/>
 														</span>
 														<span>Sign out</span>
-													</Link>
+													</div>
 												)
 												: (
 													<div>

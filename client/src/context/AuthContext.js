@@ -52,12 +52,8 @@ const AuthContextProvider = (props) => {
 
   const signOut = async () => {
     try {
-      if (await isAuthenticated) {
-        const res = await axios.get('/api/sign-out');
-        console.log(res);
-      } else {
-        throw new Error('Not authenticated yet');
-      }
+      const res = await axios.get('/api/sign-out');
+      console.log(res);
     } catch (e) {
       console.log(e);
     } finally {
