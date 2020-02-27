@@ -7,7 +7,7 @@ TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
 STATIC_FOLDER = os.environ.get(
     "FLASK_STATIC_FOLDER", os.path.join(PROJECT_ROOT, "client", "build", "static")
 )
-
+SESSION_LIFETIME = 60
 
 def get_boolean_env(name, default):
     default = "true" if default else "false"
@@ -24,7 +24,7 @@ class BaseConfig(object):
     ##########################################################################
     # session/cookies                                                        #
     ##########################################################################
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=SESSION_LIFETIME)
 
     ##########################################################################
     # database                                                               #

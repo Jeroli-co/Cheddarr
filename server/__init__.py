@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, session
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_login import LoginManager
@@ -52,6 +52,10 @@ def _create_app(config_object: BaseConfig, **kwargs):
     register_login_manager(app)
     CORS(app, resources={r"/*": {"origins":app.config.get("FLASK_DOMAIN")}})
 
+    @app.before_first_request
+    def make_session_permanent():
+        session.permanent = True
+
     @app.after_request
     def set_csrf_cookie(response):
         if response:
@@ -92,7 +96,3 @@ def register_login_manager(app):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
-
-    @login_manager.unauthorized_handler
-    def unauthorized():
-        return redirect(url_for("site.index"))

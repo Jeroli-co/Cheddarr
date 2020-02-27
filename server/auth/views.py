@@ -1,13 +1,12 @@
 from http import HTTPStatus
+from time import time
 
-from flask import jsonify, session
-from flask.helpers import url_for
 from flask_login import current_user, login_required, login_user, logout_user
-from werkzeug.utils import redirect
 
 from server import db, InvalidUsage
 from server.auth import auth
 from server.auth.models import SigninForm, SignupForm, User
+from server.config import SESSION_LIFETIME
 
 
 @auth.route("/sign-up", methods=["POST"])
@@ -44,7 +43,7 @@ def signin():
         if user:
             if user.check_password(signin_form.password.data):
                 login_user(user)
-                return {"message": "User signed in"}, HTTPStatus.OK
+                return {"username": user.username, "expiresAt": (time() + SESSION_LIFETIME) * 1000}, HTTPStatus.OK
         raise InvalidUsage("Wrong username/email or password", status_code=HTTPStatus.BAD_REQUEST)
     raise InvalidUsage("Error in signin form", status_code=HTTPStatus.INTERNAL_SERVER_ERROR, payload=signin_form.errors)
 
