@@ -67,6 +67,7 @@ const AuthContextProvider = (props) => {
     try {
       if (user.isAuthenticated) {
         const res = await axios.get('/api/profile');
+        console.log(res);
         setUser({info: res.payload});
       } else {
         throw 'Not authenticated yet';
