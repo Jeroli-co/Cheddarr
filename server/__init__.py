@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_login import LoginManager
@@ -13,6 +14,7 @@ from server.config import (
     DevConfig,
     ProdConfig,
 )
+from server.exceptions import InvalidUsage
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -56,6 +58,12 @@ def _create_app(config_object: BaseConfig, **kwargs):
             response.set_cookie("csrf_token", generate_csrf())
         return response
 
+    @app.errorhandler(InvalidUsage)
+    def handle_invalid_usage(error):
+        response = jsonify(error.to_dict())
+        response.status_code = error.status_code
+        return response
+
     return app
 
 
@@ -68,9 +76,9 @@ def register_blueprints(app):
 
 
 def register_commands(app):
-    from server.commands import init_db
+    from server.commands import init_db_command
 
-    app.cli.add_command(init_db)
+    app.cli.add_command(init_db_command)
 
 
 def register_login_manager(app):

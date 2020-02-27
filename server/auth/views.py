@@ -1,10 +1,11 @@
 from http import HTTPStatus
 
+from flask import jsonify, session
 from flask.helpers import url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.utils import redirect
 
-from server import db
+from server import db, InvalidUsage
 from server.auth import auth
 from server.auth.models import SigninForm, SignupForm, User
 
@@ -28,14 +29,13 @@ def signup():
             db.session.commit()
             login_user(user)
             return {"message": "User added"}, HTTPStatus.CREATED
-        return {"message": "User already exist"}, HTTPStatus.CONFLICT
-    return signup_form.errors, HTTPStatus.INTERNAL_SERVER_ERROR
+        raise InvalidUsage("User already exists", status_code=HTTPStatus.CONFLICT)
+    raise InvalidUsage("Error in signup form", status_code=HTTPStatus.INTERNAL_SERVER_ERROR, payload=signup_form.errors)
 
 
 @auth.route("/sign-in", methods=["POST"])
 def signin():
     signin_form = SigninForm()
-    print(signin_form.data)
     if signin_form.validate():
         user = (
             User.query.filter_by(email=signin_form.usernameOrEmail.data).first()
@@ -44,20 +44,22 @@ def signin():
         if user:
             if user.check_password(signin_form.password.data):
                 login_user(user)
-                return redirect(url_for("site.index"))
-        return {"message": "Wrong username or password"}, HTTPStatus.BAD_REQUEST
-    return redirect(url_for("auth.signin"))
+                return {"message": "User signed in"}, HTTPStatus.OK
+        raise InvalidUsage("Wrong username/email or password", status_code=HTTPStatus.BAD_REQUEST)
+    raise InvalidUsage("Error in signin form", status_code=HTTPStatus.INTERNAL_SERVER_ERROR, payload=signin_form.errors)
 
 
 @auth.route("/sign-out", methods=["GET"])
 @login_required
 def signout():
     logout_user()
-    return redirect(url_for("site.index"))
+    return {"message": "User signed out"}, HTTPStatus.OK
 
 
-@auth.route("/profile", methods=["GET"])
+@auth.route("/user/<user_name>", methods=["GET"])
 @login_required
 def user_profile():
-    print(current_user)
-    return redirect(url_for("site.favicon"))
+    user = User.query.filter_by(username=current_user.username).first()
+    if user:
+        return {"username": user.username, "email": user.email, "firstName": user.first_name, "lastName": user.last_name}, HTTPStatus.OK
+    return InvalidUsage("Internal error", status_code=HTTPStatus.INTERNAL_SERVER_ERROR)

@@ -1,6 +1,7 @@
 import pytest
 
 from server import _create_app
+from server.commands import init_db
 from server.config import TestConfig
 
 
@@ -16,4 +17,5 @@ def app():
 @pytest.yield_fixture
 def client(app):
     with app.test_client() as client:
+        init_db()
         yield client

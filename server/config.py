@@ -66,6 +66,7 @@ class DevConfig(BaseConfig):
 
 
 class TestConfig(BaseConfig):
+    FLASK_DOMAIN = "http://localhost"
     TESTING = True
     DEBUG = True
     SERVER_NAME = "127.0.0.1:5000"
