@@ -1,12 +1,29 @@
+import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import { Link } from "react-router-dom";
 import './SignIn.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faKey, faUser} from "@fortawesome/free-solid-svg-icons";
-import {Link} from "react-router-dom";
+
+const apiUrl = '/api';
 
 function SignIn() {
 
-	const onSubmit = data => console.log(data);
+	async function onSubmit(data) {
+		console.log(data);
+		const fd = new FormData();
+		Object.keys(data).forEach(key => {
+			fd.append(key, data[key]);
+		});
+		const res = await axios.post(apiUrl + '/sign-in', fd);
+		console.log(res);
+	}
+
+	const { register, handleSubmit, errors } = useForm();
+	const isInputInvalid = (inputName) => {
+		return errors[inputName] ? "is-danger" : "";
+	};
 
 	return (
 		<div className="SignIn">
@@ -15,7 +32,7 @@ function SignIn() {
 				<div className="hero-body">
 					<div className="container has-text-centered">
 						<h1 className="title">
-							<p>Sign into your <span style={{color: "orange"}}>Cheddarr</span> account</p>
+							<p>Sign into your <span style={{ color: "orange" }}>Cheddarr</span> account</p>
 						</h1>
 					</div>
 				</div>
@@ -26,26 +43,40 @@ function SignIn() {
 			<div className="columns is-mobile is-centered">
 				<div className="column is-half">
 
-					<form id="sign-in-form" onSubmit={onSubmit}>
+					<form id="sign-in-form" onSubmit={handleSubmit(onSubmit)}>
 
 						<div className="field">
 							<label className="label">Username or email</label>
 							<div className="control has-icons-left">
-								<input className="input" type="text" placeholder="Enter your username or email" />
+								<input name="login"
+									className={'input ' + isInputInvalid('login')}
+									type="text"
+									placeholder="Enter your username or email"
+									ref={register({ required: true })} />
 								<span className="icon is-small is-left">
 									<FontAwesomeIcon icon={faUser} />
 								</span>
+								{errors['login'] && (
+									<p className="help is-danger">Username or email is required</p>
+								)}
 							</div>
 						</div>
 
 						<div className="field">
 							<label className="label">Password</label>
 							<div className="control has-icons-left">
-								<input className="input" type="password" placeholder="Enter a strong password" />
+								<input name="password"
+									className={'input ' + isInputInvalid('password')}
+									type="password"
+									placeholder="Enter your password"
+									ref={register({ required: true })} />
 								<span className="icon is-small is-left">
 									<FontAwesomeIcon icon={faKey} />
 								</span>
 							</div>
+							{errors['password'] && errors['password'].type === 'required' && (
+								<p className="help is-danger">Password is required </p>
+							)}
 						</div>
 
 						<div className="field is-grouped">

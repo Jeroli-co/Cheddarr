@@ -73,6 +73,8 @@ def register_commands(app):
 
 def register_login_manager(app):
     from server.auth.models import User
+    from werkzeug.utils import redirect
+    from flask.helpers import url_for
 
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
@@ -80,3 +82,7 @@ def register_login_manager(app):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
+
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        return redirect(url_for("site.index"))

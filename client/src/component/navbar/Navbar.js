@@ -1,10 +1,14 @@
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faSignInAlt, faSignOutAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from "axios";
 import React from 'react';
-import './Navbar.css';
+import { Link } from 'react-router-dom';
 import logo from '../../cheddarr-small.png';
-import {Link} from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGithub } from '@fortawesome/free-brands-svg-icons'
-import { faUserPlus, faSignInAlt } from '@fortawesome/free-solid-svg-icons'
+import './Navbar.css';
+
+
+const apiUrl = '/api';
 
 function Navbar() {
 
@@ -19,6 +23,11 @@ function Navbar() {
 		}
 	}
 
+	async function signOut() {
+		const res = await axios.get(apiUrl + '/sign-out');
+		console.log(res);
+	}
+
 	return (
 		<div className="Navbar">
 			<nav className="navbar" role="navigation" aria-label="main navigation">
@@ -28,7 +37,7 @@ function Navbar() {
 					</Link>
 
 					<div role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" onClick={toggleBurgerMenu}
-						 data-target="navbarBasicExample">
+						data-target="navbarBasicExample">
 						<span aria-hidden="true"></span>
 						<span aria-hidden="true"></span>
 						<span aria-hidden="true"></span>
@@ -47,24 +56,31 @@ function Navbar() {
 							<div className="buttons">
 
 								<a className="button is-rounded is-dark" href="https://github.com/Jeroli-co/Cheddarr" target="_blank" rel="noopener noreferrer">
-    							<span className="icon">
+									<span className="icon">
 										<FontAwesomeIcon icon={faGithub} />
-    							</span>
+									</span>
 									<span>GitHub</span>
 								</a>
 
 								<Link className="button is-rounded is-primary" to="/sign-up">
-    							<span className="icon">
+									<span className="icon">
 										<FontAwesomeIcon icon={faUserPlus} />
-    							</span>
+									</span>
 									<span>Sign up</span>
 								</Link>
 
 								<Link className="button is-rounded is-primary" to="/sign-in">
-    							<span className="icon">
+									<span className="icon">
 										<FontAwesomeIcon icon={faSignInAlt} />
-    							</span>
+									</span>
 									<span>Sign in</span>
+								</Link>
+
+								<Link className="button is-rounded is-primary" to="/" onClick={signOut}>
+									<span className="icon">
+										<FontAwesomeIcon icon={faSignOutAlt} />
+									</span>
+									<span>Sign out</span>
 								</Link>
 
 							</div>
@@ -72,7 +88,7 @@ function Navbar() {
 					</div>
 				</div>
 			</nav>
-		</div>
+		</div >
 	);
 }
 

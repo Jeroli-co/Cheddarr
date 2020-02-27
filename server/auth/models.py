@@ -39,6 +39,6 @@ class SignupForm(FlaskForm):
     password = PasswordField("Password", [DataRequired(), Length(min=8)])
 
 
-class LoginForm(FlaskForm):
+class SigninForm(FlaskForm):
     login = StringField("Login", [DataRequired()])
     password = PasswordField("Password", [DataRequired()])
