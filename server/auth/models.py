@@ -40,5 +40,5 @@ class SignupForm(FlaskForm):
 
 
 class SigninForm(FlaskForm):
-    login = StringField("Login", [DataRequired()])
+    usernameOrEmail = StringField("Username Or Email", [DataRequired()])
     password = PasswordField("Password", [DataRequired()])

@@ -29,19 +29,18 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const signIn = (data) => {
+  const signIn = async (data) => {
     if (!user.isAuthenticated) {
       const fd = new FormData();
       fd.append('usernameOrEmail', data['usernameOrEmail']);
       fd.append('password', data['password']);
-      axios.post('/api/sign-in', fd)
-        .then((res) => {
-          console.log(res);
-          setUser({isAuthenticated: true});
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      try {
+        const res = await axios.post('/api/sign-in', fd);
+        console.log(res);
+        setUser({isAuthenticated: true});
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 

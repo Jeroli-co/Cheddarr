@@ -35,10 +35,11 @@ def signup():
 @auth.route("/sign-in", methods=["POST"])
 def signin():
     signin_form = SigninForm()
+    print(signin_form.data)
     if signin_form.validate():
         user = (
-            User.query.filter_by(email=signin_form.login.data).first()
-            or User.query.filter_by(username=signin_form.login.data).first()
+            User.query.filter_by(email=signin_form.usernameOrEmail.data).first()
+            or User.query.filter_by(username=signin_form.usernameOrEmail.data).first()
         )
         if user:
             if user.check_password(signin_form.password.data):
