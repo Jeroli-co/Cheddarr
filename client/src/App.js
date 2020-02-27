@@ -6,10 +6,11 @@ import SignIn from "./component/sign-in/SignIn";
 import SignUp from "./component/sign-up/SignUp";
 import Home from "./home/Home";
 import AuthContextProvider from "./context/AuthContext";
-import ProtectedRoute from "./ProtectedRoute";
+import PrivateRoute from "./PrivateRoute";
 import UserProfile from "./component/protected/user-profile/UserProfile";
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import ProtectedRoute from "./ProtectedRoute";
 
 const App = () => {
 
@@ -20,12 +21,16 @@ const App = () => {
       <AuthContextProvider>
         <Navbar />
         <Switch>
-          <Route exact path='/' component={Home} />
-          <Route exact path='/sign-in' component={SignIn} />
-          <Route exact path='/sign-up' component={SignUp} />
 
-          <ProtectedRoute exact path="/user-profile" component={UserProfile} />
+          <Route exact path='/' component={Home} />
+
+          <ProtectedRoute exact path='/sign-in' component={SignIn} />
+          <ProtectedRoute exact path='/sign-up' component={SignUp} />
+
+          <PrivateRoute exact path="/user-profile" component={UserProfile} />
+
           <Route path="*" component={() => "404 NOT FOUND"} />
+
         </Switch>
       </AuthContextProvider>
     </div>
