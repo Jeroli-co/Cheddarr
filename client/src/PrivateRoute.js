@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import { Route, Redirect } from "react-router-dom";
 import {AuthContext} from "./context/AuthContext";
 
-const ProtectedRoute = ({component: Component, ...rest}) => {
+const PrivateRoute = ({component: Component, ...rest}) => {
 
   const { isAuthenticated } = useContext(AuthContext);
 
@@ -10,14 +10,14 @@ const ProtectedRoute = ({component: Component, ...rest}) => {
     <Route
       {...rest}
       render={(props) => {
-        if (!isAuthenticated) {
+        if (isAuthenticated) {
           return<Component {...props} />
         } else {
-          return <Redirect to='/404'/>
+          return <Redirect to='/'/>
         }
       }
     }/>
   )
 };
 
-export default ProtectedRoute;
+export default PrivateRoute;

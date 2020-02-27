@@ -1,10 +1,23 @@
-import React from 'react';
+import React, {useContext, useEffect} from 'react';
 import './UserProfile.css';
+import {AuthContext} from "../../../context/AuthContext";
 
 function UserProfile() {
+
+	const { info, getProfile } = useContext(AuthContext);
+	useEffect(() => {
+		if (!info) {
+			getProfile();
+		}
+		console.log('[MOUNTED]');
+		console.log(info);
+	});
+
 	return (
 		<div className="UserProfile">
-			<p>My new UserProfile component !</p>
+			{ info &&
+				<p>{ info.username } profile !</p>
+			}
 		</div>
 	);
 }
