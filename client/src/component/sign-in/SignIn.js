@@ -1,23 +1,14 @@
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
+import { signIn } from '../../service/auth/authService';
 import './SignIn.css';
-
-const apiUrl = '/api';
-
 function SignIn() {
 
-	async function onSubmit(data) {
-		console.log(data);
-		const fd = new FormData();
-		Object.keys(data).forEach(key => {
-			fd.append(key, data[key]);
-		});
-		const res = await axios.post(apiUrl + '/sign-in', fd);
-		console.log(res);
+	const onSubmit = (data) => {
+		signIn(data)
 	}
 
 	const { register, handleSubmit, errors } = useForm();

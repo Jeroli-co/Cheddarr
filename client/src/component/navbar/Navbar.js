@@ -1,12 +1,11 @@
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faSignInAlt, faSignOutAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import axios from "axios";
 import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../cheddarr-small.png';
+import { signOut } from '../../service/auth/authService';
 import './Navbar.css';
-
 
 const apiUrl = '/api';
 
@@ -21,11 +20,6 @@ function Navbar() {
 			elem.classList.toggle('is-active');
 			targetElem.classList.toggle('is-active');
 		}
-	}
-
-	async function signOut() {
-		const res = await axios.get(apiUrl + '/sign-out');
-		console.log(res);
 	}
 
 	return (
