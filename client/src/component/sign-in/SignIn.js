@@ -1,17 +1,16 @@
+import React, {useContext} from 'react';
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
-import { signIn } from '../../service/auth/authService';
 import './SignIn.css';
-function SignIn() {
+import {AuthContext} from "../../context/AuthContext";
 
-	const onSubmit = (data) => {
-		signIn(data)
-	}
+const SignIn = () => {
 
 	const { register, handleSubmit, errors } = useForm();
+	const { signIn } = useContext(AuthContext);
+
 	const isInputInvalid = (inputName) => {
 		return errors[inputName] ? "is-danger" : "";
 	};
@@ -34,20 +33,20 @@ function SignIn() {
 			<div className="columns is-mobile is-centered">
 				<div className="column is-half">
 
-					<form id="sign-in-form" onSubmit={handleSubmit(onSubmit)}>
+					<form id="sign-in-form" onSubmit={handleSubmit(signIn)}>
 
 						<div className="field">
 							<label className="label">Username or email</label>
 							<div className="control has-icons-left">
-								<input name="login"
-									className={'input ' + isInputInvalid('login')}
+								<input name="usernameOrEmail"
+									className={'input ' + isInputInvalid('usernameOrEmail')}
 									type="text"
 									placeholder="Enter your username or email"
 									ref={register({ required: true })} />
 								<span className="icon is-small is-left">
 									<FontAwesomeIcon icon={faUser} />
 								</span>
-								{errors['login'] && (
+								{errors['usernameOrEmail'] && (
 									<p className="help is-danger">Username or email is required</p>
 								)}
 							</div>
@@ -86,7 +85,7 @@ function SignIn() {
 
 		</div>
 	);
-}
+};
 
 export default SignIn;
 

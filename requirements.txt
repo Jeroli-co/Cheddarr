@@ -7,3 +7,5 @@ gunicorn
 Flask-SQLAlchemy
 psycopg2-binary
 flask-login
+flask-talisman
+flask-wtf
