@@ -6,13 +6,16 @@ export const AuthContext = createContext();
 
 const AuthContextProvider = (props) => {
 
-  const [user, setUser] = useState({
-    isAuthenticated: false,
-  });
+  const initialSessionState = {
+    username: null,
+    expiresAt: null
+  };
+
+  const [session, setSession] = useState(initialSessionState);
 
   const signUp = async (data) => {
     try {
-      if (!user.isAuthenticated) {
+      if (await !isAuthenticated) {
         const fd = new FormData();
         fd.append('firstName', data['firstName']);
         fd.append('lastName', data['lastName']);
@@ -23,7 +26,7 @@ const AuthContextProvider = (props) => {
         console.log(res);
         props.history.push('/sign-in');
       } else {
-        throw 'Already authenticated';
+        props.history.push('/');
       }
     } catch (e) {
       console.log(e);
@@ -32,45 +35,87 @@ const AuthContextProvider = (props) => {
 
   const signIn = async (data) => {
     try {
-      if (!user.isAuthenticated) {
+      if (await !isAuthenticated) {
         const fd = new FormData();
         fd.append('usernameOrEmail', data['usernameOrEmail']);
         fd.append('password', data['password']);
         const res = await axios.post('/api/sign-in', fd);
         console.log(res);
-        setUser({isAuthenticated: true, info: res.payload});
-        props.history.push('/user-profile');
-      } else {
-        throw 'Already authenticated';
+        setSessionInfo(res.data.username, res.data.expiresAt);
       }
     } catch (e) {
       console.log(e);
+    } finally {
+      props.history.push('/');
     }
   };
 
   const signOut = async () => {
     try {
-      if (user.isAuthenticated) {
+      if (await isAuthenticated) {
         const res = await axios.get('/api/sign-out');
         console.log(res);
-        setUser({isAuthenticated: false});
-        props.history.push('/');
       } else {
-        throw 'Not authenticated yet';
+        throw new Error('Not authenticated yet');
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      unsetSessionInfo();
+      props.history.push('/');
+    }
+  };
+
+  const refreshSession = async () => {
+    let sessionRefreshed = false;
+    try {
+      const res = await axios.get('/api/refresh-session');
+      console.log(res);
+      setSessionInfo(res.data.username, res.data.expiresAt);
+      sessionRefreshed = true;
+    } catch (e) {
+      console.log(e);
+      unsetSessionInfo();
+    }
+    return sessionRefreshed;
+  };
+
+  const isAuthenticated = async () => {
+    let authenticated = false;
+    try {
+      const expiresAt = getExpiresAt();
+      if (expiresAt) {
+        authenticated = new Date().getTime() < expiresAt ? true : await refreshSession();
       }
     } catch (e) {
       console.log(e);
     }
+    return authenticated;
+  };
+
+  const getExpiresAt = () => {
+    return localStorage.getItem('expiresAt');
+  };
+
+  const setSessionInfo = (username, expiresAt) => {
+    localStorage.setItem('username', username);
+    localStorage.setItem('expiresAt', expiresAt);
+    setSession({username: username, expiresAt: expiresAt});
+  };
+
+  const unsetSessionInfo = () => {
+    localStorage.removeItem('username');
+    localStorage.removeItem('expiresAt');
+    setSession(initialSessionState);
   };
 
   const getProfile = async () => {
     try {
-      if (user.isAuthenticated) {
+      if (await isAuthenticated) {
         const res = await axios.get('/api/profile');
         console.log(res);
-        setUser({info: res.payload});
       } else {
-        throw 'Not authenticated yet';
+        throw new Error('Not authenticated yet');
       }
     } catch (e) {
       console.log(e);
@@ -78,7 +123,7 @@ const AuthContextProvider = (props) => {
   };
 
   return (
-    <AuthContext.Provider value={{...user, signUp, signIn, signOut, getProfile}}>
+    <AuthContext.Provider value={{...session, signUp, signIn, signOut}}>
       {props.children}
     </AuthContext.Provider>
   )
