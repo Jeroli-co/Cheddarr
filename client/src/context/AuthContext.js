@@ -50,7 +50,7 @@ const AuthContextProvider = (props) => {
         console.log(res);
         props.history.push('/sign-in');
       } else {
-        props.history.push('/');
+        throw new Error('Try to sign up but user is authenticated');
       }
     } catch (e) {
       console.log(e);
@@ -67,20 +67,41 @@ const AuthContextProvider = (props) => {
         console.log(res);
         setSessionInfo(res.data.username, res.data.expiresAt);
         props.history.push('/');
+      } else {
+        throw new Error('Try to sign in but user is authenticated');
       }
     } catch (e) {
-      console.log(e);
+      handleError(e);
     }
   };
 
   const signOut = async () => {
     try {
-      const res = await axios.get('/api/sign-out');
-      console.log(res);
+      if (session.isAuthenticated) {
+        const res = await axios.get('/api/sign-out');
+        console.log(res);
+        unsetSessionInfo();
+        props.history.push('/');
+      } else {
+        throw new Error('Try to sign out but user is not authenticated');
+      }
     } catch (e) {
-      console.log(e);
-      console.log(session.isAuthenticated);
+      handleError(e);
     }
+  };
+
+  const refreshSession = async () => {
+    try {
+      const res = await axios.get('/api/refresh-session');
+      console.log(res);
+      setSessionInfo(res.data.username, res.data.expiresAt);
+    } catch (e) {
+      handleError(e);
+    }
+  };
+
+  const handleError = (error) => {
+    console.log(error);
     unsetSessionInfo();
     props.history.push('/');
   };
@@ -95,17 +116,6 @@ const AuthContextProvider = (props) => {
     localStorage.removeItem('username');
     localStorage.removeItem('expiresAt');
     setSession(initialSessionState);
-  };
-
-  const refreshSession = async () => {
-    try {
-      const res = await axios.get('/api/refresh-session');
-      console.log(res);
-      setSessionInfo(res.data.username, res.data.expiresAt);
-    } catch (e) {
-      console.log(e);
-      unsetSessionInfo();
-    }
   };
 
   return (
