@@ -16,26 +16,34 @@ const AuthContextProvider = (props) => {
 
   useEffect(() => {
 
-    async function fetchSession() {
-      let hasSessionBeenRefreshed = false;
+    const fetchSession = async () => {
+      let hasSessionBeenFetch = false;
       try {
-        if (session.expiresAt === null) {
-          const expiresAt = localStorage.getItem('expiresAt');
-          if (expiresAt && new Date().getTime() > expiresAt) {
-            hasSessionBeenRefreshed = await refreshSession();
-          }
-        } else {
-          if (new Date().getTime() > session.expiresAt) {
-            hasSessionBeenRefreshed = await refreshSession();
-          }
+        const res = await axios.get('/api/refresh-session');
+        console.log(res);
+        setSessionInfo(res.data.username, res.data.expiresAt);
+        hasSessionBeenFetch = true;
+      } catch (e) {
+        handleError(e);
+      }
+      return hasSessionBeenFetch;
+    };
+
+    const restoreSession = async () => {
+      let hasSessionBeenRestore = false;
+      try {
+        const expiresAt = session.expiresAt || localStorage.getItem('expiresAt');
+        if (expiresAt && new Date().getTime() > expiresAt) {
+          hasSessionBeenRestore = await fetchSession();
+          if (!hasSessionBeenRestore) { throw new Error('Session has expired') }
         }
       } catch (e) {
-        console.log(e);
+        handleError(e);
       }
-      return hasSessionBeenRefreshed;
-    }
+      return hasSessionBeenRestore;
+    };
 
-    fetchSession().then((hasSessionBeenRefreshed) => console.log('Session refreshed: ' + hasSessionBeenRefreshed))
+    restoreSession().then((hasSessionBeenRestore) => console.log(hasSessionBeenRestore ? 'Session restored' : 'No need to restore session'));
 
   });
 
@@ -67,8 +75,13 @@ const AuthContextProvider = (props) => {
         fd.append('password', data['password']);
         const res = await axios.post('/api/sign-in', fd);
         console.log(res);
-        setSessionInfo(res.data.username, res.data.expiresAt);
-        props.history.push('/');
+        const username = res.data.username;
+        const expiresAt = res.data.expiresAt;
+        if (username && expiresAt) {
+          doLogin(username, expiresAt);
+        } else {
+          throw new Error("Response data doesn't match the wanted model");
+        }
       } else {
         throw new Error('Try to sign in but user is authenticated');
       }
@@ -82,8 +95,7 @@ const AuthContextProvider = (props) => {
       if (session.isAuthenticated) {
         const res = await axios.get('/api/sign-out');
         console.log(res);
-        unsetSessionInfo();
-        props.history.push('/');
+        doLogout();
       } else {
         throw new Error('Try to sign out but user is not authenticated');
       }
@@ -92,21 +104,17 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const refreshSession = async () => {
-    let hasSessionBeenRefreshed = false;
-    try {
-      const res = await axios.get('/api/refresh-session');
-      console.log(res);
-      setSessionInfo(res.data.username, res.data.expiresAt);
-      hasSessionBeenRefreshed = true;
-    } catch (e) {
-      handleError(e);
-    }
-    return hasSessionBeenRefreshed;
-  };
-
   const handleError = (error) => {
     console.log(error);
+    doLogout();
+  };
+
+  const doLogin = (username, expiresAt) => {
+    setSessionInfo(username, expiresAt);
+    props.history.push('/');
+  };
+
+  const doLogout = () => {
     unsetSessionInfo();
     props.history.push('/');
   };
