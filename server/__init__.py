@@ -91,7 +91,7 @@ def register_login_manager(app):
     from flask.helpers import url_for
 
     login_manager.init_app(app)
-    login_manager.login_view = "auth.login"
+    login_manager.login_view = "auth.signin"
 
     @login_manager.user_loader
     def load_user(user_id):

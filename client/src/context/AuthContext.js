@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, {createContext, useEffect, useState} from 'react';
 import axios from "axios";
 import {withRouter} from 'react-router';
 
@@ -7,15 +7,39 @@ export const AuthContext = createContext();
 const AuthContextProvider = (props) => {
 
   const initialSessionState = {
+    isAuthenticated: false,
     username: null,
     expiresAt: null
   };
 
   const [session, setSession] = useState(initialSessionState);
 
+  useEffect(() => {
+
+    async function fetchSession() {
+      try {
+        if (session.expiresAt === null) {
+          const expiresAt = localStorage.getItem('expiresAt');
+          if (expiresAt && new Date().getTime() > expiresAt) {
+            await refreshSession();
+          }
+        } else {
+          if (new Date().getTime() > session.expiresAt) {
+            await refreshSession();
+          }
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    fetchSession().then(() => console.log('Session refreshed'))
+
+  });
+
   const signUp = async (data) => {
     try {
-      if (await !isAuthenticated) {
+      if (!session.isAuthenticated) {
         const fd = new FormData();
         fd.append('firstName', data['firstName']);
         fd.append('lastName', data['lastName']);
@@ -35,18 +59,17 @@ const AuthContextProvider = (props) => {
 
   const signIn = async (data) => {
     try {
-      if (await !isAuthenticated) {
+      if (!session.isAuthenticated) {
         const fd = new FormData();
         fd.append('usernameOrEmail', data['usernameOrEmail']);
         fd.append('password', data['password']);
         const res = await axios.post('/api/sign-in', fd);
         console.log(res);
         setSessionInfo(res.data.username, res.data.expiresAt);
+        props.history.push('/');
       }
     } catch (e) {
       console.log(e);
-    } finally {
-      props.history.push('/');
     }
   };
 
@@ -56,47 +79,16 @@ const AuthContextProvider = (props) => {
       console.log(res);
     } catch (e) {
       console.log(e);
-    } finally {
-      unsetSessionInfo();
-      props.history.push('/');
+      console.log(session.isAuthenticated);
     }
-  };
-
-  const refreshSession = async () => {
-    let sessionRefreshed = false;
-    try {
-      const res = await axios.get('/api/refresh-session');
-      console.log(res);
-      setSessionInfo(res.data.username, res.data.expiresAt);
-      sessionRefreshed = true;
-    } catch (e) {
-      console.log(e);
-      unsetSessionInfo();
-    }
-    return sessionRefreshed;
-  };
-
-  const isAuthenticated = async () => {
-    let authenticated = false;
-    try {
-      const expiresAt = getExpiresAt();
-      if (expiresAt) {
-        authenticated = new Date().getTime() < expiresAt ? true : await refreshSession();
-      }
-    } catch (e) {
-      console.log(e);
-    }
-    return authenticated;
-  };
-
-  const getExpiresAt = () => {
-    return localStorage.getItem('expiresAt');
+    unsetSessionInfo();
+    props.history.push('/');
   };
 
   const setSessionInfo = (username, expiresAt) => {
     localStorage.setItem('username', username);
     localStorage.setItem('expiresAt', expiresAt);
-    setSession({username: username, expiresAt: expiresAt});
+    setSession({isAuthenticated: true, username: username, expiresAt: expiresAt});
   };
 
   const unsetSessionInfo = () => {
@@ -105,21 +97,19 @@ const AuthContextProvider = (props) => {
     setSession(initialSessionState);
   };
 
-  const getProfile = async () => {
+  const refreshSession = async () => {
     try {
-      if (await isAuthenticated) {
-        const res = await axios.get('/api/profile');
-        console.log(res);
-      } else {
-        throw new Error('Not authenticated yet');
-      }
+      const res = await axios.get('/api/refresh-session');
+      console.log(res);
+      setSessionInfo(res.data.username, res.data.expiresAt);
     } catch (e) {
       console.log(e);
+      unsetSessionInfo();
     }
   };
 
   return (
-    <AuthContext.Provider value={{...session, signUp, signIn, signOut, isAuthenticated}}>
+    <AuthContext.Provider value={{...session, signUp, signIn, signOut}}>
       {props.children}
     </AuthContext.Provider>
   )

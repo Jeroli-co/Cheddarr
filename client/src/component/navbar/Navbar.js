@@ -9,7 +9,7 @@ import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
 
-	const { isAuthenticated, signOut } = useContext(AuthContext);
+	const { signOut, isAuthenticated } = useContext(AuthContext);
 
 	const toggleBurgerMenu = () => {
 		const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
@@ -61,7 +61,7 @@ const Navbar = () => {
 
 										{
 											isAuthenticated ? (
-													<div className="button is-rounded is-primary" onClick={signOut} to="/">
+													<div className="button is-rounded is-primary" onClick={signOut}>
 														<span className="icon">
 															<FontAwesomeIcon icon={faSignOutAlt}/>
 														</span>
