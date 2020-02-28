@@ -17,8 +17,6 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  console.log(initialSessionState());
-
   const [session, setSession] = useState(initialSessionState());
 
   useEffect(() => {
@@ -26,9 +24,7 @@ const AuthContextProvider = (props) => {
       axios.get('/api/refresh-session')
         .then((res) => {
           setSession({...res.data, isAuthenticated: true});
-          console.log('Updated session from serveur');
         }).catch((e) => {
-          console.log(e);
           localStorage.removeItem('username');
           localStorage.removeItem('expiresAt');
           setSession(initialSessionState());
@@ -45,14 +41,13 @@ const AuthContextProvider = (props) => {
         fd.append('username', data['username']);
         fd.append('email', data['email']);
         fd.append('password', data['password']);
-        const res = await axios.post('/api/sign-up', fd);
-        console.log(res);
+        await axios.post('/api/sign-up', fd);
         props.history.push('/sign-in');
       } else {
         throw new Error('Try to sign up but user is authenticated');
       }
     } catch (e) {
-      console.log(e);
+      handleError(e);
     }
   };
 
@@ -63,7 +58,6 @@ const AuthContextProvider = (props) => {
         fd.append('usernameOrEmail', data['usernameOrEmail']);
         fd.append('password', data['password']);
         const res = await axios.post('/api/sign-in', fd);
-        console.log(res);
         const username = res.data.username;
         const expiresAt = res.data.expiresAt;
         if (username && expiresAt) {
@@ -82,8 +76,7 @@ const AuthContextProvider = (props) => {
   const signOut = async () => {
     try {
       if (session.isAuthenticated) {
-        const res = await axios.get('/api/sign-out');
-        console.log(res);
+        await axios.get('/api/sign-out');
         doLogout();
       } else {
         throw new Error('Try to sign out but user is not authenticated');
