@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
 import './SignIn.css';
-import {AuthContext} from "../../context/AuthContext";
+import {AuthContext} from "../../../context/AuthContext";
 
 const SignIn = () => {
 
