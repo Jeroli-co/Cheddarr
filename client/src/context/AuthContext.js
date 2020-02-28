@@ -17,23 +17,25 @@ const AuthContextProvider = (props) => {
   useEffect(() => {
 
     async function fetchSession() {
+      let hasSessionBeenRefreshed = false;
       try {
         if (session.expiresAt === null) {
           const expiresAt = localStorage.getItem('expiresAt');
           if (expiresAt && new Date().getTime() > expiresAt) {
-            await refreshSession();
+            hasSessionBeenRefreshed = await refreshSession();
           }
         } else {
           if (new Date().getTime() > session.expiresAt) {
-            await refreshSession();
+            hasSessionBeenRefreshed = await refreshSession();
           }
         }
       } catch (e) {
         console.log(e);
       }
+      return hasSessionBeenRefreshed;
     }
 
-    fetchSession().then(() => console.log('Session refreshed'))
+    fetchSession().then((hasSessionBeenRefreshed) => console.log('Session refreshed: ' + hasSessionBeenRefreshed))
 
   });
 
@@ -91,13 +93,16 @@ const AuthContextProvider = (props) => {
   };
 
   const refreshSession = async () => {
+    let hasSessionBeenRefreshed = false;
     try {
       const res = await axios.get('/api/refresh-session');
       console.log(res);
       setSessionInfo(res.data.username, res.data.expiresAt);
+      hasSessionBeenRefreshed = true;
     } catch (e) {
       handleError(e);
     }
+    return hasSessionBeenRefreshed;
   };
 
   const handleError = (error) => {
