@@ -6,45 +6,34 @@ export const AuthContext = createContext();
 
 const AuthContextProvider = (props) => {
 
-  const initialSessionState = {
-    isAuthenticated: false,
-    username: null,
-    expiresAt: null
+  const initialSessionState = () => {
+    const username = localStorage.getItem('username');
+    const expiresAt = localStorage.getItem('expiresAt');
+    const isAuthenticated = !!username && !!expiresAt;
+    return {
+      username: username,
+      expiresAt: expiresAt,
+      isAuthenticated: isAuthenticated
+    }
   };
 
-  const [session, setSession] = useState(initialSessionState);
+  console.log(initialSessionState());
+
+  const [session, setSession] = useState(initialSessionState());
 
   useEffect(() => {
-
-    const fetchSession = async () => {
-      let hasSessionBeenFetch = false;
-      try {
-        const res = await axios.get('/api/refresh-session');
-        console.log(res);
-        setSessionInfo(res.data.username, res.data.expiresAt);
-        hasSessionBeenFetch = true;
-      } catch (e) {
-        handleError(e);
-      }
-      return hasSessionBeenFetch;
-    };
-
-    const restoreSession = async () => {
-      let hasSessionBeenRestore = false;
-      try {
-        const expiresAt = session.expiresAt || localStorage.getItem('expiresAt');
-        if (expiresAt && new Date().getTime() > expiresAt) {
-          hasSessionBeenRestore = await fetchSession();
-          if (!hasSessionBeenRestore) { throw new Error('Session has expired') }
-        }
-      } catch (e) {
-        handleError(e);
-      }
-      return hasSessionBeenRestore;
-    };
-
-    restoreSession().then((hasSessionBeenRestore) => console.log(hasSessionBeenRestore ? 'Session restored' : 'No need to restore session'));
-
+    if (session.expiresAt && new Date().getTime() > session.expiresAt) {
+      axios.get('/api/refresh-session')
+        .then((res) => {
+          setSession({...res.data, isAuthenticated: true});
+          console.log('Updated session from serveur');
+        }).catch((e) => {
+          console.log(e);
+          localStorage.removeItem('username');
+          localStorage.removeItem('expiresAt');
+          setSession(initialSessionState());
+        });
+    }
   });
 
   const signUp = async (data) => {
@@ -110,25 +99,16 @@ const AuthContextProvider = (props) => {
   };
 
   const doLogin = (username, expiresAt) => {
-    setSessionInfo(username, expiresAt);
+    localStorage.setItem('username', username);
+    localStorage.setItem('expiresAt', expiresAt);
+    setSession({isAuthenticated: true, username: username, expiresAt: expiresAt});
     props.history.push('/');
   };
 
   const doLogout = () => {
-    unsetSessionInfo();
-    props.history.push('/');
-  };
-
-  const setSessionInfo = (username, expiresAt) => {
-    localStorage.setItem('username', username);
-    localStorage.setItem('expiresAt', expiresAt);
-    setSession({isAuthenticated: true, username: username, expiresAt: expiresAt});
-  };
-
-  const unsetSessionInfo = () => {
     localStorage.removeItem('username');
     localStorage.removeItem('expiresAt');
-    setSession(initialSessionState);
+    setSession(initialSessionState());
   };
 
   return (

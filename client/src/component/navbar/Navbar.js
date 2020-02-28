@@ -70,18 +70,17 @@ const Navbar = () => {
 												)
 												: (
 													<div>
-														<Link className="button is-rounded is-primary" to="/sign-up">
-															<span className="icon">
-																<FontAwesomeIcon icon={faUserPlus}/>
-															</span>
-															<span>Sign up</span>
-														</Link>
-
 														<Link className="button is-rounded is-primary" to="/sign-in">
 															<span className="icon">
 																<FontAwesomeIcon icon={faSignInAlt}/>
 															</span>
 															<span>Sign in</span>
+														</Link>
+														<Link className="button is-rounded is-primary" to="/sign-up">
+															<span className="icon">
+																<FontAwesomeIcon icon={faUserPlus}/>
+															</span>
+															<span>Sign up</span>
 														</Link>
 													</div>
 												)
