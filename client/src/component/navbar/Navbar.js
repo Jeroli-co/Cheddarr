@@ -4,7 +4,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faSignInAlt, faSignOutAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
-import logo from '../../cheddarr-small.png';
+import logo from '../../assets/cheddarr-small.png';
 import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {

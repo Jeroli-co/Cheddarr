@@ -1,5 +1,5 @@
 import React, {createContext, useEffect, useState} from 'react';
-import axios from "axios";
+import axios from 'axios';
 import {withRouter} from 'react-router';
 
 export const AuthContext = createContext();
@@ -7,66 +7,73 @@ export const AuthContext = createContext();
 const AuthContextProvider = (props) => {
 
   const initialSessionState = () => {
-    const username = localStorage.getItem('username');
-    const expiresAt = localStorage.getItem('expiresAt');
-    const isAuthenticated = !!username && !!expiresAt;
+    const username = localStorage.getItem('username') || null;
+    const expiresAt = localStorage.getItem('expiresAt') || null;
     return {
       username: username,
       expiresAt: expiresAt,
-      isAuthenticated: isAuthenticated
-    }
+      isAuthenticated: !!username && !!expiresAt,
+      isFresh: false
+    };
   };
 
   const [session, setSession] = useState(initialSessionState());
 
   useEffect(() => {
-    if (session.expiresAt && new Date().getTime() > session.expiresAt) {
-      axios.get('/api/refresh-session')
-        .then((res) => {
-          setSession({...res.data, isAuthenticated: true});
-        }).catch((e) => {
-          localStorage.removeItem('username');
-          localStorage.removeItem('expiresAt');
-          setSession(initialSessionState());
+
+    const refreshSession = async () => {
+      const res = await axios.get('/api/refresh-session');
+      const username = res.data.username;
+      const expiresAt = res.data.expiresAt;
+      if (username && expiresAt) {
+        updateSession(username, expiresAt);
+      } else {
+        throw new Error("Response data doesn't match the wanted model");
+      }
+    };
+
+    if (session.expiresAt && ((new Date().getTime() > session.expiresAt) || !session.isFresh)) {
+      refreshSession()
+        .then(() => {
+          console.log("Session refreshed")
+        })
+        .catch((e) => {
+          handleError(e);
         });
     }
+
   });
 
   const signUp = async (data) => {
+    const fd = new FormData();
+    fd.append('firstName', data['firstName']);
+    fd.append('lastName', data['lastName']);
+    fd.append('username', data['username']);
+    fd.append('email', data['email']);
+    fd.append('password', data['password']);
+
     try {
-      if (!session.isAuthenticated) {
-        const fd = new FormData();
-        fd.append('firstName', data['firstName']);
-        fd.append('lastName', data['lastName']);
-        fd.append('username', data['username']);
-        fd.append('email', data['email']);
-        fd.append('password', data['password']);
-        await axios.post('/api/sign-up', fd);
-        props.history.push('/sign-in');
-      } else {
-        throw new Error('Try to sign up but user is authenticated');
-      }
+      await axios.post('/api/sign-up', fd);
+      props.history.push('/sign-in');
     } catch (e) {
       handleError(e);
     }
   };
 
   const signIn = async (data) => {
+
+    const fd = new FormData();
+    fd.append('usernameOrEmail', data['usernameOrEmail']);
+    fd.append('password', data['password']);
+
     try {
-      if (!session.isAuthenticated) {
-        const fd = new FormData();
-        fd.append('usernameOrEmail', data['usernameOrEmail']);
-        fd.append('password', data['password']);
-        const res = await axios.post('/api/sign-in', fd);
-        const username = res.data.username;
-        const expiresAt = res.data.expiresAt;
-        if (username && expiresAt) {
-          doLogin(username, expiresAt);
-        } else {
-          throw new Error("Response data doesn't match the wanted model");
-        }
+      const res = await axios.post('/api/sign-in', fd);
+      const username = res.data.username;
+      const expiresAt = res.data.expiresAt;
+      if (username && expiresAt) {
+        updateSession(username, expiresAt);
       } else {
-        throw new Error('Try to sign in but user is authenticated');
+        throw new Error("Response data doesn't match the wanted model");
       }
     } catch (e) {
       handleError(e);
@@ -75,30 +82,27 @@ const AuthContextProvider = (props) => {
 
   const signOut = async () => {
     try {
-      if (session.isAuthenticated) {
-        await axios.get('/api/sign-out');
-        doLogout();
-      } else {
-        throw new Error('Try to sign out but user is not authenticated');
-      }
+      await axios.get('/api/sign-out');
+      clearSession();
     } catch (e) {
       handleError(e);
+    } finally {
+      props.history.push('/');
     }
   };
 
   const handleError = (error) => {
     console.log(error);
-    doLogout();
+    clearSession();
   };
 
-  const doLogin = (username, expiresAt) => {
+  const updateSession = (username, expiresAt) => {
     localStorage.setItem('username', username);
     localStorage.setItem('expiresAt', expiresAt);
-    setSession({isAuthenticated: true, username: username, expiresAt: expiresAt});
-    props.history.push('/');
+    setSession({username: username, expiresAt: expiresAt, isAuthenticated: true, isFresh: true});
   };
 
-  const doLogout = () => {
+  const clearSession = () => {
     localStorage.removeItem('username');
     localStorage.removeItem('expiresAt');
     setSession(initialSessionState());
