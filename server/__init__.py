@@ -96,3 +96,7 @@ def register_login_manager(app):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
+
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        raise InvalidUsage("Unauthorized", status_code=401)
