@@ -43,7 +43,7 @@ def signin():
         if user:
             if user.check_password(signin_form.password.data):
                 login_user(user)
-                return {"username": user.username, "expiresAt": (time() + SESSION_LIFETIME) * 1000}, HTTPStatus.OK
+                return get_session_info(), HTTPStatus.OK
         raise InvalidUsage("Wrong username/email or password", status_code=HTTPStatus.BAD_REQUEST)
     raise InvalidUsage("Error in signin form", status_code=HTTPStatus.INTERNAL_SERVER_ERROR, payload=signin_form.errors)
 
@@ -53,6 +53,16 @@ def signin():
 def signout():
     logout_user()
     return {"message": "User signed out"}, HTTPStatus.OK
+
+
+@auth.route("/refresh-session")
+@login_required
+def refresh_session():
+    return get_session_info(), HTTPStatus.OK
+
+
+def get_session_info():
+    return {"username": current_user.username, "expiresAt": (time() + SESSION_LIFETIME) * 1000}
 
 
 @auth.route("/user/<user_name>", methods=["GET"])
