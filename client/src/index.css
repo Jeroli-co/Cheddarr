@@ -1,4 +1,5 @@
 @import '~bulma/css/bulma.min.css';
+@import '~bulma-switch';
 
 body {
   margin: 0;

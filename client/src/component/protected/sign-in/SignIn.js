@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ const SignIn = () => {
 
 	const { register, handleSubmit, errors } = useForm();
 	const { signIn } = useContext(AuthContext);
+	const [rememberMe, setRememberMe] = useState(false);
 
 	const isInputInvalid = (inputName) => {
 		return errors[inputName] ? "is-danger" : "";
@@ -70,17 +71,20 @@ const SignIn = () => {
 						</div>
 
 						<div className="field">
-							<label className="checkbox">
-								<input name="remember" type="checkbox"/>
-									Remember me
-							</label>
+							<div className="control">
+								<input id="remember" type="checkbox" name="remember" className="switch is-rounded" checked={rememberMe} onClick={() => setRememberMe(!rememberMe)} />
+								<label htmlFor="remember">Remember me</label>
+							</div>
 						</div>
 
-						<div className="field is-grouped">
+						<div className="field">
 							<div className="control">
 								<button className="button is-link">Sign in</button>
 							</div>
-							<div className="control">
+						</div>
+
+						<div className="field">
+							<div className="control has-text-centered">
 								<p className="is-size-7">Still not have an account ? <Link to="/sign-up">Sign up</Link></p>
 							</div>
 						</div>
