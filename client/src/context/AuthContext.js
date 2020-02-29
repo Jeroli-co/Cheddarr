@@ -9,10 +9,11 @@ const AuthContextProvider = (props) => {
   const initialSessionState = () => {
     const username = localStorage.getItem('username') || null;
     const expiresAt = localStorage.getItem('expiresAt') || null;
+    const isAuthenticated = (username && !(username.length === 0)) && (expiresAt && !(expiresAt.length === 0));
     return {
       username: username,
       expiresAt: expiresAt,
-      isAuthenticated: !!username && !!expiresAt,
+      isAuthenticated: isAuthenticated,
       isFresh: false,
       isLoading: false
     };
@@ -43,7 +44,7 @@ const AuthContextProvider = (props) => {
         });
     }
 
-  });
+  }, []);
 
   const signUp = async (data) => {
     const fd = new FormData();
