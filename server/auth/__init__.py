@@ -1,13 +1,12 @@
 from flask.blueprints import Blueprint
-from server.config import STATIC_FOLDER, TEMPLATE_FOLDER
 from .models import *  # noqa
+from ..config import FLASK_TEMPLATE_FOLDER
 
 auth = Blueprint(
     "auth",
     __name__,
-    template_folder=TEMPLATE_FOLDER,
-    static_folder=STATIC_FOLDER,
+    template_folder=FLASK_TEMPLATE_FOLDER,
     url_prefix="/api",
 )
 
-from . import views  # noqa
+from . import routes  # noqa

@@ -3,10 +3,9 @@ from datetime import timedelta
 
 FLASK_APP = "cheddarr"
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
-STATIC_FOLDER = os.environ.get(
-    "FLASK_STATIC_FOLDER", os.path.join(PROJECT_ROOT, "client", "build", "static")
-)
+REACT_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
+REACT_STATIC_FOLDER = os.path.join(PROJECT_ROOT, "client", "build", "static")
+FLASK_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "server", "templates")
 SESSION_LIFETIME = 60
 
 def get_boolean_env(name, default):
@@ -31,6 +30,27 @@ class BaseConfig(object):
     ##########################################################################
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    ##########################################################################
+    # security                                                               #
+    ##########################################################################
+    SECURITY_PASSWORD_SALT = os.environ.get('FLASK_SECURITY_PASSWORD_SALT',
+                                            'security-password-salt')
+
+    ##########################################################################
+    # mail                                                                   #
+    ##########################################################################
+    MAIL_SERVER = os.environ.get('MAILGUN_SMTP_SERVER', 'localhost')
+    MAIL_PORT = int(os.environ.get('MAILGUN_SMTP_PORT', 25))
+    MAIL_USE_TLS = get_boolean_env('FLASK_MAIL_USE_TLS', False)
+    MAIL_USE_SSL = get_boolean_env('FLASK_MAIL_USE_SSL', False)
+    MAIL_USERNAME = os.environ.get('MAILGUN_SMTP_LOGIN', None)
+    MAIL_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', None)
+    MAIL_DEFAULT_SENDER = (
+        os.environ.get('FLASK_MAIL_DEFAULT_SENDER_NAME', 'Cheddarr'),
+        os.environ.get('FLASK_MAIL_DEFAULT_SENDER_EMAIL',
+                       f"noreply@{os.environ.get('FLASK_DOMAIN', 'localhost')}")
+    )
+
 
 class ProdConfig(BaseConfig):
     ##########################################################################
@@ -44,6 +64,9 @@ class ProdConfig(BaseConfig):
     # session/cookies                                                        #
     ##########################################################################
     SESSION_COOKIE_DOMAIN = FLASK_DOMAIN
+    REMEMBER_COOKIE_DOMAIN = FLASK_DOMAIN
+    REMEMBER_COOKIE_DURATION = timedelta(days=30)
+    REMEMBER_COOKIE_HTTPONLY = True
 
     ##########################################################################
     # database                                                               #

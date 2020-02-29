@@ -69,6 +69,13 @@ const SignIn = () => {
 							)}
 						</div>
 
+						<div className="field">
+							<label className="checkbox">
+								<input name="remember" type="checkbox"/>
+									Remember me
+							</label>
+						</div>
+
 						<div className="field is-grouped">
 							<div className="control">
 								<button className="button is-link">Sign in</button>

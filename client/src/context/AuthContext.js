@@ -65,7 +65,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('usernameOrEmail', data['usernameOrEmail']);
     fd.append('password', data['password']);
-
+    fd.append('remember', data['remember']);
     try {
       const res = await axios.post('/api/sign-in', fd);
       const username = res.data.username;

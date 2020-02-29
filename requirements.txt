@@ -9,3 +9,5 @@ psycopg2-binary
 flask-login
 flask-talisman
 flask-wtf
+itsdangerous
+Flask-Mail

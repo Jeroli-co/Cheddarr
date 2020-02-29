@@ -1,24 +1,29 @@
+from http import HTTPStatus
+
 from flask import jsonify, session
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_login import LoginManager
+from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_cors import CORS
-
+from server.exceptions import InvalidUsage
 from server.config import (
-    STATIC_FOLDER,
-    TEMPLATE_FOLDER,
+    REACT_STATIC_FOLDER,
+    REACT_TEMPLATE_FOLDER,
     BaseConfig,
     DevConfig,
     ProdConfig,
 )
-from server.exceptions import InvalidUsage
 
+
+"""Global extensions"""
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
+mail = Mail()
 
 
 def create_app():
@@ -31,8 +36,8 @@ def create_app():
     dev = get_debug_flag()
     return _create_app(
         DevConfig if dev else ProdConfig,
-        template_folder=TEMPLATE_FOLDER,
-        static_folder=STATIC_FOLDER,
+        template_folder=REACT_TEMPLATE_FOLDER,
+        static_folder=REACT_STATIC_FOLDER,
     )
 
 
@@ -46,6 +51,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
     db.init_app(app)
     csrf.init_app(app)
+    mail.init_app(app)
     Talisman(app)
     register_blueprints(app)
     register_commands(app)
@@ -87,16 +93,17 @@ def register_commands(app):
 
 def register_login_manager(app):
     from server.auth.models import User
-    from werkzeug.utils import redirect
-    from flask.helpers import url_for
 
     login_manager.init_app(app)
-    login_manager.login_view = "auth.signin"
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(user_id)
+        return User.query.filter_by(session_token=user_id).first()
 
     @login_manager.unauthorized_handler
     def unauthorized():
-        raise InvalidUsage("Unauthorized", status_code=401)
+        raise InvalidUsage("Unauthorized", status_code=HTTPStatus.UNAUTHORIZED)
+
+    @login_manager.needs_refresh_handler
+    def refresh():
+        raise InvalidUsage("Fresh login required", status_code=HTTPStatus.PROXY_AUTHENTICATION_REQUIRED)
