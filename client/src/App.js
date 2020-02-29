@@ -11,6 +11,7 @@ import UserProfile from "./component/private/user-profile/UserProfile";
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import ProtectedRoute from "./routes/ProtectedRoute";
+import ConfirmAccount from "./component/public/confirm-account/ConfirmAccount";
 
 const App = () => {
 
@@ -22,6 +23,7 @@ const App = () => {
         <Navbar />
         <Switch>
           <Route exact path='/' component={Home} />
+          <Route exact path='/confirm/:token' component={ConfirmAccount} />
 
           <ProtectedRoute exact path='/sign-in' component={SignIn} />
           <ProtectedRoute exact path='/sign-up' component={SignUp} />

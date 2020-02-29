@@ -1,11 +1,13 @@
 import React, {useContext} from 'react';
 import './Navbar.css';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import { faSignInAlt, faSignOutAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/cheddarr-small.png';
 import { AuthContext } from "../../context/AuthContext";
+import SignUpButton from "../element/sign-up-button/SignUpButton";
+import SignInButton from "../element/sign-in-button/SignInButton";
 
 const Navbar = () => {
 
@@ -70,18 +72,8 @@ const Navbar = () => {
 												)
 												: (
 													<div>
-														<Link className="button is-rounded is-primary" to="/sign-in">
-															<span className="icon">
-																<FontAwesomeIcon icon={faSignInAlt}/>
-															</span>
-															<span>Sign in</span>
-														</Link>
-														<Link className="button is-rounded is-primary" to="/sign-up">
-															<span className="icon">
-																<FontAwesomeIcon icon={faUserPlus}/>
-															</span>
-															<span>Sign up</span>
-														</Link>
+														<SignInButton/>
+														<SignUpButton/>
 													</div>
 												)
 										}
