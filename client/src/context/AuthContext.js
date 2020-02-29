@@ -17,12 +17,9 @@ const AuthContextProvider = (props) => {
   const [session, setSession] = useState(initialSessionState);
 
   useEffect(() => {
-    if (session.username === null && session.expiresAt === null) {
-      const username = localStorage.getItem('username');
+    if (session.expiresAt === null) {
       const expiresAt = localStorage.getItem('expiresAt');
-      if (expiresAt && !isExpired(expiresAt)) {
-        updateSession(username, expiresAt);
-      } else if (username && expiresAt) {
+      if (expiresAt) {
         refreshSession();
       }
     }
@@ -49,15 +46,14 @@ const AuthContextProvider = (props) => {
   };
 
   const signUp = async (data) => {
+    setIsLoading(true);
     const fd = new FormData();
     fd.append('firstName', data['firstName']);
     fd.append('lastName', data['lastName']);
     fd.append('username', data['username']);
     fd.append('email', data['email']);
     fd.append('password', data['password']);
-
     try {
-      setIsLoading(true);
       await axios.post('/api/sign-up', fd);
       props.history.push('/confirm/account');
     } catch (e) {
@@ -68,12 +64,12 @@ const AuthContextProvider = (props) => {
   };
 
   const signIn = async (data) => {
+    setIsLoading(true);
     const fd = new FormData();
     fd.append('usernameOrEmail', data['usernameOrEmail']);
     fd.append('password', data['password']);
     fd.append('remember', data['remember']);
     try {
-      setIsLoading(true);
       const res = await axios.post('/api/sign-in', fd);
       updateSession(res.data.username, res.data.expiresAt);
     } catch (e) {
