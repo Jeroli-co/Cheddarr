@@ -13,7 +13,8 @@ const AuthContextProvider = (props) => {
       username: username,
       expiresAt: expiresAt,
       isAuthenticated: !!username && !!expiresAt,
-      isFresh: false
+      isFresh: false,
+      isLoading: false
     };
   };
 
@@ -53,30 +54,29 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
 
     try {
+      setSession({isLoading: true});
       await axios.post('/api/sign-up', fd);
-      props.history.push('/sign-in');
+      props.history.push('/confirm/account');
     } catch (e) {
       handleError(e);
+    } finally {
+      setSession({isLoading: false});
     }
   };
 
   const signIn = async (data) => {
-
     const fd = new FormData();
     fd.append('usernameOrEmail', data['usernameOrEmail']);
     fd.append('password', data['password']);
     fd.append('remember', data['remember']);
     try {
+      setSession({isLoading: true});
       const res = await axios.post('/api/sign-in', fd);
-      const username = res.data.username;
-      const expiresAt = res.data.expiresAt;
-      if (username && expiresAt) {
-        updateSession(username, expiresAt);
-      } else {
-        throw new Error("Response data doesn't match the wanted model");
-      }
+      updateSession(res.data.username, res.data.expiresAt);
     } catch (e) {
       handleError(e);
+    } finally {
+      setSession({isLoading: false});
     }
   };
 

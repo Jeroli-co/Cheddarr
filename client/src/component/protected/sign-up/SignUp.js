@@ -5,20 +5,20 @@ import {faUser, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../../context/AuthContext";
+import PageLoader from "../../element/page-loader/PageLoader";
 
 const SignUp = () => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { signUp } = useContext(AuthContext);
+  const { signUp, isLoading } = useContext(AuthContext);
 
 	const isInputInvalid = (inputName) => {
 		return errors[inputName] ? "is-danger" : "";
 	};
 
-	return (
-		<div className="SignUp">
-
-			<div className="hero is-primary">
+	const Headband = () => {
+	  return (
+	    <div className="hero is-primary">
 				<div className="hero-body">
 					<div className="container has-text-centered">
 						<h1 className="title">
@@ -27,6 +27,17 @@ const SignUp = () => {
 					</div>
 				</div>
 			</div>
+    );
+  };
+
+	return (
+		<div className="SignUp">
+
+      {
+        isLoading && <PageLoader/>
+      }
+
+      <Headband/>
 
 			<br />
 

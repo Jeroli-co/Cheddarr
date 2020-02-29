@@ -75,7 +75,7 @@ const ConfirmAccount = () => {
 
 	const AlreadyConfirmed = () => {
 		return (
-				<section className="hero is-large is-primary is-bold">
+			<section className="hero is-large is-primary is-bold">
 				<div className="hero-body">
 					<div className="container">
 						<h1 className="title">

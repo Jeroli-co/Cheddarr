@@ -1,24 +1,24 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
 import './SignIn.css';
 import {AuthContext} from "../../../context/AuthContext";
+import PageLoader from "../../element/page-loader/PageLoader";
 
 const SignIn = () => {
 
 	const { register, handleSubmit, errors } = useForm();
-	const { signIn } = useContext(AuthContext);
+	const { signIn, isLoading } = useContext(AuthContext);
 	const [rememberMe, setRememberMe] = useState(false);
 
 	const isInputInvalid = (inputName) => {
 		return errors[inputName] ? "is-danger" : "";
 	};
 
-	return (
-		<div className="SignIn">
-
+	const Headband = () => {
+		return (
 			<div className="hero is-primary">
 				<div className="hero-body">
 					<div className="container has-text-centered">
@@ -28,6 +28,17 @@ const SignIn = () => {
 					</div>
 				</div>
 			</div>
+		)
+	};
+
+	return (
+		<div className="SignIn">
+
+			{
+				isLoading && <PageLoader/>
+			}
+
+			<Headband/>
 
 			<br />
 
@@ -72,7 +83,7 @@ const SignIn = () => {
 
 						<div className="field">
 							<div className="control">
-								<input id="remember" type="checkbox" name="remember" className="switch is-rounded" checked={rememberMe} onClick={() => setRememberMe(!rememberMe)} />
+								<input id="remember" type="checkbox" name="remember" className="switch is-rounded" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} ref={register} />
 								<label htmlFor="remember">Remember me</label>
 							</div>
 						</div>

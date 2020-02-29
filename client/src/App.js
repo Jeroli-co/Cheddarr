@@ -12,6 +12,7 @@ import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ConfirmAccount from "./component/public/confirm-account/ConfirmAccount";
+import WaitingAccountConfirmation from "./component/public/waiting-account-confirmation/WaitingAccountConfirmation";
 
 const App = () => {
 
@@ -24,6 +25,7 @@ const App = () => {
         <Switch>
           <Route exact path='/' component={Home} />
           <Route exact path='/confirm/:token' component={ConfirmAccount} />
+          <Route exaxt path='/confirm/account' component={WaitingAccountConfirmation} />
 
           <ProtectedRoute exact path='/sign-in' component={SignIn} />
           <ProtectedRoute exact path='/sign-up' component={SignUp} />
