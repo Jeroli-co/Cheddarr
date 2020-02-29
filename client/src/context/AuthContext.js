@@ -43,7 +43,7 @@ const AuthContextProvider = (props) => {
         });
     }
 
-  }, []);
+  });
 
   const signUp = async (data) => {
     const fd = new FormData();
