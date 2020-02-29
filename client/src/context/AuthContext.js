@@ -1,50 +1,52 @@
 import React, {createContext, useEffect, useState} from 'react';
 import axios from 'axios';
 import {withRouter} from 'react-router';
+import PageLoader from "../component/element/page-loader/PageLoader";
 
 export const AuthContext = createContext();
 
 const AuthContextProvider = (props) => {
 
-  const initialSessionState = () => {
-    const username = localStorage.getItem('username') || null;
-    const expiresAt = localStorage.getItem('expiresAt') || null;
-    const isAuthenticated = (username && !(username.length === 0)) && (expiresAt && !(expiresAt.length === 0));
-    return {
-      username: username,
-      expiresAt: expiresAt,
-      isAuthenticated: isAuthenticated,
-      isFresh: false,
-      isLoading: false
-    };
+  const initialSessionState = {
+    username: null,
+    expiresAt: null,
+    isAuthenticated: false
   };
 
-  const [session, setSession] = useState(initialSessionState());
+  const [isLoading, setIsLoading] = useState(false);
+  const [session, setSession] = useState(initialSessionState);
 
   useEffect(() => {
-
-    const refreshSession = async () => {
-      const res = await axios.get('/api/refresh-session');
-      const username = res.data.username;
-      const expiresAt = res.data.expiresAt;
-      if (username && expiresAt) {
+    if (session.username === null && session.expiresAt === null) {
+      const username = localStorage.getItem('username');
+      const expiresAt = localStorage.getItem('expiresAt');
+      if (expiresAt && !isExpired(expiresAt)) {
         updateSession(username, expiresAt);
-      } else {
-        throw new Error("Response data doesn't match the wanted model");
+      } else if (username && expiresAt) {
+        refreshSession();
       }
-    };
-
-    if (session.expiresAt && ((new Date().getTime() > session.expiresAt) || !session.isFresh)) {
-      refreshSession()
-        .then(() => {
-          console.log("Session refreshed")
-        })
-        .catch((e) => {
-          handleError(e);
-        });
     }
-
   }, []);
+
+  useEffect(() => {
+    if (session.expiresAt && isExpired(session.expiresAt)) {
+      refreshSession();
+    }
+  });
+
+  const refreshSession = () => {
+    axios.get('/api/refresh-session')
+      .then((res) => {
+        updateSession(res.data.username, res.data.expiresAt);
+      })
+      .catch((e) => {
+        handleError(e);
+      });
+  };
+
+  const isExpired = (expiresAt) => {
+    return new Date().getTime() > expiresAt;
+  };
 
   const signUp = async (data) => {
     const fd = new FormData();
@@ -55,13 +57,13 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
 
     try {
-      setSession({isLoading: true});
+      setIsLoading(true);
       await axios.post('/api/sign-up', fd);
       props.history.push('/confirm/account');
     } catch (e) {
       handleError(e);
     } finally {
-      setSession({isLoading: false});
+      setIsLoading(false);
     }
   };
 
@@ -71,13 +73,13 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
     fd.append('remember', data['remember']);
     try {
-      setSession({isLoading: true});
+      setIsLoading(true);
       const res = await axios.post('/api/sign-in', fd);
       updateSession(res.data.username, res.data.expiresAt);
     } catch (e) {
       handleError(e);
     } finally {
-      setSession({isLoading: false});
+      setIsLoading(false);
     }
   };
 
@@ -106,12 +108,13 @@ const AuthContextProvider = (props) => {
   const clearSession = () => {
     localStorage.removeItem('username');
     localStorage.removeItem('expiresAt');
-    setSession(initialSessionState());
+    setSession(initialSessionState);
   };
 
   return (
     <AuthContext.Provider value={{...session, signUp, signIn, signOut}}>
-      {props.children}
+      { isLoading && <PageLoader/> }
+      { props.children }
     </AuthContext.Provider>
   )
 };

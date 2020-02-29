@@ -5,12 +5,11 @@ import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
 import './SignIn.css';
 import {AuthContext} from "../../../context/AuthContext";
-import PageLoader from "../../element/page-loader/PageLoader";
 
 const SignIn = () => {
 
 	const { register, handleSubmit, errors } = useForm();
-	const { signIn, isLoading } = useContext(AuthContext);
+	const { signIn } = useContext(AuthContext);
 	const [rememberMe, setRememberMe] = useState(false);
 
 	const isInputInvalid = (inputName) => {
@@ -33,10 +32,6 @@ const SignIn = () => {
 
 	return (
 		<div className="SignIn">
-
-			{
-				isLoading && <PageLoader/>
-			}
 
 			<Headband/>
 

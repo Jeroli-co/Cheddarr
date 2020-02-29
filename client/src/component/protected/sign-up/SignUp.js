@@ -5,12 +5,11 @@ import {faUser, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../../context/AuthContext";
-import PageLoader from "../../element/page-loader/PageLoader";
 
 const SignUp = () => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { signUp, isLoading } = useContext(AuthContext);
+  const { signUp } = useContext(AuthContext);
 
 	const isInputInvalid = (inputName) => {
 		return errors[inputName] ? "is-danger" : "";
@@ -32,10 +31,6 @@ const SignUp = () => {
 
 	return (
 		<div className="SignUp">
-
-      {
-        isLoading && <PageLoader/>
-      }
 
       <Headband/>
 
