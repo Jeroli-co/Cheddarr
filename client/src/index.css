@@ -1,6 +1,7 @@
 @import '~bulma/css/bulma.min.css';
 @import '~bulma-switch';
 @import '~bulma-pageloader';
+@import '~bulma-divider';
 
 body {
   margin: 0;

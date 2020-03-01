@@ -162,11 +162,14 @@ const SignUp = () => {
             </div>
 
             {/* SUBMIT BUTTON */}
-            <div className="field is-grouped">
+            <div className="field">
               <div className="control">
                 <button className="button is-link">Sign up</button>
               </div>
-              <div className="control">
+            </div>
+
+            <div className="field">
+              <div className="control has-text-centered">
                 <p className="is-size-7">Already have an account ? <Link to="/sign-in">Sign in</Link></p>
               </div>
             </div>
