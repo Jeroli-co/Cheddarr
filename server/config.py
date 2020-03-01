@@ -6,7 +6,9 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir
 REACT_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
 REACT_STATIC_FOLDER = os.path.join(PROJECT_ROOT, "client", "build", "static")
 FLASK_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "server", "templates")
-SESSION_LIFETIME = 60
+SESSION_LIFETIME = 60  # Minutes
+REMEMBER_COOKIE_LIFETIME = 7  # Days
+
 
 def get_boolean_env(name, default):
     default = "true" if default else "false"
@@ -24,6 +26,8 @@ class BaseConfig(object):
     # session/cookies                                                        #
     ##########################################################################
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=SESSION_LIFETIME)
+    REMEMBER_COOKIE_DURATION = timedelta(days=REMEMBER_COOKIE_LIFETIME)
+    REMEMBER_COOKIE_NAME = "remember"
 
     ##########################################################################
     # database                                                               #
@@ -57,7 +61,7 @@ class ProdConfig(BaseConfig):
     # flask                                                                  #
     ##########################################################################
     FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN")
-    ENV = "production"
+    FLASK_ENV = "production"
     DEBUG = get_boolean_env("FLASK_DEBUG", False)
 
     ##########################################################################
@@ -65,7 +69,6 @@ class ProdConfig(BaseConfig):
     ##########################################################################
     SESSION_COOKIE_DOMAIN = FLASK_DOMAIN
     REMEMBER_COOKIE_DOMAIN = FLASK_DOMAIN
-    REMEMBER_COOKIE_DURATION = timedelta(days=30)
     REMEMBER_COOKIE_HTTPONLY = True
 
     ##########################################################################
@@ -79,7 +82,7 @@ class DevConfig(BaseConfig):
     # flask                                                                  #
     ##########################################################################
     FLASK_DOMAIN = "http://localhost:3000"
-    ENV = "development"
+    FLASK_ENV = "development"
     DEBUG = get_boolean_env("FLASK_DEBUG", True)
 
     ##########################################################################

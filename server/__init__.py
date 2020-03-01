@@ -1,5 +1,5 @@
 from http import HTTPStatus
-
+from datetime import datetime
 from flask import jsonify, session
 from flask.app import Flask
 from flask.helpers import get_debug_flag
@@ -73,6 +73,10 @@ def _create_app(config_object: BaseConfig, **kwargs):
         response = jsonify(error.to_dict())
         response.status_code = error.status_code
         return response
+
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.utcnow()}
 
     return app
 
