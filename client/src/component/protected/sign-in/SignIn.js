@@ -10,7 +10,7 @@ import EmailInputModal from "../element/email-input-modal/EmailInputModal";
 
 const SignIn = () => {
 
-	const { signIn } = useContext(AuthContext);
+	const { signIn, signInWithGoogle } = useContext(AuthContext);
 	const { register, handleSubmit, errors } = useForm();
 
 	const [rememberMe, setRememberMe] = useState(false);
@@ -102,7 +102,7 @@ const SignIn = () => {
 					<h1 className="subtitle is-4">With an account you already possess</h1>
 
 					<div className="buttons is-centered">
-						<button className="button is-rounded" type="button">
+						<button className="button is-rounded" type="button" onClick={signInWithGoogle}>
 							<span className="icon">
 								<FontAwesomeIcon icon={faGoogle}/>
 							</span>

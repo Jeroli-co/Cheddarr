@@ -55,6 +55,13 @@ class BaseConfig(object):
                        f"noreply@{os.environ.get('FLASK_DOMAIN', 'localhost')}")
     )
 
+    ##########################################################################
+    # oauth                                                                  #
+    ##########################################################################
+    GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+    GOOGLE_AUTHORIZE_URL = os.environ.get('GOOGLE_AUTHORIZE_URL')
+
 
 class ProdConfig(BaseConfig):
     ##########################################################################

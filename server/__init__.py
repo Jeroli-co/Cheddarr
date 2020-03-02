@@ -1,5 +1,7 @@
 from http import HTTPStatus
 from datetime import datetime
+
+from authlib.integrations.flask_client import OAuth
 from flask import jsonify, session
 from flask.app import Flask
 from flask.helpers import get_debug_flag
@@ -18,12 +20,12 @@ from server.config import (
     ProdConfig,
 )
 
-
 """Global extensions"""
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 mail = Mail()
+oauth = OAuth()
 
 
 def create_app():
@@ -52,11 +54,14 @@ def _create_app(config_object: BaseConfig, **kwargs):
     db.init_app(app)
     csrf.init_app(app)
     mail.init_app(app)
+    oauth.init_app(app)
     Talisman(app)
+    CORS(app, resources={r"/*": {"origins": [app.config.get("FLASK_DOMAIN"), "https://accounts.google.com"]}})
+
     register_blueprints(app)
     register_commands(app)
     register_login_manager(app)
-    CORS(app, resources={r"/*": {"origins":app.config.get("FLASK_DOMAIN")}})
+    register_oauth_providers(oauth)
 
     @app.before_first_request
     def make_session_permanent():
@@ -111,3 +116,9 @@ def register_login_manager(app):
     @login_manager.needs_refresh_handler
     def refresh():
         raise InvalidUsage("Fresh login required", status_code=HTTPStatus.PROXY_AUTHENTICATION_REQUIRED)
+
+
+def register_oauth_providers(oauth):
+    oauth.register('google', client_kwargs={
+        'scope': 'openid email profile'
+    })

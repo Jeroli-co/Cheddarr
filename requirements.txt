@@ -11,3 +11,4 @@ flask-talisman
 flask-wtf
 itsdangerous
 Flask-Mail
+Authlib

@@ -4,7 +4,7 @@ from flask import current_app as app, render_template, url_for, make_response, r
 from flask_login import current_user, login_required, login_user, logout_user
 from itsdangerous import URLSafeSerializer
 
-from server import db, InvalidUsage
+from server import db, InvalidUsage, oauth
 from server.auth import auth
 from server.auth.models import User
 from server.auth.forms import SignupForm, SigninForm, ChangePasswordForm, EmailForm
@@ -61,6 +61,20 @@ def signin():
         raise InvalidUsage("Wrong username/email or password.", status_code=HTTPStatus.BAD_REQUEST)
     raise InvalidUsage("Error in signin form.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                        payload=signin_form.errors)
+
+
+@auth.route("/sign-in/google")
+def signin_google():
+    redirect_uri = "https://tolocalhost.com/"#url_for('auth.authorize', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+
+@auth.route('/authorize/google')
+def authorize():
+    token = oauth.google.authorize_access_token()
+    resp = oauth.google.get('profile')
+
+    return {"ok"}
 
 
 @auth.route("/sign-out", methods=["GET"])

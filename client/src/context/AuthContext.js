@@ -124,6 +124,15 @@ const AuthContextProvider = (props) => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const res = await axios.get("/api/sign-in/google");
+      console.log(res)
+    } catch (e) {
+      handleError(e)
+    }
+  };
+
   const updateSession = (username, expiresAt) => {
     localStorage.setItem('username', username);
     localStorage.setItem('expiresAt', expiresAt);
@@ -142,7 +151,7 @@ const AuthContextProvider = (props) => {
   };
 
   return (
-    <AuthContext.Provider value={{...session, signUp, signIn, signOut, resendConfirmation, initResetPassword, resetPassword}}>
+    <AuthContext.Provider value={{...session, signUp, signIn, signOut, resendConfirmation, initResetPassword, resetPassword, signInWithGoogle}}>
       { isLoading && <PageLoader/> }
       { props.children }
     </AuthContext.Provider>
