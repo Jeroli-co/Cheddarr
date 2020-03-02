@@ -2,14 +2,14 @@ import React, {useEffect, useState} from 'react';
 import './ConfirmAccount.css';
 import {useParams} from "react-router";
 import axios from 'axios';
-import SignUpButton from "../../element/sign-up-button/SignUpButton";
-import SignInButton from "../../element/sign-in-button/SignInButton";
+import SignUpButton from "../element/sign-up-button/SignUpButton";
+import SignInButton from "../element/sign-in-button/SignInButton";
 
 const ConfirmAccount = () => {
 
 	const messageTypes = {
-		EXPIRED: 'expired',
-		ALREADY_CONFIRMED: 'already_confirmed',
+		EXPIRED: '410',
+		ALREADY_CONFIRMED: '409',
 		ACCOUNT_CONFIRMED: 'account_confirmed',
 		NOT_FOUND: '404'
 	};
@@ -27,10 +27,10 @@ const ConfirmAccount = () => {
 			const errorArray = e.toString().split(' ');
 			const statusCode = errorArray[errorArray.length - 1];
 			switch (statusCode) {
-				case '409':
+				case messageTypes.ALREADY_CONFIRMED:
 					setState(messageTypes.ALREADY_CONFIRMED);
 					break;
-				case '410':
+				case messageTypes.EXPIRED:
 					setState(messageTypes.EXPIRED);
 					break;
 				default:
@@ -38,22 +38,6 @@ const ConfirmAccount = () => {
 			}
 		});
 	}, []);
-
-	const getTemplate = () => {
-		switch (state) {
-			case messageTypes.EXPIRED:
-				return <TokenExpired/>;
-			case messageTypes.ALREADY_CONFIRMED:
-				return <AlreadyConfirmed/>;
-			case messageTypes.ACCOUNT_CONFIRMED:
-				return <AccountConfirmed/>;
-			case messageTypes.NOT_FOUND:
-				return <div>404</div>;
-			default:
-				return <div/>
-
-		}
-	};
 
 	const TokenExpired = () => {
 		return (
@@ -111,8 +95,11 @@ const ConfirmAccount = () => {
 
 	return (
 		<div className="ConfirmAccount">
-			{
-				getTemplate()
+			{ state &&
+				(state === messageTypes.EXPIRED && <TokenExpired/>)
+				(state === messageTypes.ALREADY_CONFIRMED && <AlreadyConfirmed/>)
+				(state === messageTypes.ACCOUNT_CONFIRMED && <AccountConfirmed/>)
+				(state === messageTypes.NOT_FOUND && <p>404</p>)
 			}
 		</div>
 	);

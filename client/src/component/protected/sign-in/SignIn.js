@@ -1,11 +1,12 @@
 import React, {useContext, useState} from 'react';
-import {faEnvelope, faKey, faSignInAlt, faUser} from "@fortawesome/free-solid-svg-icons";
-import {faGoogle, faFacebook, faGithub, faGitlab, faSlack} from "@fortawesome/free-brands-svg-icons";
+import {faKey, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faGoogle, faFacebook} from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
 import './SignIn.css';
 import {AuthContext} from "../../../context/AuthContext";
+import EmailInputModal from "../element/email-input-modal/EmailInputModal";
 
 const SignIn = () => {
 
@@ -33,64 +34,8 @@ const SignIn = () => {
 		)
 	};
 
-	const ResetPassword = () => {
-
-		const { register, handleSubmit, errors } = useForm();
-
-		const closeModal = () => {
-			setShowResetPassword(false);
-		};
-
-		const getInputValidity = () => {
-			return errors['email-to-reset-password'] ? "is-danger" : ""
-		};
-
-		return (
-			<div className="modal is-active">
-				<div className="modal-background" onClick={closeModal} />
-				<div className="modal-card">
-					<header className="modal-card-head">
-						<p className="modal-card-title">Reset your password</p>
-						<button className="delete" aria-label="close" onClick={closeModal}/>
-					</header>
-					<section className="modal-card-body">
-						<form id="reset-password-form" onSubmit={handleSubmit(() => {console.log('submit valid')})}>
-							<div className="field">
-								<label className="label">Email</label>
-								<div className="control has-icons-left">
-									<input name="email-to-reset-password"
-												 className={'input ' + getInputValidity()}
-												 type="email"
-												 placeholder="Enter a valid email"
-												 ref={register({ required: true, pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/i })} />
-									<span className="icon is-small is-left">
-										<FontAwesomeIcon icon={faEnvelope} />
-									</span>
-								</div>
-								{errors['email-to-reset-password'] && errors['email-to-reset-password'].type === 'required' && (
-									<p className="help is-danger">This is required</p>
-								)}
-								{errors['email-to-reset-password'] && errors['email-to-reset-password'].type === 'pattern' && (
-									<p className="help is-danger">This is not a valid email address</p>
-								)}
-							</div>
-						</form>
-					</section>
-					<footer className="modal-card-foot">
-						<button className="button is-info">Reset password</button>
-						<button className="button" onClick={closeModal}>Cancel</button>
-					</footer>
-				</div>
-			</div>
-		);
-	};
-
 	return (
 		<div className="SignIn">
-
-			{
-				showResetPassword && <ResetPassword/>
-			}
 
 			<Headband/>
 
@@ -169,28 +114,11 @@ const SignIn = () => {
 							</span>
 							<span>Facebook</span>
 						</button>
-						<button id="github-sign-in-button" className="button is-rounded" type="button">
-							<span className="icon">
-								<FontAwesomeIcon icon={faGithub}/>
-							</span>
-							<span>Github</span>
-						</button>
-						<button id="gitlab-sign-in-button" className="button is-rounded is-primary" type="button">
-							<span className="icon">
-								<FontAwesomeIcon icon={faGitlab}/>
-							</span>
-							<span>Gitlab</span>
-						</button>
-						<button className="button is-rounded is-primary" type="button">
-							<span className="icon">
-								<FontAwesomeIcon icon={faSlack}/>
-							</span>
-							<span>Slack</span>
-						</button>
 					</div>
 
 					<div className="has-text-centered">
 						<p className="is-size-7">Forgot your password ? <a onClick={() => setShowResetPassword(true)}>Click here to reset it</a></p>
+						<EmailInputModal isActive={showResetPassword} onClose={() => setShowResetPassword(false)}/>
 						<p className="is-size-7">Still not have an account ? <Link to="/sign-up">Sign up</Link></p>
 					</div>
 				</div>

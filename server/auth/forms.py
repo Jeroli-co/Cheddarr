@@ -19,7 +19,7 @@ class SigninForm(FlaskForm):
 
 
 class EmailForm(FlaskForm):
-    email = StringField("Email", [DataRequired(), Email()])
+    email = EmailField("Email", [DataRequired()])
 
 
 class ChangePasswordForm(FlaskForm):

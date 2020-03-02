@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import current_app as app, render_template, url_for, make_response
+from flask import current_app as app, render_template, url_for, make_response, request
 from flask_login import current_user, login_required, login_user, logout_user
 from itsdangerous import URLSafeSerializer
 
@@ -32,13 +32,11 @@ def signup():
             confirm_url = url_for("auth.confirm_email", token=token, _external=True)
             html = render_template("email/welcome.html", username=user.username, confirm_url=confirm_url.replace("/api", ""))
             subject = "Welcome!"
+            db.session.add(user)
+            db.session.commit()
             send_email(user.email, subject, html)
             return {"message": "Confirmation email sent"}, HTTPStatus.OK
 
-            db.session.add(user)
-            db.session.commit()
-
-            return send_email_confirmation(user.email)
         raise InvalidUsage("The user already exists.", status_code=HTTPStatus.CONFLICT)
     raise InvalidUsage("Error in signup form.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                        payload=signup_form.errors)
@@ -72,17 +70,17 @@ def signout():
     return {"message": "User signed out"}, HTTPStatus.OK
 
 
-@auth.route("/reset/password")
+@auth.route("/reset/password", methods=["POST"])
 def reset_password():
     email_form = EmailForm()
     if email_form.validate():
         email = email_form.email.data
-        existing_user = User.user_exists(email)
+        existing_user = User.exists(email=email)
         if existing_user:
             token = generate_confirmation_token(email)
             reset_url = url_for("auth.confirm_reset", token=token, _external=True)
             html = render_template("email/reset_password_instructions.html", reset_url=reset_url.replace("/api", ""))
-            subject = "Please confirm your email"
+            subject = "Reset your password"
             send_email(email, subject, html)
             return {"message": "Reset instructions sent."}, HTTPStatus.OK
     raise InvalidUsage("Error in email form", status_code=HTTPStatus.INTERNAL_SERVER_ERROR, payload=email_form.errors)
@@ -95,16 +93,20 @@ def confirm_reset(token):
     except:
         raise InvalidUsage("The reset link is invalid or has expired.", status_code=HTTPStatus.GONE)
     user = User.find(email=email)
-    user.confirmed = False
-    db.commit()
 
-    password_form = ChangePasswordForm()
-    if password_form.validate():
-        current_user.password = password_form.newPassword.data
+    if request.method == "GET":
+        user.confirmed = False
         db.session.commit()
-        return refresh_session()
-    raise InvalidUsage("Error in change password form.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                       payload=password_form.errors)
+        return {"message": "Able to reset."}, HTTPStatus.OK
+
+    if request.method == "POST":
+        password_form = ChangePasswordForm()
+        if password_form.validate():
+            current_user.password = password_form.newPassword.data
+            db.session.commit()
+            return refresh_session()
+        raise InvalidUsage("Error in change password form.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                           payload=password_form.errors)
 
 
 @auth.route('/confirm/<token>')
@@ -113,7 +115,9 @@ def confirm_email(token):
         email = confirm_token(token)
     except:
         raise InvalidUsage("The confirmation link is invalid or has expired.", status_code=HTTPStatus.GONE)
+    print(email)
     user = User.find(email=email)
+    print(user)
     if user and user.confirmed:
         raise InvalidUsage("The account is already confirmed.", HTTPStatus.CONFLICT)
     user.confirmed = True

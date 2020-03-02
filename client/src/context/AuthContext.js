@@ -31,20 +31,6 @@ const AuthContextProvider = (props) => {
     }
   });
 
-  const refreshSession = () => {
-    axios.get('/api/refresh-session')
-      .then((res) => {
-        updateSession(res.data.username, res.data.expiresAt);
-      })
-      .catch((e) => {
-        handleError(e);
-      });
-  };
-
-  const isExpired = (expiresAt) => {
-    return new Date().getTime() > expiresAt;
-  };
-
   const signUp = async (data) => {
     setIsLoading(true);
     const fd = new FormData();
@@ -55,7 +41,7 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
     try {
       await axios.post('/api/sign-up', fd);
-      props.history.push('/confirm/account');
+      props.history.push('/confirm/wait-confirmation/' + data.email);
     } catch (e) {
       handleError(e);
     } finally {
@@ -90,9 +76,52 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const handleError = (error) => {
-    console.log(error);
-    clearSession();
+  const isExpired = (expiresAt) => {
+    return new Date().getTime() > expiresAt;
+  };
+
+  const refreshSession = () => {
+    axios.get('/api/refresh-session')
+      .then((res) => {
+        updateSession(res.data.username, res.data.expiresAt);
+      })
+      .catch((e) => {
+        handleError(e);
+      });
+  };
+
+  const initResetPassword = async (data) => {
+    const fd = new FormData();
+    fd.append('email', data['email']);
+    try {
+      const res = await axios.post('/api/reset/password', fd);
+      console.log(res);
+    } catch (e) {
+      handleError(e);
+    }
+  };
+
+  const resetPassword = async (token, data) => {
+    const fd = new FormData();
+    fd.append('password', data['password']);
+    try {
+      const res = await axios.post('/api/reset/' + token, fd);
+      console.log(res);
+      props.history.push('/');
+    } catch (e) {
+      handleError(e);
+    }
+  };
+
+  const resendConfirmation = async (email) => {
+    const fd = new FormData();
+    fd.append('email', email);
+    try {
+      const res = await axios.post('/api/confirm/resend', fd);
+      console.log(res);
+    } catch (e) {
+      handleError(e);
+    }
   };
 
   const updateSession = (username, expiresAt) => {
@@ -107,8 +136,13 @@ const AuthContextProvider = (props) => {
     setSession(initialSessionState);
   };
 
+  const handleError = (error) => {
+    console.log(error);
+    clearSession();
+  };
+
   return (
-    <AuthContext.Provider value={{...session, signUp, signIn, signOut}}>
+    <AuthContext.Provider value={{...session, signUp, signIn, signOut, resendConfirmation, initResetPassword, resetPassword}}>
       { isLoading && <PageLoader/> }
       { props.children }
     </AuthContext.Provider>
