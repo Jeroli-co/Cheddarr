@@ -7,7 +7,7 @@ from itsdangerous import URLSafeSerializer
 from server import db, InvalidUsage, oauth
 from server.auth import auth
 from server.auth.models import User
-from server.auth.forms import SignupForm, SigninForm, ChangePasswordForm, EmailForm
+from server.auth.forms import SignupForm, SigninForm, ResetPasswordForm, EmailForm
 from server.auth.utils import get_session_info, generate_confirmation_token, send_email, confirm_token
 
 
@@ -66,7 +66,9 @@ def signin():
 @auth.route("/sign-in/google")
 def signin_google():
     redirect_uri = "https://tolocalhost.com/"#url_for('auth.authorize', _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
+    res = oauth.google.authorize_redirect(redirect_uri)
+    res.status_code = 200
+    return res
 
 
 @auth.route('/authorize/google')
@@ -114,11 +116,12 @@ def confirm_reset(token):
         return {"message": "Able to reset."}, HTTPStatus.OK
 
     if request.method == "POST":
-        password_form = ChangePasswordForm()
+        password_form = ResetPasswordForm()
+        print(password_form.data)
         if password_form.validate():
-            current_user.password = password_form.newPassword.data
+            current_user.password = password_form.password.data
             db.session.commit()
-            return refresh_session()
+            return {"message": "Password reset"}, HTTPStatus.OK
         raise InvalidUsage("Error in change password form.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                            payload=password_form.errors)
 

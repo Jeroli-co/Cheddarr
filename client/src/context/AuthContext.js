@@ -107,7 +107,7 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.post('/api/reset/' + token, fd);
       console.log(res);
-      props.history.push('/');
+      props.history.push('/sign-in');
     } catch (e) {
       handleError(e);
     }
@@ -127,7 +127,7 @@ const AuthContextProvider = (props) => {
   const signInWithGoogle = async () => {
     try {
       const res = await axios.get("/api/sign-in/google");
-      console.log(res)
+      window.location = res.headers.location;
     } catch (e) {
       handleError(e)
     }
