@@ -129,7 +129,7 @@ const AuthContextProvider = (props) => {
       const res = await axios.get("/api/sign-in/google");
       window.location = res.headers.location;
     } catch (e) {
-      handleError(e)
+      handleError(e);
     }
   };
 
