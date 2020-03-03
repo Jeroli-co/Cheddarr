@@ -4,11 +4,11 @@ import {faGoogle, faFacebook} from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
-import './SignIn.css';
+import './SignInForm.css';
 import {AuthContext} from "../../../context/AuthContext";
-import EmailInputModal from "../element/email-input-modal/EmailInputModal";
+import InitResetPasswordModal from "../element/init-reset-password-modal/InitResetPasswordModal";
 
-const SignIn = () => {
+const SignInForm = () => {
 
 	const { signIn, signInWithGoogle } = useContext(AuthContext);
 	const { register, handleSubmit, errors } = useForm();
@@ -16,12 +16,9 @@ const SignIn = () => {
 	const [rememberMe, setRememberMe] = useState(false);
 	const [showResetPassword, setShowResetPassword] = useState(false);
 
-	const isInputInvalid = (inputName) => {
-		return errors[inputName] ? "is-danger" : "";
-	};
+	return (
+		<div className="SignIn">
 
-	const Headband = () => {
-		return (
 			<div className="hero is-primary">
 				<div className="hero-body">
 					<div className="container has-text-centered">
@@ -31,13 +28,6 @@ const SignIn = () => {
 					</div>
 				</div>
 			</div>
-		)
-	};
-
-	return (
-		<div className="SignIn">
-
-			<Headband/>
 
 			<br />
 
@@ -52,7 +42,7 @@ const SignIn = () => {
 							<label className="label">Username or email</label>
 							<div className="control has-icons-left">
 								<input name="usernameOrEmail"
-									className={'input ' + isInputInvalid('usernameOrEmail')}
+									className={'input ' + (errors['usernameOrEmail'] ? "is-danger" : "")}
 									type="text"
 									placeholder="Enter your username or email"
 									ref={register({ required: true })} />
@@ -69,7 +59,7 @@ const SignIn = () => {
 							<label className="label">Password</label>
 							<div className="control has-icons-left">
 								<input name="password"
-									className={'input ' + isInputInvalid('password')}
+									className={'input ' + (errors['password'] ? "is-danger" : "")}
 									type="password"
 									placeholder="Enter your password"
 									ref={register({ required: true })} />
@@ -118,7 +108,7 @@ const SignIn = () => {
 
 					<div className="has-text-centered">
 						<p className="is-size-7">Forgot your password ? <a onClick={() => setShowResetPassword(true)}>Click here to reset it</a></p>
-						<EmailInputModal isActive={showResetPassword} onClose={() => setShowResetPassword(false)}/>
+						<InitResetPasswordModal isActive={showResetPassword} onClose={() => setShowResetPassword(false)}/>
 						<p className="is-size-7">Still not have an account ? <Link to="/sign-up">Sign up</Link></p>
 					</div>
 				</div>
@@ -128,5 +118,5 @@ const SignIn = () => {
 	);
 };
 
-export default SignIn;
+export default SignInForm;
 

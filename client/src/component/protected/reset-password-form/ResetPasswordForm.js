@@ -6,6 +6,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../context/AuthContext";
+import TokenExpired from "../confirm-account/ConfirmAccount";
+import NotFound from "../../public/not-found/NotFound";
 
 const ResetPasswordForm = () => {
 
@@ -19,12 +21,11 @@ const ResetPasswordForm = () => {
 	const { token } = useParams();
 	const [state, setState] = useState('');
 	const { resetPassword } = useContext(AuthContext);
-	const { register, handleSubmit, errors, watch, getValues } = useForm();
+	const { register, handleSubmit, errors, watch } = useForm();
 
 	useEffect(() => {
 		axios.get('/api/reset/' + token)
 		.then((res) => {
-			console.log(res);
 			setState(messageTypes.ABLE_TO_RESET);
 		})
 		.catch((e) => {
@@ -40,12 +41,9 @@ const ResetPasswordForm = () => {
 		});
 	}, []);
 
-	const submitResetPassword = (data) => {
-	  resetPassword(token, data);
-  };
+	return (
+		<div className="ResetPasswordForm">
 
-	const Headband = () => {
-		return (
 			<div className="hero is-primary">
 				<div className="hero-body">
 					<div className="container has-text-centered">
@@ -55,23 +53,16 @@ const ResetPasswordForm = () => {
 					</div>
 				</div>
 			</div>
-		)
-	};
-
-	return (
-		<div className="ResetPasswordForm">
-
-			<Headband/>
 
 			<br />
 
 			{ state && state === messageTypes.ABLE_TO_RESET &&
-				<form id="reset-password-form" className="PasswordForm" onSubmit={handleSubmit(submitResetPassword)}>
+				<form id="reset-password-form" className="PasswordForm" onSubmit={handleSubmit((data) => {resetPassword(token, data)})}>
 					<div className="field">
 						<label className="label">New password</label>
 						<div className="control has-icons-left">
 							<input name="password"
-										 className={'input ' + errors['password'] ? "is-danger" : ""}
+										 className={'input ' + (errors['password'] ? "is-danger" : "")}
 										 type="password"
 										 placeholder="Enter a strong password"
 										 ref={register({ required: true, pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/ })} />
@@ -91,7 +82,7 @@ const ResetPasswordForm = () => {
 						<label className="label">Confirm new password</label>
 						<div className="control has-icons-left">
 							<input name="password-confirmation"
-										 className={'input ' + errors['password-confirmation'] ? "is-danger" : ""}
+										 className={'input ' + (errors['password-confirmation'] ? "is-danger" : "")}
 										 type="password"
 										 placeholder="Enter the same password"
 										 ref={register({
@@ -122,6 +113,14 @@ const ResetPasswordForm = () => {
 						</div>
 					</div>
 				</form>
+			}
+
+			{
+				state && state === messageTypes.EXPIRED && <TokenExpired/>
+			}
+
+			{
+				state && state === messageTypes.NOT_FOUND && <NotFound/>
 			}
 
 		</div>

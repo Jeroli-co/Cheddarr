@@ -1,23 +1,20 @@
 import React, {useContext} from 'react';
-import './SignUp.css';
+import './SignUpForm.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../../context/AuthContext";
 
-const SignUp = () => {
+const SignUpForm = () => {
 
   const { register, handleSubmit, errors, watch } = useForm();
   const { signUp } = useContext(AuthContext);
 
-	const isInputInvalid = (inputName) => {
-		return errors[inputName] ? "is-danger" : "";
-	};
+	return (
+		<div className="SignUp">
 
-	const Headband = () => {
-	  return (
-	    <div className="hero is-primary">
+      <div className="hero is-primary">
 				<div className="hero-body">
 					<div className="container has-text-centered">
 						<h1 className="title">
@@ -26,13 +23,6 @@ const SignUp = () => {
 					</div>
 				</div>
 			</div>
-    );
-  };
-
-	return (
-		<div className="SignUp">
-
-      <Headband/>
 
 			<br />
 
@@ -46,7 +36,7 @@ const SignUp = () => {
               <label className="label">Last name</label>
               <div className="control">
                 <input name="lastName"
-                       className={'input ' + isInputInvalid('lastName')}
+                       className={'input ' + (errors['lastName'] ? "is-danger" : "")}
                        type="text"
                        placeholder="Enter your last name"
                        ref={register({ required: true })}/>
@@ -61,7 +51,7 @@ const SignUp = () => {
               <label className="label">First name</label>
               <div className="control">
                 <input name="firstName"
-                       className={'input ' + isInputInvalid('firstName')}
+                       className={'input ' + (errors['firstName'] ? "is-danger" : "")}
                        type="text"
                        placeholder="Enter your first name"
                        ref={register({ required: true })} />
@@ -76,7 +66,7 @@ const SignUp = () => {
               <label className="label">Username</label>
               <div className="control has-icons-left">
                 <input name="username"
-                       className={'input ' + isInputInvalid('username')}
+                       className={'input ' + (errors['username'] ? "is-danger" : "")}
                        type="text"
                        placeholder="Enter a username"
                        ref={register({ required: true })} />
@@ -94,7 +84,7 @@ const SignUp = () => {
               <label className="label">Email</label>
               <div className="control has-icons-left">
                 <input name="email"
-                       className={'input ' + isInputInvalid('email')}
+                       className={'input ' + (errors['email'] ? "is-danger" : "")}
                        type="email"
                        placeholder="Enter a valid email"
                        ref={register({ required: true, pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/i })} />
@@ -115,7 +105,7 @@ const SignUp = () => {
               <label className="label">Password</label>
               <div className="control has-icons-left">
                 <input name="password"
-                       className={'input ' + isInputInvalid('password')}
+                       className={'input ' + (errors['password'] ? "is-danger" : "")}
                        type="password"
                        placeholder="Enter a strong password"
                        ref={register({ required: true, pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/ })} />
@@ -136,7 +126,7 @@ const SignUp = () => {
               <label className="label">Confirm password</label>
               <div className="control has-icons-left">
                 <input name="password-confirmation"
-                       className={'input ' + isInputInvalid('password-confirmation')}
+                       className={'input ' + (errors['password-confirmation'] ? "is-danger" : "")}
                        type="password"
                        placeholder="Confirm your password"
                        ref={register({
@@ -183,5 +173,5 @@ const SignUp = () => {
 	);
 }
 
-export default SignUp;
+export default SignUpForm;
 

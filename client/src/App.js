@@ -2,8 +2,8 @@ import React from 'react';
 import {Route, Switch} from "react-router-dom";
 import './App.css';
 import Navbar from "./component/navbar/Navbar";
-import SignIn from "./component/protected/sign-in/SignIn";
-import SignUp from "./component/protected/sign-up/SignUp";
+import SignInForm from "./component/protected/sign-in-form/SignInForm";
+import SignUpForm from "./component/protected/sign-up-form/SignUpForm";
 import Home from "./component/public/home/Home";
 import AuthContextProvider from "./context/AuthContext";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -14,6 +14,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import ConfirmAccount from "./component/protected/confirm-account/ConfirmAccount";
 import WaitingAccountConfirmation from "./component/protected/waiting-account-confirmation/WaitingAccountConfirmation";
 import ResetPasswordForm from "./component/protected/reset-password-form/ResetPasswordForm";
+import NotFound from "./component/public/not-found/NotFound";
 
 const App = () => {
 
@@ -26,15 +27,15 @@ const App = () => {
         <Switch>
           <Route exact path='/' component={Home} />
 
-          <ProtectedRoute exact path='/sign-in' component={SignIn} />
-          <ProtectedRoute exact path='/sign-up' component={SignUp} />
+          <ProtectedRoute exact path='/sign-in' component={SignInForm} />
+          <ProtectedRoute exact path='/sign-up' component={SignUpForm} />
           <ProtectedRoute exact path='/confirm/:token' component={ConfirmAccount} />
-          <ProtectedRoute exaxt path='/confirm/wait-confirmation/:email' component={WaitingAccountConfirmation} />
-          <ProtectedRoute exact path='/reset/:token' component={ResetPasswordForm}/>
+          <ProtectedRoute exaxt path='/wait-account-confirmation/:email' component={WaitingAccountConfirmation} />
+          <ProtectedRoute exact path='/reset/:token' component={ResetPasswordForm} />
 
           <PrivateRoute exact path="/user-profile" component={UserProfile} />
 
-          <Route path="*" component={() => "404 NOT FOUND"} />
+          <Route path="*" component={<NotFound/>} />
         </Switch>
       </AuthContextProvider>
     </div>

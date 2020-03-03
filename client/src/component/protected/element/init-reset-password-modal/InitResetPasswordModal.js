@@ -1,22 +1,22 @@
 import React, {useContext} from 'react';
-import './EmailInputModal.css';
+import './InitResetPasswordModal.css';
 import {useForm} from "react-hook-form";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../context/AuthContext";
 
-const EmailInputModal = ({ isActive, onClose }) => {
+const InitResetPasswordModal = ({ isActive, onClose }) => {
 
 		const { register, handleSubmit, errors, setValue } = useForm();
 		const { initResetPassword } = useContext(AuthContext);
 
 		const submitResetPassword = (data) => {
-		  initResetPassword(data).then(() => closeModal())
+		  initResetPassword(data).then(() => {/* TODO: Add notif */})
     };
 
 		const closeModal = () => {
-		  setValue('email', '');
 		  onClose();
+		  setValue('email', '');
     };
 
 		return (
@@ -59,5 +59,5 @@ const EmailInputModal = ({ isActive, onClose }) => {
 		);
 	};
 
-export default EmailInputModal;
+export default InitResetPasswordModal;
 

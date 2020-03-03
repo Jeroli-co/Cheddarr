@@ -21,19 +21,22 @@ const WaitingAccountConfirmation = () => {
 					<h2 className="subtitle">
 						Please check your emails and click on the link provided to confirm your account
 					</h2>
+
 					<h2 className="subtitle">
 						If you already confirm your account, feel free to sign in to Cheddarr
 					</h2>
-					<SignInButton/>
 					<h2 className="subtitle">
 						If you have not receive the confirmation email, <a>Click here to resend it</a>
 					</h2>
-					<button className="button is-rounded is-primary" type="button" onClick={resendConfirmation(email)}>
-						<span className="icon">
-							<FontAwesomeIcon icon={faEnvelope}/>
-						</span>
-						<span>Resend email</span>
-					</button>
+					<div className="buttons">
+						<SignInButton/>
+						<button className="button is-rounded is-primary" type="button" onClick={() => resendConfirmation(email)}>
+							<span className="icon">
+								<FontAwesomeIcon icon={faEnvelope}/>
+							</span>
+							<span>Resend email</span>
+						</button>
+					</div>
 				</div>
 			</div>
 		</section>

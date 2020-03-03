@@ -5,13 +5,13 @@ import PageLoader from "../component/element/page-loader/PageLoader";
 
 export const AuthContext = createContext();
 
-const AuthContextProvider = (props) => {
+const initialSessionState = {
+  username: null,
+  expiresAt: null,
+  isAuthenticated: false
+};
 
-  const initialSessionState = {
-    username: null,
-    expiresAt: null,
-    isAuthenticated: false
-  };
+const AuthContextProvider = (props) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [session, setSession] = useState(initialSessionState);
@@ -40,8 +40,8 @@ const AuthContextProvider = (props) => {
     fd.append('email', data['email']);
     fd.append('password', data['password']);
     try {
-      await axios.post('/api/sign-up', fd);
-      props.history.push('/confirm/wait-confirmation/' + data.email);
+      await axios.post('/api/sign-up-form', fd);
+      props.history.push('/wait-account-confirmation/' + data.email);
     } catch (e) {
       handleError(e);
     } finally {
@@ -56,7 +56,7 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
     fd.append('remember', data['remember']);
     try {
-      const res = await axios.post('/api/sign-in', fd);
+      const res = await axios.post('/api/sign-in-form', fd);
       updateSession(res.data.username, res.data.expiresAt);
     } catch (e) {
       handleError(e);
@@ -90,6 +90,17 @@ const AuthContextProvider = (props) => {
       });
   };
 
+  const confirmAccount = async (token) => {
+    try {
+      await axios.get('/api/confirm/' + token);
+      return '200'
+    } catch (e) {
+      handleError(e);
+      const errorArray = e.toString().split(' ');
+      return errorArray[errorArray.length - 1];
+    }
+  };
+
   const initResetPassword = async (data) => {
     const fd = new FormData();
     fd.append('email', data['email']);
@@ -107,7 +118,8 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.post('/api/reset/' + token, fd);
       console.log(res);
-      props.history.push('/sign-in');
+      props.history.push('/sign-in-form');
+      // TODO: Add notif
     } catch (e) {
       handleError(e);
     }
@@ -126,7 +138,7 @@ const AuthContextProvider = (props) => {
 
   const signInWithGoogle = async () => {
     try {
-      const res = await axios.get("/api/sign-in/google");
+      const res = await axios.get("/api/sign-in-form/google");
       window.location = res.headers.location;
     } catch (e) {
       handleError(e);
@@ -151,7 +163,16 @@ const AuthContextProvider = (props) => {
   };
 
   return (
-    <AuthContext.Provider value={{...session, signUp, signIn, signOut, resendConfirmation, initResetPassword, resetPassword, signInWithGoogle}}>
+    <AuthContext.Provider value={{...session,
+      signUp,
+      signIn,
+      signInWithGoogle,
+      signOut,
+      resendConfirmation,
+      initResetPassword,
+      resetPassword,
+      confirmAccount,
+    }}>
       { isLoading && <PageLoader/> }
       { props.children }
     </AuthContext.Provider>
