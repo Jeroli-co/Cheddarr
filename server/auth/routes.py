@@ -63,7 +63,7 @@ def signin():
                        payload=signin_form.errors)
 
 
-@auth.route("/sign-in/google")
+@auth.route("/sign-in-form/google")
 def signin_google():
     redirect_uri = "https://tolocalhost.com/"#url_for('auth.authorize', _external=True)
     res = oauth.google.authorize_redirect(redirect_uri)
@@ -117,7 +117,6 @@ def confirm_reset(token):
 
     if request.method == "POST":
         password_form = ResetPasswordForm()
-        print(password_form.data)
         if password_form.validate():
             current_user.password = password_form.password.data
             db.session.commit()
@@ -132,9 +131,7 @@ def confirm_email(token):
         email = confirm_token(token)
     except:
         raise InvalidUsage("The confirmation link is invalid or has expired.", status_code=HTTPStatus.GONE)
-    print(email)
     user = User.find(email=email)
-    print(user)
     if user and user.confirmed:
         raise InvalidUsage("The account is already confirmed.", HTTPStatus.CONFLICT)
     user.confirmed = True
