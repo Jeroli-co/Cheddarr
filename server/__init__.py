@@ -56,7 +56,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
     mail.init_app(app)
     oauth.init_app(app)
     Talisman(app)
-    CORS(app, resources={r"/*": {"origins": [app.config.get("FLASK_DOMAIN"), "https://accounts.google.com"]}})
+    CORS(app, resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}})
 
     register_blueprints(app)
     register_commands(app)
@@ -122,3 +122,4 @@ def register_oauth_providers(oauth):
     oauth.register('google', client_kwargs={
         'scope': 'openid email profile'
     })
+    oauth.register('facebook')

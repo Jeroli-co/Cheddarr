@@ -88,7 +88,7 @@ class DevConfig(BaseConfig):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
-    FLASK_DOMAIN = "http://localhost:3000"
+    FLASK_DOMAIN = "http://localhost:5000"
     FLASK_ENV = "development"
     DEBUG = get_boolean_env("FLASK_DEBUG", True)
 
