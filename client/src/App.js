@@ -1,20 +1,19 @@
 import React from 'react';
 import {Route, Switch} from "react-router-dom";
 import './App.css';
-import Navbar from "./component/navbar/Navbar";
-import SignInForm from "./component/protected/sign-in-form/SignInForm";
-import SignUpForm from "./component/protected/sign-up-form/SignUpForm";
-import Home from "./component/public/home/Home";
+import {Navbar} from "./component/navbar/Navbar";
+import {SignInForm} from "./component/protected/sign-in-form/SignInForm";
+import {SignUpForm} from "./component/protected/sign-up-form/SignUpForm";
+import {Home} from "./component/public/home/Home";
 import AuthContextProvider from "./context/AuthContext";
-import PrivateRoute from "./routes/PrivateRoute";
-import UserProfile from "./component/private/user-profile/UserProfile";
+import {UserProfile} from "./component/private/user-profile/UserProfile";
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import ProtectedRoute from "./routes/ProtectedRoute";
-import ConfirmAccount from "./component/protected/confirm-account/ConfirmAccount";
-import WaitingAccountConfirmation from "./component/protected/waiting-account-confirmation/WaitingAccountConfirmation";
-import ResetPasswordForm from "./component/protected/reset-password-form/ResetPasswordForm";
-import NotFound from "./component/public/not-found/NotFound";
+import {ProtectedRoute, PrivateRoute} from "./routes";
+import {ConfirmAccount} from "./component/protected/confirm-account/ConfirmAccount";
+import {WaitingAccountConfirmation} from "./component/protected/waiting-account-confirmation/WaitingAccountConfirmation";
+import {ResetPasswordForm} from "./component/protected/reset-password-form/ResetPasswordForm";
+import {NotFound} from "./component/public/not-found/NotFound";
 
 const App = () => {
 
@@ -35,7 +34,7 @@ const App = () => {
 
           <PrivateRoute exact path="/user-profile" component={UserProfile} />
 
-          <Route path="*" component={<NotFound/>} />
+          <Route path="*" component={NotFound} />
         </Switch>
       </AuthContextProvider>
     </div>

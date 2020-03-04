@@ -59,5 +59,7 @@ const InitResetPasswordModal = ({ isActive, onClose }) => {
 		);
 	};
 
-export default InitResetPasswordModal;
+export {
+  InitResetPasswordModal
+};
 

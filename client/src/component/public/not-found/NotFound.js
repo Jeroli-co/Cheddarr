@@ -1,6 +1,6 @@
 import React from 'react';
 import './NotFound.css';
-import SignUpButton from "../../protected/element/token-expired/TokenExpired";
+import {SignUpButton} from "../../protected/element/sign-up-button/SignUpButton";
 
 const NotFound = () => {
 	return (
@@ -17,5 +17,7 @@ const NotFound = () => {
 	);
 };
 
-export default NotFound;
+export {
+	NotFound
+};
 

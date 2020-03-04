@@ -9,5 +9,7 @@ const PageLoader = () => {
 	);
 };
 
-export default PageLoader;
+export {
+	PageLoader
+};
 

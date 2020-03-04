@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/cheddarr-small.png';
 import { AuthContext } from "../../context/AuthContext";
-import SignUpButton from "../protected/element/sign-up-button/SignUpButton";
-import SignInButton from "../protected/element/sign-in-button/SignInButton";
+import { SignUpButton } from "../protected/element/sign-up-button/SignUpButton";
+import { SignInButton } from "../protected/element/sign-in-button/SignInButton";
 
 const Navbar = () => {
 
@@ -88,5 +88,7 @@ const Navbar = () => {
 	);
 };
 
-export default Navbar;
+export {
+	Navbar
+};
 

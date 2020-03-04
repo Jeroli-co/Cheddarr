@@ -15,5 +15,7 @@ function SignUpButton() {
 	);
 }
 
-export default SignUpButton;
+export {
+	SignUpButton
+};
 

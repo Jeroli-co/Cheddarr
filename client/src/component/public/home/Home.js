@@ -2,7 +2,7 @@ import React from 'react';
 import './Home.css';
 import logo from "../../../assets/cheddarr.png";
 
-function Home() {
+const Home = () => {
 	return (
 		<div className="Home">
 			<header className="Home-header">
@@ -18,7 +18,9 @@ function Home() {
       </header>
 		</div>
 	);
-}
+};
 
-export default Home;
+export {
+	Home
+};
 

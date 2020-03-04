@@ -15,5 +15,7 @@ function SignInButton() {
 	);
 }
 
-export default SignInButton;
+export {
+	SignInButton
+};
 
