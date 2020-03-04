@@ -46,3 +46,4 @@ def confirm_reset(token):
             return {"message": "Password reset"}, HTTPStatus.OK
         raise InvalidUsage("Error in change password form.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                            payload=password_form.errors)
+

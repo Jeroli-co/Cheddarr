@@ -66,3 +66,4 @@ def resend_confirmation():
         send_email(email, subject, html)
         return {"message": "Confirmation email sent"}, HTTPStatus.OK
     raise InvalidUsage("Cannot resend confirmation email", status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
+

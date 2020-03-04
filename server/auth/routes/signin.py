@@ -3,7 +3,8 @@ from http import HTTPStatus
 from flask import make_response
 from flask_login import login_user, login_required
 
-from server import InvalidUsage, oauth, auth
+from server import InvalidUsage, oauth
+from server.auth import auth
 from server.auth.models import User
 from server.auth.forms import SigninForm
 from server.auth.utils import get_session_info
@@ -49,3 +50,4 @@ def authorize():
     token = oauth.google.authorize_access_token()
     resp = oauth.google.parse_id_token(token)
     return {"ok"}, HTTPStatus.OK
+

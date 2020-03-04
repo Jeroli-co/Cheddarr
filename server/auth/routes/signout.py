@@ -10,3 +10,4 @@ from server.auth import auth
 def signout():
     logout_user()
     return {"message": "User signed out"}, HTTPStatus.OK
+
