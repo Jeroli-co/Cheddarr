@@ -1,7 +1,7 @@
 import React, {createContext, useEffect, useState} from 'react';
 import axios from 'axios';
 import {withRouter} from 'react-router';
-import PageLoader from "../component/element/page-loader/PageLoader";
+import {PageLoader} from "../component/element/page-loader/PageLoader";
 
 export const AuthContext = createContext();
 
@@ -40,7 +40,7 @@ const AuthContextProvider = (props) => {
     fd.append('email', data['email']);
     fd.append('password', data['password']);
     try {
-      await axios.post('/api/sign-up-form', fd);
+      await axios.post('/api/sign-up', fd);
       props.history.push('/wait-account-confirmation/' + data.email);
     } catch (e) {
       handleError(e);
@@ -56,7 +56,7 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
     fd.append('remember', data['remember']);
     try {
-      const res = await axios.post('/api/sign-in-form', fd);
+      const res = await axios.post('/api/sign-in', fd);
       updateSession(res.data.username, res.data.expiresAt);
     } catch (e) {
       handleError(e);
@@ -102,6 +102,7 @@ const AuthContextProvider = (props) => {
   };
 
   const initResetPassword = async (data) => {
+    setIsLoading(true);
     const fd = new FormData();
     fd.append('email', data['email']);
     try {
@@ -109,6 +110,8 @@ const AuthContextProvider = (props) => {
       console.log(res);
     } catch (e) {
       handleError(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -118,7 +121,7 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.post('/api/reset/' + token, fd);
       console.log(res);
-      props.history.push('/sign-in-form');
+      props.history.push('/sign-in');
       // TODO: Add notif
     } catch (e) {
       handleError(e);

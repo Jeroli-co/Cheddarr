@@ -2,10 +2,8 @@ import React, {useContext, useEffect, useState} from 'react';
 import './ConfirmAccount.css';
 import {useParams} from "react-router";
 import {AuthContext} from "../../../context/AuthContext";
-import AccountConfirmed from "./element/account-confirmed/AccountConfirmed";
-import AlreadyConfirmed from "./element/already-confirmed/AlreadyConfirmed";
-import TokenExpired from "../element/token-expired/TokenExpired";
-import NotFound from "../../public/not-found/NotFound";
+import {AccountConfirmed, TokenExpired, AlreadyConfirmed} from "../element/account-confirmation/AccountConfirmation";
+import {NotFound} from "../../public/not-found/NotFound";
 
 const ConfirmAccount = () => {
 
@@ -17,9 +15,6 @@ const ConfirmAccount = () => {
 	  if (code) { return }
 		confirmAccount(token).then((statusCode) => {setCode(statusCode)});
 	}, []);
-
-  console.log('code:' + code);
-  console.log('token:' + token);
 
 	return (
 		<div className="ConfirmAccount">
@@ -35,5 +30,7 @@ const ConfirmAccount = () => {
 	);
 };
 
-export default ConfirmAccount;
+export {
+  ConfirmAccount
+};
 

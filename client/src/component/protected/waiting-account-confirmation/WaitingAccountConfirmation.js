@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import './WaitingAccountConfirmation.css';
-import SignInButton from "../element/sign-in-button/SignInButton";
+import {SignInButton} from "../element/sign-in-button/SignInButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../context/AuthContext";
@@ -43,5 +43,7 @@ const WaitingAccountConfirmation = () => {
 	);
 }
 
-export default WaitingAccountConfirmation;
+export {
+	WaitingAccountConfirmation
+};
 

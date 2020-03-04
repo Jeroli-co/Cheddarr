@@ -6,8 +6,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../context/AuthContext";
-import TokenExpired from "../confirm-account/ConfirmAccount";
-import NotFound from "../../public/not-found/NotFound";
+import {TokenExpired} from "../element/account-confirmation/AccountConfirmation";
+import {NotFound} from "../../public/not-found/NotFound";
 
 const ResetPasswordForm = () => {
 
@@ -127,5 +127,7 @@ const ResetPasswordForm = () => {
 	);
 };
 
-export default ResetPasswordForm;
+export {
+	ResetPasswordForm
+};
 

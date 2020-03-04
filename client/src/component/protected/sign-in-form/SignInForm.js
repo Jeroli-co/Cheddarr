@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
 import './SignInForm.css';
 import {AuthContext} from "../../../context/AuthContext";
-import InitResetPasswordModal from "../element/init-reset-password-modal/InitResetPasswordModal";
+import {InitResetPasswordModal} from "../element/init-reset-password-modal/InitResetPasswordModal";
 
 const SignInForm = () => {
 
@@ -118,5 +118,7 @@ const SignInForm = () => {
 	);
 };
 
-export default SignInForm;
+export {
+	SignInForm
+};
 
