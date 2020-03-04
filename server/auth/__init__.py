@@ -9,4 +9,4 @@ auth = Blueprint(
     url_prefix="/api",
 )
 
-from . import routes  # noqa
+from .routes import signup, signin, signout, reset_password  # noqa
