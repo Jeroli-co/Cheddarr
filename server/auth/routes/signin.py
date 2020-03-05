@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import make_response
+from flask import make_response, url_for
 from flask_login import login_user, login_required
 
 from server import InvalidUsage, oauth
@@ -40,6 +40,7 @@ def refresh_session():
 @auth.route("/sign-in/google")
 def signin_google():
     redirect_uri = "https://tolocalhost.com/"#url_for('auth.authorize', _external=True)
+    print(url_for('auth.authorize', _external=True))
     res = oauth.google.authorize_redirect(redirect_uri)
     res.status_code = 200
     return res

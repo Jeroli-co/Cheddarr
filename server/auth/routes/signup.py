@@ -40,7 +40,7 @@ def signup():
                        payload=signup_form.errors)
 
 
-@auth.route('/confirm/<token>')
+@auth.route("/confirm/<token>")
 def confirm_email(token):
     try:
         email = confirm_token(token)
@@ -54,7 +54,7 @@ def confirm_email(token):
     return {"message": "Account confirmed"}, HTTPStatus.CREATED
 
 
-@auth.route('/confirm/resend')
+@auth.route("/confirm/resend", methods=["POST"])
 def resend_confirmation():
     email_form = EmailForm()
     if email_form.validate():

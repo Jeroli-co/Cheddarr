@@ -141,7 +141,7 @@ const AuthContextProvider = (props) => {
 
   const signInWithGoogle = async () => {
     try {
-      const res = await axios.get("/api/sign-in-form/google");
+      const res = await axios.get("/api/sign-in/google");
       window.location = res.headers.location;
     } catch (e) {
       handleError(e);

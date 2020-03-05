@@ -31,6 +31,10 @@ const App = () => {
           <ProtectedRoute exact path='/confirm/:token' component={ConfirmAccount} />
           <ProtectedRoute exaxt path='/wait-account-confirmation/:email' component={WaitingAccountConfirmation} />
           <ProtectedRoute exact path='/reset/:token' component={ResetPasswordForm} />
+          {/* TODO: Redirect full url <ProtectedRoute path='/authorize/google' component={} /> */}
+          {
+            // Delete protected route and handle it with '/' redirection
+          }
 
           <PrivateRoute exact path="/user-profile" component={UserProfile} />
 

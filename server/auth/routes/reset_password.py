@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from flask import url_for, render_template, request
-from flask_login import current_user
 
 from server import InvalidUsage, db
 from server.auth import auth, User
@@ -33,17 +32,14 @@ def confirm_reset(token):
         raise InvalidUsage("The reset link is invalid or has expired.", status_code=HTTPStatus.GONE)
     user = User.find(email=email)
 
-    if request.method == "GET":
-        user.confirmed = False
-        db.session.commit()
-        return {"message": "Able to reset."}, HTTPStatus.OK
-
     if request.method == "POST":
         password_form = ResetPasswordForm()
         if password_form.validate():
-            current_user.password = password_form.password.data
+            user.password = password_form.password.data
             db.session.commit()
             return {"message": "Password reset"}, HTTPStatus.OK
         raise InvalidUsage("Error in change password form.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                            payload=password_form.errors)
+
+    return {"message": "Able to reset."}, HTTPStatus.OK
 

@@ -65,7 +65,7 @@ const ResetPasswordForm = () => {
 										 className={'input ' + (errors['password'] ? "is-danger" : "")}
 										 type="password"
 										 placeholder="Enter a strong password"
-										 ref={register({ required: true, pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/ })} />
+										 ref={register({ required: true, pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,128}$/ })} />
 							<span className="icon is-small is-left">
 								<FontAwesomeIcon icon={faKey} />
 							</span>
@@ -87,7 +87,7 @@ const ResetPasswordForm = () => {
 										 placeholder="Enter the same password"
 										 ref={register({
 											 required: true,
-											 pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/,
+											 pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,128}$/,
 											 validate: (value) => {
 												return value === watch('password');
 											 }
