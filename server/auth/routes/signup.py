@@ -6,7 +6,7 @@ from flask import current_app as app, url_for, render_template
 from server import db, InvalidUsage
 from server.auth import auth, User
 from server.auth.forms import SignupForm, EmailForm
-from server.auth.utils import generate_confirmation_token, send_email, confirm_token
+from server.auth.utils import generate_timed_token, send_email, confirm_token, generate_token
 
 
 @auth.route("/sign-up", methods=["POST"])
@@ -17,16 +17,16 @@ def signup():
         existing_user = User.exists(email=signup_form.email.data)
         if existing_user is None:
             user = User(
-                username=signup_form.username.data.lower(),
+                username=signup_form.username.data,
                 email=signup_form.email.data,
                 password=signup_form.password.data,
                 first_name=signup_form.firstName.data,
                 last_name=signup_form.lastName.data,
                 confirmed=False,
             )
-            user.session_token = serializer.dumps(user.password, salt=app.config.get("SECURITY_PASSWORD_SALT"))
+            user.session_token = generate_token([user.email, user.password])
 
-            token = generate_confirmation_token(user.email)
+            token = generate_timed_token(user.email)
             confirm_url = url_for("auth.confirm_email", token=token, _external=True)
             html = render_template("email/welcome.html", username=user.username, confirm_url=confirm_url.replace("/api", ""))
             subject = "Welcome!"
@@ -59,7 +59,7 @@ def resend_confirmation():
     email_form = EmailForm()
     if email_form.validate():
         email = email_form.email.data
-        token = generate_confirmation_token(email)
+        token = generate_timed_token(email)
         confirm_url = url_for("auth.confirm_email", token=token, _external=True)
         html = render_template("email/account_confirmation.html", confirm_url=confirm_url.replace("/api", ""))
         subject = "Please confirm your email"

@@ -148,6 +148,15 @@ const AuthContextProvider = (props) => {
     }
   };
 
+    const signInWithFacebook = async () => {
+    try {
+      const res = await axios.get("/api/sign-in/facebook");
+      window.location = res.headers.location;
+    } catch (e) {
+      handleError(e);
+    }
+  };
+
   const updateSession = (username, expiresAt) => {
     localStorage.setItem('username', username);
     localStorage.setItem('expiresAt', expiresAt);
@@ -170,6 +179,7 @@ const AuthContextProvider = (props) => {
       signUp,
       signIn,
       signInWithGoogle,
+      signInWithFacebook,
       signOut,
       resendConfirmation,
       initResetPassword,

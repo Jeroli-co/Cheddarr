@@ -10,7 +10,7 @@ import {InitResetPasswordModal} from "../element/init-reset-password-modal/InitR
 
 const SignInForm = () => {
 
-	const { signIn, signInWithGoogle } = useContext(AuthContext);
+	const { signIn, signInWithGoogle, signInWithFacebook } = useContext(AuthContext);
 	const { register, handleSubmit, errors } = useForm();
 
 	const [rememberMe, setRememberMe] = useState(false);
@@ -98,7 +98,7 @@ const SignInForm = () => {
 							</span>
 							<span>Google</span>
 						</button>
-						<button className="button is-rounded is-info" type="button">
+						<button className="button is-rounded is-info" type="button" onClick={signInWithFacebook}>
 							<span className="icon">
 								<FontAwesomeIcon icon={faFacebook}/>
 							</span>
