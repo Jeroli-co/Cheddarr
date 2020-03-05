@@ -34,8 +34,6 @@ const SignInForm = () => {
 			<div className="columns is-mobile is-centered">
 				<div className="column is-half">
 
-					<h1 className="subtitle is-4">Sign in with</h1>
-
 					<form id="sign-in-form" onSubmit={handleSubmit(signIn)}>
 
 						<div className="field">
@@ -89,9 +87,9 @@ const SignInForm = () => {
 
 					<div className="is-divider" data-content="OR"/>
 
-					<h1 className="subtitle is-4">With an account you already possess</h1>
+					<h1 className="subtitle is-5">Sign in with</h1>
 
-					<div className="buttons is-centered">
+					<div className="buttons">
 						<button className="button is-rounded" type="button" onClick={signInWithGoogle}>
 							<span className="icon">
 								<FontAwesomeIcon icon={faGoogle}/>
