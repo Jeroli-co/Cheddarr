@@ -2,6 +2,7 @@ import React, {createContext, useEffect, useState} from 'react';
 import axios from 'axios';
 import {withRouter} from 'react-router';
 import {PageLoader} from "../component/element/page-loader/PageLoader";
+import {routes} from "../routes";
 
 export const AuthContext = createContext();
 
@@ -41,7 +42,7 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
     try {
       await axios.post('/api/sign-up', fd);
-      props.history.push('/wait-account-confirmation/' + data.email);
+      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data.email));
     } catch (e) {
       handleError(e);
     } finally {
@@ -72,7 +73,7 @@ const AuthContextProvider = (props) => {
     } catch (e) {
       handleError(e);
     } finally {
-      props.history.push('/');
+      props.history.push(routes.HOME.url);
     }
   };
 
@@ -93,7 +94,7 @@ const AuthContextProvider = (props) => {
   const confirmAccount = async (token) => {
     try {
       await axios.get('/api/confirm/' + token);
-      return '200'
+      return '200';
     } catch (e) {
       handleError(e);
       const errorArray = e.toString().split(' ');
@@ -115,13 +116,24 @@ const AuthContextProvider = (props) => {
     }
   };
 
+  const checkResetPasswordToken = async (token) => {
+    try {
+      await axios.get('/api/reset/' + token);
+      return '200';
+    } catch (e) {
+      handleError(e);
+      const errorArray = e.toString().split(' ');
+      return errorArray[errorArray.length - 1];
+    }
+  };
+
   const resetPassword = async (token, data) => {
     const fd = new FormData();
     fd.append('password', data['password']);
     try {
       const res = await axios.post('/api/reset/' + token, fd);
       console.log(res);
-      props.history.push('/sign-in');
+      props.history.push(routes.SIGN_IN.url);
       // TODO: Add notif
     } catch (e) {
       handleError(e);
@@ -148,12 +160,36 @@ const AuthContextProvider = (props) => {
     }
   };
 
-    const signInWithFacebook = async () => {
+  const authorizeGoogle = async (search) => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get('/api/authorize/google' + search);
+      updateSession(res.data.username, res.data.expiresAt);
+    } catch (e) {
+      handleError(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signInWithFacebook = async () => {
     try {
       const res = await axios.get("/api/sign-in/facebook");
       window.location = res.headers.location;
     } catch (e) {
       handleError(e);
+    }
+  };
+
+  const authorizeFacebook = async (search) => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get('/api/authorize/facebook' + search);
+      updateSession(res.data.username, res.data.expiresAt);
+    } catch (e) {
+      handleError(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -179,10 +215,13 @@ const AuthContextProvider = (props) => {
       signUp,
       signIn,
       signInWithGoogle,
+      authorizeGoogle,
       signInWithFacebook,
+      authorizeFacebook,
       signOut,
       resendConfirmation,
       initResetPassword,
+      checkResetPasswordToken,
       resetPassword,
       confirmAccount,
     }}>

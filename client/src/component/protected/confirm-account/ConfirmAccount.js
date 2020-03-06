@@ -12,7 +12,6 @@ const ConfirmAccount = () => {
   const [code, setCode] = useState(null);
 
 	useEffect(() => {
-	  if (code) { return }
 		confirmAccount(token).then((statusCode) => {setCode(statusCode)});
 	}, []);
 

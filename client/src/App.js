@@ -2,17 +2,10 @@ import React from 'react';
 import {Route, Switch} from "react-router-dom";
 import './App.css';
 import {Navbar} from "./component/navbar/Navbar";
-import {SignInForm} from "./component/protected/sign-in-form/SignInForm";
-import {SignUpForm} from "./component/protected/sign-up-form/SignUpForm";
-import {Home} from "./component/public/home/Home";
 import AuthContextProvider from "./context/AuthContext";
-import {UserProfile} from "./component/private/user-profile/UserProfile";
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import {ProtectedRoute, PrivateRoute} from "./routes";
-import {ConfirmAccount} from "./component/protected/confirm-account/ConfirmAccount";
-import {WaitingAccountConfirmation} from "./component/protected/waiting-account-confirmation/WaitingAccountConfirmation";
-import {ResetPasswordForm} from "./component/protected/reset-password-form/ResetPasswordForm";
+import {ProtectedRoute, PrivateRoute, routes} from "./routes";
 import {NotFound} from "./component/public/not-found/NotFound";
 
 const App = () => {
@@ -24,19 +17,17 @@ const App = () => {
       <AuthContextProvider>
         <Navbar />
         <Switch>
-          <Route exact path='/' component={Home} />
+          <Route exact path={routes.HOME.url} component={routes.HOME.component} />
 
-          <ProtectedRoute exact path='/sign-in' component={SignInForm} />
-          <ProtectedRoute exact path='/sign-up' component={SignUpForm} />
-          <ProtectedRoute exact path='/confirm/:token' component={ConfirmAccount} />
-          <ProtectedRoute exaxt path='/wait-account-confirmation/:email' component={WaitingAccountConfirmation} />
-          <ProtectedRoute exact path='/reset/:token' component={ResetPasswordForm} />
-          {/* TODO: Redirect full url <ProtectedRoute path='/authorize/google' component={} /> */}
-          {
-            // Delete protected route and handle it with '/' redirection
-          }
+          <ProtectedRoute exact path={routes.SIGN_IN.url} component={routes.SIGN_IN.component} />
+          <ProtectedRoute exact path={routes.SIGN_UP.url} component={routes.SIGN_UP.component} />
+          <ProtectedRoute exact path={routes.CONFIRM_ACCOUNT.url(':token')} component={routes.CONFIRM_ACCOUNT.component} />
+          <ProtectedRoute exaxt path={routes.WAIT_ACCOUNT_CONFIRMATION.url(':email')} component={routes.WAIT_ACCOUNT_CONFIRMATION} />
+          <ProtectedRoute exact path={routes.RESET_PASSWORD.url(':token')} component={routes.RESET_PASSWORD.component} />
+          <ProtectedRoute path={routes.AUTHORIZE_GOOGLE.url} component={routes.AUTHORIZE_GOOGLE.component} />
+          <ProtectedRoute path={routes.AUTHORIZE_FACEBOOK.url} component={routes.AUTHORIZE_FACEBOOK.component} />
 
-          <PrivateRoute exact path="/user-profile" component={UserProfile} />
+          <PrivateRoute exact path={routes.USER_PROFILE.url} component={routes.USER_PROFILE.component} />
 
           <Route path="*" component={NotFound} />
         </Switch>

@@ -64,6 +64,8 @@ def signin_facebook():
 
 @auth.route('/authorize/facebook')
 def authorize_facebook():
+    print("Je suis pas content")
     token = oauth.facebook.authorize_access_token()
+    print(token)
     resp = oauth.facebook.parse_id_token(token)
     return get_session_info(), HTTPStatus.OK
