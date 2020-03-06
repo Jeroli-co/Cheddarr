@@ -32,7 +32,7 @@ const SignInForm = () => {
 			<br />
 
 			<div className="columns is-mobile is-centered">
-				<div className="column is-half">
+				<div className="column is-one-quarter">
 
 					<form id="sign-in-form" onSubmit={handleSubmit(signIn)}>
 
