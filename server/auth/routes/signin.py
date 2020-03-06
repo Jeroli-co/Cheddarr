@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import url_for
+from flask import url_for, current_app as app
 from flask_login import login_user, login_required
 
 from server import InvalidUsage, oauth
@@ -55,7 +55,6 @@ def authorize_google():
 
 @auth.route("/sign-in/facebook")
 def signin_facebook():
-    #redirect_uri = "https://tolocalhost.com/"
     redirect_uri = url_for('auth.authorize_facebook', _external=True).replace("/api", "")
     res = oauth.facebook.authorize_redirect(redirect_uri)
     res.status_code = 200
@@ -64,8 +63,7 @@ def signin_facebook():
 
 @auth.route('/authorize/facebook')
 def authorize_facebook():
-    print("Je suis pas content")
+    print(app.config.get('FACEBOOK_ACCESS_TOKEN_URL'))
     token = oauth.facebook.authorize_access_token()
-    print(token)
     resp = oauth.facebook.parse_id_token(token)
     return get_session_info(), HTTPStatus.OK
