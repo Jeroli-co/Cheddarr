@@ -43,6 +43,7 @@ def refresh_session():
 
 @auth.route("/sign-in/facebook")
 def signin_facebook():
+    print(facebook_bp.redirect_url)
     return redirect(url_for("facebook.login")), HTTPStatus.OK
 
 
