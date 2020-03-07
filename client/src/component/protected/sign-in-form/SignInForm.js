@@ -107,7 +107,7 @@ const SignInForm = () => {
 					<div className="has-text-centered">
 						<p className="is-size-7">Forgot your password ? <a onClick={() => setShowResetPassword(true)}>Click here to reset it</a></p>
 						<InitResetPasswordModal isActive={showResetPassword} onClose={() => setShowResetPassword(false)}/>
-						<p className="is-size-7">Still not have an account ? <Link to="/sign-up">Sign up</Link></p>
+						<p className="is-size-7">Don't have an account ? <Link to="/sign-up">Sign up</Link></p>
 					</div>
 				</div>
 			</div>

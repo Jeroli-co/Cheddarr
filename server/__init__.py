@@ -1,7 +1,6 @@
 from http import HTTPStatus
 from datetime import datetime
 
-from authlib.integrations.flask_client import OAuth
 from flask import jsonify, session
 from flask.app import Flask
 from flask.helpers import get_debug_flag
@@ -11,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_cors import CORS
+
 from server.exceptions import InvalidUsage
 from server.config import (
     REACT_STATIC_FOLDER,
@@ -25,7 +25,6 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 mail = Mail()
-oauth = OAuth()
 
 
 def create_app():
@@ -54,14 +53,12 @@ def _create_app(config_object: BaseConfig, **kwargs):
     db.init_app(app)
     csrf.init_app(app)
     mail.init_app(app)
-    oauth.init_app(app)
     Talisman(app)
     CORS(app, resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}})
 
     register_blueprints(app)
     register_commands(app)
     register_login_manager(app)
-    register_oauth_providers(oauth)
 
     @app.before_first_request
     def make_session_permanent():
@@ -89,9 +86,11 @@ def _create_app(config_object: BaseConfig, **kwargs):
 def register_blueprints(app):
     from server.auth import auth
     from server.site import site
+    from server.auth import facebook_bp
 
     app.register_blueprint(site)
-    app.register_blueprint(auth)
+    app.register_blueprint(auth, url_prefix="/api",)
+    app.register_blueprint(facebook_bp)
 
 
 def register_commands(app):

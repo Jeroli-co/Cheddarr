@@ -5,7 +5,24 @@ from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
 from flask import current_app as app
 from server import mail
+from server.auth import User
 from server.config import SESSION_LIFETIME
+
+
+def create_user(first_name, last_name, email, username, password=None):
+    user = User(
+        username=username,
+        email=email,
+        password=password,
+        first_name=first_name,
+        last_name=last_name,
+        confirmed=False if password is not None else True
+    )
+    if user.password:
+        user.session_token = generate_token([user.email, user.password])
+    else:
+        user.session_token = generate_token([user.email])
+    return user
 
 
 def get_session_info():

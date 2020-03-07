@@ -55,7 +55,7 @@ const routes = {
   WAIT_ACCOUNT_CONFIRMATION: { url: (email) => '/wait-account-confirmation/' + email, component: WaitingAccountConfirmation },
   RESET_PASSWORD: { url: (token) => '/reset/' + token, component: ResetPasswordForm },
   AUTHORIZE_GOOGLE: { url: '/authorize/google', component: AuthorizeGoogle },
-  AUTHORIZE_FACEBOOK: { url: '/authorize/facebook', component: AuthorizeFacebook },
+  AUTHORIZE_FACEBOOK: { url: '/facebook/authorized', component: AuthorizeFacebook },
   USER_PROFILE: { url: 'user-profile', component: UserProfile }
 };
 

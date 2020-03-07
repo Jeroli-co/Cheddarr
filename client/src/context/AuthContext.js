@@ -184,7 +184,7 @@ const AuthContextProvider = (props) => {
   const authorizeFacebook = async (search) => {
     setIsLoading(true);
     try {
-      const res = await axios.get('/api/authorize/facebook' + search);
+      const res = await axios.get('/api/facebook/authorized' + search);
       updateSession(res.data.username, res.data.expiresAt);
     } catch (e) {
       handleError(e);
