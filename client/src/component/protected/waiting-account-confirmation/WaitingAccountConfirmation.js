@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-import './WaitingAccountConfirmation.css';
 import {SignInButton} from "../element/sign-in-button/SignInButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
@@ -12,34 +11,36 @@ const WaitingAccountConfirmation = () => {
 	const { email } = useParams();
 
 	return (
-		<section className="hero is-large is-primary is-bold">
-			<div className="hero-body">
-				<div className="container">
-					<h1 className="title">
-						One more step ! Account still need confirmation...
-					</h1>
-					<h2 className="subtitle">
-						Please check your emails and click on the link provided to confirm your account
-					</h2>
+		<div className="WaitingAccountConfirmation" data-testid="WaitingAccountConfirmation">
+			<section className="hero is-large is-primary is-bold">
+				<div className="hero-body">
+					<div className="container">
+						<h1 className="title">
+							One more step ! Account still need confirmation...
+						</h1>
+						<h2 className="subtitle">
+							Please check your emails and click on the link provided to confirm your account
+						</h2>
 
-					<h2 className="subtitle">
-						If you already confirm your account, feel free to sign in to Cheddarr
-					</h2>
-					<h2 className="subtitle">
-						If you have not receive the confirmation email, <a>Click here to resend it</a>
-					</h2>
-					<div className="buttons">
-						<SignInButton/>
-						<button className="button is-rounded is-primary" type="button" onClick={() => resendConfirmation(email)}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faEnvelope}/>
-							</span>
-							<span>Resend email</span>
-						</button>
+						<h2 className="subtitle">
+							If you already confirm your account, feel free to sign in to Cheddarr
+						</h2>
+						<h2 className="subtitle">
+							If you have not receive the confirmation email, <a>Click here to resend it</a>
+						</h2>
+						<div className="buttons">
+							<SignInButton/>
+							<button className="button is-rounded is-primary" type="button" onClick={() => resendConfirmation(email)}>
+								<span className="icon">
+									<FontAwesomeIcon icon={faEnvelope}/>
+								</span>
+								<span>Resend email</span>
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
-		</section>
+			</section>
+		</div>
 	);
 }
 

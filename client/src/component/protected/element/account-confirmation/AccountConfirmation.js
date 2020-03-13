@@ -1,5 +1,4 @@
 import React from 'react';
-import './AccountConfirmation.css';
 import { SignInButton } from "../sign-in-button/SignInButton";
 import { SignUpButton } from "../sign-up-button/SignUpButton";
 
@@ -23,7 +22,7 @@ const AlreadyConfirmed = () => {
 
 const AccountConfirmed = () => {
 	return (
-		<section className="hero is-large is-primary is-bold">
+		<section className="hero is-large is-primary is-bold" data-testid="AccountConfirmed">
 			<div className="hero-body">
 				<div className="container">
 					<h1 className="title">

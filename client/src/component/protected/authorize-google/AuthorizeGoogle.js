@@ -1,5 +1,4 @@
 import React, {useContext, useEffect} from 'react';
-import './AuthorizeGoogle.css';
 import {AuthContext} from "../../../context/AuthContext";
 
 const AuthorizeGoogle = (props) => {
@@ -9,7 +8,7 @@ const AuthorizeGoogle = (props) => {
 		authorizeGoogle(props.location.search);
 	}, []);
 
-	return <div/>;
+	return <div className="AuthorizeGoogle" data-testid="AuthorizeGoogle"/>;
 };
 
 export {

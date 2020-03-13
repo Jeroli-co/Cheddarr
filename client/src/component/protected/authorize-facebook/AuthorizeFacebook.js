@@ -1,5 +1,4 @@
 import React, {useContext, useEffect} from 'react';
-import './AuthorizeFacebook.css';
 import {AuthContext} from "../../../context/AuthContext";
 
 const AuthorizeFacebook = (props) => {
@@ -9,7 +8,7 @@ const AuthorizeFacebook = (props) => {
 		authorizeFacebook(props.location.search);
 	}, []);
 
-	return <div/>;
+	return <div className="AuthorizeFacebook" data-testid="AuthorizeFacebook"/>;
 };
 
 export {

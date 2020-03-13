@@ -4,7 +4,7 @@ import logo from "../../../assets/cheddarr.png";
 
 const Home = () => {
 	return (
-		<div className="Home">
+		<div className="Home" data-testid="Home">
 			<header className="Home-header">
         <img src={logo} className="Home-logo" alt="logo" />
         <a

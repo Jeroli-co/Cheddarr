@@ -4,9 +4,9 @@ import {faGoogle, faFacebook} from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
-import './SignInForm.css';
 import {AuthContext} from "../../../context/AuthContext";
 import {InitResetPasswordModal} from "../element/init-reset-password-modal/InitResetPasswordModal";
+import {ResendAccountConfirmationEmailModal} from "../element/resend-account-confirmation-email-modal/ResendAccountConfirmationEmailModal";
 
 const SignInForm = () => {
 
@@ -15,9 +15,15 @@ const SignInForm = () => {
 
 	const [rememberMe, setRememberMe] = useState(false);
 	const [showResetPassword, setShowResetPassword] = useState(false);
+	const [showResendConfirmAccount, setShowResendConfirmAccount] = useState(false);
+	const [status, setStatus] = useState(null);
+
+	const onSubmit = (data) => {
+		signIn(data).then((status) => setStatus(status));
+	};
 
 	return (
-		<div className="SignIn">
+		<div className="SignInForm" data-testid="SignInForm">
 
 			<div className="hero is-primary">
 				<div className="hero-body">
@@ -34,7 +40,7 @@ const SignInForm = () => {
 			<div className="columns is-mobile is-centered">
 				<div className="column is-one-quarter">
 
-					<form id="sign-in-form" onSubmit={handleSubmit(signIn)}>
+					<form id="sign-in-form" onSubmit={handleSubmit(onSubmit)}>
 
 						<div className="field">
 							<label className="label">Username or email</label>
@@ -69,6 +75,11 @@ const SignInForm = () => {
 								<p className="help is-danger">Password is required </p>
 							)}
 						</div>
+
+						{ status &&
+							(status === 400 && <p className="help is-danger">Unable to sign in. Wrong credentials...</p>) ||
+							(status === 401 && <p className="help is-danger">Account need to be confirmed. Please check your inbox or <a onClick={() => setShowResendConfirmAccount(true)}>Click here</a> to resend the email</p>)
+						}
 
 						<div className="field">
 							<div className="control">
@@ -106,11 +117,14 @@ const SignInForm = () => {
 
 					<div className="has-text-centered">
 						<p className="is-size-7">Forgot your password ? <a onClick={() => setShowResetPassword(true)}>Click here to reset it</a></p>
-						<InitResetPasswordModal isActive={showResetPassword} onClose={() => setShowResetPassword(false)}/>
-						<p className="is-size-7">Don't have an account ? <Link to="/sign-up">Sign up</Link></p>
+						<p className="is-size-7">Still not have an account ? <Link to="/sign-up">Sign up</Link></p>
 					</div>
+
 				</div>
 			</div>
+
+			<ResendAccountConfirmationEmailModal isActive={showResendConfirmAccount} onClose={() => setShowResendConfirmAccount(false)} />
+			<InitResetPasswordModal isActive={showResetPassword} onClose={() => setShowResetPassword(false)} />
 
 		</div>
 	);

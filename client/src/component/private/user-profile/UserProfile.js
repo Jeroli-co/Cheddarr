@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-import './UserProfile.css';
 import {AuthContext} from "../../../context/AuthContext";
 
 function UserProfile() {
@@ -7,7 +6,7 @@ function UserProfile() {
 	const { username } = useContext(AuthContext);
 
 	return (
-		<div className="UserProfile">
+		<div className="UserProfile" data-testid="UserProfile">
 			<p>{ username } profile !</p>
 		</div>
 	);

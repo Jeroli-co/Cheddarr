@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-import './SignUpForm.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
@@ -12,7 +11,7 @@ const SignUpForm = () => {
   const { signUp } = useContext(AuthContext);
 
 	return (
-		<div className="SignUp">
+		<div className="SignUpForm" data-testid="SignUpForm">
 
       <div className="hero is-primary">
 				<div className="hero-body">

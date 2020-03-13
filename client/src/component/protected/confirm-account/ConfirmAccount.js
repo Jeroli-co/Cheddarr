@@ -1,9 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
-import './ConfirmAccount.css';
 import {useParams} from "react-router";
 import {AuthContext} from "../../../context/AuthContext";
 import {AccountConfirmed, TokenExpired, AlreadyConfirmed} from "../element/account-confirmation/AccountConfirmation";
-import {NotFound} from "../../public/not-found/NotFound";
+import {NotFound} from "../../public/errors/Errors";
 
 const ConfirmAccount = () => {
 
@@ -16,13 +15,13 @@ const ConfirmAccount = () => {
 	}, []);
 
 	return (
-		<div className="ConfirmAccount">
+		<div className="ConfirmAccount" data-testid="ConfirmAccount">
       { code &&
         (
-          (code === '200' && <AccountConfirmed/>) ||
-          (code === '409' && <AlreadyConfirmed/>) ||
-          (code === '410' && <TokenExpired/>) ||
-          (code === '404' && <NotFound/>)
+          (code === 200 && <AccountConfirmed/>) ||
+          (code === 409 && <AlreadyConfirmed/>) ||
+          (code === 410 && <TokenExpired/>) ||
+          (code === 404 && <NotFound/>)
         )
       }
 		</div>

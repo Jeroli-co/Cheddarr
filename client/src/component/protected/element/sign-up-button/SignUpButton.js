@@ -1,12 +1,11 @@
 import React from 'react';
-import './SignUpButton.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUserPlus} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 
 function SignUpButton() {
 	return (
-		<Link className="button is-rounded is-primary" to="/sign-up">
+		<Link className="button is-rounded is-primary" to="/sign-up" data-testid="SignUpButton">
 			<span className="icon">
 				<FontAwesomeIcon icon={faUserPlus}/>
 			</span>

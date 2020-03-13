@@ -17,6 +17,8 @@
     "bulma-pageloader": "^0.3.0",
     "bulma-switch": "^2.0.0",
     "js-cookie": "^2.2.1",
+    "mutationobserver-shim": "^0.3.3",
+    "nock": "^12.0.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-hook-form": "^4.9.8",
@@ -45,5 +47,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000"
+  "proxy": "http://localhost:5000",
+  "devDependencies": {
+    "history": "^4.10.1"
+  }
 }

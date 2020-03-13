@@ -41,10 +41,12 @@ const AuthContextProvider = (props) => {
     fd.append('email', data['email']);
     fd.append('password', data['password']);
     try {
-      await axios.post('/api/sign-up', fd);
-      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data.email));
+      const res = await axios.post('/api/sign-up', fd);
+      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
+      return res.status;
     } catch (e) {
       handleError(e);
+      return e.response ? e.response.status : 404;
     } finally {
       setIsLoading(false);
     }
@@ -59,21 +61,26 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.post('/api/sign-in', fd);
       updateSession(res.data.username, res.data.expiresAt);
+      return res.status;
     } catch (e) {
       handleError(e);
+      return e.response ? e.response.status : 404;
     } finally {
       setIsLoading(false);
     }
   };
 
   const signOut = async () => {
+    setIsLoading(true);
     try {
-      await axios.get('/api/sign-out');
-      clearSession();
+      const res = await axios.get('/api/sign-out');
+      return res.status;
     } catch (e) {
-      handleError(e);
+      return e.response ? e.response.status : 404;
     } finally {
+      clearSession();
       props.history.push(routes.HOME.url);
+      setIsLoading(false);
     }
   };
 
@@ -81,24 +88,45 @@ const AuthContextProvider = (props) => {
     return new Date().getTime() > expiresAt;
   };
 
-  const refreshSession = () => {
-    axios.get('/api/refresh-session')
-      .then((res) => {
-        updateSession(res.data.username, res.data.expiresAt);
-      })
-      .catch((e) => {
-        handleError(e);
-      });
+  const refreshSession = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get('/api/refresh-session');
+      updateSession(res.data.username, res.data.expiresAt);
+      return res.status;
+    } catch (e) {
+      handleError(e);
+      return e.response ? e.response.status : 404;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const confirmAccount = async (token) => {
+    setIsLoading(true);
     try {
-      await axios.get('/api/confirm/' + token);
-      return '200';
+      const res = await axios.get('/api/confirm/' + token);
+      return res.status;
     } catch (e) {
       handleError(e);
-      const errorArray = e.toString().split(' ');
-      return errorArray[errorArray.length - 1];
+      return e.response ? e.response.status : 404;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+   const resendConfirmation = async (email) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('email', email);
+    try {
+      const res = await axios.post('/api/confirm/resend', fd);
+      return res.status;
+    } catch (e) {
+      handleError(e);
+      return e.response ? e.response.status : 404;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -108,55 +136,56 @@ const AuthContextProvider = (props) => {
     fd.append('email', data['email']);
     try {
       const res = await axios.post('/api/reset/password', fd);
-      console.log(res);
+      return res.status;
     } catch (e) {
       handleError(e);
+      return e.response ? e.response.status : 404;
     } finally {
       setIsLoading(false);
     }
   };
 
   const checkResetPasswordToken = async (token) => {
+    setIsLoading(true);
     try {
-      await axios.get('/api/reset/' + token);
-      return '200';
+      const res = await axios.get('/api/reset/' + token);
+      return res.status;
     } catch (e) {
       handleError(e);
-      const errorArray = e.toString().split(' ');
-      return errorArray[errorArray.length - 1];
+      return e.response ? e.response.status : 404;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const resetPassword = async (token, data) => {
+    setIsLoading(true);
     const fd = new FormData();
     fd.append('password', data['password']);
     try {
       const res = await axios.post('/api/reset/' + token, fd);
-      console.log(res);
       props.history.push(routes.SIGN_IN.url);
       // TODO: Add notif
+      return res.status;
     } catch (e) {
       handleError(e);
-    }
-  };
-
-  const resendConfirmation = async (email) => {
-    const fd = new FormData();
-    fd.append('email', email);
-    try {
-      const res = await axios.post('/api/confirm/resend', fd);
-      console.log(res);
-    } catch (e) {
-      handleError(e);
+      return e.response ? e.response.status : 404;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const signInWithGoogle = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.get("/api/sign-in/google");
       window.location = res.headers.location;
+      return res.status;
     } catch (e) {
       handleError(e);
+      return e.response ? e.response.status : 404;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -165,19 +194,26 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.get('/api/authorize/google' + search);
       updateSession(res.data.username, res.data.expiresAt);
+      return res.status;
     } catch (e) {
       handleError(e);
+      return e.response ? e.response.status : 404;
     } finally {
       setIsLoading(false);
     }
   };
 
   const signInWithFacebook = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.get("/api/sign-in/facebook");
       window.location = res.headers.location;
+      return res.status;
     } catch (e) {
       handleError(e);
+      return e.response ? e.response.status : 404;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -186,8 +222,10 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.get('/api/facebook/authorized' + search);
       updateSession(res.data.username, res.data.expiresAt);
+      return res.status;
     } catch (e) {
       handleError(e);
+      return e.response ? e.response.status : 404;
     } finally {
       setIsLoading(false);
     }
