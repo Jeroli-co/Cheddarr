@@ -54,7 +54,11 @@ def _create_app(config_object: BaseConfig, **kwargs):
     csrf.init_app(app)
     mail.init_app(app)
     Talisman(app)
-    CORS(app, resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}})
+    CORS(
+        app,
+        supports_credentials=True,
+        resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}},
+    )
 
     register_blueprints(app)
     register_commands(app)
@@ -78,7 +82,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
     @app.context_processor
     def inject_now():
-        return {'now': datetime.utcnow()}
+        return {"now": datetime.utcnow()}
 
     return app
 
@@ -87,10 +91,14 @@ def register_blueprints(app):
     from server.auth import auth
     from server.site import site
     from server.auth import facebook_bp
+    from server.auth import google_bp
 
     app.register_blueprint(site)
-    app.register_blueprint(auth, url_prefix="/api",)
+    app.register_blueprint(
+        auth, url_prefix="/api",
+    )
     app.register_blueprint(facebook_bp)
+    app.register_blueprint(google_bp)
 
 
 def register_commands(app):
@@ -114,11 +122,11 @@ def register_login_manager(app):
 
     @login_manager.needs_refresh_handler
     def refresh():
-        raise InvalidUsage("Fresh login required", status_code=HTTPStatus.PROXY_AUTHENTICATION_REQUIRED)
+        raise InvalidUsage(
+            "Fresh login required", status_code=HTTPStatus.PROXY_AUTHENTICATION_REQUIRED
+        )
 
 
 def register_oauth_providers(oauth):
-    oauth.register('google', client_kwargs={
-        'scope': 'openid email profile'
-    })
-    oauth.register('facebook')
+    oauth.register("google", client_kwargs={"scope": "openid email profile"})
+    oauth.register("facebook")

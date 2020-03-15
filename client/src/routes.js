@@ -6,9 +6,8 @@ import {ConfirmAccount} from "./component/protected/confirm-account/ConfirmAccou
 import {WaitingAccountConfirmation} from "./component/protected/waiting-account-confirmation/WaitingAccountConfirmation";
 import {ResetPasswordForm} from "./component/protected/reset-password-form/ResetPasswordForm";
 import {UserProfile} from "./component/private/user-profile/UserProfile";
-import {AuthorizeGoogle} from "./component/protected/authorize-google/AuthorizeGoogle";
-import {AuthorizeFacebook} from "./component/protected/authorize-facebook/AuthorizeFacebook";
 import {InternalServeurError, NotFound, Unauthorized} from "./component/public/errors/Errors";
+import {Authorize} from "./component/protected/authorize/Authorize";
 
 const routes = {
   HOME: { url: '/', component: Home },
@@ -17,12 +16,11 @@ const routes = {
   CONFIRM_ACCOUNT: { url: (token) => '/confirm/' + token, component: ConfirmAccount },
   WAIT_ACCOUNT_CONFIRMATION: { url: (email) => '/wait-account-confirmation/' + email, component: WaitingAccountConfirmation },
   RESET_PASSWORD: { url: (token) => '/reset/' + token, component: ResetPasswordForm },
-  AUTHORIZE_GOOGLE: { url: '/authorize/google', component: AuthorizeGoogle },
-  AUTHORIZE_FACEBOOK: { url: '/authorize/facebook', component: AuthorizeFacebook },
   ERROR_404: { url: '/404', component: NotFound },
   ERROR_500: { url: '/500', component: InternalServeurError },
   ERROR_401: { url: '/401', component: Unauthorized },
-  USER_PROFILE: { url: '/user-profile', component: UserProfile }
+  USER_PROFILE: { url: '/user-profile', component: UserProfile },
+  AUTHORIZE: { url: '/sign-in/authorize', component: Authorize }
 };
 
 export {

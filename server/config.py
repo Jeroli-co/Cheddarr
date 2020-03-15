@@ -37,31 +37,34 @@ class BaseConfig(object):
     ##########################################################################
     # security                                                               #
     ##########################################################################
-    SECURITY_PASSWORD_SALT = os.environ.get('FLASK_SECURITY_PASSWORD_SALT',
-                                            'security-password-salt')
+    SECURITY_PASSWORD_SALT = os.environ.get(
+        "FLASK_SECURITY_PASSWORD_SALT", "security-password-salt"
+    )
 
     ##########################################################################
     # mail                                                                   #
     ##########################################################################
-    MAIL_SERVER = os.environ.get('MAILGUN_SMTP_SERVER', 'localhost')
-    MAIL_PORT = int(os.environ.get('MAILGUN_SMTP_PORT', 25))
-    MAIL_USE_TLS = get_boolean_env('FLASK_MAIL_USE_TLS', False)
-    MAIL_USE_SSL = get_boolean_env('FLASK_MAIL_USE_SSL', False)
-    MAIL_USERNAME = os.environ.get('MAILGUN_SMTP_LOGIN', None)
-    MAIL_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', None)
+    MAIL_SERVER = os.environ.get("MAILGUN_SMTP_SERVER", "localhost")
+    MAIL_PORT = int(os.environ.get("MAILGUN_SMTP_PORT", 25))
+    MAIL_USE_TLS = get_boolean_env("FLASK_MAIL_USE_TLS", False)
+    MAIL_USE_SSL = get_boolean_env("FLASK_MAIL_USE_SSL", False)
+    MAIL_USERNAME = os.environ.get("MAILGUN_SMTP_LOGIN", None)
+    MAIL_PASSWORD = os.environ.get("MAILGUN_SMTP_PASSWORD", None)
     MAIL_DEFAULT_SENDER = (
-        os.environ.get('FLASK_MAIL_DEFAULT_SENDER_NAME', 'Cheddarr'),
-        os.environ.get('FLASK_MAIL_DEFAULT_SENDER_EMAIL',
-                       f"noreply@{os.environ.get('FLASK_DOMAIN', 'localhost')}")
+        os.environ.get("FLASK_MAIL_DEFAULT_SENDER_NAME", "Cheddarr"),
+        os.environ.get(
+            "FLASK_MAIL_DEFAULT_SENDER_EMAIL",
+            f"noreply@{os.environ.get('FLASK_DOMAIN', 'localhost')}",
+        ),
     )
 
     ##########################################################################
     # oauth                                                                  #
     ##########################################################################
-    GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
-    GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
-    FACEBOOK_OAUTH_CLIENT_ID = os.environ.get('FACEBOOK_CLIENT_ID')
-    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get('FACEBOOK_CLIENT_SECRET')
+    GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+    GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+    FACEBOOK_OAUTH_CLIENT_ID = os.environ.get("FACEBOOK_CLIENT_ID")
+    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get("FACEBOOK_CLIENT_SECRET")
 
 
 class ProdConfig(BaseConfig):
@@ -105,9 +108,9 @@ class DevConfig(BaseConfig):
 
 
 class TestConfig(BaseConfig):
-    FLASK_DOMAIN = "http://localhost"
+    FLASK_DOMAIN = "http://localhost:5000"
     TESTING = True
     DEBUG = True
-    SERVER_NAME = "127.0.0.1:5000"
+    SERVER_NAME = "localhost"
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     WTF_CSRF_ENABLED = False

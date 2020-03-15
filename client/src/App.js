@@ -25,8 +25,7 @@ const App = () => {
           <ProtectedRoute exact path={routes.CONFIRM_ACCOUNT.url(':token')} component={routes.CONFIRM_ACCOUNT.component} />
           <ProtectedRoute exaxt path={routes.WAIT_ACCOUNT_CONFIRMATION.url(':email')} component={routes.WAIT_ACCOUNT_CONFIRMATION.component} />
           <ProtectedRoute exact path={routes.RESET_PASSWORD.url(':token')} component={routes.RESET_PASSWORD.component} />
-          <ProtectedRoute path={routes.AUTHORIZE_GOOGLE.url} component={routes.AUTHORIZE_GOOGLE.component} />
-          <ProtectedRoute path={routes.AUTHORIZE_FACEBOOK.url} component={routes.AUTHORIZE_FACEBOOK.component} />
+          <ProtectedRoute path={routes.AUTHORIZE.url} component={routes.AUTHORIZE.component} />
 
           <PrivateRoute exact path={routes.USER_PROFILE.url} component={routes.USER_PROFILE.component} />
 

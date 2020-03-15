@@ -189,19 +189,6 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const authorizeGoogle = async (search) => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get('/api/authorize/google' + search);
-      updateSession(res.data.username, res.data.expiresAt);
-      return res.status;
-    } catch (e) {
-      handleError(e);
-      return e.response ? e.response.status : 404;
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const signInWithFacebook = async () => {
     setIsLoading(true);
@@ -217,19 +204,6 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const authorizeFacebook = async (search) => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get('/api/facebook/authorized' + search);
-      updateSession(res.data.username, res.data.expiresAt);
-      return res.status;
-    } catch (e) {
-      handleError(e);
-      return e.response ? e.response.status : 404;
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const updateSession = (username, expiresAt) => {
     localStorage.setItem('username', username);
@@ -253,15 +227,14 @@ const AuthContextProvider = (props) => {
       signUp,
       signIn,
       signInWithGoogle,
-      authorizeGoogle,
       signInWithFacebook,
-      authorizeFacebook,
       signOut,
       resendConfirmation,
       initResetPassword,
       checkResetPasswordToken,
       resetPassword,
       confirmAccount,
+      refreshSession,
     }}>
       { isLoading && <PageLoader/> }
       { props.children }
