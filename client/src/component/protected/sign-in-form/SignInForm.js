@@ -29,7 +29,7 @@ const SignInForm = () => {
 				<div className="hero-body">
 					<div className="container has-text-centered">
 						<h1 className="title">
-							<p>Sign into your <span style={{ color: "orange" }}>Cheddarr</span> account</p>
+							<p>Sign into your <span className="has-text-secondary">Cheddarr</span> account</p>
 						</h1>
 					</div>
 				</div>
@@ -38,7 +38,7 @@ const SignInForm = () => {
 			<br />
 
 			<div className="columns is-mobile is-centered">
-				<div className="column is-one-quarter">
+				<div className="column is-one-third">
 
 					<form id="sign-in-form" onSubmit={handleSubmit(onSubmit)}>
 
@@ -76,9 +76,10 @@ const SignInForm = () => {
 							)}
 						</div>
 
-						{ status &&
-							(status === 400 && <p className="help is-danger">Unable to sign in. Wrong credentials...</p>) ||
-							(status === 401 && <p className="help is-danger">Account need to be confirmed. Please check your inbox or <a onClick={() => setShowResendConfirmAccount(true)}>Click here</a> to resend the email</p>)
+						{ status && (
+								(status === 400 && <p className="help is-danger">Unable to sign in. Wrong credentials...</p>) ||
+								(status === 401 && <p className="help is-danger">Account need to be confirmed. Please check your inbox or <span className="has-link-style" onClick={() => setShowResendConfirmAccount(true)}>Click here</span> to resend the email</p>)
+							)
 						}
 
 						<div className="field">
@@ -90,7 +91,7 @@ const SignInForm = () => {
 
 						<div className="field">
 							<div className="control">
-								<button className="button is-link">Sign in</button>
+								<button className="button is-secondary-button">Sign in</button>
 							</div>
 						</div>
 
@@ -105,9 +106,14 @@ const SignInForm = () => {
 							<span className="icon">
 								<FontAwesomeIcon icon={faGoogle}/>
 							</span>
-							<span>Google</span>
+							<span style={{color: 'blue'}}>G</span>
+							<span style={{color: 'red'}}>o</span>
+							<span style={{color: 'orange'}}>o</span>
+							<span style={{color: 'blue'}}>g</span>
+							<span style={{color: 'green'}}>l</span>
+							<span style={{color: 'red'}}>e</span>
 						</button>
-						<button className="button is-rounded is-info" type="button" onClick={signInWithFacebook}>
+						<button className="button is-rounded is-facebook-button" type="button" onClick={signInWithFacebook}>
 							<span className="icon">
 								<FontAwesomeIcon icon={faFacebook}/>
 							</span>
@@ -116,7 +122,7 @@ const SignInForm = () => {
 					</div>
 
 					<div className="has-text-centered">
-						<p className="is-size-7">Forgot your password ? <a onClick={() => setShowResetPassword(true)}>Click here to reset it</a></p>
+						<p className="is-size-7">Forgot your password ? <span className="has-link-style" onClick={() => setShowResetPassword(true)}>Click here to reset it</span></p>
 						<p className="is-size-7">Still not have an account ? <Link to="/sign-up">Sign up</Link></p>
 					</div>
 

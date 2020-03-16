@@ -25,7 +25,7 @@ const Navbar = () => {
 
 	return (
 		<div className="Navbar" data-testid="Navbar">
-			<nav className="navbar" role="navigation" aria-label="main navigation">
+			<nav className="navbar is-primary" role="navigation" aria-label="main navigation">
 				<div className="navbar-brand">
 					<Link className="navbar-item" href="https://bulma.io" to="/">
 						<img src={logo} alt="Chedarr" width="32" height="24"/>
@@ -51,7 +51,7 @@ const Navbar = () => {
 						<div className="navbar-item">
 							<div className="buttons">
 
-								<a className="button is-rounded is-dark" href="https://github.com/Jeroli-co/Cheddarr"
+								<a className="button is-rounded" href="https://github.com/Jeroli-co/Cheddarr"
 									 target="_blank" rel="noopener noreferrer">
 									<span className="icon">
 										<FontAwesomeIcon icon={faGithub}/>
@@ -61,7 +61,7 @@ const Navbar = () => {
 
 								{
 									isAuthenticated ? (
-											<div id="nav-sign-out-button" className="button is-rounded is-primary" onClick={signOut} data-testid="SignOutButton">
+											<div id="nav-sign-out-button" className="button is-rounded with-background-primary" onClick={signOut} data-testid="SignOutButton">
 												<span className="icon">
 													<FontAwesomeIcon icon={faSignOutAlt}/>
 												</span>

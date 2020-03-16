@@ -12,9 +12,10 @@ const InitResetPasswordModal = ({ isActive, onClose }) => {
 
 		const submitResetPassword = (data) => {
 		  initResetPassword(data).then((status) => {
-		    if (status === 200)
-		      setValue('email', '');
-		    setStatus(status)
+		    setStatus(status);
+        if (status === 200) {
+          closeModal();
+        }
 		  })
     };
 

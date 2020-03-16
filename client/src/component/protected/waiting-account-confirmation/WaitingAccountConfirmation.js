@@ -26,7 +26,7 @@ const WaitingAccountConfirmation = () => {
 							If you already confirmed your account, feel free to sign in to Cheddarr
 						</h2>
 						<h2 className="subtitle">
-							If you have not received the confirmation email, <a>Click here to resend it</a>
+							If you have not received the confirmation email, Click on the button below
 						</h2>
 						<div className="buttons">
 							<SignInButton/>

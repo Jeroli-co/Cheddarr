@@ -1,5 +1,5 @@
 import React from 'react';
-import './Home.css';
+import './Home.scss';
 import logo from "../../../assets/cheddarr.png";
 
 const Home = () => {
@@ -7,14 +7,14 @@ const Home = () => {
 		<div className="Home" data-testid="Home">
 			<header className="Home-header">
         <img src={logo} className="Home-logo" alt="logo" />
-        <a
+        <p
           className="Home-link"
           href="https://reactjs.org"
           target="_blank"
           rel="noopener noreferrer"
         >
 					GROSSE APP EN PERSPECTIVE !
-        </a>
+        </p>
       </header>
 		</div>
 	);

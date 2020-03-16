@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 
 function SignUpButton() {
 	return (
-		<Link className="button is-rounded is-primary" to="/sign-up" data-testid="SignUpButton">
+		<Link className="button is-rounded is-secondary-button" to="/sign-up" data-testid="SignUpButton">
 			<span className="icon">
 				<FontAwesomeIcon icon={faUserPlus}/>
 			</span>

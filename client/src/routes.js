@@ -1,4 +1,3 @@
-import React from 'react';
 import {Home} from "./component/public/home/Home";
 import {SignInForm} from "./component/protected/sign-in-form/SignInForm";
 import {SignUpForm} from "./component/protected/sign-up-form/SignUpForm";

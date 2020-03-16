@@ -17,7 +17,7 @@ const SignUpForm = () => {
 				<div className="hero-body">
 					<div className="container has-text-centered">
 						<h1 className="title">
-							<p>Create a <span style={{color: "orange"}}>Cheddarr</span> account</p>
+							<p>Create a <span className="has-text-secondary">Cheddarr</span> account</p>
 						</h1>
 					</div>
 				</div>
@@ -26,7 +26,7 @@ const SignUpForm = () => {
 			<br />
 
 			<div className="columns is-mobile is-centered">
-				<div className="column is-one-quarter">
+				<div className="column is-one-third">
 
           <form onSubmit={handleSubmit(signUp)}>
 
@@ -132,7 +132,7 @@ const SignUpForm = () => {
                          required: true,
                          pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,128}$/,
                          validate: (value) => {
-                          return value === watch('password');
+                           return value === watch('password');
                          }
                        })} />
                 <span className="icon is-small is-left">
@@ -143,7 +143,7 @@ const SignUpForm = () => {
                 <p className="help is-danger">Please confirm your password</p>
               )}
               {errors['password-confirmation'] && errors['password-confirmation'].type === 'pattern' && (
-                <p className="help is-danger">Your password must contain 8 to 15 characters with at least one lowercase letter, one uppercase letter, one numeric digit, and one special character</p>
+                <p className="help is-danger">Your password must contain at least 8 characters with at least one lowercase letter, one uppercase letter, one numeric digit, and one special character</p>
               )}
               {errors['password-confirmation'] && errors['password-confirmation'].type === 'validate' && (
                 <p className="help is-danger">Passwords are not equals</p>
@@ -153,7 +153,7 @@ const SignUpForm = () => {
             {/* SUBMIT BUTTON */}
             <div className="field">
               <div className="control">
-                <button className="button is-link">Sign up</button>
+                <button className="button is-secondary-button">Sign up</button>
               </div>
             </div>
 
