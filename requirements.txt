@@ -4,6 +4,7 @@ Flask
 Flask-Cors
 requests
 Werkzeug
+blinker
 gunicorn
 Flask-SQLAlchemy
 psycopg2-binary
