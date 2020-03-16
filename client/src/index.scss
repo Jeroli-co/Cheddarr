@@ -2,9 +2,9 @@ $primary: #f8813f;
 $secondary: #f9c441;
 
 @import '~bulma/bulma.sass';
-@import '~bulma-switch';
-@import '~bulma-pageloader';
-@import '~bulma-divider';
+@import '~bulma-switch/dist/css/bulma-switch';
+@import '~bulma-pageloader/dist/css/bulma-pageloader';
+@import '~bulma-divider/dist/css/bulma-divider';
 
 body {
   margin: 0;
@@ -44,7 +44,3 @@ code {
   color: whitesmoke;
   border: none;
 }
-
-
-
-
