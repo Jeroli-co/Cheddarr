@@ -16,7 +16,6 @@ def get_session_info():
 
 
 def send_email(to_email, subject, html_content):
-    print(app.config.get("MAIL_SENDGRID_API_KEY"))
     from_email = From(app.config.get("MAIL_DEFAULT_SENDER"))
     message = Mail(
         from_email=from_email,
