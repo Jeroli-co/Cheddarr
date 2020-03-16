@@ -1,16 +1,8 @@
 from http import HTTPStatus
-
 from flask import url_for, render_template
-
 from server import db, InvalidUsage
-from server.auth import auth, User
+from server.auth import auth, User, utils
 from server.auth.forms import SignupForm, EmailForm
-from server.auth.utils import (
-    generate_timed_token,
-    send_email,
-    confirm_token,
-    create_user,
-)
 
 
 @auth.route("/sign-up", methods=["POST"])
@@ -26,7 +18,7 @@ def signup():
     if existing_user:
         raise InvalidUsage("The user already exists.", status_code=HTTPStatus.CONFLICT)
 
-    user = create_user(
+    user = User.create_user(
         signup_form.firstName.data,
         signup_form.lastName.data,
         signup_form.email.data,
@@ -34,7 +26,7 @@ def signup():
         signup_form.password.data,
     )
 
-    token = generate_timed_token(user.email)
+    token = utils.generate_timed_token(user.email)
     confirm_url = url_for("auth.confirm_email", token=token, _external=True)
     html = render_template(
         "email/welcome.html",
@@ -44,7 +36,7 @@ def signup():
     subject = "Welcome!"
     db.session.add(user)
     db.session.commit()
-    send_email(user.email, subject, html)
+    utils.send_email(user.email, subject, html)
     return {"message": "Confirmation email sent"}, HTTPStatus.OK
 
 
@@ -82,11 +74,11 @@ def resend_confirmation():
             "No user with this email exists", status_code=HTTPStatus.BAD_REQUEST
         )
 
-    token = generate_timed_token(email)
+    token = utils.generate_timed_token(email)
     confirm_url = url_for("auth.confirm_email", token=token, _external=True)
     html = render_template(
         "email/account_confirmation.html", confirm_url=confirm_url.replace("/api", "")
     )
     subject = "Please confirm your email"
-    send_email(email, subject, html)
+    utils.send_email(email, subject, html)
     return {"message": "Confirmation email sent"}, HTTPStatus.OK

@@ -1,28 +1,10 @@
 from time import time
-
 from flask_login import confirm_login, current_user
-from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
 from flask import current_app as app
+from sendgrid import Mail, From, To, Content
 from server import mail
-from server.auth import User
 from server.config import SESSION_LIFETIME
-
-
-def create_user(first_name, last_name, email, username, password=None):
-    user = User(
-        username=username,
-        email=email,
-        password=password,
-        first_name=first_name,
-        last_name=last_name,
-        confirmed=False if password is not None else True,
-    )
-    if user.password:
-        user.session_token = generate_token([user.email, user.password])
-    else:
-        user.session_token = generate_token([user.email])
-    return user
 
 
 def get_session_info():
@@ -33,9 +15,19 @@ def get_session_info():
     }  # Session next timeout in ms
 
 
-def send_email(to, subject, template):
-    msg = Message(subject, recipients=[to], html=template,)
-    mail.send(msg)
+def send_email(to_email, subject, html_content):
+    print(app.config.get("MAIL_SENDGRID_API_KEY"))
+    from_email = From(app.config.get("MAIL_DEFAULT_SENDER"))
+    message = Mail(
+        from_email=from_email,
+        to_emails=To(to_email),
+        subject=subject,
+        html_content=Content("text/html", html_content),
+    )
+    try:
+        mail.send(message)
+    except:
+        raise Exception
 
 
 def generate_token(data):

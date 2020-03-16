@@ -1,4 +1,5 @@
 pytest
+pytest-mock
 Flask
 Flask-Cors
 requests
@@ -10,6 +11,5 @@ flask-login
 flask-talisman
 flask-wtf
 itsdangerous
-Flask-Mail
-flask-mail-sendgrid
+sendgrid
 Flask-Dance[sqla]
