@@ -2,8 +2,8 @@ from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from server import db
+from server.auth import utils
 
 
 class User(db.Model, UserMixin):
@@ -22,7 +22,7 @@ class User(db.Model, UserMixin):
             self.email,
             self.first_name,
             self.last_name,
-            self.password
+            self.password,
         )
 
     def get_id(self):
@@ -42,7 +42,7 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password, value)
 
     @classmethod
-    def exists(cls, email=None, username=None):
+    def exists(cls, email=None):
         return db.session.query(User.id).filter_by(email=email).scalar()
 
     @classmethod
@@ -52,6 +52,22 @@ class User(db.Model, UserMixin):
         if username:
             return User.query.filter_by(username=username).first()
         return None
+
+    @classmethod
+    def create_user(cls, first_name, last_name, email, username, password=None):
+        user = User(
+            username=username,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            confirmed=False if password is not None else True,
+        )
+        if user.password:
+            user.session_token = utils.generate_token([user.email, user.password])
+        else:
+            user.session_token = utils.generate_token([user.email])
+        return user
 
 
 class OAuth(OAuthConsumerMixin, db.Model):

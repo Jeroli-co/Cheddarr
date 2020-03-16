@@ -1,16 +1,12 @@
 from http import HTTPStatus
-
-from flask import url_for, redirect, current_app
+from flask import url_for, redirect
 from flask_dance.consumer import oauth_authorized, oauth_error
-from flask_dance.contrib.facebook import facebook
 from flask_login import login_user, login_required
 from sqlalchemy.orm.exc import NoResultFound
-
 from server import InvalidUsage, db
-from server.auth import auth, facebook_bp, google_bp
+from server.auth import auth, facebook_bp, google_bp, utils
 from server.auth.models import User, OAuth
-from server.auth.forms import SigninForm, SignupForm
-from server.auth.utils import get_session_info, create_user
+from server.auth.forms import SigninForm
 
 
 @auth.route("/sign-in", methods=["POST"])
@@ -38,13 +34,13 @@ def signin():
 
     remember = True if signin_form.remember.data else False
     login_user(user, remember=remember)
-    return get_session_info(), HTTPStatus.OK
+    return utils.get_session_info(), HTTPStatus.OK
 
 
 @auth.route("/refresh-session")
 @login_required
 def refresh_session():
-    return get_session_info(), HTTPStatus.OK
+    return utils.get_session_info(), HTTPStatus.OK
 
 
 @auth.route("/sign-in/google")
@@ -105,7 +101,7 @@ def oauth_logged_in(blueprint, token):
                 last_name = info["family_name"]
             else:
                 return False
-            user = create_user(
+            user = User.create_user(
                 first_name=first_name, last_name=last_name, email=email, username=email,
             )
             # Associate the new local user account with the OAuth token

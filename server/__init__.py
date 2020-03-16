@@ -5,11 +5,11 @@ from flask import jsonify, session
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_login import LoginManager
-from flask_mail_sendgrid import MailSendGrid
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_cors import CORS
+from sendgrid import sendgrid
 
 from server.exceptions import InvalidUsage
 from server.config import (
@@ -24,7 +24,7 @@ from server.config import (
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
-mail = MailSendGrid()
+mail = sendgrid.SendGridAPIClient()
 
 
 def create_app():
@@ -52,7 +52,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
     db.init_app(app)
     csrf.init_app(app)
-    mail.init_app(app)
+    mail.api_key = app.config.get("MAIL_SENDGRID_API_KEY")
     Talisman(app)
     CORS(
         app,
