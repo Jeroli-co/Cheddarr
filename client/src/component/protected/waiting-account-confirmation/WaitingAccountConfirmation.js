@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {SignInButton} from "../element/sign-in-button/SignInButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
@@ -7,8 +7,16 @@ import {useParams} from "react-router";
 
 const WaitingAccountConfirmation = () => {
 
-	const { resendConfirmation } = useContext(AuthContext);
 	const { email } = useParams();
+	const { resendConfirmation } = useContext(AuthContext);
+	const [message, setMessage] = useState("");
+
+	const sendEmail = (email) => {
+		resendConfirmation(email).then((status) => {
+			const message = status === 200 ? "The email has been send resend" : "An error occured, please try again";
+			setMessage(message);
+		});
+	};
 
 	return (
 		<div className="WaitingAccountConfirmation" data-testid="WaitingAccountConfirmation">
@@ -30,12 +38,13 @@ const WaitingAccountConfirmation = () => {
 						</h2>
 						<div className="buttons">
 							<SignInButton/>
-							<button className="button is-rounded is-primary" type="button" onClick={() => resendConfirmation(email)}>
+							<button className="button is-rounded is-primary" type="button" onClick={() => sendEmail(email)}>
 								<span className="icon">
 									<FontAwesomeIcon icon={faEnvelope}/>
 								</span>
 								<span>Resend email</span>
 							</button>
+							{ message !== "" && <span>{message}</span>}
 						</div>
 					</div>
 				</div>

@@ -44,33 +44,18 @@ test('App router load components (not authentication needed) correctly', () => {
 
   // Render reset password component
   history.push(routes.RESET_PASSWORD.url('secret-token'));
-  const resetPasswordForm = wrapper.getByTestId('ResetPasswordForm');
-  expect(resetPasswordForm).toBeInTheDocument();
+  const resetPassword = wrapper.getByTestId('ResetPassword');
+  expect(resetPassword).toBeInTheDocument();
 
-  // Render authorize google
-  history.push(routes.AUTHORIZE_GOOGLE.url);
-  const authorizeGoogle = wrapper.getByTestId('AuthorizeGoogle');
-  expect(authorizeGoogle).toBeInTheDocument();
-
-  // Render authorize facebook
-  history.push(routes.AUTHORIZE_FACEBOOK.url);
-  const authorizeFacebook = wrapper.getByTestId('AuthorizeFacebook');
-  expect(authorizeFacebook).toBeInTheDocument();
+  // Render authorize
+  history.push(routes.AUTHORIZE.url);
+  const authorize = wrapper.getByTestId('Authorize');
+  expect(authorize).toBeInTheDocument();
 
   // Render 404 not found
-  history.push(routes.ERROR_404.url);
+  history.push(routes.NOT_FOUND.url);
   const notFound = wrapper.getByTestId('NotFound');
   expect(notFound).toBeInTheDocument();
-
-  // Render 500 internal server error
-  history.push(routes.ERROR_500.url);
-  const internalServerError = wrapper.getByTestId('InternalServerError');
-  expect(internalServerError).toBeInTheDocument();
-
-  // Render 401 unauthorized
-  history.push(routes.ERROR_401.url);
-  const unhautorized = wrapper.getByTestId('Unauthorized');
-  expect(unhautorized).toBeInTheDocument();
 });
 
 test('Router fire 404 when th url is unknown', () => {

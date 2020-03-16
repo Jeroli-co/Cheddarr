@@ -5,7 +5,6 @@ import AuthContextProvider from "./context/AuthContext";
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import {routes} from "./routes";
-import {NotFound} from "./component/public/errors/Errors";
 import {PrivateRoute} from "./PrivateRoute";
 import {ProtectedRoute} from "./ProtectedRoute";
 
@@ -29,10 +28,8 @@ const App = () => {
 
           <PrivateRoute exact path={routes.USER_PROFILE.url} component={routes.USER_PROFILE.component} />
 
-          <Route exact path={routes.ERROR_401.url} component={routes.ERROR_401.component} />
-          <Route exact path={routes.ERROR_500.url} component={routes.ERROR_500.component} />
-          <Route exact path={routes.ERROR_404.url} component={routes.ERROR_404.component} />
-          <Route path="*" component={NotFound} />
+          <Route exact path={routes.NOT_FOUND.url} component={routes.NOT_FOUND.component} />
+          <Route path="*" component={routes.NOT_FOUND.component} />
         </Switch>
       </AuthContextProvider>
     </div>

@@ -9,7 +9,7 @@ const Authorize = (props) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	return <div/>;
+	return <div className="Authorize" data-testid="Authorize" />;
 };
 
 export {

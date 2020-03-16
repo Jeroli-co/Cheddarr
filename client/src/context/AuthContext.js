@@ -166,7 +166,6 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.post('/api/reset/' + token, fd);
       props.history.push(routes.SIGN_IN.url);
-      // TODO: Add notif
       return res.status;
     } catch (e) {
       handleError(e);
@@ -223,6 +222,9 @@ const AuthContextProvider = (props) => {
   const handleError = (error) => {
     console.log(error);
     clearSession();
+    if (error.response.status && error.response.status === 404) {
+      props.history.push(routes.NOT_FOUND.url);
+    }
   };
 
   return (
