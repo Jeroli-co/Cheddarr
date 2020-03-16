@@ -43,7 +43,7 @@ def signup():
 @auth.route("/confirm/<token>")
 def confirm_email(token):
     try:
-        email = confirm_token(token)
+        email = utils.confirm_token(token)
     except:
         raise InvalidUsage(
             "The confirmation link is invalid or has expired.",
