@@ -16,7 +16,7 @@ def create_user(first_name, last_name, email, username, password=None):
         password=password,
         first_name=first_name,
         last_name=last_name,
-        confirmed=False if password is not None else True
+        confirmed=False if password is not None else True,
     )
     if user.password:
         user.session_token = generate_token([user.email, user.password])
@@ -28,17 +28,13 @@ def create_user(first_name, last_name, email, username, password=None):
 def get_session_info():
     confirm_login()
     return {
-            "username": current_user.username,
-            "expiresAt": (int(time()) + SESSION_LIFETIME * 60) * 1000
-        }  # Session next timeout in ms
+        "username": current_user.username,
+        "expiresAt": (int(time()) + SESSION_LIFETIME * 60) * 1000,
+    }  # Session next timeout in ms
 
 
 def send_email(to, subject, template):
-    msg = Message(
-        subject,
-        recipients=[to],
-        html=template,
-    )
+    msg = Message(subject, recipients=[to], html=template,)
     mail.send(msg)
 
 
@@ -53,14 +49,11 @@ def generate_timed_token(data):
 
 
 def confirm_token(token, expiration=600):
-    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
     try:
         data = serializer.loads(
-            token,
-            salt=app.config['SECURITY_PASSWORD_SALT'],
-            max_age=expiration
+            token, salt=app.config["SECURITY_PASSWORD_SALT"], max_age=expiration
         )
     except:
         raise Exception
     return data
-

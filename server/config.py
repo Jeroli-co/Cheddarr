@@ -44,12 +44,7 @@ class BaseConfig(object):
     ##########################################################################
     # mail                                                                   #
     ##########################################################################
-    MAIL_SERVER = os.environ.get("MAILGUN_SMTP_SERVER", "localhost")
-    MAIL_PORT = int(os.environ.get("MAILGUN_SMTP_PORT", 25))
-    MAIL_USE_TLS = get_boolean_env("FLASK_MAIL_USE_TLS", False)
-    MAIL_USE_SSL = get_boolean_env("FLASK_MAIL_USE_SSL", False)
-    MAIL_USERNAME = os.environ.get("MAILGUN_SMTP_LOGIN", None)
-    MAIL_PASSWORD = os.environ.get("MAILGUN_SMTP_PASSWORD", None)
+    MAIL_SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
     MAIL_DEFAULT_SENDER = (
         os.environ.get("FLASK_MAIL_DEFAULT_SENDER_NAME", "Cheddarr"),
         os.environ.get(

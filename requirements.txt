@@ -11,4 +11,5 @@ flask-talisman
 flask-wtf
 itsdangerous
 Flask-Mail
+flask-mail-sendgrid
 Flask-Dance[sqla]

@@ -5,7 +5,7 @@ from flask import jsonify, session
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_login import LoginManager
-from flask_mail import Mail
+from flask_mail_sendgrid import MailSendGrid
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -24,7 +24,7 @@ from server.config import (
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
-mail = Mail()
+mail = MailSendGrid()
 
 
 def create_app():

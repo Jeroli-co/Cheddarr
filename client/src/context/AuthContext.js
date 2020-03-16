@@ -180,6 +180,7 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.get("/api/sign-in/google");
       window.location = res.headers.location;
+      //window.open(res.headers.location, "_blank","toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
       return res.status;
     } catch (e) {
       handleError(e);
@@ -195,6 +196,7 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.get("/api/sign-in/facebook");
       window.location = res.headers.location;
+      //window.open(res.headers.location, "","height=200,width=200,modal=yes,alwaysRaised=yes");
       return res.status;
     } catch (e) {
       handleError(e);

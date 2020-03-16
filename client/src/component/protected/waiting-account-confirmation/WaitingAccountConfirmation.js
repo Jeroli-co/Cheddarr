@@ -16,17 +16,17 @@ const WaitingAccountConfirmation = () => {
 				<div className="hero-body">
 					<div className="container">
 						<h1 className="title">
-							One more step ! Account still need confirmation...
+							One more step ! Your account needs to be confirmed...
 						</h1>
 						<h2 className="subtitle">
 							Please check your emails and click on the link provided to confirm your account
 						</h2>
 
 						<h2 className="subtitle">
-							If you already confirm your account, feel free to sign in to Cheddarr
+							If you already confirmed your account, feel free to sign in to Cheddarr
 						</h2>
 						<h2 className="subtitle">
-							If you have not receive the confirmation email, <a>Click here to resend it</a>
+							If you have not received the confirmation email, <a>Click here to resend it</a>
 						</h2>
 						<div className="buttons">
 							<SignInButton/>

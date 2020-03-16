@@ -58,6 +58,9 @@ def confirm_reset(token):
             user.password = password_form.password.data
             user.session_token = generate_token([user.email, user.password])
             db.session.commit()
+            html = render_template("email/reset_password_notice.html",)
+            subject = "Your password has been reset"
+            send_email(user.email, subject, html)
             return {"message": "Password reset"}, HTTPStatus.OK
         raise InvalidUsage(
             "Error in change password form.",
