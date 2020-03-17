@@ -85,14 +85,17 @@ def oauth_logged_in(blueprint, token):
         login_user(oauth.user)
 
     else:
+        print(info)
         email = info["email"]
         user = User.find(email=email)
+        # If the user already exists in the User table (but not in the Oauth table)
         if user:
-            # If the user already exists in the User table (but not in the Oauth table)
+            # Associate the existing local user account with the OAuth token
             oauth.user = user
+            # Log in the existing local user account
             login_user(oauth.user)
         else:
-            # Create a new local user account for this user
+            # Get user info
             if blueprint.name == "facebook":
                 first_name = info["first_name"]
                 last_name = info["last_name"]
@@ -101,16 +104,17 @@ def oauth_logged_in(blueprint, token):
                 last_name = info["family_name"]
             else:
                 return False
+            # Create a new local user account for this user
             user = User.create_user(
                 first_name=first_name, last_name=last_name, email=email, username=email,
             )
             # Associate the new local user account with the OAuth token
             oauth.user = user
-            # Save and commit our database models
-            db.session.add_all([user, oauth])
-            db.session.commit()
             # Log in the new local user account
             login_user(user)
+        # Save and commit our database models
+        db.session.add_all([user, oauth])
+        db.session.commit()
 
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
