@@ -11,7 +11,8 @@ def get_session_info():
     confirm_login()
     return {
         "username": current_user.username,
-        "expiresAt": (int(time()) + SESSION_LIFETIME * 60) * 1000,
+        "user_picture": current_user.user_picture,
+        "expires_in": (int(time()) + SESSION_LIFETIME * 60) * 1000,
     }  # Session next timeout in ms
 
 
