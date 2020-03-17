@@ -12,17 +12,19 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(64), unique=True, index=True)
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
+    user_picture = db.Column(db.String(256), nullable=True)
     _password = db.Column(db.String(256), nullable=True)
     confirmed = db.Column(db.Boolean, default=False)
     session_token = db.Column(db.String(256))
 
     def __repr__(self):
-        return "%s/%s/%s/%s/%s" % (
+        return "%s/%s/%s/%s/%s/%s" % (
             self.username,
             self.email,
             self.first_name,
             self.last_name,
             self.password,
+            self.user_picture,
         )
 
     def get_id(self):
@@ -54,13 +56,16 @@ class User(db.Model, UserMixin):
         return None
 
     @classmethod
-    def create_user(cls, first_name, last_name, email, username, password=None):
+    def create_user(
+        cls, first_name, last_name, email, username, user_picture=None, password=None
+    ):
         user = User(
             username=username,
             email=email,
             password=password,
             first_name=first_name,
             last_name=last_name,
+            user_picture=user_picture,
             confirmed=False if password is not None else True,
         )
         if user.password:
