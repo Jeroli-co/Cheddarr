@@ -20,7 +20,7 @@ const ConfirmAccount = () => {
 		<div className="ConfirmAccount" data-testid="ConfirmAccount">
       { code &&
         (
-          (code === 200 && <AccountConfirmed/>) ||
+          (code === 201 && <AccountConfirmed/>) ||
           (code === 409 && <AlreadyConfirmed/>) ||
           (code === 410 && <TokenExpired/>)
         )
