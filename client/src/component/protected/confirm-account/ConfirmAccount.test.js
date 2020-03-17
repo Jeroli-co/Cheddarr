@@ -9,11 +9,11 @@ import {ConfirmAccount} from "./ConfirmAccount";
 
 afterEach(cleanup);
 
-test('Confirm account shows AccountConfirmed on 200', async () => {
+test('Confirm account shows AccountConfirmed on 201', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_ACCOUNT.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmAccount: () => new Promise((resolve) => resolve(200)) }}>
+      <AuthContext.Provider value={{ confirmAccount: () => new Promise((resolve) => resolve(201)) }}>
         <ConfirmAccount/>
       </AuthContext.Provider>
     </Router>
