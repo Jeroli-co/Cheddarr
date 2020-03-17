@@ -25,4 +25,4 @@ google_bp = make_google_blueprint(
     redirect_url="/sign-in/authorize",
 )
 
-from .routes import signup, signin, signout, reset_password  # noqa
+from . import routes  # noqa
