@@ -61,7 +61,9 @@ def oauth_logged_in(blueprint, token):
         return False
 
     if blueprint.name == "facebook":
-        resp = blueprint.session.get("/me?fields=email,first_name,last_name")
+        resp = blueprint.session.get(
+            "/me", params={"fields": "email, first_name, last_name"}
+        )
     elif blueprint.name == "google":
         resp = blueprint.session.get("/oauth2/v1/userinfo")
     else:
@@ -83,7 +85,6 @@ def oauth_logged_in(blueprint, token):
         login_user(oauth.user)
 
     else:
-        print(info)
         email = info["email"]
         user = User.find(email=email)
         # If the user already exists in the User table (but not in the Oauth table)
