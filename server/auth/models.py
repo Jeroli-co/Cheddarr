@@ -12,9 +12,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(64), unique=True, index=True)
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
-    _password = db.Column(db.String(128), nullable=True)
+    _password = db.Column(db.String(256), nullable=True)
     confirmed = db.Column(db.Boolean, default=False)
-    session_token = db.Column(db.String(128))
+    session_token = db.Column(db.String(256))
 
     def __repr__(self):
         return "%s/%s/%s/%s/%s" % (
