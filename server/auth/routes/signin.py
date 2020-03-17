@@ -61,9 +61,7 @@ def oauth_logged_in(blueprint, token):
         return False
 
     if blueprint.name == "facebook":
-        resp = blueprint.session.get(
-            "/me", params={"fields": "email, first_name, last_name"}
-        )
+        resp = blueprint.session.get("/me?fields=email,first_name,last_name")
     elif blueprint.name == "google":
         resp = blueprint.session.get("/oauth2/v1/userinfo")
     else:
