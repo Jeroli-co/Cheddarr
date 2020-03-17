@@ -11,21 +11,23 @@ def reset_password():
     if email_form.validate():
         email = email_form.email.data
         user = User.find(email=email)
-        if not user or not user.confirmed:
-            raise InvalidUsage(
-                "Error when sending reset instructions",
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                payload=email_form.errors,
+        if user and user.confirmed:
+
+            token = utils.generate_timed_token([user.email, user.session_token])
+            reset_url = url_for("auth.confirm_reset", token=token, _external=True)
+            html = render_template(
+                "email/reset_password_instructions.html",
+                reset_url=reset_url.replace("/api", ""),
             )
-        token = utils.generate_timed_token([user.email, user.session_token])
-        reset_url = url_for("auth.confirm_reset", token=token, _external=True)
-        html = render_template(
-            "email/reset_password_instructions.html",
-            reset_url=reset_url.replace("/api", ""),
-        )
-        subject = "Reset your password"
-        utils.send_email(email, subject, html)
-        return {"message": "Reset instructions sent."}, HTTPStatus.OK
+            subject = "Reset your password"
+            utils.send_email(email, subject, html)
+            return {"message": "Reset instructions sent."}, HTTPStatus.OK
+
+    raise InvalidUsage(
+        "Error while sending reset instructions",
+        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        payload=email_form.errors,
+    )
 
 
 @auth.route("/reset/<token>", methods=["GET", "POST"])
