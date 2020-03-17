@@ -1,0 +1,46 @@
+$primary: #f8813f;
+$secondary: #f9c441;
+
+@import '~bulma/bulma.sass';
+@import '~bulma-switch/dist/css/bulma-switch';
+@import '~bulma-pageloader/dist/css/bulma-pageloader';
+@import '~bulma-divider/dist/css/bulma-divider';
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.has-text-secondary {
+  color: $secondary;
+}
+
+.has-link-style {
+  cursor: pointer;
+  color: #5586dc;
+}
+
+.has-link-style:hover {
+  color: #5c5c5c;
+}
+
+.is-secondary-button {
+  background-color: $secondary;
+  color: $grey-darker;
+  border: none;
+}
+
+.is-facebook-button {
+  background-color: #4667ae;
+  color: whitesmoke;
+  border: none;
+}

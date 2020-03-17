@@ -1,20 +1,20 @@
-.App {
+.Home {
   text-align: center;
 }
 
-.App-logo {
+.Home-logo {
   height: 40vmin;
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+  .Home-logo {
+    animation: Home-logo-spin infinite 20s linear;
   }
 }
 
-.App-header {
-  background-color: #282c34;
+.Home-header {
+  background-color: white;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -24,11 +24,11 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.Home-link {
+  color: #f8813f;
 }
 
-@keyframes App-logo-spin {
+@keyframes Home-logo-spin {
   from {
     transform: rotate(0deg);
   }

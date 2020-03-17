@@ -1,8 +1,16 @@
 pytest
+pytest-mock
 Flask
 Flask-Cors
 requests
 Werkzeug
+blinker
 gunicorn
 Flask-SQLAlchemy
 psycopg2-binary
+flask-login
+flask-talisman
+flask-wtf
+itsdangerous
+sendgrid
+Flask-Dance[sqla]
