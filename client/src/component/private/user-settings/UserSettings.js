@@ -6,7 +6,6 @@ import './UserSettings.scss';
 import {PrivateRoute} from "../../../PrivateRoute";
 import {UserSettingsProfile} from "./element/user-settings-profile/UserSettingsProfile";
 import {UserSettingsConfigurations} from "./element/user-settings-configurations/UserSettingsConfigurations";
-import {Link} from "react-router-dom";
 
 const tabRoutes = {
   USER_SETTINGS_PROFILE: { url: '/settings', component: UserSettingsProfile },
@@ -19,14 +18,14 @@ const UserSettings = (props) => {
       <div className="tabs is-centered is-boxed is-medium">
         <ul>
           <li className={props.location.pathname === tabRoutes.USER_SETTINGS_PROFILE.url ? 'is-active' : ''} onClick={() => props.history.push(tabRoutes.USER_SETTINGS_PROFILE.url)}>
-            <Link to={tabRoutes.USER_SETTINGS_PROFILE.url}>
+            <a>
               <FontAwesomeIcon icon={faUser} />
-            </Link>
+            </a>
           </li>
           <li className={props.location.pathname === tabRoutes.USER_SETTINGS_CONFIGURATIONS.url ? 'is-active' : ''} onClick={() => props.history.push(tabRoutes.USER_SETTINGS_CONFIGURATIONS.url)}>
-            <Link to={tabRoutes.USER_SETTINGS_CONFIGURATIONS.url}>
+            <a>
               <FontAwesomeIcon icon={faCog} />
-            </Link>
+            </a>
           </li>
         </ul>
       </div>
