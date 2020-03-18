@@ -91,5 +91,5 @@ class OAuth(OAuthConsumerMixin, db.Model):
     provider_user_id = db.Column(db.String(256), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     user = db.relationship(
-        "User", backref="oauth", single_parent=True, cascade="delete, delete-orphan"
+        "User", backref=backref("oauth", cascade="delete, delete-orphan")
     )
