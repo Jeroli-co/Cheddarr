@@ -315,7 +315,6 @@ const AuthContextProvider = (props) => {
 
   return (
     <AuthContext.Provider value={{...session,
-      refreshSession,
       signUp,
       signIn,
       signInWithGoogle,
