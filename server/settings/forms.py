@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, Length
 
 
 class ChangePasswordForm(FlaskForm):
-    oldPassword = PasswordField("Old Password", [DataRequired()])
+    oldPassword = PasswordField("Old Password")
     newPassword = PasswordField("New Password", [DataRequired(), Length(min=8)])
 
 
