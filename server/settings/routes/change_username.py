@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
-from flask_login import login_required
+from flask_login import login_required, current_user
 
-from server import InvalidUsage
+from server import InvalidUsage, db
+from server.auth import User
 from server.settings import settings
 from server.settings.forms import ChangeUsernameForm
 
@@ -17,4 +18,12 @@ def change_username():
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
+    new_username = username_form.newUsername.data
+    if User.exists(username=new_username):
+        raise InvalidUsage(
+            "This username is already taken", status_code=HTTPStatus.CONFLICT
+        )
+
+    current_user.username = username_form.newUsername.data
+    db.session.commit()
     return {"message": "Username changed"}, HTTPStatus.OK
