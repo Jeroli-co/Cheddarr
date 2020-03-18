@@ -113,10 +113,10 @@ const SignUpForm = () => {
                 </span>
               </div>
               {errors['password'] && errors['password'].type === 'required' && (
-                <p className="help is-danger">Password is required (8 to 15 characters which contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character)</p>
+                <p className="help is-danger">Password is required (at least 8 characters long which contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character)</p>
               )}
               {errors['password'] && errors['password'].type === 'pattern' && (
-                <p className="help is-danger">Your password must contain 8 to 15 characters with at least one lowercase letter, one uppercase letter, one numeric digit, and one special character</p>
+                <p className="help is-danger">Your password must contain at least 8 characters long with at least one lowercase letter, one uppercase letter, one numeric digit, and one special character</p>
               )}
             </div>
 
