@@ -49,7 +49,7 @@ def confirm_reset(token):
         password_form = PasswordForm()
         if not password_form.validate():
             raise InvalidUsage(
-                "Error in change password form.",
+                "Error while resetting password",
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 payload=password_form.errors,
             )
