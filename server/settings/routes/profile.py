@@ -81,7 +81,9 @@ def delete_user():
             "Error while deleting user", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
         )
 
-    if not current_user.check_password(password_form.password.data):
+    if current_user.password is not None and not current_user.check_password(
+        password_form.password.data
+    ):
         raise InvalidUsage("Wrong password", HTTPStatus.UNAUTHORIZED)
 
     current_user.delete()
