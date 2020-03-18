@@ -7,7 +7,7 @@ from server import db
 from .models import User, OAuth
 from ..config import FLASK_TEMPLATE_FOLDER
 
-auth = Blueprint("auth", __name__, template_folder=FLASK_TEMPLATE_FOLDER,)
+auth = Blueprint("auth", __name__, template_folder=FLASK_TEMPLATE_FOLDER)
 
 
 facebook_bp = make_facebook_blueprint(

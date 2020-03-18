@@ -20,6 +20,7 @@ from server.config import (
     ProdConfig,
 )
 
+
 """Global extensions"""
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -90,13 +91,13 @@ def _create_app(config_object: BaseConfig, **kwargs):
 def register_blueprints(app):
     from server.auth import auth
     from server.site import site
+    from server.settings import settings
     from server.auth import facebook_bp
     from server.auth import google_bp
 
     app.register_blueprint(site)
-    app.register_blueprint(
-        auth, url_prefix="/api",
-    )
+    app.register_blueprint(auth, url_prefix="/api")
+    app.register_blueprint(settings, url_prefix="/api")
     app.register_blueprint(facebook_bp)
     app.register_blueprint(google_bp)
 
