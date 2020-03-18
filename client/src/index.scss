@@ -24,6 +24,14 @@ code {
   color: $secondary;
 }
 
+.has-background-secondary {
+  background-color: $secondary;
+}
+
+.is-pointed {
+  cursor: pointer;
+}
+
 .has-link-style {
   cursor: pointer;
   color: #5586dc;

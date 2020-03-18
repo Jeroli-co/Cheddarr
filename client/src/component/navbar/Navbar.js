@@ -1,16 +1,18 @@
 import React, {useContext} from 'react';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import {faCog, faSignOutAlt, faUserCircle} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/cheddarr-small.png';
 import { AuthContext } from "../../context/AuthContext";
 import { SignUpButton } from "../protected/element/sign-up-button/SignUpButton";
 import { SignInButton } from "../protected/element/sign-in-button/SignInButton";
+import {routes} from "../../routes";
+import {faUser} from "@fortawesome/free-regular-svg-icons";
 
 const Navbar = () => {
 
-	const { signOut, isAuthenticated } = useContext(AuthContext);
+	const { signOut, isAuthenticated, username, userPicture } = useContext(AuthContext);
 
 	const toggleBurgerMenu = () => {
 		const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
@@ -48,36 +50,69 @@ const Navbar = () => {
 					</div>
 
 					<div className="navbar-end">
-						<div className="navbar-item">
-							<div className="buttons">
 
-								<a className="button is-rounded" href="https://github.com/Jeroli-co/Cheddarr"
-									 target="_blank" rel="noopener noreferrer">
-									<span className="icon">
-										<FontAwesomeIcon icon={faGithub}/>
-									</span>
-									<span>GitHub</span>
-								</a>
+						<a className="navbar-item" href="https://github.com/Jeroli-co/Cheddarr"
+							 target="_blank" rel="noopener noreferrer">
+							<span className="icon">
+								<FontAwesomeIcon icon={faGithub}/>
+							</span>
+						</a>
 
-								{
-									isAuthenticated ? (
-											<div id="nav-sign-out-button" className="button is-rounded with-background-primary" onClick={signOut} data-testid="SignOutButton">
+						{ isAuthenticated ? (
+								<div className="navbar-item has-dropdown is-hoverable">
+									{
+										(	userPicture &&
+											<div className="navbar-link is-pointed">
+												<img src={userPicture} alt="userPicture"/>
+											</div>
+										) || (
+											<div className="navbar-link is-pointed">
 												<span className="icon">
-													<FontAwesomeIcon icon={faSignOutAlt}/>
+													<FontAwesomeIcon icon={faUser}/>
 												</span>
-												<span>Sign out</span>
+												<span>{username}</span>
 											</div>
 										)
-										: (
-											<div>
-												<SignInButton/>
-												<SignUpButton/>
-											</div>
-										)
-								}
+									}
 
-							</div>
-						</div>
+									<div className="navbar-dropdown is-right">
+
+										<Link className="navbar-item" to={routes.USER_PROFILE.url(username)} data-testid="UserProfileLink">
+											<span className="icon">
+												<FontAwesomeIcon icon={faUserCircle}/>
+											</span>
+											<span>Profile</span>
+										</Link>
+
+										<Link className="navbar-item" to={routes.USER_SETTINGS.url} data-testid="UserSettingsLink">
+											<span className="icon">
+												<FontAwesomeIcon icon={faCog}/>
+											</span>
+											<span>Settings</span>
+										</Link>
+
+										<hr className="navbar-divider"/>
+
+										<div className="navbar-item is-pointed" onClick={signOut} data-testid="SignOutButton">
+											<span className="icon">
+												<FontAwesomeIcon icon={faSignOutAlt}/>
+											</span>
+											<span>Sign out</span>
+										</div>
+
+									</div>
+
+								</div>
+							) : (
+								<div className="navbar-item">
+									<div className="buttons">
+										<SignInButton/>
+										<SignUpButton/>
+									</div>
+								</div>
+							)
+						}
+
 					</div>
 				</div>
 			</nav>
