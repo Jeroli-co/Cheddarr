@@ -44,8 +44,11 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password, value)
 
     @classmethod
-    def exists(cls, email=None):
-        return db.session.query(User.id).filter_by(email=email).scalar()
+    def exists(cls, email=None, username=None):
+        if email:
+            return db.session.query(User.id).filter_by(email=email).scalar()
+        if username:
+            return db.session.query(User.id).filter_by(username=username).scalar()
 
     @classmethod
     def find(cls, email=None, username=None):
@@ -53,7 +56,6 @@ class User(db.Model, UserMixin):
             return User.query.filter_by(email=email).first()
         if username:
             return User.query.filter_by(username=username).first()
-        return None
 
     @classmethod
     def create_user(
