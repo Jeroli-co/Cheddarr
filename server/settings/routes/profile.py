@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import render_template
+from flask import render_template, session
 from flask_login import fresh_login_required, current_user, login_required
 
 from server import InvalidUsage, db
@@ -84,5 +84,6 @@ def delete_user():
     if not current_user.check_password(password_form.password.data):
         raise InvalidUsage("Wrong password", HTTPStatus.UNAUTHORIZED)
 
-    User.delete_user(email=current_user.email)
+    current_user.delete()
+    session.clear()
     return {"message": "User deleted"}, HTTPStatus.OK
