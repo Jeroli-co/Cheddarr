@@ -1,6 +1,7 @@
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import backref
 from werkzeug.security import check_password_hash, generate_password_hash
 from server import db
 from server.auth import utils
@@ -16,6 +17,9 @@ class User(db.Model, UserMixin):
     _password = db.Column(db.String(256), nullable=True)
     confirmed = db.Column(db.Boolean, default=False)
     session_token = db.Column(db.String(256))
+    oauth = db.relationship(
+        "OAuth", backref=backref("user", cascade="delete, delete-orphan")
+    )
 
     def __repr__(self):
         return "%s/%s/%s/%s/%s/%s" % (
@@ -89,4 +93,4 @@ class User(db.Model, UserMixin):
 class OAuth(OAuthConsumerMixin, db.Model):
     provider_user_id = db.Column(db.String(256), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
-    user = db.relationship(User)
+    user = db.relationship("User")
