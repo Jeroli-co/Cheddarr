@@ -8,7 +8,6 @@ from server.config import SESSION_LIFETIME
 
 
 def get_session_info():
-    confirm_login()
     return {
         "username": current_user.username,
         "user_picture": current_user.user_picture,

@@ -18,8 +18,7 @@ class User(db.Model, UserMixin):
     confirmed = db.Column(db.Boolean, default=False)
     session_token = db.Column(db.String(256))
     oauth = db.relationship(
-        "OAuth",
-        backref=backref("user", single_parent=True, cascade="delete, delete-orphan"),
+        "OAuth", backref="user", single_parent=True, cascade="delete, delete-orphan"
     )
 
     def __repr__(self):
