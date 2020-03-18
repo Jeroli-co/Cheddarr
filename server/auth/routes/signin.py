@@ -101,7 +101,7 @@ def oauth_logged_in(blueprint, token):
             else:
                 return False
             # Create a new local user account for this user
-            user = User.create_user(
+            user = User.create(
                 first_name=first_name,
                 last_name=last_name,
                 email=email,

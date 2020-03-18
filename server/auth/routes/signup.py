@@ -14,11 +14,12 @@ def signup():
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             payload=signup_form.errors,
         )
+
     existing_user = User.exists(email=signup_form.email.data)
     if existing_user:
         raise InvalidUsage("The user already exists.", status_code=HTTPStatus.CONFLICT)
 
-    user = User.create_user(
+    user = User.create(
         first_name=signup_form.firstName.data,
         last_name=signup_form.lastName.data,
         email=signup_form.email.data,
@@ -53,6 +54,7 @@ def confirm_email(token):
     user = User.find(email=email)
     if user and user.confirmed:
         raise InvalidUsage("The account is already confirmed.", HTTPStatus.CONFLICT)
+
     user.confirmed = True
     db.session.commit()
     return {"message": "Account confirmed"}, HTTPStatus.CREATED
