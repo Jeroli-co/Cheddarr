@@ -19,11 +19,11 @@ def signup():
         raise InvalidUsage("The user already exists.", status_code=HTTPStatus.CONFLICT)
 
     user = User.create_user(
-        signup_form.firstName.data,
-        signup_form.lastName.data,
-        signup_form.email.data,
-        signup_form.username.data,
-        signup_form.password.data,
+        first_name=signup_form.firstName.data,
+        last_name=signup_form.lastName.data,
+        email=signup_form.email.data,
+        username=signup_form.username.data,
+        password=signup_form.password.data,
     )
 
     token = utils.generate_timed_token(user.email)
