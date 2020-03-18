@@ -24,8 +24,3 @@ class EmailForm(FlaskForm):
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField("New Password", [DataRequired(), Length(min=8)])
-
-
-class ChangePasswordForm(FlaskForm):
-    oldPassword = PasswordField("Old Password", [DataRequired()])
-    newPassword = PasswordField("New Password", [DataRequired(), Length(min=8)])

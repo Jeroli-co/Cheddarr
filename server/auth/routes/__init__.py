@@ -3,6 +3,4 @@ from . import (
     signin,
     signout,
     reset_password,
-    change_password,
-    user_profile,
 )  # noqa
