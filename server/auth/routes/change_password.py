@@ -18,7 +18,10 @@ def change_password():
             payload=password_form.errors,
         )
 
-    if current_user.password != password_form.oldPassword.data:
+    if (
+        current_user.password is not None
+        or current_user.password != password_form.oldPassword.data
+    ):
         raise InvalidUsage(
             "Error while changing password", status_code=HTTPStatus.UNAUTHORIZED,
         )
