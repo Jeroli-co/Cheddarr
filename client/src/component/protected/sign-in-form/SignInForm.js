@@ -3,10 +3,11 @@ import {faKey, faUser} from "@fortawesome/free-solid-svg-icons";
 import {faGoogle, faFacebook} from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import {AuthContext} from "../../../context/AuthContext";
 import {InitResetPasswordModal} from "../element/init-reset-password-modal/InitResetPasswordModal";
 import {ResendAccountConfirmationEmailModal} from "../element/resend-account-confirmation-email-modal/ResendAccountConfirmationEmailModal";
+import {routes} from "../../../routes";
 
 const SignInForm = () => {
 
@@ -19,7 +20,7 @@ const SignInForm = () => {
 	const [status, setStatus] = useState(null);
 
 	const onSubmit = (data) => {
-		signIn(data).then((status) => setStatus(status));
+		signIn(data).then((status) => {setStatus(status)});
 	};
 
 	return (
@@ -106,12 +107,7 @@ const SignInForm = () => {
 							<span className="icon">
 								<FontAwesomeIcon icon={faGoogle}/>
 							</span>
-							<span style={{color: 'blue'}}>G</span>
-							<span style={{color: 'red'}}>o</span>
-							<span style={{color: 'orange'}}>o</span>
-							<span style={{color: 'blue'}}>g</span>
-							<span style={{color: 'green'}}>l</span>
-							<span style={{color: 'red'}}>e</span>
+							<span>Google</span>
 						</button>
 						<button className="button is-rounded is-facebook-button" type="button" onClick={signInWithFacebook}>
 							<span className="icon">
@@ -123,7 +119,7 @@ const SignInForm = () => {
 
 					<div className="has-text-centered">
 						<p className="is-size-7">Forgot your password ? <span className="has-link-style" onClick={() => setShowResetPassword(true)}>Click here to reset it</span></p>
-						<p className="is-size-7">Still not have an account ? <Link to="/sign-up">Sign up</Link></p>
+						<p className="is-size-7">Still not have an account ? <Link to={routes.SIGN_UP.url}>Sign up</Link></p>
 					</div>
 
 				</div>

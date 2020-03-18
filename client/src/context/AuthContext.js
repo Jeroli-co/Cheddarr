@@ -233,6 +233,39 @@ const AuthContextProvider = (props) => {
     }
   };
 
+
+  const changeUsername = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('newUsername', data['newUsername']);
+    try {
+      const res = await axios.put("/api/profile/username", fd);
+      return res.status;
+    } catch (e) {
+      handleError(e, [409]);
+      return e.response ? e.response.status : null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteAccount = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('password', data['password']);
+    try {
+      const res = await axios.delete("/api/profile", { data: fd });
+      clearSession();
+      props.history.push(routes.SIGN_IN.url);
+      return res.status;
+    } catch (e) {
+      handleError(e, [401]);
+      return e.response ? e.response.status : null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{...session,
       signUp,
@@ -246,7 +279,9 @@ const AuthContextProvider = (props) => {
       resetPassword,
       confirmAccount,
       getUserProfile,
-      changePassword
+      changePassword,
+      changeUsername,
+      deleteAccount
     }}>
       { isLoading && <PageLoader/> }
       { props.children }

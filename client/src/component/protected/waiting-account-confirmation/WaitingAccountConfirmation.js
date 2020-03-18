@@ -13,7 +13,7 @@ const WaitingAccountConfirmation = () => {
 
 	const sendEmail = (email) => {
 		resendConfirmation(email).then((status) => {
-			const message = status === 200 ? "The email has been send resend" : "An error occured, please try again";
+			const message = status === 200 ? "The email has been resend" : "An error occured, please try again";
 			setMessage(message);
 		});
 	};
