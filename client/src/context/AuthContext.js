@@ -63,7 +63,7 @@ const AuthContextProvider = (props) => {
       initSession(res.data.username);
       return res.status;
     } catch (e) {
-      handleError(e);
+      handleError(e, [400, 401]);
       return e.response ? e.response.status : 404;
     } finally {
       setIsLoading(false);
@@ -110,7 +110,7 @@ const AuthContextProvider = (props) => {
       const res = await axios.get('/api/confirm/' + token);
       return res.status;
     } catch (e) {
-      handleError(e);
+      handleError(e, [409, 410]);
       return e.response ? e.response.status : 404;
     } finally {
       setIsLoading(false);
@@ -153,7 +153,7 @@ const AuthContextProvider = (props) => {
       const res = await axios.get('/api/reset/' + token);
       return res.status;
     } catch (e) {
-      handleError(e);
+      handleError(e, [410]);
       return e.response ? e.response.status : 404;
     } finally {
       setIsLoading(false);
@@ -181,7 +181,6 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.get("/api/sign-in/google");
       window.location = res.headers.location;
-      //window.open(res.headers.location, "_blank","toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400");
       return res.status;
     } catch (e) {
       handleError(e);
@@ -196,7 +195,35 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.get("/api/sign-in/facebook");
       window.location = res.headers.location;
-      //window.open(res.headers.location, "","height=200,width=200,modal=yes,alwaysRaised=yes");
+      return res.status;
+    } catch (e) {
+      handleError(e);
+      return e.response ? e.response.status : 404;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getUserProfile = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get("/api/user/" + session.username);
+      return res.data;
+    } catch (e) {
+      handleError(e);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const changePassword = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('oldPassword', data['oldPassword']);
+    fd.append('newPassword', data['newPassword']);
+    try {
+      const res = await axios.post("/change/password", fd);
       return res.status;
     } catch (e) {
       handleError(e);
@@ -217,7 +244,9 @@ const AuthContextProvider = (props) => {
       initResetPassword,
       checkResetPasswordToken,
       resetPassword,
-      confirmAccount
+      confirmAccount,
+      getUserProfile,
+      changePassword
     }}>
       { isLoading && <PageLoader/> }
       { props.children }

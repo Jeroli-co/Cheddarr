@@ -26,7 +26,10 @@ const App = () => {
           <ProtectedRoute exact path={routes.RESET_PASSWORD.url(':token')} component={routes.RESET_PASSWORD.component} />
           <ProtectedRoute path={routes.AUTHORIZE.url} component={routes.AUTHORIZE.component} />
 
-          <PrivateRoute exact path={routes.USER_PROFILE.url} component={routes.USER_PROFILE.component} />
+          <PrivateRoute exact path={routes.USER_PROFILE.url(':username')} component={routes.USER_PROFILE.component} />
+          <PrivateRoute exact path={routes.USER_SETTINGS.url} component={routes.USER_SETTINGS.component} />
+          <PrivateRoute exact path={routes.USER_SETTINGS_PROFILE.url} component={routes.USER_SETTINGS_PROFILE.component} />
+          <PrivateRoute exact path={routes.USER_SETTINGS_CONFIGURATIONS.url} component={routes.USER_SETTINGS_CONFIGURATIONS.component} />
 
           <Route exact path={routes.NOT_FOUND.url} component={routes.NOT_FOUND.component} />
           <Route path="*" component={routes.NOT_FOUND.component} />
