@@ -1,8 +1,8 @@
 from http import HTTPStatus
 from flask import url_for, render_template, request
-from server import InvalidUsage, db
+from server import InvalidUsage
 from server.auth import auth, User, utils
-from server.auth.forms import EmailForm, ResetPasswordForm
+from server.auth.forms import EmailForm, PasswordForm
 
 
 @auth.route("/reset/password", methods=["POST"])
@@ -12,7 +12,6 @@ def reset_password():
         email = email_form.email.data
         user = User.find(email=email)
         if user and user.confirmed:
-
             token = utils.generate_timed_token([user.email, user.session_token])
             reset_url = url_for("auth.confirm_reset", token=token, _external=True)
             html = render_template(
@@ -47,16 +46,14 @@ def confirm_reset(token):
         )
 
     if request.method == "POST":
-        password_form = ResetPasswordForm()
+        password_form = PasswordForm()
         if not password_form.validate():
             raise InvalidUsage(
                 "Error in change password form.",
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 payload=password_form.errors,
             )
-        user.password = password_form.password.data
-        user.session_token = utils.generate_token([user.email, user.password])
-        db.session.commit()
+        user.change_password(password_form.password.data)
         html = render_template("email/reset_password_notice.html",)
         subject = "Your password has been reset"
         utils.send_email(user.email, subject, html)

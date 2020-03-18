@@ -43,6 +43,15 @@ class User(db.Model, UserMixin):
     def check_password(self, value):
         return check_password_hash(self.password, value)
 
+    def change_password(self, new_password):
+        self.password = new_password
+        self.session_token = utils.generate_token([self.email, self.password])
+        db.session.commit()
+
+    def delete(self):
+        User.query.filter_by(id=self.id).delete()
+        db.session.commit()
+
     @classmethod
     def exists(cls, email=None, username=None):
         if email:
@@ -58,7 +67,7 @@ class User(db.Model, UserMixin):
             return User.query.filter_by(username=username).first()
 
     @classmethod
-    def create_user(
+    def create(
         cls, first_name, last_name, email, username, user_picture=None, password=None
     ):
         user = User(

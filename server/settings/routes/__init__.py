@@ -1,1 +1,1 @@
-from . import change_password  # noqa
+from . import profile  # noqa
