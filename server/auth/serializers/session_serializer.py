@@ -9,3 +9,4 @@ class SessionSerializer(SQLAlchemySchema):
         load_instance = True
 
     username = auto_field()
+    user_picture = auto_field()
