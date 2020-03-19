@@ -113,6 +113,23 @@ const AuthContextProvider = (props) => {
     }
   };
 
+  const checkPassword = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('username', data['username']);
+    fd.append('password', data['password']);
+    try {
+      const res = await axios.post('/api/sign-in', fd);
+      updateSession(res.data.user_picture, res.data.username, res.data.expires_in);
+      return res.status;
+    } catch (e) {
+      handleError(e);
+      return e.response ? e.response.status : null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signOut = async () => {
     setIsLoading(true);
     try {
@@ -214,7 +231,6 @@ const AuthContextProvider = (props) => {
     }
   };
 
-
   const signInWithFacebook = async () => {
     setIsLoading(true);
     try {
@@ -242,13 +258,22 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const changePassword = async (data) => {
+  const changePassword = async (data = null) => {
+
+    const getFresh = async () => {
+      return await axios.get('/api/profile/password');
+    };
+
+    const putData = async (data) => {
+      const fd = new FormData();
+      fd.append('oldPassword', data['oldPassword']);
+      fd.append('newPassword', data['newPassword']);
+      return await axios.put('/api/profile/password', fd);
+    };
+
     setIsLoading(true);
-    const fd = new FormData();
-    fd.append('oldPassword', data['oldPassword']);
-    fd.append('newPassword', data['newPassword']);
     try {
-      const res = await axios.put("/api/profile/password", fd);
+      const res = data ? await putData(data) : await getFresh();
       return res.status;
     } catch (e) {
       handleError(e, [401]);
@@ -259,14 +284,23 @@ const AuthContextProvider = (props) => {
   };
 
   const changeUsername = async (data) => {
+
+    const getFresh = async () => {
+      return await axios.get('/api/profile/username');
+    };
+
+    const putData = async () => {
+      const fd = new FormData();
+      fd.append('newUsername', data['newUsername']);
+      return await axios.put("/api/profile/username", fd);
+    };
+
     setIsLoading(true);
-    const fd = new FormData();
-    fd.append('newUsername', data['newUsername']);
     try {
-      const res = await axios.put("/api/profile/username", fd);
+      const res = data ? putData() : getFresh();
       return res.status;
     } catch (e) {
-      handleError(e, [409]);
+      handleError(e, [401, 409]);
       return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
@@ -317,6 +351,7 @@ const AuthContextProvider = (props) => {
     <AuthContext.Provider value={{...session,
       signUp,
       signIn,
+      checkPassword,
       signInWithGoogle,
       signInWithFacebook,
       signOut,
@@ -328,7 +363,8 @@ const AuthContextProvider = (props) => {
       getUserProfile,
       changePassword,
       changeUsername,
-      deleteAccount
+      deleteAccount,
+      refreshSession
     }}>
       { isLoading && <PageLoader/> }
       { props.children }
