@@ -21,15 +21,9 @@ const AuthContextProvider = (props) => {
     const authenticated = Cookies.get('authenticated');
     const username = Cookies.get('username');
     if (authenticated === 'yes' && username) {
-      updateSession(username);
+      setSession({username: username, isAuthenticated: true});
     }
   }, []);
-
-  const updateSession = (username) => {
-    setSession({username: username, isAuthenticated: true});
-    Cookies.set('authenticated', 'yes', { expires: 365 });
-    Cookies.set('username', username, { expires: 365 });
-  };
 
   const clearSession = () => {
     setSession(initialSessionState);
@@ -50,7 +44,8 @@ const AuthContextProvider = (props) => {
     fd.append('remember', data['remember']);
     try {
       const res = await axios.post('/api/sign-in', fd);
-      updateSession(res.data.username);
+      Cookies.set('authenticated', 'yes', { expires: 365 });
+      Cookies.set('username', res.data.username, { expires: 365 });
       return res.status;
     } catch (e) {
       handleError(e);
