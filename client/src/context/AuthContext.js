@@ -24,24 +24,19 @@ const AuthContextProvider = (props) => {
     }
   });
 
-  const signUp = async (data) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('firstName', data['firstName']);
-    fd.append('lastName', data['lastName']);
-    fd.append('username', data['username']);
-    fd.append('email', data['email']);
-    fd.append('password', data['password']);
-    try {
-      const res = await axios.post('/api/sign-up', fd);
-      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
-      return res.status;
-    } catch (e) {
-      handleError(e);
-      return e.response ? e.response.status : 404;
-    } finally {
-      setIsLoading(false);
-    }
+  const updateSession = (username) => {
+    setSession({username: username, isAuthenticated: true});
+    Cookies.set('authenticated', { username: username }, { expires: 365 });
+  };
+
+  const clearSession = () => {
+    setSession(initialSessionState);
+    Cookies.remove('authenticated');
+  };
+
+  const handleError = (error) => {
+    console.log(error);
+    clearSession();
   };
 
   const signIn = async (data) => {
@@ -71,6 +66,26 @@ const AuthContextProvider = (props) => {
       return e.response ? e.response.status : 404;
     } finally {
       props.history.push(routes.HOME.url);
+      setIsLoading(false);
+    }
+  };
+
+  const signUp = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('firstName', data['firstName']);
+    fd.append('lastName', data['lastName']);
+    fd.append('username', data['username']);
+    fd.append('email', data['email']);
+    fd.append('password', data['password']);
+    try {
+      const res = await axios.post('/api/sign-up', fd);
+      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
+      return res.status;
+    } catch (e) {
+      handleError(e);
+      return e.response ? e.response.status : 404;
+    } finally {
       setIsLoading(false);
     }
   };
@@ -176,21 +191,6 @@ const AuthContextProvider = (props) => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const updateSession = (username) => {
-    setSession({username: username, isAuthenticated: true});
-    Cookies.set('authenticated', 'yes', { expires: 365, username: username});
-  };
-
-  const clearSession = () => {
-    setSession(initialSessionState);
-    Cookies.remove('authenticated');
-  };
-
-  const handleError = (error) => {
-    console.log(error);
-    clearSession();
   };
 
   return (
