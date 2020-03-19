@@ -19,8 +19,8 @@ const AuthContextProvider = (props) => {
 
   useEffect(() => {
     const authenticated = Cookies.get('authenticated');
-    if (authenticated) {
-      const username = Cookies.get('username');
+    const username = Cookies.get('username');
+    if (authenticated === 'yes' && username) {
       updateSession(username);
     }
   }, []);
@@ -69,6 +69,7 @@ const AuthContextProvider = (props) => {
       return e.response ? e.response.status : 404;
     } finally {
       props.history.push(routes.HOME.url);
+      clearSession();
       setIsLoading(false);
     }
   };
