@@ -14,16 +14,13 @@ const initialSessionState = {
 
 const AuthContextProvider = (props) => {
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [session, setSession] = useState(initialSessionState);
+
   useEffect(() => {
     const cookie = Cookies.get('session');
     console.log(cookie);
-    if (cookie) {
-      setSession({username: cookie.username, isAuthenticated: true});
-    }
-  }, []);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [session, setSession] = useState(initialSessionState);
+  }, [session]);
 
   const signUp = async (data) => {
     setIsLoading(true);
