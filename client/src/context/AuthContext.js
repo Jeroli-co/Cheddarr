@@ -223,7 +223,7 @@ const AuthContextProvider = (props) => {
     fd.append('oldPassword', data['oldPassword']);
     fd.append('newPassword', data['newPassword']);
     try {
-      const res = await axios.post("/change/password", fd);
+      const res = await axios.put("/api/profile/password", fd);
       return res.status;
     } catch (e) {
       handleError(e);
