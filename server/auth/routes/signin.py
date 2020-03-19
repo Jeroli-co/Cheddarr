@@ -1,10 +1,10 @@
 from http import HTTPStatus
 from flask import url_for, redirect
 from flask_dance.consumer import oauth_authorized, oauth_error
-from flask_login import login_user, login_required
+from flask_login import login_user
 from sqlalchemy.orm.exc import NoResultFound
 from server import InvalidUsage, db
-from server.auth import auth, facebook_bp, google_bp, utils
+from server.auth import auth, facebook_bp, google_bp
 from server.auth.models import User, OAuth
 from server.auth.forms import SigninForm
 
@@ -34,13 +34,7 @@ def signin():
 
     remember = True if signin_form.remember.data else False
     login_user(user, remember=remember)
-    return utils.get_session_info(), HTTPStatus.OK
-
-
-@auth.route("/refresh-session")
-@login_required
-def refresh_session():
-    return utils.get_session_info(), HTTPStatus.OK
+    return {"username": user.username}, HTTPStatus.OK
 
 
 @auth.route("/sign-in/google")

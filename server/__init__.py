@@ -64,10 +64,6 @@ def _create_app(config_object: BaseConfig, **kwargs):
     register_commands(app)
     register_login_manager(app)
 
-    @app.before_first_request
-    def make_session_permanent():
-        session.permanent = True
-
     @app.after_request
     def set_csrf_cookie(response):
         if response:
