@@ -7,12 +7,15 @@ from server import InvalidUsage, db
 from server.auth import auth, facebook_bp, google_bp
 from server.auth.models import User, OAuth
 from server.auth.forms import SigninForm
+from server.auth.serializers.session_serializer import SessionSerializer
+
+session_serializer = SessionSerializer()
 
 
 @auth.route("/sign-in", methods=["GET", "POST"])
 def signin():
     if current_user.is_authenticated:
-        return {"username": current_user.username}
+        return session_serializer.dump(current_user), HTTPStatus.OK
 
     signin_form = SigninForm()
     if not signin_form.validate():
@@ -37,7 +40,7 @@ def signin():
 
     remember = True if signin_form.remember.data else False
     login_user(user, remember=remember)
-    return {"username": user.username}, HTTPStatus.OK
+    return session_serializer.dump(user), HTTPStatus.OK
 
 
 @auth.route("/sign-in/google")
