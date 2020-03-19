@@ -14,3 +14,4 @@ flask-wtf
 itsdangerous
 sendgrid
 Flask-Dance[sqla]
+marshmallow-sqlalchemy

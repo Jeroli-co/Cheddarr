@@ -1,16 +1,22 @@
 from http import HTTPStatus
 from flask import url_for, redirect
 from flask_dance.consumer import oauth_authorized, oauth_error
-from flask_login import login_user, login_required
+from flask_login import login_user, current_user
 from sqlalchemy.orm.exc import NoResultFound
 from server import InvalidUsage, db
-from server.auth import auth, facebook_bp, google_bp, utils
+from server.auth import auth, facebook_bp, google_bp
 from server.auth.models import User, OAuth
 from server.auth.forms import SigninForm
+from server.auth.serializers.session_serializer import SessionSerializer
+
+session_serializer = SessionSerializer()
 
 
-@auth.route("/sign-in", methods=["POST"])
+@auth.route("/sign-in", methods=["GET", "POST"])
 def signin():
+    if current_user.is_authenticated:
+        return session_serializer.dump(current_user), HTTPStatus.OK
+
     signin_form = SigninForm()
     if not signin_form.validate():
         raise InvalidUsage(
@@ -34,13 +40,7 @@ def signin():
 
     remember = True if signin_form.remember.data else False
     login_user(user, remember=remember)
-    return utils.get_session_info(), HTTPStatus.OK
-
-
-@auth.route("/refresh-session")
-@login_required
-def refresh_session():
-    return utils.get_session_info(), HTTPStatus.OK
+    return session_serializer.dump(user), HTTPStatus.OK
 
 
 @auth.route("/sign-in/google")
@@ -81,18 +81,13 @@ def oauth_logged_in(blueprint, token):
         oauth = query.one()
     except NoResultFound:
         oauth = OAuth(provider=blueprint.name, provider_user_id=user_id, token=token)
-    if oauth.user:
-        login_user(oauth.user)
-
-    else:
+    if not oauth.user:
         email = info["email"]
         user = User.find(email=email)
         # If the user already exists in the User table (but not in the Oauth table)
         if user:
             # Associate the existing local user account with the OAuth token
             oauth.user = user
-            # Log in the existing local user account
-            login_user(oauth.user)
         else:
             # Get user info
             if blueprint.name == "facebook":
@@ -109,12 +104,11 @@ def oauth_logged_in(blueprint, token):
             )
             # Associate the new local user account with the OAuth token
             oauth.user = user
-            # Log in the new local user account
-            login_user(user)
         # Save and commit our database models
         db.session.add_all([user, oauth])
         db.session.commit()
-
+    # Log in the user (new or existing)
+    login_user(oauth.user)
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
 

@@ -3,9 +3,9 @@ import {AuthContext} from "../../../context/AuthContext";
 
 const Authorize = (props) => {
 
-	const { refreshSession } = useContext(AuthContext);
+	const { signIn } = useContext(AuthContext);
 	useEffect(() => {
-		refreshSession(props.location.search);
+		signIn();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

@@ -1,18 +1,7 @@
-from time import time
-from flask_login import confirm_login, current_user
 from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
 from flask import current_app as app
 from sendgrid import Mail, From, To, Content
 from server import mail
-from server.config import SESSION_LIFETIME
-
-
-def get_session_info():
-    confirm_login()
-    return {
-        "username": current_user.username,
-        "expiresAt": (int(time()) + SESSION_LIFETIME * 60) * 1000,
-    }  # Session next timeout in ms
 
 
 def send_email(to_email, subject, html_content):

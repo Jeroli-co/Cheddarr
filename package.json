@@ -5,5 +5,8 @@
     "postinstall": "cd client && npm install",
     "build": "cd client && npm run build",
     "test": "cd client && npm run test"
+  },
+  "dependencies": {
+    "js-cookie": "^2.2.1"
   }
 }

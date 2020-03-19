@@ -3,12 +3,12 @@ import axios from 'axios';
 import {withRouter} from 'react-router';
 import {PageLoader} from "../component/element/page-loader/PageLoader";
 import {routes} from "../routes";
+import Cookies from 'js-cookie'
 
 export const AuthContext = createContext();
 
 const initialSessionState = {
   username: null,
-  expiresAt: null,
   isAuthenticated: false
 };
 
@@ -18,50 +18,49 @@ const AuthContextProvider = (props) => {
   const [session, setSession] = useState(initialSessionState);
 
   useEffect(() => {
-    if (session.expiresAt === null) {
-      const expiresAt = localStorage.getItem('expiresAt');
-      if (expiresAt) {
-        refreshSession();
-      }
+    const authenticated = Cookies.get('authenticated');
+    const username = Cookies.get('username');
+    if (authenticated === 'yes' && username) {
+      setSession({username: username, isAuthenticated: true});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (session.expiresAt && isExpired(session.expiresAt)) {
-      refreshSession();
-    }
-  });
+  const clearSession = () => {
+    setSession(initialSessionState);
+    Cookies.remove('authenticated');
+    Cookies.remove('username');
+  };
 
-  const signUp = async (data) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('firstName', data['firstName']);
-    fd.append('lastName', data['lastName']);
-    fd.append('username', data['username']);
-    fd.append('email', data['email']);
-    fd.append('password', data['password']);
-    try {
-      const res = await axios.post('/api/sign-up', fd);
-      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
-      return res.status;
-    } catch (e) {
-      handleError(e);
-      return e.response ? e.response.status : 404;
-    } finally {
-      setIsLoading(false);
-    }
+  const handleError = (error) => {
+    console.log(error);
+    clearSession();
   };
 
   const signIn = async (data) => {
+
+    const get = async () => {
+      return await axios.get('/api/sign-in')
+    };
+
+    const post = async (data) => {
+      const fd = new FormData();
+      fd.append('usernameOrEmail', data['usernameOrEmail']);
+      fd.append('password', data['password']);
+      fd.append('remember', data['remember']);
+      return await axios.post('/api/sign-in', fd);
+    };
+
+    const initSession = (username) => {
+      setSession({username: username, isAuthenticated: true});
+      Cookies.set('authenticated', 'yes', { expires: 365 });
+      Cookies.set('username', username, { expires: 365 });
+    };
+
     setIsLoading(true);
-    const fd = new FormData();
-    fd.append('usernameOrEmail', data['usernameOrEmail']);
-    fd.append('password', data['password']);
-    fd.append('remember', data['remember']);
+
     try {
-      const res = await axios.post('/api/sign-in', fd);
-      updateSession(res.data.username, res.data.expiresAt);
+      const res = data ? await post(data) : await get();
+      initSession(res.data.username);
       return res.status;
     } catch (e) {
       handleError(e);
@@ -79,21 +78,23 @@ const AuthContextProvider = (props) => {
     } catch (e) {
       return e.response ? e.response.status : 404;
     } finally {
-      clearSession();
       props.history.push(routes.HOME.url);
+      clearSession();
       setIsLoading(false);
     }
   };
 
-  const isExpired = (expiresAt) => {
-    return new Date().getTime() > expiresAt;
-  };
-
-  const refreshSession = async () => {
+  const signUp = async (data) => {
     setIsLoading(true);
+    const fd = new FormData();
+    fd.append('firstName', data['firstName']);
+    fd.append('lastName', data['lastName']);
+    fd.append('username', data['username']);
+    fd.append('email', data['email']);
+    fd.append('password', data['password']);
     try {
-      const res = await axios.get('/api/refresh-session');
-      updateSession(res.data.username, res.data.expiresAt);
+      const res = await axios.post('/api/sign-up', fd);
+      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
       return res.status;
     } catch (e) {
       handleError(e);
@@ -190,7 +191,6 @@ const AuthContextProvider = (props) => {
     }
   };
 
-
   const signInWithFacebook = async () => {
     setIsLoading(true);
     try {
@@ -206,27 +206,6 @@ const AuthContextProvider = (props) => {
     }
   };
 
-
-  const updateSession = (username, expiresAt) => {
-    localStorage.setItem('username', username);
-    localStorage.setItem('expiresAt', expiresAt);
-    setSession({username: username, expiresAt: expiresAt, isAuthenticated: true, isFresh: true});
-  };
-
-  const clearSession = () => {
-    localStorage.removeItem('username');
-    localStorage.removeItem('expiresAt');
-    setSession(initialSessionState);
-  };
-
-  const handleError = (error) => {
-    console.log(error);
-    clearSession();
-    if (error.response.status && error.response.status === 404) {
-      props.history.push(routes.NOT_FOUND.url);
-    }
-  };
-
   return (
     <AuthContext.Provider value={{...session,
       signUp,
@@ -238,8 +217,7 @@ const AuthContextProvider = (props) => {
       initResetPassword,
       checkResetPasswordToken,
       resetPassword,
-      confirmAccount,
-      refreshSession,
+      confirmAccount
     }}>
       { isLoading && <PageLoader/> }
       { props.children }
