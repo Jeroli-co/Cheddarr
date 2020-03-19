@@ -52,7 +52,7 @@ const AuthContextProvider = (props) => {
     fd.append('remember', data['remember']);
     try {
       const res = await axios.post('/api/sign-in', fd);
-
+      updateSession(res.data.username);
       return res.status;
     } catch (e) {
       handleError(e);
