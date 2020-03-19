@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from flask import url_for, redirect
 from flask_dance.consumer import oauth_authorized, oauth_error
-from flask_login import login_user, login_required
+from flask_login import login_user, login_required, current_user, confirm_login
 from sqlalchemy.orm.exc import NoResultFound
 from server import InvalidUsage, db
 from server.auth import auth, facebook_bp, google_bp, utils
@@ -32,8 +32,11 @@ def signin():
             "Account needs to be confirmed.", status_code=HTTPStatus.UNAUTHORIZED
         )
 
-    remember = True if signin_form.remember.data else False
-    login_user(user, remember=remember)
+    if current_user.is_authenticated:
+        confirm_login()
+    else:
+        remember = True if signin_form.remember.data else False
+        login_user(user, remember=remember)
     return utils.get_session_info(), HTTPStatus.OK
 
 

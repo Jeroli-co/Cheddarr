@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import render_template, session
+from flask import render_template, session, request
 from flask_login import fresh_login_required, current_user, login_required
 
 from server import InvalidUsage, db
@@ -10,6 +10,8 @@ from server.settings import settings
 from server.settings.forms import ChangeUsernameForm, ChangePasswordForm
 from server.settings.serializers.user_serializer import UserSerializer
 
+user_serializer = UserSerializer()
+
 
 @login_required
 @settings.route("/user/<username>")
@@ -17,16 +19,16 @@ def user_profile(username):
     user = User.find(username=username)
     if not user:
         raise InvalidUsage("The user does not exist", status_code=404)
-    return UserSerializer().dumps(user)
+    return user_serializer.dumps(user)
 
 
 @settings.route("/profile")
 @login_required
 def get_profile():
-    return UserSerializer().dumps(current_user)
+    return user_serializer.dumps(current_user)
 
 
-@settings.route("/profile/password", methods=["PUT"])
+@settings.route("/profile/password", methods=["GET", "PUT"])
 @fresh_login_required
 def change_password():
     password_form = ChangePasswordForm()
@@ -51,7 +53,7 @@ def change_password():
     return {"message": "Password changed"}, HTTPStatus.OK
 
 
-@settings.route("/profile/username", methods=["PUT"])
+@settings.route("/profile/username", methods=["GET", "PUT"])
 @fresh_login_required
 def change_username():
     username_form = ChangeUsernameForm()
@@ -72,7 +74,7 @@ def change_username():
     return {"message": "Username changed"}, HTTPStatus.OK
 
 
-@settings.route("/profile", methods=["DELETE"])
+@settings.route("/profile", methods=["GET", "DELETE"])
 @fresh_login_required
 def delete_user():
     password_form = PasswordForm()

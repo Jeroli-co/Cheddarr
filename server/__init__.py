@@ -65,10 +65,6 @@ def _create_app(config_object: BaseConfig, **kwargs):
     register_commands(app)
     register_login_manager(app)
 
-    @app.before_first_request
-    def make_session_permanent():
-        session.permanent = True
-
     @app.after_request
     def set_csrf_cookie(response):
         if response:
@@ -123,9 +119,7 @@ def register_login_manager(app):
 
     @login_manager.needs_refresh_handler
     def refresh():
-        raise InvalidUsage(
-            "Fresh login required", status_code=HTTPStatus.PROXY_AUTHENTICATION_REQUIRED
-        )
+        raise InvalidUsage("Need to authenticate", status_code=HTTPStatus.UNAUTHORIZED)
 
 
 def register_oauth_providers(oauth):
