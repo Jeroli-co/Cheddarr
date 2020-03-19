@@ -21,7 +21,7 @@ const AuthContextProvider = (props) => {
     const authenticated = Cookies.get('authenticated');
     const username = Cookies.get('username');
     if (authenticated === 'yes' && username) {
-      updateSession(username);
+      setSession({username: username, isAuthenticated: true});
     }
   }, []);
 
