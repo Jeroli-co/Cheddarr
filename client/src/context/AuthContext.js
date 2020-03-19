@@ -3,35 +3,27 @@ import axios from 'axios';
 import {withRouter} from 'react-router';
 import {PageLoader} from "../component/element/page-loader/PageLoader";
 import {routes} from "../routes";
+import Cookies from 'js-cookie'
 
 export const AuthContext = createContext();
 
 const initialSessionState = {
   username: null,
-  expiresAt: null,
   isAuthenticated: false
 };
 
 const AuthContextProvider = (props) => {
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [session, setSession] = useState(initialSessionState);
-
   useEffect(() => {
-    if (session.expiresAt === null) {
-      const expiresAt = localStorage.getItem('expiresAt');
-      if (expiresAt) {
-        refreshSession();
-      }
+    const cookie = Cookies.get('session');
+    console.log(cookie);
+    if (cookie) {
+      setSession({username: cookie.username, isAuthenticated: true});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (session.expiresAt && isExpired(session.expiresAt)) {
-      refreshSession();
-    }
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [session, setSession] = useState(initialSessionState);
 
   const signUp = async (data) => {
     setIsLoading(true);
@@ -81,24 +73,6 @@ const AuthContextProvider = (props) => {
     } finally {
       clearSession();
       props.history.push(routes.HOME.url);
-      setIsLoading(false);
-    }
-  };
-
-  const isExpired = (expiresAt) => {
-    return new Date().getTime() > expiresAt;
-  };
-
-  const refreshSession = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get('/api/refresh-session');
-      updateSession(res.data.username, res.data.expiresAt);
-      return res.status;
-    } catch (e) {
-      handleError(e);
-      return e.response ? e.response.status : 404;
-    } finally {
       setIsLoading(false);
     }
   };
@@ -206,19 +180,6 @@ const AuthContextProvider = (props) => {
     }
   };
 
-
-  const updateSession = (username, expiresAt) => {
-    localStorage.setItem('username', username);
-    localStorage.setItem('expiresAt', expiresAt);
-    setSession({username: username, expiresAt: expiresAt, isAuthenticated: true, isFresh: true});
-  };
-
-  const clearSession = () => {
-    localStorage.removeItem('username');
-    localStorage.removeItem('expiresAt');
-    setSession(initialSessionState);
-  };
-
   const handleError = (error) => {
     console.log(error);
     clearSession();
@@ -238,8 +199,7 @@ const AuthContextProvider = (props) => {
       initResetPassword,
       checkResetPasswordToken,
       resetPassword,
-      confirmAccount,
-      refreshSession,
+      confirmAccount
     }}>
       { isLoading && <PageLoader/> }
       { props.children }
