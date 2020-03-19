@@ -32,6 +32,7 @@ const App = () => {
           <PrivateRoute exact path={routes.USER_SETTINGS_CONFIGURATIONS.url} component={routes.USER_SETTINGS_CONFIGURATIONS.component} />
 
           <Route exact path={routes.NOT_FOUND.url} component={routes.NOT_FOUND.component} />
+          <Route exact path={routes.INTERNAL_SERVER_ERROR.url} component={routes.INTERNAL_SERVER_ERROR.component} />
           <Route path="*" component={routes.NOT_FOUND.component} />
         </Switch>
       </AuthContextProvider>

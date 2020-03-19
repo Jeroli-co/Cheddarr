@@ -25,9 +25,22 @@ const AuthContextProvider = (props) => {
 
   useEffect(() => {
     if (isSessionExpired()) {
-      refreshSession().then(() => {console.log('Session refreshed')});
+      refreshSession();
     }
   });
+
+  const loadSession = () => {
+    const userPicture = localStorage.getItem('userPicture');
+    const username = localStorage.getItem('username');
+    const expiresAt = localStorage.getItem('expiresAt');
+    if (userPicture && username && expiresAt) {
+      if (isSessionExpired()) {
+        refreshSession();
+      } else {
+        setSession({userPicture: userPicture, username: username, expiresAt: expiresAt, isAuthenticated: true});
+      }
+    }
+  };
 
   const refreshSession = async () => {
     setIsLoading(true);
@@ -37,10 +50,29 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false)
     }
+  };
+
+  const updateSession = (userPicture, username, expiresAt) => {
+    localStorage.setItem('userPicture', userPicture);
+    localStorage.setItem('username', username);
+    localStorage.setItem('expiresAt', expiresAt);
+    setSession({userPicture: userPicture, username: username, expiresAt: expiresAt, isAuthenticated: true});
+  };
+
+  const clearSession = () => {
+    localStorage.removeItem('userPicture');
+    localStorage.removeItem('username');
+    localStorage.removeItem('expiresAt');
+    setSession(initialSessionState);
+  };
+
+  const isSessionExpired = () => {
+    const expiresAt = session.expiresAt || localStorage.getItem('expiresAt');
+    return expiresAt && new Date().getTime() > expiresAt;
   };
 
   const signUp = async (data) => {
@@ -57,7 +89,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +107,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e, [400, 401]);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +120,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       clearSession();
       props.history.push(routes.SIGN_IN.url);
@@ -103,7 +135,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e, [409, 410]);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +150,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
@@ -133,7 +165,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +178,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e, [410]);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
@@ -162,7 +194,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
@@ -176,7 +208,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
@@ -191,65 +223,16 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const updateSession = (userPicture, username, expiresAt) => {
-    localStorage.setItem('userPicture', userPicture);
-    localStorage.setItem('username', username);
-    localStorage.setItem('expiresAt', expiresAt);
-    setSession({userPicture: userPicture, username: username, expiresAt: expiresAt, isAuthenticated: true});
-  };
-
-  const loadSession = () => {
-    const userPicture = localStorage.getItem('userPicture');
-    const username = localStorage.getItem('username');
-    const expiresAt = localStorage.getItem('expiresAt');
-    if (userPicture && username && expiresAt) {
-      if (isSessionExpired()) {
-        refreshSession().then(() => console.log("Session refreshed"));
-      } else {
-        setSession({userPicture: userPicture, username: username, expiresAt: expiresAt, isAuthenticated: true});
-      }
-    } else {
-      props.history.push(routes.HOME.url);
-    }
-  };
-
-  const clearSession = () => {
-    localStorage.removeItem('userPicture');
-    localStorage.removeItem('username');
-    localStorage.removeItem('expiresAt');
-    setSession(initialSessionState);
-  };
-
-  const isSessionExpired = () => {
-    const expiresAt = session.expiresAt || localStorage.getItem('expiresAt');
-    return expiresAt && new Date().getTime() > expiresAt;
-  };
-
-  const handleError = (error, codesHandle = []) => {
-    clearSession();
-    const response = error.response;
-    if (response) {
-      const status = response.status;
-      if (!codesHandle.includes(status)) {
-        if (status === 404) {
-          props.history.push(routes.NOT_FOUND.url);
-        } else {
-          props.history.push(routes.HOME.url);
-        }
-      }
     }
   };
 
   const getUserProfile = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/user/" + session.username);
+      const res = await axios.get("/api/profile");
       return res.data;
     } catch (e) {
       handleError(e);
@@ -265,19 +248,73 @@ const AuthContextProvider = (props) => {
     fd.append('oldPassword', data['oldPassword']);
     fd.append('newPassword', data['newPassword']);
     try {
-      const res = await axios.post("/change/password", fd);
+      const res = await axios.put("/api/profile/password", fd);
       return res.status;
     } catch (e) {
-      handleError(e);
-      return e.response ? e.response.status : 404;
+      handleError(e, [401]);
+      return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
     }
   };
 
+  const changeUsername = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('newUsername', data['newUsername']);
+    try {
+      const res = await axios.put("/api/profile/username", fd);
+      return res.status;
+    } catch (e) {
+      handleError(e, [409]);
+      return e.response ? e.response.status : null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteAccount = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('password', data['password']);
+    try {
+      const res = await axios.delete("/api/profile", { data: fd });
+      clearSession();
+      props.history.push(routes.SIGN_IN.url);
+      return res.status;
+    } catch (e) {
+      handleError(e, [401]);
+      return e.response ? e.response.status : null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleError = (error, codesHandle = []) => {
+    const response = error.response;
+    if (response) {
+      const status = response.status;
+      if (!codesHandle.includes(status)) {
+        clearSession();
+        switch (status) {
+          case 404:
+            props.history.push(routes.NOT_FOUND.url);
+            break;
+          case 500:
+            props.history.push(routes.INTERNAL_SERVER_ERROR.url);
+            break;
+          default:
+            props.history.push(routes.HOME.url);
+        }
+      }
+    } else {
+      clearSession();
+      props.history.push(routes.HOME.url);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{...session,
-      refreshSession,
       signUp,
       signIn,
       signInWithGoogle,
@@ -289,7 +326,9 @@ const AuthContextProvider = (props) => {
       resetPassword,
       confirmAccount,
       getUserProfile,
-      changePassword
+      changePassword,
+      changeUsername,
+      deleteAccount
     }}>
       { isLoading && <PageLoader/> }
       { props.children }
