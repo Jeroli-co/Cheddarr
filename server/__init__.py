@@ -119,9 +119,7 @@ def register_login_manager(app):
 
     @login_manager.needs_refresh_handler
     def refresh():
-        raise InvalidUsage(
-            "Fresh login required", status_code=HTTPStatus.PROXY_AUTHENTICATION_REQUIRED
-        )
+        raise InvalidUsage("Need to authenticate", status_code=HTTPStatus.UNAUTHORIZED)
 
 
 def register_oauth_providers(oauth):
