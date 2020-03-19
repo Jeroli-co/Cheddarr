@@ -20,6 +20,11 @@ const AuthContextProvider = (props) => {
   useEffect(() => {
     const cookie = Cookies.get('session');
     console.log(cookie);
+    if (cookie) {
+      setSession({username: username, isAuthenticated: true});
+    } else {
+      setSession(initialSessionState);
+    }
   }, [session]);
 
   const signUp = async (data) => {
