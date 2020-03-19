@@ -19,13 +19,13 @@ def user_profile(username):
     user = User.find(username=username)
     if not user:
         raise InvalidUsage("The user does not exist", status_code=404)
-    return user_serializer.dumps(user)
+    return user_serializer.dump(user), HTTPStatus.OK
 
 
 @settings.route("/profile")
 @login_required
 def get_profile():
-    return user_serializer.dumps(current_user)
+    return user_serializer.dump(current_user), HTTPStatus.OK
 
 
 @settings.route("/profile/password", methods=["PUT"])
