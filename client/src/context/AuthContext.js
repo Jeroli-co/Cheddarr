@@ -37,15 +37,30 @@ const AuthContextProvider = (props) => {
   };
 
   const signIn = async (data) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('usernameOrEmail', data['usernameOrEmail']);
-    fd.append('password', data['password']);
-    fd.append('remember', data['remember']);
-    try {
-      const res = await axios.post('/api/sign-in', fd);
+
+    const get = async () => {
+      return await axios.get('/api/sign-in')
+    };
+
+    const post = async (data) => {
+      const fd = new FormData();
+      fd.append('usernameOrEmail', data['usernameOrEmail']);
+      fd.append('password', data['password']);
+      fd.append('remember', data['remember']);
+      return await axios.post('/api/sign-in', fd);
+    };
+
+    const initSession = (username) => {
+      setSession({username: username, isAuthenticated: true});
       Cookies.set('authenticated', 'yes', { expires: 365 });
-      Cookies.set('username', res.data.username, { expires: 365 });
+      Cookies.set('username', username, { expires: 365 });
+    };
+
+    setIsLoading(true);
+
+    try {
+      const res = data ? await post(data) : await get();
+      initSession(res.data.username);
       return res.status;
     } catch (e) {
       handleError(e);
@@ -175,7 +190,6 @@ const AuthContextProvider = (props) => {
       setIsLoading(false);
     }
   };
-
 
   const signInWithFacebook = async () => {
     setIsLoading(true);
