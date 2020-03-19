@@ -28,34 +28,32 @@ def get_profile():
     return user_serializer.dumps(current_user)
 
 
-@settings.route("/profile/password", methods=["GET", "PUT"])
+@settings.route("/profile/password", methods=["PUT"])
 @fresh_login_required
 def change_password():
-    if request.method == "PUT":
-        password_form = ChangePasswordForm()
-        if not password_form.validate():
-            raise InvalidUsage(
-                "Error while changing password",
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                payload=password_form.errors,
-            )
+    password_form = ChangePasswordForm()
+    if not password_form.validate():
+        raise InvalidUsage(
+            "Error while changing password",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            payload=password_form.errors,
+        )
 
-        if current_user.password is not None and not current_user.check_password(
-            password_form.oldPassword.data
-        ):
-            raise InvalidUsage(
-                "Error while changing password", status_code=HTTPStatus.UNAUTHORIZED,
-            )
+    if current_user.password is not None and not current_user.check_password(
+        password_form.oldPassword.data
+    ):
+        raise InvalidUsage(
+            "Error while changing password", status_code=HTTPStatus.UNAUTHORIZED,
+        )
 
-        current_user.change_password(password_form.newPassword.data)
-        html = render_template("email/change_password_notice.html")
-        subject = "Your password has been chnaged"
-        utils.send_email(current_user.email, subject, html)
-        return {"message": "Password changed"}, HTTPStatus.OK
-    return {}, HTTPStatus.OK
+    current_user.change_password(password_form.newPassword.data)
+    html = render_template("email/change_password_notice.html")
+    subject = "Your password has been chnaged"
+    utils.send_email(current_user.email, subject, html)
+    return {"message": "Password changed"}, HTTPStatus.OK
 
 
-@settings.route("/profile/username", methods=["GET", "PUT"])
+@settings.route("/profile/username", methods=["PUT"])
 @fresh_login_required
 def change_username():
     username_form = ChangeUsernameForm()
@@ -76,7 +74,7 @@ def change_username():
     return {"message": "Username changed"}, HTTPStatus.OK
 
 
-@settings.route("/profile", methods=["GET", "DELETE"])
+@settings.route("/profile", methods=["DELETE"])
 @fresh_login_required
 def delete_user():
     password_form = PasswordForm()
