@@ -20,18 +20,21 @@ const AuthContextProvider = (props) => {
   useEffect(() => {
     const authenticated = Cookies.get('authenticated');
     if (authenticated) {
-      console.log(authenticated);
+      const username = Cookies.get('username');
+      updateSession(username);
     }
-  });
+  }, []);
 
   const updateSession = (username) => {
     setSession({username: username, isAuthenticated: true});
-    Cookies.set('authenticated', { username: username }, { expires: 365 });
+    Cookies.set('authenticated', 'yes', { expires: 365 });
+    Cookies.set('username', username, { expires: 365 });
   };
 
   const clearSession = () => {
     setSession(initialSessionState);
     Cookies.remove('authenticated');
+    Cookies.remove('username');
   };
 
   const handleError = (error) => {
