@@ -53,7 +53,6 @@ const AuthContextProvider = (props) => {
     fd.append('remember', data['remember']);
     try {
       const res = await axios.post('/api/sign-in', fd);
-      updateSession(res.data.username, res.data.expiresAt);
       return res.status;
     } catch (e) {
       handleError(e);
@@ -71,7 +70,6 @@ const AuthContextProvider = (props) => {
     } catch (e) {
       return e.response ? e.response.status : 404;
     } finally {
-      clearSession();
       props.history.push(routes.HOME.url);
       setIsLoading(false);
     }
@@ -182,10 +180,7 @@ const AuthContextProvider = (props) => {
 
   const handleError = (error) => {
     console.log(error);
-    clearSession();
-    if (error.response.status && error.response.status === 404) {
-      props.history.push(routes.NOT_FOUND.url);
-    }
+    setSession(initialSessionState);
   };
 
   return (
