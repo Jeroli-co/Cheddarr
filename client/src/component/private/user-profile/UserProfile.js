@@ -16,7 +16,7 @@ const UserProfile = () => {
 			{ data &&
 				<article className="media">
 					<figure className="media-left">
-						<p className="image is-64x64">
+						<p className="image is-128x128">
 							<img src={data.user_picture} alt="User" />
 						</p>
 					</figure>

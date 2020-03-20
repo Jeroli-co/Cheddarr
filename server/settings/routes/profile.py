@@ -1,13 +1,13 @@
 from http import HTTPStatus
 
-from flask import render_template, session, request
+from flask import render_template, session
 from flask_login import fresh_login_required, current_user, login_required
 
-from server import InvalidUsage, db
-from server.auth import utils, User
+from server import InvalidUsage, db, utils
+from server.auth import User
 from server.auth.forms import PasswordForm
 from server.settings import settings
-from server.settings.forms import ChangeUsernameForm, ChangePasswordForm
+from server.settings.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
 from server.settings.serializers.user_serializer import UserSerializer
 
 user_serializer = UserSerializer()
@@ -26,6 +26,20 @@ def user_profile(username):
 @login_required
 def get_profile():
     return user_serializer.dump(current_user), HTTPStatus.OK
+
+
+@settings.route("/profile/picture", methods=["PUT"])
+@login_required
+def change_picture():
+    picture_form = PictureForm()
+    if not picture_form.validate():
+        raise InvalidUsage(
+            "Error while changing the profile picture.",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
+    response = utils.upload_picture(picture_form.picture.data.filename)
+    print(response)
+    return {"message": "User picture changed."}, HTTPStatus.OK
 
 
 @settings.route("/profile/password", methods=["PUT"])
@@ -50,7 +64,7 @@ def change_password():
     html = render_template("email/change_password_notice.html")
     subject = "Your password has been changed"
     utils.send_email(current_user.email, subject, html)
-    return {"message": "Password changed."}, HTTPStatus.OK
+    return {"message": "User password changed."}, HTTPStatus.OK
 
 
 @settings.route("/profile/username", methods=["PUT"])

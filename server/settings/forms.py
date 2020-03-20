@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField
+from flask_wtf.file import FileRequired
+from wtforms import PasswordField, StringField, FileField
 from wtforms.validators import DataRequired, Length
 
 
@@ -10,3 +11,7 @@ class ChangePasswordForm(FlaskForm):
 
 class ChangeUsernameForm(FlaskForm):
     newUsername = StringField("New Username", [DataRequired()])
+
+
+class PictureForm(FlaskForm):
+    picture = FileField("Picture", [FileRequired])

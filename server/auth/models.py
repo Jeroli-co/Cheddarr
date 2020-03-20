@@ -1,10 +1,8 @@
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref
 from werkzeug.security import check_password_hash, generate_password_hash
-from server import db
-from server.auth import utils
+from server import db, utils
 
 
 class User(db.Model, UserMixin):
