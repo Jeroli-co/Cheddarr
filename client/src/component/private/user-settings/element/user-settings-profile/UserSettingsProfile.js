@@ -7,7 +7,7 @@ import {ConfirmPasswordModal} from "./element/confirm-password-modal/ConfirmPass
 
 const UserSettingsProfile = () => {
 
-  const { changePassword } = useContext(AuthContext);
+  const { signIn } = useContext(AuthContext);
 
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showChangeUsername, setShowChangeUsername] = useState(false);
@@ -15,12 +15,17 @@ const UserSettingsProfile = () => {
 
   const [confirmPasswordModalConfig, setConfirmPasswordModalConfig] = useState({ active: false, callback: null });
 
-  const onChangePasswordClick = () => {
-    changePassword().then((status) => {
+  const onActionClick = (openModalCallback) => {
+    console.log(openModalCallback);
+    signIn(null, [401]).then((status) => {
       if (status === 200) {
-        setShowChangePassword(true);
-      } else if (status === 401) {
-        setConfirmPasswordModalConfig({active: true, callback: setShowChangePassword(true)});
+        console.log('HEHE');
+        console.log(status);
+        openModalCallback();
+      } else {
+        console.log('OHO');
+        console.log(status);
+        setConfirmPasswordModalConfig({active: true, callback: () => openModalCallback(true)});
       }
     });
   };
@@ -32,21 +37,21 @@ const UserSettingsProfile = () => {
           <div className="column is-one-third">
 
             <h3 className="subtitle is-3">Change password</h3>
-            <button className="button is-primary" type="button" onClick={onChangePasswordClick}>
+            <button className="button is-primary" type="button" onClick={() => onActionClick(() => setShowChangePassword(true))}>
               Change password
             </button>
 
             <div className="is-divider" data-content="OR"/>
 
             <h3 className="subtitle is-3">Change username</h3>
-            <button className="button is-primary" type="button" onClick={() => setShowChangeUsername(true)}>
+            <button className="button is-primary" type="button" onClick={() => onActionClick(() => setShowChangeUsername(true))}>
               Change username
             </button>
 
             <div className="is-divider is-danger" data-content="OR"/>
 
             <h3 className="subtitle is-3 is-danger">Delete</h3>
-            <button className="button is-danger" type="button" onClick={() => setShowDeleteAccount(true)}>
+            <button className="button is-danger" type="button" onClick={() => onActionClick(() => setShowDeleteAccount(true))}>
               Delete account
             </button>
 

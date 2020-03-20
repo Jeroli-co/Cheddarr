@@ -9,6 +9,7 @@ export const AuthContext = createContext();
 
 const initialSessionState = {
   username: null,
+  userPicture: null,
   isAuthenticated: false
 };
 
@@ -20,8 +21,9 @@ const AuthContextProvider = (props) => {
   useEffect(() => {
     const authenticated = Cookies.get('authenticated');
     const username = Cookies.get('username');
+    const userPicture = Cookies.get('userPicture');
     if (authenticated === 'yes' && username) {
-      setSession({username: username, isAuthenticated: true});
+      setSession({username: username, userPicture: userPicture, isAuthenticated: true});
     }
   }, []);
 
@@ -29,14 +31,21 @@ const AuthContextProvider = (props) => {
     setSession(initialSessionState);
     Cookies.remove('authenticated');
     Cookies.remove('username');
+    Cookies.remove('userPicture');
+    props.history.push(routes.HOME.url);
   };
 
-  const handleError = (error) => {
+  const handleError = (error, codesHandle = []) => {
     console.log(error);
-    clearSession();
+    if (error.response) {
+      const status = error.response.status;
+      if (!codesHandle.includes(status)) {
+        clearSession();
+      }
+    }
   };
 
-  const signIn = async (data) => {
+  const signIn = async (data, codesHandle = []) => {
 
     const get = async () => {
       return await axios.get('/api/sign-in')
@@ -50,21 +59,22 @@ const AuthContextProvider = (props) => {
       return await axios.post('/api/sign-in', fd);
     };
 
-    const initSession = (username) => {
+    const initSession = (username, userPicture) => {
       setSession({username: username, isAuthenticated: true});
       Cookies.set('authenticated', 'yes', { expires: 365 });
       Cookies.set('username', username, { expires: 365 });
+      Cookies.set('userPicture', userPicture, { expires: 365 });
     };
 
     setIsLoading(true);
 
     try {
       const res = data ? await post(data) : await get();
-      initSession(res.data.username);
+      initSession(res.data.username, res.data.userPicture);
       return res.status;
     } catch (e) {
-      handleError(e, [400, 401]);
-      return e.response ? e.response.status : 404;
+      handleError(e, codesHandle);
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -76,9 +86,8 @@ const AuthContextProvider = (props) => {
       const res = await axios.get('/api/sign-out');
       return res.status;
     } catch (e) {
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
-      props.history.push(routes.HOME.url);
       clearSession();
       setIsLoading(false);
     }
@@ -94,11 +103,10 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
     try {
       const res = await axios.post('/api/sign-up', fd);
-      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
       return res.status;
     } catch (e) {
-      handleError(e);
-      return e.response ? e.response.status : 404;
+      handleError(e, [409]);
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -111,7 +119,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e, [409, 410]);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +134,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +149,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +162,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e, [410]);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -166,11 +174,10 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
     try {
       const res = await axios.post('/api/reset/' + token, fd);
-      props.history.push(routes.SIGN_IN.url);
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -184,7 +191,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -198,7 +205,7 @@ const AuthContextProvider = (props) => {
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -207,7 +214,7 @@ const AuthContextProvider = (props) => {
   const getUserProfile = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/user/" + session.username);
+      const res = await axios.get("/api/profile");
       return res.data;
     } catch (e) {
       handleError(e);
@@ -224,10 +231,11 @@ const AuthContextProvider = (props) => {
     fd.append('newPassword', data['newPassword']);
     try {
       const res = await axios.put("/api/profile/password", fd);
+      await signIn();
       return res.status;
     } catch (e) {
       handleError(e);
-      return e.response ? e.response.status : 404;
+      return e.response ? e.response.status : 500;
     } finally {
       setIsLoading(false);
     }
@@ -240,6 +248,7 @@ const AuthContextProvider = (props) => {
     fd.append('newUsername', data['newUsername']);
     try {
       const res = await axios.put("/api/profile/username", fd);
+      await signIn();
       return res.status;
     } catch (e) {
       handleError(e, [409]);
@@ -256,7 +265,6 @@ const AuthContextProvider = (props) => {
     try {
       const res = await axios.delete("/api/profile", { data: fd });
       clearSession();
-      props.history.push(routes.SIGN_IN.url);
       return res.status;
     } catch (e) {
       handleError(e, [401]);

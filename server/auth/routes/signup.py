@@ -19,6 +19,8 @@ def signup():
     if existing_user:
         raise InvalidUsage("The user already exists.", status_code=HTTPStatus.CONFLICT)
 
+    # TODO: verify if username already exist
+
     user = User.create(
         first_name=signup_form.firstName.data,
         last_name=signup_form.lastName.data,

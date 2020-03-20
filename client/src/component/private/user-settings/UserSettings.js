@@ -6,6 +6,7 @@ import './UserSettings.scss';
 import {PrivateRoute} from "../../../PrivateRoute";
 import {UserSettingsProfile} from "./element/user-settings-profile/UserSettingsProfile";
 import {UserSettingsConfigurations} from "./element/user-settings-configurations/UserSettingsConfigurations";
+import {Link} from "react-router-dom";
 
 const tabRoutes = {
   USER_SETTINGS_PROFILE: { url: '/settings', component: UserSettingsProfile },
@@ -17,15 +18,15 @@ const UserSettings = (props) => {
     <div className="UserSettings">
       <div className="tabs is-centered is-boxed is-medium">
         <ul>
-          <li className={props.location.pathname === tabRoutes.USER_SETTINGS_PROFILE.url ? 'is-active' : ''} onClick={() => props.history.push(tabRoutes.USER_SETTINGS_PROFILE.url)}>
-            <a>
+          <li className={props.location.pathname === tabRoutes.USER_SETTINGS_PROFILE.url ? 'is-active' : ''}>
+            <Link to={tabRoutes.USER_SETTINGS_PROFILE.url}>
               <FontAwesomeIcon icon={faUser} />
-            </a>
+            </Link>
           </li>
-          <li className={props.location.pathname === tabRoutes.USER_SETTINGS_CONFIGURATIONS.url ? 'is-active' : ''} onClick={() => props.history.push(tabRoutes.USER_SETTINGS_CONFIGURATIONS.url)}>
-            <a>
+          <li className={props.location.pathname === tabRoutes.USER_SETTINGS_CONFIGURATIONS.url ? 'is-active' : ''}>
+            <Link to={tabRoutes.USER_SETTINGS_CONFIGURATIONS.url}>
               <FontAwesomeIcon icon={faCog} />
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

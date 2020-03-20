@@ -9,7 +9,7 @@ import {InitResetPasswordModal} from "../element/init-reset-password-modal/InitR
 import {ResendAccountConfirmationEmailModal} from "../element/resend-account-confirmation-email-modal/ResendAccountConfirmationEmailModal";
 import {routes} from "../../../routes";
 
-const SignInForm = () => {
+const SignInForm = (props) => {
 
 	const { signIn, signInWithGoogle, signInWithFacebook } = useContext(AuthContext);
 	const { register, handleSubmit, errors } = useForm();
@@ -20,7 +20,13 @@ const SignInForm = () => {
 	const [status, setStatus] = useState(null);
 
 	const onSubmit = (data) => {
-		signIn(data).then((status) => {setStatus(status)});
+		signIn(data, [400, 401]).then((status) => {
+			if (status === 200) {
+				props.history.push(routes.HOME.url);
+			} else {
+				setStatus(status);
+			}
+		});
 	};
 
 	return (

@@ -3,8 +3,9 @@ import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../../../../../context/AuthContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
+import {routes} from "../../../../../../../routes";
 
-const DeleteAccountModal = ({ isActive, onClose }) => {
+const DeleteAccountModal = ({ isActive, onClose, history }) => {
 
   const { register, handleSubmit, reset } = useForm();
   const { deleteAccount } = useContext(AuthContext);
@@ -12,7 +13,9 @@ const DeleteAccountModal = ({ isActive, onClose }) => {
 
   const onSubmit = (data) => {
     deleteAccount(data).then((code) => {
-      if (code !== 200) {
+      if (code === 200) {
+        history.push(routes.SIGN_IN.url);
+      } else {
         setStatus(code);
       }
     });

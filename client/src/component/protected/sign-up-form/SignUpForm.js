@@ -1,14 +1,26 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../../context/AuthContext";
+import {routes} from "../../../routes";
 
-const SignUpForm = () => {
+const SignUpForm = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
   const { signUp } = useContext(AuthContext);
+  const [status, setStatus] = useState(null);
+
+  const onSubmit = (data) => {
+    signUp(data).then((status) => {
+      if (status === 200) {
+        props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
+      }  else {
+        setStatus(status);
+      }
+    });
+  };
 
 	return (
 		<div className="SignUpForm" data-testid="SignUpForm">
@@ -28,7 +40,7 @@ const SignUpForm = () => {
 			<div className="columns is-mobile is-centered">
 				<div className="column is-one-third">
 
-          <form onSubmit={handleSubmit(signUp)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
 
             {/* LAST NAME */}
             <div className="field">
@@ -149,6 +161,11 @@ const SignUpForm = () => {
                 <p className="help is-danger">Passwords are not equals</p>
               )}
             </div>
+
+            { status && (
+								(status === 409 && <p className="help is-danger">Email already exist</p>)
+							)
+						}
 
             {/* SUBMIT BUTTON */}
             <div className="field">
