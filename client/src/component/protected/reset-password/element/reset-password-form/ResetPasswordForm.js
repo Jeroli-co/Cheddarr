@@ -13,11 +13,8 @@ const ResetPasswordForm = (props) => {
 
   const onSubmit = (data) => {
     resetPassword(props.token, data).then((status) => {
-      if (status === 200) {
-        props.history.push(routes.SIGN_IN.url);
-      } else {
+      if (status !== 200)
         setStatus(status);
-      }
     });
   };
 

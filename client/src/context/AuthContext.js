@@ -41,6 +41,13 @@ const AuthContextProvider = (props) => {
       const status = error.response.status;
       if (!codesHandle.includes(status)) {
         clearSession();
+        if (status === 500) {
+          props.history.push(routes.INTERNAL_SERVER_ERROR.url);
+        } else if (status === 404) {
+          props.history.push(routes.NOT_FOUND.url);
+        } else {
+          props.history.push(routes.HOME.url);
+        }
       }
     }
   };
@@ -52,8 +59,9 @@ const AuthContextProvider = (props) => {
     };
 
     const post = async (data) => {
+      const username = data['usernameOrEmail'] || data['username'];
       const fd = new FormData();
-      fd.append('usernameOrEmail', data['usernameOrEmail']);
+      fd.append('usernameOrEmail', username);
       fd.append('password', data['password']);
       fd.append('remember', data['remember']);
       return await axios.post('/api/sign-in', fd);
@@ -174,6 +182,7 @@ const AuthContextProvider = (props) => {
     fd.append('password', data['password']);
     try {
       const res = await axios.post('/api/reset/' + token, fd);
+      props.history.push(routes.SIGN_IN.url);
       return res.status;
     } catch (e) {
       handleError(e);

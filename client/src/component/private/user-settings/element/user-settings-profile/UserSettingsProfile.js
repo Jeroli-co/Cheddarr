@@ -1,33 +1,16 @@
-import React, {useContext, useState} from 'react';
+import React from 'react';
 import {ChangePasswordModal} from "./element/change-password-modal/ChangePasswordModal";
 import {ChangeUsernameModal} from "./element/change-username-modal/ChangeUsernameModal";
 import {DeleteAccountModal} from "./element/delete-account-modal/DeleteAccountModal";
-import {AuthContext} from "../../../../../context/AuthContext";
-import {ConfirmPasswordModal} from "./element/confirm-password-modal/ConfirmPasswordModal";
+import {routes} from "../../../../../routes";
+import {Route} from "react-router";
 
-const UserSettingsProfile = () => {
+const UserSettingsProfile = (props) => {
 
-  const { signIn } = useContext(AuthContext);
-
-  const [showChangePassword, setShowChangePassword] = useState(false);
-  const [showChangeUsername, setShowChangeUsername] = useState(false);
-  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
-
-  const [confirmPasswordModalConfig, setConfirmPasswordModalConfig] = useState({ active: false, callback: null });
-
-  const onActionClick = (openModalCallback) => {
-    console.log(openModalCallback);
-    signIn(null, [401]).then((status) => {
-      if (status === 200) {
-        console.log('HEHE');
-        console.log(status);
-        openModalCallback();
-      } else {
-        console.log('OHO');
-        console.log(status);
-        setConfirmPasswordModalConfig({active: true, callback: () => openModalCallback(true)});
-      }
-    });
+  const userSettingsModalsRoutes = {
+    CHANGE_PASSWORD: { url: routes.USER_SETTINGS.url + '/profile/change-password', component: ChangePasswordModal },
+    CHANGE_USERNAME: { url: routes.USER_SETTINGS.url + '/profile/change-username', component: ChangeUsernameModal },
+    DELETE: { url: routes.USER_SETTINGS.url + '/profile/delete', component: DeleteAccountModal }
   };
 
   return (
@@ -37,31 +20,30 @@ const UserSettingsProfile = () => {
           <div className="column is-one-third">
 
             <h3 className="subtitle is-3">Change password</h3>
-            <button className="button is-primary" type="button" onClick={() => onActionClick(() => setShowChangePassword(true))}>
+            <button className="button is-primary" type="button" onClick={() => props.history.push(userSettingsModalsRoutes.CHANGE_PASSWORD.url)}>
               Change password
             </button>
 
             <div className="is-divider" data-content="OR"/>
 
             <h3 className="subtitle is-3">Change username</h3>
-            <button className="button is-primary" type="button" onClick={() => onActionClick(() => setShowChangeUsername(true))}>
+            <button className="button is-primary" type="button" onClick={() => props.history.push(userSettingsModalsRoutes.CHANGE_USERNAME.url)}>
               Change username
             </button>
 
             <div className="is-divider is-danger" data-content="OR"/>
 
             <h3 className="subtitle is-3 is-danger">Delete</h3>
-            <button className="button is-danger" type="button" onClick={() => onActionClick(() => setShowDeleteAccount(true))}>
+            <button className="button is-danger" type="button" onClick={() => props.history.push(userSettingsModalsRoutes.DELETE.url)}>
               Delete account
             </button>
 
           </div>
         </div>
       </div>
-      <ChangePasswordModal isActive={showChangePassword} onClose={() => setShowChangePassword(false)}/>
-      <ChangeUsernameModal isActive={showChangeUsername} onClose={() => setShowChangeUsername(false)}/>
-      <DeleteAccountModal isActive={showDeleteAccount} onClose={() => setShowDeleteAccount(false)}/>
-      <ConfirmPasswordModal isActive={confirmPasswordModalConfig.active} onClose={() => setConfirmPasswordModalConfig({active: false, callback: null})} callback={confirmPasswordModalConfig.callback}/>
+      <Route exact path={userSettingsModalsRoutes.CHANGE_PASSWORD.url} component={userSettingsModalsRoutes.CHANGE_PASSWORD.component} />
+      <Route exact path={userSettingsModalsRoutes.CHANGE_USERNAME.url} component={userSettingsModalsRoutes.CHANGE_USERNAME.component} />
+      <Route exact path={userSettingsModalsRoutes.DELETE.url} component={userSettingsModalsRoutes.DELETE.component} />
     </div>
   )
 };

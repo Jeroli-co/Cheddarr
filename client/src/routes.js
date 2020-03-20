@@ -9,6 +9,7 @@ import {Authorize} from "./component/protected/authorize/Authorize";
 import {NotFound} from "./component/public/not-found/NotFound";
 import {UserSettings} from "./component/private/user-settings/UserSettings";
 import {InternalServerError} from "./component/public/internal-server-error/InternalServerError";
+import {ConfirmPasswordModal} from "./component/element/confirm-password-modal/ConfirmPasswordModal";
 
 const routes = {
   HOME: { url: '/', component: Home },
@@ -20,10 +21,9 @@ const routes = {
   WAIT_ACCOUNT_CONFIRMATION: { url: (email) => '/wait-account-confirmation/' + email, component: WaitingAccountConfirmation },
   RESET_PASSWORD: { url: (token) => '/reset/' + token, component: ResetPassword },
   AUTHORIZE: { url: '/sign-in/authorize', component: Authorize },
+  CONFIRM_PASSWORD: { url: '/confirm-password', component: ConfirmPasswordModal },
   USER_PROFILE: { url: (username) => '/user/' + username, component: UserProfile },
-  USER_SETTINGS: { url: '/settings', component: UserSettings },
-  USER_SETTINGS_PROFILE: { url: '/settings', component: UserSettings },
-  USER_SETTINGS_CONFIGURATIONS: { url: '/settings/configurations', component: UserSettings }
+  USER_SETTINGS: { url: '/settings', component: UserSettings }
 };
 
 export {

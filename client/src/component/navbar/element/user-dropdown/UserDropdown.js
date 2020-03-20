@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-import {faUser} from "@fortawesome/free-regular-svg-icons";
 import {Link} from "react-router-dom";
 import {routes} from "../../../../routes";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -13,18 +12,15 @@ const UserDropdown = () => {
   return (
     <div className="navbar-item has-dropdown is-hoverable">
 
-      { userPicture == null &&
-        <div className="navbar-link is-pointed">
-          <span className="icon">
-            <FontAwesomeIcon icon={faUser}/>
-          </span>
-          <span>{username}</span>
-        </div>
-      }
-
       { userPicture &&
         <div className="navbar-link is-pointed">
           <img src={userPicture} alt="User"/>
+        </div>
+      }
+
+      { !userPicture &&
+        <div className="navbar-link is-pointed">
+          <p>{username}</p>
         </div>
       }
 
