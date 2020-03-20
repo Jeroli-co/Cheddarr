@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from flask import url_for, render_template, request
-from server import InvalidUsage
-from server.auth import auth, User, utils
+from server import InvalidUsage, utils
+from server.auth import auth, User
 from server.auth.forms import EmailForm, PasswordForm
 
 
@@ -33,7 +33,7 @@ def reset_password():
 def confirm_reset(token):
     try:
         data = utils.confirm_token(token)
-    except:
+    except Exception:
         raise InvalidUsage(
             "The reset link is invalid or has expired.", status_code=HTTPStatus.GONE
         )

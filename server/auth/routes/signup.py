@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from flask import url_for, render_template
-from server import db, InvalidUsage
-from server.auth import auth, User, utils
+from server import db, InvalidUsage, utils
+from server.auth import auth, User
 from server.auth.forms import SignupForm, EmailForm
 
 
@@ -33,6 +33,7 @@ def signup():
         email=signup_form.email.data,
         username=signup_form.username.data,
         password=signup_form.password.data,
+        user_picture=utils.random_user_picture(),
     )
 
     token = utils.generate_timed_token(user.email)
@@ -53,7 +54,7 @@ def signup():
 def confirm_email(token):
     try:
         email = utils.confirm_token(token)
-    except:
+    except Exception:
         raise InvalidUsage(
             "The confirmation link is invalid or has expired.",
             status_code=HTTPStatus.GONE,

@@ -1,7 +1,8 @@
 from importlib import reload
 
 from flask import url_for
-from server.auth import utils, User
+from server.auth import User
+from server import utils
 
 
 def test_signup_ok(client, mocker):

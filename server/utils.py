@@ -1,7 +1,13 @@
+from random import choice
+
+from cloudinary.uploader import upload
 from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
 from flask import current_app as app
 from sendgrid import Mail, From, To, Content
+from werkzeug.utils import secure_filename
+
 from server import mail
+from cloudinary.api import resources
 
 
 def send_email(to_email, subject, html_content):
@@ -14,7 +20,25 @@ def send_email(to_email, subject, html_content):
     )
     try:
         mail.send(message)
-    except:
+    except Exception:
+        raise Exception
+
+
+def random_user_picture():
+    try:
+        pictures = resources(resource_type="image", type="upload", prefix="default/")[
+            "resources"
+        ]
+    except Exception:
+        raise Exception
+    random_picture = choice(pictures)
+    return random_picture["url"]
+
+
+def upload_picture(filename):
+    try:
+        upload(secure_filename(filename))
+    except Exception:
         raise Exception
 
 
@@ -34,6 +58,6 @@ def confirm_token(token, expiration=600):
         data = serializer.loads(
             token, salt=app.config["SECURITY_PASSWORD_SALT"], max_age=expiration
         )
-    except:
+    except Exception:
         raise Exception
     return data
