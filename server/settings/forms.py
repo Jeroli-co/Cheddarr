@@ -14,4 +14,4 @@ class ChangeUsernameForm(FlaskForm):
 
 
 class PictureForm(FlaskForm):
-    picture = FileField("Picture", [FileRequired])
+    picture = FileField("Picture", [FileRequired()])
