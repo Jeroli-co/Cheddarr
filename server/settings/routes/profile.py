@@ -39,7 +39,9 @@ def change_picture():
         )
     response = utils.upload_picture(picture_form.picture.data.filename)
     print(response)
-    return {"message": "User picture changed."}, HTTPStatus.OK
+    current_user.user_picture = response["url"]
+    db.session.commit()
+    return {"user_picture": current_user.user_picture}, HTTPStatus.OK
 
 
 @settings.route("/profile/password", methods=["PUT"])
@@ -85,7 +87,7 @@ def change_username():
 
     current_user.username = username_form.newUsername.data
     db.session.commit()
-    return {"message": "Username changed."}, HTTPStatus.OK
+    return {"username": current_user.username}, HTTPStatus.OK
 
 
 @settings.route("/profile", methods=["DELETE"])
