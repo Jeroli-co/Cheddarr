@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from flask import url_for, redirect
+from flask import url_for, redirect, request
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_login import login_user, current_user
 from sqlalchemy.orm.exc import NoResultFound
@@ -14,33 +14,40 @@ session_serializer = SessionSerializer()
 
 @auth.route("/sign-in", methods=["GET", "POST"])
 def signin():
-    if current_user.is_authenticated:
-        return session_serializer.dump(current_user), HTTPStatus.OK
+    if request.method == "GET":
+        if current_user.is_authenticated:
+            return session_serializer.dump(current_user), HTTPStatus.OK
+        else:
+            raise InvalidUsage(
+                "User not authenticated", status_code=HTTPStatus.UNAUTHORIZED
+            )
 
-    signin_form = SigninForm()
-    if not signin_form.validate():
-        raise InvalidUsage(
-            "Error while signing in.",
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            payload=signin_form.errors,
+    else:
+        signin_form = SigninForm()
+        if not signin_form.validate():
+            raise InvalidUsage(
+                "Error while signing in.",
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                payload=signin_form.errors,
+            )
+
+        user = User.find(email=signin_form.usernameOrEmail.data) or User.find(
+            username=signin_form.usernameOrEmail.data
         )
+        if not user or not user.check_password(signin_form.password.data):
+            raise InvalidUsage(
+                "Wrong username/email or password.", status_code=HTTPStatus.BAD_REQUEST
+            )
 
-    user = User.find(email=signin_form.usernameOrEmail.data) or User.find(
-        username=signin_form.usernameOrEmail.data
-    )
-    if not user or not user.check_password(signin_form.password.data):
-        raise InvalidUsage(
-            "Wrong username/email or password.", status_code=HTTPStatus.BAD_REQUEST
-        )
+        if not user.confirmed:
+            raise InvalidUsage(
+                "The account needs to be confirmed.",
+                status_code=HTTPStatus.UNAUTHORIZED,
+            )
 
-    if not user.confirmed:
-        raise InvalidUsage(
-            "The account needs to be confirmed.", status_code=HTTPStatus.UNAUTHORIZED
-        )
-
-    remember = True if signin_form.remember.data else False
-    login_user(user, remember=remember)
-    return session_serializer.dump(user), HTTPStatus.OK
+        remember = True if signin_form.remember.data else False
+        login_user(user, remember=remember)
+        return session_serializer.dump(user), HTTPStatus.OK
 
 
 @auth.route("/sign-in/google")
