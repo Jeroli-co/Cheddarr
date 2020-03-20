@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../../context/AuthContext";
 import {routes} from "../../../routes";
 
-const SignUpForm = (props) => {
+const SignUpForm = () => {
 
   const { register, handleSubmit, errors, watch } = useForm();
   const { signUp } = useContext(AuthContext);
@@ -14,11 +14,8 @@ const SignUpForm = (props) => {
 
   const onSubmit = (data) => {
     signUp(data).then((status) => {
-      if (status === 200) {
-        props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
-      }  else {
+      if (status !== 200)
         setStatus(status);
-      }
     });
   };
 
@@ -176,7 +173,7 @@ const SignUpForm = (props) => {
 
             <div className="field">
               <div className="control has-text-centered">
-                <p className="is-size-7">Already have an account ? <Link to="/sign-in">Sign in</Link></p>
+                <p className="is-size-7">Already have an account ? <Link to={routes.SIGN_IN.url}>Sign in</Link></p>
               </div>
             </div>
 
