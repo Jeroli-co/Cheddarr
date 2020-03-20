@@ -14,7 +14,6 @@ const PrivateRoute = ({component: Component, location, ...rest}) => {
 
     if (isAuthenticated && status === null) {
       signIn(null, [401]).then((code) => {
-        console.log(location.pathname);
         setRedirect(location.pathname);
         setStatus(code);
       });
