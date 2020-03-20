@@ -10,16 +10,22 @@ def signup():
     signup_form = SignupForm()
     if not signup_form.validate():
         raise InvalidUsage(
-            "Error in signup form.",
+            "Error while signing up.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             payload=signup_form.errors,
         )
 
-    existing_user = User.exists(email=signup_form.email.data)
-    if existing_user:
-        raise InvalidUsage("The user already exists.", status_code=HTTPStatus.CONFLICT)
+    existing_email = User.exists(email=signup_form.email.data)
+    if existing_email:
+        raise InvalidUsage(
+            "This email is already taken.", status_code=HTTPStatus.CONFLICT
+        )
 
-    # TODO: verify if username already exist
+    existing_username = User.exists(username=signup_form.username.data)
+    if existing_username:
+        raise InvalidUsage(
+            "This username is not available.", status_code=HTTPStatus.CONFLICT
+        )
 
     user = User.create(
         first_name=signup_form.firstName.data,
@@ -37,10 +43,10 @@ def signup():
         confirm_url=confirm_url.replace("/api", ""),
     )
     subject = "Welcome!"
+    utils.send_email(user.email, subject, html)
     db.session.add(user)
     db.session.commit()
-    utils.send_email(user.email, subject, html)
-    return {"message": "Confirmation email sent"}, HTTPStatus.OK
+    return {"message": "Confirmation email sent."}, HTTPStatus.OK
 
 
 @auth.route("/confirm/<token>")
@@ -59,7 +65,7 @@ def confirm_email(token):
 
     user.confirmed = True
     db.session.commit()
-    return {"message": "Account confirmed"}, HTTPStatus.CREATED
+    return {"message": "The account is now confirmed."}, HTTPStatus.CREATED
 
 
 @auth.route("/confirm/resend", methods=["POST"])
@@ -67,7 +73,7 @@ def resend_confirmation():
     email_form = EmailForm()
     if not email_form.validate():
         raise InvalidUsage(
-            "Cannot resend confirmation email",
+            "Cannot resend the confirmation email.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
@@ -75,7 +81,7 @@ def resend_confirmation():
     existing_user = User.exists(email=email)
     if not existing_user:
         raise InvalidUsage(
-            "No user with this email exists", status_code=HTTPStatus.BAD_REQUEST
+            "No user with this email exists.", status_code=HTTPStatus.BAD_REQUEST
         )
 
     token = utils.generate_timed_token(email)
@@ -85,4 +91,4 @@ def resend_confirmation():
     )
     subject = "Please confirm your email"
     utils.send_email(email, subject, html)
-    return {"message": "Confirmation email sent"}, HTTPStatus.OK
+    return {"message": "Confirmation email sent."}, HTTPStatus.OK

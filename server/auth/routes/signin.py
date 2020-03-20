@@ -20,7 +20,7 @@ def signin():
     signin_form = SigninForm()
     if not signin_form.validate():
         raise InvalidUsage(
-            "Error in signin form.",
+            "Error while signing in.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             payload=signin_form.errors,
         )
@@ -35,7 +35,7 @@ def signin():
 
     if not user.confirmed:
         raise InvalidUsage(
-            "Account needs to be confirmed.", status_code=HTTPStatus.UNAUTHORIZED
+            "The account needs to be confirmed.", status_code=HTTPStatus.UNAUTHORIZED
         )
 
     remember = True if signin_form.remember.data else False

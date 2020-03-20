@@ -18,7 +18,7 @@ user_serializer = UserSerializer()
 def user_profile(username):
     user = User.find(username=username)
     if not user:
-        raise InvalidUsage("The user does not exist", status_code=404)
+        raise InvalidUsage("The user does not exist.", status_code=404)
     return user_serializer.dump(user), HTTPStatus.OK
 
 
@@ -34,7 +34,7 @@ def change_password():
     password_form = ChangePasswordForm()
     if not password_form.validate():
         raise InvalidUsage(
-            "Error while changing password",
+            "Error while changing password.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             payload=password_form.errors,
         )
@@ -43,14 +43,14 @@ def change_password():
         password_form.oldPassword.data
     ):
         raise InvalidUsage(
-            "Error while changing password", status_code=HTTPStatus.UNAUTHORIZED,
+            "The passwords don't match.", status_code=HTTPStatus.UNAUTHORIZED,
         )
 
     current_user.change_password(password_form.newPassword.data)
     html = render_template("email/change_password_notice.html")
-    subject = "Your password has been chnaged"
+    subject = "Your password has been changed"
     utils.send_email(current_user.email, subject, html)
-    return {"message": "Password changed"}, HTTPStatus.OK
+    return {"message": "Password changed."}, HTTPStatus.OK
 
 
 @settings.route("/profile/username", methods=["PUT"])
@@ -59,19 +59,19 @@ def change_username():
     username_form = ChangeUsernameForm()
     if not username_form.validate():
         raise InvalidUsage(
-            "Error while changing username",
+            "Error while changing username.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
     new_username = username_form.newUsername.data
     if User.exists(username=new_username):
         raise InvalidUsage(
-            "This username is already taken", status_code=HTTPStatus.CONFLICT
+            "This username is not available.", status_code=HTTPStatus.CONFLICT
         )
 
     current_user.username = username_form.newUsername.data
     db.session.commit()
-    return {"message": "Username changed"}, HTTPStatus.OK
+    return {"message": "Username changed."}, HTTPStatus.OK
 
 
 @settings.route("/profile", methods=["DELETE"])
@@ -80,14 +80,15 @@ def delete_user():
     password_form = PasswordForm()
     if not password_form.validate():
         raise InvalidUsage(
-            "Error while deleting user", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
+            "Error while deleting the user.",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
     if current_user.password is not None and not current_user.check_password(
         password_form.password.data
     ):
-        raise InvalidUsage("Wrong password", HTTPStatus.UNAUTHORIZED)
+        raise InvalidUsage("Wrong password.", HTTPStatus.UNAUTHORIZED)
 
     current_user.delete()
     session.clear()
-    return {"message": "User deleted"}, HTTPStatus.OK
+    return {"message": "User deleted."}, HTTPStatus.OK

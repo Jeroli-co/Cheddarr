@@ -23,7 +23,7 @@ def reset_password():
             return {"message": "Reset instructions sent."}, HTTPStatus.OK
 
     raise InvalidUsage(
-        "Error while sending reset instructions",
+        "Error while sending the reset instructions.",
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         payload=email_form.errors,
     )
@@ -42,14 +42,14 @@ def confirm_reset(token):
     session_token = data[1]
     if session_token != user.session_token:
         raise InvalidUsage(
-            "Reset password unavailable", status_code=HTTPStatus.FORBIDDEN
+            "Reset password unavailable.", status_code=HTTPStatus.FORBIDDEN
         )
 
     if request.method == "POST":
         password_form = PasswordForm()
         if not password_form.validate():
             raise InvalidUsage(
-                "Error while resetting password",
+                "Error while resetting the password.",
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 payload=password_form.errors,
             )
@@ -57,6 +57,6 @@ def confirm_reset(token):
         html = render_template("email/reset_password_notice.html",)
         subject = "Your password has been reset"
         utils.send_email(user.email, subject, html)
-        return {"message": "Password reset"}, HTTPStatus.OK
+        return {"message": "Password reset."}, HTTPStatus.OK
 
     return {"message": "Able to reset."}, HTTPStatus.OK
