@@ -19,7 +19,9 @@ const PrivateRoute = ({component: Component, location, ...rest}) => {
       });
     }
 
-  }, [isAuthenticated]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  });
 
   if (status === null)
     return <div/>;

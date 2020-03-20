@@ -32,7 +32,6 @@ const AuthContextProvider = (props) => {
     Cookies.remove('authenticated');
     Cookies.remove('username');
     Cookies.remove('userPicture');
-    props.history.push(routes.HOME.url);
   };
 
   const handleError = (error, codesHandle = []) => {
@@ -68,7 +67,7 @@ const AuthContextProvider = (props) => {
     };
 
     const initSession = (username, userPicture) => {
-      setSession({username: username, isAuthenticated: true});
+      setSession({username: username, userPicture: userPicture, isAuthenticated: true});
       Cookies.set('authenticated', 'yes', { expires: 365 });
       Cookies.set('username', username, { expires: 365 });
       Cookies.set('userPicture', userPicture, { expires: 365 });
@@ -78,7 +77,7 @@ const AuthContextProvider = (props) => {
 
     try {
       const res = data ? await post(data) : await get();
-      initSession(res.data.username, res.data.userPicture);
+      initSession(res.data.username, res.data['user_picture']);
       return res.status;
     } catch (e) {
       handleError(e, codesHandle);
@@ -92,6 +91,7 @@ const AuthContextProvider = (props) => {
     setIsLoading(true);
     try {
       const res = await axios.get('/api/sign-out');
+      props.history.push(routes.SIGN_IN.url);
       return res.status;
     } catch (e) {
       return e.response ? e.response.status : 500;
@@ -110,8 +110,8 @@ const AuthContextProvider = (props) => {
     fd.append('email', data['email']);
     fd.append('password', data['password']);
     try {
-      const res = await axios.post('/api/sign-up', fd);
-      return res.status;
+      await axios.post('/api/sign-up', fd);
+      props.history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url(data['email']));
     } catch (e) {
       handleError(e, [409]);
       return e.response ? e.response.status : 500;
@@ -239,9 +239,8 @@ const AuthContextProvider = (props) => {
     fd.append('oldPassword', data['oldPassword']);
     fd.append('newPassword', data['newPassword']);
     try {
-      const res = await axios.put("/api/profile/password", fd);
-      await signIn();
-      return res.status;
+      await axios.put("/api/profile/password", fd);
+      await signOut();
     } catch (e) {
       handleError(e);
       return e.response ? e.response.status : 500;
@@ -257,10 +256,30 @@ const AuthContextProvider = (props) => {
     fd.append('newUsername', data['newUsername']);
     try {
       const res = await axios.put("/api/profile/username", fd);
-      await signIn();
+      const username = res.data.username;
+      Cookies.set('username', username);
+      setSession({username: username});
       return res.status;
     } catch (e) {
       handleError(e, [409]);
+      return e.response ? e.response.status : null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const changeUserPicture = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('picture', data);
+    try {
+      const res = await axios.put('/api/profile/picture', fd);
+      const picture = res.data.picture;
+      Cookies.set('userPicture', picture);
+      setSession({userPicture: picture});
+      return res.status;
+    } catch (e) {
+      handleError(e);
       return e.response ? e.response.status : null;
     } finally {
       setIsLoading(false);
@@ -272,9 +291,9 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('password', data['password']);
     try {
-      const res = await axios.delete("/api/profile", { data: fd });
+      await axios.delete("/api/profile", { data: fd });
       clearSession();
-      return res.status;
+      props.history.push(routes.SIGN_UP.url);
     } catch (e) {
       handleError(e, [401]);
       return e.response ? e.response.status : null;
@@ -285,20 +304,21 @@ const AuthContextProvider = (props) => {
 
   return (
     <AuthContext.Provider value={{...session,
-      signUp,
       signIn,
+      signOut,
+      signUp,
+      confirmAccount,
+      initResetPassword,
+      resendConfirmation,
+      checkResetPasswordToken,
       signInWithGoogle,
       signInWithFacebook,
-      signOut,
-      resendConfirmation,
-      initResetPassword,
-      checkResetPasswordToken,
       resetPassword,
-      confirmAccount,
       getUserProfile,
       changePassword,
       changeUsername,
-      deleteAccount
+      deleteAccount,
+      changeUserPicture
     }}>
       { isLoading && <PageLoader/> }
       { props.children }
