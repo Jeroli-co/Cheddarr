@@ -8,6 +8,7 @@ from server.auth import auth, facebook_bp, google_bp
 from server.auth.models import User, OAuth
 from server.auth.forms import SigninForm
 from server.auth.serializers.session_serializer import SessionSerializer
+from server.utils import generate_password
 
 session_serializer = SessionSerializer()
 
@@ -41,8 +42,7 @@ def signin():
 
         if not user.confirmed:
             raise InvalidUsage(
-                "The account needs to be confirmed.",
-                status_code=HTTPStatus.UNAUTHORIZED,
+                "The email needs to be confirmed.", status_code=HTTPStatus.UNAUTHORIZED,
             )
 
         remember = signin_form.remember.data if signin_form.remember else False
@@ -114,6 +114,8 @@ def oauth_logged_in(blueprint, token):
                 email=email,
                 username=email,
                 user_picture=user_picture,
+                password=generate_password(),
+                oauth_only=True,
             )
             # Associate the new local user account with the OAuth token
             oauth.user = user
