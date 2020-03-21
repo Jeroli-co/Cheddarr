@@ -5,32 +5,32 @@ import { AuthContext } from "../../../context/AuthContext";
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import {routes} from "../../../routes";
-import {ConfirmAccount} from "./ConfirmAccount";
+import {ConfirmEmail} from "./ConfirmEmail";
 
 afterEach(cleanup);
 
-test('Confirm account shows AccountConfirmed on 201', async () => {
-  const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_ACCOUNT.url('secret-token')] });
+test('Confirm account shows EmailConfirmed on 201', async () => {
+  const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmAccount: () => new Promise((resolve) => resolve(201)) }}>
-        <ConfirmAccount/>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(201)) }}>
+        <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
   );
 
   const { getByTestId } = render(tree);
 
-  const accountConfirmed = await waitForElement(() => getByTestId("AccountConfirmed"));
-  expect(accountConfirmed).toBeInTheDocument();
+  const emailConfirmed = await waitForElement(() => getByTestId("EmailConfirmed"));
+  expect(emailConfirmed).toBeInTheDocument();
 });
 
 test('Confirm account shows AlreadyConfirmed on 409', async () => {
-  const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_ACCOUNT.url('secret-token')] });
+  const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmAccount: () => new Promise((resolve) => resolve(409)) }}>
-        <ConfirmAccount/>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(409)) }}>
+        <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
   );
@@ -42,11 +42,11 @@ test('Confirm account shows AlreadyConfirmed on 409', async () => {
 });
 
 test('Confirm account shows TokenExpired on 410', async () => {
-  const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_ACCOUNT.url('secret-token')] });
+  const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmAccount: () => new Promise((resolve) => resolve(410)) }}>
-        <ConfirmAccount/>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(410)) }}>
+        <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
   );
@@ -58,17 +58,17 @@ test('Confirm account shows TokenExpired on 410', async () => {
 });
 
 test('Confirm account shows nothing on other code', async () => {
-  const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_ACCOUNT.url('secret-token')] });
+  const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmAccount: () => new Promise((resolve) => resolve(3209)) }}>
-        <ConfirmAccount/>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(3209)) }}>
+        <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
   );
 
   const { getByTestId } = render(tree);
 
-  const confirmAccount = await waitForElement(() => getByTestId("ConfirmAccount"));
-  expect(confirmAccount.firstChild === null);
+  const confirmEmail = await waitForElement(() => getByTestId("ConfirmEmail"));
+  expect(confirmEmail.firstChild === null);
 });

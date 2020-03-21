@@ -32,10 +32,10 @@ test('App router load components (not authentication needed) correctly', () => {
   const signUpForm = wrapper.getByTestId('SignUpForm');
   expect(signUpForm).toBeInTheDocument();
 
-  // Render confirm account
-  history.push(routes.CONFIRM_ACCOUNT.url('secret-token'));
-  const confirmAccount = wrapper.getByTestId('ConfirmAccount');
-  expect(confirmAccount).toBeInTheDocument();
+  // Render confirm email
+  history.push(routes.CONFIRM_EMAIL.url('secret-token'));
+  const confirmEmail = wrapper.getByTestId('ConfirmEmail');
+  expect(confirmEmail).toBeInTheDocument();
 
   // Render wait account confirmation
   history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url('test@test.com'));

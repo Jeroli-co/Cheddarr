@@ -12,10 +12,7 @@ const ChangeEmailModal = (props) => {
   const [status, setStatus] = useState(null);
 
   const onSubmit = (data) => {
-    changeEmail(data).then((code) => {
-      if (code !== 200)
-        setStatus(code);
-    });
+    changeEmail(data).then(code => setStatus(code));
   };
 
   const closeModal = () => {
@@ -54,7 +51,8 @@ const ChangeEmailModal = (props) => {
             </div>
 
             { status && (
-                (status === 409 && <p className="help is-danger">This email is already register</p>)
+                (status === 409 && <p className="help is-danger">This email is already register</p>) ||
+                (status === 200 && <p className="help is-succes">Confirm your email with by clicking on the link we sent to you</p>)
               )
             }
 

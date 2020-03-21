@@ -129,7 +129,7 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const confirmAccount = async (token) => {
+  const confirmEmail = async (token) => {
     setIsLoading(true);
     try {
       const res = await axios.get('/api/confirm/' + token);
@@ -334,7 +334,7 @@ const AuthContextProvider = (props) => {
       signIn,
       signOut,
       signUp,
-      confirmAccount,
+      confirmEmail,
       initResetPassword,
       resendConfirmation,
       checkResetPasswordToken,
