@@ -32,7 +32,7 @@ def random_user_picture():
     except Exception:
         raise Exception
     random_picture = choice(pictures)
-    return random_picture["url"]
+    return random_picture["secure_url"]
 
 
 def upload_picture(file):

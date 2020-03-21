@@ -5,7 +5,7 @@ from flask_login import fresh_login_required, current_user, login_required
 
 from server import InvalidUsage, db, utils
 from server.auth import User
-from server.auth.forms import PasswordForm
+from server.auth.forms import PasswordForm, EmailForm
 from server.settings import settings
 from server.settings.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
 from server.settings.serializers.user_serializer import UserSerializer
@@ -84,9 +84,29 @@ def change_username():
             "This username is not available.", status_code=HTTPStatus.CONFLICT
         )
 
-    current_user.username = username_form.newUsername.data
+    current_user.username = new_username
     db.session.commit()
     return {"username": current_user.username}, HTTPStatus.OK
+
+
+@settings.route("/profile/email", methods=["PUT"])
+@fresh_login_required
+def change_email():
+    email_form = EmailForm()
+    if not email_form.validate():
+        raise InvalidUsage(
+            "Error while changing email.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
+
+    new_email = email_form.email.data
+    if User.exists(email=new_email):
+        raise InvalidUsage(
+            "This email is already taken.", status_code=HTTPStatus.CONFLICT
+        )
+
+    current_user.email = new_email
+    db.session.commit()
+    return {"email": current_user.email}, HTTPStatus.OK
 
 
 @settings.route("/profile", methods=["DELETE"])
