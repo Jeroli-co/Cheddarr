@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import render_template, session
+from flask import render_template, session, url_for
 from flask_login import fresh_login_required, current_user, login_required
 
 from server import InvalidUsage, db, utils
@@ -54,7 +54,7 @@ def change_password():
             payload=password_form.errors,
         )
 
-    if current_user.password is not None and not current_user.check_password(
+    if not current_user.oauth_only and current_user.check_password(
         password_form.oldPassword.data
     ):
         raise InvalidUsage(
@@ -104,9 +104,14 @@ def change_email():
             "This email is already taken.", status_code=HTTPStatus.CONFLICT
         )
 
-    current_user.email = new_email
-    db.session.commit()
-    return {"email": current_user.email}, HTTPStatus.OK
+    token = utils.generate_timed_token(new_email)
+    confirm_url = url_for("auth.confirm_email", token=token, _external=True)
+    html = render_template(
+        "email/email_confirmation.html", confirm_url=confirm_url.replace("/api", "")
+    )
+    subject = "Please confirm your email"
+    utils.send_email(new_email, subject, html)
+    return {"message": "Confirmation email sent."}, HTTPStatus.OK
 
 
 @settings.route("/profile", methods=["DELETE"])
@@ -119,7 +124,7 @@ def delete_user():
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
-    if current_user.password is not None and not current_user.check_password(
+    if not current_user.oauth_only and not current_user.check_password(
         password_form.password.data
     ):
         raise InvalidUsage("Wrong password.", HTTPStatus.UNAUTHORIZED)

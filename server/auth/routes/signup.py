@@ -62,11 +62,12 @@ def confirm_email(token):
 
     user = User.find(email=email)
     if user and user.confirmed:
-        raise InvalidUsage("The account is already confirmed.", HTTPStatus.CONFLICT)
+        raise InvalidUsage("This email is already confirmed.", HTTPStatus.CONFLICT)
 
     user.confirmed = True
+    user.email = email
     db.session.commit()
-    return {"message": "The account is now confirmed."}, HTTPStatus.CREATED
+    return {"message": "The email is now confirmed."}, HTTPStatus.CREATED
 
 
 @auth.route("/confirm/resend", methods=["POST"])
@@ -88,7 +89,7 @@ def resend_confirmation():
     token = utils.generate_timed_token(email)
     confirm_url = url_for("auth.confirm_email", token=token, _external=True)
     html = render_template(
-        "email/account_confirmation.html", confirm_url=confirm_url.replace("/api", "")
+        "email/email_confirmation.html", confirm_url=confirm_url.replace("/api", "")
     )
     subject = "Please confirm your email"
     utils.send_email(email, subject, html)

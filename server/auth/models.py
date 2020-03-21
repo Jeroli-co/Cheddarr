@@ -19,15 +19,17 @@ class User(db.Model, UserMixin):
     oauth = db.relationship(
         "OAuth", backref="user", single_parent=True, cascade="delete, delete-orphan"
     )
+    oauth_only = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return "%s/%s/%s/%s/%s/%s" % (
+        return "%s/%s/%s/%s/%s/%s/%s" % (
             self.username,
             self.email,
             self.first_name,
             self.last_name,
             self.password,
             self.user_picture,
+            self.oauth_only,
         )
 
     def get_id(self):
@@ -72,7 +74,14 @@ class User(db.Model, UserMixin):
 
     @classmethod
     def create(
-        cls, first_name, last_name, email, username, user_picture=None, password=None
+        cls,
+        first_name,
+        last_name,
+        email,
+        username,
+        password,
+        user_picture=None,
+        oauth_only=False,
     ):
         user = User(
             username=username,
@@ -81,12 +90,10 @@ class User(db.Model, UserMixin):
             first_name=first_name,
             last_name=last_name,
             user_picture=user_picture,
-            confirmed=False if password is not None else True,
+            confirmed=oauth_only,
+            oauth_only=oauth_only,
         )
-        if user.password:
-            user.session_token = utils.generate_token([user.email, user.password])
-        else:
-            user.session_token = utils.generate_token([user.email])
+        user.session_token = utils.generate_token([user.email, user.password])
         return user
 
 

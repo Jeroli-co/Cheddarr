@@ -10,3 +10,4 @@ class SessionSerializer(SQLAlchemySchema):
 
     username = auto_field()
     user_picture = auto_field()
+    oauth_only = auto_field()

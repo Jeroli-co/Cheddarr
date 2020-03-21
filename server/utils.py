@@ -1,10 +1,12 @@
+import secrets
+import string
+
 from random import choice
 
 from cloudinary.uploader import upload
 from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
 from flask import current_app as app
 from sendgrid import Mail, From, To, Content
-from werkzeug.utils import secure_filename
 
 from server import mail
 from cloudinary.api import resources
@@ -40,6 +42,12 @@ def upload_picture(file):
         return upload(file, resource_type="image", folder="user_pictures")
     except Exception:
         raise Exception
+
+
+def generate_password():
+    alphabet = string.ascii_letters + string.digits
+    password = "".join(secrets.choice(alphabet) for i in range(64))
+    return password
 
 
 def generate_token(data):
