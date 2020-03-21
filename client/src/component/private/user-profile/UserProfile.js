@@ -27,7 +27,7 @@ const UserProfile = () => {
 			{ data &&
         <div className="container profile-container">
           <div className="container">
-            <input type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} style={{ display: "none" }} />
+            <input id="input-image" type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} />
             <div className="is-pointed" onClick={() => imageUploader.current.click()}>
               <img id="user-picture" src={userPicture} alt="User" />
             </div>
