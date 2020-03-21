@@ -10,7 +10,8 @@ export const AuthContext = createContext();
 const initialSessionState = {
   username: null,
   userPicture: null,
-  isAuthenticated: false
+  isAuthenticated: false,
+  isOauthOnly: false
 };
 
 const AuthContextProvider = (props) => {
@@ -24,8 +25,14 @@ const AuthContextProvider = (props) => {
       const authenticated = Cookies.get('authenticated');
       const username = Cookies.get('username');
       const userPicture = Cookies.get('userPicture');
+      const oauthOnly = Cookies.get('oauthOnly');
       if (authenticated === 'yes' && username && userPicture) {
-        setSession({username: username, userPicture: userPicture, isAuthenticated: true});
+        setSession({
+          username: username,
+          userPicture: userPicture,
+          isAuthenticated: true,
+          isOauthOnly: oauthOnly
+        });
       }
     };
 
@@ -37,6 +44,7 @@ const AuthContextProvider = (props) => {
     Cookies.remove('authenticated');
     Cookies.remove('username');
     Cookies.remove('userPicture');
+    Cookies.remove('oauthOnly');
   };
 
   const handleError = (error, codesHandle = []) => {
@@ -75,18 +83,19 @@ const AuthContextProvider = (props) => {
       return await axios.post('/api/sign-in', fd);
     };
 
-    const initSession = (username, userPicture) => {
-      setSession({username: username, userPicture: userPicture, isAuthenticated: true});
+    const initSession = (username, userPicture, oauthOnly) => {
+      setSession({username: username, userPicture: userPicture, isAuthenticated: true, oauthOnly: oauthOnly});
       Cookies.set('authenticated', 'yes', { expires: 365 });
       Cookies.set('username', username, { expires: 365 });
       Cookies.set('userPicture', userPicture, { expires: 365 });
+      Cookies.set('oauthOnly', oauthOnly, { expires: 365 });
     };
 
     setIsLoading(true);
 
     try {
       const res = data ? await post(data) : await get();
-      initSession(res.data.username, res.data['user_picture']);
+      initSession(res.data.username, res.data['user_picture'], res.data['oauth_only']);
       return res.status;
     } catch (e) {
       handleError(e, codesHandle);

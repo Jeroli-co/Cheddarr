@@ -4,11 +4,12 @@ import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../../../../../context/AuthContext";
 import {routes} from "../../../../../../../routes";
+import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../formDefaultValidators";
 
 const ChangePasswordModal = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { changePassword } = useContext(AuthContext);
+  const { changePassword, isOauthOnly } = useContext(AuthContext);
   const [status, setStatus] = useState(null);
 
   const onSubmit = (data) => {
@@ -41,17 +42,19 @@ const ChangePasswordModal = (props) => {
                        className={'input ' + (errors['oldPassword'] ? "is-danger" : "")}
                        type="password"
                        placeholder="Enter your old password"
-                       ref={register} />
+                       ref={register({ required: !isOauthOnly, maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value })}
+                       disabled={isOauthOnly}
+                />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faKey} />
                 </span>
               </div>
               <span className="is-size-7">* if you signed up with a third party service leave this field empty</span>
               {errors['oldPassword'] && errors['oldPassword'].type === 'required' && (
-                <p className="help is-danger">Password is required (at least 8 characters long which contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character)</p>
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
               )}
-              {errors['oldPassword'] && errors['oldPassword'].type === 'pattern' && (
-                <p className="help is-danger">Your password must contain at least 8 characters long with at least one lowercase letter, one uppercase letter, one numeric digit, and one special character</p>
+              {errors['oldPassword'] && errors['oldPassword'].type === 'maxLength' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
               )}
             </div>
 
