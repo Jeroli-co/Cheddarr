@@ -45,7 +45,7 @@ const UserSettingsProfile = (props) => {
 
             <h3 className="subtitle is-3">Change email</h3>
             <div className="content">
-              <p className="is-size-7"><FontAwesomeIcon icon={faExclamationCircle} /> You will have to confirm your email</p>
+              <p className="is-size-7"><FontAwesomeIcon icon={faExclamationCircle} /> You will have to confirm your new email before changes apply</p>
               <button className="button is-primary" type="button" onClick={() => props.history.push(userSettingsModalsRoutes.CHANGE_EMAIL.url)}>
                 Change email
               </button>

@@ -4,11 +4,12 @@ import {AuthContext} from "../../../../../../../context/AuthContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../../../../../routes";
+import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../formDefaultValidators";
 
 const DeleteAccountModal = (props) => {
 
-  const { register, handleSubmit } = useForm();
-  const { deleteAccount } = useContext(AuthContext);
+  const { register, handleSubmit, errors } = useForm();
+  const { deleteAccount, isOauthOnly } = useContext(AuthContext);
   const [status, setStatus] = useState(null);
 
   const onSubmit = (data) => {
@@ -30,7 +31,7 @@ const DeleteAccountModal = (props) => {
       <div className="modal-background" onClick={closeModal} />
       <div className="modal-card">
         <header className="modal-card-head">
-          <p className="modal-card-title">Confirm your password</p>
+          <p className="modal-card-title">Are you sure you want to delete your account ?</p>
           <button className="delete" aria-label="close" type="button" onClick={closeModal}/>
         </header>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -43,11 +44,18 @@ const DeleteAccountModal = (props) => {
                        className="input"
                        type="password"
                        placeholder="Enter your password"
-                       ref={register} />
+                       ref={register({ required: !isOauthOnly, maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value })}
+                />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faKey} />
                 </span>
               </div>
+              {errors['password'] && errors['password'].type === 'required' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
+              )}
+              {errors['password'] && errors['password'].type === 'maxLength' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
+              )}
             </div>
 
             { status && (

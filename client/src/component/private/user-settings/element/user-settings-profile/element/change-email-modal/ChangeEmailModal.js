@@ -52,7 +52,7 @@ const ChangeEmailModal = (props) => {
 
             { status && (
                 (status === 409 && <p className="help is-danger">This email is already register</p>) ||
-                (status === 200 && <p className="help is-succes">Confirm your email with by clicking on the link we sent to you</p>)
+                (status === 200 && <p className="help is-success">Confirm your email by clicking on the link we sent to you</p>)
               )
             }
 

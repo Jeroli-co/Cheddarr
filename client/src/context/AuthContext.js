@@ -4,6 +4,7 @@ import {withRouter} from 'react-router';
 import {PageLoader} from "../component/element/page-loader/PageLoader";
 import {routes} from "../routes";
 import Cookies from 'js-cookie'
+import {HttpResponse} from "../model/HttpResponse";
 
 export const AuthContext = createContext();
 
@@ -20,51 +21,66 @@ const AuthContextProvider = (props) => {
   const [session, setSession] = useState(initialSessionState);
 
   useEffect(() => {
-
-    const loadSession = () => {
-      const authenticated = Cookies.get('authenticated');
-      const username = Cookies.get('username');
-      const userPicture = Cookies.get('userPicture');
-      const oauthOnly = Cookies.get('oauthOnly');
-      if (authenticated === 'yes' && username && userPicture) {
-        setSession({
-          username: username,
-          userPicture: userPicture,
-          isAuthenticated: true,
-          isOauthOnly: oauthOnly
-        });
-      }
-    };
-
-    loadSession();
+    const authenticated = Cookies.get('authenticated');
+    const username = Cookies.get('username');
+    const userPicture = Cookies.get('userPicture');
+    const oauthOnly = Cookies.get('oauthOnly');
+    if (authenticated === 'yes') {
+      setSession({isAuthenticated: true, username: username, userPicture: userPicture, isOauthOnly: oauthOnly === 'yes'})
+    }
   }, []);
 
   const clearSession = () => {
-    setSession(initialSessionState);
     Cookies.remove('authenticated');
     Cookies.remove('username');
     Cookies.remove('userPicture');
     Cookies.remove('oauthOnly');
+    setSession(initialSessionState);
   };
 
   const handleError = (error, codesHandle = []) => {
-    console.log(error);
-    if (error.response) {
-      const status = error.response.status;
-      if (!codesHandle.includes(status)) {
-        if (status === 500) {
-          props.history.push(routes.INTERNAL_SERVER_ERROR.url);
-        } else if (status === 404) {
-          props.history.push(routes.NOT_FOUND.url);
-        } else {
-          clearSession();
-          props.history.push(routes.HOME.url);
-        }
-      }
+
+    const fatalError = () => {
+      clearSession();
+      props.history.push(routes.HOME.url);
+    };
+
+    if (!error.hasOwnProperty('response')) {
+      fatalError();
+      return;
+    }
+
+    const status = error.response.status;
+    if (codesHandle.includes(status))
+      return;
+
+    switch (status) {
+      case 401:
+        props.history.push(routes.SIGN_IN.url + '?redirectURI=' + props.location.pathname);
+        return;
+
+      case 500:
+        props.history.push(routes.INTERNAL_SERVER_ERROR.url);
+        return;
+      case 404:
+        props.history.push(routes.NOT_FOUND.url);
+        return;
+
+      default:
+        fatalError();
+        return;
     }
   };
 
-  const signIn = async (data, codesHandle = []) => {
+  const signIn = async (data) => {
+
+    const initSession = (username, userPicture, oauthOnly) => {
+      Cookies.set('authenticated', 'yes', { expires: 365 });
+      Cookies.set('username', username, { expires: 365 });
+      Cookies.set('userPicture', userPicture, { expires: 365 });
+      Cookies.set('oauthOnly', oauthOnly ? 'yes' : 'no', { expires: 365 });
+      setSession({username: username, userPicture: userPicture, isAuthenticated: true, isOauthOnly: oauthOnly});
+    };
 
     const get = async () => {
       return await axios.get('/api/sign-in')
@@ -77,29 +93,19 @@ const AuthContextProvider = (props) => {
       fd.append('password', data['password']);
       const remember = data["remember"];
       if (typeof remember !== 'undefined' && remember !== null) {
-        console.log(remember);
         fd.append('remember', remember);
       }
       return await axios.post('/api/sign-in', fd);
     };
 
-    const initSession = (username, userPicture, oauthOnly) => {
-      setSession({username: username, userPicture: userPicture, isAuthenticated: true, oauthOnly: oauthOnly});
-      Cookies.set('authenticated', 'yes', { expires: 365 });
-      Cookies.set('username', username, { expires: 365 });
-      Cookies.set('userPicture', userPicture, { expires: 365 });
-      Cookies.set('oauthOnly', oauthOnly, { expires: 365 });
-    };
-
     setIsLoading(true);
-
     try {
       const res = data ? await post(data) : await get();
       initSession(res.data.username, res.data['user_picture'], res.data['oauth_only']);
-      return res.status;
+      return new HttpResponse(200, res.message);
     } catch (e) {
-      handleError(e, codesHandle);
-      return e.response ? e.response.status : 500;
+      handleError(e, [400, 401]);
+      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.message, true) : null;
     } finally {
       setIsLoading(false);
     }
@@ -108,13 +114,10 @@ const AuthContextProvider = (props) => {
   const signOut = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get('/api/sign-out');
-      props.history.push(routes.SIGN_IN.url);
-      return res.status;
-    } catch (e) {
-      return e.response ? e.response.status : 500;
+      await axios.get('/api/sign-out');
     } finally {
       clearSession();
+      props.history.push(routes.SIGN_IN.url);
       setIsLoading(false);
     }
   };
@@ -293,8 +296,6 @@ const AuthContextProvider = (props) => {
     fd.append('email', data['email']);
     try {
       const res = await axios.put("/api/profile/email", fd);
-      const email = res.data.username;
-      // TODO: Confirm this MF email
       return res.status;
     } catch (e) {
       handleError(e, [409]);

@@ -41,7 +41,7 @@ const ChangePasswordModal = (props) => {
                 <input name="oldPassword"
                        className={'input ' + (errors['oldPassword'] ? "is-danger" : "")}
                        type="password"
-                       placeholder="Enter your old password"
+                       placeholder={isOauthOnly ? "••••••••" : "Enter your old password"}
                        ref={register({ required: !isOauthOnly, maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value })}
                        disabled={isOauthOnly}
                 />
@@ -49,7 +49,6 @@ const ChangePasswordModal = (props) => {
                   <FontAwesomeIcon icon={faKey} />
                 </span>
               </div>
-              <span className="is-size-7">* if you signed up with a third party service leave this field empty</span>
               {errors['oldPassword'] && errors['oldPassword'].type === 'required' && (
                 <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
               )}
@@ -65,16 +64,16 @@ const ChangePasswordModal = (props) => {
                        className={'input ' + (errors['newPassword'] ? "is-danger" : "")}
                        type="password"
                        placeholder="Enter a strong password"
-                       ref={register({ required: true, pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,128}$/ })} />
+                       ref={register({ required: true, pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value })} />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faKey} />
                 </span>
               </div>
               {errors['newPassword'] && errors['newPassword'].type === 'required' && (
-                <p className="help is-danger">Password is required (at least 8 characters long which contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character)</p>
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
               )}
               {errors['newPassword'] && errors['newPassword'].type === 'pattern' && (
-                <p className="help is-danger">Your password must contain at least 8 characters long with at least one lowercase letter, one uppercase letter, one numeric digit, and one special character</p>
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}</p>
               )}
             </div>
 
@@ -87,7 +86,7 @@ const ChangePasswordModal = (props) => {
                        placeholder="Confirm your new password"
                        ref={register({
                          required: true,
-                         pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,128}$/,
+                         pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
                          validate: (value) => {
                            return value === watch('newPassword');
                          }
@@ -100,7 +99,7 @@ const ChangePasswordModal = (props) => {
                 <p className="help is-danger">Please confirm your password</p>
               )}
               {errors['password-confirmation'] && errors['password-confirmation'].type === 'pattern' && (
-                <p className="help is-danger">Your password must contain at least 8 characters with at least one lowercase letter, one uppercase letter, one numeric digit, and one special character</p>
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}</p>
               )}
               {errors['password-confirmation'] && errors['password-confirmation'].type === 'validate' && (
                 <p className="help is-danger">Passwords are not equals</p>
