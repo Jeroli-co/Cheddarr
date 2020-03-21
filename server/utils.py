@@ -35,9 +35,9 @@ def random_user_picture():
     return random_picture["url"]
 
 
-def upload_picture(filename):
+def upload_picture(file):
     try:
-        upload(secure_filename(filename), resource_type="image", folder="user_pictures")
+        return upload(file, resource_type="image", folder="user_pictures")
     except Exception:
         raise Exception
 

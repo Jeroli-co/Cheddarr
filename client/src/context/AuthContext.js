@@ -22,7 +22,7 @@ const AuthContextProvider = (props) => {
     const authenticated = Cookies.get('authenticated');
     const username = Cookies.get('username');
     const userPicture = Cookies.get('userPicture');
-    if (authenticated === 'yes' && username) {
+    if (authenticated === 'yes' && username && userPicture) {
       setSession({username: username, userPicture: userPicture, isAuthenticated: true});
     }
   }, []);
@@ -39,12 +39,12 @@ const AuthContextProvider = (props) => {
     if (error.response) {
       const status = error.response.status;
       if (!codesHandle.includes(status)) {
-        clearSession();
         if (status === 500) {
           props.history.push(routes.INTERNAL_SERVER_ERROR.url);
         } else if (status === 404) {
           props.history.push(routes.NOT_FOUND.url);
         } else {
+          clearSession();
           props.history.push(routes.HOME.url);
         }
       }
@@ -62,7 +62,11 @@ const AuthContextProvider = (props) => {
       const fd = new FormData();
       fd.append('usernameOrEmail', username);
       fd.append('password', data['password']);
-      fd.append('remember', data['remember']);
+      const remember = data["remember"];
+      if (typeof remember !== 'undefined' && remember !== null) {
+        console.log(remember);
+        fd.append('remember', remember);
+      }
       return await axios.post('/api/sign-in', fd);
     };
 
@@ -240,7 +244,8 @@ const AuthContextProvider = (props) => {
     fd.append('newPassword', data['newPassword']);
     try {
       await axios.put("/api/profile/password", fd);
-      await signOut();
+      clearSession();
+      props.history.push(routes.SIGN_IN.url);
     } catch (e) {
       handleError(e);
       return e.response ? e.response.status : 500;
@@ -258,7 +263,7 @@ const AuthContextProvider = (props) => {
       const res = await axios.put("/api/profile/username", fd);
       const username = res.data.username;
       Cookies.set('username', username);
-      setSession({username: username});
+      setSession({...session, username: username});
       return res.status;
     } catch (e) {
       handleError(e, [409]);
@@ -273,10 +278,10 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('picture', data);
     try {
-      const res = await axios.put('/api/profile/picture', fd);
-      const picture = res.data.picture;
+      const res = await axios.put('/api/profile/picture', fd, {headers: { 'content-type': 'multipart/form-data' }});
+      const picture = res.data["user_picture"];
       Cookies.set('userPicture', picture);
-      setSession({userPicture: picture});
+      setSession({...session, userPicture: picture});
       return res.status;
     } catch (e) {
       handleError(e);

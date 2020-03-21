@@ -6,30 +6,25 @@ import {routes} from "./routes";
 
 const PrivateRoute = ({component: Component, location, ...rest}) => {
 
-  const { isAuthenticated, signIn } = useContext(AuthContext);
-  const [status, setStatus] = useState(null);
-  const [redirect, setRedirect] = useState(null);
+  const { signIn } = useContext(AuthContext);
+  const [refreshState, setRefreshState] = useState({ status: null, redirect: null });
 
   useEffect(() => {
-
-    if (isAuthenticated && status === null) {
+    if (refreshState.status === null) {
       signIn(null, [401]).then((code) => {
-        setRedirect(location.pathname);
-        setStatus(code);
+        setRefreshState({ status: code, redirect: location.pathname });
       });
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  });
-
-  if (status === null)
+  if (refreshState.status === null)
     return <div/>;
 
-  if (status === 401)
-    return <Redirect to={routes.CONFIRM_PASSWORD.url + '?redirect=' + redirect}/>;
+  if (refreshState.status === 401)
+    return <Redirect to={routes.CONFIRM_PASSWORD.url + '?redirect=' + refreshState.redirect}/>;
 
-  if (status === 200)
+  if (refreshState.status === 200)
     return <Route {...rest} render={(props) => { return<Component {...props} /> }} />;
 
 };

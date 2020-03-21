@@ -1,14 +1,14 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {AuthContext} from "../../../context/AuthContext";
+import './UserProfile.scss';
 
 const UserProfile = () => {
 
-	const uploadedImage = useRef(null);
 	const imageUploader = useRef(null);
 
 	const { getUserProfile, changeUserPicture, userPicture } = useContext(AuthContext);
 	const [data, setData] = useState(null);
-	const [status, setStatus] = useState(null);
+	// const [imgDim, setImgDim] = useState({});
 
 	useEffect(() => {
 		getUserProfile().then((data) => setData(data))
@@ -18,38 +18,28 @@ const UserProfile = () => {
 	const _onImageChange = (e) => {
 		const [file] = e.target.files;
 		if (file) {
-			console.log(file);
-			changeUserPicture(file).then((status) => {
-				console.log("Image updated");
-				setStatus(status);
-			});
+			changeUserPicture(file);
 		}
 	};
 
 	return (
-		<div className="UserProfile container" data-testid="UserProfile">
+		<section className="UserProfile is-light is-large" data-testid="UserProfile">
 			{ data &&
-				<article className="media">
-					<div className="media-left">
-						<input type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} style={{ display: "none" }} />
-						<figure className="image is-128x128 is-pointed" onClick={() => imageUploader.current.click()}>
-							<img src={userPicture} alt="User" />
-						</figure>
-					</div>
-					<div className="media-content">
-						<div className="content">
-							<p>
-								<strong>{data.last_name + ' ' + data.first_name + ' '}</strong>
-								<small>{'@' + data.username}</small>
-							</p>
-						</div>
-					</div>
-
-					{ status && <div/> }
-
-				</article>
+        <div className="container profile-container">
+          <div className="container">
+            <input type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} style={{ display: "none" }} />
+            <div className="is-pointed" onClick={() => imageUploader.current.click()}>
+              <img id="user-picture" src={userPicture} alt="User" />
+            </div>
+            <div className="has-text-left">
+              <p className="is-size-5"><i>{'@' + data.username}</i></p>
+              <p className="is-size-4">Last name: <b>{data["last_name"]}</b></p>
+              <p className="is-size-4">First name: <b>{data["first_name"]}</b></p>
+            </div>
+          </div>
+        </div>
 			}
-		</div>
+		</section>
 	);
 };
 

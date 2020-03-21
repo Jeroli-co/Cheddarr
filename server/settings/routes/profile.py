@@ -37,9 +37,8 @@ def change_picture():
             "Error while changing the profile picture.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
-    response = utils.upload_picture(picture_form.picture.data.filename)
-    print(response)
-    current_user.user_picture = response["url"]
+    response = utils.upload_picture(picture_form.picture.data.stream)
+    current_user.user_picture = response["secure_url"]
     db.session.commit()
     return {"user_picture": current_user.user_picture}, HTTPStatus.OK
 

@@ -22,7 +22,7 @@ const routes = {
   RESET_PASSWORD: { url: (token) => '/reset/' + token, component: ResetPassword },
   AUTHORIZE: { url: '/sign-in/authorize', component: Authorize },
   CONFIRM_PASSWORD: { url: '/confirm-password', component: ConfirmPasswordModal },
-  USER_PROFILE: { url: (username) => '/user/' + username, component: UserProfile },
+  USER_PROFILE: { url: '/profile', component: UserProfile },
   USER_SETTINGS: { url: '/settings', component: UserSettings }
 };
 

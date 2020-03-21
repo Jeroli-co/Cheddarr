@@ -13,9 +13,7 @@ const ChangePasswordModal = (props) => {
 
   const onSubmit = (data) => {
     changePassword(data).then((code) => {
-      if (code === 200) {
-        closeModal();
-      } else {
+      if (code !== 200) {
         setStatus(code);
       }
     });

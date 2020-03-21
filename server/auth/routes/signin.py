@@ -45,7 +45,9 @@ def signin():
                 status_code=HTTPStatus.UNAUTHORIZED,
             )
 
-        remember = True if signin_form.remember.data else False
+        print(signin_form.remember.data)
+        remember = signin_form.remember.data if signin_form.remember else False
+        print(remember)
         login_user(user, remember=remember)
         return session_serializer.dump(user), HTTPStatus.OK
 

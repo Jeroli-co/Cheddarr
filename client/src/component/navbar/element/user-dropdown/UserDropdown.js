@@ -26,7 +26,7 @@ const UserDropdown = () => {
 
       <div className="navbar-dropdown is-right">
 
-        <Link className="navbar-item" to={routes.USER_PROFILE.url(username)} data-testid="UserProfileLink">
+        <Link className="navbar-item" to={routes.USER_PROFILE.url} data-testid="UserProfileLink">
           <span className="icon">
             <FontAwesomeIcon icon={faUserCircle}/>
           </span>

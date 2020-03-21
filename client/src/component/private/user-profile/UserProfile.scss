@@ -1,0 +1,12 @@
+#user-picture {
+  object-fit: cover;
+  width:260px;
+  height:260px;
+}
+
+.profile-container {
+  padding: 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
