@@ -273,6 +273,23 @@ const AuthContextProvider = (props) => {
     }
   };
 
+  const changeEmail = async (data) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('email', data['email']);
+    try {
+      const res = await axios.put("/api/profile/email", fd);
+      const email = res.data.username;
+      // TODO: Confirm this MF email
+      return res.status;
+    } catch (e) {
+      handleError(e, [409]);
+      return e.response ? e.response.status : null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const changeUserPicture = async (data) => {
     setIsLoading(true);
     const fd = new FormData();
@@ -322,6 +339,7 @@ const AuthContextProvider = (props) => {
       getUserProfile,
       changePassword,
       changeUsername,
+      changeEmail,
       deleteAccount,
       changeUserPicture
     }}>

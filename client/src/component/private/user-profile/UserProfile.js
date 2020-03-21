@@ -6,7 +6,7 @@ const UserProfile = () => {
 
 	const imageUploader = useRef(null);
 
-	const { getUserProfile, changeUserPicture, userPicture } = useContext(AuthContext);
+	const { getUserProfile, changeUserPicture } = useContext(AuthContext);
 	const [data, setData] = useState(null);
 	// const [imgDim, setImgDim] = useState({});
 
@@ -29,12 +29,13 @@ const UserProfile = () => {
           <div className="container">
             <input type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} style={{ display: "none" }} />
             <div className="is-pointed" onClick={() => imageUploader.current.click()}>
-              <img id="user-picture" src={userPicture} alt="User" />
+              <img id="user-picture" src={data["user_picture"]} alt="User" />
             </div>
             <div className="has-text-left">
-              <p className="is-size-5"><i>{'@' + data.username}</i></p>
+              <p className="is-size-5"><i>{'@' + data["username"]}</i></p>
               <p className="is-size-4">Last name: <b>{data["last_name"]}</b></p>
               <p className="is-size-4">First name: <b>{data["first_name"]}</b></p>
+              <p className="is-size-4">Email: <b>{data["email"]}</b></p>
             </div>
           </div>
         </div>
