@@ -51,6 +51,7 @@ class User(db.Model, UserMixin):
     def change_password(self, new_password):
         self.password = new_password
         self.session_token = utils.generate_token([self.email, self.password])
+        self.oauth_only = False
         db.session.commit()
 
     def delete(self):
