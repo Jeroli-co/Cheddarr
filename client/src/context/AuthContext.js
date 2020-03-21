@@ -19,12 +19,17 @@ const AuthContextProvider = (props) => {
   const [session, setSession] = useState(initialSessionState);
 
   useEffect(() => {
-    const authenticated = Cookies.get('authenticated');
-    const username = Cookies.get('username');
-    const userPicture = Cookies.get('userPicture');
-    if (authenticated === 'yes' && username && userPicture) {
-      setSession({username: username, userPicture: userPicture, isAuthenticated: true});
-    }
+
+    const loadSession = () => {
+      const authenticated = Cookies.get('authenticated');
+      const username = Cookies.get('username');
+      const userPicture = Cookies.get('userPicture');
+      if (authenticated === 'yes' && username && userPicture) {
+        setSession({username: username, userPicture: userPicture, isAuthenticated: true});
+      }
+    };
+
+    loadSession();
   }, []);
 
   const clearSession = () => {
