@@ -18,10 +18,10 @@ const App = () => {
         <Navbar />
         <Switch>
           <Route exact path={routes.HOME.url} component={routes.HOME.component} />
+          <Route exact path={routes.CONFIRM_EMAIL.url(':token')} component={routes.CONFIRM_EMAIL.component} />
 
           <ProtectedRoute path={routes.SIGN_IN.url} component={routes.SIGN_IN.component} />
           <ProtectedRoute exact path={routes.SIGN_UP.url} component={routes.SIGN_UP.component} />
-          <ProtectedRoute exact path={routes.CONFIRM_EMAIL.url(':token')} component={routes.CONFIRM_EMAIL.component} />
           <ProtectedRoute exaxt path={routes.WAIT_ACCOUNT_CONFIRMATION.url(':email')} component={routes.WAIT_ACCOUNT_CONFIRMATION.component} />
           <ProtectedRoute exact path={routes.RESET_PASSWORD.url(':token')} component={routes.RESET_PASSWORD.component} />
           <ProtectedRoute path={routes.AUTHORIZE.url} component={routes.AUTHORIZE.component} />
