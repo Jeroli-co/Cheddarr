@@ -8,6 +8,7 @@ import {AuthContext} from "../../../context/AuthContext";
 import {InitResetPasswordModal} from "../element/init-reset-password-modal/InitResetPasswordModal";
 import {ResendAccountConfirmationEmailModal} from "../element/resend-account-confirmation-email-modal/ResendAccountConfirmationEmailModal";
 import {routes} from "../../../routes";
+import {FORM_DEFAULT_VALIDATOR} from "../../../formDefaultValidators";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -29,9 +30,7 @@ const SignInForm = ({ history }) => {
 			switch (res.status) {
 				case 200:
 					let redirectURI = query.get('redirectURI');
-					console.log(redirectURI);
 					redirectURI = redirectURI ? redirectURI : routes.HOME.url;
-					console.log(redirectURI);
 					history.push(redirectURI);
 					return;
 				default:
@@ -72,7 +71,7 @@ const SignInForm = ({ history }) => {
 									<FontAwesomeIcon icon={faUser} />
 								</span>
 								{errors['usernameOrEmail'] && (
-									<p className="help is-danger">Username or email is required</p>
+									<p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
 								)}
 							</div>
 						</div>
@@ -90,7 +89,7 @@ const SignInForm = ({ history }) => {
 								</span>
 							</div>
 							{errors['password'] && errors['password'].type === 'required' && (
-								<p className="help is-danger">Password is required </p>
+								<p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
 							)}
 						</div>
 

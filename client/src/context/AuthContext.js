@@ -106,7 +106,7 @@ const AuthContextProvider = (props) => {
     try {
       const res = data ? await post(data) : await get();
       initSession(res.data.username, res.data['user_picture'], res.data['oauth_only']);
-      return new HttpResponse(200, res.message);
+      return new HttpResponse(res.status, res.message);
     } catch (e) {
       handleError(e, [400, 401]);
       return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.message, true) : null;

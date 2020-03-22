@@ -20,4 +20,3 @@ const Authorize = (props) => {
 export {
 	Authorize
 };
-

@@ -19,7 +19,7 @@ const routes = {
   CONFIRM_EMAIL: { url: (token) => '/confirm/' + token, component: ConfirmEmail },
   WAIT_ACCOUNT_CONFIRMATION: { url: (email) => '/wait-account-confirmation/' + email, component: WaitingAccountConfirmation },
   RESET_PASSWORD: { url: (token) => '/reset/' + token, component: ResetPassword },
-  AUTHORIZE: { url: '/sign-in/authorize', component: Authorize },
+  AUTHORIZE: { url: '/authorize', component: Authorize },
   USER_PROFILE: { url: '/profile', component: UserProfile },
   USER_SETTINGS: { url: '/settings', component: UserSettings }
 };
