@@ -58,7 +58,7 @@ def change_password():
         password_form.oldPassword.data
     ):
         raise InvalidUsage(
-            "The passwords don't match.", status_code=HTTPStatus.UNAUTHORIZED,
+            "The passwords don't match.", status_code=HTTPStatus.BAD_REQUEST,
         )
 
     current_user.change_password(password_form.newPassword.data)
@@ -127,7 +127,7 @@ def delete_user():
     if not current_user.oauth_only and not current_user.check_password(
         password_form.password.data
     ):
-        raise InvalidUsage("Wrong password.", HTTPStatus.UNAUTHORIZED)
+        raise InvalidUsage("Wrong password.", HTTPStatus.BAD_REQUEST)
 
     current_user.delete()
     session.clear()
