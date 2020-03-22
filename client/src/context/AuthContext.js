@@ -56,6 +56,8 @@ const AuthContextProvider = (props) => {
 
     switch (status) {
       case 401:
+      case 400:
+        clearSession();
         props.history.push(routes.SIGN_IN.url + '?redirectURI=' + props.location.pathname);
         return;
 
