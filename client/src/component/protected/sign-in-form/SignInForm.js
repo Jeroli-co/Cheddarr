@@ -34,6 +34,7 @@ const SignInForm = ({ history }) => {
 					history.push(redirectURI);
 					return;
 				default:
+					console.log(res);
 					setHttpResponse(res.message);
 			}
 		});

@@ -9,9 +9,6 @@ const AlreadyConfirmed = () => {
 						<h1 className="title">
 							Oops this email has been already confirmed...
 						</h1>
-						<h2 className="subtitle">
-							Please try to sign in
-						</h2>
 					</div>
 				</div>
 			</section>
