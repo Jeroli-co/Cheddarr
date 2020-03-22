@@ -66,7 +66,7 @@ def confirm_email(token):
     if not user and not current_user.is_authenticated:
         raise InvalidUsage("Need to sign in to confirm email change", status_code=HTTPStatus.UNAUTHORIZED)
     if user and user.confirmed:
-        raise InvalidUsage("This email is already confirmed.", HTTPStatus.CONFLICT)
+        raise InvalidUsage("This email is already confirmed.", HTTPStatus.FORBIDDEN)
     if current_user.is_authenticated:
         current_user.change_email(email)
     else:

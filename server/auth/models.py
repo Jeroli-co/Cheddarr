@@ -8,14 +8,14 @@ from server import db, utils
 class User(db.Model, UserMixin):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, index=True)
-    email = db.Column(db.String(64), unique=True, index=True)
-    first_name = db.Column(db.String(64))
-    last_name = db.Column(db.String(64))
+    username = db.Column(db.String(128), unique=True, index=True)
+    email = db.Column(db.String(128), unique=True, index=True)
+    first_name = db.Column(db.String(128))
+    last_name = db.Column(db.String(128))
+    _password = db.Column(db.String(128), nullable=True)
     user_picture = db.Column(db.String(256), nullable=True)
-    _password = db.Column(db.String(256), nullable=True)
-    confirmed = db.Column(db.Boolean, default=False)
     session_token = db.Column(db.String(256))
+    confirmed = db.Column(db.Boolean, default=False)
     oauth = db.relationship(
         "OAuth", backref="user", single_parent=True, cascade="delete, delete-orphan"
     )
