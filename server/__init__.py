@@ -5,6 +5,7 @@ from flask import jsonify, session
 from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_login import LoginManager
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -22,10 +23,10 @@ from server.config import (
 
 """Global extensions"""
 db = SQLAlchemy()
+migrate = Migrate()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 mail = sendgrid.SendGridAPIClient()
-
 
 def create_app():
     """Creates a pre-configured Flask application.
@@ -51,6 +52,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
     app.config.from_object(config_object)
 
     db.init_app(app)
+    migrate.init_app(app, db)
     csrf.init_app(app)
     mail.api_key = app.config.get("MAIL_SENDGRID_API_KEY")
     Talisman(app)
