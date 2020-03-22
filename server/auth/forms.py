@@ -7,8 +7,6 @@ from wtforms.validators import Length, Email, InputRequired
 class SignupForm(FlaskForm):
     username = StringField("Username", [InputRequired(), Length(min=4, max=128)])
     email = StringField("Email", [InputRequired(), Email(), Length(min=4, max=128)])
-    firstName = StringField("First Name", [InputRequired(), Length(min=4, max=128)])
-    lastName = StringField("Last Name", [InputRequired(), Length(min=4, max=128)])
     password = PasswordField("Password", [InputRequired(), Length(min=8, max=128)])
 
 

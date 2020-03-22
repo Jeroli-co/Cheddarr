@@ -30,8 +30,6 @@ def signup():
         )
 
     user = User.create(
-        first_name=signup_form.firstName.data,
-        last_name=signup_form.lastName.data,
         email=signup_form.email.data,
         username=signup_form.username.data,
         password=signup_form.password.data,

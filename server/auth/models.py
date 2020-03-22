@@ -10,8 +10,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True, index=True)
     email = db.Column(db.String(128), unique=True, index=True)
-    first_name = db.Column(db.String(128))
-    last_name = db.Column(db.String(128))
     _password = db.Column(db.String(128), nullable=True)
     user_picture = db.Column(db.String(256), nullable=True)
     session_token = db.Column(db.String(256))
@@ -22,11 +20,9 @@ class User(db.Model, UserMixin):
     oauth_only = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return "%s/%s/%s/%s/%s/%s/%s" % (
+        return "%s/%s/%s/%s/%s" % (
             self.username,
             self.email,
-            self.first_name,
-            self.last_name,
             self.password,
             self.user_picture,
             self.oauth_only,
@@ -81,8 +77,6 @@ class User(db.Model, UserMixin):
     @classmethod
     def create(
         cls,
-        first_name,
-        last_name,
         email,
         username,
         password,
@@ -93,8 +87,6 @@ class User(db.Model, UserMixin):
             username=username,
             email=email,
             password=password,
-            first_name=first_name,
-            last_name=last_name,
             user_picture=user_picture,
             confirmed=oauth_only,
             oauth_only=oauth_only,

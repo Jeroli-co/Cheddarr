@@ -14,8 +14,6 @@ def test_signup_ok(client, mocker):
                 "username": "test_user",
                 "password": "Test_password1",
                 "email": "test@test.com",
-                "firstName": "test",
-                "lastName": "test",
             },
         ).status_code
         == 200
@@ -31,8 +29,6 @@ def test_signup_user_already_exist(client):
                 "username": "user1",
                 "password": "password1",
                 "email": "email1@test.com",
-                "firstName": "user1_first_name",
-                "lastName": "user1_last_name",
             },
         ).status_code
         == 409
