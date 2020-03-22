@@ -52,7 +52,12 @@ def _create_app(config_object: BaseConfig, **kwargs):
     app.config.from_object(config_object)
 
     db.init_app(app)
-    migrate.init_app(app, db)
+    with app.app_context():
+        if db.engine.url.drivername == 'sqlite':
+            migrate.init_app(app, db, render_as_batch=True)
+        else:
+            migrate.init_app(app, db)
+
     csrf.init_app(app)
     mail.api_key = app.config.get("MAIL_SENDGRID_API_KEY")
     Talisman(app)
