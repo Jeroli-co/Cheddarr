@@ -27,6 +27,7 @@ const SignInForm = ({ history }) => {
 
 	const onSubmit = (data) => {
 		signIn(data).then(res => {
+			console.log(res);
 			switch (res.status) {
 				case 200:
 					let redirectURI = query.get('redirectURI');
@@ -34,7 +35,6 @@ const SignInForm = ({ history }) => {
 					history.push(redirectURI);
 					return;
 				default:
-					console.log(res);
 					setHttpResponse(res.message);
 			}
 		});
