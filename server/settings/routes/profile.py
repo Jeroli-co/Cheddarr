@@ -54,7 +54,7 @@ def change_password():
             payload=password_form.errors,
         )
 
-    if not current_user.oauth_only and current_user.check_password(
+    if not current_user.oauth_only and not current_user.check_password(
         password_form.oldPassword.data
     ):
         raise InvalidUsage(
