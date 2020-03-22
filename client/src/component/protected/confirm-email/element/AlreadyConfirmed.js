@@ -1,4 +1,3 @@
-import {SignInButton} from "../../element/sign-in-button/SignInButton";
 import React from "react";
 
 const AlreadyConfirmed = () => {
@@ -13,7 +12,6 @@ const AlreadyConfirmed = () => {
 						<h2 className="subtitle">
 							Please try to sign in
 						</h2>
-						<SignInButton/>
 					</div>
 				</div>
 			</section>
