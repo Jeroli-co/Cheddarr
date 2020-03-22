@@ -1,5 +1,7 @@
 from http import HTTPStatus
 from flask import url_for, render_template
+from flask_login import current_user
+
 from server import db, InvalidUsage, utils
 from server.auth import auth, User
 from server.auth.forms import SignupForm, EmailForm
@@ -47,7 +49,7 @@ def signup():
     utils.send_email(user.email, subject, html)
     db.session.add(user)
     db.session.commit()
-    return {"message": "Confirmation email sent."}, HTTPStatus.OK
+    return {"message": "Confirmation email sent."}, HTTPStatus.CREATED
 
 
 @auth.route("/confirm/<token>")
@@ -61,13 +63,16 @@ def confirm_email(token):
         )
 
     user = User.find(email=email)
+    if not user and not current_user.is_authenticated:
+        raise InvalidUsage("Need to sign in to confirm email change", status_code=HTTPStatus.UNAUTHORIZED)
     if user and user.confirmed:
         raise InvalidUsage("This email is already confirmed.", HTTPStatus.CONFLICT)
-
-    user.confirmed = True
-    user.email = email
-    db.session.commit()
-    return {"message": "The email is now confirmed."}, HTTPStatus.CREATED
+    if current_user.is_authenticated:
+        current_user.change_email(email)
+    else:
+        user.confirmed = True
+        db.session.commit()
+    return {"message": "The email is now confirmed."}, HTTPStatus.OK
 
 
 @auth.route("/confirm/resend", methods=["POST"])

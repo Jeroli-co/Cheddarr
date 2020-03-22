@@ -54,6 +54,11 @@ class User(db.Model, UserMixin):
         self.oauth_only = False
         db.session.commit()
 
+    def change_email(self, new_email):
+        self.email = new_email
+        self.session_token = utils.generate_token([self.email, self.password])
+        db.session.commit()
+
     def delete(self):
         user = User.query.filter_by(id=self.id).first()
         db.session.delete(user)
