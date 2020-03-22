@@ -16,4 +16,5 @@ pytest
 pytest-mock
 requests
 sendgrid
+sqlalchemy
 Werkzeug
