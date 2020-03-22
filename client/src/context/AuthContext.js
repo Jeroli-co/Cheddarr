@@ -149,6 +149,7 @@ const AuthContextProvider = (props) => {
     setIsLoading(true);
     try {
       const res = await axios.get('/api/confirm/' + token);
+      clearSession();
       return res.status;
     } catch (e) {
       handleError(e, [409, 410]);
