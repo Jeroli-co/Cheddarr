@@ -3,25 +3,30 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../../../../../context/AuthContext";
-import {routes} from "../../../../../../../routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../formDefaultValidators";
+import {routes} from "../../../../../../../routes";
 
 const ChangePasswordModal = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
   const { changePassword, isOauthOnly } = useContext(AuthContext);
-  const [status, setStatus] = useState(null);
+  const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
-    changePassword(data).then((code) => {
-      if (code !== 200) {
-        setStatus(code);
+    changePassword(data).then(res => {
+      switch (res.status) {
+        case 200:
+          props.history.push(routes.SIGN_IN.url);
+          return;
+        case 400:
+          setHttpResponse(res);
+          return;
       }
     });
   };
 
   const closeModal = () => {
-    props.history.push(routes.USER_SETTINGS.url + '/profile');
+    props.history.goBack();
   };
 
   return (
@@ -35,6 +40,7 @@ const ChangePasswordModal = (props) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <section className="modal-card-body">
 
+            { /* OLD PASSWORD */ }
             <div className="field">
               <label className="label">Old password</label>
               <div className="control has-icons-left">
@@ -42,8 +48,11 @@ const ChangePasswordModal = (props) => {
                        className={'input ' + (errors['oldPassword'] ? "is-danger" : "")}
                        type="password"
                        placeholder={isOauthOnly ? "••••••••" : "Enter your old password"}
-                       ref={register({ required: !isOauthOnly, maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value })}
                        disabled={isOauthOnly}
+                       ref={register({
+                         required: !isOauthOnly,
+                         pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value
+                       })}
                 />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faKey} />
@@ -52,11 +61,12 @@ const ChangePasswordModal = (props) => {
               {errors['oldPassword'] && errors['oldPassword'].type === 'required' && (
                 <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
               )}
-              {errors['oldPassword'] && errors['oldPassword'].type === 'maxLength' && (
-                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
+              {errors['oldPassword'] && errors['oldPassword'].type === 'pattern' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}</p>
               )}
             </div>
 
+            { /* NEW PASSWORD */ }
             <div className="field">
               <label className="label">New password</label>
               <div className="control has-icons-left">
@@ -64,7 +74,11 @@ const ChangePasswordModal = (props) => {
                        className={'input ' + (errors['newPassword'] ? "is-danger" : "")}
                        type="password"
                        placeholder="Enter a strong password"
-                       ref={register({ required: true, pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value })} />
+                       ref={register({
+                         required: true,
+                         pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value
+                       })}
+                />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faKey} />
                 </span>
@@ -77,6 +91,7 @@ const ChangePasswordModal = (props) => {
               )}
             </div>
 
+            { /* CONFIRM NEW PASSWORD */ }
             <div className="field">
               <label className="label">Confirm new password</label>
               <div className="control has-icons-left">
@@ -86,28 +101,22 @@ const ChangePasswordModal = (props) => {
                        placeholder="Confirm your new password"
                        ref={register({
                          required: true,
-                         pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
-                         validate: (value) => {
-                           return value === watch('newPassword');
-                         }
+                         validate: (value) => { return value === watch('newPassword') }
                        })} />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faKey} />
                 </span>
               </div>
               {errors['password-confirmation'] && errors['password-confirmation'].type === 'required' && (
-                <p className="help is-danger">Please confirm your password</p>
-              )}
-              {errors['password-confirmation'] && errors['password-confirmation'].type === 'pattern' && (
-                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}</p>
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
               )}
               {errors['password-confirmation'] && errors['password-confirmation'].type === 'validate' && (
-                <p className="help is-danger">Passwords are not equals</p>
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.WATCH_PASSWORD.message}</p>
               )}
             </div>
 
-            { status && (
-                (status === 401 && <p className="help is-danger">Old password doesn't match your current password</p>)
+            { httpResponse && (
+                (httpResponse.status === 400 && <p className="help is-danger">{httpResponse.message}</p>)
               )
             }
 

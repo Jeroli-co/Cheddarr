@@ -1,4 +1,4 @@
-import {SignInButton} from "../../element/sign-in-button/SignInButton";
+import {SignInButton} from "../../../protected/element/sign-in-button/SignInButton";
 import React from "react";
 
 const EmailConfirmed = () => {

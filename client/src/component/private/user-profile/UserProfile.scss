@@ -2,6 +2,7 @@
   object-fit: cover;
   width:260px;
   height:260px;
+  cursor: pointer;
 }
 
 .profile-container {
@@ -12,5 +13,5 @@
 }
 
 #input-image {
-  display: none
+  display: none;
 }

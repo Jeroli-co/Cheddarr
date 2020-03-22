@@ -7,7 +7,7 @@ const AlreadyConfirmed = () => {
 				<div className="hero-body">
 					<div className="container">
 						<h1 className="title">
-							Oops this email has been already confirmed...
+							Oops this has been already confirmed...
 						</h1>
 					</div>
 				</div>

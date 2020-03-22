@@ -39,7 +39,7 @@ test('App router load components (not authentication needed) correctly', () => {
 
   // Render wait account confirmation
   history.push(routes.WAIT_ACCOUNT_CONFIRMATION.url('test@test.com'));
-  const waitEmailConfirmation = wrapper.getByTestId('WaitingAccountConfirmation');
+  const waitEmailConfirmation = wrapper.getByTestId('WaitingEmailConfirmation');
   expect(waitEmailConfirmation).toBeInTheDocument();
 
   // Render reset password component

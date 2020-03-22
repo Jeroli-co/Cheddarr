@@ -2,21 +2,28 @@ import React, {useContext, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../../../../../context/AuthContext";
-import {routes} from "../../../../../../../routes";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
+import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../formDefaultValidators";
 
 const ChangeEmailModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
   const { changeEmail } = useContext(AuthContext);
-  const [status, setStatus] = useState(null);
+  const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
-    changeEmail(data).then(code => setStatus(code));
+    changeEmail(data).then(res => {
+      switch (res.status) {
+        case 200:
+        case 409:
+          setHttpResponse(res);
+          return;
+      }
+    });
   };
 
   const closeModal = () => {
-    props.history.push(routes.USER_SETTINGS.url + '/profile');
+    props.history.goBack();
   };
 
   return (
@@ -37,22 +44,30 @@ const ChangeEmailModal = (props) => {
                        className={'input ' + (errors['email'] ? "is-danger" : "")}
                        type="email"
                        placeholder="Enter a valid email"
-                       ref={register({ required: true, pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/i })} />
+                       ref={register({
+                         required: true,
+                         maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
+                         pattern: FORM_DEFAULT_VALIDATOR.EMAIL_PATTERN.value
+                       })}
+                />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faEnvelope} />
                 </span>
               </div>
               {errors['email'] && errors['email'].type === 'required' && (
-                <p className="help is-danger">This is required</p>
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
+              )}
+              {errors['email'] && errors['email'].type === 'maxLength' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
               )}
               {errors['email'] && errors['email'].type === 'pattern' && (
-                <p className="help is-danger">This is not a valid email address</p>
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.EMAIL_PATTERN.message}</p>
               )}
             </div>
 
-            { status && (
-                (status === 409 && <p className="help is-danger">This email is already register</p>) ||
-                (status === 200 && <p className="help is-success">Confirm your email by clicking on the link we sent to you</p>)
+            { httpResponse && (
+                (httpResponse.status === 409 && <p className="help is-danger">{httpResponse.message}</p>) ||
+                (httpResponse.status === 200 && <p className="help is-success">{httpResponse.message}</p>)
               )
             }
 

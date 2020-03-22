@@ -1,22 +1,11 @@
-import React, {useContext, useState} from 'react';
+import React from 'react';
 import {SignInButton} from "../element/sign-in-button/SignInButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
-import {AuthContext} from "../../../context/AuthContext";
-import {useParams} from "react-router";
+import {routes} from "../../../routes";
+import {Route} from "react-router";
 
-const WaitingAccountConfirmation = () => {
-
-	const { email } = useParams();
-	const { resendConfirmation } = useContext(AuthContext);
-	const [message, setMessage] = useState("");
-
-	const sendEmail = (email) => {
-		resendConfirmation(email).then((status) => {
-			const message = status === 200 ? "The email has been resend" : "An error occured, please try again";
-			setMessage(message);
-		});
-	};
+const WaitingEmailConfirmation = (props) => {
 
 	return (
 		<div className="WaitingAccountConfirmation" data-testid="WaitingAccountConfirmation">
@@ -38,22 +27,21 @@ const WaitingAccountConfirmation = () => {
 						</h2>
 						<div className="buttons">
 							<SignInButton/>
-							<button className="button is-rounded is-primary" type="button" onClick={() => sendEmail(email)}>
+							<button className="button is-rounded is-primary" type="button" onClick={() => props.history.push(routes.RESEND_EMAIL_CONFIRMATION.url)}>
 								<span className="icon">
 									<FontAwesomeIcon icon={faEnvelope}/>
 								</span>
 								<span>Resend email</span>
 							</button>
-							{ message !== "" && <span>{message}</span>}
 						</div>
 					</div>
 				</div>
 			</section>
 		</div>
 	);
-}
+};
 
 export {
-	WaitingAccountConfirmation
+	WaitingEmailConfirmation
 };
 

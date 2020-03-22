@@ -1,8 +1,8 @@
 class HttpResponse {
-  constructor (status, message, error = false) {
+  constructor (status, message, data = null) {
     this.status = status;
     this.message = message;
-    this.error = error;
+    this.data = data;
   }
 }
 

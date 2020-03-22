@@ -10,14 +10,17 @@ const DeleteAccountModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
   const { deleteAccount, isOauthOnly } = useContext(AuthContext);
-  const [status, setStatus] = useState(null);
+  const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
-    deleteAccount(data).then((code) => {
-      if (code === 200) {
-        props.history.push(routes.SIGN_IN.url);
-      } else {
-        setStatus(code);
+    deleteAccount(data).then(res => {
+      switch (res.status) {
+        case 200:
+          props.history.push(routes.SIGN_UP.url);
+          return;
+        case 400:
+          setHttpResponse(res);
+          return;
       }
     });
   };
@@ -44,7 +47,9 @@ const DeleteAccountModal = (props) => {
                        className="input"
                        type="password"
                        placeholder="Enter your password"
-                       ref={register({ required: !isOauthOnly, maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value })}
+                       ref={register({
+                         required: !isOauthOnly,
+                         pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value })}
                 />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faKey} />
@@ -58,8 +63,8 @@ const DeleteAccountModal = (props) => {
               )}
             </div>
 
-            { status && (
-                (status === 401 && <p className="help is-danger">Wrong password</p>)
+            { httpResponse && (
+                (httpResponse.status === 400 && <p className="help is-danger">{httpResponse.message}</p>)
               )
             }
 

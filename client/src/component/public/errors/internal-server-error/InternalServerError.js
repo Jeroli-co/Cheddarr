@@ -2,7 +2,7 @@ import React from 'react';
 
 const InternalServerError = () => {
 	return (
-		<div className="NotFound" data-testid="NotFound">
+		<div className="InternalServerError" data-testid="InternalServerError">
 			<section className="hero is-large is-primary is-bold">
 				<div className="hero-body">
 					<div className="container">

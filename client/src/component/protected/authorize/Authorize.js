@@ -5,12 +5,9 @@ import {routes} from "../../../routes";
 const Authorize = (props) => {
 
 	const { signIn } = useContext(AuthContext);
+
 	useEffect(() => {
-		signIn().then(res => {
-			if (res.status === 200) {
-				props.history.push(routes.HOME.url);
-			}
-		});
+		signIn().then(() => props.history.push(routes.HOME.url));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
