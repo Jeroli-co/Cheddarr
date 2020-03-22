@@ -109,7 +109,7 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.message);
     } catch (e) {
       handleError(e, [400, 401]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.message, true) : null;
+      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message, true) : null;
     } finally {
       setIsLoading(false);
     }
