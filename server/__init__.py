@@ -1,25 +1,18 @@
-from http import HTTPStatus
 from datetime import datetime
+from http import HTTPStatus
 
-from flask import jsonify, session
+from flask import jsonify
 from flask.app import Flask
 from flask.helpers import get_debug_flag
+from flask_cors import CORS
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
-from flask_cors import CORS
 from sendgrid import sendgrid
 
+from server.config import (BaseConfig, DevConfig, ProdConfig, REACT_STATIC_FOLDER, REACT_TEMPLATE_FOLDER)
 from server.exceptions import InvalidUsage
-from server.config import (
-    REACT_STATIC_FOLDER,
-    REACT_TEMPLATE_FOLDER,
-    BaseConfig,
-    DevConfig,
-    ProdConfig,
-)
-
 
 """Global extensions"""
 db = SQLAlchemy()
@@ -86,11 +79,9 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
 
 def register_blueprints(app):
-    from server.auth import auth
+    from server.auth import auth, facebook_bp, google_bp
     from server.site import site
     from server.settings import settings
-    from server.auth import facebook_bp
-    from server.auth import google_bp
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix="/api")
