@@ -32,7 +32,6 @@ def client(app):
             password=user1_password,
             confirmed=True,
         )
-        user1.session_token = 1
         user2 = User(
             username=user2_username,
             email=user2_email,
@@ -42,10 +41,3 @@ def client(app):
         db.session.add_all((user1, user2))
         db.session.commit()
         yield client
-
-
-@pytest.fixture
-def auth(client):
-    with client.session_transaction() as sess:
-        sess["user_id"] = User.query.first().id
-        sess["_fresh"] = True

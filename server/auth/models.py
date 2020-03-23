@@ -29,7 +29,7 @@ class User(db.Model, UserMixin):
     ):
         self.username = username
         self.email = email
-        self._password = password
+        self.password = password
         self.user_picture = user_picture
         self.confirmed = confirmed
         self.oauth_only = oauth_only
