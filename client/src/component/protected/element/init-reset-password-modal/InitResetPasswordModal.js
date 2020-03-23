@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useForm} from "react-hook-form";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
@@ -7,15 +7,16 @@ import {FORM_DEFAULT_VALIDATOR} from "../../../../formDefaultValidators";
 
 const InitResetPasswordModal = (props) => {
 
-		const { register, handleSubmit, errors, setValue } = useForm();
+		const { register, handleSubmit, errors } = useForm();
 		const { initResetPassword } = useContext(AuthContext);
 		const [httpResponse, setHttpResponse] = useState(null);
+		const [disableSendButton, setDisableSendButton] = useState(false);
 
 		const submitResetPassword = (data) => {
 		  initResetPassword(data).then(res => {
 		    switch (res.status) {
           case 200:
-            setValue('email', "");
+            setDisableSendButton(true);
             setHttpResponse(res);
             return;
           case 400:
@@ -30,6 +31,11 @@ const InitResetPasswordModal = (props) => {
 		const closeModal = () => {
 		  props.history.goBack();
     };
+
+		useEffect(() => {
+		  const timer = disableSendButton && setInterval(() => setDisableSendButton(false), 5000);
+      return () => clearInterval(timer);
+    }, [disableSendButton]);
 
 		return (
 			<div className="modal is-active">
@@ -77,7 +83,7 @@ const InitResetPasswordModal = (props) => {
 
             </section>
             <footer className="modal-card-foot">
-              <button className="button is-info">Reset password</button>
+              <button className="button is-info" disabled={disableSendButton}>Reset password</button>
               <button className="button" type="button" onClick={closeModal}>Cancel</button>
             </footer>
           </form>

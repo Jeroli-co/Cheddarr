@@ -47,25 +47,6 @@ const SignUpForm = (props) => {
 			<div className="columns is-mobile is-centered">
 				<div className="column is-one-third">
 
-					<h5 className="subtitle is-5">Sign up with</h5>
-
-					<div className="buttons">
-						<button className="button is-rounded" type="button" onClick={signInWithGoogle}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faGoogle}/>
-							</span>
-							<span>Google</span>
-						</button>
-						<button className="button is-rounded is-facebook-button" type="button" onClick={signInWithFacebook}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faFacebook}/>
-							</span>
-							<span>Facebook</span>
-						</button>
-					</div>
-
-          <div className="is-divider" data-content="OR"/>
-
           <h5 className="subtitle is-5">Create your account</h5>
 
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -194,8 +175,27 @@ const SignUpForm = (props) => {
               </div>
             </div>
 
-
           </form>
+
+          <div className="is-divider" data-content="OR"/>
+
+          <h5 className="subtitle is-5">Sign up with</h5>
+
+					<div className="buttons">
+						<button className="button is-rounded" type="button" onClick={signInWithGoogle}>
+							<span className="icon">
+								<FontAwesomeIcon icon={faGoogle}/>
+							</span>
+							<span>Google</span>
+						</button>
+						<button className="button is-rounded is-facebook-button" type="button" onClick={signInWithFacebook}>
+							<span className="icon">
+								<FontAwesomeIcon icon={faFacebook}/>
+							</span>
+							<span>Facebook</span>
+						</button>
+					</div>
+
 
 				</div>
 			</div>

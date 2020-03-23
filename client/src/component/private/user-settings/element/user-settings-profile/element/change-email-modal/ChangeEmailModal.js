@@ -70,14 +70,14 @@ const ChangeEmailModal = (props) => {
             </div>
 
             { httpResponse && (
-                (httpResponse.status === 409 && <p className="help is-danger">{httpResponse.message}</p>) ||
-                (httpResponse.status === 200 && <p className="help is-success">{httpResponse.message}</p>)
+                (httpResponse.status === 409 && <p className="help is-danger" data-testid="ErrorText">{httpResponse.message}</p>) ||
+                (httpResponse.status === 200 && <p className="help is-success" data-testid="SuccessText">{httpResponse.message}</p>)
               )
             }
 
           </section>
           <footer className="modal-card-foot">
-            <button className="button is-secondary-button">Change email</button>
+            <button className="button is-secondary-button" data-testid="ChangeEmailSubmitButton">Change email</button>
             <button className="button" type="button" onClick={closeModal}>Cancel</button>
           </footer>
         </form>

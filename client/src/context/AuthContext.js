@@ -369,7 +369,7 @@ const AuthContextProvider = (props) => {
       clearSession();
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
-      handleError(e, [401]);
+      handleError(e, [400]);
       const res = e.hasOwnProperty('response') ? e.response : null;
       const status = res ? res.status : 500;
       const message = res ? res.data.message : "";
