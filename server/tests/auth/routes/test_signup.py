@@ -4,10 +4,8 @@ from server import utils
 from server.tests.conftest import user1_username, user1_password, user1_email
 
 
-def test_signup_ok(client, mocker):
-    mocker.patch.object(utils, "send_email")
-    ran_img = mocker.patch.object(utils, "random_user_picture")
-    ran_img.return_value = ""
+def test_signup_ok(client, mocks):
+
     assert (
         client.post(
             url_for("auth.signup"),
@@ -22,9 +20,7 @@ def test_signup_ok(client, mocker):
     assert User.exists("test@test.com")
 
 
-def test_signup_user_already_exist(client, mocker):
-    ran_img = mocker.patch.object(utils, "random_user_picture")
-    ran_img.return_value = ""
+def test_signup_user_already_exist(client, mocks):
     assert (
         client.post(
             url_for("auth.signup"),

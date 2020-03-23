@@ -6,8 +6,8 @@ from flask_login import fresh_login_required, current_user, login_required
 from server import InvalidUsage, db, utils
 from server.auth import User
 from server.auth.forms import PasswordForm, EmailForm
-from server.settings import settings
 from server.settings.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
+from server.settings.routes import profile
 from server.settings.serializers.user_serializer import (
     ProfileSerializer,
     UserSerializer,
@@ -18,21 +18,21 @@ profile_serializer = ProfileSerializer()
 
 
 @login_required
-@settings.route("/user/<username>")
-def user_profile(username):
+@profile.route("/user/<username>")
+def public_profile(username):
     user = User.find(username=username)
     if not user:
         raise InvalidUsage("The user does not exist.", status_code=404)
     return user_serializer.dump(user), HTTPStatus.OK
 
 
-@settings.route("/profile")
+@profile.route("/profile")
 @login_required
 def get_profile():
     return profile_serializer.dump(current_user), HTTPStatus.OK
 
 
-@settings.route("/profile/picture", methods=["PUT"])
+@profile.route("/profile/picture", methods=["PUT"])
 @login_required
 def change_picture():
     picture_form = PictureForm()
@@ -47,7 +47,7 @@ def change_picture():
     return {"user_picture": current_user.user_picture}, HTTPStatus.OK
 
 
-@settings.route("/profile/password", methods=["PUT"])
+@profile.route("/profile/password", methods=["PUT"])
 @fresh_login_required
 def change_password():
     password_form = ChangePasswordForm()
@@ -72,7 +72,7 @@ def change_password():
     return {"message": "User password changed."}, HTTPStatus.OK
 
 
-@settings.route("/profile/username", methods=["PUT"])
+@profile.route("/profile/username", methods=["PUT"])
 @fresh_login_required
 def change_username():
     username_form = ChangeUsernameForm()
@@ -93,7 +93,7 @@ def change_username():
     return {"username": current_user.username}, HTTPStatus.OK
 
 
-@settings.route("/profile/email", methods=["PUT"])
+@profile.route("/profile/email", methods=["PUT"])
 @fresh_login_required
 def change_email():
     email_form = EmailForm()
@@ -118,7 +118,7 @@ def change_email():
     return {"message": "Confirmation email sent."}, HTTPStatus.OK
 
 
-@settings.route("/profile", methods=["DELETE"])
+@profile.route("/profile", methods=["DELETE"])
 @fresh_login_required
 def delete_user():
     password_form = PasswordForm()

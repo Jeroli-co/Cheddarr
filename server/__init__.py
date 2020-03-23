@@ -22,6 +22,7 @@ from server.config import (
 )
 from server.exceptions import InvalidUsage
 
+
 """Global extensions"""
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -98,11 +99,11 @@ def _create_app(config_object: BaseConfig, **kwargs):
 def register_blueprints(app):
     from server.auth import auth, facebook_bp, google_bp
     from server.site import site
-    from server.settings import settings
+    from server.settings.routes import profile
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix="/api")
-    app.register_blueprint(settings, url_prefix="/api")
+    app.register_blueprint(profile, url_prefix="/api")
     app.register_blueprint(facebook_bp)
     app.register_blueprint(google_bp)
 

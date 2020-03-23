@@ -1,6 +1,7 @@
 import pytest
+from flask import url_for
 
-from server import _create_app, db
+from server import _create_app, db, utils
 from server.auth import User
 from server.commands import init_db
 from server.config import TestConfig
@@ -41,3 +42,28 @@ def client(app):
         db.session.add_all((user1, user2))
         db.session.commit()
         yield client
+
+
+@pytest.fixture
+def mocks(mocker):
+    mocker.patch.object(utils, "send_email")
+    ran_img = mocker.patch.object(utils, "random_user_picture")
+    ran_img.return_value = ""
+
+
+@pytest.fixture
+def auth(client):
+    return client.post(
+        url_for("auth.signin"),
+        data={"usernameOrEmail": user1_email, "password": user1_password},
+    )
+
+
+@pytest.fixture(autouse=True, scope="function")
+def session():
+    session = db.session
+    session.begin_nested()
+
+    yield session
+
+    session.rollback()

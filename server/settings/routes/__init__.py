@@ -1,1 +1,6 @@
-from . import profile  # noqa
+from flask import Blueprint
+from server.config import FLASK_TEMPLATE_FOLDER
+
+profile = Blueprint("profile", __name__, template_folder=FLASK_TEMPLATE_FOLDER)
+
+from . import user_profile  # noqa
