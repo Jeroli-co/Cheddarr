@@ -5,8 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import {Link, Route, useLocation} from "react-router-dom";
 import {AuthContext} from "../../../context/AuthContext";
-import {InitResetPasswordModal} from "../element/init-reset-password-modal/InitResetPasswordModal";
-import {ResendEmailConfirmationModal} from "../element/resend-email-confirmation-modal/ResendEmailConfirmationModal";
 import {routes} from "../../../routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../../formDefaultValidators";
 
@@ -32,9 +30,13 @@ const SignInForm = (props) => {
 					props.history.push(redirectURI);
 					return;
 				case 400:
+					setHttpResponse(res);
+					return;
 				case 401:
 					setHttpResponse(res);
 					return;
+				default:
+					break;
 			}
 		});
 	};

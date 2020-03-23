@@ -15,6 +15,8 @@ const UserProfile = () => {
 				case 200:
 					setHttpResponse(res);
 					return;
+				default:
+					return;
 			}
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -52,13 +54,13 @@ const UserProfile = () => {
 	return (
 		<section className="UserProfile is-light is-large" data-testid="UserProfile">
 			{ httpResponse &&
-        <div className="container profile-container">
+        <div className="container profile-container" data-testid="UserProfileContainer">
           <div className="container">
             <input id="input-image" type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} />
-            <img id="user-picture" src={userPicture} alt="User" onClick={() => imageUploader.current.click()} />
+            <img id="user-picture" src={userPicture} alt="User" onClick={() => imageUploader.current.click()} data-testid="UserProfileImage" />
             <div className="has-text-left">
-              <p className="is-size-5"><i>{'@' + username}</i></p>
-              <p className="is-size-4">Email: <b>{httpResponse.data.email}</b></p>
+              <p className="is-size-5" data-testid="UserProfileUsername"><i>{'@' + username}</i></p>
+              <p className="is-size-4" data-testid="UserProfileEmail">Email: <b>{httpResponse.data.email}</b></p>
             </div>
           </div>
         </div>

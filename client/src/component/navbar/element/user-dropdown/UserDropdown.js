@@ -10,17 +10,17 @@ const UserDropdown = () => {
   const { userPicture, username, signOut } = useContext(AuthContext);
 
   return (
-    <div className="navbar-item has-dropdown is-hoverable">
+    <div className="navbar-item has-dropdown is-hoverable" data-testid="UserDropdown">
 
       { userPicture &&
         <div className="navbar-link is-pointed">
-          <img src={userPicture} alt="User"/>
+          <img src={userPicture} alt="User" data-testid="UserDropdownPicture"/>
         </div>
       }
 
       { !userPicture &&
         <div className="navbar-link is-pointed">
-          <p>{username}</p>
+          <p data-testid="UserDropdownUsername">{username}</p>
         </div>
       }
 

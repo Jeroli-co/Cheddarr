@@ -16,9 +16,13 @@ const ResendEmailConfirmationModal = (props) => {
       switch (res.status) {
         case 200:
           setValue('email', '');
+          setHttpResponse(res);
+          return;
         case 400:
           setHttpResponse(res);
-          return
+          return;
+        default:
+          return;
       }
     })
   };
@@ -28,7 +32,7 @@ const ResendEmailConfirmationModal = (props) => {
   };
 
   return (
-    <div className="modal is-active">
+    <div className="modal is-active" data-testid="ResendEmailConfirmationModal">
       <div className="modal-background" onClick={closeModal} />
       <div className="modal-card">
         <form id="email-input-modal-form" onSubmit={handleSubmit(submitResendConfirmAccount)}>

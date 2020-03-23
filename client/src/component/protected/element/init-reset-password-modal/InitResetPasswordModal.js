@@ -16,9 +16,13 @@ const InitResetPasswordModal = (props) => {
 		    switch (res.status) {
           case 200:
             setValue('email', "");
+            setHttpResponse(res);
+            return;
           case 400:
             setHttpResponse(res);
-            return
+            return;
+          default:
+            return;
         }
 		  });
     };

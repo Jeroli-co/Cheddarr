@@ -17,12 +17,13 @@ const SignUpForm = (props) => {
   const onSubmit = (data) => {
     signUp(data).then(res => {
       switch (res.status) {
-        case 200:
         case 201:
           props.history.push(routes.WAIT_EMAIL_CONFIRMATION.url);
           return;
         case 409:
           setHttpResponse(res);
+          return;
+        default:
           return;
       }
     });

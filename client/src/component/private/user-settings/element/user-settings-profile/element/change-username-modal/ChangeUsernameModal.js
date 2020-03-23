@@ -20,6 +20,8 @@ const ChangeUsernameModal = (props) => {
         case 409:
           setHttpResponse(res);
           return;
+        default:
+          return;
       }
     });
   };

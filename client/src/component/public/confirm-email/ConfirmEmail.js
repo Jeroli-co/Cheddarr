@@ -15,10 +15,15 @@ const ConfirmEmail = () => {
 		confirmEmail(token).then(res => {
 			switch (res.status) {
 				case 200:
-				case 201:
-				case 409:
+					setCode(res.status);
+					return;
+				case 403:
+					setCode(res.status);
+					return;
 				case 410:
 					setCode(res.status);
+					return;
+				default:
 					return;
 			}
 		});

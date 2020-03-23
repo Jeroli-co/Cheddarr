@@ -21,6 +21,8 @@ const DeleteAccountModal = (props) => {
         case 400:
           setHttpResponse(res);
           return;
+        default:
+          return;
       }
     });
   };

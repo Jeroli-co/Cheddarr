@@ -17,6 +17,8 @@ const ResetPasswordForm = (props) => {
         case 200:
           props.history.push(routes.SIGN_IN.url);
           return;
+        default:
+          return;
       }
     });
   };

@@ -6,7 +6,7 @@ import {routes} from "../routes";
 import Cookies from 'js-cookie'
 import {HttpResponse} from "../model/HttpResponse";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
 const initialSessionState = {
   username: null,
@@ -50,7 +50,8 @@ const AuthContextProvider = (props) => {
       return;
     }
 
-    const status = error.response.status;
+    const res = error.hasOwnProperty('response') ? error.response : null;
+    const status = res ? res.status : 500;
     if (codesHandle.includes(status))
       return;
 
@@ -111,7 +112,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400, 401]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -139,7 +143,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [409]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -153,7 +160,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [403, 410]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +178,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -183,7 +196,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -196,7 +212,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [410, 403]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -211,7 +230,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -248,7 +270,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message, res.data);
     } catch (e) {
       handleError(e);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -265,7 +290,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -284,7 +312,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [409]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -299,7 +330,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [409]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -317,7 +351,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -333,7 +370,10 @@ const AuthContextProvider = (props) => {
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [401]);
-      return e.hasOwnProperty('response') ? new HttpResponse(e.response.status, e.response.data.message) : null;
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }
@@ -364,4 +404,9 @@ const AuthContextProvider = (props) => {
   )
 };
 
-export default withRouter(AuthContextProvider);
+const AuthContextWithRouterProvider = withRouter(AuthContextProvider);
+
+export {
+  AuthContext,
+  AuthContextWithRouterProvider
+};

@@ -15,8 +15,12 @@ const ChangeEmailModal = (props) => {
     changeEmail(data).then(res => {
       switch (res.status) {
         case 200:
+          setHttpResponse(res);
+          return;
         case 409:
           setHttpResponse(res);
+          return;
+        default:
           return;
       }
     });

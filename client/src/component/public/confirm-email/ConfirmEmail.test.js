@@ -6,6 +6,7 @@ import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import {routes} from "../../../routes";
 import {ConfirmEmail} from "./ConfirmEmail";
+import {HttpResponse} from "../../../model/HttpResponse";
 
 afterEach(cleanup);
 
@@ -13,7 +14,7 @@ test('Confirm account shows EmailConfirmed on 201', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(201)) }}>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponse(200, ""))) }}>
         <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
@@ -25,11 +26,11 @@ test('Confirm account shows EmailConfirmed on 201', async () => {
   expect(emailConfirmed).toBeInTheDocument();
 });
 
-test('Confirm account shows AlreadyConfirmed on 409', async () => {
+test('Confirm account shows AlreadyConfirmed on 403', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(409)) }}>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponse(403, ""))) }}>
         <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
@@ -45,7 +46,7 @@ test('Confirm account shows TokenExpired on 410', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(410)) }}>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponse(410, ""))) }}>
         <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
