@@ -99,7 +99,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
 def register_blueprints(app):
     from server.auth import auth, facebook_bp, google_bp
     from server.site import site
-    from server.settings.routes import profile
+    from server.profile import profile
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix="/api")

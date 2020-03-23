@@ -6,9 +6,9 @@ from flask_login import fresh_login_required, current_user, login_required
 from server import InvalidUsage, db, utils
 from server.auth import User
 from server.auth.forms import PasswordForm, EmailForm
-from server.settings.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
-from server.settings.routes import profile
-from server.settings.serializers.user_serializer import (
+from server.profile import profile
+from server.profile.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
+from server.profile.serializers.user_serializer import (
     ProfileSerializer,
     UserSerializer,
 )
