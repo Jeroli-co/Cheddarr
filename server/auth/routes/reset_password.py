@@ -8,25 +8,27 @@ from server.auth.forms import EmailForm, PasswordForm
 @auth.route("/reset/password", methods=["POST"])
 def reset_password():
     email_form = EmailForm()
-    if email_form.validate():
-        email = email_form.email.data
-        user = User.find(email=email)
-        if user and user.confirmed:
-            token = utils.generate_timed_token([user.email, user.session_token])
-            reset_url = url_for("auth.confirm_reset", token=token, _external=True)
-            html = render_template(
-                "email/reset_password_instructions.html",
-                reset_url=reset_url.replace("/api", ""),
-            )
-            subject = "Reset your password"
-            utils.send_email(email, subject, html)
-            return {"message": "Reset instructions sent."}, HTTPStatus.OK
-
-    raise InvalidUsage(
-        "Error while sending the reset instructions.",
-        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-        payload=email_form.errors,
+    if not email_form.validate():
+        raise InvalidUsage(
+            "Error while sending the reset instructions.",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            payload=email_form.errors,
+        )
+    email = email_form.email.data
+    user = User.find(email=email)
+    if not user:
+        raise InvalidUsage(
+            "No user registered with this email.", status_code=HTTPStatus.BAD_REQUEST,
+        )
+    token = utils.generate_timed_token([user.email, user.session_token])
+    reset_url = url_for("auth.confirm_reset", token=token, _external=True)
+    html = render_template(
+        "email/reset_password_instructions.html",
+        reset_url=reset_url.replace("/api", ""),
     )
+    subject = "Reset your password"
+    utils.send_email(email, subject, html)
+    return {"message": "Reset instructions sent."}, HTTPStatus.OK
 
 
 @auth.route("/reset/<token>", methods=["GET", "POST"])
