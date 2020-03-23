@@ -3,23 +3,42 @@ import {faKey, faUser} from "@fortawesome/free-solid-svg-icons";
 import {faGoogle, faFacebook} from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
-import { Link } from "react-router-dom";
+import {Link, Route, useLocation} from "react-router-dom";
 import {AuthContext} from "../../../context/AuthContext";
-import {InitResetPasswordModal} from "../element/init-reset-password-modal/InitResetPasswordModal";
-import {ResendAccountConfirmationEmailModal} from "../element/resend-account-confirmation-email-modal/ResendAccountConfirmationEmailModal";
+import {routes} from "../../../routes";
+import {FORM_DEFAULT_VALIDATOR} from "../../../formDefaultValidators";
 
-const SignInForm = () => {
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
+const SignInForm = (props) => {
 
 	const { signIn, signInWithGoogle, signInWithFacebook } = useContext(AuthContext);
 	const { register, handleSubmit, errors } = useForm();
 
 	const [rememberMe, setRememberMe] = useState(false);
-	const [showResetPassword, setShowResetPassword] = useState(false);
-	const [showResendConfirmAccount, setShowResendConfirmAccount] = useState(false);
-	const [status, setStatus] = useState(null);
+	const [httpResponse, setHttpResponse] = useState(null);
+  const query = useQuery();
 
 	const onSubmit = (data) => {
-		signIn(data).then((status) => setStatus(status));
+		signIn(data).then(res => {
+			switch (res.status) {
+				case 200:
+					let redirectURI = query.get('redirectURI');
+					redirectURI = redirectURI ? redirectURI : routes.HOME.url;
+					props.history.push(redirectURI);
+					return;
+				case 400:
+					setHttpResponse(res);
+					return;
+				case 401:
+					setHttpResponse(res);
+					return;
+				default:
+					break;
+			}
+		});
 	};
 
 	return (
@@ -49,12 +68,23 @@ const SignInForm = () => {
 									className={'input ' + (errors['usernameOrEmail'] ? "is-danger" : "")}
 									type="text"
 									placeholder="Enter your username or email"
-									ref={register({ required: true })} />
+									ref={register({
+										required: true,
+										minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
+										maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
+									})}
+								/>
 								<span className="icon is-small is-left">
 									<FontAwesomeIcon icon={faUser} />
 								</span>
-								{errors['usernameOrEmail'] && (
-									<p className="help is-danger">Username or email is required</p>
+								{errors['usernameOrEmail'] && errors['usernameOrEmail'].type === 'required' && (
+									<p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
+								)}
+								{errors['usernameOrEmail'] && errors['usernameOrEmail'].type === 'minLength' && (
+									<p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MIN_LENGTH.message}</p>
+								)}
+								{errors['usernameOrEmail'] && errors['usernameOrEmail'].type === 'maxLength' && (
+									<p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
 								)}
 							</div>
 						</div>
@@ -66,19 +96,25 @@ const SignInForm = () => {
 									className={'input ' + (errors['password'] ? "is-danger" : "")}
 									type="password"
 									placeholder="Enter your password"
-									ref={register({ required: true })} />
+									ref={register({
+										required: true,
+										pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value
+									})} />
 								<span className="icon is-small is-left">
 									<FontAwesomeIcon icon={faKey} />
 								</span>
 							</div>
 							{errors['password'] && errors['password'].type === 'required' && (
-								<p className="help is-danger">Password is required </p>
+								<p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
+							)}
+							{errors['password'] && errors['password'].type === 'pattern' && (
+								<p className="help is-danger">{FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}</p>
 							)}
 						</div>
 
-						{ status && (
-								(status === 400 && <p className="help is-danger">Unable to sign in. Wrong credentials...</p>) ||
-								(status === 401 && <p className="help is-danger">Account need to be confirmed. Please check your inbox or <span className="has-link-style" onClick={() => setShowResendConfirmAccount(true)}>Click here</span> to resend the email</p>)
+						{ httpResponse && (
+								(httpResponse.status === 400 && <p className="help is-danger">{httpResponse.message}</p>) ||
+								(httpResponse.status === 401 && <p className="help is-danger">{httpResponse.message} <span className="has-link-style" onClick={() => props.history.push(routes.RESEND_EMAIL_CONFIRMATION.url)}>Click here</span> to resend the email</p>)
 							)
 						}
 
@@ -106,12 +142,7 @@ const SignInForm = () => {
 							<span className="icon">
 								<FontAwesomeIcon icon={faGoogle}/>
 							</span>
-							<span style={{color: 'blue'}}>G</span>
-							<span style={{color: 'red'}}>o</span>
-							<span style={{color: 'orange'}}>o</span>
-							<span style={{color: 'blue'}}>g</span>
-							<span style={{color: 'green'}}>l</span>
-							<span style={{color: 'red'}}>e</span>
+							<span>Google</span>
 						</button>
 						<button className="button is-rounded is-facebook-button" type="button" onClick={signInWithFacebook}>
 							<span className="icon">
@@ -122,15 +153,14 @@ const SignInForm = () => {
 					</div>
 
 					<div className="has-text-centered">
-						<p className="is-size-7">Forgot your password ? <span className="has-link-style" onClick={() => setShowResetPassword(true)}>Click here to reset it</span></p>
-						<p className="is-size-7">Still not have an account ? <Link to="/sign-up">Sign up</Link></p>
+						<p className="is-size-7">Forgot your password ? <Link to={routes.INIT_RESET_PASSWORD.url}>Click here to reset it</Link></p>
+						<p className="is-size-7">Still not have an account ? <Link to={routes.SIGN_UP.url}>Sign up</Link></p>
 					</div>
 
 				</div>
 			</div>
 
-			<ResendAccountConfirmationEmailModal isActive={showResendConfirmAccount} onClose={() => setShowResendConfirmAccount(false)} />
-			<InitResetPasswordModal isActive={showResetPassword} onClose={() => setShowResetPassword(false)} />
+			<Route exact path={routes.INIT_RESET_PASSWORD.url} component={routes.INIT_RESET_PASSWORD.component} />
 
 		</div>
 	);

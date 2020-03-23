@@ -1,32 +1,36 @@
-from http import HTTPStatus
 from datetime import datetime
+from http import HTTPStatus
 
-from flask import jsonify, session
+from flask import jsonify
 from flask.app import Flask
 from flask.helpers import get_debug_flag
+from flask_cors import CORS
 from flask_login import LoginManager
+from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
-from flask_cors import CORS
 from sendgrid import sendgrid
 
-from server.exceptions import InvalidUsage
 from server.config import (
-    REACT_STATIC_FOLDER,
-    REACT_TEMPLATE_FOLDER,
     BaseConfig,
     DevConfig,
     ProdConfig,
+    REACT_STATIC_FOLDER,
+    REACT_TEMPLATE_FOLDER,
 )
+from server.exceptions import InvalidUsage
+
 
 """Global extensions"""
 db = SQLAlchemy()
+ma = Marshmallow()
 migrate = Migrate()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 mail = sendgrid.SendGridAPIClient()
+
 
 def create_app():
     """Creates a pre-configured Flask application.
@@ -52,15 +56,17 @@ def _create_app(config_object: BaseConfig, **kwargs):
     app.config.from_object(config_object)
 
     db.init_app(app)
+    ma.init_app(app)
     with app.app_context():
-        if db.engine.url.drivername == 'sqlite':
+        if db.engine.url.drivername == "sqlite":
             migrate.init_app(app, db, render_as_batch=True)
         else:
             migrate.init_app(app, db)
 
     csrf.init_app(app)
     mail.api_key = app.config.get("MAIL_SENDGRID_API_KEY")
-    Talisman(app)
+    csp = {"default-src": "'self'", "img-src": "*"}
+    Talisman(app, content_security_policy=csp)
     CORS(
         app,
         supports_credentials=True,
@@ -91,15 +97,13 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
 
 def register_blueprints(app):
-    from server.auth import auth
+    from server.auth import auth, facebook_bp, google_bp
     from server.site import site
-    from server.auth import facebook_bp
-    from server.auth import google_bp
+    from server.profile import profile
 
     app.register_blueprint(site)
-    app.register_blueprint(
-        auth, url_prefix="/api",
-    )
+    app.register_blueprint(auth, url_prefix="/api")
+    app.register_blueprint(profile, url_prefix="/api")
     app.register_blueprint(facebook_bp)
     app.register_blueprint(google_bp)
 
@@ -125,9 +129,7 @@ def register_login_manager(app):
 
     @login_manager.needs_refresh_handler
     def refresh():
-        raise InvalidUsage(
-            "Fresh login required", status_code=HTTPStatus.PROXY_AUTHENTICATION_REQUIRED
-        )
+        raise InvalidUsage("Need to authenticate", status_code=HTTPStatus.UNAUTHORIZED)
 
 
 def register_oauth_providers(oauth):

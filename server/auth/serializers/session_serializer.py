@@ -1,11 +1,11 @@
-from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
-
+from server import ma
 from server.auth import User
 
 
-class SessionSerializer(SQLAlchemySchema):
+class SessionSerializer(ma.SQLAlchemySchema):
     class Meta:
         model = User
-        load_instance = True
 
-    username = auto_field()
+    username = ma.auto_field()
+    user_picture = ma.auto_field()
+    oauth_only = ma.auto_field()

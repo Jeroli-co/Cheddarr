@@ -21,7 +21,7 @@ test('Navbar shows buttons sign in and sign up when log out', () => {
   expect(getByTestId("SignUpButton")).toBeInTheDocument();
 });
 
-test('Navbar shows button log out when log in', () => {
+test('Navbar shows button UserDropdown when log in', () => {
   const history = createMemoryHistory({ initialEntries: [routes.HOME.url] });
   const tree = (
     <Router history={history}>
@@ -31,6 +31,6 @@ test('Navbar shows button log out when log in', () => {
     </Router>
   );
   const { getByTestId } = render(tree);
-  expect(getByTestId("SignOutButton")).toBeInTheDocument();
+  expect(getByTestId("UserDropdown")).toBeInTheDocument();
 });
 

@@ -1,14 +1,14 @@
-import {SignInButton} from "../../element/sign-in-button/SignInButton";
+import {SignInButton} from "../../../protected/element/sign-in-button/SignInButton";
 import React from "react";
 
-const AlreadyConfirmed = () => {
+const EmailConfirmed = () => {
 	return (
-		<div className="AlreadyConfirmed" data-testid="AlreadyConfirmed">
+		<div className="EmailConfirmed" data-testid="EmailConfirmed">
 			<section className="hero is-large is-primary is-bold">
 				<div className="hero-body">
 					<div className="container">
 						<h1 className="title">
-							Oops this account has been already confirmed...
+							Well done ! You confirmed your email !
 						</h1>
 						<h2 className="subtitle">
 							Please try to sign in
@@ -22,5 +22,5 @@ const AlreadyConfirmed = () => {
 };
 
 export {
-  AlreadyConfirmed
+  EmailConfirmed
 }

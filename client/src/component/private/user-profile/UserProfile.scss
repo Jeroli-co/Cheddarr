@@ -1,0 +1,17 @@
+#user-picture {
+  object-fit: cover;
+  width:260px;
+  height:260px;
+  cursor: pointer;
+}
+
+.profile-container {
+  padding: 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#input-image {
+  display: none;
+}

@@ -7,12 +7,12 @@ from server import db
 from .models import User, OAuth
 from ..config import FLASK_TEMPLATE_FOLDER
 
-auth = Blueprint("auth", __name__, template_folder=FLASK_TEMPLATE_FOLDER,)
+auth = Blueprint("auth", __name__, template_folder=FLASK_TEMPLATE_FOLDER)
 
 
 facebook_bp = make_facebook_blueprint(
     storage=SQLAlchemyStorage(OAuth, db.session, user=current_user),
-    redirect_url="/sign-in/authorize",
+    redirect_url="/authorize",
 )
 
 google_bp = make_google_blueprint(
@@ -22,7 +22,7 @@ google_bp = make_google_blueprint(
         "https://www.googleapis.com/auth/userinfo.profile",
         "https://www.googleapis.com/auth/userinfo.email",
     ],
-    redirect_url="/sign-in/authorize",
+    redirect_url="/authorize",
 )
 
-from .routes import signup, signin, signout, reset_password  # noqa
+from . import routes  # noqa

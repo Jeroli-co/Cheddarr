@@ -1,16 +1,16 @@
 import React, {useContext} from 'react';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/cheddarr-small.png';
 import { AuthContext } from "../../context/AuthContext";
 import { SignUpButton } from "../protected/element/sign-up-button/SignUpButton";
 import { SignInButton } from "../protected/element/sign-in-button/SignInButton";
+import {UserDropdown} from "./element/user-dropdown/UserDropdown";
 
 const Navbar = () => {
 
-	const { signOut, isAuthenticated } = useContext(AuthContext);
+	const { isAuthenticated } = useContext(AuthContext);
 
 	const toggleBurgerMenu = () => {
 		const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
@@ -48,36 +48,27 @@ const Navbar = () => {
 					</div>
 
 					<div className="navbar-end">
-						<div className="navbar-item">
-							<div className="buttons">
 
-								<a className="button is-rounded" href="https://github.com/Jeroli-co/Cheddarr"
-									 target="_blank" rel="noopener noreferrer">
-									<span className="icon">
-										<FontAwesomeIcon icon={faGithub}/>
-									</span>
-									<span>GitHub</span>
-								</a>
+						<a className="navbar-item" href="https://github.com/Jeroli-co/Cheddarr"
+							 target="_blank" rel="noopener noreferrer">
+							<span className="icon">
+								<FontAwesomeIcon icon={faGithub}/>
+							</span>
+						</a>
 
-								{
-									isAuthenticated ? (
-											<div id="nav-sign-out-button" className="button is-rounded with-background-primary" onClick={signOut} data-testid="SignOutButton">
-												<span className="icon">
-													<FontAwesomeIcon icon={faSignOutAlt}/>
-												</span>
-												<span>Sign out</span>
-											</div>
-										)
-										: (
-											<div>
-												<SignInButton/>
-												<SignUpButton/>
-											</div>
-										)
-								}
+						{ isAuthenticated &&
+              <UserDropdown/>
+						}
 
-							</div>
-						</div>
+            { !isAuthenticated &&
+              <div className="navbar-item">
+                <div className="buttons">
+                  <SignInButton/>
+                  <SignUpButton/>
+                </div>
+              </div>
+            }
+
 					</div>
 				</div>
 			</nav>

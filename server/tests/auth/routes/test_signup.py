@@ -1,11 +1,11 @@
-from importlib import reload
-
 from flask import url_for
-from server.auth import utils, User
+from server.auth import User
+from server import utils
+from server.tests.conftest import user1_username, user1_password, user1_email
 
 
-def test_signup_ok(client, mocker):
-    mocker.patch.object(utils, "send_email")
+def test_signup_ok(client, mocks):
+
     assert (
         client.post(
             url_for("auth.signup"),
@@ -13,25 +13,21 @@ def test_signup_ok(client, mocker):
                 "username": "test_user",
                 "password": "Test_password1",
                 "email": "test@test.com",
-                "firstName": "test",
-                "lastName": "test",
             },
         ).status_code
-        == 200
+        == 201
     )
     assert User.exists("test@test.com")
 
 
-def test_signup_user_already_exist(client):
+def test_signup_user_already_exist(client, mocks):
     assert (
         client.post(
             url_for("auth.signup"),
             data={
-                "username": "user1",
-                "password": "password1",
-                "email": "email1@test.com",
-                "firstName": "user1_first_name",
-                "lastName": "user1_last_name",
+                "username": user1_username,
+                "password": user1_password,
+                "email": user1_email,
             },
         ).status_code
         == 409
