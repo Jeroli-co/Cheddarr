@@ -8,9 +8,13 @@ from server.auth import User
 from server.auth.forms import PasswordForm, EmailForm
 from server.settings import settings
 from server.settings.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
-from server.settings.serializers.user_serializer import UserSerializer
+from server.settings.serializers.user_serializer import (
+    ProfileSerializer,
+    UserSerializer,
+)
 
 user_serializer = UserSerializer()
+profile_serializer = ProfileSerializer()
 
 
 @login_required
@@ -25,7 +29,7 @@ def user_profile(username):
 @settings.route("/profile")
 @login_required
 def get_profile():
-    return user_serializer.dump(current_user), HTTPStatus.OK
+    return profile_serializer.dump(current_user), HTTPStatus.OK
 
 
 @settings.route("/profile/picture", methods=["PUT"])

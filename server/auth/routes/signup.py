@@ -29,9 +29,9 @@ def signup():
             "This username is not available.", status_code=HTTPStatus.CONFLICT
         )
 
-    user = User.create(
-        email=signup_form.email.data,
+    user = User(
         username=signup_form.username.data,
+        email=signup_form.email.data,
         password=signup_form.password.data,
         user_picture=utils.random_user_picture(),
     )
@@ -62,7 +62,10 @@ def confirm_email(token):
 
     user = User.find(email=email)
     if not user and not current_user.is_authenticated:
-        raise InvalidUsage("Need to sign in to confirm email change", status_code=HTTPStatus.UNAUTHORIZED)
+        raise InvalidUsage(
+            "Need to sign in to confirm email change",
+            status_code=HTTPStatus.UNAUTHORIZED,
+        )
     if user and user.confirmed:
         raise InvalidUsage("This email is already confirmed.", HTTPStatus.FORBIDDEN)
     if current_user.is_authenticated:

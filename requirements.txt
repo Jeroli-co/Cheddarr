@@ -4,6 +4,7 @@ Flask
 Flask-Cors
 Flask-Dance[sqla]
 Flask-Login
+Flask-Marshmallow
 Flask-Migrate
 Flask-SQLAlchemy
 Flask-Talisman

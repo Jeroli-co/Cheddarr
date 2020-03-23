@@ -68,9 +68,7 @@ def oauth_logged_in(blueprint, token):
         return False
 
     if blueprint.name == "facebook":
-        resp = blueprint.session.get(
-            "/me", params={"fields": "email, picture"}
-        )
+        resp = blueprint.session.get("/me", params={"fields": "email, picture"})
     elif blueprint.name == "google":
         resp = blueprint.session.get("/oauth2/v1/userinfo")
     else:
@@ -104,11 +102,11 @@ def oauth_logged_in(blueprint, token):
             else:
                 return False
             # Create a new local user account for this user
-            user = User.create(
-                email=email,
+            user = User(
                 username=email,
-                user_picture=user_picture,
+                email=email,
                 password=generate_password(),
+                user_picture=user_picture,
                 oauth_only=True,
             )
             # Associate the new local user account with the OAuth token

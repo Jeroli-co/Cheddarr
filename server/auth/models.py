@@ -6,12 +6,11 @@ from server import db, utils
 
 
 class User(db.Model, UserMixin):
-    __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(128), unique=True, index=True)
-    email = db.Column(db.String(128), unique=True, index=True)
-    _password = db.Column(db.String(128), nullable=True)
-    user_picture = db.Column(db.String(256), nullable=True)
+    username = db.Column(db.String(128), unique=True, nullable=False, index=True)
+    email = db.Column(db.String(128), unique=True, nullable=False, index=True)
+    _password = db.Column(db.String(128), nullable=False)
+    user_picture = db.Column(db.String(256))
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
     oauth = db.relationship(
@@ -19,12 +18,30 @@ class User(db.Model, UserMixin):
     )
     oauth_only = db.Column(db.Boolean, default=False)
 
+    def __init__(
+        self,
+        username,
+        email,
+        password,
+        user_picture=None,
+        confirmed=False,
+        oauth_only=False,
+    ):
+        self.username = username
+        self.email = email
+        self._password = password
+        self.user_picture = user_picture
+        self.confirmed = confirmed
+        self.oauth_only = oauth_only
+        self.session_token = utils.generate_token([email, password])
+
     def __repr__(self):
-        return "%s/%s/%s/%s/%s" % (
+        return "%s/%s/%s/%s/%s/%s" % (
             self.username,
             self.email,
-            self.password,
             self.user_picture,
+            self.session_token,
+            self.confirmed,
             self.oauth_only,
         )
 
@@ -73,26 +90,6 @@ class User(db.Model, UserMixin):
             return User.query.filter_by(email=email).first()
         if username:
             return User.query.filter_by(username=username).first()
-
-    @classmethod
-    def create(
-        cls,
-        email,
-        username,
-        password,
-        user_picture=None,
-        oauth_only=False,
-    ):
-        user = User(
-            username=username,
-            email=email,
-            password=password,
-            user_picture=user_picture,
-            confirmed=oauth_only,
-            oauth_only=oauth_only,
-        )
-        user.session_token = utils.generate_token([user.email, user.password])
-        return user
 
 
 class OAuth(OAuthConsumerMixin, db.Model):

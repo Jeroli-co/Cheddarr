@@ -6,21 +6,30 @@ from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask_cors import CORS
 from flask_login import LoginManager
+from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from sendgrid import sendgrid
 
-from server.config import (BaseConfig, DevConfig, ProdConfig, REACT_STATIC_FOLDER, REACT_TEMPLATE_FOLDER)
+from server.config import (
+    BaseConfig,
+    DevConfig,
+    ProdConfig,
+    REACT_STATIC_FOLDER,
+    REACT_TEMPLATE_FOLDER,
+)
 from server.exceptions import InvalidUsage
 
 """Global extensions"""
 db = SQLAlchemy()
+ma = Marshmallow()
 migrate = Migrate()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 mail = sendgrid.SendGridAPIClient()
+
 
 def create_app():
     """Creates a pre-configured Flask application.
@@ -46,8 +55,9 @@ def _create_app(config_object: BaseConfig, **kwargs):
     app.config.from_object(config_object)
 
     db.init_app(app)
+    ma.init_app(app)
     with app.app_context():
-        if db.engine.url.drivername == 'sqlite':
+        if db.engine.url.drivername == "sqlite":
             migrate.init_app(app, db, render_as_batch=True)
         else:
             migrate.init_app(app, db)
