@@ -10,7 +10,7 @@ from server.auth import auth
 @auth.route("/key")
 @login_required
 def get_api_key():
-    return {"key": current_user.api_key}
+    return {"api_key": current_user.api_key}
 
 
 @auth.route("/key", methods=["DELETE"])
@@ -26,4 +26,4 @@ def delete_api_key():
 def reset_api_key():
     current_user.api_key = os.urandom(24).hex()
     db.session.commit()
-    return {"key": current_user.api_key}
+    return {"api_key": current_user.api_key}
