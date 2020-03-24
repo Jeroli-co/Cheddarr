@@ -107,6 +107,7 @@ def oauth_logged_in(blueprint, token):
                 email=email,
                 password=generate_password(),
                 user_picture=user_picture,
+                confirmed=True,
                 oauth_only=True,
             )
             # Associate the new local user account with the OAuth token
