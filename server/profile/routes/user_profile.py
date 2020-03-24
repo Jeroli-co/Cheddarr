@@ -23,6 +23,9 @@ def public_profile(username):
     user = User.find(username=username)
     if not user:
         raise InvalidUsage("The user does not exist.", status_code=404)
+
+    # TODO: add a boolean field (is_friend) if username is contain in the current user friend list
+
     return user_serializer.dump(user), HTTPStatus.OK
 
 

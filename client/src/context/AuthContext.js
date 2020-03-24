@@ -395,6 +395,74 @@ const AuthContextProvider = (props) => {
     }
   };
 
+  const getUserPublic = async (username) => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get("/api/users/" + username);
+      return new HttpResponse(res.status, res.data.message, res.data);
+    } catch (e) {
+      handleError(e, []);
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getFriends = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get("/api/profile/friends");
+      return new HttpResponse(res.status, res.data.message);
+    } catch (e) {
+      handleError(e, []);
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addFriend = async (username) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('username', username);
+    try {
+      const res = await axios.post("/api/profile/friends", fd);
+      return new HttpResponse(res.status, res.data.message);
+    } catch (e) {
+      handleError(e, []);
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteFriend = async (username) => {
+    setIsLoading(true);
+    const fd = new FormData();
+    fd.append('username', username);
+    try {
+      const res = await axios.delete("/api/profile/friends", { data: fd });
+      return new HttpResponse(res.status, res.data.message);
+    } catch (e) {
+      handleError(e, []);
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{...session,
       signIn,
@@ -414,6 +482,11 @@ const AuthContextProvider = (props) => {
       getApiKey,
       resetApiKey,
       deleteApiKey
+      changeUserPicture,
+      getUserPublic,
+      getFriends,
+      addFriend,
+      deleteFriend
     }}>
       { isLoading && <PageLoader/> }
       { props.children }

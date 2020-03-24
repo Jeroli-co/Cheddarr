@@ -12,21 +12,15 @@ const UserSettings = (props) => {
   const [activeLink, setActiveLink] = useState("");
 
   useEffect(() => {
-
-    if (props.location.pathname === routes.USER_SETTINGS.url) {
-      props.history.push(routes.USER_SETTINGS_PROFILE.url);
-    } else {
-      setActiveLink(props.location.pathname);
-    }
-
+    setActiveLink(props.location.pathname);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props.location]);
 
   return (
     <div className="UserSettings" data-testid="UserSettings">
       <div className="tabs is-centered is-boxed is-medium">
         <ul>
-          <li className={activeLink === routes.USER_SETTINGS_PROFILE.url ? 'is-active' : ''}>
+          <li className={((activeLink === routes.USER_SETTINGS.url) || (activeLink === routes.USER_SETTINGS_PROFILE.url)) ? 'is-active' : ''}>
             <Link to={routes.USER_SETTINGS_PROFILE.url}>
               <FontAwesomeIcon icon={faUser} />
             </Link>
@@ -38,7 +32,7 @@ const UserSettings = (props) => {
           </li>
         </ul>
       </div>
-      <Route path={routes.USER_SETTINGS_PROFILE.url} component={routes.USER_SETTINGS_PROFILE.component}/>
+      <Route path={[routes.USER_SETTINGS.url, routes.USER_SETTINGS_PROFILE.url]} component={routes.USER_SETTINGS_PROFILE.component}/>
       <Route exact path={routes.USER_SETTINGS_CONFIGURATIONS.url} component={routes.USER_SETTINGS_CONFIGURATIONS.component}/>
     </div>
   );

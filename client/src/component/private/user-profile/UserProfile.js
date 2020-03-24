@@ -1,6 +1,9 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {AuthContext} from "../../../context/AuthContext";
 import './UserProfile.scss';
+import {routes} from "../../../routes";
+import {Link} from "react-router-dom";
+import {Route} from "react-router";
 
 const UserProfile = () => {
 
@@ -53,18 +56,41 @@ const UserProfile = () => {
 
 	return (
 		<section className="UserProfile is-light is-large" data-testid="UserProfile">
-			{ httpResponse &&
-        <div className="container profile-container" data-testid="UserProfileContainer">
-          <div className="container">
-            <input id="input-image" type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} />
-            <img id="user-picture" src={userPicture} alt="User" onClick={() => imageUploader.current.click()} data-testid="UserProfileImage" />
-            <div className="has-text-left">
-              <p className="is-size-5" data-testid="UserProfileUsername"><i>{'@' + username}</i></p>
-              <p className="is-size-4" data-testid="UserProfileEmail">Email: <b>{httpResponse.data.email}</b></p>
-            </div>
-          </div>
-        </div>
-			}
+
+			<div className="columns container main-container">
+
+				<div className="column is-one-third">
+					{ httpResponse &&
+						<div className="container profile-container" data-testid="UserProfileContainer">
+							<div className="container">
+								<input id="input-image" type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} />
+								<img id="user-picture" src={userPicture} alt="User" width={260} height={260} onClick={() => imageUploader.current.click()} data-testid="UserProfileImage" />
+								<div className="has-text-left">
+									<p className="is-size-5" data-testid="UserProfileUsername"><i>{'@' + username}</i></p>
+									<p className="is-size-5" data-testid="UserProfileEmail">Email: {httpResponse.data.email}</p>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+
+				<div className="column">
+					<div className="container tabs is-boxed">
+						<ul>
+							<li className="is-active">
+								<Link to={routes.USER_SETTINGS_PROFILE.url}>
+									Friends
+								</Link>
+							</li>
+						</ul>
+					</div>
+
+					<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS_LIST.url]} component={routes.USER_FRIENDS_LIST.component} />
+
+				</div>
+
+			</div>
+
 		</section>
 	);
 };
