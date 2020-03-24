@@ -39,7 +39,7 @@ const UserSettingsProfile = (props) => {
     deleteApiKey().then(res => {
       switch (res.status) {
         case 200:
-          setApiKey("");
+          setApiKey(null);
           return;
         default:
           return;
@@ -101,14 +101,14 @@ const UserSettingsProfile = (props) => {
             <h3 className="subtitle is-3 is-danger">API Key</h3>
             <div className="content">
 
-              { apiKey && apiKey.length === 0 &&
+              { apiKey === null &&
                 <button className="button is-info" type="button" onClick={_onResetApiKey}>
                   <span className="icon"><FontAwesomeIcon icon={faPlus}/></span>
                   <span>Generate API Key</span>
                 </button>
               }
 
-              { apiKey && apiKey.length > 0 &&
+              { typeof apiKey === 'string' && apiKey.length > 0 &&
                 <div className="buttons">
                   <input type="text" value={apiKey} contentEditable={false} />
                   <button className="button is-rounded is-facebook-button" type="button" onClick={_onResetApiKey}>
