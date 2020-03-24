@@ -222,14 +222,10 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('password', data['password']);
     try {
-      const res = await axios.post('/api/reset/' + token, fd);
-      return new HttpResponse(res.status, res.data.message);
+      await axios.post('/api/reset/' + token, fd);
+      props.history.push(routes.SIGN_IN.url);
     } catch (e) {
       handleError(e);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
     } finally {
       setIsLoading(false);
     }

@@ -13,6 +13,8 @@ const DeleteAccountModal = (props) => {
   const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
+    if (isOauthOnly && data["password"] === "")
+      data["password"] = "password";
     deleteAccount(data).then(res => {
       switch (res.status) {
         case 200:
@@ -48,7 +50,8 @@ const DeleteAccountModal = (props) => {
                 <input name="password"
                        className="input"
                        type="password"
-                       placeholder="Enter your password"
+                       placeholder={isOauthOnly ? "••••••••" : "Enter your old password"}
+                       disabled={isOauthOnly}
                        ref={register({
                          required: true,
                          pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value })}
@@ -60,8 +63,8 @@ const DeleteAccountModal = (props) => {
               {errors['password'] && errors['password'].type === 'required' && (
                 <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</p>
               )}
-              {errors['password'] && errors['password'].type === 'maxLength' && (
-                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
+              {errors['password'] && errors['password'].type === 'pattern' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}</p>
               )}
             </div>
 

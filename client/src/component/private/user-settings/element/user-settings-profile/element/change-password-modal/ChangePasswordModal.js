@@ -13,6 +13,8 @@ const ChangePasswordModal = (props) => {
   const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
+    if (isOauthOnly && data["oldPassword"] === "")
+      data["oldPassword"] = "oldPassword";
     changePassword(data).then(res => {
       switch (res.status) {
         case 200:
