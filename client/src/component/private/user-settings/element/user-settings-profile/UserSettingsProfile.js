@@ -20,7 +20,7 @@ const UserSettingsProfile = (props) => {
         default:
           return;
       }
-    })
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -108,7 +108,7 @@ const UserSettingsProfile = (props) => {
 
               { typeof apiKey === 'string' && apiKey.length > 0 &&
                 <div className="api-key-container">
-                  <input id="apiKeyInput" className="input is-primary" type="text" value={apiKey} contentEditable={false} />
+                  <input id="apiKeyInput" className="input is-primary" type="text" value={apiKey} readOnly={true} contentEditable={false} />
                   <div className="buttons">
                     <button className="button is-rounded is-info" type="button" onClick={_onCopyToClipboard}>
                       <span className="icon">

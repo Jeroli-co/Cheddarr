@@ -91,7 +91,8 @@ test('App router load components (authentication needed) correctly', async () =>
     <Router history={history}>
       <AuthContext.Provider value={{
         isAuthenticated: true,
-        getUserProfile: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email})))
+        getUserProfile: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email}))),
+        getApiKey: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {api_key: "TEST-API-KEY"}))),
       }}>
         <App />
       </AuthContext.Provider>
@@ -111,7 +112,7 @@ test('App router load components (authentication needed) correctly', async () =>
   expect(userProfile).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS.url);
-  const userSettings = wrapper.getByTestId('UserSettings');
+  const userSettings = await waitForElement(() => wrapper.getByTestId('UserSettings'));
   expect(userSettings).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS_PROFILE.url);
