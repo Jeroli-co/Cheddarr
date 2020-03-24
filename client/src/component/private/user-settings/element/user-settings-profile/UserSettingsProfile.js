@@ -85,18 +85,7 @@ const UserSettingsProfile = (props) => {
               </button>
             </div>
 
-            <div className="is-divider is-danger" data-content="OR"/>
-
-            {/* DELETE ACCOUNT */}
-            <h3 className="subtitle is-3 is-danger">Delete</h3>
-            <div className="content">
-              <p className="is-size-7"><FontAwesomeIcon icon={faExclamationCircle} /> Careful with that option</p>
-              <button className="button is-danger" type="button" onClick={() => props.history.push(routes.DELETE.url)}>
-                Delete account
-              </button>
-            </div>
-
-            <div className="is-divider is-danger" data-content="OR"/>
+            <div className="is-divider" data-content="OR"/>
 
             {/* API KEY */}
             <h3 className="subtitle is-3 is-danger">API Key</h3>
@@ -127,6 +116,17 @@ const UserSettingsProfile = (props) => {
                 </div>
               }
 
+            </div>
+
+            <div className="is-divider is-danger" data-content="OR"/>
+
+            {/* DELETE ACCOUNT */}
+            <h3 className="subtitle is-3 is-danger">Delete</h3>
+            <div className="content">
+              <p className="is-size-7"><FontAwesomeIcon icon={faExclamationCircle} /> Careful with that option</p>
+              <button className="button is-danger" type="button" onClick={() => props.history.push(routes.DELETE.url)}>
+                Delete account
+              </button>
             </div>
 
           </div>
