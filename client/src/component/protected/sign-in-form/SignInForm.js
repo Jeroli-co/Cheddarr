@@ -57,7 +57,7 @@ const SignInForm = (props) => {
 			<br />
 
 			<div className="columns is-mobile is-centered">
-				<div className="column is-one-third">
+				<div className="column is-one-third-desktop is-half-tablet is-three-quarters-mobile">
 
 					<form id="sign-in-form" onSubmit={handleSubmit(onSubmit)}>
 
