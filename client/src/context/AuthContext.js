@@ -299,7 +299,7 @@ const AuthContextProvider = (props) => {
   const changeUsername = async (data) => {
     setIsLoading(true);
     const fd = new FormData();
-    fd.append('newUsername', data['newUsername']);
+    fd.append('username', data['newUsername']);
     try {
       const res = await axios.put("/api/profile/username", fd);
       const username = res.data.username;

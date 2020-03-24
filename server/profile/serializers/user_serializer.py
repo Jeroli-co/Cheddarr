@@ -12,3 +12,8 @@ class UserSerializer(ma.SQLAlchemySchema):
 
 class ProfileSerializer(UserSerializer):
     email = ma.auto_field()
+
+
+user_serializer = UserSerializer()
+users_serializer = UserSerializer(many=True)
+profile_serializer = ProfileSerializer()

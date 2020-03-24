@@ -7,11 +7,8 @@ from server import InvalidUsage, db, utils
 from server.auth.models import User
 from server.auth.forms import PasswordForm, EmailForm
 from server.profile import profile
-from server.profile.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
-from server.profile.serializers.user_serializer import ProfileSerializer
-
-
-profile_serializer = ProfileSerializer()
+from server.profile.forms import UsernameForm, ChangePasswordForm, PictureForm
+from server.profile.serializers.user_serializer import profile_serializer
 
 
 @profile.route("/", methods=["GET"])
@@ -83,14 +80,14 @@ def change_password():
 @profile.route("/username", methods=["PUT"])
 @fresh_login_required
 def change_username():
-    username_form = ChangeUsernameForm()
+    username_form = UsernameForm()
     if not username_form.validate():
         raise InvalidUsage(
             "Error while changing username.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
-    new_username = username_form.newUsername.data
+    new_username = username_form.username.data
     if User.exists(username=new_username):
         raise InvalidUsage(
             "This username is not available.", status_code=HTTPStatus.CONFLICT
