@@ -62,7 +62,8 @@ const SignUpForm = (props) => {
                        ref={register({
                          required: true,
                          minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
-                         maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value
+                         maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
+                         pattern: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value
                        })}
                 />
                 <span className="icon is-small is-left">
@@ -77,6 +78,9 @@ const SignUpForm = (props) => {
               )}
               {errors['username'] && errors['username'].type === 'maxLength' && (
                 <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
+              )}
+              {errors['username'] && errors['username'].type === 'pattern' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message}</p>
               )}
             </div>
 
