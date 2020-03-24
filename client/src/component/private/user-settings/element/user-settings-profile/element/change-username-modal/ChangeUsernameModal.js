@@ -56,7 +56,8 @@ const ChangeUsernameModal = (props) => {
                        ref={register({
                          required: true,
                          minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
-                         maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value
+                         maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
+                         pattern: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value
                        })}
                 />
                 <span className="icon is-small is-left">
@@ -71,6 +72,9 @@ const ChangeUsernameModal = (props) => {
               )}
               {errors['newUsername'] && errors['newUsername'].type === 'maxLength' && (
                 <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
+              )}
+              {errors['newUsername'] && errors['newUsername'].type === 'pattern' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message}</p>
               )}
             </div>
 
