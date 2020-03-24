@@ -51,7 +51,7 @@ def signup():
     return {"message": "Confirmation email sent."}, HTTPStatus.CREATED
 
 
-@auth.route("/confirm/<token>")
+@auth.route("/confirm/<token>", methods=["GET"])
 def confirm_email(token):
     try:
         email = utils.confirm_token(token)
