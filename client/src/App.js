@@ -27,8 +27,10 @@ const App = () => {
         <Route exact path={routes.BAD_REQUEST.url} component={routes.BAD_REQUEST.component} />
         <Route exact path={routes.NOT_FOUND.url} component={routes.NOT_FOUND.component} />
 
-        <PrivateRoute exact path={routes.USER_PROFILE.url} component={routes.USER_PROFILE.component} />
+        <PrivateRoute path={routes.USER_PROFILE.url} component={routes.USER_PROFILE.component} />
         <PrivateRoute path={routes.USER_SETTINGS.url} component={routes.USER_SETTINGS.component} />
+
+        <Route exact path={routes.USER_PUBLIC_PROFILE.url(':id')} component={routes.USER_PUBLIC_PROFILE.component} />
 
         <Route path="*" component={routes.NOT_FOUND.component} />
       </Switch>
