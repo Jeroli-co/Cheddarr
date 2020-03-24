@@ -1,4 +1,3 @@
-import base64
 from datetime import datetime
 from http import HTTPStatus
 
@@ -131,7 +130,10 @@ def register_login_manager(app):
 
     @login_manager.needs_refresh_handler
     def refresh():
-        raise InvalidUsage("Need to authenticate", status_code=HTTPStatus.UNAUTHORIZED)
+        raise InvalidUsage(
+            "Need to refresh session through web browser (API unavailable)",
+            status_code=HTTPStatus.UNAUTHORIZED,
+        )
 
     @login_manager.request_loader
     def load_user_from_request(request):

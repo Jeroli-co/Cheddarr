@@ -54,6 +54,10 @@ def unsign(value):
     return s.unsign(value)
 
 
+def generate_api_key():
+    return secrets.token_hex(24)
+
+
 def generate_password():
     alphabet = string.ascii_letters + string.digits
     password = "".join(secrets.choice(alphabet) for i in range(64))
