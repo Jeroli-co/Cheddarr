@@ -50,11 +50,11 @@ const UserPublicProfile = () => {
       <br/>
 
       { isAuthenticated && id !== username &&
-        <button className="button is-primary" type="button" disabled={user["is_friend"]} onClick={() => _onAddUser}>
+        <button className="button is-primary" type="button" onClick={_onAddUser}>
           <span className="icon">
             <FontAwesomeIcon icon={faPlus}/>
           </span>
-          <span>Add friends</span>
+          <span>Add friend</span>
         </button>
       }
 

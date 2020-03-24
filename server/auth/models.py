@@ -69,6 +69,19 @@ class User(db.Model, UserMixin):
         db.session.delete(user)
         db.session.commit()
 
+    def add_friend(self, user):
+        if not self.is_friend(user):
+            self.friends.append(user)
+            db.session.commit()
+
+    def remove_friend(self, user):
+        if self.is_friend(user):
+            self.friends.remove(user)
+            db.session.commit()
+
+    def is_friend(self, user):
+        return self.friends.filter(friendship.c.friend_b_id == user.id).count() > 0
+
     @classmethod
     def exists(cls, email=None, username=None):
         if email:

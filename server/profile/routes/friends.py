@@ -1,14 +1,13 @@
 from http import HTTPStatus
 
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from server import InvalidUsage
 from server.auth import auth
 from server.auth.models import User
 from server.profile import profile
-from server.profile.serializers.user_serializer import UserSerializer
-
-user_serializer = UserSerializer()
+from server.profile.forms import UsernameForm
+from server.profile.serializers.user_serializer import user_serializer, users_serializer
 
 
 @auth.route("/users/<username>", methods=["GET"])
@@ -16,7 +15,7 @@ user_serializer = UserSerializer()
 def public_profile(username):
     user = User.find(username=username)
     if not user:
-        raise InvalidUsage("The user does not exist.", status_code=404)
+        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
 
     # TODO: add a boolean field (is_friend) if username is contain in the current user friend list
 
@@ -26,19 +25,33 @@ def public_profile(username):
 @profile.route("/friends", methods=["GET"])
 @login_required
 def get_all_friends():
-
-    return {}
+    friends = current_user.friends.all()
+    return users_serializer.dumps(friends)
 
 
 @profile.route("/friends", methods=["POST"])
 @login_required
 def add_friend():
+    friend_username = UsernameForm()
+    if not friend_username.validate():
+        raise InvalidUsage(
+            "Error while adding friend.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
+        )
 
-    return {}
+    friend = User.find(username=friend_username.username.data)
+    if not friend:
+        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
+    current_user.add_friend(friend)
+    return {"message": "Friend added."}, HTTPStatus.OK
 
 
 @profile.route("/friends/<username>", methods=["DELETE"])
 @login_required
-def delete_friend():
+def delete_friend(username):
 
-    return {}
+    friend = User.find(username=username)
+    if not friend:
+        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
+    current_user.remove_friend(friend)
+
+    return {"message": "Friend removed."}, HTTPStatus.OK

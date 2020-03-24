@@ -86,7 +86,7 @@ def change_username():
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
-    new_username = username_form.newUsername.data
+    new_username = username_form.username.data
     if User.exists(username=new_username):
         raise InvalidUsage(
             "This username is not available.", status_code=HTTPStatus.CONFLICT
