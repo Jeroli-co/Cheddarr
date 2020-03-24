@@ -61,12 +61,16 @@ def generate_password():
 
 
 def generate_token(data):
-    serializer = Serializer(app.secret_key)
+    serializer = URLSafeSerializer(
+        app.secret_key, salt=app.config.get("SECURITY_PASSWORD_SALT")
+    )
     return serializer.dumps(data)
 
 
 def confirm_token(data):
-    serializer = Serializer(app.secret_key)
+    serializer = URLSafeSerializer(
+        app.secret_key, salt=app.config.get("SECURITY_PASSWORD_SALT")
+    )
     return serializer.loads(data)
 
 

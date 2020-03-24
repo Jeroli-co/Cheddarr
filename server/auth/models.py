@@ -37,8 +37,7 @@ class User(db.Model, UserMixin):
         self.confirmed = confirmed
         self.oauth_only = oauth_only
         self.session_token = utils.generate_token([email, password])
-        self.api_key = os.urandom(24).hex()
-        print(self.api_key)
+        self.api_key = None
 
     def __repr__(self):
         return "%s/%s/%s/%s/%s" % (

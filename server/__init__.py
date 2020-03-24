@@ -140,9 +140,8 @@ def register_login_manager(app):
         # try to login using the api_key url arg
         api_key = request.args.get("api_key")
         if api_key:
-            user = User.query.filter_by(api_key=confirm_token(api_key)).first()
-            if user:
-                print(user)
+            user = User.query.filter_by(api_key=api_key).first()
+            if user and user.confirmed:
                 return user
 
         # try to login using Basic Auth
@@ -152,7 +151,7 @@ def register_login_manager(app):
             and request.authorization.password
         ):
             user = User.find(username=request.authorization.username)
-            if user:
+            if user and user.confirmed:
                 if user.check_password(request.authorization.password):
                     return user
         # return None if both methods did not login the user
