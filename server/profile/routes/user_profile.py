@@ -18,7 +18,7 @@ profile_serializer = ProfileSerializer()
 
 
 @login_required
-@profile.route("/user/<username>")
+@profile.route("/users/<username>")
 def public_profile(username):
     user = User.find(username=username)
     if not user:
