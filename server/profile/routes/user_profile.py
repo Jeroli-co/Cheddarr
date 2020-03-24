@@ -4,7 +4,7 @@ from flask import render_template, session, url_for
 from flask_login import fresh_login_required, current_user, login_required
 
 from server import InvalidUsage, db, utils
-from server.auth import User
+from server.auth.models import User
 from server.auth.forms import PasswordForm, EmailForm
 from server.profile import profile
 from server.profile.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm

@@ -1,8 +1,9 @@
 from http import HTTPStatus
 from flask import url_for, render_template, request
 from server import InvalidUsage, utils
-from server.auth import auth, User
+from server.auth import auth
 from server.auth.forms import EmailForm, PasswordForm
+from server.auth.models import User
 
 
 @auth.route("/reset/password", methods=["POST"])

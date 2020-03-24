@@ -4,7 +4,7 @@ from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.google import make_google_blueprint
 from flask_login import current_user
 from server import db
-from .models import User, OAuth
+from .models import OAuth
 from ..config import FLASK_TEMPLATE_FOLDER
 
 auth = Blueprint("auth", __name__, template_folder=FLASK_TEMPLATE_FOLDER)

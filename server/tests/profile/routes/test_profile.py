@@ -2,7 +2,7 @@ import json
 
 from flask import url_for
 
-from server.auth import User
+from server.auth.models import User
 from server.tests.conftest import (
     user1_password,
     user1_username,
