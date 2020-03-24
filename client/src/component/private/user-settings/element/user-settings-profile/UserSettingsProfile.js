@@ -1,9 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Route} from "react-router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faExclamationCircle, faPlus, faSpinner, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faExclamationCircle, faPlus, faSyncAlt, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../../../routes";
 import {AuthContext} from "../../../../../context/AuthContext";
+import './UserSettingsProfile.scss';
 
 const UserSettingsProfile = (props) => {
 
@@ -109,18 +110,20 @@ const UserSettingsProfile = (props) => {
               }
 
               { typeof apiKey === 'string' && apiKey.length > 0 &&
-                <div className="buttons">
-                  <input type="text" value={apiKey} contentEditable={false} />
-                  <button className="button is-rounded is-facebook-button" type="button" onClick={_onResetApiKey}>
-                    <span className="icon">
-                      <FontAwesomeIcon icon={faSpinner}/>
-                    </span>
-                  </button>
-                  <button className="button is-rounded is-facebook-button" type="button" onClick={_onDeleteApiKey}>
-                    <span className="icon">
-                      <FontAwesomeIcon icon={faTrash}/>
-                    </span>
-                  </button>
+                <div className="api-key-container">
+                  <input className="input is-primary" type="text" value={apiKey} contentEditable={false} />
+                  <div className="buttons">
+                    <button className="button is-rounded is-info" type="button" onClick={_onResetApiKey}>
+                      <span className="icon">
+                        <FontAwesomeIcon icon={faSyncAlt}/>
+                      </span>
+                    </button>
+                    <button className="button is-rounded is-danger" type="button" onClick={_onDeleteApiKey}>
+                      <span className="icon">
+                        <FontAwesomeIcon icon={faTrash}/>
+                      </span>
+                    </button>
+                  </div>
                 </div>
               }
 
