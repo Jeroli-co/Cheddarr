@@ -4,7 +4,6 @@ import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../../../context/AuthContext";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../../formDefaultValidators";
-import {routes} from "../../../../../routes";
 
 const ResetPasswordForm = (props) => {
 
@@ -12,15 +11,7 @@ const ResetPasswordForm = (props) => {
   const { resetPassword } = useContext(AuthContext);
 
   const onSubmit = (data) => {
-    resetPassword(props.token, data).then(res => {
-      switch (res.status) {
-        case 200:
-          props.history.push(routes.SIGN_IN.url);
-          return;
-        default:
-          return;
-      }
-    });
+    resetPassword(props.token, data);
   };
 
   return (

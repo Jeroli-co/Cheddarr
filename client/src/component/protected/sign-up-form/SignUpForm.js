@@ -45,7 +45,7 @@ const SignUpForm = (props) => {
 			<br />
 
 			<div className="columns is-mobile is-centered">
-				<div className="column is-one-third">
+				<div className="column is-one-third-desktop is-half-tablet is-three-quarters-mobile">
 
           <h5 className="subtitle is-5">Create your account</h5>
 
@@ -62,7 +62,8 @@ const SignUpForm = (props) => {
                        ref={register({
                          required: true,
                          minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
-                         maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value
+                         maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
+                         pattern: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value
                        })}
                 />
                 <span className="icon is-small is-left">
@@ -77,6 +78,9 @@ const SignUpForm = (props) => {
               )}
               {errors['username'] && errors['username'].type === 'maxLength' && (
                 <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</p>
+              )}
+              {errors['username'] && errors['username'].type === 'pattern' && (
+                <p className="help is-danger">{FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message}</p>
               )}
             </div>
 
