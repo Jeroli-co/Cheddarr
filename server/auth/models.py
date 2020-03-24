@@ -5,6 +5,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from server import db, utils
 
 
+friendship = db.Table(
+    "friendships",
+    db.Column("friend_a_id", db.Integer, db.ForeignKey("user.id")),
+    db.Column("friend_b_id", db.Integer, db.ForeignKey("user.id")),
+)
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True, nullable=False, index=True)
@@ -17,6 +24,14 @@ class User(db.Model, UserMixin):
         "OAuth", backref="user", single_parent=True, cascade="delete, delete-orphan"
     )
     oauth_only = db.Column(db.Boolean, default=False)
+    friends = db.relationship(
+        "User",
+        secondary=friendship,
+        primaryjoin=id == friendship.c.friend_a_id,
+        secondaryjoin=id == friendship.c.friend_b_id,
+        backref=db.backref("friendships", lazy="dynamic"),
+        lazy="dynamic",
+    )
 
     def __init__(
         self,
