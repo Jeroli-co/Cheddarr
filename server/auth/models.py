@@ -1,3 +1,5 @@
+import os
+
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -10,6 +12,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(128), unique=True, nullable=False, index=True)
     email = db.Column(db.String(128), unique=True, nullable=False, index=True)
     _password = db.Column(db.String(128), nullable=False)
+    api_key = db.Column(db.String)
     user_picture = db.Column(db.String(256))
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
@@ -34,13 +37,14 @@ class User(db.Model, UserMixin):
         self.confirmed = confirmed
         self.oauth_only = oauth_only
         self.session_token = utils.generate_token([email, password])
+        self.api_key = os.urandom(24).hex()
+        print(self.api_key)
 
     def __repr__(self):
-        return "%s/%s/%s/%s/%s/%s" % (
+        return "%s/%s/%s/%s/%s" % (
             self.username,
             self.email,
             self.user_picture,
-            self.session_token,
             self.confirmed,
             self.oauth_only,
         )

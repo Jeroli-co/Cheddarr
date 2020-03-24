@@ -34,7 +34,7 @@ def reset_password():
 @auth.route("/reset/<token>", methods=["GET", "POST"])
 def confirm_reset(token):
     try:
-        data = utils.confirm_token(token)
+        data = utils.confirm_timed_token(token)
     except Exception:
         raise InvalidUsage(
             "The reset link is invalid or has expired.", status_code=HTTPStatus.GONE
