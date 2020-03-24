@@ -481,8 +481,7 @@ const AuthContextProvider = (props) => {
       changeUserPicture,
       getApiKey,
       resetApiKey,
-      deleteApiKey
-      changeUserPicture,
+      deleteApiKey,
       getUserPublic,
       getFriends,
       addFriend,
