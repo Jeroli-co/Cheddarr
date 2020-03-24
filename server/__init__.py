@@ -1,11 +1,12 @@
 from datetime import datetime
 from http import HTTPStatus
 
-from flask import jsonify
+from flask import jsonify, g
 from flask.app import Flask
 from flask.helpers import get_debug_flag
+from flask.sessions import SecureCookieSessionInterface
 from flask_cors import CORS
-from flask_login import LoginManager
+from flask_login import LoginManager, user_loaded_from_header
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -54,7 +55,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
     """
     app = Flask(__name__, **kwargs)
     app.config.from_object(config_object)
-
+    app.session_interface = CustomSessionInterface()
     db.init_app(app)
     ma.init_app(app)
     with app.app_context():
@@ -129,9 +130,50 @@ def register_login_manager(app):
 
     @login_manager.needs_refresh_handler
     def refresh():
-        raise InvalidUsage("Need to authenticate", status_code=HTTPStatus.UNAUTHORIZED)
+        raise InvalidUsage(
+            "Need to refresh session through web browser (API unavailable)",
+            status_code=HTTPStatus.UNAUTHORIZED,
+        )
+
+    @login_manager.request_loader
+    def load_user_from_request(request):
+        from server.utils import confirm_token
+
+        # try to login using the api_key url arg
+        api_key = request.args.get("api_key")
+        if api_key:
+            user = User.query.filter_by(api_key=api_key).first()
+            if user and user.confirmed:
+                return user
+
+        # try to login using Basic Auth
+        if (
+            request.authorization
+            and request.authorization.username
+            and request.authorization.password
+        ):
+            user = User.find(username=request.authorization.username)
+            if user and user.confirmed:
+                if user.check_password(request.authorization.password):
+                    return user
+        # return None if both methods did not login the user
+        return None
 
 
 def register_oauth_providers(oauth):
     oauth.register("google", client_kwargs={"scope": "openid email profile"})
     oauth.register("facebook")
+
+
+@user_loaded_from_header.connect
+def user_loaded_from_header(self, user=None):
+    g.login_via_header = True
+
+
+class CustomSessionInterface(SecureCookieSessionInterface):
+    """Prevent creating session from API requests."""
+
+    def save_session(self, *args, **kwargs):
+        if g.get("login_via_header"):
+            return
+        return super(CustomSessionInterface, self).save_session(*args, **kwargs)

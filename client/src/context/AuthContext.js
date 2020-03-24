@@ -379,6 +379,54 @@ const AuthContextProvider = (props) => {
     }
   };
 
+  const getApiKey = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get("/api/key");
+      return new HttpResponse(res.status, "", res.data);
+    } catch (e) {
+      handleError(e);
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetApiKey = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get("/api/key/reset");
+      return new HttpResponse(res.status, "", res.data);
+    } catch (e) {
+      handleError(e);
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteApiKey = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.delete("/api/key");
+      return new HttpResponse(res.status, res.data.message);
+    } catch (e) {
+      handleError(e);
+      const res = e.hasOwnProperty('response') ? e.response : null;
+      const status = res ? res.status : 500;
+      const message = res ? res.data.message : "";
+      return new HttpResponse(status, message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{...session,
       signIn,
@@ -396,7 +444,10 @@ const AuthContextProvider = (props) => {
       changeUsername,
       changeEmail,
       deleteAccount,
-      changeUserPicture
+      changeUserPicture,
+      getApiKey,
+      resetApiKey,
+      deleteApiKey
     }}>
       { isLoading && <PageLoader/> }
       { props.children }

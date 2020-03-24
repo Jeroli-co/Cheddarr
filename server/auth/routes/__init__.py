@@ -1,6 +1,1 @@
-from . import (
-    signup,
-    signin,
-    signout,
-    reset_password,
-)  # noqa
+from . import signup, signin, signout, reset_password, api  # noqa

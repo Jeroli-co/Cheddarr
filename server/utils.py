@@ -4,7 +4,7 @@ import string
 from random import choice
 
 from cloudinary.uploader import upload
-from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
+from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer, Signer, Serializer
 from flask import current_app as app
 from sendgrid import Mail, From, To, Content
 
@@ -44,6 +44,20 @@ def upload_picture(file):
         raise Exception
 
 
+def sign(value):
+    s = Signer(app.secret_key, salt=app.config.get("SECURITY_PASSWORD_SALT"))
+    return s.sign(value)
+
+
+def unsign(value):
+    s = Signer(app.secret_key, salt=app.config.get("SECURITY_PASSWORD_SALT"))
+    return s.unsign(value)
+
+
+def generate_api_key():
+    return secrets.token_hex(24)
+
+
 def generate_password():
     alphabet = string.ascii_letters + string.digits
     password = "".join(secrets.choice(alphabet) for i in range(64))
@@ -51,21 +65,32 @@ def generate_password():
 
 
 def generate_token(data):
-    serializer = URLSafeSerializer(app.secret_key)
-    return serializer.dumps(data, salt=app.config.get("SECURITY_PASSWORD_SALT"))
+    serializer = URLSafeSerializer(
+        app.secret_key, salt=app.config.get("SECURITY_PASSWORD_SALT")
+    )
+    return serializer.dumps(data)
+
+
+def confirm_token(data):
+    serializer = URLSafeSerializer(
+        app.secret_key, salt=app.config.get("SECURITY_PASSWORD_SALT")
+    )
+    return serializer.loads(data)
 
 
 def generate_timed_token(data):
-    serializer = URLSafeTimedSerializer(app.secret_key)
-    return serializer.dumps(data, salt=app.config.get("SECURITY_PASSWORD_SALT"))
+    serializer = URLSafeTimedSerializer(
+        app.secret_key, salt=app.config.get("SECURITY_PASSWORD_SALT")
+    )
+    return serializer.dumps(data)
 
 
-def confirm_token(token, expiration=600):
-    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+def confirm_timed_token(token, expiration=600):
+    serializer = URLSafeTimedSerializer(
+        app.secret_key, salt=app.config["SECURITY_PASSWORD_SALT"]
+    )
     try:
-        data = serializer.loads(
-            token, salt=app.config["SECURITY_PASSWORD_SALT"], max_age=expiration
-        )
+        data = serializer.loads(token, max_age=expiration)
     except Exception:
         raise Exception
     return data
