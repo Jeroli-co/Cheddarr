@@ -37,7 +37,7 @@ def delete_user():
     return {"message": "User deleted."}, HTTPStatus.OK
 
 
-@profile.route("/profile/picture/", methods=["PUT"])
+@profile.route("/picture/", methods=["PUT"])
 @login_required
 def change_picture():
     picture_form = PictureForm()
