@@ -3,21 +3,18 @@ from http import HTTPStatus
 from flask_login import login_required, current_user
 
 from server import InvalidUsage
-from server.auth import auth
 from server.auth.models import User
 from server.profile import profile
 from server.profile.forms import UsernameForm
 from server.profile.serializers.user_serializer import user_serializer, users_serializer
 
 
-@auth.route("/users/<username>/", methods=["GET"])
+@profile.route("/friends/<username>/", methods=["GET"])
 @login_required
-def public_profile(username):
+def get_friend(username):
     user = User.find(username=username)
-    if not user:
+    if not user or not current_user.is_friend(user):
         raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
-
-    # TODO: add a boolean field (is_friend) if username is contain in the current user friend list
 
     return user_serializer.dump(user), HTTPStatus.OK
 
