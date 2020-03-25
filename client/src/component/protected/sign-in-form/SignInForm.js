@@ -1,6 +1,5 @@
 import React, {useContext, useState} from 'react';
 import {faKey, faUser} from "@fortawesome/free-solid-svg-icons";
-import {faGoogle, faFacebook} from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import {Link, Route, useLocation} from "react-router-dom";
@@ -14,7 +13,7 @@ function useQuery() {
 
 const SignInForm = (props) => {
 
-	const { signIn, signInWithGoogle, signInWithFacebook } = useContext(AuthContext);
+	const { signIn } = useContext(AuthContext);
 	const { register, handleSubmit, errors } = useForm();
 
 	const [rememberMe, setRememberMe] = useState(false);
@@ -65,7 +64,7 @@ const SignInForm = (props) => {
 							<label className="label">Username or email</label>
 							<div className="control has-icons-left">
 								<input name="usernameOrEmail"
-									className={'input ' + (errors['usernameOrEmail'] ? "is-danger" : "")}
+									className={'input is-medium ' + (errors['usernameOrEmail'] ? "is-danger" : "")}
 									type="text"
 									placeholder="Enter your username or email"
 									ref={register({
@@ -93,7 +92,7 @@ const SignInForm = (props) => {
 							<label className="label">Password</label>
 							<div className="control has-icons-left">
 								<input name="password"
-									className={'input ' + (errors['password'] ? "is-danger" : "")}
+									className={'input is-medium ' + (errors['password'] ? "is-danger" : "")}
 									type="password"
 									placeholder="Enter your password"
 									ref={register({
@@ -131,31 +130,12 @@ const SignInForm = (props) => {
 							</div>
 						</div>
 
+						<div className="field has-text-centered">
+							<p className="is-size-7">Forgot your password ? <Link to={routes.INIT_RESET_PASSWORD.url}>Click here to reset it</Link></p>
+							<p className="is-size-7">Still not have an account ? <Link to={routes.SIGN_UP.url}>Sign up</Link></p>
+						</div>
+
 					</form>
-
-					<div className="is-divider" data-content="OR"/>
-
-					<h1 className="subtitle is-5">Sign in with</h1>
-
-					<div className="buttons">
-						<button className="button is-rounded" type="button" onClick={signInWithGoogle}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faGoogle}/>
-							</span>
-							<span>Google</span>
-						</button>
-						<button className="button is-rounded is-facebook-button" type="button" onClick={signInWithFacebook}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faFacebook}/>
-							</span>
-							<span>Facebook</span>
-						</button>
-					</div>
-
-					<div className="has-text-centered">
-						<p className="is-size-7">Forgot your password ? <Link to={routes.INIT_RESET_PASSWORD.url}>Click here to reset it</Link></p>
-						<p className="is-size-7">Still not have an account ? <Link to={routes.SIGN_UP.url}>Sign up</Link></p>
-					</div>
 
 				</div>
 			</div>

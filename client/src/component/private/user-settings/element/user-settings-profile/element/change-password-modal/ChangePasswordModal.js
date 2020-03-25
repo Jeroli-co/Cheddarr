@@ -9,7 +9,7 @@ import {routes} from "../../../../../../../routes";
 const ChangePasswordModal = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { changePassword, isOauthOnly } = useContext(AuthContext);
+  const { changePassword } = useContext(AuthContext);
   const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
@@ -49,10 +49,9 @@ const ChangePasswordModal = (props) => {
                 <input name="oldPassword"
                        className={'input ' + (errors['oldPassword'] ? "is-danger" : "")}
                        type="password"
-                       placeholder={isOauthOnly ? "••••••••" : "Enter your old password"}
-                       disabled={isOauthOnly}
+                       placeholder={"Enter your old password"}
                        ref={register({
-                         required: !isOauthOnly,
+                         required: true,
                          pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value
                        })}
                 />

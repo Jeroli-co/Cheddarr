@@ -12,7 +12,6 @@ const initialSessionState = {
   username: null,
   userPicture: null,
   isAuthenticated: false,
-  isOauthOnly: false
 };
 
 const AuthContextProvider = (props) => {
@@ -24,9 +23,8 @@ const AuthContextProvider = (props) => {
     const authenticated = Cookies.get('authenticated');
     const username = Cookies.get('username');
     const userPicture = Cookies.get('userPicture');
-    const oauthOnly = Cookies.get('oauthOnly');
     if (authenticated === 'yes') {
-      setSession({isAuthenticated: true, username: username, userPicture: userPicture, isOauthOnly: oauthOnly === 'yes'})
+      setSession({isAuthenticated: true, username: username, userPicture: userPicture})
     }
   }, []);
 
@@ -34,7 +32,6 @@ const AuthContextProvider = (props) => {
     Cookies.remove('authenticated');
     Cookies.remove('username');
     Cookies.remove('userPicture');
-    Cookies.remove('oauthOnly');
     setSession(initialSessionState);
   };
 
@@ -81,12 +78,11 @@ const AuthContextProvider = (props) => {
 
   const signIn = async (data) => {
 
-    const initSession = (username, userPicture, oauthOnly) => {
+    const initSession = (username, userPicture) => {
       Cookies.set('authenticated', 'yes', { expires: 365 });
       Cookies.set('username', username, { expires: 365 });
       Cookies.set('userPicture', userPicture, { expires: 365 });
-      Cookies.set('oauthOnly', oauthOnly ? 'yes' : 'no', { expires: 365 });
-      setSession({username: username, userPicture: userPicture, isAuthenticated: true, isOauthOnly: oauthOnly});
+      setSession({username: username, userPicture: userPicture, isAuthenticated: true});
     };
 
     const get = async () => {
@@ -108,7 +104,7 @@ const AuthContextProvider = (props) => {
     setIsLoading(true);
     try {
       const res = data ? await post(data) : await get();
-      initSession(res.data.username, res.data['user_picture'], res.data['oauth_only']);
+      initSession(res.data.username, res.data['user_picture']);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400, 401]);
@@ -234,30 +230,6 @@ const AuthContextProvider = (props) => {
       const status = res ? res.status : 500;
       const message = res ? res.data.message : "";
       return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signInWithGoogle = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get("/api/sign-in/google");
-      window.location = res.headers.location;
-    } catch (e) {
-      handleError(e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signInWithFacebook = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get("/api/sign-in/facebook");
-      window.location = res.headers.location;
-    } catch (e) {
-      handleError(e);
     } finally {
       setIsLoading(false);
     }
@@ -436,8 +408,6 @@ const AuthContextProvider = (props) => {
       initResetPassword,
       resendConfirmation,
       checkResetPasswordToken,
-      signInWithGoogle,
-      signInWithFacebook,
       resetPassword,
       getUserProfile,
       changePassword,

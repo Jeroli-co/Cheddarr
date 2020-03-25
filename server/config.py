@@ -50,14 +50,6 @@ class BaseConfig(object):
         ),
     )
 
-    ##########################################################################
-    # oauth                                                                  #
-    ##########################################################################
-    GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
-    GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-    FACEBOOK_OAUTH_CLIENT_ID = os.environ.get("FACEBOOK_CLIENT_ID")
-    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get("FACEBOOK_CLIENT_SECRET")
-
 
 class ProdConfig(BaseConfig):
     ##########################################################################
@@ -93,11 +85,6 @@ class DevConfig(BaseConfig):
     # database                                                               #
     ##########################################################################
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(PROJECT_ROOT, "dev.db")
-
-    ##########################################################################
-    # oauth                                                                  #
-    ##########################################################################
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
 class TestConfig(BaseConfig):

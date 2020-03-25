@@ -5,7 +5,6 @@ import {ConfirmEmail} from "./component/public/confirm-email/ConfirmEmail";
 import {WaitingEmailConfirmation} from "./component/protected/waiting-email-confirmation/WaitingEmailConfirmation";
 import {ResetPassword} from "./component/protected/reset-password/ResetPassword";
 import {UserProfile} from "./component/private/user-profile/UserProfile";
-import {Authorize} from "./component/protected/authorize/Authorize";
 import {NotFound} from "./component/public/errors/not-found/NotFound";
 import {UserSettings} from "./component/private/user-settings/UserSettings";
 import {InternalServerError} from "./component/public/errors/internal-server-error/InternalServerError";
@@ -27,7 +26,6 @@ const routes = {
   CONFIRM_EMAIL: { url: (token) => '/confirm/' + token, component: ConfirmEmail },
   WAIT_EMAIL_CONFIRMATION: { url: '/wait-email-confirmation', component: WaitingEmailConfirmation },
   RESET_PASSWORD: { url: (token) => '/reset/' + token, component: ResetPassword },
-  AUTHORIZE: { url: '/authorize', component: Authorize },
   RESEND_EMAIL_CONFIRMATION: { url: '/resend-email-confirmation', component: ResendEmailConfirmationModal },
   INTERNAL_SERVER_ERROR: { url: '/500', component: InternalServerError },
   BAD_REQUEST: { url: '/400', component: BadRequest },
