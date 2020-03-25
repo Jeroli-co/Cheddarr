@@ -27,7 +27,6 @@ const UserPublicProfile = () => {
     addFriend(user.username).then(res => {
       switch (res.status) {
         case 200:
-          setUser(res.data);
           return;
         default:
           return;

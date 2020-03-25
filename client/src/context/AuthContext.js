@@ -90,7 +90,7 @@ const AuthContextProvider = (props) => {
     };
 
     const get = async () => {
-      return await axios.get('/api/sign-in')
+      return await axios.get('/api/sign-in/')
     };
 
     const post = async (data) => {
@@ -102,7 +102,7 @@ const AuthContextProvider = (props) => {
       if (typeof remember !== 'undefined' && remember !== null) {
         fd.append('remember', remember);
       }
-      return await axios.post('/api/sign-in', fd);
+      return await axios.post('/api/sign-in/', fd);
     };
 
     setIsLoading(true);
@@ -124,7 +124,7 @@ const AuthContextProvider = (props) => {
   const signOut = async () => {
     setIsLoading(true);
     try {
-      await axios.get('/api/sign-out');
+      await axios.get('/api/sign-out/');
     } finally {
       clearSession();
       props.history.push(routes.SIGN_IN.url);
@@ -139,7 +139,7 @@ const AuthContextProvider = (props) => {
     fd.append('email', data['email']);
     fd.append('password', data['password']);
     try {
-      const res = await axios.post('/api/sign-up', fd);
+      const res = await axios.post('/api/sign-up/', fd);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [409]);
@@ -155,7 +155,7 @@ const AuthContextProvider = (props) => {
   const confirmEmail = async (token) => {
     setIsLoading(true);
     try {
-      const res = await axios.get('/api/confirm/' + token);
+      const res = await axios.get('/api/confirm/' + token + '/');
       clearSession();
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
@@ -174,7 +174,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('email', email);
     try {
-      const res = await axios.post('/api/confirm/resend', fd);
+      const res = await axios.post('/api/confirm/resend/', fd);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400]);
@@ -192,7 +192,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('email', data['email']);
     try {
-      const res = await axios.post('/api/reset/password', fd);
+      const res = await axios.post('/api/reset/password/', fd);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400]);
@@ -208,7 +208,7 @@ const AuthContextProvider = (props) => {
   const checkResetPasswordToken = async (token) => {
     setIsLoading(true);
     try {
-      const res = await axios.get('/api/reset/' + token);
+      const res = await axios.get('/api/reset/' + token + "/");
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [410, 403]);
@@ -226,7 +226,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('password', data['password']);
     try {
-      await axios.post('/api/reset/' + token, fd);
+      await axios.post('/api/reset/' + token + "/", fd);
       props.history.push(routes.SIGN_IN.url);
     } catch (e) {
       handleError(e);
@@ -238,7 +238,7 @@ const AuthContextProvider = (props) => {
   const signInWithGoogle = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/sign-in/google");
+      const res = await axios.get("/api/sign-in/google/");
       window.location = res.headers.location;
     } catch (e) {
       handleError(e);
@@ -250,7 +250,7 @@ const AuthContextProvider = (props) => {
   const signInWithFacebook = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/sign-in/facebook");
+      const res = await axios.get("/api/sign-in/facebook/");
       window.location = res.headers.location;
     } catch (e) {
       handleError(e);
@@ -262,7 +262,7 @@ const AuthContextProvider = (props) => {
   const getUserProfile = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/profile");
+      const res = await axios.get("/api/profile/");
       return new HttpResponse(res.status, res.data.message, res.data);
     } catch (e) {
       handleError(e);
@@ -281,7 +281,7 @@ const AuthContextProvider = (props) => {
     fd.append('oldPassword', data['oldPassword']);
     fd.append('newPassword', data['newPassword']);
     try {
-      const res = await axios.put("/api/profile/password", fd);
+      const res = await axios.put("/api/profile/password/", fd);
       clearSession();
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
@@ -301,7 +301,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('username', data['newUsername']);
     try {
-      const res = await axios.put("/api/profile/username", fd);
+      const res = await axios.put("/api/profile/username/", fd);
       const username = res.data.username;
       Cookies.set('username', username);
       setSession({...session, username: username});
@@ -322,7 +322,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('email', data['email']);
     try {
-      const res = await axios.put("/api/profile/email", fd);
+      const res = await axios.put("/api/profile/email/", fd);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [409]);
@@ -340,7 +340,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('picture', data);
     try {
-      const res = await axios.put('/api/profile/picture', fd, {headers: { 'content-type': 'multipart/form-data' }});
+      const res = await axios.put('/api/profile/picture/', fd, {headers: { 'content-type': 'multipart/form-data' }});
       const picture = res.data["user_picture"];
       Cookies.set('userPicture', picture);
       setSession({...session, userPicture: picture});
@@ -361,7 +361,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('password', data['password']);
     try {
-      const res = await axios.delete("/api/profile", { data: fd });
+      const res = await axios.delete("/api/profile/", { data: fd });
       clearSession();
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
@@ -378,7 +378,7 @@ const AuthContextProvider = (props) => {
   const getUserPublic = async (username) => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/users/" + username);
+      const res = await axios.get("/api/profile/friends/" + username + "/");
       return new HttpResponse(res.status, res.data.message, res.data);
     } catch (e) {
       handleError(e, []);
@@ -394,8 +394,8 @@ const AuthContextProvider = (props) => {
   const getFriends = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/profile/friends");
-      return new HttpResponse(res.status, res.data.message);
+      const res = await axios.get("/api/profile/friends/");
+      return new HttpResponse(res.status, res.data.message, res.data);
     } catch (e) {
       handleError(e, []);
       const res = e.hasOwnProperty('response') ? e.response : null;
@@ -412,8 +412,8 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('username', username);
     try {
-      const res = await axios.post("/api/profile/friends", fd);
-      return new HttpResponse(res.status, res.data.message);
+      const res = await axios.post("/api/profile/friends/", fd);
+      return new HttpResponse(res.status, res.data.message, res.data);
     } catch (e) {
       handleError(e, []);
       const res = e.hasOwnProperty('response') ? e.response : null;
@@ -427,10 +427,8 @@ const AuthContextProvider = (props) => {
 
   const deleteFriend = async (username) => {
     setIsLoading(true);
-    const fd = new FormData();
-    fd.append('username', username);
     try {
-      const res = await axios.delete("/api/profile/friends", { data: fd });
+      const res = await axios.delete("/api/profile/friends/" + username + "/");
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, []);
