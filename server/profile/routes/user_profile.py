@@ -37,7 +37,7 @@ def delete_user():
     return {"message": "User deleted."}, HTTPStatus.OK
 
 
-@profile.route("/profile/picture", methods=["PUT"])
+@profile.route("/profile/picture/", methods=["PUT"])
 @login_required
 def change_picture():
     picture_form = PictureForm()
@@ -52,7 +52,7 @@ def change_picture():
     return {"user_picture": current_user.user_picture}, HTTPStatus.OK
 
 
-@profile.route("/password", methods=["PUT"])
+@profile.route("/password/", methods=["PUT"])
 @fresh_login_required
 def change_password():
     password_form = ChangePasswordForm()
@@ -77,7 +77,7 @@ def change_password():
     return {"message": "User password changed."}, HTTPStatus.OK
 
 
-@profile.route("/username", methods=["PUT"])
+@profile.route("/username/", methods=["PUT"])
 @fresh_login_required
 def change_username():
     username_form = UsernameForm()
@@ -98,7 +98,7 @@ def change_username():
     return {"username": current_user.username}, HTTPStatus.OK
 
 
-@profile.route("/email", methods=["PUT"])
+@profile.route("/email/", methods=["PUT"])
 @fresh_login_required
 def change_email():
     email_form = EmailForm()

@@ -8,7 +8,7 @@ from server.auth.models import User
 from server.auth.forms import SignupForm, EmailForm
 
 
-@auth.route("/sign-up", methods=["POST"])
+@auth.route("/sign-up/", methods=["POST"])
 def signup():
     signup_form = SignupForm()
     if not signup_form.validate():
@@ -51,7 +51,7 @@ def signup():
     return {"message": "Confirmation email sent."}, HTTPStatus.CREATED
 
 
-@auth.route("/confirm/<token>", methods=["GET"])
+@auth.route("/confirm/<token>/", methods=["GET"])
 def confirm_email(token):
     try:
         email = utils.confirm_token(token)
@@ -77,7 +77,7 @@ def confirm_email(token):
     return {"message": "The email is now confirmed."}, HTTPStatus.OK
 
 
-@auth.route("/confirm/resend", methods=["POST"])
+@auth.route("/confirm/resend/", methods=["POST"])
 def resend_confirmation():
     email_form = EmailForm()
     if not email_form.validate():

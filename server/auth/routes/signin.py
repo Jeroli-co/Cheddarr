@@ -13,7 +13,7 @@ from server.utils import generate_password
 session_serializer = SessionSerializer()
 
 
-@auth.route("/sign-in", methods=["GET", "POST"])
+@auth.route("/sign-in/", methods=["GET", "POST"])
 def signin():
     if request.method == "GET":
         if current_user.is_authenticated:
@@ -50,12 +50,12 @@ def signin():
         return session_serializer.dump(user), HTTPStatus.OK
 
 
-@auth.route("/sign-in/google", methods=["GET"])
+@auth.route("/sign-in/google/", methods=["GET"])
 def signin_google():
     return redirect(url_for("google.login")), HTTPStatus.OK
 
 
-@auth.route("/sign-in/facebook", methods=["GET"])
+@auth.route("/sign-in/facebook/", methods=["GET"])
 def signin_facebook():
     return redirect(url_for("facebook.login")), HTTPStatus.OK
 

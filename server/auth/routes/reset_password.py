@@ -6,7 +6,7 @@ from server.auth.forms import EmailForm, PasswordForm
 from server.auth.models import User
 
 
-@auth.route("/reset/password", methods=["POST"])
+@auth.route("/reset/password/", methods=["POST"])
 def reset_password():
     email_form = EmailForm()
     if not email_form.validate():
@@ -32,7 +32,7 @@ def reset_password():
     return {"message": "Reset instructions sent."}, HTTPStatus.OK
 
 
-@auth.route("/reset/<token>", methods=["GET", "POST"])
+@auth.route("/reset/<token>/", methods=["GET", "POST"])
 def confirm_reset(token):
     try:
         data = utils.confirm_token(token)
