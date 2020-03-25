@@ -21,7 +21,6 @@ const App = () => {
         <Route exact path={routes.CONFIRM_EMAIL.url(':token')} component={routes.CONFIRM_EMAIL.component} />
         <ProtectedRoute exaxt path={routes.WAIT_EMAIL_CONFIRMATION.url} component={routes.WAIT_EMAIL_CONFIRMATION.component} />
         <ProtectedRoute exact path={routes.RESET_PASSWORD.url(':token')} component={routes.RESET_PASSWORD.component} />
-        <ProtectedRoute path={routes.AUTHORIZE.url} component={routes.AUTHORIZE.component} />
         <ProtectedRoute exact path={routes.RESEND_EMAIL_CONFIRMATION.url} component={routes.RESEND_EMAIL_CONFIRMATION.component} />
         <Route exact path={routes.INTERNAL_SERVER_ERROR.url} component={routes.INTERNAL_SERVER_ERROR.component} />
         <Route exact path={routes.BAD_REQUEST.url} component={routes.BAD_REQUEST.component} />

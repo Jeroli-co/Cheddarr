@@ -1,6 +1,3 @@
-import os
-
-from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -16,10 +13,6 @@ class User(db.Model, UserMixin):
     user_picture = db.Column(db.String(256))
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
-    oauth = db.relationship(
-        "OAuth", backref="user", single_parent=True, cascade="delete, delete-orphan"
-    )
-    oauth_only = db.Column(db.Boolean, default=False)
 
     def __init__(
         self,
@@ -28,24 +21,21 @@ class User(db.Model, UserMixin):
         password,
         user_picture=None,
         confirmed=False,
-        oauth_only=False,
     ):
         self.username = username
         self.email = email
         self.password = password
         self.user_picture = user_picture
         self.confirmed = confirmed
-        self.oauth_only = oauth_only
         self.session_token = utils.generate_token([email, password])
         self.api_key = None
 
     def __repr__(self):
-        return "%s/%s/%s/%s/%s" % (
+        return "%s/%s/%s/%s" % (
             self.username,
             self.email,
             self.user_picture,
-            self.confirmed,
-            self.oauth_only,
+            self.confirmed
         )
 
     def get_id(self):
@@ -67,7 +57,6 @@ class User(db.Model, UserMixin):
     def change_password(self, new_password):
         self.password = new_password
         self.session_token = utils.generate_token([self.email, self.password])
-        self.oauth_only = False
         db.session.commit()
 
     def change_email(self, new_email):
@@ -93,8 +82,3 @@ class User(db.Model, UserMixin):
             return User.query.filter_by(email=email).first()
         if username:
             return User.query.filter_by(username=username).first()
-
-
-class OAuth(OAuthConsumerMixin, db.Model):
-    provider_user_id = db.Column(db.String(256), unique=True, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)

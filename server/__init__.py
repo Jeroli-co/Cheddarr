@@ -98,15 +98,13 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
 
 def register_blueprints(app):
-    from server.auth import auth, facebook_bp, google_bp
+    from server.auth import auth
     from server.site import site
     from server.profile import profile
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix="/api")
     app.register_blueprint(profile, url_prefix="/api")
-    app.register_blueprint(facebook_bp)
-    app.register_blueprint(google_bp)
 
 
 def register_commands(app):
@@ -158,11 +156,6 @@ def register_login_manager(app):
                     return user
         # return None if both methods did not login the user
         return None
-
-
-def register_oauth_providers(oauth):
-    oauth.register("google", client_kwargs={"scope": "openid email profile"})
-    oauth.register("facebook")
 
 
 @user_loaded_from_header.connect

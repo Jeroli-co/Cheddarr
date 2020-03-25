@@ -58,11 +58,6 @@ test('App router load components (no authentication needed) correctly', async ()
   const resetPassword = await waitForElement(() => wrapper.getByTestId('ResetPassword'));
   expect(resetPassword).toBeInTheDocument();
 
-  // Render authorize
-  history.push(routes.AUTHORIZE.url);
-  const authorize = await waitForElement(() => wrapper.getByTestId('Authorize'));
-  expect(authorize).toBeInTheDocument();
-
   // Render Resend email confirmation
   history.push(routes.RESEND_EMAIL_CONFIRMATION.url);
   const resendEmailConfirmation = wrapper.getByTestId('ResendEmailConfirmationModal');

@@ -9,7 +9,7 @@ import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../formDefaultValidators
 const DeleteAccountModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { deleteAccount, isOauthOnly } = useContext(AuthContext);
+  const { deleteAccount } = useContext(AuthContext);
   const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
@@ -50,7 +50,7 @@ const DeleteAccountModal = (props) => {
                        type="password"
                        placeholder="Enter your password"
                        ref={register({
-                         required: !isOauthOnly,
+                         required: true,
                          pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value })}
                 />
                 <span className="icon is-small is-left">

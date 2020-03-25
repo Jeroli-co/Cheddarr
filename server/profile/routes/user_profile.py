@@ -4,7 +4,7 @@ from flask import render_template, session, url_for
 from flask_login import fresh_login_required, current_user, login_required
 
 from server import InvalidUsage, db, utils
-from server.auth import User
+from server.auth.models import User
 from server.auth.forms import PasswordForm, EmailForm
 from server.profile import profile
 from server.profile.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
@@ -58,9 +58,7 @@ def change_password():
             payload=password_form.errors,
         )
 
-    if not current_user.oauth_only and not current_user.check_password(
-        password_form.oldPassword.data
-    ):
+    if not current_user.check_password(password_form.oldPassword.data):
         raise InvalidUsage(
             "The passwords don't match.", status_code=HTTPStatus.BAD_REQUEST,
         )
@@ -128,9 +126,7 @@ def delete_user():
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
-    if not current_user.oauth_only and not current_user.check_password(
-        password_form.password.data
-    ):
+    if not current_user.check_password(password_form.password.data):
         raise InvalidUsage("Wrong password.", HTTPStatus.BAD_REQUEST)
 
     current_user.delete()

@@ -6,12 +6,11 @@ import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../../context/AuthContext";
 import {routes} from "../../../routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../../formDefaultValidators";
-import {faFacebook, faGoogle} from "@fortawesome/free-brands-svg-icons";
 
 const SignUpForm = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { signUp, signInWithGoogle, signInWithFacebook } = useContext(AuthContext);
+  const { signUp } = useContext(AuthContext);
   const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
@@ -56,7 +55,7 @@ const SignUpForm = (props) => {
               <label className="label">Username</label>
               <div className="control has-icons-left">
                 <input name="username"
-                       className={'input ' + (errors['username'] ? "is-danger" : "")}
+                       className={'input is-medium ' + (errors['username'] ? "is-danger" : "")}
                        type="text"
                        placeholder="Enter a username"
                        ref={register({
@@ -86,7 +85,7 @@ const SignUpForm = (props) => {
               <label className="label">Email</label>
               <div className="control has-icons-left">
                 <input name="email"
-                       className={'input ' + (errors['email'] ? "is-danger" : "")}
+                       className={'input is-medium ' + (errors['email'] ? "is-danger" : "")}
                        type="email"
                        placeholder="Enter a valid email"
                        ref={register({
@@ -115,7 +114,7 @@ const SignUpForm = (props) => {
               <label className="label">Password</label>
               <div className="control has-icons-left">
                 <input name="password"
-                       className={'input ' + (errors['password'] ? "is-danger" : "")}
+                       className={'input is-medium ' + (errors['password'] ? "is-danger" : "")}
                        type="password"
                        placeholder="Enter a strong password"
                        ref={register({ required: true, pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value })} />
@@ -136,7 +135,7 @@ const SignUpForm = (props) => {
               <label className="label">Confirm password</label>
               <div className="control has-icons-left">
                 <input name="password-confirmation"
-                       className={'input ' + (errors['password-confirmation'] ? "is-danger" : "")}
+                       className={'input is-medium ' + (errors['password-confirmation'] ? "is-danger" : "")}
                        type="password"
                        placeholder="Confirm your password"
                        ref={register({
@@ -176,26 +175,6 @@ const SignUpForm = (props) => {
             </div>
 
           </form>
-
-          <div className="is-divider" data-content="OR"/>
-
-          <h5 className="subtitle is-5">Sign up with</h5>
-
-					<div className="buttons">
-						<button className="button is-rounded" type="button" onClick={signInWithGoogle}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faGoogle}/>
-							</span>
-							<span>Google</span>
-						</button>
-						<button className="button is-rounded is-facebook-button" type="button" onClick={signInWithFacebook}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faFacebook}/>
-							</span>
-							<span>Facebook</span>
-						</button>
-					</div>
-
 
 				</div>
 			</div>
