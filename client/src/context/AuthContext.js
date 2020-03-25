@@ -415,7 +415,7 @@ const AuthContextProvider = (props) => {
       const res = await axios.post("/api/profile/friends/", fd);
       return new HttpResponse(res.status, res.data.message, res.data);
     } catch (e) {
-      handleError(e, []);
+      handleError(e, [409, 404]);
       const res = e.hasOwnProperty('response') ? e.response : null;
       const status = res ? res.status : 500;
       const message = res ? res.data.message : "";
