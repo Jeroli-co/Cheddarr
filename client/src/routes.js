@@ -17,7 +17,7 @@ import {ChangePasswordModal} from "./component/private/user-settings/element/use
 import {ChangeUsernameModal} from "./component/private/user-settings/element/user-settings-profile/element/change-username-modal/ChangeUsernameModal";
 import {ChangeEmailModal} from "./component/private/user-settings/element/user-settings-profile/element/change-email-modal/ChangeEmailModal";
 import {DeleteAccountModal} from "./component/private/user-settings/element/user-settings-profile/element/delete-account-modal/DeleteAccountModal";
-import {UserPublicProfile} from "./component/private/user-public-profile/UserPublicProfile";
+import {UserFriendProfile} from "./component/private/user-friend-profile/UserFriendProfile";
 import {UserFriendsList} from "./component/private/user-profile/element/user-friends-list/UserFriendsList";
 
 const routes = {
@@ -34,7 +34,7 @@ const routes = {
   NOT_FOUND: { url: '/404', component: NotFound },
   USER_PROFILE: { url: '/profile', component: UserProfile },
   USER_FRIENDS_LIST: { url: '/profile/friends', component: UserFriendsList },
-  USER_PUBLIC_PROFILE: { url: (username) => '/users/' + username, component: UserPublicProfile },
+  USER_FRIEND_PROFILE: { url: (username) => '/users/' + username, component: UserFriendProfile },
   USER_SETTINGS: { url: '/settings', component: UserSettings },
   USER_SETTINGS_PROFILE: { url: '/settings/profile', component: UserSettingsProfile },
   CHANGE_PASSWORD: { url: '/settings/profile/change-password', component: ChangePasswordModal },

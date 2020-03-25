@@ -18,7 +18,7 @@ const UserFriendsList = () => {
     getFriends().then(res => {
       switch (res.status) {
         case 200:
-          setFriends(res.data || []);
+          setFriends(res.data);
           return;
         default:
           return;
@@ -73,7 +73,7 @@ const UserFriendsList = () => {
                 </figure>
               </div>
               <div className="level-item">
-                <Link className="is-size-5" to={routes.USER_PUBLIC_PROFILE.url(friend.username)}><i>{'@' + friend.username}</i></Link>
+                <Link className="is-size-5" to={routes.USER_FRIEND_PROFILE.url(friend.username)}><i>{'@' + friend.username}</i></Link>
               </div>
             </div>
             <div className="level-right">

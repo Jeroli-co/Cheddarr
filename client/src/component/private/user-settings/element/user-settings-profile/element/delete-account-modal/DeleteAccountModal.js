@@ -13,8 +13,6 @@ const DeleteAccountModal = (props) => {
   const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
-    if (isOauthOnly && data["password"] === "")
-      data["password"] = "password";
     deleteAccount(data).then(res => {
       switch (res.status) {
         case 200:
@@ -50,8 +48,7 @@ const DeleteAccountModal = (props) => {
                 <input name="password"
                        className="input"
                        type="password"
-                       placeholder={isOauthOnly ? "••••••••" : "Enter your old password"}
-                       disabled={isOauthOnly}
+                       placeholder={"Enter your old password"}
                        ref={register({
                          required: true,
                          pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value })}

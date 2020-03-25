@@ -22,9 +22,7 @@ def get_friend(username):
 @profile.route("/friends/", methods=["GET"])
 @login_required
 def get_all_friends():
-    friends = current_user.friends.all()
-    print(friends)
-    return users_serializer.dumps(friends)
+    return "[]"
 
 
 @profile.route("/friends/", methods=["POST"])

@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {useParams} from "react-router";
 import {AuthContext} from "../../../context/AuthContext";
 
-const UserPublicProfile = () => {
+const UserFriendProfile = () => {
 
   const { id } = useParams();
   const { getUserPublic } = useContext(AuthContext);
@@ -38,5 +38,5 @@ const UserPublicProfile = () => {
 };
 
 export {
-  UserPublicProfile
+  UserFriendProfile
 }

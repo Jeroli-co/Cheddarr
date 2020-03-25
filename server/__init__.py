@@ -104,7 +104,7 @@ def register_blueprints(app):
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix="/api")
-    app.register_blueprint(profile, url_prefix="/api")
+    app.register_blueprint(profile, url_prefix="/api/profile")
 
 
 def register_commands(app):

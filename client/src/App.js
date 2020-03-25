@@ -29,7 +29,7 @@ const App = () => {
         <PrivateRoute path={routes.USER_PROFILE.url} component={routes.USER_PROFILE.component} />
         <PrivateRoute path={routes.USER_SETTINGS.url} component={routes.USER_SETTINGS.component} />
 
-        <Route exact path={routes.USER_PUBLIC_PROFILE.url(':id')} component={routes.USER_PUBLIC_PROFILE.component} />
+        <Route exact path={routes.USER_FRIEND_PROFILE.url(':id')} component={routes.USER_FRIEND_PROFILE.component} />
 
         <Route path="*" component={routes.NOT_FOUND.component} />
       </Switch>
