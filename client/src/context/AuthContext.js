@@ -410,7 +410,7 @@ const AuthContextProvider = (props) => {
   const addFriend = async (username) => {
     setIsLoading(true);
     const fd = new FormData();
-    fd.append('username', username);
+    fd.append('usernameOrEmail', username);
     try {
       const res = await axios.post("/api/profile/friends/", fd);
       return new HttpResponse(res.status, res.data.message, res.data);
