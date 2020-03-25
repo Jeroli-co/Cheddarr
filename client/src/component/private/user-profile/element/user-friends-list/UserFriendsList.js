@@ -1,15 +1,18 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {AuthContext} from "../../../../../context/AuthContext";
 import './UserFriendsList.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMinus} from "@fortawesome/free-solid-svg-icons";
+import {faMinus, faPlus, faSearch} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import {routes} from "../../../../../routes";
 
 const UserFriendsList = () => {
 
-  const { getFriends, deleteFriend } = useContext(AuthContext);
+  const { getFriends, addFriend, deleteFriend } = useContext(AuthContext);
   const [friends, setFriends] = useState([]);
+
+  const searchFriendsInput = useRef();
+  const [addFriendsHttpResponse, setAddFriendsHttpResponse] = useState(null);
 
   useEffect(() => {
     getFriends().then(res => {
@@ -34,6 +37,28 @@ const UserFriendsList = () => {
           return;
       }
     })
+  };
+
+  const _onAddFriend = () => {
+    const inputValue = searchFriendsInput.current.value;
+    if (inputValue.replace(/\s/g,'').length > 0) {
+      addFriend(inputValue).then(res => {
+        switch (res.status) {
+          case 200:
+            setAddFriendsHttpResponse(res);
+            console.log(res);
+            return;
+          case 409:
+            setAddFriendsHttpResponse(res);
+            return;
+          case 404:
+            setAddFriendsHttpResponse(res);
+            return;
+          default:
+            return;
+        }
+      });
+    }
   };
 
   const FriendsList = ({ friends }) => {
@@ -74,7 +99,37 @@ const UserFriendsList = () => {
 
   return (
     <div className="UserFriendsList" data-testid="UserFriendsList">
-      <FriendsList friends={friends}/>
+      <div className="container">
+        <div className="level">
+          <div className="level-left">
+            <div className="level-item">
+              <div className="field has-addons">
+                <div className="control has-icons-left">
+                  <input className="input" type="search" ref={searchFriendsInput} placeholder="Add friends" autoComplete="off" />
+                  <span className="icon is-small is-left"><FontAwesomeIcon icon={faSearch} /></span>
+                </div>
+                <div className="control">
+                  <button className="button is-success" onClick={_onAddFriend}>
+                    <span className="icon is-small"><FontAwesomeIcon icon={faPlus} /></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            { addFriendsHttpResponse &&
+              <div className="level-item">
+                {
+                  (addFriendsHttpResponse.status === 200 && <p className="help is-success">{addFriendsHttpResponse.message}</p>) ||
+                  (addFriendsHttpResponse.status === 409 && <p className="help is-danger">{addFriendsHttpResponse.message}</p>) ||
+                  (addFriendsHttpResponse.status === 404 && <p className="help is-danger">{addFriendsHttpResponse.message}</p>)
+                }
+              </div>
+            }
+          </div>
+        </div>
+        <hr/>
+        <FriendsList friends={friends}/>
+
+      </div>
     </div>
   )
 };
