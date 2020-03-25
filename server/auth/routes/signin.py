@@ -10,7 +10,7 @@ from server.auth.serializers.session_serializer import SessionSerializer
 session_serializer = SessionSerializer()
 
 
-@auth.route("/sign-in", methods=["GET", "POST"])
+@auth.route("/sign-in/", methods=["GET", "POST"])
 def signin():
     if request.method == "GET":
         if current_user.is_authenticated:

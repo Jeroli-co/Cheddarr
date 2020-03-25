@@ -10,7 +10,7 @@ from server.profile.forms import UsernameForm
 from server.profile.serializers.user_serializer import user_serializer, users_serializer
 
 
-@auth.route("/users/<username>", methods=["GET"])
+@auth.route("/users/<username>/", methods=["GET"])
 @login_required
 def public_profile(username):
     user = User.find(username=username)
@@ -22,14 +22,15 @@ def public_profile(username):
     return user_serializer.dump(user), HTTPStatus.OK
 
 
-@profile.route("/friends", methods=["GET"])
+@profile.route("/friends/", methods=["GET"])
 @login_required
 def get_all_friends():
     friends = current_user.friends.all()
+    print(friends)
     return users_serializer.dumps(friends)
 
 
-@profile.route("/friends", methods=["POST"])
+@profile.route("/friends/", methods=["POST"])
 @login_required
 def add_friend():
     friend_username = UsernameForm()
@@ -45,7 +46,7 @@ def add_friend():
     return {"message": "Friend added."}, HTTPStatus.OK
 
 
-@profile.route("/friends/<username>", methods=["DELETE"])
+@profile.route("/friends/<username>/", methods=["DELETE"])
 @login_required
 def delete_friend(username):
 
