@@ -3,6 +3,8 @@ import {AuthContext} from "../../../../../context/AuthContext";
 import './UserFriendsList.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMinus} from "@fortawesome/free-solid-svg-icons";
+import {Link} from "react-router-dom";
+import {routes} from "../../../../../routes";
 
 const UserFriendsList = () => {
 
@@ -37,21 +39,28 @@ const UserFriendsList = () => {
   const FriendsList = ({ friends }) => {
     const list = friends.map((friend) => {
       return (
-        <div className="FriendsList">
-          <div key={friend.username} className="friend-item">
-            <div className="friend-item-info">
-              <figure className="image is-64x64">
-                <img src={friend["user_picture"]} alt="User" />
-              </figure>
-              <p className="is-size-5"><i>{'@' + friend.username}</i></p>
+        <div key={friend.username} className="FriendsList">
+          <div className="level is-mobile">
+            <div className="level-left">
+              <div className="level-item">
+                <figure className="image is-64x64">
+                  <img src={friend["user_picture"]} alt="User" />
+                </figure>
+              </div>
+              <div className="level-item">
+                <Link className="is-size-5" to={routes.USER_PUBLIC_PROFILE.url(friend.username)}><i>{'@' + friend.username}</i></Link>
+              </div>
             </div>
-            <button className="button is-danger is-small" type="button" onClick={() => _onDeleteFriend(friend.username)}>
-              <span className="icon">
-                <FontAwesomeIcon icon={faMinus}/>
-              </span>
-            </button>
+            <div className="level-right">
+              <div className="level-item">
+                <button className="button is-danger is-small" type="button" onClick={() => _onDeleteFriend(friend.username)}>
+                  <span className="icon">
+                    <FontAwesomeIcon icon={faMinus}/>
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="is-divider"/>
         </div>
       )
     });
