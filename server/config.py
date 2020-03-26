@@ -37,6 +37,7 @@ class BaseConfig(object):
     SECURITY_PASSWORD_SALT = os.environ.get(
         "FLASK_SECURITY_PASSWORD_SALT", "security-password-salt"
     )
+    WTF_CSRF_CHECK_DEFAULT = False
 
     ##########################################################################
     # mail                                                                   #
@@ -66,6 +67,7 @@ class ProdConfig(BaseConfig):
     REMEMBER_COOKIE_DOMAIN = FLASK_DOMAIN
     REMEMBER_COOKIE_SECURE = True
     REMEMBER_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
 
     ##########################################################################
     # database                                                               #
