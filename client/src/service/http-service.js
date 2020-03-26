@@ -1,4 +1,4 @@
-import {HttpResponse} from "../model/HttpResponse";
+import {HttpResponse} from "../models/HttpResponse";
 
 const isHttpError = (error) => {
   return error.hasOwnProperty('response');
