@@ -20,6 +20,7 @@ from server.config import (
     ProdConfig,
     REACT_STATIC_FOLDER,
     REACT_TEMPLATE_FOLDER,
+    TestConfig,
 )
 from server.exceptions import InvalidUsage
 
@@ -77,6 +78,13 @@ def _create_app(config_object: BaseConfig, **kwargs):
     register_blueprints(app)
     register_commands(app)
     register_login_manager(app)
+
+    @app.before_request
+    def check_csrf():
+        from flask import request
+
+        if app.config.get("WTF_CSRF_ENABLED") and not request.headers.get("api_key"):
+            csrf.protect()
 
     @app.after_request
     def set_csrf_cookie(response):
@@ -137,29 +145,20 @@ def register_login_manager(app):
     def load_user_from_request(request):
         from server.utils import confirm_token
 
-        # try to login using the api_key url arg
-        api_key = request.args.get("api_key")
+        # try to login using the api_key url header
+        api_key = request.headers.get("api_key")
         if api_key:
             user = User.query.filter_by(api_key=api_key).first()
             if user and user.confirmed:
+                user_loaded_from_header.send(app, user=user)
                 return user
 
-        # try to login using Basic Auth
-        if (
-            request.authorization
-            and request.authorization.username
-            and request.authorization.password
-        ):
-            user = User.find(username=request.authorization.username)
-            if user and user.confirmed:
-                if user.check_password(request.authorization.password):
-                    return user
         # return None if both methods did not login the user
         return None
 
 
 @user_loaded_from_header.connect
-def user_loaded_from_header(self, user=None):
+def loaded_from_header(self, user=None):
     g.login_via_header = True
 
 
