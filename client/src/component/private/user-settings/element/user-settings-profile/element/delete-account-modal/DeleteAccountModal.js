@@ -3,8 +3,8 @@ import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../../../../../context/AuthContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
-import {routes} from "../../../../../../../routes";
-import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../formDefaultValidators";
+import {routes} from "../../../../../../../router/routes";
+import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../forms/formDefaultValidators";
 
 const DeleteAccountModal = (props) => {
 

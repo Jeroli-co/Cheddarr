@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { AuthContext } from "../../../context/AuthContext";
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import {routes} from "../../../routes";
+import {routes} from "../../../router/routes";
 import {ConfirmEmail} from "./ConfirmEmail";
 import {HttpResponse} from "../../../model/HttpResponse";
 

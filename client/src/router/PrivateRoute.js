@@ -1,9 +1,9 @@
 import {useContext} from "react";
-import {AuthContext} from "./context/AuthContext";
+import {AuthContext} from "../context/AuthContext";
 import {Route} from "react-router";
 import React from "react";
 
-const ProtectedRoute = ({component: Component, ...rest}) => {
+const PrivateRoute = ({component: Component, location, ...rest}) => {
 
   const { isAuthenticated } = useContext(AuthContext);
 
@@ -11,16 +11,17 @@ const ProtectedRoute = ({component: Component, ...rest}) => {
     <Route
       {...rest}
       render={(props) => {
-        if (!isAuthenticated) {
-          return <Component {...props} />;
+        if (isAuthenticated) {
+          return <Component {...props} />
         } else {
-          return <div/>;
+          return <div/>
         }
-      }
-    }/>
-  )
+      }}
+    />
+  );
+
 };
 
 export {
-  ProtectedRoute
+  PrivateRoute
 }

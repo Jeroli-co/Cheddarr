@@ -3,7 +3,7 @@ import {useForm} from "react-hook-form";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../context/AuthContext";
-import {FORM_DEFAULT_VALIDATOR} from "../../../../formDefaultValidators";
+import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
 
 const InitResetPasswordModal = (props) => {
 

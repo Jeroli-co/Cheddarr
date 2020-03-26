@@ -4,8 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import {Link, Route, useLocation} from "react-router-dom";
 import {AuthContext} from "../../../context/AuthContext";
-import {routes} from "../../../routes";
-import {FORM_DEFAULT_VALIDATOR} from "../../../formDefaultValidators";
+import {routes} from "../../../router/routes";
+import {FORM_DEFAULT_VALIDATOR} from "../../../forms/formDefaultValidators";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);

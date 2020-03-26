@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {Route} from "react-router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCopy, faExclamationCircle, faPlus, faSyncAlt, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {routes} from "../../../../../routes";
+import {routes} from "../../../../../router/routes";
 import {AuthContext} from "../../../../../context/AuthContext";
 import './UserSettingsProfile.scss';
 

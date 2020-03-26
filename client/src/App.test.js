@@ -4,7 +4,7 @@ import { createMemoryHistory } from 'history';
 import {cleanup, render, waitForElement} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { App } from './App';
-import {routes} from "./routes";
+import {routes} from "./router/routes";
 import {AuthContext} from "./context/AuthContext";
 import {HttpResponse} from "./model/HttpResponse";
 

@@ -3,8 +3,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {AuthContext} from "../../../../../../../context/AuthContext";
-import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../formDefaultValidators";
-import {routes} from "../../../../../../../routes";
+import {FORM_DEFAULT_VALIDATOR} from "../../../../../../../forms/formDefaultValidators";
+import {routes} from "../../../../../../../router/routes";
 
 const ChangePasswordModal = (props) => {
 

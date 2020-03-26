@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {Link} from "react-router-dom";
-import {routes} from "../../../../routes";
+import {routes} from "../../../../router/routes";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCog, faSignOutAlt, faUserCircle} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../context/AuthContext";

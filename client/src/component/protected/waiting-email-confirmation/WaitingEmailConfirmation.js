@@ -2,7 +2,7 @@ import React from 'react';
 import {SignInButton} from "../element/sign-in-button/SignInButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
-import {routes} from "../../../routes";
+import {routes} from "../../../router/routes";
 
 const WaitingEmailConfirmation = (props) => {
 

@@ -5,7 +5,7 @@ import { AuthContext } from "../../context/AuthContext";
 import {Navbar} from "./Navbar";
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import {routes} from "../../routes";
+import {routes} from "../../router/routes";
 
 test('Navbar shows buttons sign in and sign up when log out', () => {
   const history = createMemoryHistory({ initialEntries: [routes.HOME.url] });

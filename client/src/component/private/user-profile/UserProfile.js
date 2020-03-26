@@ -1,9 +1,10 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {AuthContext} from "../../../context/AuthContext";
 import './UserProfile.scss';
-import {routes} from "../../../routes";
+import {routes} from "../../../router/routes";
 import {Link} from "react-router-dom";
 import {Route} from "react-router";
+import {FriendsContextProvider} from "../../../context/FriendsContext";
 
 const UserProfile = () => {
 
@@ -85,7 +86,9 @@ const UserProfile = () => {
 						</ul>
 					</div>
 
-					<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS_LIST.url]} component={routes.USER_FRIENDS_LIST.component} />
+					<FriendsContextProvider>
+						<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS.url]} component={routes.USER_FRIENDS.component} />
+					</FriendsContextProvider>
 
 				</div>
 

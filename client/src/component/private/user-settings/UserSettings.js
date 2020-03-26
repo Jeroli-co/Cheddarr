@@ -4,7 +4,7 @@ import {faUser} from "@fortawesome/free-regular-svg-icons";
 import {faCog} from "@fortawesome/free-solid-svg-icons";
 import './UserSettings.scss';
 import {Link} from "react-router-dom";
-import {routes} from "../../../routes";
+import {routes} from "../../../router/routes";
 import {Route} from "react-router";
 
 const UserSettings = (props) => {

@@ -2,7 +2,7 @@ import React, {createContext, useEffect, useState} from 'react';
 import axios from 'axios';
 import {withRouter} from 'react-router';
 import {PageLoader} from "../component/element/page-loader/PageLoader";
-import {routes} from "../routes";
+import {routes} from "../router/routes";
 import Cookies from 'js-cookie'
 import {HttpResponse} from "../model/HttpResponse";
 
@@ -18,6 +18,7 @@ const AuthContextProvider = (props) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [session, setSession] = useState(initialSessionState);
+  const apiUrl = "/api";
 
   useEffect(() => {
     const authenticated = Cookies.get('authenticated');
@@ -86,7 +87,7 @@ const AuthContextProvider = (props) => {
     };
 
     const get = async () => {
-      return await axios.get('/api/sign-in/')
+      return await axios.get(apiUrl + '/sign-in/')
     };
 
     const post = async (data) => {
@@ -98,7 +99,7 @@ const AuthContextProvider = (props) => {
       if (typeof remember !== 'undefined' && remember !== null) {
         fd.append('remember', remember);
       }
-      return await axios.post('/api/sign-in/', fd);
+      return await axios.post(apiUrl + '/sign-in/', fd);
     };
 
     setIsLoading(true);
@@ -120,7 +121,7 @@ const AuthContextProvider = (props) => {
   const signOut = async () => {
     setIsLoading(true);
     try {
-      await axios.get('/api/sign-out/');
+      await axios.get(apiUrl + '/sign-out/');
     } finally {
       clearSession();
       props.history.push(routes.SIGN_IN.url);
@@ -135,7 +136,7 @@ const AuthContextProvider = (props) => {
     fd.append('email', data['email']);
     fd.append('password', data['password']);
     try {
-      const res = await axios.post('/api/sign-up/', fd);
+      const res = await axios.post(apiUrl + '/sign-up/', fd);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [409]);
@@ -151,7 +152,7 @@ const AuthContextProvider = (props) => {
   const confirmEmail = async (token) => {
     setIsLoading(true);
     try {
-      const res = await axios.get('/api/confirm/' + token + '/');
+      const res = await axios.get(apiUrl + '/confirm/' + token + '/');
       clearSession();
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
@@ -170,7 +171,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('email', email);
     try {
-      const res = await axios.post('/api/confirm/resend/', fd);
+      const res = await axios.post(apiUrl + '/confirm/resend/', fd);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400]);
@@ -188,7 +189,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('email', data['email']);
     try {
-      const res = await axios.post('/api/reset/password/', fd);
+      const res = await axios.post(apiUrl + '/reset/password/', fd);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [400]);
@@ -204,7 +205,7 @@ const AuthContextProvider = (props) => {
   const checkResetPasswordToken = async (token) => {
     setIsLoading(true);
     try {
-      const res = await axios.get('/api/reset/' + token + "/");
+      const res = await axios.get(apiUrl + '/reset/' + token + "/");
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [410, 403]);
@@ -222,7 +223,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('password', data['password']);
     try {
-      await axios.post('/api/reset/' + token + "/", fd);
+      await axios.post(apiUrl + '/reset/' + token + "/", fd);
       props.history.push(routes.SIGN_IN.url);
     } catch (e) {
       handleError(e);
@@ -234,7 +235,7 @@ const AuthContextProvider = (props) => {
   const getUserProfile = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/profile/");
+      const res = await axios.get(apiUrl + "/profile/");
       return new HttpResponse(res.status, res.data.message, res.data);
     } catch (e) {
       handleError(e);
@@ -253,7 +254,7 @@ const AuthContextProvider = (props) => {
     fd.append('oldPassword', data['oldPassword']);
     fd.append('newPassword', data['newPassword']);
     try {
-      const res = await axios.put("/api/profile/password/", fd);
+      const res = await axios.put(apiUrl + "/profile/password/", fd);
       clearSession();
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
@@ -273,7 +274,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('username', data['newUsername']);
     try {
-      const res = await axios.put("/api/profile/username/", fd);
+      const res = await axios.put(apiUrl + "/profile/username/", fd);
       const username = res.data.username;
       Cookies.set('username', username);
       setSession({...session, username: username});
@@ -294,7 +295,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('email', data['email']);
     try {
-      const res = await axios.put("/api/profile/email/", fd);
+      const res = await axios.put(apiUrl + "/profile/email/", fd);
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, [409]);
@@ -312,7 +313,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('picture', data);
     try {
-      const res = await axios.put('/api/profile/picture/', fd, {headers: { 'content-type': 'multipart/form-data' }});
+      const res = await axios.put(apiUrl + '/profile/picture/', fd, {headers: { 'content-type': 'multipart/form-data' }});
       const picture = res.data["user_picture"];
       Cookies.set('userPicture', picture);
       setSession({...session, userPicture: picture});
@@ -333,7 +334,7 @@ const AuthContextProvider = (props) => {
     const fd = new FormData();
     fd.append('password', data['password']);
     try {
-      const res = await axios.delete("/api/profile/", { data: fd });
+      const res = await axios.delete(apiUrl + "/profile/", { data: fd });
       clearSession();
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
@@ -350,7 +351,7 @@ const AuthContextProvider = (props) => {
   const getApiKey = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/key");
+      const res = await axios.get(apiUrl + "/key");
       return new HttpResponse(res.status, "", res.data);
     } catch (e) {
       handleError(e);
@@ -366,7 +367,7 @@ const AuthContextProvider = (props) => {
   const resetApiKey = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/key/reset");
+      const res = await axios.get(apiUrl + "/key/reset");
       return new HttpResponse(res.status, "", res.data);
     } catch (e) {
       handleError(e);
@@ -382,7 +383,7 @@ const AuthContextProvider = (props) => {
   const deleteApiKey = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.delete("/api/key");
+      const res = await axios.delete(apiUrl + "/key");
       return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e);
@@ -398,58 +399,8 @@ const AuthContextProvider = (props) => {
   const getUserPublic = async (username) => {
     setIsLoading(true);
     try {
-      const res = await axios.get("/api/profile/friends/" + username + "/");
+      const res = await axios.get(apiUrl + "/profile/friends/" + username + "/");
       return new HttpResponse(res.status, res.data.message, res.data);
-    } catch (e) {
-      handleError(e, []);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getFriends = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get("/api/profile/friends/");
-      return new HttpResponse(res.status, res.data.message, res.data);
-    } catch (e) {
-      handleError(e, []);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const addFriend = async (username) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('usernameOrEmail', username);
-    try {
-      const res = await axios.post("/api/profile/friends/", fd);
-      return new HttpResponse(res.status, res.data.message, res.data);
-    } catch (e) {
-      handleError(e, [409, 404]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const deleteFriend = async (username) => {
-    setIsLoading(true);
-    try {
-      const res = await axios.delete("/api/profile/friends/" + username + "/");
-      return new HttpResponse(res.status, res.data.message);
     } catch (e) {
       handleError(e, []);
       const res = e.hasOwnProperty('response') ? e.response : null;
@@ -463,6 +414,8 @@ const AuthContextProvider = (props) => {
 
   return (
     <AuthContext.Provider value={{...session,
+      handleError,
+      apiUrl,
       signIn,
       signOut,
       signUp,
@@ -480,10 +433,7 @@ const AuthContextProvider = (props) => {
       getApiKey,
       resetApiKey,
       deleteApiKey,
-      getUserPublic,
-      getFriends,
-      addFriend,
-      deleteFriend
+      getUserPublic
     }}>
       { isLoading && <PageLoader/> }
       { props.children }
