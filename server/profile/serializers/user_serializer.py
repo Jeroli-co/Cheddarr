@@ -8,12 +8,8 @@ class UserSerializer(ma.SQLAlchemySchema):
 
     username = ma.auto_field()
     user_picture = ma.auto_field()
-
-
-class ProfileSerializer(UserSerializer):
     email = ma.auto_field()
 
 
 user_serializer = UserSerializer()
 users_serializer = UserSerializer(many=True)
-profile_serializer = ProfileSerializer()

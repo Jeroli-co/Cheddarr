@@ -15,8 +15,14 @@ class ChangePasswordForm(FlaskForm):
 
 class UsernameForm(FlaskForm):
     username = StringField(
-        "New Username",
+        "Username",
         [InputRequired(), Length(min=4, max=128), Regexp(r"^[a-zA-Z0-9]+$")],
+    )
+
+
+class UsernameOrEmailForm(FlaskForm):
+    usernameOrEmail = StringField(
+        "Username or Email", [InputRequired(), Length(min=4, max=128)],
     )
 
 

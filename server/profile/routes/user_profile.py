@@ -8,16 +8,13 @@ from server.auth.models import User
 from server.auth.forms import PasswordForm, EmailForm
 from server.profile import profile
 from server.profile.forms import UsernameForm, ChangePasswordForm, PictureForm
-from server.profile.serializers.user_serializer import ProfileSerializer
-
-
-profile_serializer = ProfileSerializer()
+from server.profile.serializers.user_serializer import user_serializer
 
 
 @profile.route("/", methods=["GET"])
 @login_required
 def get_profile():
-    return profile_serializer.dump(current_user), HTTPStatus.OK
+    return user_serializer.dump(current_user), HTTPStatus.OK
 
 
 @profile.route("/", methods=["DELETE"])

@@ -69,7 +69,7 @@ def confirm_email(token):
         )
     if user and user.confirmed:
         raise InvalidUsage("This email is already confirmed.", HTTPStatus.FORBIDDEN)
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.confirmed:
         current_user.change_email(email)
     else:
         user.confirmed = True
