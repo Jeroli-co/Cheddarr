@@ -23,11 +23,14 @@ def get_friend(username):
 @login_required
 def get_friends():
 
-    return {
-        "requested": users_serializer.dump(current_user.get_pending_requested()),
-        "received": users_serializer.dump(current_user.get_pending_received()),
-        "friends": users_serializer.dump(current_user.get_friendships()),
-    }
+    return (
+        {
+            "requested": users_serializer.dump(current_user.get_pending_requested()),
+            "received": users_serializer.dump(current_user.get_pending_received()),
+            "friends": users_serializer.dump(current_user.get_friendships()),
+        },
+        HTTPStatus.OK,
+    )
 
 
 @profile.route("/friends/", methods=["POST"])
@@ -44,7 +47,7 @@ def add_friend():
     friend = User.find(username=add_friend_form.usernameOrEmail.data) or User.find(
         email=add_friend_form.usernameOrEmail.data
     )
-    if not friend:
+    if not friend or friend == current_user:
         raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
 
     if current_user.is_friend(friend):
@@ -53,7 +56,7 @@ def add_friend():
         )
     current_user.add_friendship(friend)
 
-    return user_serializer.dump(friend), HTTPStatus.OK
+    return user_serializer.dump(friend), HTTPStatus.CREATED
 
 
 @profile.route("/friends/<username>/", methods=["DELETE"])
