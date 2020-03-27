@@ -1,28 +1,31 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {ProfileContext} from "../../../../contexts/ProfileContext";
+import {routes} from "../../../../router/routes";
+import {useProfileSettings} from "../../../../hooks/useProfileSettings";
 
 const ChangePasswordModal = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { changePassword } = useContext(ProfileContext);
-  const [httpResponse, setHttpResponse] = useState(null);
+  const { changePassword } = useProfileSettings();
+  const [httpError, setHttpError] = useState(null);
 
-  const onSubmit = (data) => {
-    changePassword(data).then(res => {
+  const onSubmit = async (data) => {
+    const res = await changePassword(data);
+    if (res) {
       switch (res.status) {
         case 200:
+          props.history.push(routes.SIGN_IN.url);
           return;
         case 400:
-          setHttpResponse(res);
+          setHttpError(res);
           return;
         default:
           return;
       }
-    });
+    }
   };
 
   const closeModal = () => {
@@ -114,8 +117,8 @@ const ChangePasswordModal = (props) => {
               )}
             </div>
 
-            { httpResponse && (
-                (httpResponse.status === 400 && <p className="help is-danger">{httpResponse.message}</p>)
+            { httpError && (
+                (httpError.status === 400 && <p className="help is-danger">{httpError.message}</p>)
               )
             }
 

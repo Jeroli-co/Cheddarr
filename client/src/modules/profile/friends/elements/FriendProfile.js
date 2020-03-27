@@ -10,6 +10,7 @@ const FriendProfile = () => {
 
   useEffect(() => {
     getFriend(id).then(res => {
+      console.log(res);
       switch (res.status) {
         case 200:
           setUser(res.data);
