@@ -4,9 +4,9 @@ import { createMemoryHistory } from 'history';
 import {cleanup, render, waitForElement} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { App } from './App';
-import {routes} from "./routes";
-import {AuthContext} from "./context/AuthContext";
-import {HttpResponse} from "./model/HttpResponse";
+import {routes} from "./router/routes";
+import {AuthContext} from "./contexts/AuthContext";
+import {HttpResponse} from "./models/HttpResponse";
 
 afterEach(cleanup);
 
@@ -103,15 +103,15 @@ test('App router load components (authentication needed) correctly', async () =>
   expect(home).toBeInTheDocument();
 
   history.push(routes.USER_PROFILE.url);
-  const userProfile = await waitForElement(() => wrapper.getByTestId('UserProfile'));
+  const userProfile = await waitForElement(() => wrapper.getByTestId('Profile'));
   expect(userProfile).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS.url);
-  const userSettings = await waitForElement(() => wrapper.getByTestId('UserSettings'));
+  const userSettings = await waitForElement(() => wrapper.getByTestId('Settings'));
   expect(userSettings).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS_PROFILE.url);
-  const userSettingsProfile = wrapper.getByTestId('UserSettingsProfile');
+  const userSettingsProfile = wrapper.getByTestId('SettingsProfile');
   expect(userSettingsProfile).toBeInTheDocument();
 
   history.push(routes.CHANGE_PASSWORD.url);
@@ -131,7 +131,7 @@ test('App router load components (authentication needed) correctly', async () =>
   expect(deleteModal).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS_CONFIGURATIONS.url);
-  const userSettingsConfigurations = wrapper.getByTestId('UserSettingsConfigurations');
+  const userSettingsConfigurations = wrapper.getByTestId('SettingsConfigurations');
   expect(userSettingsConfigurations).toBeInTheDocument();
 });
 

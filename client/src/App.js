@@ -1,11 +1,11 @@
 import React from 'react';
 import {Route, Switch} from "react-router-dom";
-import {Navbar} from "./component/navbar/Navbar";
+import {Navbar} from "./elements/navbar/Navbar";
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import {routes} from "./routes";
-import {PrivateRoute} from "./PrivateRoute";
-import {ProtectedRoute} from "./ProtectedRoute";
+import {routes} from "./router/routes";
+import {PrivateRoute} from "./router/PrivateRoute";
+import {ProtectedRoute} from "./router/ProtectedRoute";
 
 const App = () => {
 
