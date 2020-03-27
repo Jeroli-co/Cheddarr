@@ -8,9 +8,6 @@ import {AuthContextWithRouterProvider} from "./contexts/AuthContext";
 import {APIContextProvider} from "./contexts/APIContext";
 import axios from "axios";
 
-axios.defaults.xsrfCookieName = 'csrf_token';
-axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
-
 ReactDOM.render(
   <BrowserRouter>
     <APIContextProvider>

@@ -95,4 +95,3 @@ class TestConfig(BaseConfig):
     DEBUG = True
     SERVER_NAME = "localhost"
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    WTF_CSRF_ENABLED = False
