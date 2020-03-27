@@ -1,9 +1,7 @@
-import React, {useContext, useEffect, useRef} from 'react';
-import {AuthContext} from "../../contexts/AuthContext";
+import React, {useEffect, useRef} from 'react';
 import './Profile.scss';
 import {routes} from "../../router/routes";
 import {Link} from "react-router-dom";
-import {FriendsContextProvider} from "../../contexts/FriendsContext";
 import {useProfile} from "../../hooks/useProfile";
 import {Route} from "react-router-dom";
 
@@ -42,10 +40,6 @@ const Profile = () => {
 		}
 	};
 
-	useEffect(() => {
-		console.log(user);
-	});
-
 	return (
 		<section className="UserProfile is-light is-large" data-testid="UserProfile">
 
@@ -77,9 +71,7 @@ const Profile = () => {
 						</ul>
 					</div>
 
-					<FriendsContextProvider>
-						<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS.url]} component={routes.USER_FRIENDS.component} />
-					</FriendsContextProvider>
+					<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS.url]} component={routes.USER_FRIENDS.component} />
 
 				</div>
 

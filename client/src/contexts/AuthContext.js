@@ -5,7 +5,7 @@ import {PageLoader} from "../elements/PageLoader";
 import {routes} from "../router/routes";
 import Cookies from 'js-cookie'
 import {HttpResponse} from "../models/HttpResponse";
-import {ProfileContextProvider} from "./ProfileContext";
+import {FriendsContextProvider} from "./FriendsContext";
 
 const AuthContext = createContext();
 
@@ -314,9 +314,9 @@ const AuthContextProvider = (props) => {
       updateUsername,
       updatePicture
     }}>
-      <ProfileContextProvider>
+      <FriendsContextProvider>
         { props.children }
-      </ProfileContextProvider>
+      </FriendsContextProvider>
       { isLoading && <PageLoader/> }
     </AuthContext.Provider>
   )

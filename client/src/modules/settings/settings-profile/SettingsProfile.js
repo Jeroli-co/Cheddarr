@@ -1,52 +1,14 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React from 'react';
 import {Route} from "react-router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCopy, faExclamationCircle, faPlus, faSyncAlt, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../router/routes";
-import {AuthContext} from "../../../contexts/AuthContext";
 import './SettingsProfile.scss';
+import {useProfileSettings} from "../../../hooks/useProfileSettings";
 
 const SettingsProfile = (props) => {
 
-  const [apiKey, setApiKey] = useState(null);
-  const { getApiKey, resetApiKey, deleteApiKey } = useContext(AuthContext);
-
-  useEffect(() => {
-    getApiKey().then(res => {
-      switch (res.status) {
-        case 200:
-          setApiKey(res.data["api_key"]);
-          return;
-        default:
-          return;
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const _onResetApiKey = () => {
-    resetApiKey().then(res => {
-      switch (res.status) {
-        case 200:
-          setApiKey(res.data["api_key"]);
-          return;
-        default:
-          return;
-      }
-    });
-  };
-
-  const _onDeleteApiKey = () => {
-    deleteApiKey().then(res => {
-      switch (res.status) {
-        case 200:
-          setApiKey(null);
-          return;
-        default:
-          return;
-      }
-    });
-  };
+  const { apiKey, refreshApiKey, removeApiKey } = useProfileSettings();
 
   const _onCopyToClipboard = () => {
     const copyText = document.getElementById("apiKeyInput");
@@ -100,7 +62,7 @@ const SettingsProfile = (props) => {
             <div className="content">
 
               { apiKey === null &&
-                <button className="button is-info" type="button" onClick={_onResetApiKey}>
+                <button className="button is-info" type="button" onClick={refreshApiKey}>
                   <span className="icon"><FontAwesomeIcon icon={faPlus}/></span>
                   <span>Generate API Key</span>
                 </button>
@@ -115,12 +77,12 @@ const SettingsProfile = (props) => {
                         <FontAwesomeIcon icon={faCopy}/>
                       </span>
                     </button>
-                    <button className="button is-rounded is-info" type="button" onClick={_onResetApiKey}>
+                    <button className="button is-rounded is-info" type="button" onClick={refreshApiKey}>
                       <span className="icon">
                         <FontAwesomeIcon icon={faSyncAlt}/>
                       </span>
                     </button>
-                    <button className="button is-rounded is-danger" type="button" onClick={_onDeleteApiKey}>
+                    <button className="button is-rounded is-danger" type="button" onClick={removeApiKey}>
                       <span className="icon">
                         <FontAwesomeIcon icon={faTrash}/>
                       </span>

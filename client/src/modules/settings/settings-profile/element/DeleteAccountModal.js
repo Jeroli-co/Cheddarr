@@ -4,30 +4,32 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../../router/routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {ProfileContext} from "../../../../contexts/ProfileContext";
+import {useProfileSettings} from "../../../../hooks/useProfileSettings";
 
 const DeleteAccountModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { deleteAccount } = useContext(ProfileContext);
-  const [httpResponse, setHttpResponse] = useState(null);
+  const { deleteAccount } = useProfileSettings();
+  const [httpError, setHttpError] = useState(null);
 
-  const onSubmit = (data) => {
-    deleteAccount(data).then(res => {
+  const onSubmit = async (data) => {
+    const res = await deleteAccount(data);
+    if (res) {
       switch (res.status) {
         case 200:
+          props.history.push(routes.SIGN_UP.url);
           return;
         case 400:
-          setHttpResponse(res);
+          setHttpError(res);
           return;
         default:
           return;
       }
-    });
+    }
   };
 
   const closeModal = () => {
-    props.history.push(routes.USER_SETTINGS.url + '/profile');
+    props.history.goBack();
   };
 
   return (
@@ -64,8 +66,8 @@ const DeleteAccountModal = (props) => {
               )}
             </div>
 
-            { httpResponse && (
-                (httpResponse.status === 400 && <p className="help is-danger">{httpResponse.message}</p>)
+            { httpError && (
+                (httpError.status === 400 && <p className="help is-danger">{httpError.message}</p>)
               )
             }
 
