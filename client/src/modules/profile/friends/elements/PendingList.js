@@ -5,14 +5,14 @@ import {FriendsContext} from "../../../../contexts/FriendsContext";
 
 const PendingList = () => {
 
-  const { pendings, cancelRequest } = useContext(FriendsContext);
+  const { requested, deleteFriend } = useContext(FriendsContext);
 
   useEffect(() => {
-    console.log(pendings);
+    console.log(requested);
   });
 
   return (
-      pendings.map((pending) => {
+      requested.map((pending) => {
       return (
         <div key={pending.username}>
           <div className="level is-mobile">
@@ -28,7 +28,7 @@ const PendingList = () => {
             </div>
             <div className="level-right">
               <div className="level-item">
-                <button className="button is-danger is-small" type="button" onClick={() => cancelRequest(pending.username)}>
+                <button className="button is-danger is-small" type="button" onClick={() => deleteFriend(pending.username)}>
                   <span className="icon">
                     <FontAwesomeIcon icon={faMinus}/>
                   </span>

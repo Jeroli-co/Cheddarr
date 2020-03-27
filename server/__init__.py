@@ -83,8 +83,10 @@ def _create_app(config_object: BaseConfig, **kwargs):
     def check_csrf():
         from flask import request
 
-        if app.config.get("WTF_CSRF_ENABLED") and not request.headers.get("api_key"):
-            csrf.protect()
+        if request.headers.get("api_key"):
+            app.config["WTF_CSRF_ENABLED"] = False
+        else:
+            app.config["WTF_CSRF_ENABLED"] = True
 
     @app.after_request
     def set_csrf_cookie(response):

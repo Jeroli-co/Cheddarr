@@ -37,7 +37,7 @@ class BaseConfig(object):
     SECURITY_PASSWORD_SALT = os.environ.get(
         "FLASK_SECURITY_PASSWORD_SALT", "security-password-salt"
     )
-    WTF_CSRF_CHECK_DEFAULT = False
+    WTF_CSRF_ENABLED = False
 
     ##########################################################################
     # mail                                                                   #

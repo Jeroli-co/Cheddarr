@@ -1,5 +1,4 @@
 from flask_login import UserMixin
-from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 from server import db, utils
@@ -47,42 +46,36 @@ class User(db.Model, UserMixin):
     )
 
     def get_friends(self):
-        return
+        return []
 
-    def add_friend(self):
-        return
-
-    def remove_friend(self):
-        return
-
-    def is_friend(self, user):
-
-        return self.friend_requests_sent.filter(friendships.receiving_id == user.id)
-
+    def is_friend_pending(self, user):
         return (
-            db.session.query(friend_requests.requesting_id).filter(
-                friendships.receiving_id == user.id
-            )
-            and db.session.query(friend_requests.receiving_id).filter(
-                friendships.requesting_id == user.id
-            )
-            and db.session.query(friendships.friend_a_id).filter(
-                friendships.friend_b_id == user.id
-            )
-            and db.session.query(friendships.friend_b_id).filter(
-                friendships.friend_a_id == user.id
-            )
+            self.friend_requests_received.filter(
+                friend_requests.c.requesting_id == user.id
+            ).count()
+            + self.friend_requests_sent.filter(
+                friend_requests.c.receiving_id == user.id
+            ).count()
+            > 0
         )
 
-    def add_friend_request(self, user):
+    def is_friend(self, user):
+        return (
+            self.friends.filter(friendships.c.friend_b_id == user.id).count()
+            + self.friends_approved.filter(friendships.c.friend_a_id == user.id).count()
+        )
+
+    def add_friend(self, user):
         if not self.is_friend(user):
             self.friend_requests_sent.append(user)
             db.session.commit()
 
-    def remove_friend_request(self, user):
-        if self.is_friend(user):
+    def remove_friend(self, user):
+        if self.is_friend_pending(user):
             self.friend_requests_sent.remove(user)
-            db.session.commit()
+        elif self.is_friend(user):
+            pass
+        db.session.commit()
 
     def __init__(
         self, username, email, password, user_picture=None, confirmed=False,

@@ -5,9 +5,9 @@ import {FriendsContext} from "../../../../contexts/FriendsContext";
 
 const RequestList = () => {
 
-  const { acceptRequest, refuseRequest, requests } = useContext(FriendsContext);
+  const { acceptRequest, deleteFriend, received } = useContext(FriendsContext);
 
-  return requests.map(request =>
+  return received.map(request =>
     <div key={request.username}>
       <div className="level is-mobile">
         <div className="level-left">
@@ -28,7 +28,7 @@ const RequestList = () => {
                   <FontAwesomeIcon icon={faCheck}/>
                 </span>
               </button>
-              <button className="button is-danger is-small" type="button" onClick={() => refuseRequest(request.username)}>
+              <button className="button is-danger is-small" type="button" onClick={() => deleteFriend(request.username)}>
                 <span className="icon">
                   <FontAwesomeIcon icon={faTimes}/>
                 </span>

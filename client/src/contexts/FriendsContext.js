@@ -10,8 +10,8 @@ const FriendsContextProvider = (props) => {
 
   const initialState = {
     friends: [],
-    requests: [],
-    pendings: []
+    received: [],
+    requested: []
   };
 
   const { apiUrl, handleError } = useContext(AuthContext);
@@ -21,10 +21,11 @@ const FriendsContextProvider = (props) => {
   const getFriends = async () => {
     try {
       const res = await axios.get(apiUrl + "/profile/friends/");
+      console.log(res);
       setFriendsList({
         friends: res.data["friends"],
-        requests: res.data["received"],
-        pendings: res.data["pending"]
+        received: res.data["received"],
+        requested: res.data["requested"]
       });
     } catch (e) {
       handleError(e);
@@ -36,7 +37,7 @@ const FriendsContextProvider = (props) => {
     fd.append('usernameOrEmail', username);
     try {
       const res = await axios.post(apiUrl + "/profile/friends/", fd);
-      setFriendsList({...friendsList, pendings: friendsList.pendings.push(res.data.user)});
+      setFriendsList({...friendsList, requested: friendsList.requested.push(res.data.user)});
       setAddFriendsFeedback(new HttpResponse(200, res.data.message));
     } catch (e) {
       handleError(e, [409, 404]);
@@ -44,15 +45,7 @@ const FriendsContextProvider = (props) => {
     }
   };
 
-  const cancelRequest = async (username) => {
-
-  };
-
   const acceptRequest = async (username) => {
-
-  };
-
-  const refuseRequest = async (username) => {
 
   };
 
@@ -70,10 +63,8 @@ const FriendsContextProvider = (props) => {
       ...friendsList,
       getFriends,
       addFriend,
-      cancelRequest,
       addFriendsFeedback,
       acceptRequest,
-      refuseRequest,
       deleteFriend
     }}>
       { props.children }
