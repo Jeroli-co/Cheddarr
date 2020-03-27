@@ -1,22 +1,21 @@
 import React, {useContext, useState} from 'react';
 import {useForm} from "react-hook-form";
-import {AuthContext} from "../../../../contexts/AuthContext";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../../router/routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
+import {ProfileContext} from "../../../../contexts/ProfileContext";
 
 const DeleteAccountModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { deleteAccount } = useContext(AuthContext);
+  const { deleteAccount } = useContext(ProfileContext);
   const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
     deleteAccount(data).then(res => {
       switch (res.status) {
         case 200:
-          props.history.push(routes.SIGN_UP.url);
           return;
         case 400:
           setHttpResponse(res);

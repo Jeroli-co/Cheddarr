@@ -1,20 +1,21 @@
 import {useContext} from "react";
 import {AuthContext} from "../contexts/AuthContext";
-import {Route} from "react-router";
+import {Redirect, Route} from "react-router-dom";
 import React from "react";
+import {routes} from "./routes";
 
-const ProtectedRoute = ({component: Component, ...rest}) => {
+const ProtectedRoute = ({component: Component, location, ...rest}) => {
 
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, isLoading } = useContext(AuthContext);
 
   return (
     <Route
       {...rest}
       render={(props) => {
-        if (!isAuthenticated) {
+        if (isAuthenticated) {
+          return <Redirect to={routes.HOME.url}/>;
+        } else if (!isLoading) {
           return <Component {...props} />;
-        } else {
-          return <div/>;
         }
       }
     }/>

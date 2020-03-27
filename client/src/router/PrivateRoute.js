@@ -1,11 +1,12 @@
 import {useContext} from "react";
 import {AuthContext} from "../contexts/AuthContext";
-import {Route} from "react-router";
+import {Redirect, Route} from "react-router-dom";
 import React from "react";
+import {routes} from "./routes";
 
 const PrivateRoute = ({component: Component, location, ...rest}) => {
 
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, isLoading } = useContext(AuthContext);
 
   return (
     <Route
@@ -13,8 +14,8 @@ const PrivateRoute = ({component: Component, location, ...rest}) => {
       render={(props) => {
         if (isAuthenticated) {
           return <Component {...props} />
-        } else {
-          return <div/>
+        } else if (!isLoading) {
+          return <Redirect to={routes.SIGN_IN.url}/>
         }
       }}
     />

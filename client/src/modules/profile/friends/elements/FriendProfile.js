@@ -1,15 +1,15 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useParams} from "react-router";
-import {AuthContext} from "../../../../contexts/AuthContext";
+import {FriendsContext} from "../../../../contexts/FriendsContext";
 
 const FriendProfile = () => {
 
   const { id } = useParams();
-  const { getUserPublic } = useContext(AuthContext);
+  const { getFriend } = useContext(FriendsContext);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    getUserPublic(id).then(res => {
+    getFriend(id).then(res => {
       switch (res.status) {
         case 200:
           setUser(res.data);
@@ -22,7 +22,7 @@ const FriendProfile = () => {
   }, []);
 
   return (
-    <div className="UserPublicProfile container has-text-centered" data-testid="UserPublicProfile">
+    <div className="FriendProfile container has-text-centered" data-testid="FriendProfile">
 
       <div className="is-divider" data-content="Profile"/>
 

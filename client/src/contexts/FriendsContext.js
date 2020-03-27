@@ -18,6 +18,16 @@ const FriendsContextProvider = (props) => {
   const [friendsList, setFriendsList] = useState(initialState);
   const [addFriendsFeedback, setAddFriendsFeedback] = useState(null);
 
+  const getFriend = async (username) => {
+    try {
+      const res = await axios.get(apiUrl + "/profile/friends/" + username + "/");
+      return new HttpResponse(res.status, res.data.message, res.data);
+    } catch (e) {
+      handleError(e);
+      return(createErrorResponse(e));
+    }
+  };
+
   const getFriends = async () => {
     try {
       const res = await axios.get(apiUrl + "/profile/friends/");
@@ -87,6 +97,7 @@ const FriendsContextProvider = (props) => {
   return (
     <FriendsContext.Provider value={{
       ...friendsList,
+      getFriend,
       getFriends,
       addFriend,
       addFriendsFeedback,

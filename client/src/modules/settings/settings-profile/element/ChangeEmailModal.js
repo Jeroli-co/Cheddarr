@@ -1,29 +1,21 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useForm} from "react-hook-form";
-import {AuthContext} from "../../../../contexts/AuthContext";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
+import {useProfile} from "../../../../hooks/useProfile";
 
 const ChangeEmailModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { changeEmail } = useContext(AuthContext);
+  const { changeEmail } = useProfile();
   const [httpResponse, setHttpResponse] = useState(null);
 
-  const onSubmit = (data) => {
-    changeEmail(data).then(res => {
-      switch (res.status) {
-        case 200:
-          setHttpResponse(res);
-          return;
-        case 409:
-          setHttpResponse(res);
-          return;
-        default:
-          return;
-      }
-    });
+  const onSubmit = async (data) => {
+    const res = await changeEmail(data);
+    if (res) {
+      setHttpResponse(res);
+    }
   };
 
   const closeModal = () => {

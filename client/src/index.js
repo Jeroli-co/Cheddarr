@@ -5,6 +5,7 @@ import {App} from './App';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
 import {AuthContextWithRouterProvider} from "./contexts/AuthContext";
+import {APIContextProvider} from "./contexts/APIContext";
 import axios from "axios";
 
 axios.defaults.xsrfCookieName = 'csrf_token';
@@ -12,9 +13,11 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 
 ReactDOM.render(
   <BrowserRouter>
-    <AuthContextWithRouterProvider>
-      <App />
-    </AuthContextWithRouterProvider>
+    <APIContextProvider>
+      <AuthContextWithRouterProvider>
+        <App />
+      </AuthContextWithRouterProvider>
+    </APIContextProvider>
   </BrowserRouter>
   , document.getElementById('root')
 );

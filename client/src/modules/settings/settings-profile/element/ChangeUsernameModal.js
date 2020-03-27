@@ -1,18 +1,19 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useForm} from "react-hook-form";
-import {AuthContext} from "../../../../contexts/AuthContext";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
+import {useProfile} from "../../../../hooks/useProfile";
 
 const ChangeUsernameModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { changeUsername } = useContext(AuthContext);
+  const { changeUsername } = useProfile();
   const [httpResponse, setHttpResponse] = useState(null);
 
-  const onSubmit = (data) => {
-    changeUsername(data).then(res => {
+  const onSubmit = async (data) => {
+    const res = await changeUsername(data);
+    if (res) {
       switch (res.status) {
         case 200:
           closeModal();
@@ -23,7 +24,7 @@ const ChangeUsernameModal = (props) => {
         default:
           return;
       }
-    });
+    }
   };
 
   const closeModal = () => {

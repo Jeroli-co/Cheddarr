@@ -5,6 +5,7 @@ import {PageLoader} from "../elements/PageLoader";
 import {routes} from "../router/routes";
 import Cookies from 'js-cookie'
 import {HttpResponse} from "../models/HttpResponse";
+import {ProfileContextProvider} from "./ProfileContext";
 
 const AuthContext = createContext();
 
@@ -16,24 +17,40 @@ const initialSessionState = {
 
 const AuthContextProvider = (props) => {
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(initialSessionState);
   const apiUrl = "/api";
 
   useEffect(() => {
-    const authenticated = Cookies.get('authenticated');
-    const username = Cookies.get('username');
-    const userPicture = Cookies.get('userPicture');
-    if (authenticated === 'yes') {
-      setSession({isAuthenticated: true, username: username, userPicture: userPicture})
+    if (!session.isAuthenticated) {
+      const authenticated = Cookies.get('authenticated');
+      const username = Cookies.get('username');
+      const userPicture = Cookies.get('userPicture');
+      if (authenticated === 'yes') {
+        setSession({isAuthenticated: true, username: username, userPicture: userPicture})
+      } else {
+        setIsLoading(false);
+      }
+    } else {
+      setIsLoading(false);
     }
-  }, []);
+  }, [session.isAuthenticated]);
 
   const clearSession = () => {
     Cookies.remove('authenticated');
     Cookies.remove('username');
     Cookies.remove('userPicture');
     setSession(initialSessionState);
+  };
+
+  const updateUsername = (username) => {
+    Cookies.set('username', username);
+    setSession({...session, username: username});
+  };
+
+  const updatePicture = (picture) => {
+    Cookies.set('userPicture', picture);
+    setSession({...session, userPicture: picture});
   };
 
   const handleError = (error, codesHandle = []) => {
@@ -232,124 +249,7 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const getUserProfile = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get(apiUrl + "/profile/");
-      return new HttpResponse(res.status, res.data.message, res.data);
-    } catch (e) {
-      handleError(e);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const changePassword = async (data) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('oldPassword', data['oldPassword']);
-    fd.append('newPassword', data['newPassword']);
-    try {
-      const res = await axios.put(apiUrl + "/profile/password/", fd);
-      clearSession();
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [400]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-
-  const changeUsername = async (data) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('username', data['newUsername']);
-    try {
-      const res = await axios.put(apiUrl + "/profile/username/", fd);
-      const username = res.data.username;
-      Cookies.set('username', username);
-      setSession({...session, username: username});
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [409]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const changeEmail = async (data) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('email', data['email']);
-    try {
-      const res = await axios.put(apiUrl + "/profile/email/", fd);
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [409]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const changeUserPicture = async (data) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('picture', data);
-    try {
-      const res = await axios.put(apiUrl + '/profile/picture/', fd, {headers: { 'content-type': 'multipart/form-data' }});
-      const picture = res.data["user_picture"];
-      Cookies.set('userPicture', picture);
-      setSession({...session, userPicture: picture});
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const deleteAccount = async (data) => {
-    setIsLoading(true);
-    const fd = new FormData();
-    fd.append('password', data['password']);
-    try {
-      const res = await axios.delete(apiUrl + "/profile/", { data: fd });
-      clearSession();
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [400]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const getApiKey = async () => {
-    setIsLoading(true);
     try {
       const res = await axios.get(apiUrl + "/key");
       return new HttpResponse(res.status, "", res.data);
@@ -359,8 +259,6 @@ const AuthContextProvider = (props) => {
       const status = res ? res.status : 500;
       const message = res ? res.data.message : "";
       return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -396,25 +294,11 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const getUserPublic = async (username) => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get(apiUrl + "/profile/friends/" + username + "/");
-      return new HttpResponse(res.status, res.data.message, res.data);
-    } catch (e) {
-      handleError(e, []);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <AuthContext.Provider value={{...session,
       handleError,
+      clearSession,
+      isLoading,
       apiUrl,
       signIn,
       signOut,
@@ -424,19 +308,16 @@ const AuthContextProvider = (props) => {
       resendConfirmation,
       checkResetPasswordToken,
       resetPassword,
-      getUserProfile,
-      changePassword,
-      changeUsername,
-      changeEmail,
-      deleteAccount,
-      changeUserPicture,
       getApiKey,
       resetApiKey,
       deleteApiKey,
-      getUserPublic
+      updateUsername,
+      updatePicture
     }}>
+      <ProfileContextProvider>
+        { props.children }
+      </ProfileContextProvider>
       { isLoading && <PageLoader/> }
-      { props.children }
     </AuthContext.Provider>
   )
 };

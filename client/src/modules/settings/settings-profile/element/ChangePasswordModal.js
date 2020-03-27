@@ -2,21 +2,19 @@ import React, {useContext, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
-import {AuthContext} from "../../../../contexts/AuthContext";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {routes} from "../../../../router/routes";
+import {ProfileContext} from "../../../../contexts/ProfileContext";
 
 const ChangePasswordModal = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { changePassword } = useContext(AuthContext);
+  const { changePassword } = useContext(ProfileContext);
   const [httpResponse, setHttpResponse] = useState(null);
 
   const onSubmit = (data) => {
     changePassword(data).then(res => {
       switch (res.status) {
         case 200:
-          props.history.push(routes.SIGN_IN.url);
           return;
         case 400:
           setHttpResponse(res);

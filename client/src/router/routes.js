@@ -37,11 +37,11 @@ const routes = {
   USER_FRIEND_PROFILE: { url: (username) => '/users/' + username, component: FriendProfile },
   USER_SETTINGS: { url: '/settings', component: Settings },
   USER_SETTINGS_PROFILE: { url: '/settings/profile', component: SettingsProfile },
+  USER_SETTINGS_CONFIGURATIONS: { url: '/settings/configurations', component: SettingsConfigurations },
   CHANGE_PASSWORD: { url: '/settings/profile/change-password', component: ChangePasswordModal },
   CHANGE_USERNAME: { url: '/settings/profile/change-username', component: ChangeUsernameModal },
   CHANGE_EMAIL: { url: '/settings/profile/change-email', component: ChangeEmailModal },
-  DELETE: { url: '/settings/profile/delete', component: DeleteAccountModal },
-  USER_SETTINGS_CONFIGURATIONS: { url: '/settings/configurations', component: SettingsConfigurations }
+  DELETE: { url: '/settings/profile/delete', component: DeleteAccountModal }
 };
 
 export {
