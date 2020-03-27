@@ -73,7 +73,7 @@ def remove_friend(username):
     return {"message": "Friend removed."}, HTTPStatus.OK
 
 
-@profile.route("/friends/<username>/accept", methods=["GET"])
+@profile.route("/friends/<username>/accept/", methods=["GET"])
 def accept_friend(username):
     friend = User.find(username=username)
     if not friend:
@@ -85,4 +85,4 @@ def accept_friend(username):
         )
 
     current_user.confirm_friendship(friend)
-    return {"message": "Friendship confirmed."}, HTTPStatus.OK
+    return user_serializer.dump(friend), HTTPStatus.OK

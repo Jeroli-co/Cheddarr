@@ -90,7 +90,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
     @app.after_request
     def set_csrf_cookie(response):
-        if response:
+        if response and app.config["WTF_CSRF_ENABLED"]:
             response.set_cookie("csrf_token", generate_csrf())
         return response
 

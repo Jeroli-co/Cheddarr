@@ -3,8 +3,8 @@ import './Friends.scss';
 import {FriendsContext} from "../../../contexts/FriendsContext";
 import {AddFriendsInput} from "./elements/AddFriendsInput";
 import {FriendsList} from "./elements/FriendsList";
-import {PendingList} from "./elements/PendingList";
-import {RequestList} from "./elements/RequestList";
+import {RequestedList} from "./elements/RequestedList";
+import {ReceivedList} from "./elements/ReceivedList";
 
 const Friends = () => {
 
@@ -20,13 +20,13 @@ const Friends = () => {
       <div className="container">
         <AddFriendsInput/>
         <hr/>
-        <h1 className="subtitle is-3">Request</h1>
+        <h1 className="subtitle is-4">Requested</h1>
         <hr/>
-        <RequestList/>
-        <h1 className="subtitle is-3">Pending</h1>
+        <RequestedList/>
+        <h1 className="subtitle is-4">Received</h1>
         <hr/>
-        <PendingList/>
-        <h1 className="subtitle is-3">Current</h1>
+        <ReceivedList/>
+        <h1 className="subtitle is-4">Friends</h1>
         <hr/>
         <FriendsList/>
       </div>

@@ -21,7 +21,6 @@ const FriendsContextProvider = (props) => {
   const getFriends = async () => {
     try {
       const res = await axios.get(apiUrl + "/profile/friends/");
-      console.log(res);
       setFriendsList({
         friends: res.data["friends"],
         received: res.data["received"],
@@ -37,7 +36,8 @@ const FriendsContextProvider = (props) => {
     fd.append('usernameOrEmail', username);
     try {
       const res = await axios.post(apiUrl + "/profile/friends/", fd);
-      setFriendsList({...friendsList, requested: friendsList.requested.push(res.data.user)});
+      const requested = friendsList.requested.concat([res.data]);
+      setFriendsList({...friendsList, requested: requested});
       setAddFriendsFeedback(new HttpResponse(200, res.data.message));
     } catch (e) {
       handleError(e, [409, 404]);
@@ -46,6 +46,14 @@ const FriendsContextProvider = (props) => {
   };
 
   const acceptRequest = async (username) => {
+    try {
+      const res = await axios.get(apiUrl + "/profile/friends/" + username + "/accept/");
+      const friends =  friendsList.friends.concat([res.data]);
+      const received = friendsList.received.filter(friend => friend.username !== username);
+      setFriendsList({...friendsList, received: received, friends: friends})
+    } catch (e) {
+      handleError(e);
+    }
 
   };
 
@@ -58,6 +66,24 @@ const FriendsContextProvider = (props) => {
     }
   };
 
+    const refuseFriend = async (username) => {
+    try {
+      await axios.delete(apiUrl + "/profile/friends/" + username + "/");
+      setFriendsList({...friendsList, received: friendsList.friends.filter(friend => friend.username !== username)});
+    } catch (e) {
+      handleError(e);
+    }
+  };
+
+    const cancelFriend = async (username) => {
+  try {
+    await axios.delete(apiUrl + "/profile/friends/" + username + "/");
+    setFriendsList({...friendsList, requested: friendsList.friends.filter(friend => friend.username !== username)});
+  } catch (e) {
+    handleError(e);
+  }
+};
+
   return (
     <FriendsContext.Provider value={{
       ...friendsList,
@@ -65,7 +91,9 @@ const FriendsContextProvider = (props) => {
       addFriend,
       addFriendsFeedback,
       acceptRequest,
-      deleteFriend
+      deleteFriend,
+      refuseFriend,
+      cancelFriend
     }}>
       { props.children }
     </FriendsContext.Provider>

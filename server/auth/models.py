@@ -29,6 +29,56 @@ class User(db.Model, UserMixin):
         lazy="dynamic",
     )
 
+    def __init__(
+        self, username, email, password, user_picture=None, confirmed=False,
+    ):
+        self.username = username
+        self.email = email
+        self.password = password
+        self.user_picture = user_picture
+        self.confirmed = confirmed
+        self.session_token = utils.generate_token([email, password])
+        self.api_key = None
+
+    def __repr__(self):
+        return "%s/%s/%s/%s" % (
+            self.username,
+            self.email,
+            self.user_picture,
+            self.confirmed,
+        )
+
+    def get_id(self):
+        return str(self.session_token)
+
+    @hybrid_property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, value):
+        """Store the password as a hash for security."""
+        if value is not None:
+            self._password = generate_password_hash(value)
+
+    def check_password(self, value):
+        return check_password_hash(self.password, value)
+
+    def change_password(self, new_password):
+        self.password = new_password
+        self.session_token = utils.generate_token([self.email, self.password])
+        db.session.commit()
+
+    def change_email(self, new_email):
+        self.email = new_email
+        self.session_token = utils.generate_token([self.email, self.password])
+        db.session.commit()
+
+    def delete(self):
+        user = User.query.filter_by(id=self.id).first()
+        db.session.delete(user)
+        db.session.commit()
+
     def get_friendship(self, friend):
         friendship = (
             Friendship.query.filter(
@@ -81,56 +131,6 @@ class User(db.Model, UserMixin):
             self.friends_sent.filter(Friendship.friend_b_id == user.id).count()
             + self.friends_received.filter(Friendship.friend_a_id == user.id).count()
         ) > 0
-
-    def __init__(
-        self, username, email, password, user_picture=None, confirmed=False,
-    ):
-        self.username = username
-        self.email = email
-        self.password = password
-        self.user_picture = user_picture
-        self.confirmed = confirmed
-        self.session_token = utils.generate_token([email, password])
-        self.api_key = None
-
-    def __repr__(self):
-        return "%s/%s/%s/%s" % (
-            self.username,
-            self.email,
-            self.user_picture,
-            self.confirmed,
-        )
-
-    def get_id(self):
-        return str(self.session_token)
-
-    @hybrid_property
-    def password(self):
-        return self._password
-
-    @password.setter
-    def password(self, value):
-        """Store the password as a hash for security."""
-        if value is not None:
-            self._password = generate_password_hash(value)
-
-    def check_password(self, value):
-        return check_password_hash(self.password, value)
-
-    def change_password(self, new_password):
-        self.password = new_password
-        self.session_token = utils.generate_token([self.email, self.password])
-        db.session.commit()
-
-    def change_email(self, new_email):
-        self.email = new_email
-        self.session_token = utils.generate_token([self.email, self.password])
-        db.session.commit()
-
-    def delete(self):
-        user = User.query.filter_by(id=self.id).first()
-        db.session.delete(user)
-        db.session.commit()
 
     @classmethod
     def exists(cls, email=None, username=None):

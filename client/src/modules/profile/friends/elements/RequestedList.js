@@ -3,13 +3,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMinus} from "@fortawesome/free-solid-svg-icons";
 import {FriendsContext} from "../../../../contexts/FriendsContext";
 
-const PendingList = () => {
+const RequestedList = () => {
 
-  const { requested, deleteFriend } = useContext(FriendsContext);
-
-  useEffect(() => {
-    console.log(requested);
-  });
+  const { requested, cancelFriend } = useContext(FriendsContext);
 
   return (
       requested.map((pending) => {
@@ -28,7 +24,7 @@ const PendingList = () => {
             </div>
             <div className="level-right">
               <div className="level-item">
-                <button className="button is-danger is-small" type="button" onClick={() => deleteFriend(pending.username)}>
+                <button className="button is-danger is-small" type="button" onClick={() => cancelFriend(pending.username)}>
                   <span className="icon">
                     <FontAwesomeIcon icon={faMinus}/>
                   </span>
@@ -43,5 +39,5 @@ const PendingList = () => {
 };
 
 export {
-  PendingList
+  RequestedList
 }

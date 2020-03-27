@@ -3,9 +3,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FriendsContext} from "../../../../contexts/FriendsContext";
 
-const RequestList = () => {
+const ReceivedList = () => {
 
-  const { acceptRequest, deleteFriend, received } = useContext(FriendsContext);
+  const { acceptRequest, refuseFriend, received } = useContext(FriendsContext);
 
   return received.map(request =>
     <div key={request.username}>
@@ -28,7 +28,7 @@ const RequestList = () => {
                   <FontAwesomeIcon icon={faCheck}/>
                 </span>
               </button>
-              <button className="button is-danger is-small" type="button" onClick={() => deleteFriend(request.username)}>
+              <button className="button is-danger is-small" type="button" onClick={() => refuseFriend(request.username)}>
                 <span className="icon">
                   <FontAwesomeIcon icon={faTimes}/>
                 </span>
@@ -42,5 +42,5 @@ const RequestList = () => {
 };
 
 export {
-  RequestList
+  ReceivedList
 }
