@@ -13,8 +13,8 @@ from server.profile.serializers.user_serializer import user_serializer, users_se
 @login_required
 def get_friend(username):
     user = User.find(username=username)
-    # if not user or not current_user.is_friend(user):
-    #   raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
+    if not user or not current_user.is_friend(user):
+        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
 
     return user_serializer.dump(user), HTTPStatus.OK
 
@@ -24,9 +24,9 @@ def get_friend(username):
 def get_friends():
 
     return {
-        "requested": users_serializer.dump(current_user.friend_requests_sent.all()),
-        "received": users_serializer.dump(current_user.friend_requests_received.all()),
-        "friends": users_serializer.dump(current_user.get_friends()),
+        "requested": users_serializer.dump(current_user.get_pending_requested()),
+        "received": users_serializer.dump(current_user.get_pending_received()),
+        "friends": users_serializer.dump(current_user.get_friendships()),
     }
 
 
@@ -46,28 +46,43 @@ def add_friend():
     )
     if not friend:
         raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
-    if current_user.is_friend_pending(friend) or current_user.is_friend(friend):
+
+    if current_user.is_friend(friend):
         raise InvalidUsage(
-            "This user has already been added.", status_code=HTTPStatus.CONFLICT
+            "This user is already your friend.", status_code=HTTPStatus.CONFLICT
         )
-    current_user.add_friend(friend)
+    current_user.add_friendship(friend)
 
     return user_serializer.dump(friend), HTTPStatus.OK
 
 
 @profile.route("/friends/<username>/", methods=["DELETE"])
 @login_required
-def delete_friend(username):
+def remove_friend(username):
 
     friend = User.find(username=username)
     if not friend:
         raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
 
-    if not current_user.is_friend_pending(friend) or not current_user.is_friend(friend):
+    if not current_user.is_friend(friend):
         raise InvalidUsage(
             "This user is not in your friend list.", status_code=HTTPStatus.BAD_REQUEST
         )
 
-    current_user.remove_friend(friend)
-
+    current_user.remove_friendship(friend)
     return {"message": "Friend removed."}, HTTPStatus.OK
+
+
+@profile.route("/friends/<username>/accept", methods=["GET"])
+def accept_friend(username):
+    friend = User.find(username=username)
+    if not friend:
+        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
+
+    if not current_user.is_friend(friend):
+        raise InvalidUsage(
+            "This user is not in your friend list.", status_code=HTTPStatus.BAD_REQUEST
+        )
+
+    current_user.confirm_friendship(friend)
+    return {"message": "Friendship confirmed."}, HTTPStatus.OK
