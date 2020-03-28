@@ -1,1 +1,1 @@
-from . import user_profile  # noqa
+from . import user_profile, friends  # noqa

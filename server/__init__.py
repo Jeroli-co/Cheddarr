@@ -11,7 +11,6 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
-from flask_wtf.csrf import CSRFProtect, generate_csrf
 from sendgrid import sendgrid
 
 from server.config import (
@@ -30,7 +29,6 @@ db = SQLAlchemy()
 ma = Marshmallow()
 migrate = Migrate()
 login_manager = LoginManager()
-csrf = CSRFProtect()
 mail = sendgrid.SendGridAPIClient()
 
 
@@ -65,7 +63,6 @@ def _create_app(config_object: BaseConfig, **kwargs):
         else:
             migrate.init_app(app, db)
 
-    csrf.init_app(app)
     mail.api_key = app.config.get("MAIL_SENDGRID_API_KEY")
     csp = {"default-src": "'self'", "img-src": "*"}
     Talisman(app, content_security_policy=csp)
@@ -78,19 +75,6 @@ def _create_app(config_object: BaseConfig, **kwargs):
     register_blueprints(app)
     register_commands(app)
     register_login_manager(app)
-
-    @app.before_request
-    def check_csrf():
-        from flask import request
-
-        if app.config.get("WTF_CSRF_ENABLED") and not request.headers.get("api_key"):
-            csrf.protect()
-
-    @app.after_request
-    def set_csrf_cookie(response):
-        if response:
-            response.set_cookie("csrf_token", generate_csrf())
-        return response
 
     @app.errorhandler(InvalidUsage)
     def handle_invalid_usage(error):
@@ -112,7 +96,7 @@ def register_blueprints(app):
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix="/api")
-    app.register_blueprint(profile, url_prefix="/api")
+    app.register_blueprint(profile, url_prefix="/api/profile")
 
 
 def register_commands(app):

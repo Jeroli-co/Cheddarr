@@ -4,9 +4,10 @@ import { createMemoryHistory } from 'history';
 import {cleanup, render, waitForElement} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { App } from './App';
-import {routes} from "./routes";
-import {AuthContext} from "./context/AuthContext";
-import {HttpResponse} from "./model/HttpResponse";
+import {routes} from "./router/routes";
+import {AuthContext} from "./contexts/AuthContext";
+import {HttpResponse} from "./models/HttpResponse";
+import { APIContext } from "./contexts/APIContext";
 
 afterEach(cleanup);
 
@@ -84,13 +85,15 @@ test('App router load components (authentication needed) correctly', async () =>
   const email = "jero@li.co";
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{
-        isAuthenticated: true,
-        getUserProfile: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email}))),
-        getApiKey: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {api_key: "TEST-API-KEY"}))),
-      }}>
-        <App />
-      </AuthContext.Provider>
+      <APIContext.Provider value={{executeRequest: () => new Promise(resolve => resolve(new HttpResponse(200, "", {friends: [], received: [], requested: []})))}}>
+        <AuthContext.Provider value={{
+          isAuthenticated: true,
+          getUser: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email}))),
+          getApiKey: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {api_key: "TEST-API-KEY"}))),
+        }}>
+          <App />
+        </AuthContext.Provider>
+      </APIContext.Provider>
     </Router>
   );
 
@@ -103,16 +106,16 @@ test('App router load components (authentication needed) correctly', async () =>
   expect(home).toBeInTheDocument();
 
   history.push(routes.USER_PROFILE.url);
-  const userProfile = await waitForElement(() => wrapper.getByTestId('UserProfile'));
-  expect(userProfile).toBeInTheDocument();
+  const profile = await waitForElement(() => wrapper.getByTestId('Profile'));
+  expect(profile).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS.url);
-  const userSettings = await waitForElement(() => wrapper.getByTestId('UserSettings'));
-  expect(userSettings).toBeInTheDocument();
+  const settings = await waitForElement(() => wrapper.getByTestId('Settings'));
+  expect(settings).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS_PROFILE.url);
-  const userSettingsProfile = wrapper.getByTestId('UserSettingsProfile');
-  expect(userSettingsProfile).toBeInTheDocument();
+  const settingsProfile = await waitForElement(() => wrapper.getByTestId('SettingsProfile'));
+  expect(settingsProfile).toBeInTheDocument();
 
   history.push(routes.CHANGE_PASSWORD.url);
   const changePassword = wrapper.getByTestId('ChangePasswordModal');
@@ -131,8 +134,8 @@ test('App router load components (authentication needed) correctly', async () =>
   expect(deleteModal).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS_CONFIGURATIONS.url);
-  const userSettingsConfigurations = wrapper.getByTestId('UserSettingsConfigurations');
-  expect(userSettingsConfigurations).toBeInTheDocument();
+  const settingsConfigurations = wrapper.getByTestId('SettingsConfigurations');
+  expect(settingsConfigurations).toBeInTheDocument();
 });
 
 test('Router fire 404 when th url is unknown', () => {

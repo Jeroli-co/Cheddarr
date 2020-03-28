@@ -7,32 +7,35 @@ from server import InvalidUsage, db, utils
 from server.auth.models import User
 from server.auth.forms import PasswordForm, EmailForm
 from server.profile import profile
-from server.profile.forms import ChangeUsernameForm, ChangePasswordForm, PictureForm
-from server.profile.serializers.user_serializer import (
-    ProfileSerializer,
-    UserSerializer,
-)
-
-user_serializer = UserSerializer()
-profile_serializer = ProfileSerializer()
+from server.profile.forms import UsernameForm, ChangePasswordForm, PictureForm
+from server.profile.serializers.user_serializer import user_serializer
 
 
-@login_required
-@profile.route("/user/<username>")
-def public_profile(username):
-    user = User.find(username=username)
-    if not user:
-        raise InvalidUsage("The user does not exist.", status_code=404)
-    return user_serializer.dump(user), HTTPStatus.OK
-
-
-@profile.route("/profile")
+@profile.route("/", methods=["GET"])
 @login_required
 def get_profile():
-    return profile_serializer.dump(current_user), HTTPStatus.OK
+    return user_serializer.dump(current_user), HTTPStatus.OK
 
 
-@profile.route("/profile/picture", methods=["PUT"])
+@profile.route("/", methods=["DELETE"])
+@fresh_login_required
+def delete_user():
+    password_form = PasswordForm()
+    if not password_form.validate():
+        raise InvalidUsage(
+            "Error while deleting the user.",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
+
+    if not current_user.check_password(password_form.password.data):
+        raise InvalidUsage("Wrong password.", HTTPStatus.BAD_REQUEST)
+
+    current_user.delete()
+    session.clear()
+    return {"message": "User deleted."}, HTTPStatus.OK
+
+
+@profile.route("/picture/", methods=["PUT"])
 @login_required
 def change_picture():
     picture_form = PictureForm()
@@ -47,7 +50,7 @@ def change_picture():
     return {"user_picture": current_user.user_picture}, HTTPStatus.OK
 
 
-@profile.route("/profile/password", methods=["PUT"])
+@profile.route("/password/", methods=["PUT"])
 @fresh_login_required
 def change_password():
     password_form = ChangePasswordForm()
@@ -70,17 +73,17 @@ def change_password():
     return {"message": "User password changed."}, HTTPStatus.OK
 
 
-@profile.route("/profile/username", methods=["PUT"])
+@profile.route("/username/", methods=["PUT"])
 @fresh_login_required
 def change_username():
-    username_form = ChangeUsernameForm()
+    username_form = UsernameForm()
     if not username_form.validate():
         raise InvalidUsage(
             "Error while changing username.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
-    new_username = username_form.newUsername.data
+    new_username = username_form.username.data
     if User.exists(username=new_username):
         raise InvalidUsage(
             "This username is not available.", status_code=HTTPStatus.CONFLICT
@@ -91,7 +94,7 @@ def change_username():
     return {"username": current_user.username}, HTTPStatus.OK
 
 
-@profile.route("/profile/email", methods=["PUT"])
+@profile.route("/email/", methods=["PUT"])
 @fresh_login_required
 def change_email():
     email_form = EmailForm()
@@ -114,21 +117,3 @@ def change_email():
     subject = "Please confirm your email"
     utils.send_email(new_email, subject, html)
     return {"message": "Confirmation email sent."}, HTTPStatus.OK
-
-
-@profile.route("/profile", methods=["DELETE"])
-@fresh_login_required
-def delete_user():
-    password_form = PasswordForm()
-    if not password_form.validate():
-        raise InvalidUsage(
-            "Error while deleting the user.",
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-        )
-
-    if not current_user.check_password(password_form.password.data):
-        raise InvalidUsage("Wrong password.", HTTPStatus.BAD_REQUEST)
-
-    current_user.delete()
-    session.clear()
-    return {"message": "User deleted."}, HTTPStatus.OK

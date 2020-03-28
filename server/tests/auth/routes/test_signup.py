@@ -9,7 +9,7 @@ def test_signup_ok(client, mocks):
         client.post(
             url_for("auth.signup"),
             data={
-                "username": "test_user",
+                "username": "UsernameTest",
                 "password": "Test_password1",
                 "email": "test@test.com",
             },

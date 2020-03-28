@@ -1,7 +1,14 @@
 from flask_login import UserMixin
+from sqlalchemy import and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 from server import db, utils
+
+
+class Friendship(db.Model):
+    friend_a_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
+    friend_b_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
+    pending = db.Column(db.Boolean, default=True)
 
 
 class User(db.Model, UserMixin):
@@ -13,14 +20,17 @@ class User(db.Model, UserMixin):
     user_picture = db.Column(db.String(256))
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
+    friends_sent = db.relationship(
+        "User",
+        secondary=Friendship.__table__,
+        primaryjoin=(Friendship.friend_a_id == id),
+        secondaryjoin=(Friendship.friend_b_id == id),
+        backref=db.backref("friends_received", lazy="dynamic"),
+        lazy="dynamic",
+    )
 
     def __init__(
-        self,
-        username,
-        email,
-        password,
-        user_picture=None,
-        confirmed=False,
+        self, username, email, password, user_picture=None, confirmed=False,
     ):
         self.username = username
         self.email = email
@@ -35,7 +45,7 @@ class User(db.Model, UserMixin):
             self.username,
             self.email,
             self.user_picture,
-            self.confirmed
+            self.confirmed,
         )
 
     def get_id(self):
@@ -68,6 +78,59 @@ class User(db.Model, UserMixin):
         user = User.query.filter_by(id=self.id).first()
         db.session.delete(user)
         db.session.commit()
+
+    def get_friendship(self, friend):
+        friendship = (
+            Friendship.query.filter(
+                and_(
+                    Friendship.friend_a_id == self.id,
+                    Friendship.friend_b_id == friend.id,
+                )
+            )
+            .union(
+                Friendship.query.filter(
+                    and_(
+                        Friendship.friend_b_id == self.id,
+                        Friendship.friend_a_id == friend.id,
+                    )
+                )
+            )
+            .first()
+        )
+        return friendship
+
+    def get_friendships(self):
+        return (
+            self.friends_sent.filter(Friendship.pending == False).union(
+                self.friends_received.filter(Friendship.pending == False)
+            )
+        ).all()
+
+    def get_pending_requested(self):
+        return self.friends_sent.filter(Friendship.pending == True).all()
+
+    def get_pending_received(self):
+        return self.friends_received.filter(Friendship.pending == True).all()
+
+    def add_friendship(self, user):
+        db.session.add(Friendship(friend_a_id=self.id, friend_b_id=user.id))
+        db.session.commit()
+
+    def remove_friendship(self, friend):
+        friendship = self.get_friendship(friend)
+        db.session.delete(friendship)
+        db.session.commit()
+
+    def confirm_friendship(self, friend):
+        friendship = self.get_friendship(friend)
+        friendship.pending = False
+        db.session.commit()
+
+    def is_friend(self, user):
+        return (
+            self.friends_sent.filter(Friendship.friend_b_id == user.id).count()
+            + self.friends_received.filter(Friendship.friend_a_id == user.id).count()
+        ) > 0
 
     @classmethod
     def exists(cls, email=None, username=None):
