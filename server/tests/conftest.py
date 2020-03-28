@@ -2,7 +2,7 @@ import pytest
 from flask import url_for
 
 from server import _create_app, db, utils
-from server.auth.models import User
+from server.auth.models import User, Friendship
 from server.commands import init_db
 from server.config import TestConfig
 
@@ -12,6 +12,9 @@ user1_password = "password1"
 user2_username = "user2"
 user2_email = "email2@test.com"
 user2_password = "password2"
+user3_username = "user3"
+user3_email = "email3@test.com"
+user3_password = "password3"
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -39,7 +42,19 @@ def client(app):
             password=user2_password,
             confirmed=False,
         )
-        db.session.add_all((user1, user2))
+        user3 = User(
+            username=user3_username,
+            email=user3_email,
+            password=user3_password,
+            confirmed=True,
+        )
+
+        db.session.add_all((user1, user2, user3))
+        db.session.commit()
+        friendship1 = Friendship(
+            friend_a_id=user1.id, friend_b_id=user2.id, pending=True
+        )
+        db.session.add(friendship1)
         db.session.commit()
         yield client
 
