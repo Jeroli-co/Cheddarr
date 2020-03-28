@@ -9,7 +9,7 @@ Cheddarr is a companion application for your media server. It acts as a hub for 
 
 | Master                      | Develop                      |
 |:---------------------------:|:----------------------------:|
-|[![Cheddarr](https://github.com/Jeroli-co/Cheddarr/workflows/Cheddarr/badge.svg)](https://github.com/Jeroli-co/Cheddarr/actions) |![Cheddarr](https://github.com/Jeroli-co/Cheddarr/workflows/Cheddarr/badge.svg?branch=develop)  
+|[![Cheddarr](https://github.com/Jeroli-co/Cheddarr/workflows/Cheddarr/badge.svg)](https://github.com/Jeroli-co/Cheddarr/actions) |[![Cheddarr](https://github.com/Jeroli-co/Cheddarr/workflows/Cheddarr/badge.svg?branch=develop)](https://github.com/Jeroli-co/Cheddarr/actions)  
   
   
 ## Getting Started
