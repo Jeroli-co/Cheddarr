@@ -11,19 +11,18 @@ const SignUpForm = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
   const { signUp } = useContext(AuthContext);
-  const [httpResponse, setHttpResponse] = useState(null);
+  const [httpError, setHttpError] = useState(null);
 
   const onSubmit = (data) => {
     signUp(data).then(res => {
-      switch (res.status) {
-        case 201:
-          props.history.push(routes.WAIT_EMAIL_CONFIRMATION.url);
-          return;
-        case 409:
-          setHttpResponse(res);
-          return;
-        default:
-          return;
+      if (res) {
+        switch (res.status) {
+          case 201:
+            props.history.push(routes.WAIT_EMAIL_CONFIRMATION.url);
+            return;
+          default:
+            setHttpError(res);
+        }
       }
     });
   };
@@ -45,8 +44,6 @@ const SignUpForm = (props) => {
 
 			<div className="columns is-mobile is-centered">
 				<div className="column is-one-third-desktop is-half-tablet is-three-quarters-mobile">
-
-          <h5 className="subtitle is-5">Create your account</h5>
 
           <form onSubmit={handleSubmit(onSubmit)}>
 
@@ -160,10 +157,7 @@ const SignUpForm = (props) => {
               )}
             </div>
 
-            { httpResponse && (
-                (httpResponse.status === 409 && <p className="help is-danger">{httpResponse.message}</p>)
-              )
-            }
+            { httpError && <p className="help is-danger">{httpError.message}</p> }
 
             {/* SUBMIT BUTTON */}
             <div className="field">

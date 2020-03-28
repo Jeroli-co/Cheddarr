@@ -2,10 +2,12 @@ import React, {useContext} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FriendsContext} from "../../../../contexts/FriendsContext";
+import {routes} from "../../../../router/routes";
+import {Link} from "react-router-dom";
 
 const ReceivedList = () => {
 
-  const { acceptRequest, refuseFriend, received } = useContext(FriendsContext);
+  const { received, acceptRequest, refuseFriend } = useContext(FriendsContext);
 
   return received.map(request =>
     <div key={request.username}>
@@ -17,7 +19,7 @@ const ReceivedList = () => {
             </figure>
           </div>
           <div className="level-item">
-            <p className="is-size-5"><i>{'@' + request.username}</i></p>
+            <Link className="is-size-5" to={routes.USER_FRIEND_PROFILE.url(request.username)}><i>{'@' + request.username}</i></Link>
           </div>
         </div>
         <div className="level-right">
@@ -37,6 +39,7 @@ const ReceivedList = () => {
           </div>
         </div>
       </div>
+      <hr/>
     </div>
   );
 };

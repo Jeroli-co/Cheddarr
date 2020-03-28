@@ -10,9 +10,7 @@ const ResetPasswordForm = (props) => {
   const { register, handleSubmit, errors, watch } = useForm();
   const { resetPassword } = useContext(AuthContext);
 
-  const onSubmit = (data) => {
-    resetPassword(props.token, data);
-  };
+  const onSubmit = (data) => { resetPassword(props.token, data) };
 
   return (
     <div className="ResetPasswordForm" data-testid="ResetPasswordForm">

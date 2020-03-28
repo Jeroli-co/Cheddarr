@@ -13,16 +13,15 @@ const ResendEmailConfirmationModal = (props) => {
 
   const submitResendConfirmAccount = (data) => {
     resendConfirmation(data['email']).then(res => {
-      switch (res.status) {
-        case 200:
-          setValue('email', '');
-          setHttpResponse(res);
-          return;
-        case 400:
-          setHttpResponse(res);
-          return;
-        default:
-          return;
+      if (res) {
+        switch (res.status) {
+          case 200:
+            setValue('email', '');
+            setHttpResponse(res);
+            return;
+          default:
+            setHttpResponse(res);
+        }
       }
     })
   };

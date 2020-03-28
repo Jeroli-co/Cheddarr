@@ -6,7 +6,6 @@ import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
 import {AuthContextWithRouterProvider} from "./contexts/AuthContext";
 import {APIContextProvider} from "./contexts/APIContext";
-import axios from "axios";
 
 ReactDOM.render(
   <BrowserRouter>

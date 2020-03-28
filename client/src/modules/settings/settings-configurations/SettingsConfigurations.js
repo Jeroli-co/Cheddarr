@@ -3,7 +3,7 @@ import React from 'react';
 const SettingsConfigurations = () => {
 
   return (
-    <div className="UserSettingsConfigurations" data-testid="UserSettingsConfigurations">
+    <div className="SettingsConfigurations" data-testid="SettingsConfigurations">
       <p>Hello from UserSettingsConfigurations</p>
     </div>
   )

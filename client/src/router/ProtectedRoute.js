@@ -6,7 +6,7 @@ import {routes} from "./routes";
 
 const ProtectedRoute = ({component: Component, location, ...rest}) => {
 
-  const { isAuthenticated, isLoading } = useContext(AuthContext);
+  const { isAuthenticated, isLoadingSession } = useContext(AuthContext);
 
   return (
     <Route
@@ -14,7 +14,7 @@ const ProtectedRoute = ({component: Component, location, ...rest}) => {
       render={(props) => {
         if (isAuthenticated) {
           return <Redirect to={routes.HOME.url}/>;
-        } else if (!isLoading) {
+        } else if (!isLoadingSession) {
           return <Component {...props} />;
         }
       }

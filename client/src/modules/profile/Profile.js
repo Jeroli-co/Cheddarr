@@ -1,15 +1,22 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import './Profile.scss';
 import {routes} from "../../router/routes";
 import {Link} from "react-router-dom";
-import {useProfile} from "../../hooks/useProfile";
 import {Route} from "react-router-dom";
+import {AuthContext} from "../../contexts/AuthContext";
+import {FriendsContextProvider} from "../../contexts/FriendsContext";
 
 const Profile = () => {
 
 	const imageUploader = useRef(null);
 
-	const { user, changeUserPicture } = useProfile();
+	const { getUser, changeUserPicture, username, userPicture } = useContext(AuthContext);
+	const [user, setUser] = useState(null);
+
+	useEffect(() => {
+		getUser().then(res => {if (res) setUser(res.data)});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const _onImageChange = (e) => {
 		const [file] = e.target.files;
@@ -41,7 +48,7 @@ const Profile = () => {
 	};
 
 	return (
-		<section className="UserProfile is-light is-large" data-testid="UserProfile">
+		<section className="Profile is-light is-large" data-testid="Profile">
 
 			<div className="columns container main-container">
 
@@ -50,9 +57,9 @@ const Profile = () => {
 						<div className="container profile-container" data-testid="UserProfileContainer">
 							<div className="container">
 								<input id="input-image" type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} />
-								<img id="user-picture" src={user["user_picture"]} alt="User" width={260} height={260} onClick={() => imageUploader.current.click()} data-testid="UserProfileImage" />
+								<img id="user-picture" src={userPicture} alt="User" width={260} height={260} onClick={() => imageUploader.current.click()} data-testid="UserProfileImage" />
 								<div className="has-text-left">
-									<p className="is-size-5" data-testid="UserProfileUsername"><i>{'@' + user.username}</i></p>
+									<p className="is-size-5" data-testid="UserProfileUsername"><i>{'@' + username}</i></p>
 									<p className="is-size-5" data-testid="UserProfileEmail">Email: {user.email}</p>
 								</div>
 							</div>
@@ -64,14 +71,16 @@ const Profile = () => {
 					<div className="container tabs is-boxed">
 						<ul>
 							<li className="is-active">
-								<Link to={routes.USER_SETTINGS_PROFILE.url}>
+								<Link to={routes.USER_FRIENDS.url}>
 									Friends
 								</Link>
 							</li>
 						</ul>
 					</div>
 
-					<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS.url]} component={routes.USER_FRIENDS.component} />
+					<FriendsContextProvider>
+						<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS.url]} component={routes.USER_FRIENDS.component} />
+					</FriendsContextProvider>
 
 				</div>
 

@@ -15,27 +15,22 @@ const SignInForm = (props) => {
 
 	const { signIn } = useContext(AuthContext);
 	const { register, handleSubmit, errors } = useForm();
-
 	const [rememberMe, setRememberMe] = useState(false);
-	const [httpResponse, setHttpResponse] = useState(null);
+	const [httpError, setHttpError] = useState(null);
   const query = useQuery();
 
 	const onSubmit = (data) => {
 		signIn(data).then(res => {
-			switch (res.status) {
-				case 200:
-					let redirectURI = query.get('redirectURI');
-					redirectURI = redirectURI ? redirectURI : routes.HOME.url;
-					props.history.push(redirectURI);
-					return;
-				case 400:
-					setHttpResponse(res);
-					return;
-				case 401:
-					setHttpResponse(res);
-					return;
-				default:
-					break;
+			if (res) {
+				switch (res.status) {
+					case 200:
+						let redirectURI = query.get('redirectURI');
+						redirectURI = redirectURI ? redirectURI : routes.HOME.url;
+						props.history.push(redirectURI);
+						return;
+					default:
+						setHttpError(res);
+				}
 			}
 		});
 	};
@@ -111,9 +106,9 @@ const SignInForm = (props) => {
 							)}
 						</div>
 
-						{ httpResponse && (
-								(httpResponse.status === 400 && <p className="help is-danger">{httpResponse.message}</p>) ||
-								(httpResponse.status === 401 && <p className="help is-danger">{httpResponse.message} <span className="has-link-style" onClick={() => props.history.push(routes.RESEND_EMAIL_CONFIRMATION.url)}>Click here</span> to resend the email</p>)
+						{ httpError && (
+								(httpError.status === 400 && <p className="help is-danger">{httpError.message}</p>) ||
+								(httpError.status === 401 && <p className="help is-danger">{httpError.message} <span className="has-link-style" onClick={() => props.history.push(routes.RESEND_EMAIL_CONFIRMATION.url)}>Click here</span> to resend the email</p>)
 							)
 						}
 

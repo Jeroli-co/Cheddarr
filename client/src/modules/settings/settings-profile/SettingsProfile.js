@@ -1,14 +1,19 @@
-import React from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Route} from "react-router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCopy, faExclamationCircle, faPlus, faSyncAlt, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../router/routes";
 import './SettingsProfile.scss';
-import {useProfileSettings} from "../../../hooks/useProfileSettings";
+import {AuthContext} from "../../../contexts/AuthContext";
 
 const SettingsProfile = (props) => {
 
-  const { apiKey, refreshApiKey, removeApiKey } = useProfileSettings();
+  const { apiKey, getApiKey, resetApiKey, deleteApiKey } = useContext(AuthContext);
+
+  useEffect(() => {
+    getApiKey();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const _onCopyToClipboard = () => {
     const copyText = document.getElementById("apiKeyInput");
@@ -19,7 +24,7 @@ const SettingsProfile = (props) => {
   };
 
   return (
-    <div className="UserSettingsProfile" data-testid="UserSettingsProfile">
+    <div className="SettingsProfile" data-testid="SettingsProfile">
       <div className="container">
         <div className="columns is-mobile">
           <div id="action-column" className="column is-half">
@@ -62,7 +67,7 @@ const SettingsProfile = (props) => {
             <div className="content">
 
               { apiKey === null &&
-                <button className="button is-info" type="button" onClick={refreshApiKey}>
+                <button className="button is-info" type="button" onClick={resetApiKey}>
                   <span className="icon"><FontAwesomeIcon icon={faPlus}/></span>
                   <span>Generate API Key</span>
                 </button>
@@ -77,12 +82,12 @@ const SettingsProfile = (props) => {
                         <FontAwesomeIcon icon={faCopy}/>
                       </span>
                     </button>
-                    <button className="button is-rounded is-info" type="button" onClick={refreshApiKey}>
+                    <button className="button is-rounded is-info" type="button" onClick={resetApiKey}>
                       <span className="icon">
                         <FontAwesomeIcon icon={faSyncAlt}/>
                       </span>
                     </button>
-                    <button className="button is-rounded is-danger" type="button" onClick={removeApiKey}>
+                    <button className="button is-rounded is-danger" type="button" onClick={deleteApiKey}>
                       <span className="icon">
                         <FontAwesomeIcon icon={faTrash}/>
                       </span>

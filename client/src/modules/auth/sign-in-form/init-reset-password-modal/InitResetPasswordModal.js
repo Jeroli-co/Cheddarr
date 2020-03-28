@@ -14,16 +14,15 @@ const InitResetPasswordModal = (props) => {
 
 		const submitResetPassword = (data) => {
 		  initResetPassword(data).then(res => {
-		    switch (res.status) {
-          case 200:
-            setDisableSendButton(true);
-            setHttpResponse(res);
-            return;
-          case 400:
-            setHttpResponse(res);
-            return;
-          default:
-            return;
+		    if (res) {
+		      switch (res.status) {
+            case 200:
+              setDisableSendButton(true);
+              setHttpResponse(res);
+              return;
+            default:
+              setHttpResponse(res);
+          }
         }
 		  });
     };

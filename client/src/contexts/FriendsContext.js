@@ -1,110 +1,116 @@
-import React, {createContext, useContext, useState} from "react";
-import axios from "axios";
+import React, {createContext, useContext, useEffect, useState} from "react";
+import {APIContext, methods} from "./APIContext";
 import {AuthContext} from "./AuthContext";
-import {HttpResponse} from "../models/HttpResponse";
-import {createErrorResponse} from "../service/http-service";
 
 const FriendsContext = createContext();
 
 const FriendsContextProvider = (props) => {
 
+  const friendsURI = "/profile/friends/";
   const initialState = {
     friends: [],
     received: [],
     requested: []
   };
 
-  const { apiUrl, handleError } = useContext(AuthContext);
-  const [friendsList, setFriendsList] = useState(initialState);
-  const [addFriendsFeedback, setAddFriendsFeedback] = useState(null);
+  const [friendsLists, setFriendsLists] = useState(initialState);
 
-  const getFriend = async (username) => {
-    try {
-      const res = await axios.get(apiUrl + "/profile/friends/" + username + "/");
-      return new HttpResponse(res.status, res.data.message, res.data);
-    } catch (e) {
-      handleError(e);
-      return(createErrorResponse(e));
-    }
-  };
+  const { executeRequest } = useContext(APIContext);
+  const { handleError } = useContext(AuthContext);
 
-  const getFriends = async () => {
-    try {
-      const res = await axios.get(apiUrl + "/profile/friends/");
-      setFriendsList({
-        friends: res.data["friends"],
-        received: res.data["received"],
-        requested: res.data["requested"]
-      });
-    } catch (e) {
-      handleError(e);
-    }
-  };
+  useEffect(() => {
+    executeRequest(methods.GET, friendsURI).then(res => {
+      switch (res.status) {
+        case 200:
+          setFriendsLists({friends: res.data["friends"], received: res.data["received"], requested: res.data["requested"]});
+          return res;
+        default:
+          handleError(res);
+          return null;
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const addFriend = async (username) => {
     const fd = new FormData();
     fd.append('usernameOrEmail', username);
-    try {
-      const res = await axios.post(apiUrl + "/profile/friends/", fd);
-      const requested = friendsList.requested.concat([res.data]);
-      setFriendsList({...friendsList, requested: requested});
-      setAddFriendsFeedback(new HttpResponse(200, res.data.message));
-    } catch (e) {
-      handleError(e, [409, 404]);
-      setAddFriendsFeedback(createErrorResponse(e));
+    const res = await executeRequest(methods.POST, friendsURI, fd);
+    switch (res.status) {
+      case 200:
+        const requested = friendsLists.requested.concat([res.data]);
+        setFriendsLists({...friendsLists, requested: requested});
+        return res;
+      case 404:
+      case 409:
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
   const acceptRequest = async (username) => {
-    try {
-      const res = await axios.get(apiUrl + "/profile/friends/" + username + "/accept/");
-      const friends =  friendsList.friends.concat([res.data]);
-      const received = friendsList.received.filter(friend => friend.username !== username);
-      setFriendsList({...friendsList, received: received, friends: friends})
-    } catch (e) {
-      handleError(e);
+    const res = await executeRequest(methods.GET, friendsURI + username + "/accept/");
+    switch (res.status) {
+      case 200:
+        const friends =  friendsLists.friends.concat([res.data]);
+        const received = friendsLists.received.filter(friend => friend.username !== username);
+        setFriendsLists({...friendsLists, received: received, friends: friends});
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
-
   };
 
   const deleteFriend = async (username) => {
-    try {
-      await axios.delete(apiUrl + "/profile/friends/" + username + "/");
-      setFriendsList({...friendsList, friends: friendsList.friends.filter(friend => friend.username !== username)});
-    } catch (e) {
-      handleError(e);
+    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    switch (res.status) {
+      case 200:
+        const friends = friendsLists.friends.filter(friend => friend.username !== username);
+        setFriendsLists({...friendsLists, friends: friends});
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
-    const refuseFriend = async (username) => {
-    try {
-      await axios.delete(apiUrl + "/profile/friends/" + username + "/");
-      setFriendsList({...friendsList, received: friendsList.friends.filter(friend => friend.username !== username)});
-    } catch (e) {
-      handleError(e);
+  const refuseFriend = async (username) => {
+    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    switch (res.status) {
+      case 200:
+        const received = friendsLists.received.filter(friend => friend.username !== username);
+        setFriendsLists({...friendsLists, received: received});
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
-    const cancelFriend = async (username) => {
-  try {
-    await axios.delete(apiUrl + "/profile/friends/" + username + "/");
-    setFriendsList({...friendsList, requested: friendsList.friends.filter(friend => friend.username !== username)});
-  } catch (e) {
-    handleError(e);
-  }
-};
+  const cancelFriend = async (username) => {
+    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    switch (res.status) {
+      case 200:
+        const requested = friendsLists.requested.filter(friend => friend.username !== username);
+        setFriendsLists({...friendsLists, requested: requested});
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
 
   return (
     <FriendsContext.Provider value={{
-      ...friendsList,
-      getFriend,
-      getFriends,
+      ...friendsLists,
       addFriend,
-      addFriendsFeedback,
       acceptRequest,
       deleteFriend,
       refuseFriend,
-      cancelFriend
+      cancelFriend,
     }}>
       { props.children }
     </FriendsContext.Provider>

@@ -4,12 +4,12 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../../router/routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {useProfileSettings} from "../../../../hooks/useProfileSettings";
+import {AuthContext} from "../../../../contexts/AuthContext";
 
 const DeleteAccountModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { deleteAccount } = useProfileSettings();
+  const { deleteAccount } = useContext(AuthContext);
   const [httpError, setHttpError] = useState(null);
 
   const onSubmit = async (data) => {
@@ -19,11 +19,8 @@ const DeleteAccountModal = (props) => {
         case 200:
           props.history.push(routes.SIGN_UP.url);
           return;
-        case 400:
-          setHttpError(res);
-          return;
         default:
-          return;
+          setHttpError(res);
       }
     }
   };

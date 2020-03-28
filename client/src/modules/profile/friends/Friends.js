@@ -1,32 +1,23 @@
-import React, {useContext, useEffect} from 'react';
+import React from 'react';
 import './Friends.scss';
-import {FriendsContext} from "../../../contexts/FriendsContext";
 import {AddFriendsInput} from "./elements/AddFriendsInput";
 import {FriendsList} from "./elements/FriendsList";
 import {RequestedList} from "./elements/RequestedList";
 import {ReceivedList} from "./elements/ReceivedList";
 
 const Friends = () => {
-
-  const { getFriends } = useContext(FriendsContext);
-
-  useEffect(() => {
-    getFriends();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <div className="UserFriendsList" data-testid="UserFriendsList">
+    <div className="Friends" data-testid="Friends">
       <div className="container">
         <AddFriendsInput/>
         <hr/>
-        <h1 className="subtitle is-4">Requested</h1>
+        <h5 className="subtitle is-5">Requested</h5>
         <hr/>
         <RequestedList/>
-        <h1 className="subtitle is-4">Received</h1>
+        <h5 className="subtitle is-5">Received</h5>
         <hr/>
         <ReceivedList/>
-        <h1 className="subtitle is-4">Friends</h1>
+        <h5 className="subtitle is-5">Friends</h5>
         <hr/>
         <FriendsList/>
       </div>

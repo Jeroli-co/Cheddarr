@@ -8,13 +8,11 @@ import {AlreadyConfirmed} from "../elements/AlreadyConfirmed";
 const ResetPassword = () => {
 
 	const { token } = useParams();
-	const [httpResponse, setHttpResponse] = useState(null);
 	const { checkResetPasswordToken } = useContext(AuthContext);
+	const [httpResponse, setHttpResponse] = useState(null);
 
 	useEffect(() => {
-		checkResetPasswordToken(token).then(res => {
-			setHttpResponse(res);
-		});
+		checkResetPasswordToken(token).then(res => setHttpResponse(res));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

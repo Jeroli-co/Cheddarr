@@ -16,7 +16,7 @@ const Settings = ({ location }) => {
   }, [location.pathname]);
 
   return (
-    <div className="UserSettings" data-testid="UserSettings">
+    <div className="Settings" data-testid="Settings">
       <div className="tabs is-centered is-boxed is-medium">
         <ul>
           <li className={((activeLink === routes.USER_SETTINGS.url) || (activeLink === routes.USER_SETTINGS_PROFILE.url)) ? 'is-active' : ''}>

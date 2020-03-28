@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useForm} from "react-hook-form";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {useProfile} from "../../../../hooks/useProfile";
+import {AuthContext} from "../../../../contexts/AuthContext";
 
 const ChangeUsernameModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { changeUsername } = useProfile();
-  const [httpResponse, setHttpResponse] = useState(null);
+  const { changeUsername } = useContext(AuthContext);
+  const [httpError, setHttpError] = useState(null);
 
   const onSubmit = async (data) => {
     const res = await changeUsername(data);
@@ -18,11 +18,8 @@ const ChangeUsernameModal = (props) => {
         case 200:
           closeModal();
           return;
-        case 409:
-          setHttpResponse(res);
-          return;
         default:
-          return;
+          setHttpError(res);
       }
     }
   };
@@ -79,8 +76,8 @@ const ChangeUsernameModal = (props) => {
               )}
             </div>
 
-            { httpResponse && (
-                (httpResponse.status === 409 && <p className="help is-danger">{httpResponse.message}</p>)
+            { httpError && (
+                (httpError.status === 409 && <p className="help is-danger">{httpError.message}</p>)
               )
             }
 

@@ -1,38 +1,42 @@
-import React, {createContext, useEffect, useState} from 'react';
-import axios from 'axios';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import {withRouter} from 'react-router';
-import {PageLoader} from "../elements/PageLoader";
 import {routes} from "../router/routes";
 import Cookies from 'js-cookie'
-import {HttpResponse} from "../models/HttpResponse";
-import {FriendsContextProvider} from "./FriendsContext";
+import {APIContext, methods} from "./APIContext";
+import {PageLoader} from "../elements/PageLoader";
 
 const AuthContext = createContext();
 
 const initialSessionState = {
+  isAuthenticated: false,
   username: null,
   userPicture: null,
-  isAuthenticated: false,
 };
 
 const AuthContextProvider = (props) => {
 
-  const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(initialSessionState);
-  const apiUrl = "/api";
+  const [apiKey, setApiKey] = useState(null);
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
+  const { executeRequest } = useContext(APIContext);
+
+  const profileURI = '/profile/';
 
   useEffect(() => {
-    if (!session.isAuthenticated) {
-      const authenticated = Cookies.get('authenticated');
-      const username = Cookies.get('username');
-      const userPicture = Cookies.get('userPicture');
-      if (authenticated === 'yes') {
-        setSession({isAuthenticated: true, username: username, userPicture: userPicture})
-      } else {
-        setIsLoading(false);
-      }
+    // Load session from browser storage
+    const authenticated = Cookies.get('authenticated');
+    const username = Cookies.get('username');
+    const userPicture = Cookies.get('userPicture');
+    if (authenticated === 'yes') {
+      setSession({isAuthenticated: true, username: username, userPicture: userPicture})
     } else {
-      setIsLoading(false);
+      setIsLoadingSession(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (session.isAuthenticated) {
+      setIsLoadingSession(false);
     }
   }, [session.isAuthenticated]);
 
@@ -43,34 +47,14 @@ const AuthContextProvider = (props) => {
     setSession(initialSessionState);
   };
 
-  const updateUsername = (username) => {
-    Cookies.set('username', username);
-    setSession({...session, username: username});
-  };
-
-  const updatePicture = (picture) => {
-    Cookies.set('userPicture', picture);
-    setSession({...session, userPicture: picture});
-  };
-
-  const handleError = (error, codesHandle = []) => {
+  const handleError = (error) => {
 
     const fatalError = () => {
       clearSession();
       props.history.push(routes.HOME.url);
     };
 
-    if (!error.hasOwnProperty('response')) {
-      fatalError();
-      return;
-    }
-
-    const res = error.hasOwnProperty('response') ? error.response : null;
-    const status = res ? res.status : 500;
-    if (codesHandle.includes(status))
-      return;
-
-    switch (status) {
+    switch (error.status) {
       case 401:
         clearSession();
         props.history.push(routes.SIGN_IN.url + '?redirectURI=' + props.location.pathname);
@@ -104,7 +88,7 @@ const AuthContextProvider = (props) => {
     };
 
     const get = async () => {
-      return await axios.get(apiUrl + '/sign-in/')
+      return await executeRequest(methods.GET, "/sign-in/");
     };
 
     const post = async (data) => {
@@ -116,208 +100,281 @@ const AuthContextProvider = (props) => {
       if (typeof remember !== 'undefined' && remember !== null) {
         fd.append('remember', remember);
       }
-      return await axios.post(apiUrl + '/sign-in/', fd);
+      return await executeRequest(methods.POST, "/sign-in/", fd);
     };
 
-    setIsLoading(true);
-    try {
-      const res = data ? await post(data) : await get();
-      initSession(res.data.username, res.data['user_picture']);
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [400, 401]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
+    const res = data ? await post(data) : await get();
+    switch (res.status) {
+      case 200:
+        initSession(res.data.username, res.data['user_picture']);
+        return res;
+      case 400:
+      case 401:
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
   const signOut = async () => {
-    setIsLoading(true);
-    try {
-      await axios.get(apiUrl + '/sign-out/');
-    } finally {
-      clearSession();
-      props.history.push(routes.SIGN_IN.url);
-      setIsLoading(false);
-    }
+    await executeRequest(methods.GET, "/sign-out/");
+    clearSession();
+    props.history.push(routes.SIGN_IN.url);
   };
 
   const signUp = async (data) => {
-    setIsLoading(true);
     const fd = new FormData();
     fd.append('username', data['username']);
     fd.append('email', data['email']);
     fd.append('password', data['password']);
-    try {
-      const res = await axios.post(apiUrl + '/sign-up/', fd);
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [409]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
+    const res = await executeRequest(methods.POST, "/sign-up/", fd);
+    switch (res.status) {
+      case 201:
+      case 409:
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
   const confirmEmail = async (token) => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get(apiUrl + '/confirm/' + token + '/');
-      clearSession();
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [403, 410]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
+    const res = await executeRequest(methods.GET, "/confirm/" + token + "/");
+    switch (res.status) {
+      case 200:
+        clearSession();
+        return res;
+      case 403:
+      case 410:
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
    const resendConfirmation = async (email) => {
-    setIsLoading(true);
-    const fd = new FormData();
+     const fd = new FormData();
     fd.append('email', email);
-    try {
-      const res = await axios.post(apiUrl + '/confirm/resend/', fd);
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [400]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
-    }
+     const res = await executeRequest(methods.POST, "/confirm/resend/", fd);
+     switch (res.status) {
+       case 200:
+       case 400:
+         return res;
+       default:
+         handleError(res);
+         return null;
+     }
   };
 
   const initResetPassword = async (data) => {
-    setIsLoading(true);
     const fd = new FormData();
     fd.append('email', data['email']);
-    try {
-      const res = await axios.post(apiUrl + '/reset/password/', fd);
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [400]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
+    const res = await executeRequest(methods.POST, "/reset/password/", fd);
+    switch (res.status) {
+      case 200:
+      case 400:
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
   const checkResetPasswordToken = async (token) => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get(apiUrl + '/reset/' + token + "/");
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e, [410, 403]);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
+    const res = await executeRequest(methods.GET, "/reset/" + token + "/");
+    switch (res.status) {
+      case 200:
+      case 403:
+      case 410:
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
   const resetPassword = async (token, data) => {
-    setIsLoading(true);
     const fd = new FormData();
     fd.append('password', data['password']);
-    try {
-      await axios.post(apiUrl + '/reset/' + token + "/", fd);
-      props.history.push(routes.SIGN_IN.url);
-    } catch (e) {
-      handleError(e);
-    } finally {
-      setIsLoading(false);
+    const res = await executeRequest(methods.POST, "/reset/" + token + "/", fd);
+    switch (res.status) {
+      case 200:
+        props.history.push(routes.SIGN_IN.url);
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
   const getApiKey = async () => {
-    try {
-      const res = await axios.get(apiUrl + "/key");
-      return new HttpResponse(res.status, "", res.data);
-    } catch (e) {
-      handleError(e);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
+    const res = await executeRequest(methods.GET, "/key/");
+    switch (res.status) {
+      case 200:
+        setApiKey(res.data["api_key"]);
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
   const resetApiKey = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get(apiUrl + "/key/reset");
-      return new HttpResponse(res.status, "", res.data);
-    } catch (e) {
-      handleError(e);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
+    const res = await executeRequest(methods.GET, "/key/reset/");
+    switch (res.status) {
+      case 200:
+        setApiKey(res.data["api_key"]);
+        return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
   const deleteApiKey = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.delete(apiUrl + "/key");
-      return new HttpResponse(res.status, res.data.message);
-    } catch (e) {
-      handleError(e);
-      const res = e.hasOwnProperty('response') ? e.response : null;
-      const status = res ? res.status : 500;
-      const message = res ? res.data.message : "";
-      return new HttpResponse(status, message);
-    } finally {
-      setIsLoading(false);
+    const res = await executeRequest(methods.DELETE, "/key/");
+    switch (res.status) {
+      case 200:
+        setApiKey(null);
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const changePassword = async (data) => {
+    const fd = new FormData();
+    fd.append('oldPassword', data['oldPassword']);
+    fd.append('newPassword', data['newPassword']);
+    const res = await executeRequest(methods.PUT, profileURI + "password/", fd);
+    switch (res.status) {
+      case 200:
+        clearSession();
+        return res;
+      case 400:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const deleteAccount = async (data) => {
+    const fd = new FormData();
+    fd.append('password', data['password']);
+    const res = await executeRequest(methods.DELETE, profileURI, fd);
+    switch (res.status) {
+      case 200:
+        clearSession();
+        return res;
+      case 400:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const getUser = async () => {
+    const res = await executeRequest(methods.GET, profileURI);
+    switch (res.status) {
+      case 200:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const getFriend = async (username) => {
+    const res = await executeRequest(methods.GET, "/profile/friends/" + username + "/");
+    switch (res.status) {
+      case 200:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const changeEmail = async (data) => {
+    const fd = new FormData();
+    fd.append('email', data['email']);
+    const res = await executeRequest(methods.PUT, profileURI + 'email/', fd);
+    switch (res.status) {
+      case 200:
+      case 409:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const changeUsername = async (data) => {
+    const fd = new FormData();
+    fd.append('username', data['newUsername']);
+    const res = await executeRequest(methods.PUT, profileURI + "username/", fd);
+    switch (res.status) {
+      case 200:
+        const username = res.data.username;
+        Cookies.set('username', username);
+        setSession({...session, username: username});
+        return res;
+      case 409:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const changeUserPicture = async (data) => {
+    const fd = new FormData();
+    fd.append('picture', data);
+    const res = await executeRequest(methods.PUT, profileURI + "picture/", fd, { 'content-type': 'multipart/form-data' });
+    switch (res.status) {
+      case 200:
+        const userPicture = res.data["user_picture"];
+        Cookies.set('userPicture', userPicture);
+        setSession({...session, userPicture: userPicture});
+        return res;
+      default:
+        handleError(res);
+        return res;
     }
   };
 
   return (
-    <AuthContext.Provider value={{...session,
+    <AuthContext.Provider value={{
+      ...session,
+      apiKey,
+      isLoadingSession,
       handleError,
-      clearSession,
-      isLoading,
-      apiUrl,
       signIn,
       signOut,
       signUp,
       confirmEmail,
-      initResetPassword,
       resendConfirmation,
+      initResetPassword,
       checkResetPasswordToken,
       resetPassword,
+      changePassword,
+      getUser,
+      getFriend,
+      changeEmail,
+      changeUsername,
+      changeUserPicture,
       getApiKey,
       resetApiKey,
       deleteApiKey,
-      updateUsername,
-      updatePicture
+      deleteAccount,
     }}>
-      <FriendsContextProvider>
-        { props.children }
-      </FriendsContextProvider>
-      { isLoading && <PageLoader/> }
+      { isLoadingSession && <PageLoader/> }
+      { props.children }
     </AuthContext.Provider>
   )
 };

@@ -6,13 +6,13 @@ from server import db, utils
 from server.auth import auth
 
 
-@auth.route("/key")
+@auth.route("/key/")
 @fresh_login_required
 def get_api_key():
     return {"api_key": current_user.api_key}
 
 
-@auth.route("/key", methods=["DELETE"])
+@auth.route("/key/", methods=["DELETE"])
 @fresh_login_required
 def delete_api_key():
     current_user.api_key = None
@@ -20,7 +20,7 @@ def delete_api_key():
     return {"message": "API key deleted"}, HTTPStatus.OK
 
 
-@auth.route("/key/reset")
+@auth.route("/key/reset/")
 @fresh_login_required
 def reset_api_key():
     current_user.api_key = utils.generate_api_key()

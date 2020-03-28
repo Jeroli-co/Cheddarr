@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
 import {routes} from "../../../../router/routes";
-import {useProfileSettings} from "../../../../hooks/useProfileSettings";
+import {AuthContext} from "../../../../contexts/AuthContext";
 
 const ChangePasswordModal = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { changePassword } = useProfileSettings();
+  const { changePassword } = useContext(AuthContext);
   const [httpError, setHttpError] = useState(null);
 
   const onSubmit = async (data) => {
@@ -19,11 +19,8 @@ const ChangePasswordModal = (props) => {
         case 200:
           props.history.push(routes.SIGN_IN.url);
           return;
-        case 400:
-          setHttpError(res);
-          return;
         default:
-          return;
+          setHttpError(res);
       }
     }
   };
