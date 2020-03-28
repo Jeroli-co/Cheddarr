@@ -52,9 +52,9 @@ const Profile = () => {
 
 			<br/>
 
-			<div className="columns">
+			<div className="columns is-desktop is-fullwidth">
 
-				<div className="column is-one-quarter">
+				<div className="column is-one-quarter-desktop">
 					{ user &&
 						<div className="tile is-ancestor" data-testid="UserProfileContainer">
 							<div className="tile is-parent is-vertical">
@@ -62,7 +62,7 @@ const Profile = () => {
 									<input id="input-image" type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} />
 									<img id="user-picture" src={userPicture} alt="User" width={260} height={260} onClick={() => imageUploader.current.click()} data-testid="UserProfileImage" />
 								</div>
-								<div className="tile has-text-centered is-child">
+								<div className="tile is-child has-text-centered">
 									<p className="is-size-5" data-testid="UserProfileUsername"><i>{'@' + username}</i></p>
 									<p className="is-size-5" data-testid="UserProfileEmail">{user.email}</p>
 								</div>
