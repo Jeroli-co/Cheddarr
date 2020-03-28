@@ -14,9 +14,8 @@ const AddFriendsInput = () => {
       const res = await addFriend(searchFriends);
       if (res) {
         switch (res.status) {
-          case 200:
+          case 201:
             setSearchFriends("");
-            console.log("HEHE");
             setHttpResponse(res);
             break;
           default:

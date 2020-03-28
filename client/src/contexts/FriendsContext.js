@@ -37,7 +37,7 @@ const FriendsContextProvider = (props) => {
     fd.append('usernameOrEmail', username);
     const res = await executeRequest(methods.POST, friendsURI, fd);
     switch (res.status) {
-      case 200:
+      case 201:
         const requested = friendsLists.requested.concat([res.data]);
         setFriendsLists({...friendsLists, requested: requested});
         return res;
@@ -103,6 +103,18 @@ const FriendsContextProvider = (props) => {
     }
   };
 
+  const getFriendsLength = () => {
+    return friendsLists.friends.length;
+  };
+
+  const getRequestedLength = () => {
+    return friendsLists.requested.length;
+  };
+
+  const getReceivedLength = () => {
+    return friendsLists.received.length;
+  };
+
   return (
     <FriendsContext.Provider value={{
       ...friendsLists,
@@ -111,6 +123,9 @@ const FriendsContextProvider = (props) => {
       deleteFriend,
       refuseFriend,
       cancelFriend,
+      getFriendsLength,
+      getRequestedLength,
+      getReceivedLength
     }}>
       { props.children }
     </FriendsContext.Provider>

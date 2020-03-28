@@ -14,7 +14,7 @@ const Profile = () => {
 	const [user, setUser] = useState(null);
 
 	useEffect(() => {
-		getUser().then(res => {if (res) setUser(res.data)});
+		getUser().then(res => { if (res) setUser(res.data) });
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -48,19 +48,23 @@ const Profile = () => {
 	};
 
 	return (
-		<section className="Profile is-light is-large" data-testid="Profile">
+		<section className="Profile container is-fluid" data-testid="Profile">
 
-			<div className="columns container main-container">
+			<br/>
 
-				<div className="column is-one-third">
+			<div className="columns">
+
+				<div className="column is-one-quarter">
 					{ user &&
-						<div className="container profile-container" data-testid="UserProfileContainer">
-							<div className="container">
-								<input id="input-image" type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} />
-								<img id="user-picture" src={userPicture} alt="User" width={260} height={260} onClick={() => imageUploader.current.click()} data-testid="UserProfileImage" />
-								<div className="has-text-left">
+						<div className="tile is-ancestor" data-testid="UserProfileContainer">
+							<div className="tile is-parent is-vertical">
+								<div className="tile is-child has-text-centered">
+									<input id="input-image" type="file" accept="image/*" onChange={_onImageChange} ref={imageUploader} />
+									<img id="user-picture" src={userPicture} alt="User" width={260} height={260} onClick={() => imageUploader.current.click()} data-testid="UserProfileImage" />
+								</div>
+								<div className="tile has-text-centered is-child">
 									<p className="is-size-5" data-testid="UserProfileUsername"><i>{'@' + username}</i></p>
-									<p className="is-size-5" data-testid="UserProfileEmail">Email: {user.email}</p>
+									<p className="is-size-5" data-testid="UserProfileEmail">{user.email}</p>
 								</div>
 							</div>
 						</div>
@@ -68,7 +72,7 @@ const Profile = () => {
 				</div>
 
 				<div className="column">
-					<div className="container tabs is-boxed">
+					<div className="tabs is-boxed">
 						<ul>
 							<li className="is-active">
 								<Link to={routes.USER_FRIENDS.url}>
