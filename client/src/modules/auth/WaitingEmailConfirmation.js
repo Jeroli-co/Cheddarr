@@ -12,7 +12,7 @@ const WaitingEmailConfirmation = (props) => {
 				<div className="hero-body">
 					<div className="container">
 						<h1 className="title">
-							One more step ! Your account needs to be confirmed...
+							One more step ! Your email needs to be confirmed...
 						</h1>
 						<h2 className="subtitle">
 							Please check your emails and click on the link provided to confirm your account
