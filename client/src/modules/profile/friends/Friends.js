@@ -56,7 +56,7 @@ const Friends = () => {
 
             <hr/>
 
-            <Fade top collapse when={isFriendVisible}>
+            <Fade ssrFadeout top collapse when={isFriendVisible}>
               <FriendsList/>
             </Fade>
 
@@ -81,7 +81,7 @@ const Friends = () => {
 
             <hr/>
 
-            <Fade top collapse when={isReceivedVisible}>
+            <Fade ssrFadeout top collapse when={isReceivedVisible}>
               <ReceivedList/>
             </Fade>
 
@@ -104,7 +104,7 @@ const Friends = () => {
 
             <hr/>
 
-            <Fade top collapse when={isRequestedVisible}>
+            <Fade ssrFadeout top collapse when={isRequestedVisible}>
               <RequestedList/>
             </Fade>
 
