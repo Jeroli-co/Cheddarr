@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../contexts/AuthContext";
 import {routes} from "../../router/routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../forms/formDefaultValidators";
-import {WaitingEmailConfirmation} from "./WaitingEmailConfirmation";
 
 const SignUpForm = ({ history }) => {
 
