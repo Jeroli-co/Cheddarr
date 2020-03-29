@@ -6,44 +6,46 @@ import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../contexts/AuthContext";
 import {routes} from "../../router/routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../forms/formDefaultValidators";
+import {WaitingEmailConfirmation} from "./WaitingEmailConfirmation";
 
-const SignUpForm = (props) => {
+const SignUpForm = ({ history }) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
   const { signUp } = useContext(AuthContext);
   const [httpError, setHttpError] = useState(null);
+  const email = watch('email');
 
   const onSubmit = (data) => {
     signUp(data).then(res => {
       if (res) {
         switch (res.status) {
           case 201:
-            props.history.push(routes.WAIT_EMAIL_CONFIRMATION.url);
+            history.push(routes.WAIT_EMAIL_CONFIRMATION.url(email));
             return;
           default:
-            setHttpError(res);
+            setHttpError(res)
         }
       }
     });
   };
 
 	return (
-		<div className="SignUpForm" data-testid="SignUpForm">
+	  <div className="SignUpForm" data-testid="SignUpForm">
 
       <div className="hero is-primary">
-				<div className="hero-body">
-					<div className="container has-text-centered">
-						<h1 className="title">
-							<p>Create a <span className="has-text-secondary">Cheddarr</span> account</p>
-						</h1>
-					</div>
-				</div>
-			</div>
+        <div className="hero-body">
+          <div className="container has-text-centered">
+            <h1 className="title">
+              <p>Create a <span className="has-text-secondary">Cheddarr</span> account</p>
+            </h1>
+          </div>
+        </div>
+      </div>
 
-			<br />
+      <br />
 
-			<div className="columns is-mobile is-centered">
-				<div className="column is-one-third-desktop is-half-tablet is-three-quarters-mobile">
+      <div className="columns is-mobile is-centered">
+        <div className="column is-one-third-desktop is-half-tablet is-three-quarters-mobile">
 
           <form onSubmit={handleSubmit(onSubmit)}>
 
@@ -174,12 +176,12 @@ const SignUpForm = (props) => {
 
           </form>
 
-				</div>
-			</div>
+        </div>
+      </div>
 
-		</div>
+    </div>
 	);
-}
+};
 
 export {
   SignUpForm

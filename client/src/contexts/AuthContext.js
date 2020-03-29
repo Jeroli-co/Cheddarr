@@ -156,7 +156,7 @@ const AuthContextProvider = (props) => {
 
    const resendConfirmation = async (email) => {
      const fd = new FormData();
-    fd.append('email', email);
+     fd.append('email', email);
      const res = await executeRequest(methods.POST, "/confirm/resend/", fd);
      switch (res.status) {
        case 200:

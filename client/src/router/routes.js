@@ -26,7 +26,7 @@ const routes = {
   INIT_RESET_PASSWORD: { url: '/sign-in/init-reset-password', component: InitResetPasswordModal },
   SIGN_UP: { url: '/sign-up', component: SignUpForm },
   CONFIRM_EMAIL: { url: (token) => '/confirm/' + token, component: ConfirmEmail },
-  WAIT_EMAIL_CONFIRMATION: { url: '/wait-email-confirmation', component: WaitingEmailConfirmation },
+  WAIT_EMAIL_CONFIRMATION: { url: (email) => '/wait-email-confirmation/' + email, component: WaitingEmailConfirmation },
   RESET_PASSWORD: { url: (token) => '/reset/' + token, component: ResetPassword },
   RESEND_EMAIL_CONFIRMATION: { url: '/resend-email-confirmation', component: ResendEmailConfirmationModal },
   INTERNAL_SERVER_ERROR: { url: '/500', component: InternalServerError },
