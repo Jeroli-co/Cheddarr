@@ -45,7 +45,9 @@ const AddFriendsInput = () => {
                      value={searchFriends}
                      onChange={(e) => setSearchFriends(e.target.value)}
               />
-              <span className="icon is-small is-left"><FontAwesomeIcon icon={faSearch} /></span>
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faSearch} />
+              </span>
             </div>
             <div className="control">
               <button className="button is-success" onClick={_onAddFriend}>
