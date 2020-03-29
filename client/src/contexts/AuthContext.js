@@ -39,6 +39,7 @@ const AuthContextProvider = (props) => {
       setIsLoadingSession(false);
       getApiKey().then(() => {});
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session.isAuthenticated]);
 
   const clearSession = () => {
