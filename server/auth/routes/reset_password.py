@@ -1,12 +1,13 @@
 from http import HTTPStatus
 from flask import url_for, render_template, request
-from server import InvalidUsage, utils
-from server.auth.routes import auth
+from server import InvalidUsage, utils, limiter
+from server.auth import auth
 from server.auth.models import User
 from server.auth.forms import EmailForm, PasswordForm
 
 
 @auth.route("/reset/password/", methods=["POST"])
+@limiter.limit("10/day")
 def reset_password():
     email_form = EmailForm()
     if not email_form.validate():

@@ -3,18 +3,18 @@ from http import HTTPStatus
 from flask import render_template, session, url_for
 from flask_login import fresh_login_required, current_user, login_required
 
-from server import InvalidUsage, db, utils
+from server import InvalidUsage, db, utils, limiter
 from server.auth.models import User
 from server.auth.forms import PasswordForm, EmailForm
-from server.profile.routes import profile
+from server.profile import profile
 from server.profile.forms import UsernameForm, ChangePasswordForm, PictureForm
-from server.profile.serializers.profile_serializer import profile_serializer
+from server.profile.serializers.user_serializer import user_serializer
 
 
 @profile.route("/", methods=["GET"])
 @login_required
 def get_profile():
-    return profile_serializer.dump(current_user), HTTPStatus.OK
+    return user_serializer.dump(current_user), HTTPStatus.OK
 
 
 @profile.route("/", methods=["DELETE"])
@@ -27,7 +27,7 @@ def delete_user():
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
-    if not current_user.password == password_form.password.data:
+    if not current_user.check_password(password_form.password.data):
         raise InvalidUsage("Wrong password.", HTTPStatus.BAD_REQUEST)
 
     current_user.delete()
@@ -36,6 +36,7 @@ def delete_user():
 
 
 @profile.route("/picture/", methods=["PUT"])
+@limiter.limit("10/hour")
 @login_required
 def change_picture():
     picture_form = PictureForm()
@@ -51,6 +52,7 @@ def change_picture():
 
 
 @profile.route("/password/", methods=["PUT"])
+@limiter.limit("10/day")
 @fresh_login_required
 def change_password():
     password_form = ChangePasswordForm()
@@ -61,10 +63,11 @@ def change_password():
             payload=password_form.errors,
         )
 
-    if not current_user.password == password_form.oldPassword.data:
+    if not current_user.check_password(password_form.oldPassword.data):
         raise InvalidUsage(
             "The passwords don't match.", status_code=HTTPStatus.BAD_REQUEST,
         )
+
     current_user.change_password(password_form.newPassword.data)
     html = render_template("email/change_password_notice.html")
     subject = "Your password has been changed"
@@ -73,6 +76,8 @@ def change_password():
 
 
 @profile.route("/username/", methods=["PUT"])
+@limiter.limit("10/day")
+@fresh_login_required
 def change_username():
     username_form = UsernameForm()
     if not username_form.validate():
@@ -93,6 +98,7 @@ def change_username():
 
 
 @profile.route("/email/", methods=["PUT"])
+@limiter.limit("10/day")
 @fresh_login_required
 def change_email():
     email_form = EmailForm()

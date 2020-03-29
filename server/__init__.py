@@ -6,6 +6,8 @@ from flask.app import Flask
 from flask.helpers import get_debug_flag
 from flask.sessions import SecureCookieSessionInterface
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_login import LoginManager, user_loaded_from_header
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -31,6 +33,7 @@ ma = Marshmallow()
 migrate = Migrate()
 login_manager = LoginManager()
 mail = sendgrid.SendGridAPIClient()
+limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app():
@@ -58,12 +61,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
     app.session_interface = CustomSessionInterface()
     db.init_app(app)
     ma.init_app(app)
-    with app.app_context():
-        if db.engine.url.drivername == "sqlite":
-            migrate.init_app(app, db, render_as_batch=True)
-        else:
-            migrate.init_app(app, db)
-
+    limiter.init_app(app)
     mail.api_key = app.config.get("MAIL_SENDGRID_API_KEY")
     csp = {"default-src": "'self'", "img-src": "*"}
     Talisman(app, content_security_policy=csp)
@@ -72,6 +70,12 @@ def _create_app(config_object: BaseConfig, **kwargs):
         supports_credentials=True,
         resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}},
     )
+
+    with app.app_context():
+        if db.engine.url.drivername == "sqlite":
+            migrate.init_app(app, db, render_as_batch=True)
+        else:
+            migrate.init_app(app, db)
 
     register_blueprints(app)
     register_commands(app)
