@@ -31,8 +31,11 @@ const Friends = () => {
 
   return (
     <div className="Friends" data-testid="Friends">
+
       <AddFriendsInput/>
+
       <hr/>
+
       <div className="tile is-ancestor">
 
         <div className="tile is-6 is-parent">
@@ -46,7 +49,7 @@ const Friends = () => {
               </div>
               <div className="level-right">
                 <div className="level-item">
-                  { isFriendVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/> || <FontAwesomeIcon icon={faAngleRight} size="lg"/> }
+                  { (isFriendVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/>) || (<FontAwesomeIcon icon={faAngleRight} size="lg"/>) }
                 </div>
               </div>
             </div>
@@ -71,7 +74,7 @@ const Friends = () => {
               </div>
               <div className="level-right">
                 <div className="level-item">
-                  { isReceivedVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/> || <FontAwesomeIcon icon={faAngleRight} size="lg"/> }
+                  { (isReceivedVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/>) || (<FontAwesomeIcon icon={faAngleRight} size="lg"/>) }
                 </div>
               </div>
             </div>
@@ -94,7 +97,7 @@ const Friends = () => {
               </div>
               <div className="level-right">
                 <div className="level-item">
-                  { isRequestedVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/> || <FontAwesomeIcon icon={faAngleRight} size="lg"/> }
+                  { (isRequestedVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/>) || (<FontAwesomeIcon icon={faAngleRight} size="lg"/>) }
                 </div>
               </div>
             </div>
