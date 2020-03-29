@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 import {Route} from "react-router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCopy, faExclamationCircle, faPlus, faSyncAlt, faTrash} from "@fortawesome/free-solid-svg-icons";
@@ -8,12 +8,7 @@ import {AuthContext} from "../../../contexts/AuthContext";
 
 const SettingsProfile = (props) => {
 
-  const { apiKey, getApiKey, resetApiKey, deleteApiKey } = useContext(AuthContext);
-
-  useEffect(() => {
-    getApiKey();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { apiKey, resetApiKey, deleteApiKey } = useContext(AuthContext);
 
   const _onCopyToClipboard = () => {
     const copyText = document.getElementById("apiKeyInput");
