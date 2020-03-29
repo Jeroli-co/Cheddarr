@@ -20,6 +20,7 @@
     "mutationobserver-shim": "^0.3.3",
     "node-sass": "^4.13.1",
     "react": "^16.12.0",
+    "react-animated-css": "^1.2.1",
     "react-dom": "^16.12.0",
     "react-hook-form": "^4.9.8",
     "react-router": "^5.1.2",

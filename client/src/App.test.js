@@ -50,7 +50,7 @@ test('App router load components (no authentication needed) correctly', async ()
   expect(confirmEmail).toBeInTheDocument();
 
   // Render wait account confirmation
-  history.push(routes.WAIT_EMAIL_CONFIRMATION.url);
+  history.push(routes.WAIT_EMAIL_CONFIRMATION.url("test@test.test"));
   const waitEmailConfirmation = wrapper.getByTestId('WaitingEmailConfirmation');
   expect(waitEmailConfirmation).toBeInTheDocument();
 
