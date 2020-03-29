@@ -37,6 +37,7 @@ const AuthContextProvider = (props) => {
   useEffect(() => {
     if (session.isAuthenticated) {
       setIsLoadingSession(false);
+      getApiKey().then(() => {});
     }
   }, [session.isAuthenticated]);
 

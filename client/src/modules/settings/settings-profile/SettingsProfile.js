@@ -8,12 +8,7 @@ import {AuthContext} from "../../../contexts/AuthContext";
 
 const SettingsProfile = (props) => {
 
-  const { apiKey, getApiKey, resetApiKey, deleteApiKey } = useContext(AuthContext);
-
-  useEffect(() => {
-    getApiKey();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { apiKey, resetApiKey, deleteApiKey } = useContext(AuthContext);
 
   const _onCopyToClipboard = () => {
     const copyText = document.getElementById("apiKeyInput");
