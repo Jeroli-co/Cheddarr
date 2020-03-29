@@ -25,6 +25,7 @@ class BaseConfig(object):
     # session/cookies                                                        #
     ##########################################################################
     REMEMBER_COOKIE_DURATION = timedelta(days=REMEMBER_COOKIE_LIFETIME)
+    RATELIMIT_DEFAULT = "200/hour"
 
     ##########################################################################
     # database                                                               #
