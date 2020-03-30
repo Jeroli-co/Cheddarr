@@ -5,7 +5,6 @@ import {FriendsList} from "./elements/FriendsList";
 import {RequestedList} from "./elements/RequestedList";
 import {ReceivedList} from "./elements/ReceivedList";
 import {FriendsContext} from "../../../contexts/FriendsContext";
-import {Fade} from "react-reveal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 
@@ -56,9 +55,7 @@ const Friends = () => {
 
             <hr/>
 
-            <Fade ssrFadeout top collapse when={isFriendVisible}>
-              <FriendsList/>
-            </Fade>
+            { isFriendVisible && <FriendsList/> }
 
           </div>
         </div>
@@ -81,9 +78,7 @@ const Friends = () => {
 
             <hr/>
 
-            <Fade ssrFadeout top collapse when={isReceivedVisible}>
-              <ReceivedList/>
-            </Fade>
+            { isReceivedVisible && <ReceivedList/> }
 
           </div>
 
@@ -104,9 +99,7 @@ const Friends = () => {
 
             <hr/>
 
-            <Fade ssrFadeout top collapse when={isRequestedVisible}>
-              <RequestedList/>
-            </Fade>
+            { isRequestedVisible && <RequestedList/> }
 
           </div>
 
