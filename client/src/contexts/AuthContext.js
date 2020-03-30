@@ -122,19 +122,27 @@ const AuthContextProvider = (props) => {
   };
 
   const signInWithPlex = async () => {
-    try {
-      const res = await axios.get("/api/sign-in/plex/");
-      window.location = res.headers.location;
-    }
-    catch (e) {
-       handleError(e);
+    const res = await executeRequest(methods.GET, "/api/sign-in/plex/");
+    switch (res.status) {
+      case 200:
+        window.location(res.headers.location);
+        return res;
+      default:
+        handleError(res);
         return null;
     }
   };
 
-  const authorizePlex = async(search) => {
-    return await executeRequest(methods.GET, "/plex/authorize/" + search );
-  }
+  const authorizePlex = async (search) => {
+    const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
+    switch (res.status) {
+      case 200:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
 
   const signOut = async () => {
     await executeRequest(methods.GET, "/sign-out/");
