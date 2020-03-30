@@ -21,8 +21,8 @@ const SettingsProfile = (props) => {
   return (
     <div className="SettingsProfile" data-testid="SettingsProfile">
       <div className="container">
-        <div className="columns is-mobile">
-          <div id="action-column" className="column is-half">
+        <div className="columns has-text-centered-mobile">
+          <div id="action-column" className="column is-half-desktop">
 
             {/* CHANGE USERNAME */}
             <h3 className="subtitle is-3">Change username</h3>
