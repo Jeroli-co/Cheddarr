@@ -16,7 +16,6 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(128), unique=True, nullable=False, index=True)
     email = db.Column(db.String(128), unique=True, nullable=False, index=True)
     _password = db.Column(db.String(128), nullable=False)
-    api_key = db.Column(db.String)
     user_picture = db.Column(db.String(256))
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
@@ -38,7 +37,6 @@ class User(db.Model, UserMixin):
         self.user_picture = user_picture
         self.confirmed = confirmed
         self.session_token = utils.generate_token([email, password])
-        self.api_key = None
 
     def __repr__(self):
         return "%s/%s/%s/%s" % (
@@ -145,3 +143,25 @@ class User(db.Model, UserMixin):
             return User.query.filter_by(email=email).first()
         if username:
             return User.query.filter_by(username=username).first()
+
+
+class ApiKey(db.Model):
+    user_id = db.Column(
+        db.Integer, db.ForeignKey(User.id), primary_key=True, nullable=False
+    )
+    user = db.relationship(User)
+    provider = db.Column(db.String(32), primary_key=True, nullable=False)
+    key = db.Column(db.String, unique=True)
+
+    @classmethod
+    def find(cls, user, provider):
+        return (
+            ApiKey.query.filter_by(user_id=user.id).filter_by(provider=provider).first()
+        )
+
+
+class Oauth(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    provider_user_id = db.Column(db.String(256), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
+    user = db.relationship(User)

@@ -26,3 +26,7 @@ class EmailForm(FlaskForm):
 
 class PasswordForm(FlaskForm):
     password = PasswordField("Password", [InputRequired(), Length(min=8, max=128)])
+
+
+class ApiKeyForm(FlaskForm):
+    apiKey = StringField("API key", InputRequired())
