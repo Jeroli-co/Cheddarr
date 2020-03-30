@@ -18,6 +18,7 @@ def get_profile():
 
 
 @profile.route("/", methods=["DELETE"])
+@limiter.limit("3/hour")
 @fresh_login_required
 def delete_user():
     password_form = PasswordForm()
@@ -52,7 +53,7 @@ def change_picture():
 
 
 @profile.route("/password/", methods=["PUT"])
-@limiter.limit("10/day")
+@limiter.limit("3/hour")
 @fresh_login_required
 def change_password():
     password_form = ChangePasswordForm()
@@ -76,7 +77,7 @@ def change_password():
 
 
 @profile.route("/username/", methods=["PUT"])
-@limiter.limit("10/day")
+@limiter.limit("3/hour")
 @fresh_login_required
 def change_username():
     username_form = UsernameForm()
@@ -98,7 +99,7 @@ def change_username():
 
 
 @profile.route("/email/", methods=["PUT"])
-@limiter.limit("10/day")
+@limiter.limit("3/hour")
 @fresh_login_required
 def change_email():
     email_form = EmailForm()

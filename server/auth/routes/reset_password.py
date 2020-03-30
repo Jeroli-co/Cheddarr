@@ -7,7 +7,7 @@ from server.auth.forms import EmailForm, PasswordForm
 
 
 @auth.route("/reset/password/", methods=["POST"])
-@limiter.limit("10/day")
+@limiter.limit("3/hour")
 def reset_password():
     email_form = EmailForm()
     if not email_form.validate():
