@@ -4,7 +4,7 @@ import {routes} from "../router/routes";
 import Cookies from 'js-cookie'
 import {APIContext, methods} from "./APIContext";
 import {PageLoader} from "../elements/PageLoader";
-
+import axios from "axios";
 const AuthContext = createContext();
 
 const initialSessionState = {
@@ -119,6 +119,21 @@ const AuthContextProvider = (props) => {
     }
   };
 
+  const signInWithPlex = async () => {
+    try {
+      const res = await axios.get("/api/sign-in/plex/");
+      window.location = res.headers.location;
+    }
+    catch (e) {
+       handleError(e);
+        return null;
+    }
+  };
+
+  const authorizePlex = async(search) => {
+    return await executeRequest(methods.GET, "/plex/authorize/" + search );
+  }
+
   const signOut = async () => {
     await executeRequest(methods.GET, "/sign-out/");
     clearSession();
@@ -212,10 +227,10 @@ const AuthContextProvider = (props) => {
   };
 
   const getApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/");
+    const res = await executeRequest(methods.GET, "/key/cheddarr/");
     switch (res.status) {
       case 200:
-        setApiKey(res.data["api_key"]);
+        setApiKey(res.data["key"]);
         return res;
       default:
         handleError(res);
@@ -224,10 +239,10 @@ const AuthContextProvider = (props) => {
   };
 
   const resetApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/reset/");
+    const res = await executeRequest(methods.GET, "/key/cheddarr/reset/");
     switch (res.status) {
       case 200:
-        setApiKey(res.data["api_key"]);
+        setApiKey(res.data["key"]);
         return res;
       default:
         handleError(res);
@@ -236,7 +251,7 @@ const AuthContextProvider = (props) => {
   };
 
   const deleteApiKey = async () => {
-    const res = await executeRequest(methods.DELETE, "/key/");
+    const res = await executeRequest(methods.DELETE, "/key/cheddarr/");
     switch (res.status) {
       case 200:
         setApiKey(null);
@@ -357,6 +372,8 @@ const AuthContextProvider = (props) => {
       isLoadingSession,
       handleError,
       signIn,
+      signInWithPlex,
+      authorizePlex,
       signOut,
       signUp,
       confirmEmail,

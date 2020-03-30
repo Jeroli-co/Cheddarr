@@ -61,35 +61,28 @@ const SettingsProfile = (props) => {
             <h3 className="subtitle is-3 is-danger">API Key</h3>
             <div className="content">
 
-              { apiKey === null &&
-                <button className="button is-info" type="button" onClick={resetApiKey}>
-                  <span className="icon"><FontAwesomeIcon icon={faPlus}/></span>
-                  <span>Generate API Key</span>
-                </button>
-              }
 
-              { typeof apiKey === 'string' && apiKey.length > 0 &&
-                <div className="api-key-container">
-                  <input id="apiKeyInput" className="input is-primary" type="text" value={apiKey} readOnly={true} contentEditable={false} />
-                  <div className="buttons">
-                    <button className="button is-rounded is-info" type="button" onClick={_onCopyToClipboard}>
-                      <span className="icon">
-                        <FontAwesomeIcon icon={faCopy}/>
-                      </span>
-                    </button>
-                    <button className="button is-rounded is-info" type="button" onClick={resetApiKey}>
-                      <span className="icon">
-                        <FontAwesomeIcon icon={faSyncAlt}/>
-                      </span>
-                    </button>
-                    <button className="button is-rounded is-danger" type="button" onClick={deleteApiKey}>
-                      <span className="icon">
-                        <FontAwesomeIcon icon={faTrash}/>
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              }
+
+            <div className="api-key-container">
+              <input id="apiKeyInput" className="input is-primary" type="text" value={apiKey} readOnly={true} contentEditable={false} />
+              <div className="buttons">
+                <button className="button is-rounded is-info" type="button" onClick={_onCopyToClipboard}>
+                  <span className="icon">
+                    <FontAwesomeIcon icon={faCopy}/>
+                  </span>
+                </button>
+                <button className="button is-rounded is-info" type="button" onClick={resetApiKey}>
+                  <span className="icon">
+                    <FontAwesomeIcon icon={faSyncAlt}/>
+                  </span>
+                </button>
+                <button className="button is-rounded is-danger" type="button" onClick={deleteApiKey}>
+                  <span className="icon">
+                    <FontAwesomeIcon icon={faTrash}/>
+                  </span>
+                </button>
+              </div>
+            </div>
 
             </div>
 

@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {faKey, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faKey, faSignInAlt, faUser} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import {Link, Route, useLocation} from "react-router-dom";
@@ -13,7 +13,7 @@ function useQuery() {
 
 const SignInForm = (props) => {
 
-	const { signIn } = useContext(AuthContext);
+	const { signIn, signInWithPlex } = useContext(AuthContext);
 	const { register, handleSubmit, errors } = useForm();
 	const [rememberMe, setRememberMe] = useState(false);
 	const [httpError, setHttpError] = useState(null);
@@ -124,13 +124,26 @@ const SignInForm = (props) => {
 								<button className="button is-secondary-button">Sign in</button>
 							</div>
 						</div>
+					</form>
+
+					<div className="is-divider" data-content="OR"/>
+
+					<h1 className="subtitle is-5">Sign in with</h1>
+
+					<div className="buttons">
+						<button className="button is-rounded" type="button" onClick={signInWithPlex}>
+							<span className="icon">
+								<FontAwesomeIcon icon={faSignInAlt}/>
+							</span>
+							<span>Plex</span>
+						</button>
+					</div>
 
 						<div className="field has-text-centered">
 							<p className="is-size-7">Forgot your password ? <Link to={routes.INIT_RESET_PASSWORD.url}>Click here to reset it</Link></p>
 							<p className="is-size-7">Still not have an account ? <Link to={routes.SIGN_UP.url}>Sign up</Link></p>
 						</div>
 
-					</form>
 
 				</div>
 			</div>
