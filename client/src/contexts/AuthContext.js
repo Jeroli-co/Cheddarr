@@ -17,7 +17,7 @@ const initialSessionState = {
 const AuthContextProvider = (props) => {
 
   const [session, setSession] = useState(initialSessionState);
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState(null);
   const [isLoadingSession, setIsLoadingSession] = useState(true);
   const { executeRequest } = useContext(APIContext);
   const { pushSuccess } = useContext(NotificationContext);
@@ -43,13 +43,6 @@ const AuthContextProvider = (props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session.isAuthenticated]);
-
-  const initSession = (username, userPicture) => {
-    Cookies.set('authenticated', 'yes', { expires: 365 });
-    Cookies.set('username', username, { expires: 365 });
-    Cookies.set('userPicture', userPicture, { expires: 365 });
-    setSession({username: username, userPicture: userPicture, isAuthenticated: true});
-  };
 
   const clearSession = () => {
     Cookies.remove('authenticated');
@@ -91,6 +84,13 @@ const AuthContextProvider = (props) => {
 
   const signIn = async (data) => {
 
+    const initSession = (username, userPicture) => {
+      Cookies.set('authenticated', 'yes', { expires: 365 });
+      Cookies.set('username', username, { expires: 365 });
+      Cookies.set('userPicture', userPicture, { expires: 365 });
+      setSession({username: username, userPicture: userPicture, isAuthenticated: true});
+    };
+
     const get = async () => {
       return await executeRequest(methods.GET, "/sign-in/");
     };
@@ -121,31 +121,20 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const signInWithPlex = async (redirectURI = null) => {
-    const uri = redirectURI ? redirectURI : "";
-    const res = await executeRequest(methods.GET, "/sign-in/plex/?redirectURI=" + uri);
-    switch (res.status) {
-      case 200:
-        window.location.href = res.headers.location;
-        return res;
-      default:
-        handleError(res);
+  const signInWithPlex = async () => {
+    try {
+      const res = await axios.get("/api/sign-in/plex/");
+      window.location = res.headers.location;
+    }
+    catch (e) {
+       handleError(e);
         return null;
     }
   };
 
-  const authorizePlex = async (search) => {
-    const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
-    switch (res.status) {
-      case 200:
-        console.log(res);
-        initSession(res.data.username, res.data["user_picture"]);
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
+  const authorizePlex = async(search) => {
+    return await executeRequest(methods.GET, "/plex/authorize/" + search );
+  }
 
   const signOut = async () => {
     await executeRequest(methods.GET, "/sign-out/");
@@ -243,8 +232,7 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.GET, "/key/cheddarr/");
     switch (res.status) {
       case 200:
-        const key = res.data["key"] ? res.data["key"] : null;
-        if (key) setApiKey(key);
+        setApiKey(res.data["key"]);
         return res;
       default:
         handleError(res);
@@ -268,7 +256,7 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.DELETE, "/key/cheddarr/");
     switch (res.status) {
       case 200:
-        setApiKey("");
+        setApiKey(null);
         return res;
       default:
         handleError(res);
@@ -377,19 +365,7 @@ const AuthContextProvider = (props) => {
         return res;
       default:
         handleError(res);
-        return null;
-    }
-  };
-
-  const getPlexConfig = async () => {
-    const res = await executeRequest(methods.GET, "/provider/plex/config/");
-    switch (res.status) {
-      case 200:
-      case 404:
         return res;
-      default:
-        handleError(res);
-        return null;
     }
   };
 
@@ -419,7 +395,6 @@ const AuthContextProvider = (props) => {
       resetApiKey,
       deleteApiKey,
       deleteAccount,
-      getPlexConfig
     }}>
       { isLoadingSession && <PageLoader/> }
       { props.children }
