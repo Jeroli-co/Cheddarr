@@ -119,9 +119,9 @@ def authorize_plex():
                 confirmed=True,
             )
 
-        # Create the Plex API key (auth token)
+        # Associate the API key (auth token)
         plex_config.provider_api_key = auth_token
-        # Associate the local user account with the OAuth table and the ApiKey table
+        # Associate the local user account with the ProviderConfig (Plex) table
         plex_config.user = user
         print(user)
 
