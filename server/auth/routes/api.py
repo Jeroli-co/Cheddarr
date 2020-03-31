@@ -41,8 +41,8 @@ def reset_api_key():
 def check_plex_api_key():
     plex_api_key = ApiKey.find(user=current_user, provider="plex")
     if not plex_api_key:
-        return HTTPStatus.NOT_FOUND
-    return HTTPStatus.OK
+        return {}, HTTPStatus.NOT_FOUND
+    return {}, HTTPStatus.OK
 
 
 def set_plex_api_key(auth_token, user_id):

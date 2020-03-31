@@ -119,8 +119,9 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const signInWithPlex = async () => {
-    const res = await executeRequest(methods.GET, "/sign-in/plex/");
+  const signInWithPlex = async (redirectURI = null) => {
+    const uri = redirectURI ? redirectURI : "";
+    const res = await executeRequest(methods.GET, "/sign-in/plex/?redirectURI=" + uri);
     switch (res.status) {
       case 200:
         window.location.href = res.headers.location;
@@ -135,6 +136,7 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
     switch (res.status) {
       case 200:
+        console.log(res);
         initSession(res.data.username, res.data["user_picture"]);
         return res;
       default:
@@ -371,7 +373,19 @@ const AuthContextProvider = (props) => {
         return res;
       default:
         handleError(res);
+        return null;
+    }
+  };
+
+  const checkPlexAPIKey = async () => {
+    const res = await executeRequest(methods.GET, "/key/plex/");
+    switch (res.status) {
+      case 200:
+      case 404:
         return res;
+      default:
+        handleError(res);
+        return null;
     }
   };
 
@@ -401,6 +415,7 @@ const AuthContextProvider = (props) => {
       resetApiKey,
       deleteApiKey,
       deleteAccount,
+      checkPlexAPIKey
     }}>
       { isLoadingSession && <PageLoader/> }
       { props.children }

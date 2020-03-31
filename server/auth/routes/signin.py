@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, make_response
 from flask_login import login_user, current_user
 from requests import get, post
 from sqlalchemy.orm.exc import NoResultFound
@@ -59,26 +59,32 @@ def signin():
 
 @auth.route("/sign-in/plex/", methods=["GET"])
 def plex_signin():
+    redirect_uri = request.args.get("redirectURI", "")
     r = post("https://plex.tv/api/v2/pins?strong=true", headers=plex_headers)
     info = r.json()
     code = info["code"]
     state = info["id"]
+    forward_url = url_for("auth.authorize_plex", _external=True).replace("/api", "")
+    token = utils.generate_token({"id": str(state), "redirectURI": redirect_uri})
     authorize_url = (
         "https://app.plex.tv/auth#?clientID="
         + plex_identifier
         + "&code="
         + code
         + "&forwardUrl="
-        + url_for("auth.authorize_plex", _external=True).replace("/api", "")
-        + "?id="
-        + str(state)
+        + forward_url
+        + "?token="
+        + token
     )
     return redirect(authorize_url), HTTPStatus.OK
 
 
 @auth.route("/plex/authorize/", methods=["GET"])
 def authorize_plex():
-    state = request.args.get("id")
+    token = request.args.get("token")
+    token = utils.confirm_token(token)
+    redirect_uri = token.get("redirectURI")
+    state = token.get("id")
     r = get("https://plex.tv/api/v2/pins/" + state, headers=plex_headers)
     auth_token = r.json().get("authToken")
     if not auth_token:
@@ -111,16 +117,18 @@ def authorize_plex():
                 user_picture=user_picture,
                 confirmed=True,
             )
+
         # Create the Plex API key (auth token)
         api_key = ApiKey(user_id=user.id, provider="plex", key=auth_token)
         # Associate the local user account with the OAuth table and the ApiKey table
         oauth.user = user
         api_key.user = user
-        print(user)
 
         # Save and commit our database models
         db.session.add_all([user, oauth, api_key])
         db.session.commit()
     # Log in the user (new or existing)
     login_user(oauth.user)
-    return session_serializer.dump(oauth.user), HTTPStatus.OK
+    res = make_response(session_serializer.dump(oauth.user))
+    res.headers["redirect-uri"] = redirect_uri
+    return res
