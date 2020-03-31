@@ -3,7 +3,6 @@ import {Route} from "react-router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCopy, faExclamationCircle, faSyncAlt, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../router/routes";
-import './SettingsProfile.scss';
 import {AuthContext} from "../../../contexts/AuthContext";
 
 const SettingsProfile = (props) => {
@@ -61,28 +60,34 @@ const SettingsProfile = (props) => {
             <h3 className="subtitle is-3 is-danger">API Key</h3>
             <div className="content">
 
-
-
-            <div className="api-key-container">
-              <input id="apiKeyInput" className="input is-primary" type="text" value={apiKey} readOnly={true} contentEditable={false} />
-              <div className="buttons">
-                <button className="button is-rounded is-info" type="button" onClick={_onCopyToClipboard}>
-                  <span className="icon">
-                    <FontAwesomeIcon icon={faCopy}/>
-                  </span>
-                </button>
-                <button className="button is-rounded is-info" type="button" onClick={resetApiKey}>
-                  <span className="icon">
-                    <FontAwesomeIcon icon={faSyncAlt}/>
-                  </span>
-                </button>
-                <button className="button is-rounded is-danger" type="button" onClick={deleteApiKey}>
-                  <span className="icon">
-                    <FontAwesomeIcon icon={faTrash}/>
-                  </span>
-                </button>
+              <div className="columns">
+                <div className="column is-two-thirds">
+                  <input id="apiKeyInput" className="input is-primary" type="text" disabled={apiKey.length === 0} placeholder="No api key is set" value={apiKey} readOnly={true} contentEditable={false} />
+                </div>
+                <div className="column">
+                  <div className="buttons">
+                    { apiKey.length > 0 &&
+                      <button className="button is-rounded is-info" type="button" onClick={_onCopyToClipboard} data-tooltip="Copy to clipboard">
+                        <span className="icon">
+                          <FontAwesomeIcon icon={faCopy}/>
+                        </span>
+                      </button>
+                    }
+                    <button className="button is-rounded is-info" type="button" onClick={resetApiKey} data-tooltip="Generate new API key">
+                      <span className="icon">
+                        <FontAwesomeIcon icon={faSyncAlt}/>
+                      </span>
+                    </button>
+                    { apiKey.length > 0 &&
+                      <button className="button is-rounded is-danger" type="button" onClick={deleteApiKey} data-tooltip="Delete API key">
+                        <span className="icon">
+                          <FontAwesomeIcon icon={faTrash}/>
+                        </span>
+                      </button>
+                    }
+                  </div>
+                </div>
               </div>
-            </div>
 
             </div>
 

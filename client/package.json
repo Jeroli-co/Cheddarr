@@ -16,6 +16,7 @@
     "bulma-divider": "^0.2.0",
     "bulma-pageloader": "^0.3.0",
     "bulma-switch": "^2.0.0",
+    "bulma-tooltip": "^3.0.2",
     "js-cookie": "^2.2.1",
     "mutationobserver-shim": "^0.3.3",
     "node-sass": "^4.13.1",

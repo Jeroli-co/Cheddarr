@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUser, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
+import {faUser, faEnvelope, faKey, faSignInAlt} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../contexts/AuthContext";
@@ -10,7 +10,7 @@ import {FORM_DEFAULT_VALIDATOR} from "../../forms/formDefaultValidators";
 const SignUpForm = ({ history }) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { signUp } = useContext(AuthContext);
+  const { signUp, signInWithPlex } = useContext(AuthContext);
   const [httpError, setHttpError] = useState(null);
   const email = watch('email');
 
@@ -166,6 +166,17 @@ const SignUpForm = ({ history }) => {
                 <button className="button is-secondary-button">Sign up</button>
               </div>
             </div>
+
+            <div className="is-divider" data-content="OR"/>
+
+            <h1 className="subtitle is-5">Sign up with</h1>
+
+            <button className="button is-rounded" type="button" onClick={signInWithPlex}>
+							<span className="icon">
+								<FontAwesomeIcon icon={faSignInAlt}/>
+							</span>
+							<span>Plex</span>
+						</button>
 
             <div className="field">
               <div className="control has-text-centered">

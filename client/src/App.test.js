@@ -89,7 +89,7 @@ test('App router load components (authentication needed) correctly', async () =>
         <AuthContext.Provider value={{
           isAuthenticated: true,
           getUser: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email}))),
-          getApiKey: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {api_key: "TEST-API-KEY"}))),
+          getApiKey: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {key: "TEST-API-KEY"}))),
         }}>
           <App />
         </AuthContext.Provider>
