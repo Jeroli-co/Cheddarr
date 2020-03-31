@@ -17,7 +17,7 @@ const initialSessionState = {
 const AuthContextProvider = (props) => {
 
   const [session, setSession] = useState(initialSessionState);
-  const [apiKey, setApiKey] = useState(null);
+  const [apiKey, setApiKey] = useState("");
   const [isLoadingSession, setIsLoadingSession] = useState(true);
   const { executeRequest } = useContext(APIContext);
   const { pushSuccess } = useContext(NotificationContext);
@@ -43,6 +43,13 @@ const AuthContextProvider = (props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session.isAuthenticated]);
+
+  const initSession = (username, userPicture) => {
+    Cookies.set('authenticated', 'yes', { expires: 365 });
+    Cookies.set('username', username, { expires: 365 });
+    Cookies.set('userPicture', userPicture, { expires: 365 });
+    setSession({username: username, userPicture: userPicture, isAuthenticated: true});
+  };
 
   const clearSession = () => {
     Cookies.remove('authenticated');
@@ -84,13 +91,6 @@ const AuthContextProvider = (props) => {
 
   const signIn = async (data) => {
 
-    const initSession = (username, userPicture) => {
-      Cookies.set('authenticated', 'yes', { expires: 365 });
-      Cookies.set('username', username, { expires: 365 });
-      Cookies.set('userPicture', userPicture, { expires: 365 });
-      setSession({username: username, userPicture: userPicture, isAuthenticated: true});
-    };
-
     const get = async () => {
       return await executeRequest(methods.GET, "/sign-in/");
     };
@@ -122,10 +122,10 @@ const AuthContextProvider = (props) => {
   };
 
   const signInWithPlex = async () => {
-    const res = await executeRequest(methods.GET, "/api/sign-in/plex/");
+    const res = await executeRequest(methods.GET, "/sign-in/plex/");
     switch (res.status) {
       case 200:
-        window.location(res.headers.location);
+        window.location.href = res.headers.location;
         return res;
       default:
         handleError(res);
@@ -137,6 +137,7 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
     switch (res.status) {
       case 200:
+        initSession(res.data.username, res.data["user_picture"]);
         return res;
       default:
         handleError(res);
@@ -240,7 +241,8 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.GET, "/key/cheddarr/");
     switch (res.status) {
       case 200:
-        setApiKey(res.data["key"]);
+        const key = res.data["key"] ? res.data["key"] : null;
+        if (key) setApiKey(key);
         return res;
       default:
         handleError(res);
@@ -264,7 +266,7 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.DELETE, "/key/cheddarr/");
     switch (res.status) {
       case 200:
-        setApiKey(null);
+        setApiKey("");
         return res;
       default:
         handleError(res);
