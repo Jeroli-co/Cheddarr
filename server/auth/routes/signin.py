@@ -7,10 +7,11 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from server import db, InvalidUsage, utils
 from server.auth import auth
-from server.auth.models import ApiKey, Oauth, User
+from server.auth.models import User
 from server.auth.forms import SigninForm
 from server.auth.serializers.auth_serializer import session_serializer
 from server.config import FLASK_APP
+from server.providers.models import PlexConfig
 
 plex_identifier = utils.generate_api_key()
 plex_headers = {
@@ -97,13 +98,13 @@ def authorize_plex():
     user_id = info["id"]
 
     # Find this OAuth user in the database, or create it
-    query = Oauth.query.filter_by(provider_user_id=user_id)
+    query = PlexConfig.query.filter_by(plex_user_id=user_id)
     try:
-        oauth = query.one()
+        plex_config = query.one()
     except NoResultFound:
-        oauth = Oauth(provider_user_id=user_id)
+        plex_config = PlexConfig(plex_user_id=user_id)
 
-    if not oauth.user:
+    if not plex_config.user:
         email = info["email"]
         user = User.find(email=email)
         # If the user does not exist we create him
@@ -119,16 +120,16 @@ def authorize_plex():
             )
 
         # Create the Plex API key (auth token)
-        api_key = ApiKey(user_id=user.id, provider="plex", key=auth_token)
+        plex_config.provider_api_key = auth_token
         # Associate the local user account with the OAuth table and the ApiKey table
-        oauth.user = user
-        api_key.user = user
+        plex_config.user = user
+        print(user)
 
         # Save and commit our database models
-        db.session.add_all([user, oauth, api_key])
+        db.session.add_all([user, plex_config])
         db.session.commit()
     # Log in the user (new or existing)
-    login_user(oauth.user)
-    res = make_response(session_serializer.dump(oauth.user))
+    login_user(plex_config.user)
+    res = make_response(session_serializer.dump(plex_config.user))
     res.headers["redirect-uri"] = redirect_uri
     return res

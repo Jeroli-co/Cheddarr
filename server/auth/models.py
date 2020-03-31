@@ -3,6 +3,7 @@ from sqlalchemy import and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 from server import db, utils
+from server.providers.models import ProviderConfig
 
 
 class Friendship(db.Model):
@@ -19,6 +20,7 @@ class User(db.Model, UserMixin):
     user_picture = db.Column(db.String(256))
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
+    api_key = db.Column(db.String(256))
     friends_sent = db.relationship(
         "User",
         secondary=Friendship.__table__,
@@ -27,6 +29,7 @@ class User(db.Model, UserMixin):
         backref=db.backref("friends_received", lazy="dynamic"),
         lazy="dynamic",
     )
+    providers_configs = db.relationship(ProviderConfig, backref="user", cascade="all")
 
     def __init__(
         self, username, email, password, user_picture=None, confirmed=False,
@@ -36,6 +39,7 @@ class User(db.Model, UserMixin):
         self.password = password
         self.user_picture = user_picture
         self.confirmed = confirmed
+        self.api_key = None
         self.session_token = utils.generate_token([email, password])
 
     def __repr__(self):
@@ -143,25 +147,3 @@ class User(db.Model, UserMixin):
             return User.query.filter_by(email=email).first()
         if username:
             return User.query.filter_by(username=username).first()
-
-
-class ApiKey(db.Model):
-    user_id = db.Column(
-        db.Integer, db.ForeignKey(User.id), primary_key=True, nullable=False
-    )
-    user = db.relationship(User)
-    provider = db.Column(db.String(32), primary_key=True, nullable=False)
-    key = db.Column(db.String, unique=True)
-
-    @classmethod
-    def find(cls, user, provider):
-        return (
-            ApiKey.query.filter_by(user_id=user.id).filter_by(provider=provider).first()
-        )
-
-
-class Oauth(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    provider_user_id = db.Column(db.String(256), unique=True, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
-    user = db.relationship(User)
