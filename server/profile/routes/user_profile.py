@@ -3,7 +3,7 @@ from http import HTTPStatus
 from flask import render_template, session, url_for
 from flask_login import fresh_login_required, current_user, login_required
 
-from server import InvalidUsage, db, utils
+from server import InvalidUsage, db, utils, limiter
 from server.auth.models import User
 from server.auth.forms import PasswordForm, EmailForm
 from server.profile import profile
@@ -18,6 +18,7 @@ def get_profile():
 
 
 @profile.route("/", methods=["DELETE"])
+@limiter.limit("3/hour")
 @fresh_login_required
 def delete_user():
     password_form = PasswordForm()
@@ -36,6 +37,7 @@ def delete_user():
 
 
 @profile.route("/picture/", methods=["PUT"])
+@limiter.limit("10/hour")
 @login_required
 def change_picture():
     picture_form = PictureForm()
@@ -51,6 +53,7 @@ def change_picture():
 
 
 @profile.route("/password/", methods=["PUT"])
+@limiter.limit("3/hour")
 @fresh_login_required
 def change_password():
     password_form = ChangePasswordForm()
@@ -74,6 +77,7 @@ def change_password():
 
 
 @profile.route("/username/", methods=["PUT"])
+@limiter.limit("3/hour")
 @fresh_login_required
 def change_username():
     username_form = UsernameForm()
@@ -95,6 +99,7 @@ def change_username():
 
 
 @profile.route("/email/", methods=["PUT"])
+@limiter.limit("3/hour")
 @fresh_login_required
 def change_email():
     email_form = EmailForm()

@@ -2,6 +2,7 @@ blinker
 cloudinary
 Flask
 Flask-Cors
+Flask-Limiter
 Flask-Login
 Flask-Marshmallow
 Flask-Migrate
