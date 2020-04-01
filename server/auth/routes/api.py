@@ -3,8 +3,8 @@ from http import HTTPStatus
 from flask_login import current_user, fresh_login_required
 
 from server import db, utils, limiter
-from server.auth import auth
 from server.providers.models import PlexConfig
+from server.auth.routes import auth
 
 
 @auth.route("/key/cheddarr/", methods=["GET"])
@@ -28,12 +28,3 @@ def reset_api_key():
     current_user.api_key = utils.generate_api_key()
     db.session.commit()
     return {"key": current_user.api_key}
-
-
-@auth.route("/key/plex/", methods=["GET"])
-@fresh_login_required
-def check_plex_api_key():
-    plex_api_key = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
-    if not plex_api_key:
-        return {"message": "No API key set."}, HTTPStatus.NOT_FOUND
-    return {"key": plex_api_key}, HTTPStatus.OK
