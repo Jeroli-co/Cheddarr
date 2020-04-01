@@ -4,9 +4,9 @@ from flask import request, redirect, url_for, make_response
 from flask_login import login_user, current_user
 from requests import get, post
 from sqlalchemy.orm.exc import NoResultFound
-
+from passlib import pwd
 from server import db, InvalidUsage, utils
-from server.auth import auth
+from server.auth.routes import auth
 from server.auth.models import User
 from server.auth.forms import SigninForm
 from server.auth.serializers.auth_serializer import session_serializer
@@ -43,7 +43,7 @@ def signin():
         user = User.find(email=signin_form.usernameOrEmail.data) or User.find(
             username=signin_form.usernameOrEmail.data
         )
-        if not user or not user.check_password(signin_form.password.data):
+        if not user or not user.password == signin_form.password.data:
             raise InvalidUsage(
                 "Wrong username/email or password.", status_code=HTTPStatus.BAD_REQUEST
             )
@@ -114,7 +114,7 @@ def authorize_plex():
             user = User(
                 username=username,
                 email=email,
-                password=utils.generate_password(),
+                password=pwd.genword(entropy=56),
                 user_picture=user_picture,
                 confirmed=True,
             )
@@ -123,7 +123,6 @@ def authorize_plex():
         plex_config.provider_api_key = auth_token
         # Associate the local user account with the ProviderConfig (Plex) table
         plex_config.user = user
-        print(user)
 
         # Save and commit our database models
         db.session.add_all([user, plex_config])

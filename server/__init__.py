@@ -14,6 +14,7 @@ from flask_talisman import Talisman
 from sendgrid import sendgrid
 
 from server.config import (
+    API_ROOT,
     BaseConfig,
     DevConfig,
     ProdConfig,
@@ -90,13 +91,15 @@ def _create_app(config_object: BaseConfig, **kwargs):
 
 
 def register_blueprints(app):
-    from server.auth import auth
+    from server.auth.routes import auth
     from server.site import site
-    from server.profile import profile
+    from server.profile.routes import profile
+    from server.providers.routes import provider
 
     app.register_blueprint(site)
-    app.register_blueprint(auth, url_prefix="/api")
-    app.register_blueprint(profile, url_prefix="/api/profile")
+    app.register_blueprint(auth, url_prefix=API_ROOT)
+    app.register_blueprint(profile, url_prefix=API_ROOT + "/profile")
+    app.register_blueprint(provider, url_prefix=API_ROOT + "/provider")
 
 
 def register_commands(app):
@@ -106,7 +109,7 @@ def register_commands(app):
 
 
 def register_login_manager(app):
-    from server.auth.models import User
+    from server.auth.models.user import User
 
     login_manager.init_app(app)
 

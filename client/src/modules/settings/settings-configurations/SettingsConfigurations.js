@@ -5,11 +5,11 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const SettingsConfigurations = () => {
 
-  const { signInWithPlex, checkPlexAPIKey } = useContext(AuthContext);
+  const { signInWithPlex, getPlexConfig } = useContext(AuthContext);
   const [hasPlexAPIKey, setHasPlexAPIKey] = useState(null);
 
   useEffect(() => {
-    checkPlexAPIKey().then((res) => {
+    getPlexConfig().then((res) => {
       if (res) {
         switch (res.status) {
           case 200:

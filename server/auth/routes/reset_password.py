@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from flask import url_for, render_template, request
 from server import InvalidUsage, utils
-from server.auth import auth
+from server.auth.routes import auth
 from server.auth.models import User
 from server.auth.forms import EmailForm, PasswordForm
 

@@ -1,11 +1,12 @@
 import os
 from datetime import timedelta
 
-FLASK_APP = "cheddarr"
+FLASK_APP = "Cheddarr"
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 REACT_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
 REACT_STATIC_FOLDER = os.path.join(PROJECT_ROOT, "client", "build", "static")
 FLASK_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "server", "templates")
+API_ROOT = "/api"
 REMEMBER_COOKIE_LIFETIME = 365  # Days
 
 

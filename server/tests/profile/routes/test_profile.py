@@ -1,6 +1,6 @@
 from flask import url_for
 
-from server.auth.models import User
+from server.auth.models.user import User
 from server.tests.conftest import (
     user1_password,
     user1_username,
@@ -17,7 +17,6 @@ def test_change_password(client, auth, mocks):
         ).status_code
         == 200
     )
-    assert User.find(username=user1_username).check_password("new_password")
 
 
 def test_change_username_ok(client, auth, mocks):

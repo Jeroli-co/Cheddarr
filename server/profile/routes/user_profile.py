@@ -6,15 +6,15 @@ from flask_login import fresh_login_required, current_user, login_required
 from server import InvalidUsage, db, utils
 from server.auth.models import User
 from server.auth.forms import PasswordForm, EmailForm
-from server.profile import profile
+from server.profile.routes import profile
 from server.profile.forms import UsernameForm, ChangePasswordForm, PictureForm
-from server.profile.serializers.user_serializer import user_serializer
+from server.profile.serializers.profile_serializer import profile_serializer
 
 
 @profile.route("/", methods=["GET"])
 @login_required
 def get_profile():
-    return user_serializer.dump(current_user), HTTPStatus.OK
+    return profile_serializer.dump(current_user), HTTPStatus.OK
 
 
 @profile.route("/", methods=["DELETE"])
@@ -27,7 +27,7 @@ def delete_user():
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
-    if not current_user.check_password(password_form.password.data):
+    if not current_user.password == password_form.password.data:
         raise InvalidUsage("Wrong password.", HTTPStatus.BAD_REQUEST)
 
     current_user.delete()
@@ -61,11 +61,10 @@ def change_password():
             payload=password_form.errors,
         )
 
-    if not current_user.check_password(password_form.oldPassword.data):
+    if not current_user.password == password_form.oldPassword.data:
         raise InvalidUsage(
             "The passwords don't match.", status_code=HTTPStatus.BAD_REQUEST,
         )
-
     current_user.change_password(password_form.newPassword.data)
     html = render_template("email/change_password_notice.html")
     subject = "Your password has been changed"
@@ -74,7 +73,6 @@ def change_password():
 
 
 @profile.route("/username/", methods=["PUT"])
-@fresh_login_required
 def change_username():
     username_form = UsernameForm()
     if not username_form.validate():

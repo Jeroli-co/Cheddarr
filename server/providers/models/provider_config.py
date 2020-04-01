@@ -9,11 +9,11 @@ class ProviderConfig(db.Model):
     enabled = db.Column(db.Boolean, default=False, nullable=False)
     __mapper_args__ = {
         "polymorphic_on": provider_name,
-        "polymorphic_identity": "provider",
     }
 
 
 class PlexConfig(ProviderConfig):
+    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
     plex_user_id = db.Column(db.Integer, unique=True, nullable=False)
     machine_id = db.Column(db.Integer)
 

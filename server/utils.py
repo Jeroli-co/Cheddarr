@@ -4,7 +4,7 @@ import string
 from random import choice
 
 from cloudinary.uploader import upload
-from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer, Signer, Serializer
+from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer, Signer
 from flask import current_app as app
 from sendgrid import Mail, From, To, Content
 
@@ -56,12 +56,6 @@ def unsign(value):
 
 def generate_api_key():
     return secrets.token_hex(24)
-
-
-def generate_password():
-    alphabet = string.ascii_letters + string.digits
-    password = "".join(secrets.choice(alphabet) for i in range(64))
-    return password
 
 
 def generate_token(data):

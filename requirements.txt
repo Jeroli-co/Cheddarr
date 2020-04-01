@@ -2,15 +2,16 @@ blinker
 cloudinary
 Flask
 Flask-Cors
+Flask-WTF
 Flask-Login
 Flask-Marshmallow
 Flask-Migrate
 Flask-SQLAlchemy
 Flask-Talisman
-Flask-WTF
 gunicorn
 itsdangerous
 marshmallow-sqlalchemy
+passlib
 PlexAPI
 psycopg2-binary
 pytest
@@ -19,3 +20,5 @@ requests
 sendgrid
 sqlalchemy
 Werkzeug
+wtforms
+WTForms-Alchemy

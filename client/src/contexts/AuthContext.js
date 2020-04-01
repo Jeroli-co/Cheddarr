@@ -377,8 +377,8 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const checkPlexAPIKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/plex/");
+  const getPlexConfig = async () => {
+    const res = await executeRequest(methods.GET, "/provider/plex/config/");
     switch (res.status) {
       case 200:
       case 404:
@@ -415,7 +415,7 @@ const AuthContextProvider = (props) => {
       resetApiKey,
       deleteApiKey,
       deleteAccount,
-      checkPlexAPIKey
+      getPlexConfig
     }}>
       { isLoadingSession && <PageLoader/> }
       { props.children }
