@@ -8,6 +8,7 @@ import {routes} from "./router/routes";
 import {AuthContext} from "./contexts/AuthContext";
 import {HttpResponse} from "./models/HttpResponse";
 import { APIContext } from "./contexts/APIContext";
+import {NotificationContext} from "./contexts/NotificationContext";
 
 afterEach(cleanup);
 
@@ -86,13 +87,15 @@ test('App router load components (authentication needed) correctly', async () =>
   const tree = (
     <Router history={history}>
       <APIContext.Provider value={{executeRequest: () => new Promise(resolve => resolve(new HttpResponse(200, "", {friends: [], received: [], requested: []})))}}>
-        <AuthContext.Provider value={{
-          isAuthenticated: true,
-          getUser: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email}))),
-          getApiKey: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {api_key: "TEST-API-KEY"}))),
-        }}>
-          <App />
-        </AuthContext.Provider>
+        <NotificationContext.Provider value={{pushNotification: () => {}}}>
+          <AuthContext.Provider value={{
+            isAuthenticated: true,
+            getUser: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email}))),
+            getApiKey: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {api_key: "TEST-API-KEY"}))),
+          }}>
+            <App />
+          </AuthContext.Provider>
+        </NotificationContext.Provider>
       </APIContext.Provider>
     </Router>
   );
