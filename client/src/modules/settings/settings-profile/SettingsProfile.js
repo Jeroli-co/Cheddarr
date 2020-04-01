@@ -4,17 +4,20 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCopy, faExclamationCircle, faSyncAlt, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../router/routes";
 import {AuthContext} from "../../../contexts/AuthContext";
+import {NOTIFICATION_LEVEL, NotificationModel} from "../../../models/NotificationModel";
+import {NotificationContext} from "../../../contexts/NotificationContext";
 
 const SettingsProfile = (props) => {
 
   const { apiKey, resetApiKey, deleteApiKey } = useContext(AuthContext);
+  const { pushNotification } = useContext(NotificationContext);
 
   const _onCopyToClipboard = () => {
     const copyText = document.getElementById("apiKeyInput");
     copyText.select();
     copyText.setSelectionRange(0, 99999); /*For mobile devices*/
     document.execCommand("copy");
-    alert("API Key copied");
+    pushNotification(new NotificationModel("API Key copied", NOTIFICATION_LEVEL.SUCCESS));
   };
 
   return (
