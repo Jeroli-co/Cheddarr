@@ -5,17 +5,19 @@ import {faCopy, faExclamationCircle, faPlus, faSyncAlt, faTrash} from "@fortawes
 import {routes} from "../../../router/routes";
 import './SettingsProfile.scss';
 import {AuthContext} from "../../../contexts/AuthContext";
+import {NotificationContext} from "../../../contexts/NotificationContext";
 
 const SettingsProfile = (props) => {
 
   const { apiKey, resetApiKey, deleteApiKey } = useContext(AuthContext);
+  const { pushSuccess } = useContext(NotificationContext);
 
   const _onCopyToClipboard = () => {
     const copyText = document.getElementById("apiKeyInput");
     copyText.select();
     copyText.setSelectionRange(0, 99999); /*For mobile devices*/
     document.execCommand("copy");
-    alert("API Key copied");
+    pushSuccess("API Key copied");
   };
 
   return (
