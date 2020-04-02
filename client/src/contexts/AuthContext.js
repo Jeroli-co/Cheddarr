@@ -4,6 +4,7 @@ import {routes} from "../router/routes";
 import Cookies from 'js-cookie'
 import {APIContext, methods} from "./APIContext";
 import {PageLoader} from "../elements/PageLoader";
+import {NotificationContext} from "./NotificationContext";
 
 const AuthContext = createContext();
 
@@ -19,6 +20,7 @@ const AuthContextProvider = (props) => {
   const [apiKey, setApiKey] = useState("");
   const [isLoadingSession, setIsLoadingSession] = useState(true);
   const { executeRequest } = useContext(APIContext);
+  const { pushSuccess } = useContext(NotificationContext);
 
   const profileURI = '/profile/';
 
@@ -352,6 +354,7 @@ const AuthContextProvider = (props) => {
         const username = res.data.username;
         Cookies.set('username', username);
         setSession({...session, username: username});
+        pushSuccess("Username has changed");
         return res;
       case 409:
         return res;
@@ -370,6 +373,7 @@ const AuthContextProvider = (props) => {
         const userPicture = res.data["user_picture"];
         Cookies.set('userPicture', userPicture);
         setSession({...session, userPicture: userPicture});
+        pushSuccess("Picture has changed");
         return res;
       default:
         handleError(res);
