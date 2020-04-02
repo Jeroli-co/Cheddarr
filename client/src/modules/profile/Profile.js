@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {Route} from "react-router-dom";
 import {AuthContext} from "../../contexts/AuthContext";
 import {FriendsContextProvider} from "../../contexts/FriendsContext";
+import {NotificationContext} from "../../contexts/NotificationContext";
 
 const Profile = () => {
 
@@ -12,6 +13,7 @@ const Profile = () => {
 
 	const { getUser, changeUserPicture, username, userPicture } = useContext(AuthContext);
 	const [user, setUser] = useState(null);
+	const { pushDanger } = useContext(NotificationContext);
 
 	useEffect(() => {
 		getUser().then(res => { if (res) setUser(res.data) });
@@ -24,7 +26,7 @@ const Profile = () => {
 			// Check file size
 			const fileSize = ((file.size/1024)/1024).toFixed(4);
 			if (fileSize > 1) {
-				alert("File size must be lower than 1MB");
+				pushDanger("File size must be lower than 1MB");
 				return;
 			}
 			// Check image size
@@ -37,7 +39,7 @@ const Profile = () => {
 					const width = e.target["width"];
 					const height = e.target["height"];
 					if (width > 1024 || height > 1024) {
-						alert("Image width and height must be lower than 512px");
+						pushDanger("Image width and height must be lower than 512px");
 					} else {
 						await changeUserPicture(file);
 					}
