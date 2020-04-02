@@ -21,4 +21,5 @@ sendgrid
 sqlalchemy
 Werkzeug
 wtforms
+wtforms-validators
 WTForms-Alchemy
