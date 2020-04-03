@@ -143,6 +143,6 @@ class User(db.Model, UserMixin):
     @classmethod
     def find(cls, email=None, username=None):
         if email:
-            return User.query.filter_by(email=email).first()
+            return cls.query.filter_by(email=email).one_or_none()
         if username:
-            return User.query.filter_by(username=username).first()
+            return cls.query.filter_by(username=username).one_or_none()

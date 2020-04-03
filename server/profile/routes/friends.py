@@ -48,7 +48,7 @@ def add_friend():
         email=add_friend_form.usernameOrEmail.data
     )
     if not friend or friend == current_user:
-        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
+        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.BAD_REQUEST)
 
     if current_user.is_friend(friend):
         raise InvalidUsage(

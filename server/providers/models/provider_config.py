@@ -11,6 +11,14 @@ class ProviderConfig(db.Model):
         "polymorphic_on": provider_name,
     }
 
+    @classmethod
+    def get_api_key(cls, user):
+        return (
+            db.session.query(ProviderConfig.provider_api_key)
+            .filter_by(user_id=user.id)
+            .one_or_none()
+        )
+
 
 class PlexConfig(ProviderConfig):
     id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
