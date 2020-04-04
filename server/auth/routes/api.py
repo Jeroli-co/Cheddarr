@@ -16,6 +16,7 @@ def get_api_key():
 @fresh_login_required
 def delete_api_key():
     current_user.api_key = None
+    db.session.commit()
     return {"message": "API key deleted"}, HTTPStatus.OK
 
 
