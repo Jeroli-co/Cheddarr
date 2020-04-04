@@ -13,7 +13,7 @@ from cloudinary.api import resources
 
 
 def send_email(to_email, subject, html_content):
-    from_email = From(app.config.get("MAIL_DEFAULT_SENDER"))
+    from_email = From(*app.config.get("MAIL_DEFAULT_SENDER"))
     message = Mail(
         from_email=from_email,
         to_emails=To(to_email),

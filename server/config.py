@@ -59,11 +59,11 @@ class BaseConfig(object):
     ##########################################################################
     MAIL_SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
     MAIL_DEFAULT_SENDER = (
-        os.environ.get("FLASK_MAIL_DEFAULT_SENDER_NAME", "Cheddarr"),
         os.environ.get(
             "FLASK_MAIL_DEFAULT_SENDER_EMAIL",
             f"noreply@{os.environ.get('FLASK_DOMAIN', 'localhost')}",
         ),
+        os.environ.get("FLASK_MAIL_DEFAULT_SENDER_NAME", "Cheddarr"),
     )
 
 
