@@ -7,7 +7,8 @@ const methods = {
   GET: "get",
   POST: "post",
   PUT: "put",
-  DELETE: "delete"
+  DELETE: "delete",
+  PATCH: "patch"
 };
 
 const APIContext = createContext();
@@ -39,6 +40,9 @@ const APIContextProvider = (props) => {
         case methods.DELETE:
           const deleteHeaders = formData ? { headers: headers, data: formData } : reqHeaders; // Only required for the delete account who is checking the password
           res = await axios.delete(reqUrl, deleteHeaders);
+          break;
+        case methods.PATCH:
+          res = await axios.patch(reqUrl, formData, reqHeaders);
           break;
         default:
           console.log("No methods matched");

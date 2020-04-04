@@ -160,8 +160,6 @@ typings/
 .env
 .env.test
 
-setenv
-
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 

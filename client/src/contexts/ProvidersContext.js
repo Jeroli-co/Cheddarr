@@ -24,21 +24,9 @@ const ProvidersContextProvider = (props) => {
     }
   };
 
-  const getProviderServer = async (provider) => {
-    const res = await executeRequest(methods.GET, "/provider/" + provider + "/servers/");
-    switch (res.status) {
-      case 200:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
   return (
     <ProvidersContext.Provider value={{
-      getProviderConfig,
-      getProviderServer
+      getProviderConfig
     }}>
       { props.children }
     </ProvidersContext.Provider>
