@@ -11,17 +11,21 @@ class ProviderConfig(db.Model):
         "polymorphic_on": provider_name,
     }
 
+    def update_config(self, config):
+        print(config)
+        self.query.filter_by(id=self.id).update(config)
+        db.session.commit()
+
     @classmethod
     def get_api_key(cls, user):
         return (
             db.session.query(ProviderConfig.provider_api_key)
             .filter_by(user_id=user.id)
-            .one_or_none()
+            .scalar()
         )
 
 
 class PlexConfig(ProviderConfig):
-    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
     plex_user_id = db.Column(db.Integer, unique=True, nullable=False)
     machine_id = db.Column(db.Integer)
 

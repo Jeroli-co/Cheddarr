@@ -7,3 +7,4 @@ from server.providers.models import PlexConfig
 class PlexConfigForm(ModelForm):
     class Meta:
         model = PlexConfig
+        all_fields_optional = True
