@@ -40,7 +40,7 @@ const PlexConfigContextProvider = (props) => {
   }, []);
 
   const getPlexServers = async () => {
-    const res = await executeRequest(methods.GET, "/provider/plex/servers/");
+    const res = await executeRequest(methods.GET, "/provider/plex/servers/", null, null, false);
     switch (res.status) {
       case 200:
         setServers(res.data);

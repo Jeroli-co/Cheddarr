@@ -13,7 +13,7 @@ const ServersModal = ({ onClose }) => {
 
   const linkServer = () => {
     if (serverSelected) {
-      updateServer(serverSelected["machine_name"]).then(res => {
+      updateServer(serverSelected.name).then(res => {
         if (res) {
           onClose();
         }
@@ -26,15 +26,14 @@ const ServersModal = ({ onClose }) => {
       <div className="level">
         <div className="level-left">
           <div className="level-item">
-            <input type="checkbox" checked={serverSelected && serverSelected["machine_name"] === server["machine_name"]} onClick={() => setServerSelected(server)} />
+            <input type="radio"
+                   id={server.name}
+                   checked={serverSelected && serverSelected.name === server.name}
+                   onClick={() => setServerSelected(server)}
+            />
           </div>
           <div className="level-item has-text-grey-dark">
             { server.name }
-          </div>
-        </div>
-        <div className="level-right">
-          <div className="level-item has-text-grey-dark">
-            { server["machine_name"] }
           </div>
         </div>
       </div>
@@ -50,7 +49,7 @@ const ServersModal = ({ onClose }) => {
           <button className="delete" aria-label="close" onClick={onClose}/>
         </header>
         <section className="modal-card-body">
-          { servers && servers.map(server => { return <Server key={server["machine_name"]} server={server}/> }) }
+          { servers && servers.map(server => { return <Server key={server.name} server={server}/> }) }
         </section>
         <footer className="modal-card-foot">
           <button className="button is-success" onClick={linkServer}>Save changes</button>
