@@ -10,13 +10,18 @@ from server.auth.routes import auth
 from server.auth.models import User
 from server.auth.forms import SigninForm
 from server.auth.serializers.auth_serializer import session_serializer
-from server.config import FLASK_APP
+from server.config import (
+    APP_NAME,
+    PLEX_ACCESS_TOKEN_URL,
+    PLEX_AUTHORIZATION_URL,
+    PLEX_REQUEST_TOKEN_URL,
+)
 from server.providers.models import PlexConfig
 
 plex_identifier = utils.generate_api_key()
 plex_headers = {
     "X-Plex-Client-Identifier": plex_identifier,
-    "X-Plex-Product": FLASK_APP,
+    "X-Plex-Product": APP_NAME,
     "Accept": "application/json",
 }
 
@@ -61,14 +66,15 @@ def signin():
 @auth.route("/sign-in/plex/", methods=["GET"])
 def plex_signin():
     redirect_uri = request.args.get("redirectURI", "")
-    r = post("https://plex.tv/api/v2/pins?strong=true", headers=plex_headers)
+    r = post(PLEX_REQUEST_TOKEN_URL, headers=plex_headers)
     info = r.json()
     code = info["code"]
     state = info["id"]
     forward_url = url_for("auth.authorize_plex", _external=True).replace("/api", "")
     token = utils.generate_token({"id": str(state), "redirectURI": redirect_uri})
     authorize_url = (
-        "https://app.plex.tv/auth#?clientID="
+        PLEX_AUTHORIZATION_URL
+        + "?clientID="
         + plex_identifier
         + "&code="
         + code
@@ -86,7 +92,7 @@ def authorize_plex():
     token = utils.confirm_token(token)
     redirect_uri = token.get("redirectURI")
     state = token.get("id")
-    r = get("https://plex.tv/api/v2/pins/" + state, headers=plex_headers)
+    r = get(PLEX_ACCESS_TOKEN_URL + state, headers=plex_headers)
     auth_token = r.json().get("authToken")
     if not auth_token:
         raise InvalidUsage(

@@ -1,13 +1,23 @@
 import os
 from datetime import timedelta
 
-FLASK_APP = "Cheddarr"
+APP_NAME = "Cheddarr"
+
+##########################################################################
+# folders                                                                #
+##########################################################################
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 REACT_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
 REACT_STATIC_FOLDER = os.path.join(PROJECT_ROOT, "client", "build", "static")
 FLASK_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "server", "templates")
+
+##########################################################################
+# api                                                                    #
+##########################################################################
 API_ROOT = "/api"
-REMEMBER_COOKIE_LIFETIME = 365  # Days
+PLEX_REQUEST_TOKEN_URL = "https://plex.tv/api/v2/pins?strong=true"
+PLEX_AUTHORIZATION_URL = "https://app.plex.tv/auth#"
+PLEX_ACCESS_TOKEN_URL = "https://plex.tv/api/v2/pins"
 
 
 def get_boolean_env(name, default):
@@ -25,6 +35,7 @@ class BaseConfig(object):
     ##########################################################################
     # session/cookies                                                        #
     ##########################################################################
+    REMEMBER_COOKIE_LIFETIME = 365  # Days
     REMEMBER_COOKIE_DURATION = timedelta(days=REMEMBER_COOKIE_LIFETIME)
     RATELIMIT_DEFAULT = "500/hour"
 
