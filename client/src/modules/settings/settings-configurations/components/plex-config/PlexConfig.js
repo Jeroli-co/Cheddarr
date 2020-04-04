@@ -8,7 +8,7 @@ import {PlexConfigContext} from "../../../../../contexts/PlexConfigContext";
 const PlexConfig = ({ location }) => {
 
   const { signInWithPlex } = useContext(AuthContext);
-  const { providerApiKey, machineId, loading } = useContext(PlexConfigContext);
+  const { providerApiKey, machineName, loading } = useContext(PlexConfigContext);
   const [isServersModalActive, setIsServersModalActive] = useState(false);
 
   const isPlexAccountLinked = () => {
@@ -16,7 +16,7 @@ const PlexConfig = ({ location }) => {
   };
 
   const isPlexServerLinked = () => {
-    return machineId !== null && typeof machineId !== 'undefined';
+    return machineName !== null && typeof machineName !== 'undefined';
   };
 
   const LinkPlexServer = () => {
@@ -50,7 +50,7 @@ const PlexConfig = ({ location }) => {
     <div className="content has-text-success">
       <p className="is-size-3"><FontAwesomeIcon icon={faCheck}/> <span className="is-size-4 has-text-weight-light">Plex account linked</span></p>;
       <LinkPlexServer/>
-      { isServersModalActive && <ServersModal/> }
+      { isServersModalActive && <ServersModal onClose={() => setIsServersModalActive(false)}/> }
     </div>
   );
 };
