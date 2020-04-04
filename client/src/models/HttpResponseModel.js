@@ -1,4 +1,4 @@
-class HttpResponse {
+class HttpResponseModel {
   constructor (status, message, data = null, headers = null) {
     this.status = status;
     this.message = message;
@@ -8,5 +8,5 @@ class HttpResponse {
 }
 
 export {
-  HttpResponse
+  HttpResponseModel
 }

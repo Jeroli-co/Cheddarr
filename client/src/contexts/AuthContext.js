@@ -391,6 +391,17 @@ const AuthContextProvider = (props) => {
     }
   };
 
+  const getPlexServer = async () => {
+    const res = await executeRequest(methods.GET, "/provider/plex/servers/");
+    switch (res.status) {
+      case 200:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       ...session,
@@ -417,7 +428,8 @@ const AuthContextProvider = (props) => {
       resetApiKey,
       deleteApiKey,
       deleteAccount,
-      getPlexConfig
+      getPlexConfig,
+      getPlexServer
     }}>
       { isLoadingSession && <PageLoader/> }
       { props.children }

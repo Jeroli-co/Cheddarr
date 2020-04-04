@@ -6,7 +6,7 @@ import { createMemoryHistory } from 'history';
 import {routes} from "../../router/routes";
 import { AuthContext } from "../../contexts/AuthContext";
 import {Profile} from "./Profile";
-import {HttpResponse} from "../../models/HttpResponse";
+import {HttpResponseModel} from "../../models/HttpResponseModel";
 import logo from "../../assets/cheddarr.png";
 import {APIContext} from "../../contexts/APIContext";
 import {NotificationContext} from "../../contexts/NotificationContext";
@@ -20,10 +20,10 @@ test('Profile always shows static element', async () => {
   const tree = (
     <Router history={history}>
       <NotificationContext.Provider value={{pushDanger: () => {}}}>
-        <APIContext.Provider value={{executeRequest: () => new Promise(resolve => resolve(new HttpResponse(200, "", {friends: [], received: [], requested: []})))}}>
+        <APIContext.Provider value={{executeRequest: () => new Promise(resolve => resolve(new HttpResponseModel(200, "", {friends: [], received: [], requested: []})))}}>
           <AuthContext.Provider value={{
             isAuthenticated: true,
-            getUser: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email}))),
+            getUser: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {email: email}))),
             changeUserPicture: () => {},
             username: username,
             userPicture: logo

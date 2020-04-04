@@ -7,13 +7,16 @@ import {BrowserRouter} from "react-router-dom";
 import {AuthContextWithRouterProvider} from "./contexts/AuthContext";
 import {APIContextProvider} from "./contexts/APIContext";
 import {NotificationContextProvider} from "./contexts/NotificationContext";
+import {ProvidersContextProvider} from "./contexts/ProvidersContext";
 
 ReactDOM.render(
   <BrowserRouter>
     <NotificationContextProvider>
       <APIContextProvider>
         <AuthContextWithRouterProvider>
-          <App />
+          <ProvidersContextProvider>
+            <App />
+          </ProvidersContextProvider>
         </AuthContextWithRouterProvider>
       </APIContextProvider>
     </NotificationContextProvider>
