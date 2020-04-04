@@ -15,10 +15,10 @@ FLASK_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "server", "templates")
 # api                                                                    #
 ##########################################################################
 API_ROOT = "/api"
-PLEX_REQUEST_TOKEN_URL = "https://plex.tv/api/v2/pins?strong=true"
-PLEX_AUTHORIZE_URL = "https://app.plex.tv/auth#"
-PLEX_ACCESS_TOKEN_URL = "https://plex.tv/api/v2/pins"
-PLEX_USER_RESOURCE_URL = "https://plex.tv/users/account.json"
+PLEX_REQUEST_TOKEN_URL = "https://plex.tv/api/v2/pins/?strong=true"
+PLEX_AUTHORIZE_URL = "https://app.plex.tv/auth#/"
+PLEX_ACCESS_TOKEN_URL = "https://plex.tv/api/v2/pins/"
+PLEX_USER_RESOURCE_URL = "https://plex.tv/users/account.json/"
 
 
 def get_boolean_env(name, default):
