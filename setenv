@@ -1,5 +1,0 @@
-export FLASK_APP=cheddarr
-export FLASK_ENV=development
-export SENDGRID_API_KEY=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
-export CLOUDINARY_URL=cloudinary://731536652162966:Ha1qLzDGhS6XXGCQgDgRCs7Ly6A@hodgqh3bx
-
