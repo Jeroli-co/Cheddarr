@@ -12,7 +12,6 @@ class ProviderConfig(db.Model):
     }
 
     def update_config(self, config):
-        print(config)
         self.query.filter_by(id=self.id).update(config)
         db.session.commit()
 

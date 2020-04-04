@@ -19,7 +19,7 @@ def get_plex_config():
     return plex_serializer.dump(plex_user_config)
 
 
-@provider.route("/plex/config/", methods=["PATCH"])
+@provider.route("/plex/config/", methods=["PUT"])
 @login_required
 def update_plex_config():
     config_form = PlexConfigForm()
