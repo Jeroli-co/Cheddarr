@@ -138,7 +138,6 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
     switch (res.status) {
       case 200:
-        console.log(res);
         initSession(res.data.username, res.data["user_picture"]);
         return res;
       default:
@@ -385,7 +384,6 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.GET, "/provider/plex/config/");
     switch (res.status) {
       case 200:
-      case 404:
         return res;
       default:
         handleError(res);
