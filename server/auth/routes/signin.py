@@ -13,8 +13,9 @@ from server.auth.serializers.auth_serializer import session_serializer
 from server.config import (
     APP_NAME,
     PLEX_ACCESS_TOKEN_URL,
-    PLEX_AUTHORIZATION_URL,
+    PLEX_AUTHORIZE_URL,
     PLEX_REQUEST_TOKEN_URL,
+    PLEX_USER_RESOURCE_URL,
 )
 from server.providers.models import PlexConfig
 
@@ -73,7 +74,7 @@ def plex_signin():
     forward_url = url_for("auth.authorize_plex", _external=True).replace("/api", "")
     token = utils.generate_token({"id": str(state), "redirectURI": redirect_uri})
     authorize_url = (
-        PLEX_AUTHORIZATION_URL
+        PLEX_AUTHORIZE_URL
         + "?clientID="
         + plex_identifier
         + "&code="
@@ -99,7 +100,7 @@ def authorize_plex():
             "Error while authorizing Plex", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
         )
     plex_headers["X-Plex-Token"] = auth_token
-    r = get("https://plex.tv/users/account.json", headers=plex_headers)
+    r = get(PLEX_USER_RESOURCE_URL, headers=plex_headers)
     info = r.json().get("user")
     user_id = info["id"]
 
