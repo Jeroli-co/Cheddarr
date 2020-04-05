@@ -6,9 +6,10 @@ import '@testing-library/jest-dom/extend-expect';
 import { App } from './App';
 import {routes} from "./router/routes";
 import {AuthContext} from "./contexts/AuthContext";
-import {HttpResponse} from "./models/HttpResponse";
+import {HttpResponseModel} from "./models/HttpResponseModel";
 import { APIContext } from "./contexts/APIContext";
 import {NotificationContext} from "./contexts/NotificationContext";
+import {ProvidersContextProvider} from "./contexts/ProvidersContext";
 
 afterEach(cleanup);
 
@@ -18,9 +19,9 @@ test('App router load components (no authentication needed) correctly', async ()
     <Router history={history}>
       <AuthContext.Provider value={{
         isAuthenticated: false,
-        confirmEmail: () => new Promise((resolve) => resolve(new HttpResponse(200, ""))),
-        checkResetPasswordToken: () => new Promise((resolve) => resolve(new HttpResponse(200, ""))),
-        signIn: () => new Promise((resolve) => resolve(new HttpResponse(3000, "")))
+        confirmEmail: () => new Promise((resolve) => resolve(new HttpResponseModel(200, ""))),
+        checkResetPasswordToken: () => new Promise((resolve) => resolve(new HttpResponseModel(200, ""))),
+        signIn: () => new Promise((resolve) => resolve(new HttpResponseModel(3000, "")))
       }}>
         <App />
       </AuthContext.Provider>
@@ -86,14 +87,16 @@ test('App router load components (authentication needed) correctly', async () =>
   const email = "jero@li.co";
   const tree = (
     <Router history={history}>
-      <APIContext.Provider value={{executeRequest: () => new Promise(resolve => resolve(new HttpResponse(200, "", {friends: [], received: [], requested: []})))}}>
+      <APIContext.Provider value={{executeRequest: () => new Promise(resolve => resolve(new HttpResponseModel(200, "", {friends: [], received: [], requested: []})))}}>
         <NotificationContext.Provider value={{pushNotification: () => {}}}>
           <AuthContext.Provider value={{
             isAuthenticated: true,
-            getUser: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {email: email}))),
-            getApiKey: () => new Promise((resolve) => resolve(new HttpResponse(200, "", {api_key: "TEST-API-KEY"}))),
+            getUser: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {email: email}))),
+            getApiKey: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {api_key: "TEST-API-KEY"}))),
           }}>
-            <App />
+            <ProvidersContextProvider value={{getProviderConfig: () => new Promise(resolve => resolve(new HttpResponseModel(200, "", {})))}}>
+              <App />
+            </ProvidersContextProvider>
           </AuthContext.Provider>
         </NotificationContext.Provider>
       </APIContext.Provider>
@@ -137,7 +140,7 @@ test('App router load components (authentication needed) correctly', async () =>
   expect(deleteModal).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS_CONFIGURATIONS.url);
-  const settingsConfigurations = wrapper.getByTestId('SettingsConfigurations');
+  const settingsConfigurations = await waitForElement(() => wrapper.getByTestId('SettingsConfigurations'));
   expect(settingsConfigurations).toBeInTheDocument();
 });
 

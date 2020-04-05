@@ -41,7 +41,7 @@ const FriendsContextProvider = (props) => {
         const requested = friendsLists.requested.concat([res.data]);
         setFriendsLists({...friendsLists, requested: requested});
         return res;
-      case 404:
+      case 400:
       case 409:
         return res;
       default:

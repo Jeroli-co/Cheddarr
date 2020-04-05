@@ -3,7 +3,7 @@ import json
 from flask import url_for
 from sqlalchemy import and_
 
-from server.auth.models import Friendship, User
+from server.auth.models.user import Friendship, User
 from server.tests.conftest import (
     user2_username,
     user2_email,
@@ -54,7 +54,7 @@ def test_add_friend_not_existing(client, auth):
             url_for("profile.add_friend"),
             data={"usernameOrEmail": "notExistingUsername"},
         ).status_code
-        == 404
+        == 400
     )
 
 

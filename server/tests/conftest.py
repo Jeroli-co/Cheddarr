@@ -2,7 +2,7 @@ import pytest
 from flask import url_for
 
 from server import _create_app, db, utils
-from server.auth.models import User, Friendship
+from server.auth.models.user import User, Friendship
 from server.commands import init_db
 from server.config import TestConfig
 

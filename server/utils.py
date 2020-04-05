@@ -4,7 +4,7 @@ import string
 from random import choice
 
 from cloudinary.uploader import upload
-from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer, Signer, Serializer
+from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer, Signer
 from flask import current_app as app
 from sendgrid import Mail, From, To, Content
 
@@ -13,7 +13,7 @@ from cloudinary.api import resources
 
 
 def send_email(to_email, subject, html_content):
-    from_email = From(app.config.get("MAIL_DEFAULT_SENDER"))
+    from_email = From(*app.config.get("MAIL_DEFAULT_SENDER"))
     message = Mail(
         from_email=from_email,
         to_emails=To(to_email),
@@ -56,12 +56,6 @@ def unsign(value):
 
 def generate_api_key():
     return secrets.token_hex(24)
-
-
-def generate_password():
-    alphabet = string.ascii_letters + string.digits
-    password = "".join(secrets.choice(alphabet) for i in range(64))
-    return password
 
 
 def generate_token(data):

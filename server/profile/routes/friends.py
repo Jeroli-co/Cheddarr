@@ -4,9 +4,9 @@ from flask_login import login_required, current_user
 
 from server import InvalidUsage
 from server.auth.models import User
-from server.profile import profile
+from server.profile.routes import profile
 from server.profile.forms import UsernameOrEmailForm
-from server.profile.serializers.user_serializer import user_serializer, users_serializer
+from server.profile.serializers.profile_serializer import profile_serializer, profiles_serializer
 
 
 @profile.route("/friends/<username>/", methods=["GET"])
@@ -16,7 +16,7 @@ def get_friend(username):
     if not user or not current_user.is_friend(user):
         raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
 
-    return user_serializer.dump(user), HTTPStatus.OK
+    return profile_serializer.dump(user), HTTPStatus.OK
 
 
 @profile.route("/friends/", methods=["GET"])
@@ -25,9 +25,9 @@ def get_friends():
 
     return (
         {
-            "requested": users_serializer.dump(current_user.get_pending_requested()),
-            "received": users_serializer.dump(current_user.get_pending_received()),
-            "friends": users_serializer.dump(current_user.get_friendships()),
+            "requested": profiles_serializer.dump(current_user.get_pending_requested()),
+            "received": profiles_serializer.dump(current_user.get_pending_received()),
+            "friends": profiles_serializer.dump(current_user.get_friendships()),
         },
         HTTPStatus.OK,
     )
@@ -48,7 +48,7 @@ def add_friend():
         email=add_friend_form.usernameOrEmail.data
     )
     if not friend or friend == current_user:
-        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
+        raise InvalidUsage("The user does not exist.", status_code=HTTPStatus.BAD_REQUEST)
 
     if current_user.is_friend(friend):
         raise InvalidUsage(
@@ -56,7 +56,7 @@ def add_friend():
         )
     current_user.add_friendship(friend)
 
-    return user_serializer.dump(friend), HTTPStatus.CREATED
+    return profile_serializer.dump(friend), HTTPStatus.CREATED
 
 
 @profile.route("/friends/<username>/", methods=["DELETE"])
@@ -88,4 +88,4 @@ def accept_friend(username):
         )
 
     current_user.confirm_friendship(friend)
-    return user_serializer.dump(friend), HTTPStatus.OK
+    return profile_serializer.dump(friend), HTTPStatus.OK

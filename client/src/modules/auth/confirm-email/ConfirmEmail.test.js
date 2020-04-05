@@ -6,7 +6,7 @@ import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import {routes} from "../../../router/routes";
 import {ConfirmEmail} from "./ConfirmEmail";
-import {HttpResponse} from "../../../models/HttpResponse";
+import {HttpResponseModel} from "../../../models/HttpResponseModel";
 
 afterEach(cleanup);
 
@@ -14,7 +14,7 @@ test('Confirm account shows EmailConfirmed on 201', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponse(200, ""))) }}>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponseModel(200, ""))) }}>
         <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
@@ -30,7 +30,7 @@ test('Confirm account shows AlreadyConfirmed on 403', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponse(403, ""))) }}>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponseModel(403, ""))) }}>
         <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>
@@ -46,7 +46,7 @@ test('Confirm account shows TokenExpired on 410', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.CONFIRM_EMAIL.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponse(410, ""))) }}>
+      <AuthContext.Provider value={{ confirmEmail: () => new Promise((resolve) => resolve(new HttpResponseModel(410, ""))) }}>
         <ConfirmEmail/>
       </AuthContext.Provider>
     </Router>

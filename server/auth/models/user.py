@@ -1,8 +1,10 @@
 from flask_login import UserMixin
 from sqlalchemy import and_
-from sqlalchemy.ext.hybrid import hybrid_property
-from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy_utils import EmailType, PasswordType, URLType
+from wtforms.validators import Length
+from wtforms_validators import AlphaNumeric, DisposableEmail
 from server import db, utils
+from server.providers.models import ProviderConfig
 
 
 class Friendship(db.Model):
@@ -13,13 +15,24 @@ class Friendship(db.Model):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(128), unique=True, nullable=False, index=True)
-    email = db.Column(db.String(128), unique=True, nullable=False, index=True)
-    _password = db.Column(db.String(128), nullable=False)
-    api_key = db.Column(db.String)
-    user_picture = db.Column(db.String(256))
+    username = db.Column(
+        db.String(128),
+        unique=True,
+        nullable=False,
+        info={"validators": [AlphaNumeric(), Length(min=4)]},
+    )
+    email = db.Column(
+        EmailType, unique=True, nullable=False, info={"validators": DisposableEmail()}
+    )
+    password = db.Column(
+        PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"]),
+        nullable=False,
+        info={"validators": Length(min=8)},
+    )
+    user_picture = db.Column(URLType)
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
+    api_key = db.Column(db.String(256))
     friends_sent = db.relationship(
         "User",
         secondary=Friendship.__table__,
@@ -28,6 +41,7 @@ class User(db.Model, UserMixin):
         backref=db.backref("friends_received", lazy="dynamic"),
         lazy="dynamic",
     )
+    providers_configs = db.relationship(ProviderConfig, backref="user", cascade="all")
 
     def __init__(
         self, username, email, password, user_picture=None, confirmed=False,
@@ -37,8 +51,8 @@ class User(db.Model, UserMixin):
         self.password = password
         self.user_picture = user_picture
         self.confirmed = confirmed
-        self.session_token = utils.generate_token([email, password])
         self.api_key = None
+        self.session_token = utils.generate_token([email, password])
 
     def __repr__(self):
         return "%s/%s/%s/%s" % (
@@ -51,27 +65,14 @@ class User(db.Model, UserMixin):
     def get_id(self):
         return str(self.session_token)
 
-    @hybrid_property
-    def password(self):
-        return self._password
-
-    @password.setter
-    def password(self, value):
-        """Store the password as a hash for security."""
-        if value is not None:
-            self._password = generate_password_hash(value)
-
-    def check_password(self, value):
-        return check_password_hash(self.password, value)
-
     def change_password(self, new_password):
         self.password = new_password
-        self.session_token = utils.generate_token([self.email, self.password])
+        self.session_token = utils.generate_token([self.email, new_password])
         db.session.commit()
 
     def change_email(self, new_email):
         self.email = new_email
-        self.session_token = utils.generate_token([self.email, self.password])
+        self.session_token = utils.generate_token([self.email, self.password.hash])
         db.session.commit()
 
     def delete(self):
@@ -142,6 +143,6 @@ class User(db.Model, UserMixin):
     @classmethod
     def find(cls, email=None, username=None):
         if email:
-            return User.query.filter_by(email=email).first()
+            return cls.query.filter_by(email=email).one_or_none()
         if username:
-            return User.query.filter_by(username=username).first()
+            return cls.query.filter_by(username=username).one_or_none()

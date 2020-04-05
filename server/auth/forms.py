@@ -1,28 +1,37 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import Length, Email, InputRequired, Regexp
+from wtforms import StringField, BooleanField
+from wtforms.validators import Length, InputRequired
+from server.auth.models import User
+from server.forms import ModelForm
 
 
-class SignupForm(FlaskForm):
-    username = StringField(
-        "Username", [InputRequired(), Length(min=4, max=128), Regexp(r"^[a-zA-Z0-9]+$")]
-    )
-    email = StringField("Email", [InputRequired(), Email(), Length(min=4, max=128)])
-    password = PasswordField("Password", [InputRequired(), Length(min=8, max=128)])
+def username():
+    return False
 
 
-class SigninForm(FlaskForm):
+class SignupForm(ModelForm):
+    class Meta:
+        model = User
+        only = ["username", "email", "password"]
+
+
+class SigninForm(ModelForm):
+    class Meta:
+        model = User
+        only = ["password"]
+
     usernameOrEmail = StringField(
         "Username Or Email", [InputRequired(), Length(min=4, max=128)]
     )
-    password = PasswordField("Password", [InputRequired(), Length(min=8, max=128)])
     remember = BooleanField("Remember")
 
 
-class EmailForm(FlaskForm):
-    email = EmailField("Email", [InputRequired(), Length(min=4, max=128)])
+class EmailForm(ModelForm):
+    class Meta:
+        model = User
+        only = ["email"]
 
 
-class PasswordForm(FlaskForm):
-    password = PasswordField("Password", [InputRequired(), Length(min=8, max=128)])
+class PasswordForm(ModelForm):
+    class Meta:
+        model = User
+        only = ["password"]

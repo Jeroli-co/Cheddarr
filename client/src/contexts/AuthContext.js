@@ -17,7 +17,7 @@ const initialSessionState = {
 const AuthContextProvider = (props) => {
 
   const [session, setSession] = useState(initialSessionState);
-  const [apiKey, setApiKey] = useState(null);
+  const [apiKey, setApiKey] = useState("");
   const [isLoadingSession, setIsLoadingSession] = useState(true);
   const { executeRequest } = useContext(APIContext);
   const { pushSuccess } = useContext(NotificationContext);
@@ -39,10 +39,16 @@ const AuthContextProvider = (props) => {
   useEffect(() => {
     if (session.isAuthenticated) {
       setIsLoadingSession(false);
-      getApiKey().then(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session.isAuthenticated]);
+
+  const initSession = (username, userPicture) => {
+    Cookies.set('authenticated', 'yes', { expires: 365 });
+    Cookies.set('username', username, { expires: 365 });
+    Cookies.set('userPicture', userPicture, { expires: 365 });
+    setSession({username: username, userPicture: userPicture, isAuthenticated: true});
+  };
 
   const clearSession = () => {
     Cookies.remove('authenticated');
@@ -84,13 +90,6 @@ const AuthContextProvider = (props) => {
 
   const signIn = async (data) => {
 
-    const initSession = (username, userPicture) => {
-      Cookies.set('authenticated', 'yes', { expires: 365 });
-      Cookies.set('username', username, { expires: 365 });
-      Cookies.set('userPicture', userPicture, { expires: 365 });
-      setSession({username: username, userPicture: userPicture, isAuthenticated: true});
-    };
-
     const get = async () => {
       return await executeRequest(methods.GET, "/sign-in/");
     };
@@ -114,6 +113,31 @@ const AuthContextProvider = (props) => {
         return res;
       case 400:
       case 401:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const signInWithPlex = async (redirectURI = null) => {
+    const uri = redirectURI ? redirectURI : "";
+    const res = await executeRequest(methods.GET, "/sign-in/plex/?redirectURI=" + uri);
+    switch (res.status) {
+      case 200:
+        window.location.href = res.headers.location;
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const authorizePlex = async (search) => {
+    const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
+    switch (res.status) {
+      case 200:
+        initSession(res.data.username, res.data["user_picture"]);
         return res;
       default:
         handleError(res);
@@ -214,10 +238,11 @@ const AuthContextProvider = (props) => {
   };
 
   const getApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/");
+    const res = await executeRequest(methods.GET, "/key/cheddarr/");
     switch (res.status) {
       case 200:
-        setApiKey(res.data["api_key"]);
+        const key = res.data["key"] ? res.data["key"] : null;
+        if (key) setApiKey(key);
         return res;
       default:
         handleError(res);
@@ -226,10 +251,10 @@ const AuthContextProvider = (props) => {
   };
 
   const resetApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/reset/");
+    const res = await executeRequest(methods.GET, "/key/cheddarr/reset/");
     switch (res.status) {
       case 200:
-        setApiKey(res.data["api_key"]);
+        setApiKey(res.data["key"]);
         return res;
       default:
         handleError(res);
@@ -238,10 +263,10 @@ const AuthContextProvider = (props) => {
   };
 
   const deleteApiKey = async () => {
-    const res = await executeRequest(methods.DELETE, "/key/");
+    const res = await executeRequest(methods.DELETE, "/key/cheddarr/");
     switch (res.status) {
       case 200:
-        setApiKey(null);
+        setApiKey("");
         return res;
       default:
         handleError(res);
@@ -350,7 +375,7 @@ const AuthContextProvider = (props) => {
         return res;
       default:
         handleError(res);
-        return res;
+        return null;
     }
   };
 
@@ -361,6 +386,8 @@ const AuthContextProvider = (props) => {
       isLoadingSession,
       handleError,
       signIn,
+      signInWithPlex,
+      authorizePlex,
       signOut,
       signUp,
       confirmEmail,
@@ -377,7 +404,7 @@ const AuthContextProvider = (props) => {
       getApiKey,
       resetApiKey,
       deleteApiKey,
-      deleteAccount,
+      deleteAccount
     }}>
       { isLoadingSession && <PageLoader/> }
       { props.children }

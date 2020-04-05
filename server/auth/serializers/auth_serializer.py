@@ -8,3 +8,6 @@ class SessionSerializer(ma.SQLAlchemySchema):
 
     username = ma.auto_field()
     user_picture = ma.auto_field()
+
+
+session_serializer = SessionSerializer()

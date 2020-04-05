@@ -2,7 +2,7 @@ from server import ma
 from server.auth.models import User
 
 
-class UserSerializer(ma.SQLAlchemySchema):
+class ProfileSerializer(ma.SQLAlchemySchema):
     class Meta:
         model = User
 
@@ -11,5 +11,5 @@ class UserSerializer(ma.SQLAlchemySchema):
     email = ma.auto_field()
 
 
-user_serializer = UserSerializer()
-users_serializer = UserSerializer(many=True)
+profile_serializer = ProfileSerializer()
+profiles_serializer = ProfileSerializer(many=True)

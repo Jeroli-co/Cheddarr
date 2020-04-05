@@ -6,7 +6,7 @@ import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import {routes} from "../../../router/routes";
 import {ResetPassword} from "./ResetPassword";
-import {HttpResponse} from "../../../models/HttpResponse";
+import {HttpResponseModel} from "../../../models/HttpResponseModel";
 
 afterEach(cleanup);
 
@@ -15,7 +15,7 @@ test('Reset password shows TokenExpired on 410', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.RESET_PASSWORD.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ checkResetPasswordToken: () => new Promise((resolve) => resolve(new HttpResponse(410, "")))}}>
+      <AuthContext.Provider value={{ checkResetPasswordToken: () => new Promise((resolve) => resolve(new HttpResponseModel(410, "")))}}>
         <ResetPassword/>
       </AuthContext.Provider>
     </Router>
@@ -32,7 +32,7 @@ test('Reset password shows AlreadyConfirmed on 403', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.RESET_PASSWORD.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ checkResetPasswordToken: () => new Promise((resolve) => resolve(new HttpResponse(403, "")))}}>
+      <AuthContext.Provider value={{ checkResetPasswordToken: () => new Promise((resolve) => resolve(new HttpResponseModel(403, "")))}}>
         <ResetPassword/>
       </AuthContext.Provider>
     </Router>
@@ -49,7 +49,7 @@ test('Reset password shows ResetPasswordForm on 200', async () => {
   const history = createMemoryHistory({ initialEntries: [routes.RESET_PASSWORD.url('secret-token')] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ checkResetPasswordToken: () => new Promise((resolve) => resolve(new HttpResponse(200, "")))}}>
+      <AuthContext.Provider value={{ checkResetPasswordToken: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "")))}}>
         <ResetPassword/>
       </AuthContext.Provider>
     </Router>

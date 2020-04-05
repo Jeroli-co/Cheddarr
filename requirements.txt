@@ -12,6 +12,8 @@ Flask-WTF
 gunicorn
 itsdangerous
 marshmallow-sqlalchemy
+passlib
+PlexAPI
 psycopg2-binary
 pytest
 pytest-mock
@@ -19,3 +21,6 @@ requests
 sendgrid
 sqlalchemy
 Werkzeug
+wtforms
+wtforms-validators
+WTForms-Alchemy
