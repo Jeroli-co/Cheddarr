@@ -56,3 +56,14 @@ def get_plex_user_servers():
         for child in root
     ]
     return jsonify(servers)
+
+
+@provider.route("/plex/", methods=["GET"])
+@login_required
+def get_plex_hub():
+    plex_config = PlexConfig.find(current_user)
+    api_key = plex_config.provider_api_key
+    server_name = plex_config.machine_name
+    plex_server = MyPlexAccount(api_key).resource(server_name).connect()
+    movies = plex_server.library.section("Films")
+    return jsonify([movie.title for movie in movies.all()])
