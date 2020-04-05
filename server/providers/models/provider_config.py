@@ -1,3 +1,5 @@
+from sqlalchemy.orm import with_polymorphic
+
 from server.extensions import db
 from sqlalchemy.orm import with_polymorphic
 
