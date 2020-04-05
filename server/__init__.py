@@ -63,7 +63,7 @@ def _create_app(config_object: BaseConfig, **kwargs):
     ma.init_app(app)
     limiter.init_app(app)
     mail.api_key = app.config.get("MAIL_SENDGRID_API_KEY")
-    csp = {"default-src": "'self'", "img-src": "*"}
+    csp = {"default-src": "'self'", "img-src": ["*", "'self'", "data:"]}
     Talisman(app, content_security_policy=csp)
     CORS(
         app,
