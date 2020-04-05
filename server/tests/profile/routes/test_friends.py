@@ -54,7 +54,7 @@ def test_add_friend_not_existing(client, auth):
             url_for("profile.add_friend"),
             data={"usernameOrEmail": "notExistingUsername"},
         ).status_code
-        == 404
+        == 400
     )
 
 
