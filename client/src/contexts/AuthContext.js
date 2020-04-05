@@ -39,7 +39,6 @@ const AuthContextProvider = (props) => {
   useEffect(() => {
     if (session.isAuthenticated) {
       setIsLoadingSession(false);
-      getApiKey().then(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session.isAuthenticated]);

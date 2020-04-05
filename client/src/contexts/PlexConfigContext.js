@@ -2,14 +2,15 @@ import React, {createContext, useContext, useEffect, useState} from "react";
 import {APIContext, methods} from "./APIContext";
 import {providers, ProvidersContext} from "./ProvidersContext";
 import {AuthContext} from "./AuthContext";
+import {NotificationContext} from "./NotificationContext";
 
 const PlexConfigContext = createContext();
 
 const initialConfig = {
   providerApiKey: null,
   enabled: null,
-  plexUserId: null,
   machineName: null,
+  machineId: null,
   loading: true,
 };
 
@@ -21,6 +22,7 @@ const PlexConfigContextProvider = (props) => {
   const { getProviderConfig } = useContext(ProvidersContext);
   const { executeRequest } = useContext(APIContext);
   const { handleError } = useContext(AuthContext);
+  const { pushSuccess } = useContext(NotificationContext);
 
   useEffect(() => {
     getProviderConfig(providers.PLEX).then(res => {
@@ -28,8 +30,8 @@ const PlexConfigContextProvider = (props) => {
         setConfig({
           providerApiKey: res.data["provider_api_key"],
           enabled: res.data.enabled,
-          plexUserId: res.data["plex_user_id"],
           machineName: res.data["machine_name"],
+          machineId: res.data["machine_id"],
           loading: false,
         });
       } else {
@@ -51,16 +53,32 @@ const PlexConfigContextProvider = (props) => {
     }
   };
 
-  const updateServer = async (machineName) => {
+  const updatePlexServer = async (machineId, machineName) => {
+    return await updateConfig({machineId: machineId, machineName: machineName});
+  };
+
+  const updateConfig = async (newConfig) => {
     const fd = new FormData();
+    const providerApiKey = newConfig.hasOwnProperty('providerApiKey') ? newConfig.providerApiKey : config.providerApiKey;
+    const enabled = newConfig.hasOwnProperty('enabled') ? newConfig.enabled : config.enabled;
+    const machineName = newConfig.hasOwnProperty('machineName') ? newConfig.machineName : config.machineName;
+    const machineId = newConfig.hasOwnProperty('machineId') ? newConfig.machineId : config.machineId;
+    fd.append("provider_api_key", providerApiKey);
+    fd.append("enabled", enabled);
     fd.append("machine_name", machineName);
-    const res = await executeRequest(methods.PATCH, "/provider/plex/config/", fd);
+    fd.append("machine_id", machineId);
+    fd.forEach(data => console.log(data));
+    const res = await executeRequest(methods.PUT, "/provider/plex/config/", fd);
     switch (res.status) {
       case 200:
         setConfig({
           ...config,
-          machineName: res.data["machine_name"]
+          providerApiKey: res.data["provider_api_key"],
+          enabled: res.data.enabled,
+          machineName: res.data["machine_name"],
+          machineId: res.data["machine_id"]
         });
+        pushSuccess("Configurations updated");
         return res;
       default:
         handleError(res);
@@ -73,7 +91,8 @@ const PlexConfigContextProvider = (props) => {
       ...config,
       servers,
       getPlexServers,
-      updateServer
+      updatePlexServer,
+      updateConfig
     }}>
       { props.children }
     </PlexConfigContext.Provider>

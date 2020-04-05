@@ -9,6 +9,7 @@ import {AuthContext} from "./contexts/AuthContext";
 import {HttpResponseModel} from "./models/HttpResponseModel";
 import { APIContext } from "./contexts/APIContext";
 import {NotificationContext} from "./contexts/NotificationContext";
+import {ProvidersContextProvider} from "./contexts/ProvidersContext";
 
 afterEach(cleanup);
 
@@ -93,7 +94,9 @@ test('App router load components (authentication needed) correctly', async () =>
             getUser: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {email: email}))),
             getApiKey: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {api_key: "TEST-API-KEY"}))),
           }}>
-            <App />
+            <ProvidersContextProvider value={{getProviderConfig: () => new Promise(resolve => resolve(new HttpResponseModel(200, "", {})))}}>
+              <App />
+            </ProvidersContextProvider>
           </AuthContext.Provider>
         </NotificationContext.Provider>
       </APIContext.Provider>
@@ -137,7 +140,7 @@ test('App router load components (authentication needed) correctly', async () =>
   expect(deleteModal).toBeInTheDocument();
 
   history.push(routes.USER_SETTINGS_CONFIGURATIONS.url);
-  const settingsConfigurations = wrapper.getByTestId('SettingsConfigurations');
+  const settingsConfigurations = await waitForElement(() => wrapper.getByTestId('SettingsConfigurations'));
   expect(settingsConfigurations).toBeInTheDocument();
 });
 

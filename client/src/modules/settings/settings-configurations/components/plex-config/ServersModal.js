@@ -4,7 +4,7 @@ import {PlexConfigContext} from "../../../../../contexts/PlexConfigContext";
 const ServersModal = ({ onClose }) => {
 
   const [serverSelected, setServerSelected] = useState(null);
-  const { getPlexServers, servers, updateServer } = useContext(PlexConfigContext);
+  const { getPlexServers, servers, updatePlexServer } = useContext(PlexConfigContext);
 
   useEffect(() => {
     getPlexServers();
@@ -13,23 +13,24 @@ const ServersModal = ({ onClose }) => {
 
   const linkServer = () => {
     if (serverSelected) {
-      updateServer(serverSelected.name).then(res => {
-        if (res) {
-          onClose();
-        }
-      });
+      updatePlexServer(serverSelected["machine_id"], serverSelected.name).then(res => { if (res) onClose() });
     }
   };
 
   const Server = ({ server }) => {
+
+    const _onChange = () => {
+      setServerSelected(server);
+    };
+
     return (
-      <div className="level">
+      <div className="level is-mobile">
         <div className="level-left">
           <div className="level-item">
             <input type="radio"
-                   id={server.name}
-                   checked={serverSelected && serverSelected.name === server.name}
-                   onClick={() => setServerSelected(server)}
+                   name={server.name}
+                   checked={serverSelected && server["machine_id"] === serverSelected["machine_id"]}
+                   onChange={_onChange}
             />
           </div>
           <div className="level-item has-text-grey-dark">
