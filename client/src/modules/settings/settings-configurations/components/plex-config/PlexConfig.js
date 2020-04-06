@@ -1,10 +1,11 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faEdit} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../../contexts/AuthContext";
 import {ServersModal} from "./ServersModal";
 import {PlexConfigContext} from "../../../../../contexts/PlexConfigContext";
 import {useForm} from "react-hook-form";
+import styled, {keyframes} from "styled-components";
 
 const PlexConfig = ({ location }) => {
 
@@ -12,6 +13,74 @@ const PlexConfig = ({ location }) => {
   const [isServersModalActive, setIsServersModalActive] = useState(false);
 
   const { register, handleSubmit, formState } = useForm();
+  const [hasFormValueChanged, setHasFormValueChanged] = useState(false);
+
+  useEffect(() => {
+    if (formState.dirty) {
+      setHasFormValueChanged(true);
+    }
+  }, [formState.dirty]);
+
+  const fadeInUp = keyframes`
+    from {
+      opacity: 0;
+      margin-bottom: -60px;
+    }
+    
+    to {
+      opacity: 1;
+      margin-bottom: 0px;
+    }
+  `;
+
+  const fadeOutDown = keyframes`
+    from {
+      opacity: 1;
+      margin-bottom: 0px;
+    }
+    
+    to {
+      opacity: 0;
+      margin-bottom: -60px;
+    }
+  `;
+
+  const SubmitContainer = styled.div`
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-top: 1px solid lightgrey;
+    background-color: #f7f7f7;
+    opacity: 0;
+    animation: ${props => props.hasFormValueChanged ? 
+      (props.dirty ? fadeInUp : fadeOutDown) : 
+      'none'
+    } 1s linear forwards; 
+  `;
+
+  const SubmitButton = styled.button`
+    background: transparent;
+    border-radius: 3px;
+    border: 2px solid mediumseagreen;
+    background-color: white;
+    color: mediumseagreen;
+    margin: 0 1em;
+    padding: 0.25em 1em;
+    font-size: 1em;
+    width: 150px;
+    height: 40px;
+    
+    &:hover {
+      cursor: pointer;
+      color: white;
+      background-color: mediumseagreen;
+    }
+  `;
 
   const _onSubmit = (data) => {
     console.log(data);
@@ -112,11 +181,13 @@ const PlexConfig = ({ location }) => {
         { isPlexAccountLinked() &&
           <div>
             <LinkPlexServer/>
-            { formState.dirty && (
-              <button type="submit" className="button is-success">
+
+            <SubmitContainer hasFormValueChanged={hasFormValueChanged} dirty={formState.dirty}>
+              <SubmitButton type="submit">
                 Save changes
-              </button>
-            )}
+              </SubmitButton>
+            </SubmitContainer>
+
           </div>
         }
 
