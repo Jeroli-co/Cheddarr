@@ -1,5 +1,5 @@
-from server import ma
 from server.auth.models import User
+from server.extensions import ma
 
 
 class SessionSerializer(ma.SQLAlchemySchema):

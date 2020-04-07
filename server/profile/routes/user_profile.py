@@ -1,20 +1,23 @@
 from http import HTTPStatus
 
 from flask import render_template, session, url_for
-from flask_login import fresh_login_required, current_user, login_required
+from flask_login import current_user, fresh_login_required, login_required
 
-from server import InvalidUsage, db, utils, limiter
+from server import utils
+from server.auth.forms import EmailForm, PasswordForm
 from server.auth.models import User
-from server.auth.forms import PasswordForm, EmailForm
+from server.exceptions import HTTPError
+from server.extensions import db, limiter
+from server.profile.forms import ChangePasswordForm, PictureForm, UsernameForm
 from server.profile.routes import profile
-from server.profile.forms import UsernameForm, ChangePasswordForm, PictureForm
 from server.profile.serializers.profile_serializer import profile_serializer
+from server.tasks import send_email
 
 
 @profile.route("/", methods=["GET"])
 @login_required
 def get_profile():
-    return profile_serializer.dump(current_user), HTTPStatus.OK
+    return profile_serializer.jsonify(current_user), HTTPStatus.OK
 
 
 @profile.route("/", methods=["DELETE"])
@@ -23,13 +26,13 @@ def get_profile():
 def delete_user():
     password_form = PasswordForm()
     if not password_form.validate():
-        raise InvalidUsage(
+        raise HTTPError(
             "Error while deleting the user.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
     if not current_user.password == password_form.password.data:
-        raise InvalidUsage("Wrong password.", HTTPStatus.BAD_REQUEST)
+        raise HTTPError("Wrong password.", HTTPStatus.BAD_REQUEST)
 
     current_user.delete()
     session.clear()
@@ -42,12 +45,12 @@ def delete_user():
 def change_picture():
     picture_form = PictureForm()
     if not picture_form.validate():
-        raise InvalidUsage(
+        raise HTTPError(
             "Error while changing the profile picture.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
-    response = utils.upload_picture(picture_form.picture.data.stream)
-    current_user.user_picture = response["secure_url"]
+    picture = utils.upload_picture(picture_form.picture.data.stream)
+    current_user.user_picture = picture
     db.session.commit()
     return {"user_picture": current_user.user_picture}, HTTPStatus.OK
 
@@ -58,20 +61,20 @@ def change_picture():
 def change_password():
     password_form = ChangePasswordForm()
     if not password_form.validate():
-        raise InvalidUsage(
+        raise HTTPError(
             "Error while changing password.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             payload=password_form.errors,
         )
 
     if not current_user.password == password_form.oldPassword.data:
-        raise InvalidUsage(
+        raise HTTPError(
             "The passwords don't match.", status_code=HTTPStatus.BAD_REQUEST,
         )
     current_user.change_password(password_form.newPassword.data)
     html = render_template("email/change_password_notice.html")
     subject = "Your password has been changed"
-    utils.send_email(current_user.email, subject, html)
+    send_email.delay(current_user.email, subject, html)
     return {"message": "User password changed."}, HTTPStatus.OK
 
 
@@ -81,14 +84,14 @@ def change_password():
 def change_username():
     username_form = UsernameForm()
     if not username_form.validate():
-        raise InvalidUsage(
+        raise HTTPError(
             "Error while changing username.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
     new_username = username_form.username.data
     if User.exists(username=new_username):
-        raise InvalidUsage(
+        raise HTTPError(
             "This username is not available.", status_code=HTTPStatus.CONFLICT
         )
 
@@ -103,15 +106,13 @@ def change_username():
 def change_email():
     email_form = EmailForm()
     if not email_form.validate():
-        raise InvalidUsage(
+        raise HTTPError(
             "Error while changing email.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
 
     new_email = email_form.email.data
     if User.exists(email=new_email):
-        raise InvalidUsage(
-            "This email is already taken.", status_code=HTTPStatus.CONFLICT
-        )
+        raise HTTPError("This email is already taken.", status_code=HTTPStatus.CONFLICT)
 
     token = utils.generate_timed_token(new_email)
     confirm_url = url_for("auth.confirm_email", token=token, _external=True)
@@ -119,5 +120,5 @@ def change_email():
         "email/email_confirmation.html", confirm_url=confirm_url.replace("/api", "")
     )
     subject = "Please confirm your email"
-    utils.send_email(new_email, subject, html)
+    send_email.delay(new_email, subject, html)
     return {"message": "Confirmation email sent."}, HTTPStatus.OK

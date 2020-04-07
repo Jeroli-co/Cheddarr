@@ -1,14 +1,15 @@
 from http import HTTPStatus
 
-from flask import request, redirect, url_for, make_response
-from flask_login import login_user, current_user
+from flask import make_response, redirect, request, url_for
+from flask_login import current_user, login_user
+from passlib import pwd
 from requests import get, post
 from sqlalchemy.orm.exc import NoResultFound
-from passlib import pwd
-from server import db, InvalidUsage, utils
-from server.auth.routes import auth
-from server.auth.models import User
+
+from server import utils
 from server.auth.forms import SigninForm
+from server.auth.models import User
+from server.auth.routes import auth
 from server.auth.serializers.auth_serializer import session_serializer
 from server.config import (
     APP_NAME,
@@ -17,6 +18,8 @@ from server.config import (
     PLEX_REQUEST_TOKEN_URL,
     PLEX_USER_RESOURCE_URL,
 )
+from server.exceptions import HTTPError
+from server.extensions import db
 from server.providers.models import PlexConfig
 
 plex_identifier = utils.generate_api_key()
@@ -31,16 +34,16 @@ plex_headers = {
 def signin():
     if request.method == "GET":
         if current_user.is_authenticated:
-            return session_serializer.dump(current_user), HTTPStatus.OK
+            return session_serializer.jsonify(current_user), HTTPStatus.OK
         else:
-            raise InvalidUsage(
+            raise HTTPError(
                 "User not authenticated", status_code=HTTPStatus.UNAUTHORIZED
             )
 
     else:
         signin_form = SigninForm()
         if not signin_form.validate():
-            raise InvalidUsage(
+            raise HTTPError(
                 "Error while signing in.",
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 payload=signin_form.errors,
@@ -50,18 +53,18 @@ def signin():
             username=signin_form.usernameOrEmail.data
         )
         if not user or not user.password == signin_form.password.data:
-            raise InvalidUsage(
+            raise HTTPError(
                 "Wrong username/email or password.", status_code=HTTPStatus.BAD_REQUEST
             )
 
         if not user.confirmed:
-            raise InvalidUsage(
+            raise HTTPError(
                 "The email needs to be confirmed.", status_code=HTTPStatus.UNAUTHORIZED,
             )
 
         remember = signin_form.remember.data if signin_form.remember else False
         login_user(user, remember=remember)
-        return session_serializer.dump(user), HTTPStatus.OK
+        return session_serializer.jsonify(user), HTTPStatus.OK
 
 
 @auth.route("/sign-in/plex/", methods=["GET"])
@@ -96,7 +99,7 @@ def authorize_plex():
     r = get(PLEX_ACCESS_TOKEN_URL + state, headers=plex_headers)
     auth_token = r.json().get("authToken")
     if not auth_token:
-        raise InvalidUsage(
+        raise HTTPError(
             "Error while authorizing Plex", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
         )
     plex_headers["X-Plex-Token"] = auth_token
@@ -136,6 +139,6 @@ def authorize_plex():
         db.session.commit()
     # Log in the user (new or existing)
     login_user(plex_config.user)
-    res = make_response(session_serializer.dump(plex_config.user))
+    res = make_response(session_serializer.jsonify(plex_config.user))
     res.headers["redirect-uri"] = redirect_uri
     return res

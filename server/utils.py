@@ -1,47 +1,10 @@
 import secrets
-import string
-
 from random import choice
 
-from cloudinary.uploader import upload
-from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer, Signer
-from flask import current_app as app
-from sendgrid import Mail, From, To, Content
-
-from server import mail
 from cloudinary.api import resources
-
-
-def send_email(to_email, subject, html_content):
-    from_email = From(*app.config.get("MAIL_DEFAULT_SENDER"))
-    message = Mail(
-        from_email=from_email,
-        to_emails=To(to_email),
-        subject=subject,
-        html_content=Content("text/html", html_content),
-    )
-    try:
-        mail.send(message)
-    except Exception:
-        raise Exception
-
-
-def random_user_picture():
-    try:
-        pictures = resources(resource_type="image", type="upload", prefix="default/")[
-            "resources"
-        ]
-    except Exception:
-        raise Exception
-    random_picture = choice(pictures)
-    return random_picture["secure_url"]
-
-
-def upload_picture(file):
-    try:
-        return upload(file, resource_type="image", folder="user_pictures")
-    except Exception:
-        raise Exception
+from cloudinary.uploader import upload
+from flask import current_app as app
+from itsdangerous import Signer, URLSafeSerializer, URLSafeTimedSerializer
 
 
 def sign(value):
@@ -88,3 +51,22 @@ def confirm_timed_token(token, expiration=600):
     except Exception:
         raise Exception
     return data
+
+
+def upload_picture(file):
+    try:
+        r = upload(file, resource_type="image", folder="user_pictures")
+        return r["secure_url"]
+    except Exception:
+        raise Exception
+
+
+def random_user_picture():
+    try:
+        pictures = resources(resource_type="image", type="upload", prefix="default/")[
+            "resources"
+        ]
+    except Exception:
+        raise Exception
+    random_picture = choice(pictures)
+    return random_picture["secure_url"]
