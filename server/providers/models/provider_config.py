@@ -2,7 +2,6 @@ from server.extensions import db
 from sqlalchemy.orm import with_polymorphic
 
 
-
 class ProviderConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     provider_name = db.Column(db.String(32), nullable=False)

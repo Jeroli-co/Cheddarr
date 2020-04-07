@@ -11,7 +11,7 @@ from server.app import create_app
 from server.app import celery  # noqa
 
 """USAGE:
-python manage.py [--env=production|development] COMMAND [OPTIONS] [ARGS]
+python manage.py [--env=production] COMMAND [OPTIONS] [ARGS]
 """
 
 
@@ -26,8 +26,8 @@ A utility script for the Cheddarr application.
 @click.option(
     "--env",
     type=click.Choice(["development", "production"]),
-    default="production",
-    help="Whether to use DevConfig or ProdConfig (production by default).",
+    default="development",
+    help="Whether to use DevConfig or ProdConfig (development by default).",
 )
 @click.pass_context
 def cli(ctx, env):
@@ -36,7 +36,7 @@ def cli(ctx, env):
 
 def main():
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("--env", default="production")
+    parser.add_argument("--env", default="development")
     args, _ = parser.parse_known_args()
 
     if args.env == "development":
