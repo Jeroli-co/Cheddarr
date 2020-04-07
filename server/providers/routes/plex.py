@@ -56,20 +56,3 @@ def get_plex_user_servers():
         for child in root
     ]
     return jsonify(servers)
-
-
-@provider.route("/plex/movies/recent/", methods=["GET"])
-@login_required
-@cache.cached(timeout=300)
-def get_plex_recent_movies():
-    plex_server = get_plex_user_server(current_user)
-    movies = plex_server.library.section("Films")
-    return jsonify([movie.title for movie in movies.recentlyAdded()])
-
-
-@cache.memoize(timeout=900)
-def get_plex_user_server(user):
-    plex_config = PlexConfig.find(user)
-    api_key = plex_config.provider_api_key
-    server_name = plex_config.machine_name
-    return MyPlexAccount(api_key).resource(server_name).connect()
