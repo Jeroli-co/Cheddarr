@@ -4,6 +4,7 @@ import styled, {css} from "styled-components";
 const AnimationStyle = styled.div`
   padding: 0;
   visibility: ${ ({ active }) => active ? 'visible' : 'hidden'};
+  margin-bottom: ${ ({ active, size }) => active && size ? '0' : '-' + size }px;
   ${ ({ active, isVisible, animationIn, animationOut, size, duration }) => active && 
     css`animation: ${isVisible ? (size ? animationIn(size) : animationIn()) : (size ? animationOut(size) : animationOut())} ${duration}s linear forwards;` 
   }
