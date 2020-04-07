@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {PlexConfigContext} from "../../../../../contexts/PlexConfigContext";
+import {PlexConfigContext} from "../../../../../../contexts/PlexConfigContext";
 
 const ServersModal = ({ onClose }) => {
 
