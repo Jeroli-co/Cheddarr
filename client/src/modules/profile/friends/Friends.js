@@ -83,8 +83,8 @@ const Friends = () => {
           <hr/>
           <RequestedList requested={requested} cancelRequest={cancelFriendRequest}/>
         </div>
-      </div>
 
+      </div>
     </div>
   )
 };
