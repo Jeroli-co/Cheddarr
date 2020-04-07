@@ -131,7 +131,7 @@ const SignInForm = (props) => {
 					<h1 className="subtitle is-5">Sign in with</h1>
 
 					<div className="buttons">
-						<button className="button is-rounded" type="button" onClick={() => signInWithPlex()}>
+						<button className="button is-rounded" type="button" onClick={() => signInWithPlex(query.get('redirectURI'))}>
 							<span className="icon">
 								<FontAwesomeIcon icon={faSignInAlt}/>
 							</span>
