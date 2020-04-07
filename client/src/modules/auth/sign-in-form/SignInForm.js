@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {faKey, faSignInAlt, faUser} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
@@ -18,15 +18,19 @@ const SignInForm = (props) => {
 	const [rememberMe, setRememberMe] = useState(false);
 	const [httpError, setHttpError] = useState(null);
   const query = useQuery();
+  const [redirectURI, setRedirectURI] = useState(null);
+
+  useEffect(() => {
+  	let redirectURI = query.get('redirectURI');
+		redirectURI = redirectURI ? redirectURI : routes.HOME.url;
+		setRedirectURI(redirectURI);
+	}, [query]);
 
 	const onSubmit = (data) => {
-		signIn(data).then(res => {
+		signIn(data, redirectURI).then(res => {
 			if (res) {
 				switch (res.status) {
 					case 200:
-						let redirectURI = query.get('redirectURI');
-						redirectURI = redirectURI ? redirectURI : routes.HOME.url;
-						props.history.push(redirectURI);
 						return;
 					default:
 						setHttpError(res);
@@ -131,7 +135,7 @@ const SignInForm = (props) => {
 					<h1 className="subtitle is-5">Sign in with</h1>
 
 					<div className="buttons">
-						<button className="button is-rounded" type="button" onClick={() => signInWithPlex(query.get('redirectURI'))}>
+						<button className="button is-rounded" type="button" onClick={() => signInWithPlex(redirectURI)}>
 							<span className="icon">
 								<FontAwesomeIcon icon={faSignInAlt}/>
 							</span>

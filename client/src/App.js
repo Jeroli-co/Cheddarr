@@ -20,6 +20,7 @@ const App = () => {
 
         <Route exact path={routes.CONFIRM_EMAIL.url(':token')} component={routes.CONFIRM_EMAIL.component} />
         <Route exact path={routes.RESET_PASSWORD.url(':token')} component={routes.RESET_PASSWORD.component} />
+
         <Route path={routes.AUTHORIZE_PLEX.url} component={routes.AUTHORIZE_PLEX.component} />
 
         <ProtectedRoute path={routes.SIGN_IN.url} component={routes.SIGN_IN.component} />

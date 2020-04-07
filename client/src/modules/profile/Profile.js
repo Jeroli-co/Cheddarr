@@ -4,7 +4,6 @@ import {routes} from "../../router/routes";
 import {Link} from "react-router-dom";
 import {Route} from "react-router-dom";
 import {AuthContext} from "../../contexts/AuthContext";
-import {FriendsContextProvider} from "../../contexts/FriendsContext";
 import {NotificationContext} from "../../contexts/NotificationContext";
 
 const Profile = () => {
@@ -84,9 +83,7 @@ const Profile = () => {
 						</ul>
 					</div>
 
-					<FriendsContextProvider>
-						<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS.url]} component={routes.USER_FRIENDS.component} />
-					</FriendsContextProvider>
+					<Route path={[routes.USER_PROFILE.url, routes.USER_FRIENDS.url]} component={routes.USER_FRIENDS.component} />
 
 				</div>
 

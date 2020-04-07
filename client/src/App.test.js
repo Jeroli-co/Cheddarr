@@ -7,9 +7,7 @@ import { App } from './App';
 import {routes} from "./router/routes";
 import {AuthContext} from "./contexts/AuthContext";
 import {HttpResponseModel} from "./models/HttpResponseModel";
-import { APIContext } from "./contexts/APIContext";
 import {NotificationContext} from "./contexts/NotificationContext";
-import {ProvidersContextProvider} from "./contexts/ProvidersContext";
 
 afterEach(cleanup);
 
@@ -87,20 +85,14 @@ test('App router load components (authentication needed) correctly', async () =>
   const email = "jero@li.co";
   const tree = (
     <Router history={history}>
-      <APIContext.Provider value={{executeRequest: () => new Promise(resolve => resolve(new HttpResponseModel(200, "", {friends: [], received: [], requested: []})))}}>
-        <NotificationContext.Provider value={{pushNotification: () => {}}}>
-          <AuthContext.Provider value={{
-            isAuthenticated: true,
-            apiKey: "",
-            getUser: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {email: email}))),
-            getApiKey: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {api_key: "TEST-API-KEY"}))),
-          }}>
-            <ProvidersContextProvider value={{getProviderConfig: () => new Promise(resolve => resolve(new HttpResponseModel(200, "", {})))}}>
-              <App />
-            </ProvidersContextProvider>
-          </AuthContext.Provider>
-        </NotificationContext.Provider>
-      </APIContext.Provider>
+      <NotificationContext.Provider value={{pushNotification: () => {}}}>
+        <AuthContext.Provider value={{
+          isAuthenticated: true,
+          getUser: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {email: email}))),
+        }}>
+          <App />
+        </AuthContext.Provider>
+      </NotificationContext.Provider>
     </Router>
   );
 

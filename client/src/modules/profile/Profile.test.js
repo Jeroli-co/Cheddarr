@@ -8,7 +8,6 @@ import { AuthContext } from "../../contexts/AuthContext";
 import {Profile} from "./Profile";
 import {HttpResponseModel} from "../../models/HttpResponseModel";
 import logo from "../../assets/cheddarr.png";
-import {APIContext} from "../../contexts/APIContext";
 import {NotificationContext} from "../../contexts/NotificationContext";
 
 afterEach(cleanup);
@@ -20,17 +19,15 @@ test('Profile always shows static element', async () => {
   const tree = (
     <Router history={history}>
       <NotificationContext.Provider value={{pushDanger: () => {}}}>
-        <APIContext.Provider value={{executeRequest: () => new Promise(resolve => resolve(new HttpResponseModel(200, "", {friends: [], received: [], requested: []})))}}>
-          <AuthContext.Provider value={{
-            isAuthenticated: true,
-            getUser: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {email: email}))),
-            changeUserPicture: () => {},
-            username: username,
-            userPicture: logo
-          }}>
-            <Profile/>
-          </AuthContext.Provider>
-        </APIContext.Provider>
+        <AuthContext.Provider value={{
+          isAuthenticated: true,
+          getUser: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {email: email}))),
+          changeUserPicture: () => {},
+          username: username,
+          userPicture: logo
+        }}>
+          <Profile/>
+        </AuthContext.Provider>
       </NotificationContext.Provider>
     </Router>
   );
