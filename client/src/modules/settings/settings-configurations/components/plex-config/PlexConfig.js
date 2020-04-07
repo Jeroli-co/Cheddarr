@@ -1,18 +1,23 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faEdit} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../../contexts/AuthContext";
 import {ServersModal} from "./elements/ServersModal";
-import {PlexConfigContext} from "../../../../../contexts/PlexConfigContext";
 import {useForm} from "react-hook-form";
 import {SubmitPlexConfig} from "./elements/SubmitPlexConfig";
+import {usePlexConfig} from "../../../../../hooks/usePlexConfig";
 
 const PlexConfig = ({ location }) => {
 
-  const { providerApiKey, machineName, loading, enabled, updateConfig } = useContext(PlexConfigContext);
+  const { getPlexConfig, providerApiKey, machineName, loaded, enabled, updateConfig } = usePlexConfig();
   const [isServersModalActive, setIsServersModalActive] = useState(false);
 
   const { register, handleSubmit, formState, reset } = useForm();
+
+  useEffect(() => {
+    getPlexConfig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const _onSubmit = (data) => {
     updateConfig(data).then(res => { if (res) reset() });
@@ -84,7 +89,7 @@ const PlexConfig = ({ location }) => {
     );
   };
 
-  if (loading) return <div/>;
+  if (!loaded) return <div/>;
 
   return (
     <div className="PlexConfig" data-testid="PlexConfig">

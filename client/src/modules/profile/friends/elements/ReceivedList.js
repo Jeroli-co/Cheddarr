@@ -1,12 +1,10 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleRight, faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
-import {FriendsContext} from "../../../../contexts/FriendsContext";
 import {FriendItemContainer} from "./FriendItemContainer";
 
-const ReceivedList = () => {
+const ReceivedList = ({ received, acceptRequest, refuseRequest }) => {
 
-  const { received, acceptRequest, refuseFriend, getReceivedLength } = useContext(FriendsContext);
   const [showReceivedList, setShowReceivedList] = useState(false);
 
   const Actions = ({ user }) => {
@@ -17,7 +15,7 @@ const ReceivedList = () => {
             <FontAwesomeIcon icon={faCheck}/>
           </span>
         </button>
-        <button className="button is-danger is-small" type="button" onClick={() => refuseFriend(user.username)}>
+        <button className="button is-danger is-small" type="button" onClick={() => refuseRequest(user.username)}>
           <span className="icon">
             <FontAwesomeIcon icon={faTimes}/>
           </span>
@@ -32,7 +30,7 @@ const ReceivedList = () => {
       <div className="level is-pointed" onClick={() => setShowReceivedList(!showReceivedList)}>
         <div className="level-left">
           <div className="level-item">
-            <h5 className="subtitle is-5">Received ({getReceivedLength()})</h5>
+            <h5 className="subtitle is-5">Received ({received.length})</h5>
           </div>
         </div>
         <div className="level-right">

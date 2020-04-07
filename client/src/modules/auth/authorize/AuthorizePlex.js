@@ -1,6 +1,5 @@
 import React, {useContext, useEffect} from 'react';
 import {AuthContext} from "../../../contexts/AuthContext";
-import {routes} from "../../../router/routes";
 
 const AuthorizePlex = (props) => {
 
