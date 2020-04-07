@@ -1,9 +1,9 @@
 import pytest
 from flask import url_for
 
-from server import _create_app, db, utils
-from server.auth.models.user import User, Friendship
-from server.commands import init_db
+from server import utils
+from server.app import _create_app, db
+from server.auth.models.user import Friendship, User
 from server.config import TestConfig
 
 user1_username = "user1"
@@ -29,7 +29,8 @@ def app():
 @pytest.yield_fixture(scope="session")
 def client(app):
     with app.test_client() as client:
-        init_db()
+        db.drop_all()
+        db.create_all()
         user1 = User(
             username=user1_username,
             email=user1_email,
@@ -61,7 +62,7 @@ def client(app):
 
 @pytest.fixture
 def mocks(mocker):
-    mocker.patch.object(utils, "send_email")
+    mocker.patch("server.tasks.send_email.delay")
     ran_img = mocker.patch.object(utils, "random_user_picture")
     ran_img.return_value = ""
 

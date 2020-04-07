@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms_alchemy import model_form_factory
 
-from server import db
+from server.extensions import db
 
 Form = model_form_factory(FlaskForm)
 

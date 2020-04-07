@@ -22,16 +22,10 @@ PLEX_USER_RESOURCE_URL = "https://plex.tv/users/account.json/"
 ##########################################################################
 
 
-def get_boolean_env(name, default):
-    default = "true" if default else "false"
-    return os.getenv(name, default).lower() in ["true", "yes", "1"]
-
-
-class BaseConfig(object):
+class Config(object):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
-    DEBUG = get_boolean_env("FLASK_DEBUG", False)
     SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "not-secret-key")
 
     ##########################################################################
@@ -66,21 +60,27 @@ class BaseConfig(object):
         os.environ.get("FLASK_MAIL_DEFAULT_SENDER_NAME", "Cheddarr"),
     )
 
+    ##########################################################################
+    # celery                                                                 #
+    ##########################################################################
+    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "localhost:5672")
+    CELERY_RESULT_BACKEND = "rpc://"
 
-class ProdConfig(BaseConfig):
+
+class ProdConfig(Config):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
     FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN")
-    FLASK_ENV = "production"
-    DEBUG = get_boolean_env("FLASK_DEBUG", False)
 
     ##########################################################################
     # session/cookies                                                        #
     ##########################################################################
     SESSION_COOKIE_DOMAIN = FLASK_DOMAIN
     REMEMBER_COOKIE_DOMAIN = FLASK_DOMAIN
+    SESSION_COOKIE_SECURE = True
     REMEMBER_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
 
@@ -90,13 +90,11 @@ class ProdConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
 
-class DevConfig(BaseConfig):
+class DevConfig(Config):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
     FLASK_DOMAIN = "localhost"
-    FLASK_ENV = "development"
-    DEBUG = get_boolean_env("FLASK_DEBUG", True)
 
     ##########################################################################
     # database                                                               #
@@ -104,7 +102,7 @@ class DevConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(PROJECT_ROOT, "dev.db")
 
 
-class TestConfig(BaseConfig):
+class TestConfig(Config):
     FLASK_DOMAIN = "localhost"
     TESTING = True
     DEBUG = True

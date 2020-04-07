@@ -1,6 +1,8 @@
 blinker
+celery
 cloudinary
 Flask
+Flask-Celeryext
 Flask-Cors
 Flask-Limiter
 Flask-Login

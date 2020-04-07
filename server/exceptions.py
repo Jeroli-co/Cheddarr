@@ -1,4 +1,4 @@
-class InvalidUsage(Exception):
+class HTTPError(Exception):
     def __init__(self, message, status_code=None, payload=None):
         Exception.__init__(self)
         self.message = message

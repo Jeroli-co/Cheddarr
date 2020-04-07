@@ -1,4 +1,4 @@
-from server import ma
+from server.extensions import ma
 from server.providers.models import PlexConfig
 
 

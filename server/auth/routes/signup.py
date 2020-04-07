@@ -1,11 +1,15 @@
 from http import HTTPStatus
-from flask import url_for, render_template
+
+from flask import render_template, url_for
 from flask_login import current_user
 
-from server.auth.routes import auth
-from server import db, InvalidUsage, utils, limiter
+from server import utils
+from server.auth.forms import EmailForm, SignupForm
 from server.auth.models import User
-from server.auth.forms import SignupForm, EmailForm
+from server.auth.routes import auth
+from server.exceptions import HTTPError
+from server.extensions import db, limiter
+from server.tasks import send_email
 
 
 @auth.route("/sign-up/", methods=["POST"])
@@ -13,7 +17,7 @@ from server.auth.forms import SignupForm, EmailForm
 def signup():
     signup_form = SignupForm()
     if not signup_form.validate():
-        raise InvalidUsage(
+        raise HTTPError(
             "Error while signing up.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             payload=signup_form.errors,
@@ -21,13 +25,11 @@ def signup():
 
     existing_email = User.exists(email=signup_form.email.data)
     if existing_email:
-        raise InvalidUsage(
-            "This email is already taken.", status_code=HTTPStatus.CONFLICT
-        )
+        raise HTTPError("This email is already taken.", status_code=HTTPStatus.CONFLICT)
 
     existing_username = User.exists(username=signup_form.username.data)
     if existing_username:
-        raise InvalidUsage(
+        raise HTTPError(
             "This username is not available.", status_code=HTTPStatus.CONFLICT
         )
 
@@ -37,7 +39,6 @@ def signup():
         password=signup_form.password.data,
         user_picture=utils.random_user_picture(),
     )
-
     token = utils.generate_timed_token(user.email)
     confirm_url = url_for("auth.confirm_email", token=token, _external=True)
     html = render_template(
@@ -46,7 +47,7 @@ def signup():
         confirm_url=confirm_url.replace("/api", ""),
     )
     subject = "Welcome!"
-    utils.send_email(user.email, subject, html)
+    send_email.delay(user.email, subject, html)
     db.session.add(user)
     db.session.commit()
     return {"message": "Confirmation email sent."}, HTTPStatus.CREATED
@@ -57,19 +58,19 @@ def confirm_email(token):
     try:
         email = utils.confirm_timed_token(token)
     except Exception:
-        raise InvalidUsage(
+        raise HTTPError(
             "The confirmation link is invalid or has expired.",
             status_code=HTTPStatus.GONE,
         )
 
     user = User.find(email=email)
     if not user and not current_user.is_authenticated:
-        raise InvalidUsage(
+        raise HTTPError(
             "Need to sign in to confirm email change",
             status_code=HTTPStatus.UNAUTHORIZED,
         )
     if user and user.confirmed:
-        raise InvalidUsage("This email is already confirmed.", HTTPStatus.FORBIDDEN)
+        raise HTTPError("This email is already confirmed.", HTTPStatus.FORBIDDEN)
     if current_user.is_authenticated and current_user.confirmed:
         current_user.change_email(email)
     else:
@@ -83,7 +84,7 @@ def confirm_email(token):
 def resend_confirmation():
     email_form = EmailForm()
     if not email_form.validate():
-        raise InvalidUsage(
+        raise HTTPError(
             "Cannot resend the confirmation email.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         )
@@ -91,7 +92,7 @@ def resend_confirmation():
     email = email_form.email.data
     existing_user = User.exists(email=email)
     if not existing_user:
-        raise InvalidUsage(
+        raise HTTPError(
             "No user with this email exists.", status_code=HTTPStatus.BAD_REQUEST
         )
 
@@ -101,5 +102,5 @@ def resend_confirmation():
         "email/email_confirmation.html", confirm_url=confirm_url.replace("/api", "")
     )
     subject = "Please confirm your email"
-    utils.send_email(email, subject, html)
+    send_email.delay(email, subject, html)
     return {"message": "Confirmation email sent."}, HTTPStatus.OK
