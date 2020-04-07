@@ -91,6 +91,7 @@ test('App router load components (authentication needed) correctly', async () =>
         <NotificationContext.Provider value={{pushNotification: () => {}}}>
           <AuthContext.Provider value={{
             isAuthenticated: true,
+            apiKey: "",
             getUser: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {email: email}))),
             getApiKey: () => new Promise((resolve) => resolve(new HttpResponseModel(200, "", {api_key: "TEST-API-KEY"}))),
           }}>

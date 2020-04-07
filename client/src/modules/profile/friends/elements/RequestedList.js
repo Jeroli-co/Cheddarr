@@ -1,40 +1,52 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMinus} from "@fortawesome/free-solid-svg-icons";
+import {faAngleDown, faAngleRight, faMinus} from "@fortawesome/free-solid-svg-icons";
 import {FriendsContext} from "../../../../contexts/FriendsContext";
-import {routes} from "../../../../router/routes";
-import {Link} from "react-router-dom";
+import {FriendItemContainer} from "./FriendItemContainer";
 
 const RequestedList = () => {
 
-  const { requested, cancelFriend } = useContext(FriendsContext);
+  const { requested, cancelFriend, getRequestedLength } = useContext(FriendsContext);
+  const [showRequestedList, setShowRequestedList] = useState(false);
 
-  return requested.map(pending =>
-    <div key={pending.username}>
-      <div className="level is-mobile">
+  const Actions = ({ user }) => {
+    return (
+      <button className="button is-danger is-small" type="button" onClick={() => cancelFriend(user.username)}>
+        <span className="icon">
+          <FontAwesomeIcon icon={faMinus}/>
+        </span>
+      </button>
+    );
+  };
+
+  return (
+    <div className="RequestedList" data-testid="RequestedList">
+
+      <div className="level is-pointed" onClick={() => setShowRequestedList(!showRequestedList)}>
         <div className="level-left">
           <div className="level-item">
-            <figure className="image is-64x64">
-              <img src={pending["user_picture"]} alt="User" />
-            </figure>
-          </div>
-          <div className="level-item">
-            <Link className="is-size-5" to={routes.USER_FRIEND_PROFILE.url(pending.username)}><i>{'@' + pending.username}</i></Link>
+            <h5 className="subtitle is-5">Requested ({getRequestedLength()})</h5>
           </div>
         </div>
         <div className="level-right">
           <div className="level-item">
-            <button className="button is-danger is-small" type="button" onClick={() => cancelFriend(pending.username)}>
-              <span className="icon">
-                <FontAwesomeIcon icon={faMinus}/>
-              </span>
-            </button>
+            { (showRequestedList && <FontAwesomeIcon icon={faAngleDown} size="lg"/>) || (<FontAwesomeIcon icon={faAngleRight} size="lg"/>) }
           </div>
         </div>
       </div>
-      <hr/>
+
+      { requested.map(user =>
+          <FriendItemContainer
+            key={user.username}
+            user={user}
+            actions={<Actions user={user}/>}
+            isShow={showRequestedList}
+          />
+        )
+      }
+
     </div>
-  );
+  )
 };
 
 export {
