@@ -238,7 +238,7 @@ const AuthContextProvider = (props) => {
   };
 
   const getApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/cheddarr/");
+    const res = await executeRequest(methods.GET, "/key/cheddarr/", null, null, false);
     switch (res.status) {
       case 200:
         const key = res.data["key"] ? res.data["key"] : null;

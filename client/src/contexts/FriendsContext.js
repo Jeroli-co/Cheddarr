@@ -35,7 +35,7 @@ const FriendsContextProvider = (props) => {
   const addFriend = async (username) => {
     const fd = new FormData();
     fd.append('usernameOrEmail', username);
-    const res = await executeRequest(methods.POST, friendsURI, fd);
+    const res = await executeRequest(methods.POST, friendsURI, fd, null, false);
     switch (res.status) {
       case 201:
         const requested = friendsLists.requested.concat([res.data]);
@@ -51,7 +51,7 @@ const FriendsContextProvider = (props) => {
   };
 
   const acceptRequest = async (username) => {
-    const res = await executeRequest(methods.GET, friendsURI + username + "/accept/");
+    const res = await executeRequest(methods.GET, friendsURI + username + "/accept/", null, null, false);
     switch (res.status) {
       case 200:
         const friends =  friendsLists.friends.concat([res.data]);
@@ -65,7 +65,7 @@ const FriendsContextProvider = (props) => {
   };
 
   const deleteFriend = async (username) => {
-    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    const res = await executeRequest(methods.DELETE, friendsURI + username + "/", null, null, false);
     switch (res.status) {
       case 200:
         const friends = friendsLists.friends.filter(friend => friend.username !== username);
@@ -78,7 +78,7 @@ const FriendsContextProvider = (props) => {
   };
 
   const refuseFriend = async (username) => {
-    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    const res = await executeRequest(methods.DELETE, friendsURI + username + "/", null, null, false);
     switch (res.status) {
       case 200:
         const received = friendsLists.received.filter(friend => friend.username !== username);
@@ -91,7 +91,7 @@ const FriendsContextProvider = (props) => {
   };
 
   const cancelFriend = async (username) => {
-    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    const res = await executeRequest(methods.DELETE, friendsURI + username + "/", null, null, false);
     switch (res.status) {
       case 200:
         const requested = friendsLists.requested.filter(friend => friend.username !== username);

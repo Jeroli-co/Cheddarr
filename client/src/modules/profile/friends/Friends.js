@@ -1,32 +1,11 @@
-import React, {useContext, useState} from 'react';
+import React from 'react';
 import './Friends.scss';
 import {AddFriendsInput} from "./elements/AddFriendsInput";
 import {FriendsList} from "./elements/FriendsList";
 import {RequestedList} from "./elements/RequestedList";
 import {ReceivedList} from "./elements/ReceivedList";
-import {FriendsContext} from "../../../contexts/FriendsContext";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAngleDown, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 
 const Friends = () => {
-
-  const { getFriendsLength, getRequestedLength, getReceivedLength } = useContext(FriendsContext);
-
-  const [isFriendVisible, setIsFriendVisible] = useState(true);
-  const [isReceivedVisible, setIsReceivedVisible] = useState(false);
-  const [isRequestedVisible, setIsRequestedVisible] = useState(false);
-
-  const toggleFriend = () => {
-    setIsFriendVisible(!isFriendVisible);
-  };
-
-  const toggleReceived = () => {
-    setIsReceivedVisible(!isReceivedVisible);
-  };
-
-  const toggleRequested = () => {
-    setIsRequestedVisible(!isRequestedVisible);
-  };
 
   return (
     <div className="Friends" data-testid="Friends">
@@ -35,77 +14,17 @@ const Friends = () => {
 
       <hr/>
 
-      <div className="tile is-ancestor">
-
-        <div className="tile is-6 is-parent">
-          <div className="tile is-child">
-
-            <div className="level is-pointed" onClick={toggleFriend}>
-              <div className="level-left">
-                <div className="level-item">
-                  <h5 className="subtitle is-5">Friends ({getFriendsLength()})</h5>
-                </div>
-              </div>
-              <div className="level-right">
-                <div className="level-item">
-                  { (isFriendVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/>) || (<FontAwesomeIcon icon={faAngleRight} size="lg"/>) }
-                </div>
-              </div>
-            </div>
-
-            <hr/>
-
-            { isFriendVisible && <FriendsList/> }
-
-          </div>
+      <div className="columns">
+        <div className="column is-half">
+          <FriendsList/>
         </div>
-
-        <div className="tile is-vertical is-parent">
-          <div className="tile is-child">
-
-            <div className="level is-pointed" onClick={toggleReceived}>
-              <div className="level-left">
-                <div className="level-item">
-                  <h5 className="subtitle is-5">Received ({getReceivedLength()})</h5>
-                </div>
-              </div>
-              <div className="level-right">
-                <div className="level-item">
-                  { (isReceivedVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/>) || (<FontAwesomeIcon icon={faAngleRight} size="lg"/>) }
-                </div>
-              </div>
-            </div>
-
-            <hr/>
-
-            { isReceivedVisible && <ReceivedList/> }
-
-          </div>
-
-          <div className="tile is-child">
-
-            <div className="level is-pointed" onClick={toggleRequested}>
-              <div className="level-left">
-                <div className="level-item">
-                  <h5 className="subtitle is-5">Requested ({getRequestedLength()})</h5>
-                </div>
-              </div>
-              <div className="level-right">
-                <div className="level-item">
-                  { (isRequestedVisible && <FontAwesomeIcon icon={faAngleDown} size="lg"/>) || (<FontAwesomeIcon icon={faAngleRight} size="lg"/>) }
-                </div>
-              </div>
-            </div>
-
-            <hr/>
-
-            { isRequestedVisible && <RequestedList/> }
-
-          </div>
-
+        <div className="column">
+          <ReceivedList/>
+          <hr/>
+          <RequestedList/>
         </div>
-
       </div>
+
     </div>
   )
 };
