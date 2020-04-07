@@ -6,16 +6,16 @@ import {routes} from "./routes";
 
 const PrivateRoute = ({component: Component, location, ...rest}) => {
 
-  const { isAuthenticated, isLoadingSession } = useContext(AuthContext);
+  const { isAuthenticated, hasBeenLoad } = useContext(AuthContext);
 
   return (
     <Route
       {...rest}
       render={(props) => {
         if (isAuthenticated) {
-          return <Component {...props} />
-        } else if (!isLoadingSession) {
-          return <Redirect to={routes.SIGN_IN.url}/>
+          return <Component {...props} />;
+        } else if (hasBeenLoad) {
+          return <Redirect to={routes.SIGN_IN.url}/>;
         }
       }}
     />

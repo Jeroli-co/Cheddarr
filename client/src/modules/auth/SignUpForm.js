@@ -171,7 +171,7 @@ const SignUpForm = ({ history }) => {
 
             <h1 className="subtitle is-5">Sign up with</h1>
 
-            <button className="button is-rounded" type="button" onClick={() => signInWithPlex()}>
+            <button className="button is-rounded" type="button" onClick={() => signInWithPlex(routes.HOME.url)}>
 							<span className="icon">
 								<FontAwesomeIcon icon={faSignInAlt}/>
 							</span>

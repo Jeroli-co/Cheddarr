@@ -2,9 +2,9 @@ import React, {createContext, useContext, useEffect, useState} from 'react';
 import {withRouter} from 'react-router';
 import {routes} from "../router/routes";
 import Cookies from 'js-cookie'
-import {APIContext, methods} from "./APIContext";
 import {PageLoader} from "../elements/PageLoader";
 import {NotificationContext} from "./NotificationContext";
+import {useApi} from "../hooks/useApi";
 
 const AuthContext = createContext();
 
@@ -12,62 +12,68 @@ const initialSessionState = {
   isAuthenticated: false,
   username: null,
   userPicture: null,
+  hasBeenLoad: false,
+  isLoading: false,
+  redirectURI: null
 };
 
 const AuthContextProvider = (props) => {
 
   const [session, setSession] = useState(initialSessionState);
-  const [apiKey, setApiKey] = useState("");
-  const [isLoadingSession, setIsLoadingSession] = useState(true);
-  const { executeRequest } = useContext(APIContext);
+  const { executeRequest, methods } = useApi();
   const { pushSuccess } = useContext(NotificationContext);
 
   const profileURI = '/profile/';
 
   useEffect(() => {
-    // Load session from browser storage
-    const authenticated = Cookies.get('authenticated');
-    const username = Cookies.get('username');
-    const userPicture = Cookies.get('userPicture');
-    if (authenticated === 'yes') {
-      setSession({isAuthenticated: true, username: username, userPicture: userPicture})
-    } else {
-      setIsLoadingSession(false);
-    }
-  }, []);
 
-  useEffect(() => {
-    if (session.isAuthenticated) {
-      setIsLoadingSession(false);
+    if (!session.isLoading && !session.hasBeenLoad) {
+      setSession({...session, isLoading: true});
+      return;
     }
+
+    if (session.isLoading) {
+      const authenticated = Cookies.get('authenticated');
+      const username = Cookies.get('username');
+      const userPicture = Cookies.get('userPicture');
+      if (authenticated === 'yes') {
+        setSession({...session, isAuthenticated: true, username: username, userPicture: userPicture, isLoading: false, hasBeenLoad: true});
+      } else {
+        setSession({...initialSessionState, hasBeenLoad: true})
+      }
+      return;
+    }
+
+    if (session.redirectURI) {
+      props.history.push(session.redirectURI);
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session.isAuthenticated]);
+  }, [session]);
 
-  const initSession = (username, userPicture) => {
+  const initSession = (username, userPicture, redirectURI = null) => {
     Cookies.set('authenticated', 'yes', { expires: 365 });
     Cookies.set('username', username, { expires: 365 });
     Cookies.set('userPicture', userPicture, { expires: 365 });
-    setSession({username: username, userPicture: userPicture, isAuthenticated: true});
+    setSession({...session, isLoading: true, redirectURI: redirectURI});
   };
 
-  const clearSession = () => {
+  const clearSession = (redirectURI = null) => {
     Cookies.remove('authenticated');
     Cookies.remove('username');
     Cookies.remove('userPicture');
-    setSession(initialSessionState);
+    setSession({...session, isLoading: true, redirectURI: redirectURI});
   };
 
   const handleError = (error) => {
 
     const fatalError = () => {
-      clearSession();
-      props.history.push(routes.HOME.url);
+      clearSession(routes.HOME.url);
     };
 
     switch (error.status) {
       case 401:
-        clearSession();
-        props.history.push(routes.SIGN_IN.url + '?redirectURI=' + props.location.pathname);
+        clearSession(routes.SIGN_IN.url + '?redirectURI=' + props.location.pathname);
         return;
 
       case 400:
@@ -88,7 +94,7 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const signIn = async (data) => {
+  const signIn = async (data, redirectURI) => {
 
     const get = async () => {
       return await executeRequest(methods.GET, "/sign-in/");
@@ -109,7 +115,7 @@ const AuthContextProvider = (props) => {
     const res = data ? await post(data) : await get();
     switch (res.status) {
       case 200:
-        initSession(res.data.username, res.data['user_picture']);
+        initSession(res.data.username, res.data['user_picture'], redirectURI);
         return res;
       case 400:
       case 401:
@@ -120,9 +126,8 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const signInWithPlex = async (redirectURI = null) => {
-    const uri = redirectURI ? redirectURI : "";
-    const res = await executeRequest(methods.GET, "/sign-in/plex/?redirectURI=" + uri);
+  const signInWithPlex = async (redirectURI) => {
+    const res = await executeRequest(methods.GET, "/sign-in/plex/?redirectURI=" + redirectURI);
     switch (res.status) {
       case 200:
         window.location.href = res.headers.location;
@@ -140,7 +145,6 @@ const AuthContextProvider = (props) => {
         let redirectURI = res.headers["redirect-uri"];
         redirectURI = redirectURI.length > 0 ? redirectURI : routes.HOME.url;
         initSession(res.data.username, res.data["user_picture"], redirectURI);
-        props.history.push(redirectURI);
         return res;
       default:
         handleError(res);
@@ -233,43 +237,6 @@ const AuthContextProvider = (props) => {
     switch (res.status) {
       case 200:
         props.history.push(routes.SIGN_IN.url);
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const getApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/cheddarr/", null, null, false);
-    switch (res.status) {
-      case 200:
-        const key = res.data["key"] ? res.data["key"] : null;
-        if (key) setApiKey(key);
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const resetApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/cheddarr/reset/");
-    switch (res.status) {
-      case 200:
-        setApiKey(res.data["key"]);
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const deleteApiKey = async () => {
-    const res = await executeRequest(methods.DELETE, "/key/cheddarr/");
-    switch (res.status) {
-      case 200:
-        setApiKey("");
         return res;
       default:
         handleError(res);
@@ -385,8 +352,6 @@ const AuthContextProvider = (props) => {
   return (
     <AuthContext.Provider value={{
       ...session,
-      apiKey,
-      isLoadingSession,
       handleError,
       signIn,
       signInWithPlex,
@@ -404,13 +369,9 @@ const AuthContextProvider = (props) => {
       changeEmail,
       changeUsername,
       changeUserPicture,
-      getApiKey,
-      resetApiKey,
-      deleteApiKey,
       deleteAccount
     }}>
-      { isLoadingSession && <PageLoader/> }
-      { props.children }
+      { (session.isLoading && <PageLoader/>) || (props.children) }
     </AuthContext.Provider>
   )
 };

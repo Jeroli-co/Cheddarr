@@ -1,10 +1,10 @@
-import React, {useContext, useEffect, useState} from "react";
-import {PlexConfigContext} from "../../../../../../contexts/PlexConfigContext";
+import React, {useEffect, useState} from "react";
+import {usePlexConfig} from "../../../../../../hooks/usePlexConfig";
 
 const ServersModal = ({ onClose }) => {
 
   const [serverSelected, setServerSelected] = useState(null);
-  const { getPlexServers, servers, updatePlexServer } = useContext(PlexConfigContext);
+  const { getPlexServers, servers, updatePlexServer } = usePlexConfig();
 
   useEffect(() => {
     getPlexServers();

@@ -5,9 +5,7 @@ import {App} from './App';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
 import {AuthContextWithRouterProvider} from "./contexts/AuthContext";
-import {APIContextProvider} from "./contexts/APIContext";
 import {NotificationContextProvider} from "./contexts/NotificationContext";
-import {ProvidersContextProvider} from "./contexts/ProvidersContext";
 import { ThemeProvider } from "styled-components";
 
 const theme = {
@@ -20,13 +18,9 @@ ReactDOM.render(
   <BrowserRouter>
     <ThemeProvider theme={theme}>
       <NotificationContextProvider>
-        <APIContextProvider>
-          <AuthContextWithRouterProvider>
-            <ProvidersContextProvider>
-              <App />
-            </ProvidersContextProvider>
-          </AuthContextWithRouterProvider>
-        </APIContextProvider>
+        <AuthContextWithRouterProvider>
+          <App />
+        </AuthContextWithRouterProvider>
       </NotificationContextProvider>
     </ThemeProvider>
   </BrowserRouter>

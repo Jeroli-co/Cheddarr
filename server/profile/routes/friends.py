@@ -25,15 +25,19 @@ def get_friend(username):
 @profile.route("/friends/", methods=["GET"])
 @login_required
 def get_friends():
+    return profiles_serializer.jsonify(current_user.get_friendships()), HTTPStatus.OK
 
-    return (
-        {
-            "requested": profiles_serializer.dump(current_user.get_pending_requested()),
-            "received": profiles_serializer.dump(current_user.get_pending_received()),
-            "friends": profiles_serializer.dump(current_user.get_friendships()),
-        },
-        HTTPStatus.OK,
-    )
+
+@profile.route("/friends/received/", methods=["GET"])
+@login_required
+def get_received():
+    return profiles_serializer.jsonify(current_user.get_pending_received()), HTTPStatus.OK
+
+
+@profile.route("/friends/requested/", methods=["GET"])
+@login_required
+def get_requested():
+    return profiles_serializer.jsonify(current_user.get_pending_requested()), HTTPStatus.OK
 
 
 @profile.route("/friends/", methods=["POST"])
