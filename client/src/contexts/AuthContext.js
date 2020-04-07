@@ -137,7 +137,10 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
     switch (res.status) {
       case 200:
-        initSession(res.data.username, res.data["user_picture"]);
+        let redirectURI = res.headers["redirect-uri"];
+        redirectURI = redirectURI.length > 0 ? redirectURI : routes.HOME.url;
+        initSession(res.data.username, res.data["user_picture"], redirectURI);
+        props.history.push(redirectURI);
         return res;
       default:
         handleError(res);
