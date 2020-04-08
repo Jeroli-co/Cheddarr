@@ -43,9 +43,6 @@ class Config(object):
     ##########################################################################
     # security                                                               #
     ##########################################################################
-    SECURITY_PASSWORD_SALT = os.environ.get(
-        "FLASK_SECURITY_PASSWORD_SALT", "security-password-salt"
-    )
     WTF_CSRF_ENABLED = False
 
     ##########################################################################
@@ -53,11 +50,8 @@ class Config(object):
     ##########################################################################
     MAIL_SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
     MAIL_DEFAULT_SENDER = (
-        os.environ.get(
-            "FLASK_MAIL_DEFAULT_SENDER_EMAIL",
-            f"noreply@{os.environ.get('FLASK_DOMAIN', 'localhost')}",
-        ),
-        os.environ.get("FLASK_MAIL_DEFAULT_SENDER_NAME", "Cheddarr"),
+        f"noreply@{os.environ.get('FLASK_DOMAIN', 'localhost')}",
+        APP_NAME,
     )
 
     ##########################################################################
@@ -71,7 +65,9 @@ class ProdConfig(Config):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
-    FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN")
+    FLASK_DOMAIN = os.environ.get(
+        "FLASK_DOMAIN", os.environ.get("HEROKU_APP_NAME", "") + ".herokuapp.com"
+    )
 
     ##########################################################################
     # session/cookies                                                        #

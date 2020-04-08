@@ -1,0 +1,28 @@
+{
+  "name": "Cheddarr",
+  "description": "Hub for media server architecture.",
+  "repository": "https://github.com/Jeroli-co/Cheddarr",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "FLASK_APP": {
+      "value": "cheddarr"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    },
+    "worker": {
+      "quantity": 1,
+      "size": "free"
+    }
+  }
+}
