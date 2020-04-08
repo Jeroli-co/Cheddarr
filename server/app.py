@@ -16,7 +16,7 @@ from server.config import (
     REACT_TEMPLATE_FOLDER,
 )
 from server.exceptions import HTTPError
-from server.extensions import celery, db, limiter, ma, mail, migrate
+from server.extensions import cache, celery, db, limiter, ma, mail, migrate
 from server.extensions.login_manager import register_login_manager
 
 
@@ -49,6 +49,7 @@ def _create_app(config_object: Config, **kwargs):
     db.init_app(app)
     ma.init_app(app)
     limiter.init_app(app)
+    cache.init_app(app)
     mail.api_key = config_object.MAIL_SENDGRID_API_KEY
 
     """Security patches"""
