@@ -26,7 +26,7 @@ class Config(object):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
-    SECRET_KEY = os.environ.get("FLASK_SECRET_KEY")
+    SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "not-secret-key")
 
     ##########################################################################
     # session/cookies                                                        #
