@@ -6,7 +6,7 @@ import {routes} from "./routes";
 
 const PrivateRoute = ({component: Component, location, ...rest}) => {
 
-  const { isAuthenticated, hasBeenLoad } = useContext(AuthContext);
+  const { isAuthenticated, isLoading } = useContext(AuthContext);
 
   return (
     <Route
@@ -14,7 +14,7 @@ const PrivateRoute = ({component: Component, location, ...rest}) => {
       render={(props) => {
         if (isAuthenticated) {
           return <Component {...props} />;
-        } else if (hasBeenLoad) {
+        } else if (!isLoading) {
           return <Redirect to={routes.SIGN_IN.url}/>;
         }
       }}

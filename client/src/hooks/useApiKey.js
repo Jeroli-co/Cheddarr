@@ -1,6 +1,6 @@
 import {useContext, useEffect, useState} from "react";
-import {AuthContext} from "../contexts/AuthContext";
 import {useApi} from "./useApi";
+import {AuthContext} from "../contexts/AuthContext";
 
 const useApiKey = () => {
 

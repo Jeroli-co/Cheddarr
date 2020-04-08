@@ -10,7 +10,7 @@ import {UserDropdown} from "./user-dropdown/UserDropdown";
 
 const Navbar = () => {
 
-	const { isAuthenticated } = useContext(AuthContext);
+	const { isAuthenticated, isLoading } = useContext(AuthContext);
 
 	const toggleBurgerMenu = () => {
 		const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
@@ -56,11 +56,11 @@ const Navbar = () => {
 							</span>
 						</a>
 
-						{ isAuthenticated &&
+						{ !isLoading && isAuthenticated &&
               <UserDropdown/>
 						}
 
-            { !isAuthenticated &&
+            { !isLoading && !isAuthenticated &&
               <div className="navbar-item">
                 <div className="buttons">
                   <SignInButton/>

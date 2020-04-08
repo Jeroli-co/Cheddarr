@@ -12,7 +12,7 @@ const ConfirmEmail = () => {
   const [code, setCode] = useState(null);
 
 	useEffect(() => {
-		confirmEmail(token).then(res => setCode(res.status));
+		confirmEmail(token).then(res => { if (res) setCode(res.status) });
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
