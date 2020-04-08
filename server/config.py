@@ -61,10 +61,17 @@ class Config(object):
     )
 
     ##########################################################################
+    # cache                                                                  #
+    ##########################################################################
+    CACHE_TYPE = "redis"
+    CACHE_REDIS_URL = os.environ.get("REDIS_URL", "localhost:6379")
+    CACHE_DEFAULT_TIMEOUT = 60
+
+    ##########################################################################
     # celery                                                                 #
     ##########################################################################
-    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "localhost:5672")
-    CELERY_RESULT_BACKEND = "rpc://"
+    CELERY_BROKER_URL = os.environ.get("REDIS_URL", "localhost:6379")
+    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 
 class ProdConfig(Config):
