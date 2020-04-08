@@ -52,7 +52,11 @@ def _create_app(config_object: Config, **kwargs):
     mail.api_key = config_object.MAIL_SENDGRID_API_KEY
 
     """Security patches"""
-    csp = {"default-src": "'self'", "img-src": ["*", "'self'", "data:"]}
+    csp = {
+        "default-src": "'self'",
+        "img-src": ["*", "'self'", "data:"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+    }
     Talisman(app, content_security_policy=csp)
     CORS(
         app,
