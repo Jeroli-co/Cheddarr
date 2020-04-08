@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from flask_login import UserMixin
 from sqlalchemy import and_
 from sqlalchemy_utils import EmailType, PasswordType, URLType
@@ -54,7 +56,7 @@ class User(db.Model, UserMixin):
         self.user_picture = user_picture
         self.confirmed = confirmed
         self.api_key = None
-        self.session_token = utils.generate_token([email, password])
+        self.session_token = utils.generate_token(str(uuid4()))
 
     def __repr__(self):
         return "%s/%s/%s/%s" % (
@@ -69,12 +71,12 @@ class User(db.Model, UserMixin):
 
     def change_password(self, new_password):
         self.password = new_password
-        self.session_token = utils.generate_token([self.email, new_password])
+        self.session_token = utils.generate_token(str(uuid4()))
         db.session.commit()
 
     def change_email(self, new_email):
         self.email = new_email
-        self.session_token = utils.generate_token([self.email, self.password.hash])
+        self.session_token = utils.generate_token(str(uuid4()))
         db.session.commit()
 
     def delete(self):
