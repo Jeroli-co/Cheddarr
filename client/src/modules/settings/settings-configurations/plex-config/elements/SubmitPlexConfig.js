@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import {Animate} from "../../../../../animations/Animate";
-import {FadeIn, FadeOut} from "../../../../../animations/Animations";
+import {Animate} from "../../../../animations/Animate";
+import {FadeIn, FadeOut} from "../../../../animations/Animations";
 
 const SubmitButton = styled.button`
   background: transparent;

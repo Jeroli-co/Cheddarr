@@ -12,7 +12,7 @@ const ResetPassword = () => {
 	const [httpResponse, setHttpResponse] = useState(null);
 
 	useEffect(() => {
-		checkResetPasswordToken(token).then(res => setHttpResponse(res));
+		checkResetPasswordToken(token).then(res => { if (res) setHttpResponse(res) });
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

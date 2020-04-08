@@ -1,15 +1,15 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {useForm} from "react-hook-form";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {routes} from "../../../../router/routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {AuthContext} from "../../../../contexts/AuthContext";
+import {useProfile} from "../../../../hooks/useProfile";
 
 const DeleteAccountModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { deleteAccount } = useContext(AuthContext);
+  const { deleteAccount } = useProfile();
   const [httpError, setHttpError] = useState(null);
 
   const onSubmit = async (data) => {
