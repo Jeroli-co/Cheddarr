@@ -2,7 +2,7 @@ blinker
 celery
 cloudinary
 Flask
-Flask-Celeryext
+Flask-Caching
 Flask-Cors
 Flask-Limiter
 Flask-Login
