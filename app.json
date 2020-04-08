@@ -19,7 +19,7 @@
     "review": {
       "env": {
         "FLASK_DOMAIN": {
-          "value": "#{HEROKU_APP_NAME}.herokuapp.com"
+          "value": "${HEROKU_APP_NAME}.herokuapp.com"
         }
       }
     }
