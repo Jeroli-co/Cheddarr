@@ -3,7 +3,9 @@ from sqlalchemy import and_
 from sqlalchemy_utils import EmailType, PasswordType, URLType
 from wtforms.validators import Length
 from wtforms_validators import AlphaNumeric, DisposableEmail
-from server import db, utils
+
+from server import utils
+from server.extensions import db
 from server.providers.models import ProviderConfig
 
 

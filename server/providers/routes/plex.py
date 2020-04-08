@@ -1,11 +1,12 @@
-from http import HTTPStatus
 import xml.etree.ElementTree as ET
+from http import HTTPStatus
+
 import requests
 from flask import jsonify
 from flask_login import current_user, login_required
 from plexapi.myplex import MyPlexAccount
 
-from server import InvalidUsage
+from server.exceptions import HTTPError
 from server.providers.forms import PlexConfigForm
 from server.providers.models import PlexConfig
 from server.providers.routes import provider
@@ -16,7 +17,7 @@ from server.providers.serializers.provider_serializer import plex_serializer
 @login_required
 def get_plex_config():
     plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
-    return plex_serializer.dump(plex_user_config)
+    return plex_serializer.jsonify(plex_user_config)
 
 
 @provider.route("/plex/config/", methods=["PUT"])
@@ -24,7 +25,7 @@ def get_plex_config():
 def update_plex_config():
     config_form = PlexConfigForm()
     if not config_form.validate():
-        raise InvalidUsage(
+        raise HTTPError(
             "Error while updating provider's config",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             payload=config_form.errors,
@@ -32,11 +33,11 @@ def update_plex_config():
     updated_config = config_form.data
     user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
     if not user_config:
-        raise InvalidUsage(
+        raise HTTPError(
             "No config created for this provider", status_code=HTTPStatus.BAD_REQUEST
         )
     user_config.update_config(updated_config)
-    return plex_serializer.dump(user_config)
+    return plex_serializer.jsonify(user_config)
 
 
 @provider.route("/plex/servers/", methods=["GET"])
