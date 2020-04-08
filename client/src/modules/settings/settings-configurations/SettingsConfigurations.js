@@ -1,5 +1,5 @@
 import React from 'react';
-import {PlexConfig} from "./components/plex-config/PlexConfig";
+import {PlexConfig} from "./plex-config/PlexConfig";
 
 const SettingsConfigurations = (props) => {
   return (

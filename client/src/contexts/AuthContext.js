@@ -1,9 +1,7 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
-import {withRouter} from 'react-router';
+import React, {createContext, useEffect, useState} from 'react';
+import {withRouter} from 'react-router-dom';
 import {routes} from "../router/routes";
 import Cookies from 'js-cookie'
-import {PageLoader} from "../elements/PageLoader";
-import {NotificationContext} from "./NotificationContext";
 import {useApi} from "../hooks/useApi";
 
 const AuthContext = createContext();
@@ -12,23 +10,20 @@ const initialSessionState = {
   isAuthenticated: false,
   username: null,
   userPicture: null,
-  hasBeenLoad: false,
-  isLoading: false,
-  redirectURI: null
+  isLoading: true,
 };
+
+const plexAuthorizeUri = "/plex/authorize/";
 
 const AuthContextProvider = (props) => {
 
   const [session, setSession] = useState(initialSessionState);
   const { executeRequest, methods } = useApi();
-  const { pushSuccess } = useContext(NotificationContext);
-
-  const profileURI = '/profile/';
 
   useEffect(() => {
 
-    if (!session.isLoading && !session.hasBeenLoad) {
-      setSession({...session, isLoading: true});
+    if (props.location.pathname === plexAuthorizeUri) {
+      authorizePlex(props.location.search).then(() => {});
       return;
     }
 
@@ -37,61 +32,27 @@ const AuthContextProvider = (props) => {
       const username = Cookies.get('username');
       const userPicture = Cookies.get('userPicture');
       if (authenticated === 'yes') {
-        setSession({...session, isAuthenticated: true, username: username, userPicture: userPicture, isLoading: false, hasBeenLoad: true});
+        initSession(username, userPicture);
       } else {
-        setSession({...initialSessionState, hasBeenLoad: true})
+        setSession({...initialSessionState, isLoading: false});
       }
-      return;
-    }
-
-    if (session.redirectURI) {
-      props.history.push(session.redirectURI);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+  }, []);
 
-  const initSession = (username, userPicture, redirectURI = null) => {
+  const initSession = (username, userPicture) => {
     Cookies.set('authenticated', 'yes', { expires: 365 });
     Cookies.set('username', username, { expires: 365 });
     Cookies.set('userPicture', userPicture, { expires: 365 });
-    setSession({...session, isLoading: true, redirectURI: redirectURI});
+    setSession({...session, isAuthenticated: true, username: username, userPicture: userPicture, isLoading: false});
   };
 
-  const clearSession = (redirectURI = null) => {
+  const clearSession = () => {
     Cookies.remove('authenticated');
     Cookies.remove('username');
     Cookies.remove('userPicture');
-    setSession({...session, isLoading: true, redirectURI: redirectURI});
-  };
-
-  const handleError = (error) => {
-
-    const fatalError = () => {
-      clearSession(routes.HOME.url);
-    };
-
-    switch (error.status) {
-      case 401:
-        clearSession(routes.SIGN_IN.url + '?redirectURI=' + props.location.pathname);
-        return;
-
-      case 400:
-        props.history.push(routes.BAD_REQUEST.url);
-        return;
-
-      case 500:
-        props.history.push(routes.INTERNAL_SERVER_ERROR.url);
-        return;
-
-      case 404:
-        props.history.push(routes.NOT_FOUND.url);
-        return;
-
-      default:
-        fatalError();
-        return;
-    }
+    setSession({...initialSessionState, isLoading: false});
   };
 
   const signIn = async (data, redirectURI) => {
@@ -115,7 +76,8 @@ const AuthContextProvider = (props) => {
     const res = data ? await post(data) : await get();
     switch (res.status) {
       case 200:
-        initSession(res.data.username, res.data['user_picture'], redirectURI);
+        initSession(res.data.username, res.data['user_picture']);
+        props.history.push(redirectURI);
         return res;
       case 400:
       case 401:
@@ -142,9 +104,10 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
     switch (res.status) {
       case 200:
+        initSession(res.data.username, res.data["user_picture"]);
         let redirectURI = res.headers["redirect-uri"];
-        redirectURI = redirectURI.length > 0 ? redirectURI : routes.HOME.url;
-        initSession(res.data.username, res.data["user_picture"], redirectURI);
+        redirectURI = redirectURI && redirectURI.length > 0 ? redirectURI : routes.HOME.url;
+        props.history.push(redirectURI);
         return res;
       default:
         handleError(res);
@@ -244,118 +207,53 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const changePassword = async (data) => {
-    const fd = new FormData();
-    fd.append('oldPassword', data['oldPassword']);
-    fd.append('newPassword', data['newPassword']);
-    const res = await executeRequest(methods.PUT, profileURI + "password/", fd);
-    switch (res.status) {
-      case 200:
+  const setUsername = (username) => {
+    Cookies.set('username', username);
+    setSession({...session, username: username});
+  };
+
+  const setUserPicture = (userPicture) => {
+    Cookies.set('userPicture', userPicture);
+    setSession({...session, userPicture: userPicture});
+  };
+
+  const handleError = (error) => {
+
+    const fatalError = () => {
+      clearSession();
+      props.history.push(routes.HOME.url);
+    };
+
+    switch (error.status) {
+      case 401:
         clearSession();
-        return res;
+        props.history.push(routes.SIGN_IN.url + '?redirectURI=' + props.location.pathname);
+        return;
+
       case 400:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
+        props.history.push(routes.BAD_REQUEST.url);
+        return;
 
-  const deleteAccount = async (data) => {
-    const fd = new FormData();
-    fd.append('password', data['password']);
-    const res = await executeRequest(methods.DELETE, profileURI, fd);
-    switch (res.status) {
-      case 200:
-        clearSession();
-        return res;
-      case 400:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
+      case 500:
+        props.history.push(routes.INTERNAL_SERVER_ERROR.url);
+        return;
 
-  const getUser = async () => {
-    const res = await executeRequest(methods.GET, profileURI);
-    switch (res.status) {
-      case 200:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
+      case 404:
+        props.history.push(routes.NOT_FOUND.url);
+        return;
 
-  const getFriend = async (username) => {
-    const res = await executeRequest(methods.GET, "/profile/friends/" + username + "/");
-    switch (res.status) {
-      case 200:
-        return res;
       default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const changeEmail = async (data) => {
-    const fd = new FormData();
-    fd.append('email', data['email']);
-    const res = await executeRequest(methods.PUT, profileURI + 'email/', fd);
-    switch (res.status) {
-      case 200:
-      case 409:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const changeUsername = async (data) => {
-    const fd = new FormData();
-    fd.append('username', data['newUsername']);
-    const res = await executeRequest(methods.PUT, profileURI + "username/", fd);
-    switch (res.status) {
-      case 200:
-        const username = res.data.username;
-        Cookies.set('username', username);
-        setSession({...session, username: username});
-        pushSuccess("Username has changed");
-        return res;
-      case 409:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const changeUserPicture = async (data) => {
-    const fd = new FormData();
-    fd.append('picture', data);
-    const res = await executeRequest(methods.PUT, profileURI + "picture/", fd, { 'content-type': 'multipart/form-data' });
-    switch (res.status) {
-      case 200:
-        const userPicture = res.data["user_picture"];
-        Cookies.set('userPicture', userPicture);
-        setSession({...session, userPicture: userPicture});
-        pushSuccess("Picture has changed");
-        return res;
-      default:
-        handleError(res);
-        return null;
+        fatalError();
+        return;
     }
   };
 
   return (
     <AuthContext.Provider value={{
       ...session,
-      handleError,
+      clearSession,
       signIn,
       signInWithPlex,
-      authorizePlex,
       signOut,
       signUp,
       confirmEmail,
@@ -363,15 +261,11 @@ const AuthContextProvider = (props) => {
       initResetPassword,
       checkResetPasswordToken,
       resetPassword,
-      changePassword,
-      getUser,
-      getFriend,
-      changeEmail,
-      changeUsername,
-      changeUserPicture,
-      deleteAccount
+      setUsername,
+      setUserPicture,
+      handleError
     }}>
-      { (session.isLoading && <PageLoader/>) || (props.children) }
+      { props.children }
     </AuthContext.Provider>
   )
 };

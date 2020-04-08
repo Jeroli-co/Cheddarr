@@ -5,6 +5,7 @@ const NOTIFICATION_LEVEL = {
   DANGER: { duration: 8000, color: "#800000", bgColor: "#ff9290" },
   WARNING: { duration: 4000, color: "#805500", bgColor: "#ffe8a3" },
   SUCCESS: { duration: 5000, color: "#006500", bgColor: "#bcffb7" },
+  INFO: { duration: 5000, color: "#4667ae", bgColor: "#a8cbff" },
 };
 
 class NotificationModel {
@@ -40,6 +41,11 @@ const NotificationContextProvider = (props) => {
     pushNotification(notification);
   };
 
+  const pushInfo = (message) => {
+    const notification = new NotificationModel(message, NOTIFICATION_LEVEL.INFO);
+    pushNotification(notification);
+  };
+
   const removeNotification = () => {
     setState({ notification: null, timer: null });
   };
@@ -48,6 +54,7 @@ const NotificationContextProvider = (props) => {
     <NotificationContext.Provider value={{
       pushSuccess,
       pushWarning,
+      pushInfo,
       pushDanger,
       removeNotification
     }}>

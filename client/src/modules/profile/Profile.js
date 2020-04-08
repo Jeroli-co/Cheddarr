@@ -5,12 +5,14 @@ import {Link} from "react-router-dom";
 import {Route} from "react-router-dom";
 import {AuthContext} from "../../contexts/AuthContext";
 import {NotificationContext} from "../../contexts/NotificationContext";
+import {useProfile} from "../../hooks/useProfile";
 
 const Profile = () => {
 
 	const imageUploader = useRef(null);
 
-	const { getUser, changeUserPicture, username, userPicture } = useContext(AuthContext);
+	const { getUser, changeUserPicture } = useProfile();
+	const { username, userPicture } = useContext(AuthContext);
 	const [user, setUser] = useState(null);
 	const { pushDanger } = useContext(NotificationContext);
 

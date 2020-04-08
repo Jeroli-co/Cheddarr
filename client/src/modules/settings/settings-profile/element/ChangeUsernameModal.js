@@ -1,14 +1,14 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useForm} from "react-hook-form";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {AuthContext} from "../../../../contexts/AuthContext";
+import {useProfile} from "../../../../hooks/useProfile";
 
 const ChangeUsernameModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { changeUsername } = useContext(AuthContext);
+  const { changeUsername } = useProfile();
   const [httpError, setHttpError] = useState(null);
 
   const onSubmit = async (data) => {

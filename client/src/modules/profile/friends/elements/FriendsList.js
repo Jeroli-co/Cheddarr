@@ -35,6 +35,7 @@ const FriendsList = ({ friends, removeFriend }) => {
 
       { friends.map(user =>
           <FriendItemContainer
+            key={user.username}
             user={user}
             actions={<Actions user={user}/>}
             isShow={showFriendsList}

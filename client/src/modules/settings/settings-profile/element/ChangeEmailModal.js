@@ -1,20 +1,24 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useForm} from "react-hook-form";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {AuthContext} from "../../../../contexts/AuthContext";
+import {useProfile} from "../../../../hooks/useProfile";
 
 const ChangeEmailModal = (props) => {
 
   const { register, handleSubmit, errors } = useForm();
-  const { changeEmail } = useContext(AuthContext);
-  const [httpResponse, setHttpResponse] = useState(null);
+  const { changeEmail } = useProfile();
+  const [httpError, setHttpError] = useState(null);
 
   const onSubmit = async (data) => {
     const res = await changeEmail(data);
     if (res) {
-      setHttpResponse(res);
+      if (res.status !== 200) {
+        setHttpError(res)
+      } else {
+        closeModal();
+      }
     }
   };
 
@@ -61,11 +65,7 @@ const ChangeEmailModal = (props) => {
               )}
             </div>
 
-            { httpResponse && (
-                (httpResponse.status === 409 && <p className="help is-danger" data-testid="ErrorText">{httpResponse.message}</p>) ||
-                (httpResponse.status === 200 && <p className="help is-success" data-testid="SuccessText">{httpResponse.message}</p>)
-              )
-            }
+            { httpError && <p className="help is-danger" data-testid="ErrorText">{httpError.message}</p> }
 
           </section>
           <footer className="modal-card-foot">

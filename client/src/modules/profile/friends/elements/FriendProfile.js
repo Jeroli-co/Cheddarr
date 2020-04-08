@@ -1,15 +1,17 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router";
-import {AuthContext} from "../../../../contexts/AuthContext";
+import {useFriends} from "../../../../hooks/useFriends";
 
 const FriendProfile = () => {
 
   const { id } = useParams();
-  const { getFriend } = useContext(AuthContext);
+  const { getFriend } = useFriends();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    getFriend(id).then(res => setUser(res.data));
+    getFriend(id).then(res => {
+      if (res) setUser(res.data);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

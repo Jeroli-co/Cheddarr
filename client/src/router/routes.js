@@ -19,12 +19,10 @@ import {ChangeEmailModal} from "../modules/settings/settings-profile/element/Cha
 import {DeleteAccountModal} from "../modules/settings/settings-profile/element/DeleteAccountModal";
 import {FriendProfile} from "../modules/profile/friends/elements/FriendProfile";
 import {Friends} from "../modules/profile/friends/Friends";
-import {AuthorizePlex} from "../modules/auth/authorize/AuthorizePlex";
 
 const routes = {
   HOME: { url: '/', component: Home },
   SIGN_IN: { url: '/sign-in', component: SignInForm },
-  AUTHORIZE_PLEX : {url: '/plex/authorize', component: AuthorizePlex},
   INIT_RESET_PASSWORD: { url: '/sign-in/init-reset-password', component: InitResetPasswordModal },
   SIGN_UP: { url: '/sign-up', component: SignUpForm },
   CONFIRM_EMAIL: { url: (token) => '/confirm/' + token, component: ConfirmEmail },

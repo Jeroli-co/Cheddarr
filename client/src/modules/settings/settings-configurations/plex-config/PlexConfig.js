@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faEdit} from "@fortawesome/free-solid-svg-icons";
-import {AuthContext} from "../../../../../contexts/AuthContext";
+import {AuthContext} from "../../../../contexts/AuthContext";
 import {ServersModal} from "./elements/ServersModal";
 import {useForm} from "react-hook-form";
 import {SubmitPlexConfig} from "./elements/SubmitPlexConfig";
-import {usePlexConfig} from "../../../../../hooks/usePlexConfig";
+import {usePlexConfig} from "../../../../hooks/usePlexConfig";
 
 const PlexConfig = ({ location }) => {
 

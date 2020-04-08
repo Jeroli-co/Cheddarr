@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {usePlexConfig} from "../../../../../../hooks/usePlexConfig";
+import {usePlexConfig} from "../../../../../hooks/usePlexConfig";
 
 const ServersModal = ({ onClose }) => {
 

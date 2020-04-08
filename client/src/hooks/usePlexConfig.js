@@ -1,7 +1,7 @@
 import {useContext, useState} from "react";
 import {useApi} from "./useApi";
-import {AuthContext} from "../contexts/AuthContext";
 import {NotificationContext} from "../contexts/NotificationContext";
+import {AuthContext} from "../contexts/AuthContext";
 
 const usePlexConfig = () => {
 

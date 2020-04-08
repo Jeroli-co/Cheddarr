@@ -1,10 +1,11 @@
-import {useContext} from "react";
 import {useApi} from "./useApi";
+import {useContext} from "react";
 import {AuthContext} from "../contexts/AuthContext";
 
 const useFriends = () => {
 
   const friendsURI = "/profile/friends/";
+
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
 
@@ -100,6 +101,17 @@ const useFriends = () => {
     }
   };
 
+  const getFriend = async (username) => {
+    const res = await executeRequest(methods.GET, friendsURI + username + "/");
+    switch (res.status) {
+      case 200:
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return {
     addFriend,
     acceptRequest,
@@ -108,7 +120,8 @@ const useFriends = () => {
     cancelFriend,
     getFriends,
     getReceived,
-    getRequested
+    getRequested,
+    getFriend
   }
 
 };

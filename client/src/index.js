@@ -4,25 +4,10 @@ import './index.scss';
 import {App} from './App';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter} from "react-router-dom";
-import {AuthContextWithRouterProvider} from "./contexts/AuthContext";
-import {NotificationContextProvider} from "./contexts/NotificationContext";
-import { ThemeProvider } from "styled-components";
-
-const theme = {
-  primary: "#f8813f",
-  primaryLight: "#ffc5a6",
-  primaryLighter: "#ffe3d4",
-};
 
 ReactDOM.render(
   <BrowserRouter>
-    <ThemeProvider theme={theme}>
-      <NotificationContextProvider>
-        <AuthContextWithRouterProvider>
-          <App />
-        </AuthContextWithRouterProvider>
-      </NotificationContextProvider>
-    </ThemeProvider>
+    <App />
   </BrowserRouter>
   , document.getElementById('root')
 );
