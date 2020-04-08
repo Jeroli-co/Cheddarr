@@ -71,7 +71,9 @@ class ProdConfig(Config):
     ##########################################################################
     # flask                                                                  #
     ##########################################################################
-    FLASK_DOMAIN = os.environ.get("FLASK_DOMAIN")
+    FLASK_DOMAIN = os.environ.get(
+        "FLASK_DOMAIN", os.environ.get("HEROKU_APP_NAME") + ".herokuapp.com"
+    )
 
     ##########################################################################
     # session/cookies                                                        #
