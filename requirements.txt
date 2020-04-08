@@ -1,5 +1,5 @@
 blinker
-celery
+celery[redis]
 cloudinary
 Flask
 Flask-Caching
