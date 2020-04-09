@@ -4,6 +4,7 @@ from http import HTTPStatus
 import requests
 from flask import jsonify
 from flask_login import current_user, login_required
+from plexapi.library import MovieSection
 from plexapi.myplex import MyPlexAccount
 
 from server.exceptions import HTTPError
@@ -11,17 +12,20 @@ from server.extensions import cache
 from server.providers.forms import PlexConfigForm
 from server.providers.models import PlexConfig
 from server.providers.routes import provider
-from server.providers.serializers.provider_serializer import plex_serializer
+from server.providers.serializers.media_serializer import plex_movie_serializer
+from server.providers.serializers.provider_config_serializer import (
+    plex_config_serializer,
+)
 
 
 @provider.route("/plex/config/", methods=["GET"])
 @login_required
 def get_plex_config():
     plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
-    return plex_serializer.jsonify(plex_user_config)
+    return plex_config_serializer.jsonify(plex_user_config)
 
 
-@provider.route("/plex/config/", methods=["PUT"])
+@provider.route("/plex/config/", methods=["PATCH"])
 @login_required
 def update_plex_config():
     config_form = PlexConfigForm()
@@ -38,7 +42,7 @@ def update_plex_config():
             "No config created for this provider", status_code=HTTPStatus.BAD_REQUEST
         )
     user_config.update_config(updated_config)
-    return plex_serializer.jsonify(user_config)
+    return plex_config_serializer.jsonify(user_config)
 
 
 @provider.route("/plex/servers/", methods=["GET"])
@@ -60,14 +64,24 @@ def get_plex_user_servers():
 
 @provider.route("/plex/movies/recent/", methods=["GET"])
 @login_required
-@cache.cached(timeout=300)
+# @cache.cached(timeout=300)
 def get_plex_recent_movies():
     plex_server = get_plex_user_server(current_user)
-    movies = plex_server.library.section("Films")
-    return jsonify([movie.title for movie in movies.recentlyAdded()])
+    movie_sections = [
+        section
+        for section in plex_server.library.sections()
+        if isinstance(section, MovieSection)
+    ]
+    recent_movies = [
+        movie
+        for section in movie_sections
+        for movie in section.recentlyAdded(maxresults=20)
+    ]
+    print(plex_movie_serializer.load(plex_movie_serializer.dump(recent_movies[0])))
+    return jsonify(recent_movies)
 
 
-@cache.memoize(timeout=900)
+# @cache.memoize(timeout=900)
 def get_plex_user_server(user):
     plex_config = PlexConfig.find(user)
     api_key = plex_config.provider_api_key
