@@ -15,6 +15,7 @@ from server.config import (
     APP_NAME,
     PLEX_ACCESS_TOKEN_URL,
     PLEX_AUTHORIZE_URL,
+    PLEX_CLIENT_IDENTIFIER,
     PLEX_REQUEST_TOKEN_URL,
     PLEX_USER_RESOURCE_URL,
 )
@@ -22,9 +23,8 @@ from server.exceptions import HTTPError
 from server.extensions import db
 from server.providers.models import PlexConfig
 
-plex_identifier = utils.generate_api_key()
 plex_headers = {
-    "X-Plex-Client-Identifier": plex_identifier,
+    "X-Plex-Client-Identifier": PLEX_CLIENT_IDENTIFIER,
     "X-Plex-Product": APP_NAME,
     "Accept": "application/json",
 }
@@ -79,7 +79,7 @@ def plex_signin():
     authorize_url = (
         PLEX_AUTHORIZE_URL
         + "?clientID="
-        + plex_identifier
+        + PLEX_CLIENT_IDENTIFIER
         + "&code="
         + code
         + "&forwardUrl="
@@ -90,7 +90,7 @@ def plex_signin():
     return redirect(authorize_url), HTTPStatus.OK
 
 
-@auth.route("/plex/authorize/", methods=["GET"])
+@auth.route("/sign-in/plex/authorize/", methods=["GET"])
 def authorize_plex():
     token = request.args.get("token")
     token = utils.confirm_token(token)

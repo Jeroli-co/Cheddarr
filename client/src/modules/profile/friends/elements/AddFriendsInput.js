@@ -1,17 +1,15 @@
-import React, {useContext, useState} from "react";
+import React, {useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faSearch} from "@fortawesome/free-solid-svg-icons";
-import {FriendsContext} from "../../../../contexts/FriendsContext";
 
-const AddFriendsInput = () => {
+const AddFriendsInput = ({ sendFriendRequest }) => {
 
-  const { addFriend } = useContext(FriendsContext);
   const [searchFriends, setSearchFriends] = useState("");
   const [httpResponse, setHttpResponse] = useState(null);
 
   const _onAddFriend = async () => {
     if (searchFriends.replace(/\s/g,'').length > 0) {
-      const res = await addFriend(searchFriends);
+      const res = await sendFriendRequest(searchFriends);
       if (res) {
         switch (res.status) {
           case 201:

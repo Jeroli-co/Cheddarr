@@ -1,48 +1,37 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
-import {APIContext, methods} from "./APIContext";
-import {providers, ProvidersContext} from "./ProvidersContext";
-import {AuthContext} from "./AuthContext";
-import {NotificationContext} from "./NotificationContext";
+import {useContext, useState} from "react";
+import {useApi} from "./useApi";
+import {NotificationContext} from "../contexts/NotificationContext";
+import {AuthContext} from "../contexts/AuthContext";
 
-const PlexConfigContext = createContext();
+const usePlexConfig = () => {
 
-const initialConfig = {
-  providerApiKey: null,
-  enabled: null,
-  machineName: null,
-  machineId: null,
-  loading: true,
-};
-
-const PlexConfigContextProvider = (props) => {
-
-  const [config, setConfig] = useState(initialConfig);
+  const [config, setConfig] = useState({ loaded: false });
   const [servers, setServers] = useState(null);
 
-  const { getProviderConfig } = useContext(ProvidersContext);
-  const { executeRequest } = useContext(APIContext);
+  const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
   const { pushSuccess } = useContext(NotificationContext);
 
-  useEffect(() => {
-    getProviderConfig(providers.PLEX).then(res => {
-      if (res) {
+  const getPlexConfig = async () => {
+    const res = await executeRequest(methods.GET, "/provider/plex/config/");
+    switch (res.status) {
+      case 200:
         setConfig({
           providerApiKey: res.data["provider_api_key"],
           enabled: res.data.enabled,
           machineName: res.data["machine_name"],
           machineId: res.data["machine_id"],
-          loading: false,
+          loaded: true,
         });
-      } else {
-        setConfig({ ...initialConfig, loading: false });
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
 
   const getPlexServers = async () => {
-    const res = await executeRequest(methods.GET, "/provider/plex/servers/", null, null, false);
+    const res = await executeRequest(methods.GET, "/provider/plex/servers/");
     switch (res.status) {
       case 200:
         setServers(res.data);
@@ -86,20 +75,17 @@ const PlexConfigContextProvider = (props) => {
     }
   };
 
-  return (
-    <PlexConfigContext.Provider value={{
-      ...config,
-      servers,
-      getPlexServers,
-      updatePlexServer,
-      updateConfig
-    }}>
-      { props.children }
-    </PlexConfigContext.Provider>
-  );
+  return {
+    ...config,
+    servers,
+    getPlexConfig,
+    getPlexServers,
+    updatePlexServer,
+    updateConfig
+  }
+
 };
 
 export {
-  PlexConfigContext,
-  PlexConfigContextProvider
+  usePlexConfig
 }

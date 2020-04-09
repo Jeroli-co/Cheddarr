@@ -3,10 +3,11 @@ import {AuthContext} from "../contexts/AuthContext";
 import {Redirect, Route} from "react-router-dom";
 import React from "react";
 import {routes} from "./routes";
+import {PageLoader} from "../elements/PageLoader";
 
 const ProtectedRoute = ({component: Component, location, ...rest}) => {
 
-  const { isAuthenticated, isLoadingSession } = useContext(AuthContext);
+  const { isAuthenticated, isLoading } = useContext(AuthContext);
 
   return (
     <Route
@@ -14,7 +15,9 @@ const ProtectedRoute = ({component: Component, location, ...rest}) => {
       render={(props) => {
         if (isAuthenticated) {
           return <Redirect to={routes.HOME.url}/>;
-        } else if (!isLoadingSession) {
+        } else if (isLoading) {
+          return <PageLoader/>;
+        } else {
           return <Component {...props} />;
         }
       }

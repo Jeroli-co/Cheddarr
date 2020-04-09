@@ -1,11 +1,12 @@
 import React, {useContext, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUser, faEnvelope, faKey, faSignInAlt} from "@fortawesome/free-solid-svg-icons";
+import {faUser, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import { useForm } from 'react-hook-form'
 import {AuthContext} from "../../contexts/AuthContext";
 import {routes} from "../../router/routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../forms/formDefaultValidators";
+import logo from "../../assets/plex.png";
 
 const SignUpForm = ({ history }) => {
 
@@ -44,7 +45,7 @@ const SignUpForm = ({ history }) => {
       <br />
 
       <div className="columns is-mobile is-centered">
-        <div className="column is-one-third-desktop is-half-tablet is-three-quarters-mobile">
+        <div className="column is-one-quarter-desktop is-half-tablet is-three-quarters-mobile">
 
           <form onSubmit={handleSubmit(onSubmit)}>
 
@@ -55,7 +56,7 @@ const SignUpForm = ({ history }) => {
                 <input name="username"
                        className={'input is-medium ' + (errors['username'] ? "is-danger" : "")}
                        type="text"
-                       placeholder="Enter a username"
+                       placeholder="Username"
                        ref={register({
                          required: true,
                          minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
@@ -89,7 +90,7 @@ const SignUpForm = ({ history }) => {
                 <input name="email"
                        className={'input is-medium ' + (errors['email'] ? "is-danger" : "")}
                        type="email"
-                       placeholder="Enter a valid email"
+                       placeholder="Valid email"
                        ref={register({
                          required: true,
                          maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
@@ -118,7 +119,7 @@ const SignUpForm = ({ history }) => {
                 <input name="password"
                        className={'input is-medium ' + (errors['password'] ? "is-danger" : "")}
                        type="password"
-                       placeholder="Enter a strong password"
+                       placeholder="Strong password"
                        ref={register({ required: true, pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value })} />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faKey} />
@@ -139,7 +140,7 @@ const SignUpForm = ({ history }) => {
                 <input name="password-confirmation"
                        className={'input is-medium ' + (errors['password-confirmation'] ? "is-danger" : "")}
                        type="password"
-                       placeholder="Confirm your password"
+                       placeholder="Confirm password"
                        ref={register({
                          required: true,
                          validate: (value) => {
@@ -163,25 +164,25 @@ const SignUpForm = ({ history }) => {
             {/* SUBMIT BUTTON */}
             <div className="field">
               <div className="control">
-                <button className="button is-secondary-button">Sign up</button>
+                <button type="submit" className="button is-fullwidth is-secondary-button">Sign up</button>
               </div>
             </div>
 
             <div className="is-divider" data-content="OR"/>
 
-            <h1 className="subtitle is-5">Sign up with</h1>
+            <div className="content has-text-centered">
+              <button className="button has-background-dark-plex" type="button" onClick={() => signInWithPlex(routes.HOME.url)}>
+                <span className="icon">
+                  <img className="icon-left" src={logo} alt="Plex logo" width="30px" height="30px"/>
+                </span>
+                <span>Sign up with Plex</span>
+              </button>
+            </div>
 
-            <button className="button is-rounded" type="button" onClick={() => signInWithPlex()}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faSignInAlt}/>
-							</span>
-							<span>Plex</span>
-						</button>
+            <br/>
 
-            <div className="field">
-              <div className="control has-text-centered">
-                <p className="is-size-7">Already have an account ? <Link to={routes.SIGN_IN.url}>Sign in</Link></p>
-              </div>
+            <div className="content has-text-centered">
+              <p className="is-size-7"><Link to={routes.SIGN_IN.url}>Already have an account ?</Link></p>
             </div>
 
           </form>

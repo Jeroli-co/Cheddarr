@@ -1,28 +1,18 @@
-import React, {createContext, useState} from 'react';
 import axios from "axios";
 import {createErrorResponse, createResponse} from "../service/http-service";
-import {PageLoader} from "../elements/PageLoader";
 
-const methods = {
-  GET: "get",
-  POST: "post",
-  PUT: "put",
-  DELETE: "delete",
-  PATCH: "patch"
-};
-
-const APIContext = createContext();
-
-const APIContextProvider = (props) => {
+const useApi = () => {
 
   const apiUrl = "/api";
+  const methods = {
+    GET: "get",
+    POST: "post",
+    PUT: "put",
+    DELETE: "delete",
+    PATCH: "patch"
+  };
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  const executeRequest = async (method, url, formData = null, headers = null, withLoader = true) => {
-    if (withLoader) {
-      setIsLoading(true);
-    }
+  const executeRequest = async (method, url, formData = null, headers = null) => {
     const reqUrl = apiUrl + url;
     const reqHeaders = headers ? { headers: headers } : {};
     let res = null;
@@ -51,25 +41,16 @@ const APIContextProvider = (props) => {
       return createResponse(res);
     } catch (e) {
       return createErrorResponse(e);
-    } finally {
-      if (withLoader) {
-        setIsLoading(false);
-      }
     }
   };
 
-  return (
-    <APIContext.Provider value={{
-      executeRequest,
-    }}>
-      { isLoading && <PageLoader/> }
-      { props.children }
-    </APIContext.Provider>
-  );
+  return {
+    methods,
+    executeRequest,
+  }
+
 };
 
 export {
-  methods,
-  APIContext,
-  APIContextProvider
+  useApi
 }

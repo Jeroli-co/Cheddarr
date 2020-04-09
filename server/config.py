@@ -15,6 +15,7 @@ FLASK_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "server", "templates")
 # api                                                                    #
 ##########################################################################
 API_ROOT = "/api"
+PLEX_CLIENT_IDENTIFIER = os.environ.get("PLEX_CLIENT_IDENTIFIER", APP_NAME)
 PLEX_REQUEST_TOKEN_URL = "https://plex.tv/api/v2/pins/?strong=true"
 PLEX_AUTHORIZE_URL = "https://app.plex.tv/auth#/"
 PLEX_ACCESS_TOKEN_URL = "https://plex.tv/api/v2/pins/"

@@ -1,11 +1,12 @@
-import React, {useContext, useState} from 'react';
-import {faKey, faSignInAlt, faUser} from "@fortawesome/free-solid-svg-icons";
+import React, {useContext, useEffect, useState} from 'react';
+import {faKey, faUser} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from 'react-hook-form';
 import {Link, Route, useLocation} from "react-router-dom";
 import {AuthContext} from "../../../contexts/AuthContext";
 import {routes} from "../../../router/routes";
 import {FORM_DEFAULT_VALIDATOR} from "../../../forms/formDefaultValidators";
+import logo from "../../../assets/plex.png";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -18,15 +19,19 @@ const SignInForm = (props) => {
 	const [rememberMe, setRememberMe] = useState(false);
 	const [httpError, setHttpError] = useState(null);
   const query = useQuery();
+  const [redirectURI, setRedirectURI] = useState(null);
+
+  useEffect(() => {
+  	let redirectURI = query.get('redirectURI');
+		redirectURI = redirectURI ? redirectURI : routes.HOME.url;
+		setRedirectURI(redirectURI);
+	}, [query]);
 
 	const onSubmit = (data) => {
-		signIn(data).then(res => {
+		signIn(data, redirectURI).then(res => {
 			if (res) {
 				switch (res.status) {
 					case 200:
-						let redirectURI = query.get('redirectURI');
-						redirectURI = redirectURI ? redirectURI : routes.HOME.url;
-						props.history.push(redirectURI);
 						return;
 					default:
 						setHttpError(res);
@@ -51,7 +56,7 @@ const SignInForm = (props) => {
 			<br />
 
 			<div className="columns is-mobile is-centered">
-				<div className="column is-one-third-desktop is-half-tablet is-three-quarters-mobile">
+				<div className="column is-one-quarter-desktop is-half-tablet is-three-quarters-mobile">
 
 					<form id="sign-in-form" onSubmit={handleSubmit(onSubmit)}>
 
@@ -61,7 +66,7 @@ const SignInForm = (props) => {
 								<input name="usernameOrEmail"
 									className={'input is-medium ' + (errors['usernameOrEmail'] ? "is-danger" : "")}
 									type="text"
-									placeholder="Enter your username or email"
+									placeholder="Username or email"
 									ref={register({
 										required: true,
 										minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
@@ -89,7 +94,7 @@ const SignInForm = (props) => {
 								<input name="password"
 									className={'input is-medium ' + (errors['password'] ? "is-danger" : "")}
 									type="password"
-									placeholder="Enter your password"
+									placeholder="Password"
 									ref={register({
 										required: true,
 										pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value
@@ -121,29 +126,28 @@ const SignInForm = (props) => {
 
 						<div className="field">
 							<div className="control">
-								<button className="button is-secondary-button">Sign in</button>
+								<button type="submit" className="button is-fullwidth is-secondary-button">Sign in</button>
 							</div>
 						</div>
 					</form>
 
 					<div className="is-divider" data-content="OR"/>
 
-					<h1 className="subtitle is-5">Sign in with</h1>
-
-					<div className="buttons">
-						<button className="button is-rounded" type="button" onClick={() => signInWithPlex(query.get('redirectURI'))}>
-							<span className="icon">
-								<FontAwesomeIcon icon={faSignInAlt}/>
+					<div className="content has-text-centered">
+            <button className="button has-background-dark-plex" type="button" onClick={() => signInWithPlex(redirectURI)}>
+              <span className="icon">
+								<img className="icon-left" src={logo} alt="Plex logo" width="30px" height="30px"/>
 							</span>
-							<span>Plex</span>
-						</button>
-					</div>
+							<span>Sign in with Plex</span>
+            </button>
+          </div>
 
-						<div className="field has-text-centered">
-							<p className="is-size-7">Forgot your password ? <Link to={routes.INIT_RESET_PASSWORD.url}>Click here to reset it</Link></p>
-							<p className="is-size-7">Still not have an account ? <Link to={routes.SIGN_UP.url}>Sign up</Link></p>
-						</div>
+          <br/>
 
+          <div className="content has-text-centered">
+            <p className="is-size-7"><Link to={routes.INIT_RESET_PASSWORD.url}>Forgot your password ?</Link></p>
+            <p className="is-size-7"><Link to={routes.SIGN_UP.url}>Still not have an account ?</Link></p>
+          </div>
 
 				</div>
 			</div>

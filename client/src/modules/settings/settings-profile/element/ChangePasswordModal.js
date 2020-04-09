@@ -1,28 +1,19 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faKey} from "@fortawesome/free-solid-svg-icons";
 import {useForm} from "react-hook-form";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
-import {routes} from "../../../../router/routes";
-import {AuthContext} from "../../../../contexts/AuthContext";
+import {useProfile} from "../../../../hooks/useProfile";
 
 const ChangePasswordModal = (props) => {
 
   const { register, handleSubmit, errors, watch } = useForm();
-  const { changePassword } = useContext(AuthContext);
+  const { changePassword } = useProfile();
   const [httpError, setHttpError] = useState(null);
 
   const onSubmit = async (data) => {
     const res = await changePassword(data);
-    if (res) {
-      switch (res.status) {
-        case 200:
-          props.history.push(routes.SIGN_IN.url);
-          return;
-        default:
-          setHttpError(res);
-      }
-    }
+    if (res && res.status !== 200) setHttpError(res);
   };
 
   const closeModal = () => {

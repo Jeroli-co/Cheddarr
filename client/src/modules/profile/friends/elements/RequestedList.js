@@ -1,17 +1,15 @@
-import React, {useContext, useState} from "react";
+import React, {useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleRight, faMinus} from "@fortawesome/free-solid-svg-icons";
-import {FriendsContext} from "../../../../contexts/FriendsContext";
 import {FriendItemContainer} from "./FriendItemContainer";
 
-const RequestedList = () => {
+const RequestedList = ({ requested, cancelRequest }) => {
 
-  const { requested, cancelFriend, getRequestedLength } = useContext(FriendsContext);
   const [showRequestedList, setShowRequestedList] = useState(false);
 
   const Actions = ({ user }) => {
     return (
-      <button className="button is-danger is-small" type="button" onClick={() => cancelFriend(user.username)}>
+      <button className="button is-danger is-small" type="button" onClick={() => cancelRequest(user.username)}>
         <span className="icon">
           <FontAwesomeIcon icon={faMinus}/>
         </span>
@@ -25,7 +23,7 @@ const RequestedList = () => {
       <div className="level is-pointed" onClick={() => setShowRequestedList(!showRequestedList)}>
         <div className="level-left">
           <div className="level-item">
-            <h5 className="subtitle is-5">Requested ({getRequestedLength()})</h5>
+            <h5 className="subtitle is-5">Requested ({requested.length})</h5>
           </div>
         </div>
         <div className="level-right">

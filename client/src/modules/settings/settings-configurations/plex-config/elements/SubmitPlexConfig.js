@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import {Animate} from "../../../../../animations/Animate";
-import {FadeIn, FadeOut} from "../../../../../animations/Animations";
+import {Animate} from "../../../../animations/Animate";
+import {FadeIn, FadeOut} from "../../../../animations/Animations";
 
 const SubmitButton = styled.button`
   background: transparent;
@@ -14,7 +14,7 @@ const SubmitButton = styled.button`
   font-size: 1em;
   width: 150px;
   height: 40px;
-  
+
   &:hover {
     cursor: pointer;
     color: white;
@@ -32,7 +32,7 @@ const SubmitContainer = styled.div`
   justify-content: flex-end;
   align-items: center;
   border-top: 1px solid ${(props) => props.theme.primaryLight};
-  background-color: ${(props) => props.theme.primaryLighter}; 
+  background-color: ${(props) => props.theme.primaryLighter};
 `;
 
 const SubmitPlexConfig = ({ isFormDirty }) => {
