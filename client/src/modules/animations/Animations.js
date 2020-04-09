@@ -7,7 +7,7 @@ const FadeInUp = (height) => {
       opacity: 0;
       margin-bottom: -${height}px;
     }
-    
+
     to {
       opacity: 1;
       visibility: visible;
@@ -22,7 +22,7 @@ const FadeOutDown = (height) => {
       opacity: 1;
       margin-bottom: 0px;
     }
-    
+
     to {
       visibility: hidden;
       opacity: 0;
@@ -37,7 +37,7 @@ const FadeIn = () => {
       visibility: visible;
       opacity: 0;
     }
-  
+
     to {
       visibility: visible;
       opacity: 1;
@@ -48,7 +48,7 @@ const FadeIn = () => {
 const FadeOut = () => {
   return keyframes`
     from {
-      opacity: 1; 
+      opacity: 1;
     }
 
     to {
@@ -62,5 +62,5 @@ export {
   FadeInUp,
   FadeOutDown,
   FadeIn,
-  FadeOut
+  FadeOut,
 }

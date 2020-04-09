@@ -5,7 +5,7 @@ const createResponse = (res) => {
 };
 
 const isHttpError = (error) => {
-  return error.hasOwnProperty('response');
+  return error.hasOwnProperty("response") && error.response !== null;
 };
 
 const createErrorResponse = (e) => {
