@@ -19,5 +19,14 @@ def init_db():
 @with_appcontext
 def worker():
     """Start the celery worker."""
-    subprocess.run("celery worker -A cheddarr.celery -l debug", shell=True)
+    subprocess.run("celery worker -A server.worker.celery -l debug", shell=True)
     click.echo("Celery worker started...")
+
+
+@click.command("test")
+def test():
+    """Run the tests."""
+    import pytest
+
+    rv = pytest.main(["./server/tests", "--verbose"])
+    exit(rv)

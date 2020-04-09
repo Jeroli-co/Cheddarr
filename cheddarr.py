@@ -8,9 +8,6 @@ from flask.cli import cli, FlaskGroup, run_command
 
 from server.app import create_app
 
-"""Used for celery worker"""
-from server.app import celery  # noqa
-
 """USAGE:
 python manage.py [--env=production|development] COMMAND [OPTIONS] [ARGS]
 """
@@ -47,10 +44,6 @@ def main():
 
     cli.add_command(run_command)
     cli.main(args=sys.argv[1:])
-
-
-app = create_app()
-app.app_context().push()
 
 
 if __name__ == "__main__":
