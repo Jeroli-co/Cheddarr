@@ -22,7 +22,8 @@ class ProviderConfig(db.Model):
             .one()
         )
         for config, value in updated_config.items():
-            setattr(user_config, config, value)
+            if value != "":
+                setattr(user_config, config, value)
         db.session.commit()
 
     @classmethod
