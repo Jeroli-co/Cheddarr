@@ -112,3 +112,4 @@ class TestConfig(Config):
     DEBUG = True
     SERVER_NAME = "localhost"
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    CACHE_TYPE = "null"
