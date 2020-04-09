@@ -111,6 +111,7 @@ const AuthContextProvider = (props) => {
         initSession(res.data.username, res.data["user_picture"]);
         return res;
       default:
+        clearSession();
         handleError(res);
         return null;
     }
