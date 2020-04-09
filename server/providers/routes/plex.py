@@ -73,11 +73,10 @@ def get_plex_recent_movies():
         if isinstance(section, MovieSection)
     ]
     recent_movies = [
-        movie
+        plex_movie_serializer.dump(movie)
         for section in movie_sections
         for movie in section.recentlyAdded(maxresults=20)
     ]
-    print(plex_movie_serializer.load(plex_movie_serializer.dump(recent_movies[0])))
     return jsonify(recent_movies)
 
 
