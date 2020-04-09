@@ -19,6 +19,7 @@ const usePlexConfig = () => {
     switch (res.status) {
       case 200:
         setConfig({
+          providerApiKey: res.data["provider_api_key"],
           enabled: res.data.enabled,
           machineName: res.data["machine_name"],
           machineId: res.data["machine_id"],
@@ -49,6 +50,7 @@ const usePlexConfig = () => {
 
   const updateConfig = async (newConfig) => {
     const fd = new FormData();
+    const providerApiKey = newConfig.hasOwnProperty('providerApiKey') ? newConfig.providerApiKey : config.providerApiKey;
     const enabled = newConfig.hasOwnProperty('enabled') ? newConfig.enabled : config.enabled;
     const machineName = newConfig.hasOwnProperty('machineName') ? newConfig.machineName : config.machineName;
     const machineId = newConfig.hasOwnProperty('machineId') ? newConfig.machineId : config.machineId;
@@ -61,6 +63,7 @@ const usePlexConfig = () => {
       case 200:
         setConfig({
           ...config,
+          providerApiKey: res.data["provider_api_key"],
           enabled: res.data.enabled,
           machineName: res.data["machine_name"],
           machineId: res.data["machine_id"]
