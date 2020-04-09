@@ -56,13 +56,6 @@ class Config(object):
     )
 
     ##########################################################################
-    # cache                                                                  #
-    ##########################################################################
-    CACHE_TYPE = "redis"
-    CACHE_REDIS_URL = os.environ.get("REDIS_URL", "localhost:6379")
-    CACHE_DEFAULT_TIMEOUT = 60
-
-    ##########################################################################
     # celery                                                                 #
     ##########################################################################
     CELERY_BROKER_URL = os.environ.get("REDIS_URL", "localhost:6379")
@@ -93,6 +86,13 @@ class ProdConfig(Config):
     ##########################################################################
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
+    ##########################################################################
+    # cache                                                                  #
+    ##########################################################################
+    CACHE_TYPE = "redis"
+    CACHE_REDIS_URL = os.environ.get("REDIS_URL", "localhost:6379")
+    CACHE_DEFAULT_TIMEOUT = 60
+
 
 class DevConfig(Config):
     ##########################################################################
@@ -104,6 +104,12 @@ class DevConfig(Config):
     # database                                                               #
     ##########################################################################
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(PROJECT_ROOT, "dev.db")
+
+    ##########################################################################
+    # cache                                                                  #
+    ##########################################################################
+    CACHE_TYPE = "filesystem"
+    CACHE_DIR = "./cache"
 
 
 class TestConfig(Config):
