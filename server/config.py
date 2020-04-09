@@ -109,7 +109,7 @@ class DevConfig(Config):
     # cache                                                                  #
     ##########################################################################
     CACHE_TYPE = "filesystem"
-    CACHE_DIR = "./cache"
+    CACHE_DIR = "./tmp"
 
 
 class TestConfig(Config):
