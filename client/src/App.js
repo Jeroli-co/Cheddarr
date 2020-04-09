@@ -16,25 +16,30 @@ const App = () => {
 
   const theme = {
     primary: "#f8813f",
-    primaryLight: "#ffc5a6",
+    primaryLight: "#ff9761",
     primaryLighter: "#ffe3d4",
     secondary: "#f9c441",
-    secondaryLight: "#FFE58F",
+    secondaryLight: "#ffd679",
     secondaryLighter: "#fff7c9",
+    secondaryDark: "#9a702a",
+    dark: "rgb(40,40,40)",
   };
 
   return (
     <ThemeProvider theme={theme}>
       <NotificationContextProvider>
         <AuthContextWithRouterProvider>
-          <div className="App">
-            <Navbar />
-            <Switch>
 
+          <div className="App">
+
+            <Navbar />
+
+            <Switch>
               <Route exact path={routes.HOME.url} component={routes.HOME.component} />
 
               <Route exact path={routes.CONFIRM_EMAIL.url(':token')} component={routes.CONFIRM_EMAIL.component} />
               <Route exact path={routes.RESET_PASSWORD.url(':token')} component={routes.RESET_PASSWORD.component} />
+              <Route exact path={routes.AUTHORIZE_PLEX.url} component={routes.AUTHORIZE_PLEX.component} />
 
               <ProtectedRoute path={routes.SIGN_IN.url} component={routes.SIGN_IN.component} />
               <ProtectedRoute exact path={routes.SIGN_UP.url} component={routes.SIGN_UP.component} />
@@ -53,6 +58,7 @@ const App = () => {
             </Switch>
 
           </div>
+
         </AuthContextWithRouterProvider>
       </NotificationContextProvider>
     </ThemeProvider>

@@ -13,8 +13,6 @@ const initialSessionState = {
   isLoading: true,
 };
 
-const plexAuthorizeUri = "/plex/authorize/";
-
 const AuthContextProvider = (props) => {
 
   const [session, setSession] = useState(initialSessionState);
@@ -22,8 +20,14 @@ const AuthContextProvider = (props) => {
 
   useEffect(() => {
 
-    if (props.location.pathname === plexAuthorizeUri) {
-      authorizePlex(props.location.search).then(() => {});
+    if (props.location.pathname === routes.AUTHORIZE_PLEX.url) {
+      authorizePlex(props.location.search).then(res => {
+        if (res) {
+          let redirectURI = res.headers["redirect-uri"];
+          redirectURI = redirectURI && redirectURI.length > 0 ? redirectURI : routes.HOME.url;
+          props.history.push(redirectURI);
+        }
+      });
       return;
     }
 
@@ -101,13 +105,10 @@ const AuthContextProvider = (props) => {
   };
 
   const authorizePlex = async (search) => {
-    const res = await executeRequest(methods.GET, "/plex/authorize/" + search);
+    const res = await executeRequest(methods.GET, "/sign-in/plex/authorize/" + search);
     switch (res.status) {
       case 200:
         initSession(res.data.username, res.data["user_picture"]);
-        let redirectURI = res.headers["redirect-uri"];
-        redirectURI = redirectURI && redirectURI.length > 0 ? redirectURI : routes.HOME.url;
-        props.history.push(redirectURI);
         return res;
       default:
         handleError(res);

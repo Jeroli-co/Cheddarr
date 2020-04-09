@@ -90,7 +90,7 @@ def plex_signin():
     return redirect(authorize_url), HTTPStatus.OK
 
 
-@auth.route("/plex/authorize/", methods=["GET"])
+@auth.route("/sign-in/plex/authorize/", methods=["GET"])
 def authorize_plex():
     token = request.args.get("token")
     token = utils.confirm_token(token)
