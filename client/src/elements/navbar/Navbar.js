@@ -7,6 +7,31 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { SignUpButton } from "../../modules/auth/elements/SignUpButton";
 import { SignInButton } from "../../modules/auth/elements/SignInButton";
 import {UserDropdown} from "./user-dropdown/UserDropdown";
+import styled, {keyframes} from "styled-components";
+
+const NavbarLogoKeyframes = () => {
+  return keyframes`
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    60% {
+      transform: rotate(360deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  `;
+}
+
+const NavbarLogoStyle = styled.div`
+  animation-name: ${NavbarLogoKeyframes};
+  animation-duration: 10s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+`;
 
 const Navbar = () => {
 
@@ -27,9 +52,11 @@ const Navbar = () => {
 		<div className="Navbar" data-testid="Navbar">
 			<nav className="navbar is-primary" role="navigation" aria-label="main navigation">
 				<div className="navbar-brand">
-					<Link className="navbar-item" to="/">
-						<img src={logo} alt="Chedarr" width="32" height="24"/>
-					</Link>
+          <Link className="navbar-item" to="/">
+            <NavbarLogoStyle>
+              <img src={logo} alt="Chedarr" width="32" height="24"/>
+            </NavbarLogoStyle>
+          </Link>
 
 					<div role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false"
 							 onClick={toggleBurgerMenu}
