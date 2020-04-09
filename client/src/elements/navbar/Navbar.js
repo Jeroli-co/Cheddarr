@@ -27,7 +27,7 @@ const Navbar = () => {
 		<div className="Navbar" data-testid="Navbar">
 			<nav className="navbar is-primary" role="navigation" aria-label="main navigation">
 				<div className="navbar-brand">
-					<Link className="navbar-item" href="https://bulma.io" to="/">
+					<Link className="navbar-item" to="/">
 						<img src={logo} alt="Chedarr" width="32" height="24"/>
 					</Link>
 
@@ -41,11 +41,6 @@ const Navbar = () => {
 				</div>
 
 				<div id="navbarBasicExample" className="navbar-menu">
-					<div className="navbar-start">
-						<Link className="navbar-item" to="/">
-							Home
-						</Link>
-					</div>
 
 					<div className="navbar-end">
 

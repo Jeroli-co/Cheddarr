@@ -16,6 +16,7 @@ const Home = () => {
 					GROSSE APP EN PERSPECTIVE !
         </p>
       </header>
+
 		</div>
 	);
 };

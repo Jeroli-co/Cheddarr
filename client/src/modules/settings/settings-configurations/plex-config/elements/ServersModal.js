@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {usePlexConfig} from "../../../../../hooks/usePlexConfig";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 
 const ServersModal = ({ onClose }) => {
 
@@ -46,14 +48,19 @@ const ServersModal = ({ onClose }) => {
       <div className="modal-background" onClick={onClose}/>
       <div className="modal-card">
         <header className="modal-card-head">
-          <p className="modal-card-title">Modal title</p>
+          <p className="modal-card-title has-text-primary has-text-weight-semibold">Plex servers</p>
           <button className="delete" aria-label="close" onClick={onClose}/>
         </header>
         <section className="modal-card-body">
+          { !servers && (
+            <div className="content has-text-centered has-text-primary">
+              <FontAwesomeIcon icon={faSpinner} pulse size="2x"/>
+            </div>
+          )}
           { servers && servers.map(server => { return <Server key={server.name} server={server}/> }) }
         </section>
         <footer className="modal-card-foot">
-          <button className="button is-success" onClick={linkServer}>Save changes</button>
+          <button className="button is-primary is-inverted" onClick={linkServer}>Save changes</button>
           <button type="button" className="button" onClick={onClose}>Cancel</button>
         </footer>
       </div>

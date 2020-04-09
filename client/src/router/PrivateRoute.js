@@ -3,6 +3,7 @@ import {AuthContext} from "../contexts/AuthContext";
 import {Redirect, Route} from "react-router-dom";
 import React from "react";
 import {routes} from "./routes";
+import {PageLoader} from "../elements/PageLoader";
 
 const PrivateRoute = ({component: Component, location, ...rest}) => {
 
@@ -12,9 +13,11 @@ const PrivateRoute = ({component: Component, location, ...rest}) => {
     <Route
       {...rest}
       render={(props) => {
-        if (isAuthenticated) {
+        if (isLoading) {
+          return <PageLoader/>;
+        } else if (isAuthenticated) {
           return <Component {...props} />;
-        } else if (!isLoading) {
+        } else {
           return <Redirect to={routes.SIGN_IN.url}/>;
         }
       }}
