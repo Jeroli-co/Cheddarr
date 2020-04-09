@@ -104,10 +104,11 @@ def register_blueprints(app):
 
 def register_commands(app):
     """Register application's CLI commands"""
-    from server.commands import init_db, worker
+    from server.commands import init_db, worker, test
 
     app.cli.add_command(init_db)
     app.cli.add_command(worker)
+    app.cli.add_command(test)
 
 
 class CustomSessionInterface(SecureCookieSessionInterface):

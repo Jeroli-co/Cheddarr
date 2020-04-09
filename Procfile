@@ -1,2 +1,2 @@
 web: gunicorn cheddarr:app
-worker: celery worker --app=cheddarr:celery
+worker: celery worker --app=server.worker:celery
