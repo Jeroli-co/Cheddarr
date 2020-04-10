@@ -61,7 +61,7 @@ const ServersModal = ({ onClose }) => {
           { servers && servers.map(server => { return <Server key={server.name} server={server}/> }) }
         </section>
         <footer className="modal-card-foot">
-          <button className="button is-primary is-inverted" onClick={linkServer}>Save changes</button>
+          <button type="button" className="button is-primary is-inverted" onClick={linkServer}>Save changes</button>
           <button type="button" className="button" onClick={onClose}>Cancel</button>
         </footer>
       </div>

@@ -108,36 +108,39 @@ const PlexConfig = ({ location }) => {
 
       { config && (
 
-        <form onSubmit={handleSubmit(_onSubmit)}>
+        <div className="container">
+          <form onSubmit={handleSubmit(_onSubmit)}>
 
-          { isPlexAccountLinked() &&
-            <div className="field">
-              <div className="control">
-                <input id="enabled"
-                       type="checkbox"
-                       name="enabled"
-                       className="switch is-primary"
-                       ref={register}
-                       defaultChecked={config.enabled}
-                />
-                <label htmlFor="enabled">Enabled</label>
+            { isPlexAccountLinked() &&
+              <div className="field">
+                <div className="control">
+                  <input id="enabled"
+                         type="checkbox"
+                         name="enabled"
+                         className="switch is-primary"
+                         ref={register}
+                         defaultChecked={config.enabled}
+                  />
+                  <label htmlFor="enabled">Enabled</label>
+                </div>
+                <hr/>
               </div>
-              <hr/>
-            </div>
-          }
+            }
 
-          <LinkPlexAccount/>
+            <LinkPlexAccount/>
 
-          { isPlexAccountLinked() &&
-            <div>
-              <LinkPlexServer/>
-              <SubmitPlexConfig isFormDirty={formState.dirty}/>
-            </div>
-          }
+            { isPlexAccountLinked() &&
+              <div>
+                <LinkPlexServer/>
+                <SubmitPlexConfig isFormDirty={formState.dirty}/>
+              </div>
+            }
+
+          </form>
 
           { isServersModalActive && <ServersModal onClose={() => setIsServersModalActive(false)}/> }
 
-        </form>
+        </div>
 
       )}
 
