@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {usePlexConfig} from "../../../../../hooks/usePlexConfig";
+import React, {useContext, useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import {PlexConfigContext} from "../../../../../contexts/PlexConfigContext";
 
 const ServersModal = ({ onClose }) => {
 
   const [serverSelected, setServerSelected] = useState(null);
-  const { getPlexServers, updatePlexServer } = usePlexConfig();
+  const { getPlexServers, updatePlexServer } = useContext(PlexConfigContext);
   const [servers, setServers] = useState(null);
 
   useEffect(() => {
