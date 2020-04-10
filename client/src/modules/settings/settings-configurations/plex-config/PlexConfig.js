@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheck, faEdit} from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faEdit, faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../contexts/AuthContext";
 import {ServersModal} from "./elements/ServersModal";
 import {useForm} from "react-hook-form";
@@ -9,26 +9,31 @@ import {usePlexConfig} from "../../../../hooks/usePlexConfig";
 
 const PlexConfig = ({ location }) => {
 
-  const { getPlexConfig, providerApiKey, machineName, loaded, enabled, updateConfig } = usePlexConfig();
+  const { getPlexConfig, updateConfig } = usePlexConfig();
   const [isServersModalActive, setIsServersModalActive] = useState(false);
+  const [config, setConfig] = useState(null);
 
   const { register, handleSubmit, formState, reset } = useForm();
 
   useEffect(() => {
-    getPlexConfig();
+    getPlexConfig().then(data => { if (data) setConfig(data) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const _onSubmit = (data) => {
-    updateConfig(data).then(res => { if (res) reset() });
+    let newConfig = {};
+    formState.dirtyFields.forEach(key => {
+      newConfig[key] = data[key];
+    });
+    updateConfig(newConfig).then(res => { if (res) reset() });
   };
 
   const isPlexAccountLinked = () => {
-    return providerApiKey !== null && typeof providerApiKey !== 'undefined';
+    return config["provider_api_key"] !== null && typeof config["provider_api_key"] !== 'undefined';
   };
 
   const isPlexServerLinked = () => {
-    return machineName !== null && typeof machineName !== 'undefined';
+    return config["machine_name"] !== null && typeof config["machine_name"] !== 'undefined';
   };
 
   const LinkPlexAccount = () => {
@@ -67,7 +72,7 @@ const PlexConfig = ({ location }) => {
               <FontAwesomeIcon icon={faCheck}/>
             </div>
             <div className="level-item">
-              <p className="is-size-5 is-size-7-mobile has-text-weight-light">Plex server linked ({machineName})</p>
+              <p className="is-size-5 is-size-7-mobile has-text-weight-light">Plex server linked ({config["machine_name"]})</p>
             </div>
             <div className="level-item">
               <button type="button" className="button is-small is-rounded is-info" onClick={() => setIsServersModalActive(true)}>
@@ -89,41 +94,52 @@ const PlexConfig = ({ location }) => {
     );
   };
 
-  if (!loaded) return <div/>;
-
   return (
     <div className="PlexConfig" data-testid="PlexConfig">
 
-      <form onSubmit={handleSubmit(_onSubmit)}>
+      <h1 className="title is-1">Plex</h1>
+      <hr/>
 
-        { isPlexAccountLinked() &&
-          <div className="field">
-            <div className="control">
-              <input id="enabled"
-                     type="checkbox"
-                     name="enabled"
-                     className="switch is-primary"
-                     ref={register}
-                     defaultChecked={enabled}
-              />
-              <label htmlFor="enabled">Enabled</label>
+      { !config &&
+        <div className="content has-text-primary">
+          <FontAwesomeIcon icon={faSpinner} pulse size="2x"/>
+        </div>
+      }
+
+      { config && (
+
+        <form onSubmit={handleSubmit(_onSubmit)}>
+
+          { isPlexAccountLinked() &&
+            <div className="field">
+              <div className="control">
+                <input id="enabled"
+                       type="checkbox"
+                       name="enabled"
+                       className="switch is-primary"
+                       ref={register}
+                       defaultChecked={config.enabled}
+                />
+                <label htmlFor="enabled">Enabled</label>
+              </div>
+              <hr/>
             </div>
-            <hr/>
-          </div>
-        }
+          }
 
-        <LinkPlexAccount/>
+          <LinkPlexAccount/>
 
-        { isPlexAccountLinked() &&
-          <div>
-            <LinkPlexServer/>
-            <SubmitPlexConfig isFormDirty={formState.dirty}/>
-          </div>
-        }
+          { isPlexAccountLinked() &&
+            <div>
+              <LinkPlexServer/>
+              <SubmitPlexConfig isFormDirty={formState.dirty}/>
+            </div>
+          }
 
-      </form>
+          { isServersModalActive && <ServersModal onClose={() => setIsServersModalActive(false)}/> }
 
-      { isServersModalActive && <ServersModal onClose={() => setIsServersModalActive(false)}/> }
+        </form>
+
+      )}
 
     </div>
   );
