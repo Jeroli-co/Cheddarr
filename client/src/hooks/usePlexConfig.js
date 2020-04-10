@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import {useContext} from "react";
 import {useApi} from "./useApi";
 import {NotificationContext} from "../contexts/NotificationContext";
 import {AuthContext} from "../contexts/AuthContext";
@@ -6,9 +6,6 @@ import {AuthContext} from "../contexts/AuthContext";
 const usePlexConfig = () => {
 
   const providerUrl = "/provider/plex/";
-
-  const [config, setConfig] = useState({ loaded: false });
-  const [servers, setServers] = useState(null);
 
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
@@ -18,14 +15,7 @@ const usePlexConfig = () => {
     const res = await executeRequest(methods.GET, providerUrl + "config/");
     switch (res.status) {
       case 200:
-        setConfig({
-          providerApiKey: res.data["provider_api_key"],
-          enabled: res.data.enabled,
-          machineName: res.data["machine_name"],
-          machineId: res.data["machine_id"],
-          loaded: true,
-        });
-        return res;
+        return res.data;
       default:
         handleError(res);
         return null;
@@ -36,8 +26,7 @@ const usePlexConfig = () => {
     const res = await executeRequest(methods.GET, providerUrl + "servers/");
     switch (res.status) {
       case 200:
-        setServers(res.data);
-        return res;
+        return res.data;
       default:
         handleError(res);
         return null;
@@ -45,29 +34,17 @@ const usePlexConfig = () => {
   };
 
   const updatePlexServer = async (machineId, machineName) => {
-    return await updateConfig({machineId: machineId, machineName: machineName});
+    return await updateConfig({"machine_id": machineId, "machine_name": machineName});
   };
 
   const updateConfig = async (newConfig) => {
     const fd = new FormData();
-    const providerApiKey = newConfig.hasOwnProperty('providerApiKey') ? newConfig.providerApiKey : config.providerApiKey;
-    const enabled = newConfig.hasOwnProperty('enabled') ? newConfig.enabled : config.enabled;
-    const machineName = newConfig.hasOwnProperty('machineName') ? newConfig.machineName : config.machineName;
-    const machineId = newConfig.hasOwnProperty('machineId') ? newConfig.machineId : config.machineId;
-    fd.append("enabled", enabled);
-    fd.append("machine_name", machineName);
-    fd.append("machine_id", machineId);
-    fd.forEach(data => console.log(data));
-    const res = await executeRequest(methods.PUT, providerUrl + "config/", fd);
+    Object.keys(newConfig).forEach(key => {
+      fd.append(key, newConfig[key])
+    });
+    const res = await executeRequest(methods.PATCH, providerUrl + "config/", fd);
     switch (res.status) {
       case 200:
-        setConfig({
-          ...config,
-          providerApiKey: res.data["provider_api_key"],
-          enabled: res.data.enabled,
-          machineName: res.data["machine_name"],
-          machineId: res.data["machine_id"]
-        });
         pushSuccess("Configurations updated");
         return res;
       default:
@@ -77,8 +54,6 @@ const usePlexConfig = () => {
   };
 
   return {
-    ...config,
-    servers,
     getPlexConfig,
     getPlexServers,
     updatePlexServer,

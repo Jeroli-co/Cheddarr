@@ -6,10 +6,11 @@ import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 const ServersModal = ({ onClose }) => {
 
   const [serverSelected, setServerSelected] = useState(null);
-  const { getPlexServers, servers, updatePlexServer } = usePlexConfig();
+  const { getPlexServers, updatePlexServer } = usePlexConfig();
+  const [servers, setServers] = useState(null);
 
   useEffect(() => {
-    getPlexServers();
+    getPlexServers().then(data => { if (data) setServers(data) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
