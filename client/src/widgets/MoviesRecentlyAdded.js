@@ -13,7 +13,13 @@ const MoviesRecentlyAdded = () => {
   }, []);
 
   return (
-    movies.map(movie => <Movie key={movie.title} movie={movie}/>)
+    <div className="columns is-multiline">
+      { movies.map((movie) =>
+        <div className="column is-one-fifth">
+          <Movie key={movie.title} movie={movie}/>
+        </div>
+      )}
+    </div>
   );
 
 };
