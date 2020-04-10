@@ -1,24 +1,18 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faEdit, faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../contexts/AuthContext";
 import {ServersModal} from "./elements/ServersModal";
 import {useForm} from "react-hook-form";
 import {SubmitPlexConfig} from "./elements/SubmitPlexConfig";
-import {usePlexConfig} from "../../../../hooks/usePlexConfig";
+import {PlexConfigContext} from "../../../../contexts/PlexConfigContext";
 
 const PlexConfig = ({ location }) => {
 
-  const { getPlexConfig, updateConfig } = usePlexConfig();
+  const { config, updateConfig } = useContext(PlexConfigContext);
   const [isServersModalActive, setIsServersModalActive] = useState(false);
-  const [config, setConfig] = useState(null);
 
   const { register, handleSubmit, formState, reset } = useForm();
-
-  useEffect(() => {
-    getPlexConfig().then(data => { if (data) setConfig(data) });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const _onSubmit = (data) => {
     let newConfig = {};
