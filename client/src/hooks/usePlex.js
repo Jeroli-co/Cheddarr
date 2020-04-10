@@ -11,7 +11,7 @@ const usePlex = () => {
   const { handleError } = useContext(AuthContext);
 
   const getMoviesRecentlyAdded = async () => {
-    const res = await executeRequest(methods.GET, moviesUrl + "recent");
+    const res = await executeRequest(methods.GET, moviesUrl + "recent/");
     switch (res.status) {
       case 200:
         return res.data;

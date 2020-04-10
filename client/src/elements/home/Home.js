@@ -27,7 +27,9 @@ const Home = () => {
   }
 
   return (
-    <MoviesRecentlyAdded/>
+    <div className="container is-fluid">
+      <MoviesRecentlyAdded/>
+    </div>
   );
 
 };
