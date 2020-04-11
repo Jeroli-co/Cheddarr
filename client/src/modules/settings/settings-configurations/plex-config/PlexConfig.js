@@ -1,11 +1,12 @@
 import React, {useContext, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheck, faEdit, faSpinner} from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faEdit} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../contexts/AuthContext";
 import {ServersModal} from "./elements/ServersModal";
 import {useForm} from "react-hook-form";
 import {SubmitPlexConfig} from "./elements/SubmitPlexConfig";
 import {PlexConfigContext} from "../../../../contexts/PlexConfigContext";
+import {Spinner} from "../../../../elements/Spinner";
 
 const PlexConfig = ({ location }) => {
 
@@ -96,7 +97,7 @@ const PlexConfig = ({ location }) => {
 
       { !config &&
         <div className="content has-text-primary">
-          <FontAwesomeIcon icon={faSpinner} pulse size="2x"/>
+          <Spinner/>
         </div>
       }
 

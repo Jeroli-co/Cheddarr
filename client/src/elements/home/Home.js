@@ -6,7 +6,9 @@ import {MoviesRecentlyAdded} from "../../widgets/MoviesRecentlyAdded";
 
 const Home = () => {
 
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, isLoading } = useContext(AuthContext);
+
+  if (isLoading) return <div/>;
 
   if (!isAuthenticated) {
     return (
@@ -24,13 +26,11 @@ const Home = () => {
         </header>
       </div>
     );
-  }
-
-  return (
-    <div className="container is-fluid">
+  } else {
+    return (
       <MoviesRecentlyAdded/>
-    </div>
-  );
+    );
+  }
 
 };
 
