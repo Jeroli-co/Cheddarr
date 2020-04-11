@@ -4,14 +4,22 @@ import styled from "styled-components";
 const MovieStyle = styled.div`
 
   position: relative;
+  height: 350px;
+  width: 250px;
+  transition: .3s ease;
+
+  &:hover {
+    border: 2px solid ${(props) => props.theme.primary};
+    margin-left: .5em;
+    margin-right: .5em;
+  }
 
   .movie-image {
-    opacity: 1;
     display: block;
     width: 100%;
-    height: auto;
-    transition: .5s ease;
-    backface-visibility: hidden;
+    height: 100%;
+    opacity: 1;
+    transition: opacity .6s ease;
   }
 
   &:hover .movie-image {
@@ -19,13 +27,13 @@ const MovieStyle = styled.div`
   }
 
   .movie-title {
-    transition: .5s ease;
-    opacity: 0;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+    opacity: 0;
+    transition: opacity .6s ease;
   }
 
   &:hover .movie-title {

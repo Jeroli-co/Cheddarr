@@ -1,7 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {PlexConfigContext} from "../../../../../contexts/PlexConfigContext";
+import {Spinner} from "../../../../../elements/Spinner";
 
 const ServersModal = ({ onClose }) => {
 
@@ -55,7 +54,7 @@ const ServersModal = ({ onClose }) => {
         <section className="modal-card-body">
           { !servers && (
             <div className="content has-text-centered has-text-primary">
-              <FontAwesomeIcon icon={faSpinner} pulse size="2x"/>
+              <Spinner/>
             </div>
           )}
           { servers && servers.map(server => { return <Server key={server.name} server={server}/> }) }
