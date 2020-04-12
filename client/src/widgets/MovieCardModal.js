@@ -1,13 +1,16 @@
 import React from "react";
+import styled from "styled-components";
+
+const ModalCardStyled = styled.div`
+  width: 500px;
+  height: 800px;
+`;
 
 const MovieCardModal = ({ movie, onClose}) => {
-
-
-
   return (
     <div className="modal is-active">
       <div className="modal-background" onClick={onClose} />
-      <div className="modal-card">
+      <ModalCardStyled className="modal-card">
       <header className="modal-card-head">
           <p className="modal-card-title has-text-primary has-text-weight-semibold">{movie.title}</p>
           <button className="delete" aria-label="close" onClick={onClose}/>
@@ -20,7 +23,7 @@ const MovieCardModal = ({ movie, onClose}) => {
              {movie.summary}
            </div>
         </section>
-      </div>
+      </ModalCardStyled>
     </div>
   );
 }
