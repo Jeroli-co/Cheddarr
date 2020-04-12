@@ -1,10 +1,47 @@
 import React from "react";
 import styled from "styled-components";
+import {faExternalLinkAlt} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const ModalCardStyled = styled.div`
-  width: 500px;
+  width: 1200px;
   height: 800px;
 `;
+
+const MoviePoster = styled.div`
+  
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+  
+  &:hover .overlay {
+    visibility: visible;
+  }
+  
+  .movie-image {
+    width: 100%;
+    height: 100%;
+  }
+  
+
+  .overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    visibility: hidden;
+  }
+  
+
+`;
+
+  
+
 
 const MovieCardModal = ({ movie, onClose}) => {
   return (
@@ -16,12 +53,31 @@ const MovieCardModal = ({ movie, onClose}) => {
           <button className="delete" aria-label="close" onClick={onClose}/>
       </header>
         <section className="modal-card-body">
-          <p className="image is-128x128">
-            <img src={movie.poster} alt="poster"/>
-          </p>
-           <div className="content has-text-centered has-text-primary">
-             {movie.summary}
-           </div>
+          <div className="columns">
+            <div className="column is-one-third">
+              <MoviePoster posterUrl={movie.poster} onClick={() => window.open(movie.webUrl)}>
+                <img className="movie-image" src={movie.poster} onClick={() => window.open(movie.webUrl)} alt="poster"/>
+                <div className="overlay">
+                  <span className="icon">
+                    <FontAwesomeIcon icon={faExternalLinkAlt} size="3x" color="white"/>
+                  </span>
+                </div>
+              </MoviePoster>
+            </div>
+            <div className="column is-two-thirds">
+              <div className="content">
+                {movie.summary}
+              </div>
+            </div>
+          </div>
+          <div>
+            {movie.duration}
+          </div>
+          <div>
+            {movie.rating}
+          </div>
+
+
         </section>
       </ModalCardStyled>
     </div>

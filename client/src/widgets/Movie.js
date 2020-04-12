@@ -5,16 +5,21 @@ import {MovieCardModal} from "./MovieCardModal";
 const MovieStyle = styled.div`
 
   position: relative;
-  height: 350px;
-  width: 250px;
+  height: 345px;
+  width: 240px;
   transition: .3s ease;
-
+  border: 5px solid transparent;
+  
   &:hover {
     border: 2px solid ${(props) => props.theme.primary};
     margin-left: .5em;
     margin-right: .5em;
+    
+    .movie-title {
+      visibility: visible;  
+    }
   }
-
+  
   .movie-image {
     display: block;
     width: 100%;
@@ -23,22 +28,21 @@ const MovieStyle = styled.div`
     transition: opacity .6s ease;
   }
 
-  &:hover .movie-image {
-    opacity: 0.3;
-  }
-
   .movie-title {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    opacity: 0;
+    position: absolute;
+    width: 100%; height: 100%;
+    top: 0; left: 0;
     transition: opacity .6s ease;
+    visibility: hidden;
+    color: white;
   }
 
   &:hover .movie-title {
-    opacity: 1;
+    background: rgba(0,0,0,0.5);
   }
 
 `;
