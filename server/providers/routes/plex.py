@@ -1,10 +1,12 @@
+import re
 import xml.etree.ElementTree as ET
 from http import HTTPStatus
 
 import requests
 from flask import jsonify
 from flask_login import current_user, login_required
-from plexapi.library import MovieSection
+from plexapi.exceptions import PlexApiException
+from plexapi.library import MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
 
 from server.exceptions import HTTPError
@@ -12,7 +14,10 @@ from server.extensions import cache
 from server.providers.forms import PlexConfigForm
 from server.providers.models import PlexConfig
 from server.providers.routes import provider
-from server.providers.serializers.media_serializer import plex_movie_serializer
+from server.providers.serializers.media_serializer import (
+    plex_movie_serializer,
+    plex_series_serializer,
+)
 from server.providers.serializers.provider_config_serializer import (
     plex_config_serializer,
 )
@@ -20,7 +25,7 @@ from server.providers.serializers.provider_config_serializer import (
 
 @provider.route("/plex/config/", methods=["GET"])
 @login_required
-def get_plex_config():
+def get_plex_user_config():
     plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
     return plex_config_serializer.jsonify(plex_user_config)
 
@@ -64,9 +69,9 @@ def get_plex_user_servers():
 
 @provider.route("/plex/movies/recent/", methods=["GET"])
 @login_required
-# @cache.cached(timeout=300)
+# @cache.cached(timeout=10000000)
 def get_plex_recent_movies():
-    plex_server = get_plex_user_server(current_user)
+    plex_server = plex_user_server(current_user)
     movie_sections = [
         section
         for section in plex_server.library.sections()
@@ -80,9 +85,33 @@ def get_plex_recent_movies():
     return jsonify(recent_movies)
 
 
+@provider.route("/plex/series/recent/", methods=["GET"])
+@login_required
+# @cache.cached(timeout=10000000)
+def get_plex_recent_series():
+    plex_server = plex_user_server(current_user)
+    series_section = [
+        section
+        for section in plex_server.library.sections()
+        if isinstance(section, ShowSection)
+    ]
+    recent_series = [
+        plex_series_serializer.dump(serie)
+        for section in series_section
+        for serie in section.recentlyAdded(maxresults=20)
+    ]
+    return jsonify(recent_series)
+
+
 # @cache.memoize(timeout=900)
-def get_plex_user_server(user):
+def plex_user_server(user):
     plex_config = PlexConfig.find(user)
     api_key = plex_config.provider_api_key
     server_name = plex_config.machine_name
-    return MyPlexAccount(api_key).resource(server_name).connect()
+    try:
+        return MyPlexAccount(api_key).resource(server_name).connect()
+    except PlexApiException:
+        raise HTTPError(
+            "Error while connecting to Plex server",
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        )

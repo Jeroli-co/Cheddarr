@@ -23,7 +23,6 @@ const MoviePoster = styled.div`
     height: 100%;
   }
   
-
   .overlay {
     display: flex;
     justify-content: center;
@@ -36,8 +35,6 @@ const MoviePoster = styled.div`
     background: rgba(0,0,0,0.6);
     visibility: hidden;
   }
-  
-
 `;
 
   
@@ -49,14 +46,14 @@ const MovieCardModal = ({ movie, onClose}) => {
       <div className="modal-background" onClick={onClose} />
       <ModalCardStyled className="modal-card">
       <header className="modal-card-head">
-          <p className="modal-card-title has-text-primary has-text-weight-semibold">{movie.title}</p>
+          <p className="modal-card-title has-text-primary has-text-weight-bold has-text-centered">{movie.title}</p>
           <button className="delete" aria-label="close" onClick={onClose}/>
       </header>
         <section className="modal-card-body">
           <div className="columns">
             <div className="column is-one-third">
               <MoviePoster posterUrl={movie.poster} onClick={() => window.open(movie.webUrl)}>
-                <img className="movie-image" src={movie.poster} onClick={() => window.open(movie.webUrl)} alt="poster"/>
+                <img className="movie-image" src={movie.poster} alt="poster"/>
                 <div className="overlay">
                   <span className="icon">
                     <FontAwesomeIcon icon={faExternalLinkAlt} size="3x" color="white"/>
@@ -79,6 +76,8 @@ const MovieCardModal = ({ movie, onClose}) => {
 
 
         </section>
+        <footer className="modal-card-foot">
+        </footer>
       </ModalCardStyled>
     </div>
   );
