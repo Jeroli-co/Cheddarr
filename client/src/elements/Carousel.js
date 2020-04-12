@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
@@ -7,19 +7,16 @@ const CarouselStyled = styled.div`
   position: relative;
 `
 
-const CarouselItemsStyled = styled.ul`
+const CarouselPages = styled.div`
   display: flex;
-  overflow-x: scroll;
-  scroll-behavior: smooth;
+  overflow: hidden;
+`
 
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-const CarouselItemStyled = styled.li`
-  flex-grow: 1;
-  flex-shrink: 0;
+const CarouselPage = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-left: 1em;
+  margin-right: 1em;
 `;
 
 const CarouselButtons = styled.div`
@@ -78,25 +75,58 @@ const RightScrollButton = styled.button`
   }
 `;
 
+
+
 const Carousel = ({ children }) => {
 
-  const carouselItemsRefs = [];
-  children.forEach(() => {
-    carouselItemsRefs.push(React.createRef());
+  const carouselPagesSize = 5;
+  const carouselPagesRef = [];
+  const carouselPages = [];
+
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
+  // Creating pages
+  children.forEach((child, index) => {
+    if (index % carouselPagesSize === 0) {
+      const page = [];
+      for (let i = 0; i < carouselPagesSize; i++) {
+        if (index+i < children.length) page.push(children[index+i]);
+      }
+      carouselPages.push(page);
+      carouselPagesRef.push(React.createRef());
+    }
   });
+
+  useEffect(() => {
+    carouselPagesRef[currentPageIndex].current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center',
+    });
+  }, [currentPageIndex])
+
+  const _onPreviousPage = () => {
+    const prevPageIndex = currentPageIndex > 0 ? currentPageIndex - 1 : carouselPages.length - 1;
+    setCurrentPageIndex(prevPageIndex);
+  };
+
+  const _onNextPage = () => {
+    const nextPageIndex = currentPageIndex < carouselPages.length - 1 ? currentPageIndex + 1 : 0;
+    setCurrentPageIndex(nextPageIndex);
+  };
 
   return (
     <CarouselStyled>
 
       <CarouselButtons>
 
-        <LeftScrollButton>
+        <LeftScrollButton onClick={() => _onPreviousPage()}>
           <span className="icon">
             <FontAwesomeIcon icon={faAngleLeft} size="6x"/>
           </span>
         </LeftScrollButton>
 
-        <RightScrollButton>
+        <RightScrollButton onClick={() => _onNextPage()}>
           <span className="icon">
             <FontAwesomeIcon icon={faAngleRight} size="6x"/>
           </span>
@@ -104,9 +134,20 @@ const Carousel = ({ children }) => {
 
       </CarouselButtons>
 
-      <CarouselItemsStyled>
-        { children.map((child, index) => <CarouselItemStyled key={index} ref={carouselItemsRefs[index]} >{child}</CarouselItemStyled>) }
-      </CarouselItemsStyled>
+      { carouselPages.length > 0 &&
+        <CarouselPages>
+          { carouselPages.map((page, index) =>
+            <CarouselPage
+              key={index}
+              ref={carouselPagesRef[index]}
+              index={index}
+              currentPageIndex={currentPageIndex}
+            >
+              {page}
+            </CarouselPage>)
+          }
+        </CarouselPages>
+      }
 
     </CarouselStyled>
   );
