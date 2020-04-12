@@ -64,7 +64,7 @@ def get_plex_user_servers():
 
 @provider.route("/plex/movies/recent/", methods=["GET"])
 @login_required
-@cache.cached(timeout=10000000)
+# @cache.cached(timeout=300)
 def get_plex_recent_movies():
     plex_server = get_plex_user_server(current_user)
     movie_sections = [

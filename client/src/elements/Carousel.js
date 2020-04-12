@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useReducer} from "react";
 import styled from "styled-components";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
@@ -14,9 +14,7 @@ const CarouselPages = styled.div`
 
 const CarouselPage = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin-left: 1em;
-  margin-right: 1em;
+  justify-content: space-around;
 `;
 
 const CarouselButtons = styled.div`
@@ -75,15 +73,10 @@ const RightScrollButton = styled.button`
   }
 `;
 
-
-
 const Carousel = ({ children }) => {
 
   const carouselPagesSize = 5;
-  const carouselPagesRef = [];
   const carouselPages = [];
-
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
   // Creating pages
   children.forEach((child, index) => {
@@ -92,60 +85,76 @@ const Carousel = ({ children }) => {
       for (let i = 0; i < carouselPagesSize; i++) {
         if (index+i < children.length) page.push(children[index+i]);
       }
-      carouselPages.push(page);
-      carouselPagesRef.push(React.createRef());
+      carouselPages.push({ page: page, ref: React.createRef() });
     }
   });
 
-  useEffect(() => {
-    carouselPagesRef[currentPageIndex].current.scrollIntoView({
+  const initialState = {
+    prevPageIndex: carouselPages.length - 1,
+    currentPageIndex: 0,
+    nextPageIndex: 1,
+  }
+
+  const initReducer = () => {
+    return initialState;
+  }
+
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case 'prev-page':
+        return {
+          prevPageIndex: state.prevPageIndex !== 0 ? (state.prevPageIndex - 1) % carouselPages.length : carouselPages.length - 1,
+          currentPageIndex: state.prevPageIndex,
+          nextPageIndex: state.currentPageIndex,
+        }
+      case 'next-page':
+        return {
+          prevPageIndex: state.currentPageIndex,
+          currentPageIndex: state.nextPageIndex,
+          nextPageIndex: (state.nextPageIndex + 1) % carouselPages.length,
+        }
+      default:
+        throw new Error("No action matched");
+    }
+  };
+
+  const scrollToRef = (ref) => {
+    ref.current.scrollIntoView({
       behavior: 'smooth',
-      block: 'center',
-      inline: 'center',
+      inline: 'center'
     });
-  }, [currentPageIndex])
+  }
 
-  const _onPreviousPage = () => {
-    const prevPageIndex = currentPageIndex > 0 ? currentPageIndex - 1 : carouselPages.length - 1;
-    setCurrentPageIndex(prevPageIndex);
-  };
+  const [state, dispatch] = useReducer(reducer, initialState, initReducer);
 
-  const _onNextPage = () => {
-    const nextPageIndex = currentPageIndex < carouselPages.length - 1 ? currentPageIndex + 1 : 0;
-    setCurrentPageIndex(nextPageIndex);
-  };
+  useEffect(() => {
+    scrollToRef(carouselPages[state.currentPageIndex].ref)
+  }, [state]);
 
   return (
     <CarouselStyled>
 
       <CarouselButtons>
-
-        <LeftScrollButton onClick={() => _onPreviousPage()}>
+        <LeftScrollButton onClick={() => dispatch({type: 'prev-page'})}>
           <span className="icon">
             <FontAwesomeIcon icon={faAngleLeft} size="6x"/>
           </span>
         </LeftScrollButton>
 
-        <RightScrollButton onClick={() => _onNextPage()}>
+        <RightScrollButton onClick={() => dispatch({type: 'next-page'})}>
           <span className="icon">
             <FontAwesomeIcon icon={faAngleRight} size="6x"/>
           </span>
         </RightScrollButton>
-
       </CarouselButtons>
 
       { carouselPages.length > 0 &&
         <CarouselPages>
           { carouselPages.map((page, index) =>
-            <CarouselPage
-              key={index}
-              ref={carouselPagesRef[index]}
-              index={index}
-              currentPageIndex={currentPageIndex}
-            >
-              {page}
-            </CarouselPage>)
-          }
+            <CarouselPage key={index} ref={page.ref}>
+              { page.page }
+            </CarouselPage>
+          )}
         </CarouselPages>
       }
 
