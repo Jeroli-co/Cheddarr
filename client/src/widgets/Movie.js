@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import styled from "styled-components";
+import {MovieCardModal} from "./MovieCardModal";
 
 const MovieStyle = styled.div`
 
@@ -43,11 +44,17 @@ const MovieStyle = styled.div`
 `;
 
 const Movie = ({ movie }) => {
+
+  const [isMovieCardModalActive, setIsMovieCardModalActive] = useState(false);
   return (
-    <MovieStyle movie={movie}>
-      <img className="movie-image" src={movie.poster} alt="Movie poster"/>
-      <p className="movie-title">{movie.title}</p>
-    </MovieStyle>
+    <div className="Movie">
+      <MovieStyle movie={movie} onClick={() => setIsMovieCardModalActive(true)}>
+        <img className="movie-image" src={movie.poster} alt="Movie poster"/>
+        <p className="movie-title">{movie.title}</p>
+
+      </MovieStyle>
+        { isMovieCardModalActive && <MovieCardModal movie={movie} onClose={() => setIsMovieCardModalActive(false)}/> }
+    </div>
   );
 };
 
