@@ -58,9 +58,35 @@ const FadeOut = () => {
   `;
 };
 
+const SlideIn = () => {
+  return keyframes`
+    from {
+      opacity: 0.5;
+    }
+
+    to {
+      opacity: 1;
+    }
+  `;
+};
+
+const SlideOut = () => {
+  return keyframes`
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0.5;
+    }
+  `;
+};
+
 export {
   FadeInUp,
   FadeOutDown,
   FadeIn,
   FadeOut,
+  SlideIn,
+  SlideOut
 }
