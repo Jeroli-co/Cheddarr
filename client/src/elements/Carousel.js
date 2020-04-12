@@ -42,6 +42,7 @@ const LeftScrollButton = styled.button`
   opacity: .5;
   transition: .6s ease;
   z-index: 1;
+  border: none;
 
   &:hover {
     opacity: 1;
@@ -63,8 +64,9 @@ const RightScrollButton = styled.button`
   color: SlateGray;
   background: transparent;
   opacity: .5;
-  z-index: 1;
   transition: .6s ease;
+  z-index: 1;
+  border: none;
 
   &:hover {
     opacity: 1;
@@ -128,7 +130,8 @@ const Carousel = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState, initReducer);
 
   useEffect(() => {
-    scrollToRef(carouselPages[state.currentPageIndex].ref)
+    scrollToRef(carouselPages[state.currentPageIndex].ref);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   return (
