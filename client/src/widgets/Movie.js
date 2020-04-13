@@ -53,7 +53,7 @@ const Movie = ({ movie }) => {
   return (
     <div className="Movie">
       <MovieStyle movie={movie} onClick={() => setIsMovieCardModalActive(true)}>
-        <img className="movie-image" src={movie.poster} alt="Movie poster"/>
+        <img className="movie-image" src={movie.posterUrl} alt="Movie poster"/>
         <p className="movie-title">{movie.title}</p>
 
       </MovieStyle>

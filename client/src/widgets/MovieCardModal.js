@@ -1,19 +1,20 @@
 import React from "react";
 import styled from "styled-components";
-import {faExternalLinkAlt} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import logo from "../assets/plex.png"
+import {CircularProgressbar, buildStyles} from "react-circular-progressbar";
+import 'react-circular-progressbar/dist/styles.css';
+import {routes} from "../router/routes";
 
 const ModalCardStyled = styled.div`
   width: 1200px;
-  height: 800px;
+  height: 650px;
 `;
 
 const MoviePoster = styled.div`
   
   height: 100%;
   position: relative;
-  cursor: pointer;
-  
+
   &:hover .overlay {
     visibility: visible;
   }
@@ -21,6 +22,7 @@ const MoviePoster = styled.div`
   .movie-image {
     width: 100%;
     height: 100%;
+    border-radius: 12px;
   }
   
   .overlay {
@@ -34,10 +36,16 @@ const MoviePoster = styled.div`
     height: 100%;
     background: rgba(0,0,0,0.6);
     visibility: hidden;
+    border-radius: 12px;
   }
 `;
 
-  
+const MovieDetails = styled.div`
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  border: 5px solid red;
+`;
 
 
 const MovieCardModal = ({ movie, onClose}) => {
@@ -45,42 +53,47 @@ const MovieCardModal = ({ movie, onClose}) => {
     <div className="modal is-active">
       <div className="modal-background" onClick={onClose} />
       <ModalCardStyled className="modal-card">
-      <header className="modal-card-head">
-          <p className="modal-card-title has-text-primary has-text-weight-bold has-text-centered">{movie.title}</p>
-          <button className="delete" aria-label="close" onClick={onClose}/>
-      </header>
-        <section className="modal-card-body">
-          <div className="columns">
-            <div className="column is-one-third">
-              <MoviePoster posterUrl={movie.poster} onClick={() => window.open(movie.webUrl)}>
-                <img className="movie-image" src={movie.poster} alt="poster"/>
-                <div className="overlay">
-                  <span className="icon">
-                    <FontAwesomeIcon icon={faExternalLinkAlt} size="3x" color="white"/>
-                  </span>
+
+          <section className="modal-card-body">
+            <div className="columns">
+              <div className="column is-one-third">
+                <MoviePoster>
+                  <img className="movie-image" src={movie.posterUrl} alt="poster"/>
+                  <div className="overlay">
+                    <button className="button has-background-dark-plex is-size-4" type="button" onClick={() => window.open(movie.webUrl)}>
+                      <span className="icon">
+                        <img className="icon-left" src={logo} alt="Plex logo" width="30px" height="30px"/>
+                      </span>
+                      <span>Open in Plex</span>
+                    </button>
+                  </div>
+                </MoviePoster>
+              </div>
+              <div className="column is-two-thirds">
+                <MovieDetails className="columns">
+                  <div className="column">{movie.releaseDate}</div>
+                  <div className="column">{msToHoursMinutes(movie.duration)}</div>
+                  <CircularProgressbar className="column" value={movie.rating * 10} text={`${movie.rating * 10}%`} styles={buildStyles({textColor: "black", pathColor: "gold"})}/>
+              </MovieDetails>
+                <div className="card-content">
+                  {movie.summary}
                 </div>
-              </MoviePoster>
-            </div>
-            <div className="column is-two-thirds">
-              <div className="content">
-                {movie.summary}
               </div>
             </div>
-          </div>
-          <div>
-            {movie.duration}
-          </div>
-          <div>
-            {movie.rating}
-          </div>
 
 
-        </section>
-        <footer className="modal-card-foot">
-        </footer>
+
+          </section>
       </ModalCardStyled>
     </div>
   );
+}
+
+const msToHoursMinutes = (ms) => {
+  const hours = Math.floor(ms / 3600000);
+  const minutes = Math.ceil((ms - (hours * 3600000)) / 60000);
+
+  return hours + 'h ' + minutes + 'm';
 }
 
 export {
