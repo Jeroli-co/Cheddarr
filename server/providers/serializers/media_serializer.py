@@ -1,4 +1,4 @@
-from marshmallow import fields, post_dump, pre_dump
+from marshmallow import fields, pre_dump
 
 from server.extensions import ma
 
@@ -12,11 +12,15 @@ tag_field = fields.List(fields.Pluck(PlexMediaTag, "tag"))
 
 class PlexVideoSerializer(ma.Schema):
     title = fields.String()
-    thumbUrl = fields.URL(data_key="poster")
+    thumbUrl = fields.URL(data_key="posterUrl")
+    artUrl = fields.URL(data_key="artUrl")
     summary = fields.String()
-    duration = fields.String()
+    duration = fields.Integer()
+    originallyAvailableAt = fields.Date(format="%d/%m/%Y", data_key="releaseDate")
     actors = tag_field
-    rating = fields.String()
+    studio = fields.String()
+    genres = tag_field
+    rating = fields.Float()
     webUrl = fields.String()
 
     @pre_dump
