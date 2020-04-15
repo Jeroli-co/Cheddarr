@@ -19,7 +19,6 @@
     "bulma-switch": "^2.0.0",
     "bulma-tooltip": "^3.0.2",
     "cross-env": "^7.0.2",
-    "fsevents": "^1.2.12",
     "js-cookie": "^2.2.1",
     "mutationobserver-shim": "^0.3.3",
     "node-sass": "^4.13.1",
