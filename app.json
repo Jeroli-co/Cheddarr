@@ -10,11 +10,11 @@
       "url": "heroku/python"
     }
   ],
-  "env": {
-    "FLASK_APP": {
-      "value": "cheddarr"
+  "addons": [
+    {
+      "plan": "heroku-postgresql"
     }
-  },
+  ],
   "formation": {
     "web": {
       "quantity": 1,
