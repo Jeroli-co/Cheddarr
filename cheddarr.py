@@ -24,8 +24,8 @@ A utility script for the Cheddarr application.
 @click.option(
     "--env",
     type=click.Choice(["development", "production"]),
-    default="development",
-    help="Whether to use DevConfig or ProdConfig (development by default).",
+    default="production",
+    help="Whether to use DevConfig or ProdConfig (production by default).",
 )
 @click.pass_context
 def cli(ctx, env):
@@ -34,7 +34,7 @@ def cli(ctx, env):
 
 def main():
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("--env", default="development")
+    parser.add_argument("--env", default="production")
     args, _ = parser.parse_known_args()
 
     if args.env == "development":

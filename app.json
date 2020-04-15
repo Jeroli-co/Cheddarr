@@ -24,5 +24,8 @@
       "quantity": 1,
       "size": "free"
     }
+  },
+  "scripts": {
+    "postdeploy": "python cheddarr.py init-db"
   }
 }
