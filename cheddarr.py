@@ -9,7 +9,7 @@ from flask.cli import cli, FlaskGroup, run_command
 from server.app import create_app
 
 """USAGE:
-python manage.py [--env=production] COMMAND [OPTIONS] [ARGS]
+python manage.py [--env=production|development] COMMAND [OPTIONS] [ARGS]
 """
 
 
