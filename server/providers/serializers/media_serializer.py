@@ -1,4 +1,4 @@
-from marshmallow import fields, pre_dump
+from marshmallow import fields, post_dump, pre_dump
 
 from server.extensions import ma
 
@@ -11,12 +11,13 @@ tag_field = fields.List(fields.Pluck(PlexMediaTag, "tag"))
 
 
 class PlexVideoSerializer(ma.Schema):
+    ratingKey = fields.String(data_key="id")
     title = fields.String()
     thumbUrl = fields.URL(data_key="posterUrl")
     artUrl = fields.URL(data_key="artUrl")
     summary = fields.String()
     duration = fields.Integer()
-    originallyAvailableAt = fields.Date(format="%d/%m/%Y", data_key="releaseDate")
+    originallyAvailableAt = fields.Date(data_key="releaseDate")
     actors = tag_field
     studio = fields.String()
     genres = tag_field
@@ -38,8 +39,22 @@ class PlexMovieSerializer(PlexVideoSerializer):
 
 
 class PlexSeriesSerializer(PlexVideoSerializer):
-    seasonNumber = fields.Function(lambda ep: ep.seasonNumber)
+    pass
 
 
-plex_movie_serializer = PlexMovieSerializer()
+class PlexSeasonSerializer(PlexVideoSerializer):
+    pass
+
+
+class PlexEpisodeSerializer(PlexVideoSerializer):
+    parentRatingKey = fields.String(data_key="seasonId")
+    grandparentRatingKey = fields.String(data_key="seriesId")
+    seasonNumber = fields.Integer()
+    index = fields.Integer(data_key="episodeNumber")
+    parentThumb = fields.String()
+
+
+plex_movies_serializer = PlexMovieSerializer(many=True)
 plex_series_serializer = PlexSeriesSerializer()
+plex_season_serializer = PlexSeasonSerializer()
+plex_episodes_serializer = PlexEpisodeSerializer(many=True)

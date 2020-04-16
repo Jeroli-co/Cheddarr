@@ -22,9 +22,9 @@ from server.extensions.login_manager import register_login_manager
 
 def create_app():
     """Creates a pre-configured Flask application.
-    Defaults to using :class:`backend.config.ProdConfig`, unless the
+    Defaults to using :class:`server.config.ProdConfig`, unless the
     :envvar:`FLASK_DEBUG` environment variable is explicitly set to "true",
-    in which case it uses :class:`backend.config.DevConfig`. Also configures
+    in which case it uses :class:`server.config.DevConfig`. Also configures
     paths for the templates folder and static files.
     """
     dev = get_debug_flag()
