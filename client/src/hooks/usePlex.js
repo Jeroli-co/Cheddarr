@@ -1,11 +1,11 @@
-import {useApi} from "./useApi";
-import {useContext} from "react";
-import {AuthContext} from "../contexts/AuthContext";
+import { useApi } from "./useApi";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 const usePlex = () => {
-
   const providerUrl = "/provider/plex/";
-  const moviesUrl = providerUrl + "movies/"
+  const moviesUrl = providerUrl + "movies/";
+  const seriesUrl = providerUrl + "series/";
 
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
@@ -21,12 +21,21 @@ const usePlex = () => {
     }
   };
 
-  return {
-    getMoviesRecentlyAdded
-  }
+  const getSeriesRecentlyAdded = async () => {
+    const res = await executeRequest(methods.GET, seriesUrl + "recent/");
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
 
+  return {
+    getMoviesRecentlyAdded,
+    getSeriesRecentlyAdded,
+  };
 };
 
-export {
-  usePlex
-}
+export { usePlex };

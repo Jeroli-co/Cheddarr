@@ -1,14 +1,14 @@
-import React, {useContext} from 'react';
-import './Home.scss';
+import React, { useContext } from "react";
+import "./Home.scss";
 import logo from "../../assets/cheddarr.png";
-import {AuthContext} from "../../contexts/AuthContext";
-import {MoviesRecentlyAdded} from "../../widgets/MoviesRecentlyAdded";
+import { AuthContext } from "../../contexts/AuthContext";
+import { MoviesRecentlyAdded } from "../../widgets/MoviesRecentlyAdded";
+import { SeriesRecentlyAdded } from "../../widgets/SeriesRecentlyAdded";
 
 const Home = () => {
-
   const { isAuthenticated, isLoading } = useContext(AuthContext);
 
-  if (isLoading) return <div/>;
+  if (isLoading) return <div />;
 
   if (!isAuthenticated) {
     return (
@@ -28,13 +28,12 @@ const Home = () => {
     );
   } else {
     return (
-      <MoviesRecentlyAdded/>
+      <div>
+        <MoviesRecentlyAdded />
+        <SeriesRecentlyAdded />
+      </div>
     );
   }
-
 };
 
-export {
-	Home
-};
-
+export { Home };
