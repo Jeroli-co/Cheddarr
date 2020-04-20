@@ -40,10 +40,36 @@ const MoviePoster = styled.div`
 
 const MovieDetails = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  border: 5px solid red;
+  height: 10vh;
+
+  > .circular-progress {
+    width: 10%;
+  }
 `;
+
+const ratingColor = {
+  GREEN: "#3fab2e",
+  YELLOW: "#dedb37",
+  ORANGE: "#e3a034",
+  RED: "#c43b2b"
+}
+
+const getColorRating = (rating) => {
+  if (rating >= 0 && rating < 25) {
+    return ratingColor.RED;
+  } else if (rating >= 25 && rating < 50) {
+    return ratingColor.ORANGE;
+  } else if (rating >= 50 && rating < 75) {
+    return ratingColor.YELLOW;
+  } else {
+    return ratingColor.GREEN;
+  }
+};
+
+const getRatingPercentage = (rating) => rating * 10;
 
 const MovieCardModal = ({ movie, onClose }) => {
   return (
@@ -80,18 +106,23 @@ const MovieCardModal = ({ movie, onClose }) => {
               </MoviePoster>
             </div>
             <div className="column is-two-thirds">
-              <MovieDetails className="columns">
-                <div className="column">{movie.releaseDate}</div>
-                <div className="column">{msToHoursMinutes(movie.duration)}</div>
-                <CircularProgressbar
-                  className="column"
-                  value={movie.rating * 10}
-                  text={`${movie.rating * 10}%`}
-                  styles={buildStyles({
-                    textColor: "black",
-                    pathColor: "gold",
-                  })}
-                />
+              <MovieDetails>
+                <div>{movie.releaseDate}</div>
+                <div>{msToHoursMinutes(movie.duration)}</div>
+                <div className="circular-progress">
+                  <CircularProgressbar
+                    value={getRatingPercentage(movie.rating)}
+                    text={`${getRatingPercentage(movie.rating)}%`}
+                    styles={buildStyles({
+                      textColor: "black",
+                      pathColor: getColorRating(getRatingPercentage(movie.rating)),
+                    })}
+                    style={{
+                      width: "200px",
+                      height: "200px"
+                    }}
+                  />
+                </div>
               </MovieDetails>
               <div className="card-content">{movie.summary}</div>
             </div>

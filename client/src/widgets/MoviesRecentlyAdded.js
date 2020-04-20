@@ -14,7 +14,7 @@ const Movie = ({ movie }) => {
         <img className="movie-image" src={movie.posterUrl} alt="Movie poster" />
         <p className="movie-title">{movie.title}</p>
       </MediaStyle>
-      {isMovieCardModalActive && (
+      { isMovieCardModalActive && (
         <MovieCardModal
           movie={movie}
           onClose={() => setIsMovieCardModalActive(false)}
@@ -54,7 +54,7 @@ const MoviesRecentlyAdded = () => {
 
       <div className="is-divider is-primary" />
 
-      {movies && (
+      { movies && (
         <Carousel>
           {movies.map((movie) => (
             <Movie key={movie.title} movie={movie} />
@@ -62,7 +62,7 @@ const MoviesRecentlyAdded = () => {
         </Carousel>
       )}
 
-      {!movies && (
+      { !movies && (
         <div className="content has-text-centered has-text-primary">
           <Spinner />
         </div>

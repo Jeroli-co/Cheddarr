@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 const MediaStyle = styled.div`
   position: relative;
-  height: 345px;
-  width: 240px;
+  width: 220px;
+  height: 325px;
   transition: 0.3s ease;
   border: 5px solid transparent;
 

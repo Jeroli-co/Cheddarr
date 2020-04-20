@@ -83,7 +83,7 @@ def get_recent_movies():
 
 @provider.route("/plex/series/recent/", methods=["GET"])
 @login_required
-# @cache.cached(timeout=10000000)
+#@cache.cached(timeout=300)
 def get_recent_series():
     plex_server = user_server(current_user)
     series_section = library_sections(plex_server, section_type="series")
