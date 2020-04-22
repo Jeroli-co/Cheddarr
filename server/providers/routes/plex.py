@@ -13,6 +13,7 @@ from server.providers.models import PlexConfig
 from server.providers.routes import provider
 from server.providers.serializers.media_serializer import (
     plex_movies_serializer,
+    plex_movie_serializer,
     plex_series_serializer,
     plex_season_serializer,
     plex_episodes_serializer,
@@ -81,9 +82,18 @@ def get_recent_movies():
     return plex_movies_serializer.jsonify(recent_movies), HTTPStatus.OK
 
 
+@provider.route("/plex/movies/<movie_id>/", methods=["GET"])
+@login_required
+def get_movie(movie_id):
+    plex_server = user_server(current_user)
+    movie = plex_server.fetchItem(ekey=int(movie_id))
+    movie.reload()
+    return plex_movie_serializer.jsonify(movie), HTTPStatus.OK
+
+
 @provider.route("/plex/series/recent/", methods=["GET"])
 @login_required
-#@cache.cached(timeout=300)
+# @cache.cached(timeout=300)
 def get_recent_series():
     plex_server = user_server(current_user)
     series_section = library_sections(plex_server, section_type="series")
@@ -92,8 +102,8 @@ def get_recent_series():
         for section in series_section
         for series in section.recentlyAdded(maxresults=20)
     ]
-    for p, v in vars(recent_series[20]).items():
-        print(p, ":", v)
+    # for p, v in vars(recent_series[20]).items():
+    # print(p, ":", v)
     return plex_episodes_serializer.jsonify(recent_series), HTTPStatus.OK
 
 
@@ -102,6 +112,7 @@ def get_recent_series():
 def get_series(series_id):
     plex_server = user_server(current_user)
     series = plex_server.fetchItem(ekey=int(series_id))
+    series.reload()
     return plex_series_serializer.jsonify(series), HTTPStatus.OK
 
 
@@ -110,4 +121,5 @@ def get_series(series_id):
 def get_season(season_id):
     plex_server = user_server(current_user)
     season = plex_server.fetchItem(ekey=int(season_id))
+    season.reload()
     return plex_season_serializer.jsonify(season), HTTPStatus.OK
