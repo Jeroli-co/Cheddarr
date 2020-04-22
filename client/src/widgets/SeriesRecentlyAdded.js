@@ -3,19 +3,19 @@ import { usePlex } from "../hooks/usePlex";
 import { Carousel } from "../elements/Carousel";
 import { Spinner } from "../elements/Spinner";
 import styled from "styled-components";
-import { MediaStyle } from "./MediaCardStyle";
+import {MediaPreviewCardStyle} from "../elements/medias/MediaPreviewCard";
 
 const Series = ({ series }) => {
   return (
     <div className="Series">
-      <MediaStyle>
+      <MediaPreviewCardStyle>
         <img
           className="series-image"
-          src={series.parentThumb}
+          src={series.posterUrl}
           alt="Series poster"
         />
         <p className="series-title">{series.title}</p>
-      </MediaStyle>
+      </MediaPreviewCardStyle>
     </div>
   );
 };

@@ -54,3 +54,13 @@ code {
   background-color: $dark-plex;
   color: White;
 }
+
+.is-plex-button {
+  background-color: $dark-plex;
+  color: LightGrey;
+  border: none;
+
+  &:hover {
+    color: white;
+  }
+}

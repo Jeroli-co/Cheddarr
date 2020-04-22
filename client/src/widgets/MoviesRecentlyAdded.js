@@ -3,33 +3,39 @@ import { usePlex } from "../hooks/usePlex";
 import { Carousel } from "../elements/Carousel";
 import { Spinner } from "../elements/Spinner";
 import styled from "styled-components";
-import { MediaStyle } from "./MediaCardStyle";
-import { MovieCardModal } from "./MovieCardModal";
-
-const Movie = ({ movie }) => {
-  const [isMovieCardModalActive, setIsMovieCardModalActive] = useState(false);
-  return (
-    <div className="Movie">
-      <MediaStyle onClick={() => setIsMovieCardModalActive(true)}>
-        <img className="movie-image" src={movie.posterUrl} alt="Movie poster" />
-        <p className="movie-title">{movie.title}</p>
-      </MediaStyle>
-      { isMovieCardModalActive && (
-        <MovieCardModal
-          movie={movie}
-          onClose={() => setIsMovieCardModalActive(false)}
-        />
-      )}
-    </div>
-  );
-};
+import {Modal} from "../elements/Modal";
+import {MovieDetailsCard} from "../elements/medias/MovieDetailsCard";
+import {MediaPreviewCardStyle} from "../elements/medias/MediaPreviewCard";
 
 const MoviesRecentlyAddedStyled = styled.section`
   margin: 1em;
   display: block;
 `;
 
+const Movie = ({ movie }) => {
+
+  const [isMovieCardModalActive, setIsMovieCardModalActive] = useState(false);
+
+  return (
+    <div className="Movie">
+
+      <MediaPreviewCardStyle onClick={() => setIsMovieCardModalActive(true)}>
+        <img className="movie-image" src={movie.posterUrl} alt="Movie poster" />
+        <p className="movie-title">{movie.title}</p>
+      </MediaPreviewCardStyle>
+
+      { isMovieCardModalActive && (
+        <Modal onClose={() => setIsMovieCardModalActive(false)}>
+          <MovieDetailsCard movie={movie} />
+        </Modal>
+      )}
+
+    </div>
+  );
+};
+
 const MoviesRecentlyAdded = () => {
+
   const { getMoviesRecentlyAdded } = usePlex();
   const [movies, setMovies] = useState(null);
 
@@ -56,9 +62,7 @@ const MoviesRecentlyAdded = () => {
 
       { movies && (
         <Carousel>
-          {movies.map((movie) => (
-            <Movie key={movie.title} movie={movie} />
-          ))}
+          { movies.map((movie) => <Movie key={movie.title} movie={movie} /> )}
         </Carousel>
       )}
 

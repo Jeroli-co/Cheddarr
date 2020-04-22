@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const MediaStyle = styled.div`
+const MediaPreviewCardStyle = styled.div`
   position: relative;
   width: 220px;
   height: 325px;
@@ -45,4 +45,6 @@ const MediaStyle = styled.div`
   }
 `;
 
-export { MediaStyle };
+export {
+  MediaPreviewCardStyle
+};
