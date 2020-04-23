@@ -6,8 +6,10 @@ import styled from "styled-components";
 import {Modal} from "../elements/Modal";
 import {MovieDetailsCard} from "../elements/medias/MovieDetailsCard";
 import {MediaPreviewCardStyle} from "../elements/medias/MediaPreviewCard";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAngleDown, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 
-const MoviesRecentlyAddedStyled = styled.section`
+const MoviesRecentlyAddedStyle = styled.section`
   margin: 1em;
   display: block;
 `;
@@ -38,6 +40,7 @@ const MoviesRecentlyAdded = () => {
 
   const { getMoviesRecentlyAdded } = usePlex();
   const [movies, setMovies] = useState(null);
+  const [isShow, setIsShow] = useState(true);
 
   useEffect(() => {
     getMoviesRecentlyAdded().then((data) => {
@@ -47,20 +50,29 @@ const MoviesRecentlyAdded = () => {
   }, []);
 
   return (
-    <MoviesRecentlyAddedStyled data-testid="MoviesRecentlyAdded">
-      <div className="level">
-        <div className="level-left">
-          <div className="level-item content">
-            <p className="is-size-4 has-text-primary has-text-weight-semibold">
-              Movies recently added
-            </p>
+    <MoviesRecentlyAddedStyle data-testid="MoviesRecentlyAdded">
+      <div className="is-pointed" onClick={() => setIsShow(!isShow)}>
+        <div className="level">
+          <div className="level-left">
+            <div className="level-item content">
+              <p className="is-size-4 has-text-primary has-text-weight-semibold">
+                Movies recently added
+              </p>
+            </div>
+          </div>
+          <div className="level-right">
+            <div className="level-item">
+              <p className="is-size-4 has-text-primary has-text-weight-semibold">
+                { (isShow && <FontAwesomeIcon icon={faAngleDown} size="lg"/>) || (<FontAwesomeIcon icon={faAngleRight} size="lg"/>) }
+              </p>
+            </div>
           </div>
         </div>
+
+        <div className="is-divider is-primary" />
       </div>
 
-      <div className="is-divider is-primary" />
-
-      { movies && (
+      { movies && isShow && (
         <Carousel>
           { movies.map((movie) => <Movie key={movie.title} movie={movie} /> )}
         </Carousel>
@@ -71,7 +83,7 @@ const MoviesRecentlyAdded = () => {
           <Spinner />
         </div>
       )}
-    </MoviesRecentlyAddedStyled>
+    </MoviesRecentlyAddedStyle>
   );
 };
 

@@ -22,7 +22,6 @@ const Series = ({ series }) => {
 
 const SeriesRecentlyAddedStyled = styled.section`
   margin: 1em;
-  display: block;
 `;
 
 const SeriesRecentlyAdded = () => {

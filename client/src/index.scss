@@ -59,6 +59,9 @@ code {
   background-color: $dark-plex;
   color: LightGrey;
   border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &:hover {
     color: white;

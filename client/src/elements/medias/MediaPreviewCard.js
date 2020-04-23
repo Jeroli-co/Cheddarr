@@ -4,7 +4,7 @@ const MediaPreviewCardStyle = styled.div`
   position: relative;
   width: 220px;
   height: 325px;
-  transition: 0.3s ease;
+  transition: .3s ease;
   border: 5px solid transparent;
 
   &:hover {
