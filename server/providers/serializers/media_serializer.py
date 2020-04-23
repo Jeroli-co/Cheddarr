@@ -11,6 +11,7 @@ tag_field = fields.List(fields.Pluck(PlexMediaTag, "tag"))
 
 
 class PlexVideoSerializer(ma.Schema):
+    type = fields.String()
     ratingKey = fields.String(data_key="id")
     title = fields.String()
     thumbUrl = fields.URL(data_key="posterUrl")
@@ -22,6 +23,7 @@ class PlexVideoSerializer(ma.Schema):
     studio = fields.String()
     genres = tag_field
     rating = fields.Float()
+    contentRating = fields.String()
     webUrl = fields.String()
 
     @pre_dump
@@ -38,20 +40,37 @@ class PlexMovieSerializer(PlexVideoSerializer):
     directors = tag_field
 
 
-class PlexSeriesSerializer(PlexVideoSerializer):
-    pass
-
-
-class PlexSeasonSerializer(PlexVideoSerializer):
-    pass
-
-
 class PlexEpisodeSerializer(PlexVideoSerializer):
     parentRatingKey = fields.String(data_key="seasonId")
     grandparentRatingKey = fields.String(data_key="seriesId")
     seasonNumber = fields.Integer()
     index = fields.Integer(data_key="episodeNumber")
-    parentThumb = fields.String()
+    seasonPosterUrl = fields.Function(lambda ep: ep.url(ep.parentThumb))
+
+    @pre_dump
+    def season_poster_url(self, episode, **kwargs):
+        if episode.parentThumb is None:
+            episode.parentThumb = episode.grandparentThumb
+        return episode
+
+
+class PlexSeasonSerializer(PlexVideoSerializer):
+    parentRatingKey = fields.String(data_key="seriesId")
+    episodes = fields.Nested(PlexEpisodeSerializer, many=True)
+
+    @pre_dump
+    def season_episodes(self, season, **kwargs):
+        season.episodes = season.episodes()
+        return season
+
+
+class PlexSeriesSerializer(PlexVideoSerializer):
+    seasons = fields.Nested(PlexSeasonSerializer, many=True)
+
+    @pre_dump
+    def series_seasons(self, series, **kwargs):
+        series.seasons = series.seasons()
+        return series
 
 
 plex_movies_serializer = PlexMovieSerializer(many=True)

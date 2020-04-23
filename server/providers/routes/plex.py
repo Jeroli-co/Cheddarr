@@ -102,8 +102,7 @@ def get_recent_series():
         for section in series_section
         for series in section.recentlyAdded(maxresults=20)
     ]
-    # for p, v in vars(recent_series[20]).items():
-    # print(p, ":", v)
+
     return plex_episodes_serializer.jsonify(recent_series), HTTPStatus.OK
 
 
@@ -116,10 +115,18 @@ def get_series(series_id):
     return plex_series_serializer.jsonify(series), HTTPStatus.OK
 
 
-@provider.route("/plex/series/<season_id>/", methods=["GET"])
+@provider.route("/plex/season/<season_id>/", methods=["GET"])
 @login_required
 def get_season(season_id):
     plex_server = user_server(current_user)
     season = plex_server.fetchItem(ekey=int(season_id))
     season.reload()
     return plex_season_serializer.jsonify(season), HTTPStatus.OK
+
+
+@provider.route("/plex/onDeck/", methods=["GET"])
+@login_required
+def get_on_deck():
+    plex_server = user_server(current_user)
+    on_deck = plex_server.library.onDeck()
+    return plex_episodes_serializer.jsonify(on_deck), HTTPStatus.OK
