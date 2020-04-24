@@ -32,9 +32,21 @@ const usePlex = () => {
     }
   };
 
+  const getMovie = async (id) => {
+    const res = await executeRequest(methods.GET, moviesUrl + id + "/");
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return {
     getMoviesRecentlyAdded,
     getSeriesRecentlyAdded,
+    getMovie,
   };
 };
 

@@ -11,7 +11,6 @@ import {faAngleDown, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 
 const MoviesRecentlyAddedStyle = styled.section`
   margin: 1em;
-  display: block;
 `;
 
 const Movie = ({ movie }) => {
@@ -28,7 +27,7 @@ const Movie = ({ movie }) => {
 
       { isMovieCardModalActive && (
         <Modal onClose={() => setIsMovieCardModalActive(false)}>
-          <MovieDetailsCard movie={movie} />
+          <MovieDetailsCard id={movie.id} />
         </Modal>
       )}
 
@@ -43,9 +42,7 @@ const MoviesRecentlyAdded = () => {
   const [isShow, setIsShow] = useState(true);
 
   useEffect(() => {
-    getMoviesRecentlyAdded().then((data) => {
-      if (data) setMovies(data);
-    });
+    getMoviesRecentlyAdded().then((data) => { if (data) setMovies(data) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

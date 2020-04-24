@@ -23,6 +23,7 @@ const ModalCloseButton = styled.span`
   color: #aaaaaa;
   font-size: 28px;
   font-weight: bold;
+  z-index: 101;
 
   &:hover, &:focus {
     color: #000;
@@ -32,9 +33,11 @@ const ModalCloseButton = styled.span`
 `;
 
 const ModalCard = styled.div`
+  position: relative;
   margin: 0;
   max-width: 80vw;
   max-height: 80vh;
+  z-index: 101;
   overflow-y: auto;
   -ms-overflow-style: none; /* IE 11 */
   scrollbar-width: none; /* Firefox 64 */

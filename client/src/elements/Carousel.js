@@ -4,10 +4,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import smoothscroll from 'smoothscroll-polyfill';
 
-const CarouselStyled = styled.div`
-  position: relative;
-`
-
 const CarouselItems = styled.div`
   display: flex;
   overflow-x: scroll;
@@ -69,7 +65,7 @@ const Carousel = ({ children }) => {
   };
 
   return (
-    <CarouselStyled>
+    <div>
 
       <CarouselItems ref={scrollRef}>
         { children.map((child, index) => <div key={index}>{child}</div>) }
@@ -88,7 +84,7 @@ const Carousel = ({ children }) => {
         </PaginationButton>
       </PaginationTabs>
 
-    </CarouselStyled>
+    </div>
   );
 };
 

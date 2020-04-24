@@ -61,11 +61,15 @@ const FadeOut = () => {
 const SlideIn = () => {
   return keyframes`
     from {
-      opacity: 0.5;
+      visibility: visible;
+      opacity: 0;
+      margin-bottom: -100px;
     }
 
     to {
+      visibility: visible;
       opacity: 1;
+      margin-bottom: 0;
     }
   `;
 };
@@ -74,10 +78,13 @@ const SlideOut = () => {
   return keyframes`
     from {
       opacity: 1;
+      margin-bottom: 0;
     }
 
     to {
-      opacity: 0.5;
+      opacity: 0;
+      margin-bottom: -100px;
+      visibility: hidden;
     }
   `;
 };

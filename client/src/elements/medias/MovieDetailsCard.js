@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import logo from "../../assets/plex.png";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
@@ -6,10 +6,11 @@ import "react-circular-progressbar/dist/styles.css";
 import {Tag, TagColor} from "../Tag";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircle} from "@fortawesome/free-solid-svg-icons";
+import {usePlex} from "../../hooks/usePlex";
+import {Spinner} from "../Spinner";
 
 const MovieDetailsCardStyle = styled.div`
   position: relative;
-  display: flex;
   width: 80vw;
   padding: 1%;
   font-weight: 600;
@@ -79,9 +80,26 @@ const Rating = styled.div`
 const getColorRating = (rating) => "hsl(" + rating + ", 100%, 50%)";
 const getRatingPercentage = (rating) => rating * 10;
 
-const MovieDetailsCard = ({ movie }) => {
+const MovieDetailsCard = ({ id }) => {
 
-  console.log(movie);
+  const { getMovie } = usePlex();
+  const [movie, setMovie] = useState(null);
+
+  useEffect(() => {
+    getMovie(id).then(m => { if (m) setMovie(m) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    console.log(movie);
+  });
+
+  if (!movie)
+    return (
+      <div className="has-text-primary">
+        <Spinner/>
+      </div>
+    )
 
   return (
     <MovieDetailsCardStyle>
@@ -137,7 +155,7 @@ const MovieDetailsCard = ({ movie }) => {
           <RowLayout justifyContent="space-between" alignItems="flex-start">
             <ColumnLayout>
               <p className="is-size-6">Directed</p>
-              {movie.directors.map((director, index) => <p className="is-size-7">{director + (index+1 === movie.directors.length ? "" : ", ")}</p>)}
+              {movie.directors.map((director, index) => <p className="is-size-7" key={index}>{director + (index+1 === movie.directors.length ? "" : ", ")}</p>)}
             </ColumnLayout>
             <ColumnLayout>
               <p className="is-size-6">Studio</p>
@@ -145,7 +163,7 @@ const MovieDetailsCard = ({ movie }) => {
             </ColumnLayout>
             <ColumnLayout>
               <p className="is-size-6">Actors</p>
-              {movie.actors.map((actor, index) => <p className="is-size-7">{actor + (index+1 === movie.actors.length ? "" : ", ")}</p>)}
+              {movie.actors.map((actor, index) => <p className="is-size-7" key={index}>{actor + (index+1 === movie.actors.length ? "" : ", ")}</p>)}
             </ColumnLayout>
           </RowLayout>
 
