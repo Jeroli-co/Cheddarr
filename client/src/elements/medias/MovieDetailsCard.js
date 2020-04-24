@@ -9,6 +9,11 @@ import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import { usePlex } from "../../hooks/usePlex";
 import { Spinner } from "../Spinner";
 import { Carousel } from "../Carousel";
+import {
+  getColorRating,
+  getRatingPercentage,
+  msToHoursMinutes,
+} from "../../utils/media-utils";
 
 const MovieDetailsCardStyle = styled.div`
   position: relative;
@@ -115,9 +120,6 @@ const ActorInitials = styled.div`
   font-size: 2em;
 `;
 
-const getColorRating = (rating) => "hsl(" + rating + ", 100%, 50%)";
-const getRatingPercentage = (rating) => rating * 10;
-
 const MovieDetailsCard = ({ movie }) => {
   const { getMovie } = usePlex();
   const [movieDetails, setMovieDetails] = useState(null);
@@ -128,10 +130,6 @@ const MovieDetailsCard = ({ movie }) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    console.log(movieDetails);
-  });
 
   if (!movie)
     return (
@@ -245,12 +243,6 @@ const MovieDetailsCard = ({ movie }) => {
       </RowLayout>
     </MovieDetailsCardStyle>
   );
-};
-
-const msToHoursMinutes = (ms) => {
-  const hours = Math.floor(ms / 3600000);
-  const minutes = Math.ceil((ms - hours * 3600000) / 60000);
-  return hours + "h " + minutes + "m";
 };
 
 const getActorInitial = (name) => {

@@ -14,12 +14,12 @@ const MediaPreviewCardStyle = styled.div`
     margin-left: 0.5em;
     margin-right: 0.5em;
 
-    .movie-title {
+    .media-title {
       visibility: visible;
     }
   }
 
-  .movie-image {
+  .media-image {
     display: block;
     width: 100%;
     height: 100%;
@@ -28,7 +28,7 @@ const MediaPreviewCardStyle = styled.div`
     border-radius: 12px;
   }
 
-  .movie-title {
+  .media-title {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -44,7 +44,7 @@ const MediaPreviewCardStyle = styled.div`
     border-radius: 12px;
   }
 
-  &:hover .movie-title {
+  &:hover .media-title {
     background: rgba(0, 0, 0, 0.5);
   }
 `;

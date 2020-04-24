@@ -4,18 +4,35 @@ import { Carousel } from "../elements/Carousel";
 import { Spinner } from "../elements/Spinner";
 import styled from "styled-components";
 import { MediaPreviewCardStyle } from "../elements/medias/MediaPreviewCard";
+import { Modal } from "../elements/Modal";
+import { SeriesDetailsCard } from "../elements/medias/SeriesDetailsCard";
 
 const Series = ({ series }) => {
+  const [isSeriesCardModalActive, setIsSeriesCardModalActive] = useState(false);
+
   return (
     <div className="Series">
-      <MediaPreviewCardStyle>
+      <MediaPreviewCardStyle onClick={() => setIsSeriesCardModalActive(true)}>
         <img
-          className="series-image"
-          src={series.thumbUrl}
-          alt="Series poster"
+          className="media-image"
+          src={series.seasonThumbUrl}
+          alt={series.title}
         />
-        <p className="series-title">{series.title}</p>
+        <div className="media-title">
+          <div>
+            <p>{series.seriesTitle}</p>
+            <p>
+              S{series.seasonNumber} ・ E{series.episodeNumber}
+            </p>
+          </div>
+        </div>
       </MediaPreviewCardStyle>
+
+      {isSeriesCardModalActive && (
+        <Modal onClose={() => setIsSeriesCardModalActive(false)}>
+          <SeriesDetailsCard series={series} />
+        </Modal>
+      )}
     </div>
   );
 };

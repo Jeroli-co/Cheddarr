@@ -20,6 +20,7 @@ const ModalCard = styled.div`
   position: relative;
   margin: 0;
   max-width: 80vw;
+  min-height: 60vh;
   max-height: 100vh;
   z-index: 101;
   overflow-y: auto;

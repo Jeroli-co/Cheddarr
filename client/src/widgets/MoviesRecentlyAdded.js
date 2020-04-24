@@ -20,7 +20,7 @@ const Movie = ({ movie }) => {
     <div className="Movie">
       <MediaPreviewCardStyle onClick={() => setIsMovieCardModalActive(true)}>
         <img
-          className="movie-image"
+          className="media-image"
           src={movie.thumbUrl}
           alt={
             movie.title.length <= 20
@@ -28,7 +28,7 @@ const Movie = ({ movie }) => {
               : movie.title.slice(0, 20) + "..."
           }
         />
-        <p className="movie-title is-size-5-tablet is-size-7-mobile">
+        <p className="media-title is-size-5-tablet is-size-7-mobile">
           {movie.title}
         </p>
       </MediaPreviewCardStyle>
