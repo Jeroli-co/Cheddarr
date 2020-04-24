@@ -1,13 +1,18 @@
 from marshmallow import fields, post_dump, pre_dump
+from plexapi.media import Role
 
 from server.extensions import ma
 
 
 class PlexMediaTag(ma.Schema):
-    tag = fields.String()
+    tag = fields.String(data_key="name")
+    thumb = fields.String(data_key="imageUrl")
 
-
-tag_field = fields.List(fields.Pluck(PlexMediaTag, "tag"))
+    @pre_dump
+    def remove_image(self, tag, **kwargs):
+        if not isinstance(tag, Role):
+            delattr(tag, "thumb")
+        return tag
 
 
 class PlexVideoSerializer(ma.Schema):
@@ -19,9 +24,9 @@ class PlexVideoSerializer(ma.Schema):
     summary = fields.String()
     duration = fields.Integer()
     originallyAvailableAt = fields.Date(data_key="releaseDate")
-    actors = tag_field
+    actors = fields.Nested(PlexMediaTag, many=True)
     studio = fields.String()
-    genres = tag_field
+    genres = fields.Nested(PlexMediaTag, many=True)
     rating = fields.Float()
     contentRating = fields.String()
     webUrl = fields.String()
@@ -37,7 +42,7 @@ class PlexVideoSerializer(ma.Schema):
 
 
 class PlexMovieSerializer(PlexVideoSerializer):
-    directors = tag_field
+    directors = fields.Nested(PlexMediaTag, many=True)
 
 
 class PlexEpisodeSerializer(PlexVideoSerializer):
@@ -56,6 +61,7 @@ class PlexEpisodeSerializer(PlexVideoSerializer):
 
 class PlexSeasonSerializer(PlexVideoSerializer):
     parentRatingKey = fields.String(data_key="seriesId")
+    seasonNumber = fields.Integer()
     episodes = fields.Nested(PlexEpisodeSerializer, many=True)
 
     @pre_dump
@@ -65,7 +71,7 @@ class PlexSeasonSerializer(PlexVideoSerializer):
 
 
 class PlexSeriesSerializer(PlexVideoSerializer):
-    seasons = fields.Nested(PlexSeasonSerializer, many=True)
+    seasons = fields.Nested(PlexSeasonSerializer, many=True, exclude=["episodes"])
 
     @pre_dump
     def series_seasons(self, series, **kwargs):
