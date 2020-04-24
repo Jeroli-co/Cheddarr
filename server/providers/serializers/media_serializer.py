@@ -46,7 +46,6 @@ class PlexMovieSerializer(PlexVideoSerializer):
 
 
 class PlexEpisodeSerializer(PlexVideoSerializer):
-    parentRatingKey = fields.String(data_key="seasonId")
     grandparentRatingKey = fields.String(data_key="seriesId")
     seasonNumber = fields.Integer()
     index = fields.Integer(data_key="episodeNumber")
@@ -84,3 +83,4 @@ plex_movie_serializer = PlexMovieSerializer()
 plex_series_serializer = PlexSeriesSerializer()
 plex_season_serializer = PlexSeasonSerializer()
 plex_episodes_serializer = PlexEpisodeSerializer(many=True)
+plex_episode_serializer = PlexEpisodeSerializer()

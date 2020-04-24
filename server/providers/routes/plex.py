@@ -17,6 +17,7 @@ from server.providers.serializers.media_serializer import (
     plex_series_serializer,
     plex_season_serializer,
     plex_episodes_serializer,
+    plex_episode_serializer,
 )
 from server.providers.serializers.provider_config_serializer import (
     plex_config_serializer,
@@ -115,13 +116,29 @@ def get_series(series_id):
     return plex_series_serializer.jsonify(series), HTTPStatus.OK
 
 
-@provider.route("/plex/season/<season_id>/", methods=["GET"])
+@provider.route(
+    "/plex/series/<series_id>/seasons/<season_number>/", methods=["GET"],
+)
 @login_required
-def get_season(season_id):
+def get_season(series_id, season_number):
     plex_server = user_server(current_user)
-    season = plex_server.fetchItem(ekey=int(season_id))
+    series = plex_server.fetchItem(ekey=int(series_id))
+    season = series.episode(season=int(season_number))
     season.reload()
     return plex_season_serializer.jsonify(season), HTTPStatus.OK
+
+
+@provider.route(
+    "/plex/series/<series_id>/seasons/<season_number>/episodes/<episode_number>/",
+    methods=["GET"],
+)
+@login_required
+def get_episode(series_id, season_number, episode_number):
+    plex_server = user_server(current_user)
+    series = plex_server.fetchItem(ekey=int(series_id))
+    episode = series.episode(season=int(season_number), episode=int(episode_number))
+    episode.reload()
+    return plex_episode_serializer.jsonify(episode), HTTPStatus.OK
 
 
 @provider.route("/plex/onDeck/", methods=["GET"])
