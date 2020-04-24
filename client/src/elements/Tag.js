@@ -12,7 +12,7 @@ const TagStyle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-left: 8px;
+  padding-left: 6px;
   padding-right: 8px;
   border-radius: 3px;
   font-size: 11px;
@@ -21,7 +21,7 @@ const TagStyle = styled.div`
   background-color: ${(props) => props.type.bgColor};
 `;
 
-const Tag = ({ type, content }) => {
+const Tag = ({ type, content, className }) => {
   return (
     <TagStyle type={type}>
       <p>{content}</p>

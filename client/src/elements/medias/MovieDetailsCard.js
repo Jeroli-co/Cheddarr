@@ -1,5 +1,5 @@
 import React from "react";
-import styled, {css} from "styled-components";
+import styled from "styled-components";
 import logo from "../../assets/plex.png";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -11,8 +11,9 @@ const MovieDetailsCardStyle = styled.div`
   position: relative;
   display: flex;
   width: 80vw;
-  max-height: 80vh;
   padding: 1%;
+  font-weight: 600;
+  color: ${(props) => props.theme.dark};
 `;
 
 const MovieDetailsCardBackground = styled.div`
@@ -41,20 +42,6 @@ const MovieDetailsCardBackgroundImage = styled.div`
   z-index: -1;
 `;
 
-const MovieDetailsCardContent = styled.div`
-  display: flex;
-  width: 100%;
-  max-height: 100%;
-  font-weight: 600;
-  color: ${(props) => props.theme.dark};
-  overflow: auto;
-  -ms-overflow-style: none; /* IE 11 */
-  scrollbar-width: none; /* Firefox 64 */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
 const MoviePoster = styled.div`
   min-width: 25%;
   max-width: 25%;
@@ -66,29 +53,22 @@ const MoviePoster = styled.div`
   }
 `;
 
-const MainColumnLayout = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: 2%;
-  width: 100%;
-`;
-
 const ColumnLayout = styled.div`
   display: flex;
   flex-direction: column;
-  width: ${(props) => props.width ? props.width : "100%"};
+  justify-content: ${(props) => props.justifyContent ? props.justifyContent : "flex-start"};
+  width: 100%;
+  height: ${(props) => props.height ? props.height : "auto"};
 `;
 
 const RowLayout = styled.div`
   display: flex;
-  flex-wrap: ${(props) => props.wrap ? props.wrap : "nowrap"};
   justify-content: ${(props) => props.justifyContent ? props.justifyContent : "flex-start"};
-  align-items: center;
-  width: ${(props) => props.width ? props.width : "100%"};
+  align-items: ${(props) => props.alignItems ? props.alignItems : "center"};
+  width: 100%;
 
   > * {
-    margin-right: ${(props) => props.marginRight ? props.marginRight : "0"};
-    margin-left: ${(props) => props.marginLeft ? props.marginLeft : "0"};
+    margin: 1%;
   }
 `;
 
@@ -109,38 +89,25 @@ const MovieDetailsCard = ({ movie }) => {
       <MovieDetailsCardBackground/>
       <MovieDetailsCardBackgroundImage backgroundImage={movie.artUrl}/>
 
-      <MovieDetailsCardContent>
+      <RowLayout alignItems="flex-start">
 
         <MoviePoster>
           <img src={movie.posterUrl} alt="poster" />
         </MoviePoster>
 
-        <MainColumnLayout>
+        <ColumnLayout justifyContent="space-around" height="100%">
 
-          <RowLayout justifyContent="space-between">
-            <ColumnLayout>
-              <p className="is-size-2">{movie.title}</p>
-              <RowLayout marginRight="1%" wrap="wrap">
-                { movie.genres.map((genre, index) => <Tag key={index} type={TagColor.INFO} content={genre} />) }
-                <FontAwesomeIcon icon={faCircle} style={{fontSize: "5px"}} />
-                <p className="is-size-7">{movie.releaseDate}</p>
-                <FontAwesomeIcon icon={faCircle} style={{fontSize: "5px"}} />
-                <p className="is-size-7">{msToHoursMinutes(movie.duration)}</p>
-              </RowLayout>
-            </ColumnLayout>
+          <ColumnLayout>
+            <p className="is-size-2">{movie.title}</p>
+            <RowLayout childsMarginRight="1%">
+              { movie.genres.map((genre, index) => <Tag key={index} type={TagColor.INFO} content={genre} />) }
+              <FontAwesomeIcon icon={faCircle} style={{fontSize: "5px"}} />
+              <p className="is-size-7">{movie.releaseDate}</p>
+              <FontAwesomeIcon icon={faCircle} style={{fontSize: "5px"}} />
+              <p className="is-size-7">{msToHoursMinutes(movie.duration)}</p>
+            </RowLayout>
 
-            <RowLayout justifyContent="space-between" wrap="wrap">
-              <button
-                className="button is-plex-button"
-                type="button"
-                onClick={() => window.open(movie.webUrl)}
-              >
-                <span className="icon">
-                  <img className="icon-left" src={logo} alt="Plex logo"/>
-                </span>
-                <span>Open in Plex</span>
-              </button>
-
+            <RowLayout>
               <Rating>
                 <CircularProgressbar
                   value={getRatingPercentage(movie.rating)}
@@ -151,19 +118,26 @@ const MovieDetailsCard = ({ movie }) => {
                   })}
                 />
               </Rating>
+              <button
+                className="button is-plex-button"
+                type="button"
+                onClick={() => window.open(movie.webUrl)}
+              >
+                <span className="icon">
+                  <img className="icon-left" src={logo} alt="Plex logo"/>
+                </span>
+                <span>Open in Plex</span>
+              </button>
             </RowLayout>
-          </RowLayout>
+          </ColumnLayout>
 
-          <br/>
+          <div className="is-size-5">Overview</div>
+          <div className="is-size-6">{movie.summary}</div>
 
-          <p className="is-size-6">{movie.summary}</p>
-
-          <br/>
-
-          <RowLayout justifyContent="space-between">
+          <RowLayout justifyContent="space-between" alignItems="flex-start">
             <ColumnLayout>
-              <p className="is-size-6">Directed by</p>
-              <p className="is-size-7">{movie.directors.map((director, index) => director + (index+1 === movie.directors.length ? "" : ", "))}</p>
+              <p className="is-size-6">Directed</p>
+              {movie.directors.map((director, index) => <p className="is-size-7">{director + (index+1 === movie.directors.length ? "" : ", ")}</p>)}
             </ColumnLayout>
             <ColumnLayout>
               <p className="is-size-6">Studio</p>
@@ -171,13 +145,13 @@ const MovieDetailsCard = ({ movie }) => {
             </ColumnLayout>
             <ColumnLayout>
               <p className="is-size-6">Actors</p>
-              <p className="is-size-7">{movie.actors.map((actor, index) => actor + (index+1 === movie.actors.length ? "" : ", "))}</p>
+              {movie.actors.map((actor, index) => <p className="is-size-7">{actor + (index+1 === movie.actors.length ? "" : ", ")}</p>)}
             </ColumnLayout>
           </RowLayout>
 
-        </MainColumnLayout>
+        </ColumnLayout>
 
-      </MovieDetailsCardContent>
+      </RowLayout>
 
     </MovieDetailsCardStyle>
   );

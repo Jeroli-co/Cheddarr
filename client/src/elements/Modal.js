@@ -16,7 +16,7 @@ const ModalStyle = styled.div`
   z-index: 100;
 `;
 
-const ModalCloseButtonStyle = styled.span`
+const ModalCloseButton = styled.span`
   position: absolute;
   top: 0;
   right: 10px;
@@ -28,6 +28,18 @@ const ModalCloseButtonStyle = styled.span`
     color: #000;
     text-decoration: none;
     cursor: pointer;
+  }
+`;
+
+const ModalCard = styled.div`
+  margin: 0;
+  max-width: 80vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE 11 */
+  scrollbar-width: none; /* Firefox 64 */
+  ::-webkit-scrollbar {
+    display: none;
   }
 `;
 
@@ -43,10 +55,12 @@ const Modal = ({ children, onClose }) => {
 
   return (
     <ModalStyle ref={modalBackgroundRef} onClick={(e) => _onClick(e)}>
-      <ModalCloseButtonStyle onClick={() => onClose()}>
+      <ModalCloseButton onClick={() => onClose()}>
         <FontAwesomeIcon icon={faTimes}/>
-      </ModalCloseButtonStyle>
-      { children }
+      </ModalCloseButton>
+      <ModalCard>
+        { children }
+      </ModalCard>
     </ModalStyle>
   )
 };
