@@ -6,7 +6,7 @@ from server.extensions import ma
 
 class PlexMediaTag(ma.Schema):
     tag = fields.String(data_key="name")
-    thumb = fields.String(data_key="imageUrl")
+    thumb = fields.String(data_key="thumbUrl")
 
     @pre_dump
     def remove_image(self, tag, **kwargs):
@@ -19,8 +19,8 @@ class PlexVideoSerializer(ma.Schema):
     type = fields.String()
     ratingKey = fields.String(data_key="id")
     title = fields.String()
-    thumbUrl = fields.URL(data_key="posterUrl")
-    artUrl = fields.URL(data_key="artUrl")
+    thumbUrl = fields.URL()
+    artUrl = fields.URL()
     summary = fields.String()
     duration = fields.Integer()
     originallyAvailableAt = fields.Date(data_key="releaseDate")
