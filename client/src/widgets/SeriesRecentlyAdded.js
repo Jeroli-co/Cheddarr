@@ -3,7 +3,7 @@ import { usePlex } from "../hooks/usePlex";
 import { Carousel } from "../elements/Carousel";
 import { Spinner } from "../elements/Spinner";
 import styled from "styled-components";
-import {MediaPreviewCardStyle} from "../elements/medias/MediaPreviewCard";
+import { MediaPreviewCardStyle } from "../elements/medias/MediaPreviewCard";
 
 const Series = ({ series }) => {
   return (
@@ -11,7 +11,7 @@ const Series = ({ series }) => {
       <MediaPreviewCardStyle>
         <img
           className="series-image"
-          src={series.posterUrl}
+          src={series.thumbUrl}
           alt="Series poster"
         />
         <p className="series-title">{series.title}</p>
@@ -51,17 +51,13 @@ const SeriesRecentlyAdded = () => {
 
       {series && (
         <Carousel>
-          {series.map((series) => (
-            <Series key={series.title} series={series} />
+          {series.map((series, index) => (
+            <Series key={index} series={series} />
           ))}
         </Carousel>
       )}
 
-      {!series && (
-        <div className="content has-text-centered has-text-primary">
-          <Spinner />
-        </div>
-      )}
+      {!series && <Spinner color="primary" size="2x" justifyContent="center" />}
     </SeriesRecentlyAddedStyled>
   );
 };
