@@ -6,12 +6,14 @@ from server.extensions import ma
 
 class PlexMediaTag(ma.Schema):
     tag = fields.String(data_key="name")
+    role = fields.String()
     thumb = fields.String(data_key="thumbUrl")
 
     @pre_dump
     def remove_image(self, tag, **kwargs):
         if not isinstance(tag, Role):
             delattr(tag, "thumb")
+            delattr(tag, "role")
         return tag
 
 
