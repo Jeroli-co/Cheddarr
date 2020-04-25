@@ -29,6 +29,7 @@ class PlexVideoSerializer(ma.Schema):
     genres = fields.Nested(PlexMediaTag, many=True)
     rating = fields.Float()
     contentRating = fields.String()
+    isWatched = fields.Boolean()
     webUrl = fields.String()
 
     @pre_dump

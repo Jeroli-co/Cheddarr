@@ -2,8 +2,7 @@ import React, { useContext } from "react";
 import "./Home.scss";
 import logo from "../../assets/cheddarr.png";
 import { AuthContext } from "../../contexts/AuthContext";
-import { MoviesRecentlyAdded } from "../../widgets/MoviesRecentlyAdded";
-import { SeriesRecentlyAdded } from "../../widgets/SeriesRecentlyAdded";
+import { MediaRecentlyAdded } from "../../widgets/MediaRecentlyAdded";
 
 const Home = () => {
   const { isAuthenticated, isLoading } = useContext(AuthContext);
@@ -29,8 +28,9 @@ const Home = () => {
   } else {
     return (
       <div>
-        <MoviesRecentlyAdded />
-        <SeriesRecentlyAdded />
+        {/*<MediaRecentlyAdded type="onDeck"/>*/}
+        <MediaRecentlyAdded type="movies" />
+        <MediaRecentlyAdded type="series" />
       </div>
     );
   }

@@ -32,6 +32,17 @@ const usePlex = () => {
     }
   };
 
+  const getOnDeck = async () => {
+    const res = await executeRequest(methods.GET, providerUrl + "onDeck/");
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   const getMovie = async (id) => {
     const res = await executeRequest(methods.GET, moviesUrl + id + "/");
     switch (res.status) {
@@ -46,6 +57,7 @@ const usePlex = () => {
   return {
     getMoviesRecentlyAdded,
     getSeriesRecentlyAdded,
+    getOnDeck,
     getMovie,
   };
 };
