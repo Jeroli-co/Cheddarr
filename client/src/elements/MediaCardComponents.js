@@ -13,7 +13,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Tag, TagColor } from "./Tag";
 import { Spinner } from "./Spinner";
-import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 import logo from "../assets/plex.png";
 import { Modal } from "./Modal";
 
@@ -127,6 +126,10 @@ const MediaDetailsRating = styled.div`
 `;
 
 const Actor = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   margin: 1%;
 `;
 
@@ -150,10 +153,6 @@ const ActorInitials = styled.div`
   background-color: ${(props) => props.theme.transparentDark};
   color: ${(props) => props.theme.dark};
   font-size: 2em;
-`;
-
-const ProgressBar = styled.progress`
-  background-color: ${(props) => props.color};
 `;
 
 const Actors = ({ actors }) => {
@@ -207,33 +206,34 @@ const MediaCard = ({ media }) => {
               </p>
             )}
             <RowLayout wrap="wrap" childMarginRight="1%">
-              <p className="is-size-7">{media.releaseDate}</p>
+              <p className="is-size-7" data-tooltip="Released">
+                {media.releaseDate}
+              </p>
               <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
-              <p className="is-size-7">{msToHoursMinutes(media.duration)}</p>
+              <p className="is-size-7" data-tooltip="Duration">
+                {msToHoursMinutes(media.duration)}
+              </p>
+              <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
+              <p className="is-size-7" data-tooltip="Content rating">
+                {media.contentRating}
+              </p>
               {!media.isWatched && (
                 <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
               )}
               {!media.isWatched && <p className="is-size-7">Unplayed</p>}
-              <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
-              <p className="is-size-7">{media.contentRating}</p>
-              {movieDetails && (
-                <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
-              )}
-              {movieDetails &&
-                movieDetails.genres.map((genre, index) => (
-                  <Tag key={index} type={TagColor.INFO} content={genre.name} />
-                ))}
-              {media.type === "movie" && !movieDetails && <Spinner />}
             </RowLayout>
 
             <RowLayout childMargin="1%">
-              <MediaDetailsRating
-                backgroundColor={getColorRating(
-                  getRatingPercentage(media.rating)
-                )}
-              >
-                {getRatingPercentage(media.rating) + "%"}
-              </MediaDetailsRating>
+              {media.rating && (
+                <MediaDetailsRating
+                  data-tooltip="Rating"
+                  backgroundColor={getColorRating(
+                    getRatingPercentage(media.rating)
+                  )}
+                >
+                  {getRatingPercentage(media.rating) + "%"}
+                </MediaDetailsRating>
+              )}
               <button
                 className="button is-plex-button"
                 type="button"
@@ -256,21 +256,38 @@ const MediaCard = ({ media }) => {
 
           {media.type === "movie" && <br />}
           {media.type === "movie" && (
-            <RowLayout alignItems="flex-start" childMarginRight="2%">
-              <div>
-                <p className="is-size-6">Directed</p>
-                {media.directors.map((director, index) => (
-                  <p className="is-size-7" key={index}>
-                    {director.name +
-                      (index + 1 === media.directors.length ? "" : ", ")}
-                  </p>
-                ))}
-              </div>
-              <div>
-                <p className="is-size-6">Studio</p>
-                <p className="is-size-7">{media.studio}</p>
-              </div>
-            </RowLayout>
+            <ColumnLayout>
+              <RowLayout alignItems="flex-start" childMarginRight="2%">
+                <div>
+                  <p className="is-size-6">Directed</p>
+                  {media.directors.map((director, index) => (
+                    <p className="is-size-7" key={index}>
+                      {director.name +
+                        (index + 1 === media.directors.length ? "" : ", ")}
+                    </p>
+                  ))}
+                </div>
+                <div>
+                  <p className="is-size-6">Studio</p>
+                  <p className="is-size-7">{media.studio}</p>
+                </div>
+              </RowLayout>
+              <RowLayout
+                childMarginTop="1%"
+                childMarginBottom="1%"
+                childMarginRight="1%"
+              >
+                {movieDetails &&
+                  movieDetails.genres.map((genre, index) => (
+                    <Tag
+                      key={index}
+                      type={TagColor.INFO}
+                      content={genre.name}
+                    />
+                  ))}
+                {media.type === "movie" && !movieDetails && <Spinner />}
+              </RowLayout>
+            </ColumnLayout>
           )}
         </ColumnLayout>
       </RowLayout>

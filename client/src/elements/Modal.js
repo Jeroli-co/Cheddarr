@@ -23,6 +23,7 @@ const ModalCard = styled.div`
   min-height: 60vh;
   max-height: 100vh;
   z-index: 101;
+  overflow-x: hidden;
   overflow-y: auto;
   -ms-overflow-style: none; /* IE 11 */
   scrollbar-width: none; /* Firefox 64 */
