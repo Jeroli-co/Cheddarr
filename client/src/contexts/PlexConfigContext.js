@@ -43,12 +43,6 @@ const PlexConfigContextProvider = (props) => {
     }
   };
 
-  const updatePlexServer = async (machineName) => {
-    return await updateConfig({
-      machine_name: machineName,
-    });
-  };
-
   const updateConfig = async (newConfig) => {
     const res = await executeRequest(
       methods.PATCH,
@@ -71,7 +65,6 @@ const PlexConfigContextProvider = (props) => {
       value={{
         config,
         updateConfig,
-        updatePlexServer,
         getPlexServers,
       }}
     >

@@ -48,9 +48,7 @@ const LinkPlexAccount = ({ config, location }) => {
 };
 
 const PlexConfig = ({ location }) => {
-  const { config, updateConfig, updatePlexServer } = useContext(
-    PlexConfigContext
-  );
+  const { config, updateConfig } = useContext(PlexConfigContext);
   const [isServersModalActive, setIsServersModalActive] = useState(false);
   const [isUnlinkServerModalActive, setIsUnlinkServerModalActive] = useState(
     false
@@ -59,7 +57,7 @@ const PlexConfig = ({ location }) => {
   const { register, handleSubmit, formState, reset } = useForm();
 
   const _onUnlinkPlexServer = () => {
-    updatePlexServer(null).then((res) => {
+    updateConfig({ machine_name: null }).then((res) => {
       if (res) setIsUnlinkServerModalActive(false);
     });
   };
