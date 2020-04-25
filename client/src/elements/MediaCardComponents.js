@@ -126,11 +126,7 @@ const MediaDetailsRating = styled.div`
 `;
 
 const Actor = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 1%;
+  padding: 1%;
 `;
 
 const ActorPicture = styled.img`
@@ -157,21 +153,26 @@ const ActorInitials = styled.div`
 
 const Actors = ({ actors }) => {
   return (
-    <Carousel>
-      {actors &&
-        actors.map((actor) => (
-          <Actor key={actor.name}>
-            {actor.thumbUrl ? (
-              <ActorPicture src={actor.thumbUrl} alt="" />
-            ) : (
-              <ActorInitials>
-                <p>{getActorInitial(actor.name)}</p>
-              </ActorInitials>
-            )}
-            <p className="is-size-7">{actor.name}</p>
-          </Actor>
-        ))}
-    </Carousel>
+    <RowLayout>
+      <Carousel>
+        {actors &&
+          actors.map((actor) => (
+            <Actor key={actor.name}>
+              {actor.thumbUrl ? (
+                <ActorPicture src={actor.thumbUrl} alt="" />
+              ) : (
+                <ActorInitials>
+                  <p>{getActorInitial(actor.name)}</p>
+                </ActorInitials>
+              )}
+              <div className="content has-text-centered">
+                <p className="is-size-7">{actor.name}</p>
+                <p className="is-size-7 has-text-weight-light">{actor.role}</p>
+              </div>
+            </Actor>
+          ))}
+      </Carousel>
+    </RowLayout>
   );
 };
 
@@ -271,21 +272,28 @@ const MediaCard = ({ media }) => {
                   <p className="is-size-6">Studio</p>
                   <p className="is-size-7">{media.studio}</p>
                 </div>
-              </RowLayout>
-              <RowLayout
-                childMarginTop="1%"
-                childMarginBottom="1%"
-                childMarginRight="1%"
-              >
-                {movieDetails &&
-                  movieDetails.genres.map((genre, index) => (
-                    <Tag
-                      key={index}
-                      type={TagColor.INFO}
-                      content={genre.name}
-                    />
-                  ))}
-                {media.type === "movie" && !movieDetails && <Spinner />}
+
+                <div>
+                  <p className="is-size-6">
+                    Genres{" "}
+                    {media.type === "movie" && !movieDetails && <Spinner />}
+                  </p>
+                  {movieDetails && (
+                    <RowLayout
+                      childMarginTop="1%"
+                      childMarginBottom="1%"
+                      childMarginRight="1%"
+                    >
+                      {movieDetails.genres.map((genre, index) => (
+                        <Tag
+                          key={index}
+                          type={TagColor.INFO}
+                          content={genre.name}
+                        />
+                      ))}
+                    </RowLayout>
+                  )}
+                </div>
               </RowLayout>
             </ColumnLayout>
           )}

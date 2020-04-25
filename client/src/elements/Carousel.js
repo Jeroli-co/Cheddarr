@@ -6,6 +6,7 @@ import smoothscroll from "smoothscroll-polyfill";
 
 const CarouselStyle = styled.div`
   position: relative;
+  max-width: 100%;
 `;
 
 const CarouselItems = styled.div`

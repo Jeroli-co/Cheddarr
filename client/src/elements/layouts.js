@@ -5,6 +5,8 @@ const ColumnLayout = styled.div`
   flex-direction: column;
   justify-content: ${(props) =>
     props.justifyContent ? props.justifyContent : "flex-start"};
+  align-items: ${(props) =>
+    props.alignItems ? props.alignItems : "flex-start"};
   width: ${(props) => (props.width ? props.width : "100%")};
   height: ${(props) => (props.height ? props.height : "auto")};
 `;
