@@ -49,6 +49,7 @@ def update_config():
             payload=config_form.errors,
         )
     updated_config = config_form.data
+    print(updated_config)
     user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
     if not user_config:
         raise HTTPError(
@@ -68,10 +69,7 @@ def get_user_servers():
         plex_account.PLEXSERVERS.format(machineId=""), headers={"X-PLEX-TOKEN": api_key}
     )
     root = ET.fromstring(r.content)
-    servers = [
-        {"name": child.attrib["name"], "machine_id": child.attrib["machineIdentifier"]}
-        for child in root
-    ]
+    servers = [{"name": child.attrib["name"]} for child in root]
     return jsonify(servers), HTTPStatus.OK
 
 
@@ -80,6 +78,8 @@ def get_user_servers():
 # @cache.cached(timeout=10000000)
 def get_recent_movies():
     plex_server = user_server(current_user)
+    if plex_server is None:
+        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     movie_sections = library_sections(plex_server, section_type="movies")
     recent_movies = [
         movie
@@ -93,6 +93,8 @@ def get_recent_movies():
 @login_required
 def get_movie(movie_id):
     plex_server = user_server(current_user)
+    if plex_server is None:
+        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     movie = plex_server.fetchItem(ekey=int(movie_id))
     movie.reload()
     return plex_movies_serializer.jsonify(movie), HTTPStatus.OK
@@ -103,6 +105,8 @@ def get_movie(movie_id):
 # @cache.cached(timeout=300)
 def get_recent_series():
     plex_server = user_server(current_user)
+    if plex_server is None:
+        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series_section = library_sections(plex_server, section_type="series")
     recent_series = [
         series
@@ -117,6 +121,8 @@ def get_recent_series():
 @login_required
 def get_series(series_id):
     plex_server = user_server(current_user)
+    if plex_server is None:
+        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
     series.reload()
     return plex_series_serializer.jsonify(series), HTTPStatus.OK
@@ -128,6 +134,8 @@ def get_series(series_id):
 @login_required
 def get_season(series_id, season_number):
     plex_server = user_server(current_user)
+    if plex_server is None:
+        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
     season = series.episode(season=int(season_number))
     season.reload()
@@ -141,6 +149,8 @@ def get_season(series_id, season_number):
 @login_required
 def get_episode(series_id, season_number, episode_number):
     plex_server = user_server(current_user)
+    if plex_server is None:
+        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
     episode = series.episode(season=int(season_number), episode=int(episode_number))
     episode.reload()
@@ -151,5 +161,7 @@ def get_episode(series_id, season_number, episode_number):
 @login_required
 def get_on_deck():
     plex_server = user_server(current_user)
+    if plex_server is None:
+        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     on_deck = plex_server.library.onDeck()
-    return plex_episodes_serializer.jsonify(on_deck), HTTPStatus.OK
+    return plex_episodes_serializer.jsonify(on_deck, many=True), HTTPStatus.OK

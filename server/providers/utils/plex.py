@@ -12,6 +12,8 @@ def user_server(user):
     plex_config = PlexConfig.find(user)
     api_key = plex_config.provider_api_key
     server_name = plex_config.machine_name
+    if server_name is None:
+        return None
     try:
         return MyPlexAccount(api_key).resource(server_name).connect()
     except PlexApiException:
