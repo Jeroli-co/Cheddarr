@@ -10,6 +10,20 @@ const usePlex = () => {
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
 
+  const getPlexStatus = async () => {
+    const res = await executeRequest(
+      methods.GET,
+      providerUrl + "config/status/"
+    );
+    switch (res.status) {
+      case 200:
+        console.log(res);
+        return !!res.data.enabled;
+      default:
+        return false;
+    }
+  };
+
   const getMoviesRecentlyAdded = async () => {
     const res = await executeRequest(methods.GET, moviesUrl + "recent/");
     switch (res.status) {
@@ -55,6 +69,7 @@ const usePlex = () => {
   };
 
   return {
+    getPlexStatus,
     getMoviesRecentlyAdded,
     getSeriesRecentlyAdded,
     getOnDeck,

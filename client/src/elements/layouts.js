@@ -16,9 +16,47 @@ const RowLayout = styled.div`
     props.justifyContent ? props.justifyContent : "flex-start"};
   align-items: ${(props) => (props.alignItems ? props.alignItems : "center")};
   width: 100%;
+  border-bottom: ${(props) =>
+    props.borderBottom ? props.borderBottom : "none"};
+
+  margin-top: ${(props) =>
+    props.marginTop ? props.marginTop : props.margin ? props.margin : "0"};
+  margin-left: ${(props) =>
+    props.marginLeft ? props.marginLeft : props.margin ? props.margin : "0"};
+  margin-bottom: ${(props) =>
+    props.marginBottom
+      ? props.marginBottom
+      : props.margin
+      ? props.margin
+      : "0"};
+  margin-right: ${(props) =>
+    props.marginRight ? props.marginRight : props.margin ? props.margin : "0"};
 
   > * {
-    margin: 1%;
+    margin-top: ${(props) =>
+      props.childMarginTop
+        ? props.childMarginTop
+        : props.childMargin
+        ? props.childMargin
+        : "0"};
+    margin-left: ${(props) =>
+      props.childMarginLeft
+        ? props.childMarginLeft
+        : props.childMargin
+        ? props.childMargin
+        : "0"};
+    margin-bottom: ${(props) =>
+      props.childMarginBottom
+        ? props.childMarginBottom
+        : props.childMargin
+        ? props.childMargin
+        : "0"};
+    margin-right: ${(props) =>
+      props.childMarginRight
+        ? props.childMarginRight
+        : props.childMargin
+        ? props.childMargin
+        : "0"};
   }
 
   @media only screen and (max-width: 768px) {

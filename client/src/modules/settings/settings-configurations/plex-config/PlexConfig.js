@@ -1,12 +1,50 @@
 import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../../../../contexts/AuthContext";
 import { ServersModal } from "./elements/ServersModal";
 import { useForm } from "react-hook-form";
 import { SubmitPlexConfig } from "./elements/SubmitPlexConfig";
 import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
 import { Spinner } from "../../../../elements/Spinner";
+import { RowLayout } from "../../../../elements/layouts";
+
+const isPlexAccountLinked = (config) => {
+  return (
+    config["provider_api_key"] !== null &&
+    typeof config["provider_api_key"] !== "undefined"
+  );
+};
+
+const isPlexServerLinked = (config) => {
+  return (
+    config["machine_name"] !== null &&
+    typeof config["machine_name"] !== "undefined"
+  );
+};
+
+const LinkPlexAccount = ({ config, location }) => {
+  const { signInWithPlex } = useContext(AuthContext);
+
+  if (!isPlexAccountLinked(config)) {
+    return (
+      <button
+        className="button is-primary"
+        type="button"
+        onClick={() => signInWithPlex(location.pathname)}
+      >
+        Link Plex account
+      </button>
+    );
+  }
+
+  return (
+    <p className="is-size-5 is-size-7-mobile has-text-weight-light">
+      <FontAwesomeIcon className="has-text-success" icon={faCheck} /> Plex
+      account linked
+    </p>
+  );
+};
 
 const PlexConfig = ({ location }) => {
   const { config, updateConfig } = useContext(PlexConfigContext);
@@ -24,127 +62,68 @@ const PlexConfig = ({ location }) => {
     });
   };
 
-  const isPlexAccountLinked = () => {
-    return (
-      config["provider_api_key"] !== null &&
-      typeof config["provider_api_key"] !== "undefined"
-    );
-  };
-
-  const isPlexServerLinked = () => {
-    return (
-      config["machine_name"] !== null &&
-      typeof config["machine_name"] !== "undefined"
-    );
-  };
-
-  const LinkPlexAccount = () => {
-    const { signInWithPlex } = useContext(AuthContext);
-
-    if (!isPlexAccountLinked()) {
-      return (
-        <button
-          className="button is-primary"
-          type="button"
-          onClick={() => signInWithPlex(location.pathname)}
-        >
-          Link Plex account
-        </button>
-      );
-    }
-
-    return (
-      <div className="level is-mobile">
-        <div className="level-left">
-          <div className="level-item has-text-success">
-            <FontAwesomeIcon icon={faCheck} />
-          </div>
-          <div className="level-item">
-            <p className="is-size-5 is-size-7-mobile has-text-weight-light">
-              Plex account linked
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const LinkPlexServer = () => {
-    return (
-      <div className="level is-mobile">
-        {isPlexServerLinked() && (
-          <div className="level-left">
-            <div className="level-item has-text-success">
-              <FontAwesomeIcon icon={faCheck} />
-            </div>
-            <div className="level-item">
-              <p className="is-size-5 is-size-7-mobile has-text-weight-light">
-                Plex server linked ({config["machine_name"]})
-              </p>
-            </div>
-            <div className="level-item">
-              <button
-                type="button"
-                className="button is-small is-rounded is-info"
-                onClick={() => setIsServersModalActive(true)}
-              >
-                <FontAwesomeIcon icon={faEdit} />
-              </button>
-            </div>
-          </div>
-        )}
-        {!isPlexServerLinked() && (
-          <div className="level-left">
-            <div className="level-item">
-              <button
-                className="button is-primary"
-                type="button"
-                onClick={() => setIsServersModalActive(true)}
-              >
-                Link Plex server
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
+  if (!config) return <Spinner color="primary" size="3x" />;
 
   return (
     <div className="PlexConfig" data-testid="PlexConfig">
-      <h1 className="title is-1">Plex</h1>
-      <hr />
+      <RowLayout
+        justifyContent="space-between"
+        borderBottom="1px solid LightGrey"
+      >
+        <h1 className="is-size-1">Plex</h1>
+        <LinkPlexAccount config={config} location={location} />
+      </RowLayout>
 
-      {!config && <Spinner color="primary" size="3x" />}
-
-      {config && (
+      {isPlexAccountLinked(config) && (
         <div className="container">
           <form onSubmit={handleSubmit(_onSubmit)}>
-            {isPlexAccountLinked() && (
-              <div className="field">
-                <div className="control">
-                  <input
-                    id="enabled"
-                    type="checkbox"
-                    name="enabled"
-                    className="switch is-primary"
-                    ref={register}
-                    defaultChecked={config.enabled}
-                  />
-                  <label htmlFor="enabled">Enabled</label>
+            {isPlexServerLinked(config) && (
+              <RowLayout justifyContent="space-between" marginTop="2%">
+                <p className="is-size-4">Plex server</p>
+                <p className="is-size-5 has-text-weight-light">
+                  {config["machine_name"]}
+                </p>
+                <button
+                  type="button"
+                  className="button is-small is-rounded is-info"
+                  onClick={() => setIsServersModalActive(true)}
+                >
+                  <FontAwesomeIcon icon={faEdit} />
+                </button>
+                <button
+                  type="button"
+                  className="button is-small is-rounded is-danger"
+                  onClick={() => console.log("UNLINK SERVER")}
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                </button>
+                <div className="field">
+                  <div className="control">
+                    <input
+                      id="enabled"
+                      type="checkbox"
+                      name="enabled"
+                      className="switch is-primary"
+                      ref={register}
+                      defaultChecked={config.enabled}
+                    />
+                    <label htmlFor="enabled">Enabled</label>
+                  </div>
                 </div>
-                <hr />
-              </div>
+              </RowLayout>
             )}
-
-            <LinkPlexAccount />
-
-            {isPlexAccountLinked() && (
-              <div>
-                <LinkPlexServer />
-                <SubmitPlexConfig isFormDirty={formState.dirty} />
-              </div>
+            {!isPlexServerLinked(config) && (
+              <RowLayout marginTop="2%">
+                <button
+                  className="button is-primary"
+                  type="button"
+                  onClick={() => setIsServersModalActive(true)}
+                >
+                  Link Plex server
+                </button>
+              </RowLayout>
             )}
+            <SubmitPlexConfig isFormDirty={formState.dirty} />
           </form>
 
           {isServersModalActive && (

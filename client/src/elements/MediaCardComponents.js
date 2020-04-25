@@ -181,7 +181,7 @@ const MediaCard = ({ media }) => {
 
   return (
     <MediaDetailsCard artUrl={media.artUrl}>
-      <RowLayout alignItems="flex-start">
+      <RowLayout alignItems="flex-start" childMargin="1%">
         <ColumnLayout width="25%">
           <MediaDetailsPoster src={media.thumbUrl} alt={media.title} />
         </ColumnLayout>
@@ -196,7 +196,7 @@ const MediaCard = ({ media }) => {
                 S{media.seasonNumber}・E{media.episodeNumber} - {media.title}
               </p>
             )}
-            <RowLayout wrap="wrap">
+            <RowLayout wrap="wrap" childMarginRight="1%">
               <p className="is-size-7">{media.releaseDate}</p>
               <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
               <p className="is-size-7">{msToHoursMinutes(media.duration)}</p>
@@ -214,7 +214,7 @@ const MediaCard = ({ media }) => {
               {media.type === "movie" && !movieDetails && <Spinner />}
             </RowLayout>
 
-            <RowLayout>
+            <RowLayout childMargin="1%">
               {media.rating && (
                 <MediaDetailsRating>
                   <CircularProgressbar
@@ -245,7 +245,7 @@ const MediaCard = ({ media }) => {
             </RowLayout>
           </ColumnLayout>
 
-          <RowLayout>
+          <RowLayout childMarginTop="1%">
             <ColumnLayout>
               <div className="is-size-5">Overview</div>
               <div className="is-size-6">{media.summary}</div>
@@ -254,7 +254,7 @@ const MediaCard = ({ media }) => {
 
           {media.type === "movie" && <br />}
           {media.type === "movie" && (
-            <RowLayout alignItems="flex-start">
+            <RowLayout alignItems="flex-start" childMarginRight="2%">
               <div>
                 <p className="is-size-6">Directed</p>
                 {media.directors.map((director, index) => (
@@ -274,7 +274,7 @@ const MediaCard = ({ media }) => {
       </RowLayout>
 
       {media.type === "movie" && (
-        <RowLayout>
+        <RowLayout childMargin="1%">
           <ColumnLayout>
             <p className="is-size-6">
               Actors{" "}
