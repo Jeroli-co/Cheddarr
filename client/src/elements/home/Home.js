@@ -4,8 +4,6 @@ import logo from "../../assets/cheddarr.png";
 import { AuthContext } from "../../contexts/AuthContext";
 import { MediaRecentlyAdded } from "../../widgets/MediaRecentlyAdded";
 import { usePlex } from "../../hooks/usePlex";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { routes } from "../../router/routes";
 
@@ -57,12 +55,10 @@ const Home = () => {
       <div className="container">
         <div className="content has-text-centered">
           <br />
-          <FontAwesomeIcon icon={faExclamationTriangle} size="6x" />
-          <Link
-            className="is-size-4"
-            to={routes.USER_SETTINGS_CONFIGURATIONS.url}
-          >
-            <p>Enable Plex to see this section</p>
+          <img src={logo} className="Home-logo" alt="logo" />
+          <div className="is-divider" />
+          <Link to={routes.USER_SETTINGS_CONFIGURATIONS.url}>
+            <p className="is-size-5">Enable Plex to start using your hub</p>
           </Link>
         </div>
       </div>
