@@ -60,12 +60,28 @@ const PlexConfigContextProvider = (props) => {
     }
   };
 
+  const isPlexAccountLinked = (config) => {
+    return (
+      config["provider_api_key"] !== null &&
+      typeof config["provider_api_key"] !== "undefined"
+    );
+  };
+
+  const isPlexServerLinked = (config) => {
+    return (
+      config["machine_name"] !== null &&
+      typeof config["machine_name"] !== "undefined"
+    );
+  };
+
   return (
     <PlexConfigContext.Provider
       value={{
         config,
         updateConfig,
         getPlexServers,
+        isPlexServerLinked,
+        isPlexAccountLinked,
       }}
     >
       {props.children}

@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { AuthContext } from "../../../../contexts/AuthContext";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ServersModal } from "./elements/ServersModal";
 import { useForm } from "react-hook-form";
 import { SubmitPlexConfig } from "./elements/SubmitPlexConfig";
@@ -9,46 +8,15 @@ import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
 import { Spinner } from "../../../../elements/Spinner";
 import { RowLayout } from "../../../../elements/layouts";
 import { UnlinkServerModal } from "./elements/UnlinkServerModal";
-
-const isPlexAccountLinked = (config) => {
-  return (
-    config["provider_api_key"] !== null &&
-    typeof config["provider_api_key"] !== "undefined"
-  );
-};
-
-const isPlexServerLinked = (config) => {
-  return (
-    config["machine_name"] !== null &&
-    typeof config["machine_name"] !== "undefined"
-  );
-};
-
-const LinkPlexAccount = ({ config, location }) => {
-  const { signInWithPlex } = useContext(AuthContext);
-
-  if (!isPlexAccountLinked(config)) {
-    return (
-      <button
-        className="button is-primary"
-        type="button"
-        onClick={() => signInWithPlex(location.pathname)}
-      >
-        Link Plex account
-      </button>
-    );
-  }
-
-  return (
-    <p className="is-size-5 is-size-7-mobile has-text-weight-light">
-      <FontAwesomeIcon className="has-text-success" icon={faCheck} /> Plex
-      account linked
-    </p>
-  );
-};
+import { LinkPlexAccount } from "./elements/LinkPlexAccount";
 
 const PlexConfig = ({ location }) => {
-  const { config, updateConfig } = useContext(PlexConfigContext);
+  const {
+    config,
+    updateConfig,
+    isPlexAccountLinked,
+    isPlexServerLinked,
+  } = useContext(PlexConfigContext);
   const [isServersModalActive, setIsServersModalActive] = useState(false);
   const [isUnlinkServerModalActive, setIsUnlinkServerModalActive] = useState(
     false

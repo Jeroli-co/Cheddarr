@@ -54,7 +54,7 @@ const Carousel = ({ children }) => {
   const _onSlideLeft = () => {
     scrollRef.current.scrollBy({
       top: 0,
-      left: -300,
+      left: -500,
       behavior: "smooth",
     });
   };
@@ -62,7 +62,7 @@ const Carousel = ({ children }) => {
   const _onSlideRight = () => {
     scrollRef.current.scrollBy({
       top: 0,
-      left: 300,
+      left: 500,
       behavior: "smooth",
     });
   };
