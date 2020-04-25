@@ -117,7 +117,13 @@ const MediaDetailsPoster = styled.img`
 `;
 
 const MediaDetailsRating = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
   width: 60px;
+  height: 60px;
+  background-color: ${(props) => props.backgroundColor};
 `;
 
 const Actor = styled.div`
@@ -144,6 +150,10 @@ const ActorInitials = styled.div`
   background-color: ${(props) => props.theme.transparentDark};
   color: ${(props) => props.theme.dark};
   font-size: 2em;
+`;
+
+const ProgressBar = styled.progress`
+  background-color: ${(props) => props.color};
 `;
 
 const Actors = ({ actors }) => {
@@ -217,24 +227,13 @@ const MediaCard = ({ media }) => {
             </RowLayout>
 
             <RowLayout childMargin="1%">
-              {media.rating && (
-                <MediaDetailsRating
-                  data-tooltip={
-                    "Rating " + getRatingPercentage(media.rating) + "%"
-                  }
-                >
-                  <CircularProgressbar
-                    value={getRatingPercentage(media.rating)}
-                    background
-                    styles={buildStyles({
-                      pathColor: getColorRating(
-                        getRatingPercentage(media.rating)
-                      ),
-                      backgroundColor: "rgba(40, 42, 45, .8)",
-                    })}
-                  />
-                </MediaDetailsRating>
-              )}
+              <MediaDetailsRating
+                backgroundColor={getColorRating(
+                  getRatingPercentage(media.rating)
+                )}
+              >
+                {getRatingPercentage(media.rating) + "%"}
+              </MediaDetailsRating>
               <button
                 className="button is-plex-button"
                 type="button"
