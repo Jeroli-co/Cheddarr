@@ -124,7 +124,7 @@ const PlexConfig = ({ location }) => {
                 {isUnlinkServerModalActive && (
                   <UnlinkServerModal
                     machineName={config["machine_name"]}
-                    onSubmit={() => _onUnlinkPlexServer()}
+                    onUnlink={() => _onUnlinkPlexServer()}
                     onClose={() => setIsUnlinkServerModalActive(false)}
                   />
                 )}

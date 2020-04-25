@@ -1,6 +1,6 @@
 import React from "react";
 
-const UnlinkServerModal = ({ onSubmit, onClose, machineName }) => {
+const UnlinkServerModal = ({ onUnlink, onClose, machineName }) => {
   return (
     <div
       className="UnlinkServerModal modal is-active"
@@ -32,7 +32,7 @@ const UnlinkServerModal = ({ onSubmit, onClose, machineName }) => {
         </section>
 
         <footer className="modal-card-foot">
-          <button className="button is-danger" onClick={() => onSubmit()}>
+          <button className="button is-danger" onClick={() => onUnlink()}>
             Unlink server
           </button>
           <button className="button" type="button" onClick={() => onClose()}>
