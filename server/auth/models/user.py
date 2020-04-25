@@ -4,7 +4,7 @@ from flask_login import UserMixin
 from sqlalchemy import and_
 from sqlalchemy_utils import EmailType, PasswordType, URLType
 from wtforms.validators import Length
-from wtforms_validators import AlphaNumeric, DisposableEmail
+from wtforms_validators import AlphaNumeric
 
 from server import utils
 from server.extensions import db
@@ -25,9 +25,7 @@ class User(db.Model, UserMixin):
         nullable=False,
         info={"validators": [AlphaNumeric(), Length(min=4)]},
     )
-    email = db.Column(
-        EmailType, unique=True, nullable=False, info={"validators": DisposableEmail()}
-    )
+    email = db.Column(EmailType, unique=True, nullable=False)
     password = db.Column(
         PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"]),
         nullable=False,

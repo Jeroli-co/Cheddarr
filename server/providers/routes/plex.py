@@ -49,7 +49,6 @@ def update_config():
             payload=config_form.errors,
         )
     updated_config = config_form.data
-    print(updated_config)
     user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
     if not user_config:
         raise HTTPError(
