@@ -90,7 +90,7 @@ def get_recent_movies():
 
 @provider.route("/plex/movies/<movie_id>/", methods=["GET"])
 @login_required
-@cache.cached(timeout=600)
+@cache.memoize(timeout=600)
 def get_movie(movie_id):
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -118,7 +118,7 @@ def get_recent_series():
 
 @provider.route("/plex/series/<series_id>/", methods=["GET"])
 @login_required
-@cache.cached(timeout=180)
+@cache.memoize(timeout=180)
 def get_series(series_id):
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -148,7 +148,7 @@ def get_season(series_id, season_number):
     methods=["GET"],
 )
 @login_required
-@cache.cached(timeout=600)
+@cache.memoize(timeout=600)
 def get_episode(series_id, season_number, episode_number):
     plex_server = user_server(current_user)
     if plex_server is None:
