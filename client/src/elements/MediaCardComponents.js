@@ -204,6 +204,8 @@ const MediaCard = ({ media }) => {
                 <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
               )}
               {!media.isWatched && <p className="is-size-7">Unplayed</p>}
+              <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
+              <p className="is-size-7">{media.contentRating}</p>
               {movieDetails && (
                 <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
               )}
@@ -216,22 +218,23 @@ const MediaCard = ({ media }) => {
 
             <RowLayout childMargin="1%">
               {media.rating && (
-                <MediaDetailsRating>
+                <MediaDetailsRating
+                  data-tooltip={
+                    "Rating " + getRatingPercentage(media.rating) + "%"
+                  }
+                >
                   <CircularProgressbar
                     value={getRatingPercentage(media.rating)}
-                    text={`${getRatingPercentage(media.rating)}%`}
                     background
                     styles={buildStyles({
-                      textColor: "GhostWhite",
                       pathColor: getColorRating(
                         getRatingPercentage(media.rating)
                       ),
-                      backgroundColor: "#282a2d",
+                      backgroundColor: "rgba(40, 42, 45, .8)",
                     })}
                   />
                 </MediaDetailsRating>
               )}
-              {media.rating && <p>Rating</p>}
               <button
                 className="button is-plex-button"
                 type="button"
