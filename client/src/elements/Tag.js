@@ -5,7 +5,7 @@ const TagColor = {
   SUCCESS: { color: "#006500", bgColor: "#bcffb7" },
   DANGER: { color: "#800000", bgColor: "#ff9290" },
   WARNING: { color: "#805500", bgColor: "#ffe8a3" },
-  INFO: { color: "#4667ae", bgColor: "#d3e5ff" }
+  INFO: { color: "#4667ae", bgColor: "#d3e5ff" },
 };
 
 const TagStyle = styled.div`
@@ -21,15 +21,12 @@ const TagStyle = styled.div`
   background-color: ${(props) => props.type.bgColor};
 `;
 
-const Tag = ({ type, content, className }) => {
+const Tag = ({ type, content }) => {
   return (
     <TagStyle type={type}>
       <p>{content}</p>
     </TagStyle>
-  )
+  );
 };
 
-export {
-  Tag,
-  TagColor
-}
+export { Tag, TagColor };

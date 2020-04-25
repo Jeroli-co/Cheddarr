@@ -47,9 +47,10 @@ class PlexMovieSerializer(PlexVideoSerializer):
 
 class PlexEpisodeSerializer(PlexVideoSerializer):
     grandparentRatingKey = fields.String(data_key="seriesId")
+    grandparentTitle = fields.String(data_key="seriesTitle")
     seasonNumber = fields.Integer()
     index = fields.Integer(data_key="episodeNumber")
-    seasonPosterUrl = fields.Function(lambda ep: ep.url(ep.parentThumb))
+    seasonThumbUrl = fields.Function(lambda ep: ep.url(ep.parentThumb))
 
     @pre_dump
     def season_poster_url(self, episode, **kwargs):

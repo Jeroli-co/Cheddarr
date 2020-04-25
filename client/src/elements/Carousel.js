@@ -1,8 +1,12 @@
-import React, {useRef} from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
-import smoothscroll from 'smoothscroll-polyfill';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import smoothscroll from "smoothscroll-polyfill";
+
+const CarouselStyle = styled.div`
+  position: relative;
+`;
 
 const CarouselItems = styled.div`
   display: flex;
@@ -14,7 +18,7 @@ const CarouselItems = styled.div`
   ::-webkit-scrollbar {
     display: none;
   }
-`
+`;
 
 const PaginationTabs = styled.div`
   display: flex;
@@ -31,19 +35,18 @@ const PaginationButton = styled.button`
   border: 1px solid transparent;
   background: transparent;
   color: SlateGray;
-  opacity: .5;
-  transition: .6s ease;
+  opacity: 0.5;
+  transition: 0.6s ease;
 
   &:hover {
     color: white;
     background: rgba(0, 0, 0, 0.5);
     border-radius: 50%;
-    opacity: .6;
+    opacity: 0.6;
   }
 `;
 
 const Carousel = ({ children }) => {
-
   smoothscroll.polyfill();
 
   const scrollRef = useRef();
@@ -52,42 +55,36 @@ const Carousel = ({ children }) => {
     scrollRef.current.scrollBy({
       top: 0,
       left: -300,
-      behavior: 'smooth'
-    })
+      behavior: "smooth",
+    });
   };
 
   const _onSlideRight = () => {
     scrollRef.current.scrollBy({
       top: 0,
       left: 300,
-      behavior: 'smooth'
-    })
+      behavior: "smooth",
+    });
   };
 
   return (
-    <div>
-
-      <CarouselItems ref={scrollRef}>
-        { children.map((child, index) => <div key={index}>{child}</div>) }
-      </CarouselItems>
+    <CarouselStyle>
+      <CarouselItems ref={scrollRef}>{children}</CarouselItems>
 
       <PaginationTabs>
         <PaginationButton onClick={() => _onSlideLeft()}>
           <span className="icon">
-            <FontAwesomeIcon icon={faAngleLeft} size="2x"/>
+            <FontAwesomeIcon icon={faAngleLeft} size="2x" />
           </span>
         </PaginationButton>
         <PaginationButton onClick={() => _onSlideRight()}>
           <span className="icon">
-            <FontAwesomeIcon icon={faAngleRight} size="2x"/>
+            <FontAwesomeIcon icon={faAngleRight} size="2x" />
           </span>
         </PaginationButton>
       </PaginationTabs>
-
-    </div>
+    </CarouselStyle>
   );
 };
 
-export {
-  Carousel
-}
+export { Carousel };

@@ -3,19 +3,36 @@ import { usePlex } from "../hooks/usePlex";
 import { Carousel } from "../elements/Carousel";
 import { Spinner } from "../elements/Spinner";
 import styled from "styled-components";
-import {MediaPreviewCardStyle} from "../elements/medias/MediaPreviewCard";
+import { MediaPreviewCardStyle } from "../elements/medias/MediaPreviewCard";
+import { Modal } from "../elements/Modal";
+import { SeriesDetailsCard } from "../elements/medias/SeriesDetailsCard";
 
 const Series = ({ series }) => {
+  const [isSeriesCardModalActive, setIsSeriesCardModalActive] = useState(false);
+
   return (
     <div className="Series">
-      <MediaPreviewCardStyle>
+      <MediaPreviewCardStyle onClick={() => setIsSeriesCardModalActive(true)}>
         <img
-          className="series-image"
-          src={series.posterUrl}
-          alt="Series poster"
+          className="media-image"
+          src={series.seasonThumbUrl}
+          alt={series.title}
         />
-        <p className="series-title">{series.title}</p>
+        <div className="media-title">
+          <div>
+            <p>{series.seriesTitle}</p>
+            <p>
+              S{series.seasonNumber} ・ E{series.episodeNumber}
+            </p>
+          </div>
+        </div>
       </MediaPreviewCardStyle>
+
+      {isSeriesCardModalActive && (
+        <Modal onClose={() => setIsSeriesCardModalActive(false)}>
+          <SeriesDetailsCard series={series} />
+        </Modal>
+      )}
     </div>
   );
 };
@@ -51,17 +68,13 @@ const SeriesRecentlyAdded = () => {
 
       {series && (
         <Carousel>
-          {series.map((series) => (
-            <Series key={series.title} series={series} />
+          {series.map((series, index) => (
+            <Series key={index} series={series} />
           ))}
         </Carousel>
       )}
 
-      {!series && (
-        <div className="content has-text-centered has-text-primary">
-          <Spinner />
-        </div>
-      )}
+      {!series && <Spinner color="primary" size="2x" justifyContent="center" />}
     </SeriesRecentlyAddedStyled>
   );
 };

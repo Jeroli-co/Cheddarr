@@ -2,30 +2,33 @@ import styled from "styled-components";
 
 const MediaPreviewCardStyle = styled.div`
   position: relative;
-  width: 220px;
-  height: 325px;
-  transition: .3s ease;
+  min-width: 10vw;
+  max-width: 10vw;
+  height: auto;
+  transition: 0.3s ease;
   border: 5px solid transparent;
+  border-radius: 12px;
 
   &:hover {
     border: 2px solid ${(props) => props.theme.primary};
     margin-left: 0.5em;
     margin-right: 0.5em;
 
-    .movie-title {
+    .media-title {
       visibility: visible;
     }
   }
 
-  .movie-image {
+  .media-image {
     display: block;
     width: 100%;
     height: 100%;
     opacity: 1;
     transition: opacity 0.6s ease;
+    border-radius: 12px;
   }
 
-  .movie-title {
+  .media-title {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,13 +41,12 @@ const MediaPreviewCardStyle = styled.div`
     transition: opacity 0.6s ease;
     visibility: hidden;
     color: white;
+    border-radius: 12px;
   }
 
-  &:hover .movie-title {
+  &:hover .media-title {
     background: rgba(0, 0, 0, 0.5);
   }
 `;
 
-export {
-  MediaPreviewCardStyle
-};
+export { MediaPreviewCardStyle };
