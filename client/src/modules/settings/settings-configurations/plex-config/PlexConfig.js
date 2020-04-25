@@ -120,14 +120,6 @@ const PlexConfig = ({ location }) => {
                     <label htmlFor="enabled">Enabled</label>
                   </div>
                 </div>
-
-                {isUnlinkServerModalActive && (
-                  <UnlinkServerModal
-                    machineName={config["machine_name"]}
-                    onUnlink={() => _onUnlinkPlexServer()}
-                    onClose={() => setIsUnlinkServerModalActive(false)}
-                  />
-                )}
               </RowLayout>
             )}
             {!isPlexServerLinked(config) && (
@@ -143,11 +135,19 @@ const PlexConfig = ({ location }) => {
             )}
             <SubmitPlexConfig isFormDirty={formState.dirty} />
           </form>
-
-          {isServersModalActive && (
-            <ServersModal onClose={() => setIsServersModalActive(false)} />
-          )}
         </div>
+      )}
+
+      {isServersModalActive && (
+        <ServersModal onClose={() => setIsServersModalActive(false)} />
+      )}
+
+      {isUnlinkServerModalActive && (
+        <UnlinkServerModal
+          machineName={config["machine_name"]}
+          onUnlink={() => _onUnlinkPlexServer()}
+          onClose={() => setIsUnlinkServerModalActive(false)}
+        />
       )}
     </div>
   );
