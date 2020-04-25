@@ -16,11 +16,9 @@ const ServersModal = ({ onClose }) => {
 
   const linkServer = () => {
     if (serverSelected) {
-      updatePlexServer(serverSelected["machine_id"], serverSelected.name).then(
-        (res) => {
-          if (res) onClose();
-        }
-      );
+      updatePlexServer(serverSelected.name).then((res) => {
+        if (res) onClose();
+      });
     }
   };
 
@@ -36,10 +34,7 @@ const ServersModal = ({ onClose }) => {
             <input
               type="radio"
               name={server.name}
-              checked={
-                serverSelected &&
-                server["machine_id"] === serverSelected["machine_id"]
-              }
+              checked={serverSelected && server.name === serverSelected.name}
               onChange={_onChange}
             />
           </div>

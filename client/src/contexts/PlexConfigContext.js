@@ -1,12 +1,11 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
-import {useApi} from "../hooks/useApi";
-import {AuthContext} from "./AuthContext";
-import {NotificationContext} from "./NotificationContext";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useApi } from "../hooks/useApi";
+import { AuthContext } from "./AuthContext";
+import { NotificationContext } from "./NotificationContext";
 
 const PlexConfigContext = createContext();
 
 const PlexConfigContextProvider = (props) => {
-
   const [config, setConfig] = useState(null);
 
   const providerUrl = "/provider/plex/";
@@ -16,7 +15,9 @@ const PlexConfigContextProvider = (props) => {
   const { pushSuccess } = useContext(NotificationContext);
 
   useEffect(() => {
-    getPlexConfig().then(data => { if (data) setConfig(data) });
+    getPlexConfig().then((data) => {
+      if (data) setConfig(data);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -42,16 +43,18 @@ const PlexConfigContextProvider = (props) => {
     }
   };
 
-  const updatePlexServer = async (machineId, machineName) => {
-    return await updateConfig({"machine_id": machineId, "machine_name": machineName});
+  const updatePlexServer = async (machineName) => {
+    return await updateConfig({
+      machine_name: machineName,
+    });
   };
 
   const updateConfig = async (newConfig) => {
-    const fd = new FormData();
-    Object.keys(newConfig).forEach(key => {
-      fd.append(key, newConfig[key])
-    });
-    const res = await executeRequest(methods.PATCH, providerUrl + "config/", fd);
+    const res = await executeRequest(
+      methods.PATCH,
+      providerUrl + "config/",
+      newConfig
+    );
     switch (res.status) {
       case 200:
         setConfig(res.data);
@@ -64,19 +67,17 @@ const PlexConfigContextProvider = (props) => {
   };
 
   return (
-    <PlexConfigContext.Provider value={{
-      config,
-      updateConfig,
-      updatePlexServer,
-      getPlexServers
-    }}>
-      { props.children }
+    <PlexConfigContext.Provider
+      value={{
+        config,
+        updateConfig,
+        updatePlexServer,
+        getPlexServers,
+      }}
+    >
+      {props.children}
     </PlexConfigContext.Provider>
-  )
+  );
+};
 
-}
-
-export {
-  PlexConfigContext,
-  PlexConfigContextProvider
-}
+export { PlexConfigContext, PlexConfigContextProvider };

@@ -8,6 +8,7 @@ import { SubmitPlexConfig } from "./elements/SubmitPlexConfig";
 import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
 import { Spinner } from "../../../../elements/Spinner";
 import { RowLayout } from "../../../../elements/layouts";
+import { UnlinkServerModal } from "./elements/UnlinkServerModal";
 
 const isPlexAccountLinked = (config) => {
   return (
@@ -47,10 +48,21 @@ const LinkPlexAccount = ({ config, location }) => {
 };
 
 const PlexConfig = ({ location }) => {
-  const { config, updateConfig } = useContext(PlexConfigContext);
+  const { config, updateConfig, updatePlexServer } = useContext(
+    PlexConfigContext
+  );
   const [isServersModalActive, setIsServersModalActive] = useState(false);
+  const [isUnlinkServerModalActive, setIsUnlinkServerModalActive] = useState(
+    false
+  );
 
   const { register, handleSubmit, formState, reset } = useForm();
+
+  const _onUnlinkPlexServer = () => {
+    updatePlexServer(null).then((res) => {
+      if (res) setIsUnlinkServerModalActive(false);
+    });
+  };
 
   const _onSubmit = (data) => {
     let newConfig = {};
@@ -93,7 +105,7 @@ const PlexConfig = ({ location }) => {
                 <button
                   type="button"
                   className="button is-small is-rounded is-danger"
-                  onClick={() => console.log("UNLINK SERVER")}
+                  onClick={() => setIsUnlinkServerModalActive(true)}
                 >
                   <FontAwesomeIcon icon={faTrash} />
                 </button>
@@ -110,6 +122,14 @@ const PlexConfig = ({ location }) => {
                     <label htmlFor="enabled">Enabled</label>
                   </div>
                 </div>
+
+                {isUnlinkServerModalActive && (
+                  <UnlinkServerModal
+                    machineName={config["machine_name"]}
+                    onSubmit={() => _onUnlinkPlexServer()}
+                    onClose={() => setIsUnlinkServerModalActive(false)}
+                  />
+                )}
               </RowLayout>
             )}
             {!isPlexServerLinked(config) && (
