@@ -78,9 +78,7 @@ class PlexSeriesSerializer(PlexVideoSerializer):
         return series
 
 
-plex_movies_serializer = PlexMovieSerializer(many=True)
-plex_movie_serializer = PlexMovieSerializer()
+plex_movies_serializer = PlexMovieSerializer()
 plex_series_serializer = PlexSeriesSerializer()
-plex_season_serializer = PlexSeasonSerializer()
-plex_episodes_serializer = PlexEpisodeSerializer(many=True)
-plex_episode_serializer = PlexEpisodeSerializer()
+plex_seasons_serializer = PlexSeasonSerializer()
+plex_episodes_serializer = PlexEpisodeSerializer()

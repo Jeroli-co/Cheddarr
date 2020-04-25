@@ -9,3 +9,4 @@ class PlexConfigSerializer(ma.SQLAlchemyAutoSchema):
 
 
 plex_config_serializer = PlexConfigSerializer()
+provider_status_serializer = PlexConfigSerializer(only=["enabled"])

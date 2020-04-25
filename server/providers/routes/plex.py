@@ -13,14 +13,13 @@ from server.providers.models import PlexConfig
 from server.providers.routes import provider
 from server.providers.serializers.media_serializer import (
     plex_movies_serializer,
-    plex_movie_serializer,
     plex_series_serializer,
-    plex_season_serializer,
+    plex_seasons_serializer,
     plex_episodes_serializer,
-    plex_episode_serializer,
 )
 from server.providers.serializers.provider_config_serializer import (
     plex_config_serializer,
+    provider_status_serializer,
 )
 from server.providers.utils.plex import user_server, library_sections
 
@@ -30,6 +29,13 @@ from server.providers.utils.plex import user_server, library_sections
 def get_user_config():
     plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
     return plex_config_serializer.jsonify(plex_user_config), HTTPStatus.OK
+
+
+@provider.route("/plex/config/status/", methods=["GET"])
+@login_required
+def get_user_config_status():
+    plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
+    return provider_status_serializer.dump(plex_user_config), HTTPStatus.OK
 
 
 @provider.route("/plex/config/", methods=["PATCH"])
@@ -80,7 +86,7 @@ def get_recent_movies():
         for section in movie_sections
         for movie in section.recentlyAdded(maxresults=20)
     ]
-    return plex_movies_serializer.jsonify(recent_movies), HTTPStatus.OK
+    return plex_movies_serializer.jsonify(recent_movies, many=True), HTTPStatus.OK
 
 
 @provider.route("/plex/movies/<movie_id>/", methods=["GET"])
@@ -89,7 +95,7 @@ def get_movie(movie_id):
     plex_server = user_server(current_user)
     movie = plex_server.fetchItem(ekey=int(movie_id))
     movie.reload()
-    return plex_movie_serializer.jsonify(movie), HTTPStatus.OK
+    return plex_movies_serializer.jsonify(movie), HTTPStatus.OK
 
 
 @provider.route("/plex/series/recent/", methods=["GET"])
@@ -104,7 +110,7 @@ def get_recent_series():
         for series in section.recentlyAdded(maxresults=20)
     ]
 
-    return plex_episodes_serializer.jsonify(recent_series), HTTPStatus.OK
+    return plex_episodes_serializer.jsonify(recent_series, many=True), HTTPStatus.OK
 
 
 @provider.route("/plex/series/<series_id>/", methods=["GET"])
@@ -125,7 +131,7 @@ def get_season(series_id, season_number):
     series = plex_server.fetchItem(ekey=int(series_id))
     season = series.episode(season=int(season_number))
     season.reload()
-    return plex_season_serializer.jsonify(season), HTTPStatus.OK
+    return plex_seasons_serializer.jsonify(season), HTTPStatus.OK
 
 
 @provider.route(
@@ -138,7 +144,7 @@ def get_episode(series_id, season_number, episode_number):
     series = plex_server.fetchItem(ekey=int(series_id))
     episode = series.episode(season=int(season_number), episode=int(episode_number))
     episode.reload()
-    return plex_episode_serializer.jsonify(episode), HTTPStatus.OK
+    return plex_episodes_serializer.jsonify(episode), HTTPStatus.OK
 
 
 @provider.route("/plex/onDeck/", methods=["GET"])

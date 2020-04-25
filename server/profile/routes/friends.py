@@ -6,10 +6,7 @@ from server.auth.models import User
 from server.exceptions import HTTPError
 from server.profile.forms import UsernameOrEmailForm
 from server.profile.routes import profile
-from server.profile.serializers.profile_serializer import (
-    profile_serializer,
-    profiles_serializer,
-)
+from server.profile.serializers.profile_serializer import profiles_serializer
 
 
 @profile.route("/friends/<username>/", methods=["GET"])
@@ -19,25 +16,34 @@ def get_friend(username):
     if not user or not current_user.is_friend(user):
         raise HTTPError("The user does not exist.", status_code=HTTPStatus.NOT_FOUND)
 
-    return profile_serializer.jsonify(user), HTTPStatus.OK
+    return profiles_serializer.jsonify(user), HTTPStatus.OK
 
 
 @profile.route("/friends/", methods=["GET"])
 @login_required
 def get_friends():
-    return profiles_serializer.jsonify(current_user.get_friendships()), HTTPStatus.OK
+    return (
+        profiles_serializer.jsonify(current_user.get_friendships(), many=True),
+        HTTPStatus.OK,
+    )
 
 
 @profile.route("/friends/received/", methods=["GET"])
 @login_required
 def get_received():
-    return profiles_serializer.jsonify(current_user.get_pending_received()), HTTPStatus.OK
+    return (
+        profiles_serializer.jsonify(current_user.get_pending_received(), many=True),
+        HTTPStatus.OK,
+    )
 
 
 @profile.route("/friends/requested/", methods=["GET"])
 @login_required
 def get_requested():
-    return profiles_serializer.jsonify(current_user.get_pending_requested()), HTTPStatus.OK
+    return (
+        profiles_serializer.jsonify(current_user.get_pending_requested(), many=True),
+        HTTPStatus.OK,
+    )
 
 
 @profile.route("/friends/", methods=["POST"])
@@ -63,7 +69,7 @@ def add_friend():
         )
     current_user.add_friendship(friend)
 
-    return profile_serializer.jsonify(friend), HTTPStatus.CREATED
+    return profiles_serializer.jsonify(friend), HTTPStatus.CREATED
 
 
 @profile.route("/friends/<username>/", methods=["DELETE"])
@@ -95,4 +101,4 @@ def accept_friend(username):
         )
 
     current_user.confirm_friendship(friend)
-    return profile_serializer.jsonify(friend), HTTPStatus.OK
+    return profiles_serializer.jsonify(friend), HTTPStatus.OK
