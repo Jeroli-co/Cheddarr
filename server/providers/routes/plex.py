@@ -1,10 +1,9 @@
-import xml.etree.ElementTree as ET
 from http import HTTPStatus
 
-import requests
 from flask import jsonify
 from flask_login import current_user, login_required
 from plexapi.myplex import MyPlexAccount
+from plexapi.video import Movie
 
 from server.exceptions import HTTPError
 from server.extensions import cache
@@ -64,11 +63,11 @@ def get_user_servers():
     plex_config = PlexConfig.find(current_user)
     api_key = plex_config.provider_api_key
     plex_account = MyPlexAccount(api_key)
-    r = requests.get(
-        plex_account.PLEXSERVERS.format(machineId=""), headers={"X-PLEX-TOKEN": api_key}
-    )
-    root = ET.fromstring(r.content)
-    servers = [{"name": child.attrib["name"]} for child in root]
+    servers = [
+        {"name": resource.name, "machine_id": resource.clientIdentifier}
+        for resource in plex_account.resources()
+        if resource.provides == "server"
+    ]
     return jsonify(servers), HTTPStatus.OK
 
 
@@ -102,7 +101,7 @@ def get_movie(movie_id):
 
 @provider.route("/plex/series/recent/", methods=["GET"])
 @login_required
-@cache.cached(timeout=180)
+@cache.memoize(timeout=180)
 def get_recent_series():
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -132,7 +131,7 @@ def get_series(series_id):
     "/plex/series/<series_id>/seasons/<season_number>/", methods=["GET"],
 )
 @login_required
-@cache.cached(timeout=180)
+@cache.memoize(timeout=180)
 def get_season(series_id, season_number):
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -161,10 +160,16 @@ def get_episode(series_id, season_number, episode_number):
 
 @provider.route("/plex/onDeck/", methods=["GET"])
 @login_required
-@cache.cached(timeout=180)
+@cache.memoize(timeout=180)
 def get_on_deck():
     plex_server = user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     on_deck = plex_server.library.onDeck()
-    return plex_episodes_serializer.jsonify(on_deck, many=True), HTTPStatus.OK
+    on_deck = [
+        plex_movies_serializer.dump(media)
+        if isinstance(media, Movie)
+        else plex_episodes_serializer.dump(media)
+        for media in on_deck
+    ]
+    return jsonify(on_deck), HTTPStatus.OK

@@ -34,6 +34,7 @@ class ProviderConfig(db.Model):
 class PlexConfig(ProviderConfig):
     id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
     plex_user_id = db.Column(db.Integer, unique=True, nullable=False)
+    machine_id = db.Column(db.String(64))
     machine_name = db.Column(db.String(64))
 
     __mapper_args__ = {"polymorphic_identity": "plex"}

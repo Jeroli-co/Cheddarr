@@ -16,7 +16,10 @@ const ServersModal = ({ onClose }) => {
 
   const linkServer = () => {
     if (serverSelected) {
-      updateConfig({ machine_name: serverSelected.name }).then((res) => {
+      updateConfig({
+        machine_name: serverSelected.name,
+        machine_id: serverSelected.machine_id,
+      }).then((res) => {
         if (res) onClose();
       });
     }
