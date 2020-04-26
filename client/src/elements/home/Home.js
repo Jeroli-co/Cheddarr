@@ -44,7 +44,7 @@ const Home = () => {
     );
   } else if (isPlexEnabled.enabled) {
     return (
-      <div>
+      <div className="noselect">
         <MediaRecentlyAdded type="onDeck" />
         <MediaRecentlyAdded type="movies" />
         <MediaRecentlyAdded type="series" />

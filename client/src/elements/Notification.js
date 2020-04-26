@@ -1,39 +1,43 @@
-import React, {useContext} from "react";
-import {NotificationContext} from "../contexts/NotificationContext";
+import React, { useContext } from "react";
+import { NotificationContext } from "../contexts/NotificationContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import styled from "styled-components";
+
+const NotificationStyle = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+  color: ${(props) => props.color};
+  background-color: ${(props) => props.backgroundColor};
+  padding: 10px;
+  margin-bottom: 5px;
+  min-width: 30vw;
+  min-height: 5%;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 const Notification = ({ notification }) => {
-
   const { removeNotification } = useContext(NotificationContext);
 
-  if (!notification)
-    return <div/>;
-
-  const columnsStyle = {
-    position: "fixed",
-    bottom: "10px",
-    right: "10px",
-    left: "10px",
-    zIndex: 150
-  };
-
-  const style = {
-    color: notification.level.color,
-    backgroundColor: notification.level.bgColor
-  };
+  if (!notification) return <div />;
 
   return (
-    <div className="columns" style={columnsStyle}>
-      <div className="column is-one-third-desktop is-offset-one-third-desktop is-two-thirds-tablet is-offset-one-third-tablet">
-        <div className="notification" style={style}>
-          <button className="delete" onClick={removeNotification}/>
-          { notification.message }
-        </div>
+    <NotificationStyle
+      color={notification.level.color}
+      backgroundColor={notification.level.bgColor}
+    >
+      {notification.message}
+      <div className="is-pointed" onClick={removeNotification}>
+        <FontAwesomeIcon icon={faTimes} />
       </div>
-    </div>
+    </NotificationStyle>
   );
-
 };
 
-export {
-  Notification
-}
+export { Notification };

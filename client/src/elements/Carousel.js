@@ -1,12 +1,26 @@
-import React, { useRef } from "react";
-import styled from "styled-components";
+import React, { useEffect, useRef, useState } from "react";
+import styled, { css } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import smoothscroll from "smoothscroll-polyfill";
+import { RowLayout } from "./layouts";
 
 const CarouselStyle = styled.div`
   position: relative;
   max-width: 100%;
+
+  .pagination-button {
+    transition: 0.6s ease;
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  &:hover .pagination-button {
+    @media only screen and (min-width: 768px) {
+      visibility: visible;
+      opacity: 0.8;
+    }
+  }
 `;
 
 const CarouselItems = styled.div`
@@ -21,69 +35,94 @@ const CarouselItems = styled.div`
   }
 `;
 
-const PaginationTabs = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50px;
-`;
-
 const PaginationButton = styled.button`
-  display: flex;
+  position: absolute;
+  ${(props) =>
+    props.direction === "left" &&
+    css`
+      left: 0;
+    `}
+  ${(props) =>
+    props.direction === "right" &&
+    css`
+      right: 0;
+    `}
+  display: ${(props) => (props.isNeeded ? "flex" : "none")};
   justify-content: center;
   align-items: center;
   margin: 1em;
+  min-width: 60px;
+  max-width: 60px;
+  height: 60px;
   border: 1px solid transparent;
-  background: transparent;
-  color: SlateGray;
-  opacity: 0.5;
-  transition: 0.6s ease;
-
-  &:hover {
-    color: white;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    opacity: 0.6;
-  }
+  background: ${(props) => props.theme.dark};
+  color: white;
+  border-radius: 50%;
+  z-index: 1;
 `;
 
 const Carousel = ({ children }) => {
   smoothscroll.polyfill();
 
   const scrollRef = useRef();
+  const [isButtonsNeeded, setIsButtonNeeded] = useState(false);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      setIsButtonNeeded(scrollRef.current.scrollWidth > window.innerWidth);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const _onSlideLeft = () => {
+    const left =
+      scrollRef.current.scrollLeft > 0
+        ? -((window.innerWidth + window.innerHeight) * 30) / 100
+        : scrollRef.current.scrollWidth;
+
     scrollRef.current.scrollBy({
       top: 0,
-      left: -500,
+      left: left,
       behavior: "smooth",
     });
   };
 
   const _onSlideRight = () => {
+    const left =
+      scrollRef.current.scrollLeft + window.innerWidth <
+      scrollRef.current.scrollWidth
+        ? ((window.innerWidth + window.innerHeight) * 30) / 100
+        : -scrollRef.current.scrollWidth;
+
     scrollRef.current.scrollBy({
       top: 0,
-      left: 500,
+      left: left,
       behavior: "smooth",
     });
   };
 
   return (
     <CarouselStyle>
-      <CarouselItems ref={scrollRef}>{children}</CarouselItems>
+      <RowLayout>
+        <PaginationButton
+          className="pagination-button"
+          isNeeded={isButtonsNeeded}
+          direction="left"
+          onClick={() => _onSlideLeft()}
+        >
+          <FontAwesomeIcon icon={faAngleLeft} size="4x" />
+        </PaginationButton>
+        <PaginationButton
+          className="pagination-button"
+          isNeeded={isButtonsNeeded}
+          direction="right"
+          onClick={() => _onSlideRight()}
+        >
+          <FontAwesomeIcon icon={faAngleRight} size="4x" />
+        </PaginationButton>
 
-      <PaginationTabs>
-        <PaginationButton onClick={() => _onSlideLeft()}>
-          <span className="icon">
-            <FontAwesomeIcon icon={faAngleLeft} size="2x" />
-          </span>
-        </PaginationButton>
-        <PaginationButton onClick={() => _onSlideRight()}>
-          <span className="icon">
-            <FontAwesomeIcon icon={faAngleRight} size="2x" />
-          </span>
-        </PaginationButton>
-      </PaginationTabs>
+        <CarouselItems ref={scrollRef}>{children}</CarouselItems>
+      </RowLayout>
     </CarouselStyle>
   );
 };

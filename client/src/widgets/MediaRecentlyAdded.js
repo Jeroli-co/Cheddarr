@@ -6,10 +6,9 @@ import { Carousel } from "../elements/Carousel";
 import { Spinner } from "../elements/Spinner";
 import styled from "styled-components";
 import { MediaPreview } from "../elements/MediaCardComponents";
+import { RowLayout } from "../elements/layouts";
 
-const MediaRecentlyAddedStyle = styled.section`
-  margin: 1em;
-`;
+const MediaRecentlyAddedStyle = styled.section``;
 
 const MediaRecentlyAdded = ({ type }) => {
   const {
@@ -41,30 +40,30 @@ const MediaRecentlyAdded = ({ type }) => {
 
   return (
     <MediaRecentlyAddedStyle data-testid="MediaRecentlyAdded">
-      <div className="is-pointed" onClick={() => setIsShow(!isShow)}>
-        <div className="level is-mobile">
-          <div className="level-left">
-            <div className="level-item content">
-              <p className="is-size-4 has-text-primary has-text-weight-semibold">
-                {type === "movies" && "Movies recently added"}
-                {type === "series" && "Series recently added"}
-                {type === "onDeck" && "On Deck"}
-              </p>
-            </div>
-          </div>
-          <div className="level-right">
-            <div className="level-item">
-              <p className="is-size-4 has-text-primary has-text-weight-semibold">
-                {(isShow && (
-                  <FontAwesomeIcon icon={faAngleDown} size="lg" />
-                )) || <FontAwesomeIcon icon={faAngleRight} size="lg" />}
-              </p>
-            </div>
-          </div>
-        </div>
+      <div
+        className={!medias ? "" : "is-pointed"}
+        onClick={medias ? () => setIsShow(!isShow) : null}
+      >
+        <RowLayout
+          align-items="center"
+          marginBottom="1%"
+          childMargin="2%"
+          borderBottom="1px solid #f8813f"
+        >
+          <p className="is-size-4 has-text-primary has-text-weight-semibold">
+            {type === "movies" && "Movies recently added"}
+            {type === "series" && "Series recently added"}
+            {type === "onDeck" && "On Deck"}
+          </p>
+          {(!medias && <Spinner color="primary" justifyContent="center" />) || (
+            <p className="is-size-4 has-text-primary has-text-weight-semibold">
+              {(isShow && <FontAwesomeIcon icon={faAngleDown} />) || (
+                <FontAwesomeIcon icon={faAngleRight} />
+              )}
+            </p>
+          )}
+        </RowLayout>
       </div>
-
-      <div className="is-divider is-primary" />
 
       {medias && isShow && (
         <Carousel>
@@ -73,8 +72,6 @@ const MediaRecentlyAdded = ({ type }) => {
           ))}
         </Carousel>
       )}
-
-      {!medias && <Spinner color="primary" size="2x" justifyContent="center" />}
     </MediaRecentlyAddedStyle>
   );
 };

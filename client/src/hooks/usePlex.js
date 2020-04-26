@@ -17,7 +17,6 @@ const usePlex = () => {
     );
     switch (res.status) {
       case 200:
-        console.log(res);
         return !!res.data.enabled;
       default:
         return false;

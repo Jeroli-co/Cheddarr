@@ -6,6 +6,7 @@ const TagColor = {
   DANGER: { color: "#800000", bgColor: "#ff9290" },
   WARNING: { color: "#805500", bgColor: "#ffe8a3" },
   INFO: { color: "#4667ae", bgColor: "#d3e5ff" },
+  DARK: { color: "#525252", bgColor: "#e8e8e8" },
 };
 
 const TagStyle = styled.div`

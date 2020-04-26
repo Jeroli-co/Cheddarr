@@ -20,13 +20,18 @@ const MediaPreviewCardStyle = styled.div`
   position: relative;
   min-width: 10vw;
   max-width: 10vw;
-  height: auto;
+  min-height: 50px;
   transition: 0.3s ease;
-  border: 5px solid transparent;
-  border-radius: 12px;
+  margin-left: 0.2em;
+  margin-right: 0.2em;
+  border-radius: 1vw;
+
+  @media only screen and (max-width: 1024px) {
+    min-width: 30vw;
+    max-width: 30vw;
+  }
 
   &:hover {
-    border: 2px solid ${(props) => props.theme.primary};
     margin-left: 0.5em;
     margin-right: 0.5em;
 
@@ -41,7 +46,7 @@ const MediaPreviewCardStyle = styled.div`
     height: 100%;
     opacity: 1;
     transition: opacity 0.6s ease;
-    border-radius: 12px;
+    border-radius: 1vw;
   }
 
   .media-title {
@@ -57,10 +62,11 @@ const MediaPreviewCardStyle = styled.div`
     transition: opacity 0.6s ease;
     visibility: hidden;
     color: white;
-    border-radius: 12px;
+    border-radius: 1vw;
   }
 
   &:hover .media-title {
+    border: 2px solid ${(props) => props.theme.primary};
     background: rgba(0, 0, 0, 0.5);
   }
 `;
@@ -95,7 +101,7 @@ const MediaDetailsCardBackgroundImage = styled.div`
   background-position: center;
   background-size: cover;
   border-radius: 12px;
-  opacity: .4;
+  opacity: .2;
   z-index: -1;
 `;
 
@@ -110,7 +116,7 @@ const MediaDetailsCard = ({ children, artUrl }) => {
 };
 
 const MediaDetailsPoster = styled.img`
-  width: 100%;
+  width: 25%;
   height: auto;
   border-radius: 12px;
 `;
@@ -123,10 +129,6 @@ const MediaDetailsRating = styled.div`
   width: 60px;
   height: 60px;
   background-color: ${(props) => props.backgroundColor};
-`;
-
-const Actor = styled.div`
-  padding: 1%;
 `;
 
 const ActorPicture = styled.img`
@@ -153,11 +155,11 @@ const ActorInitials = styled.div`
 
 const Actors = ({ actors }) => {
   return (
-    <RowLayout>
-      <Carousel>
+    <Carousel>
+      <RowLayout childMarginRight="1%" alignItems="flex-start">
         {actors &&
           actors.map((actor) => (
-            <Actor key={actor.name}>
+            <div>
               {actor.thumbUrl ? (
                 <ActorPicture src={actor.thumbUrl} alt="" />
               ) : (
@@ -169,10 +171,10 @@ const Actors = ({ actors }) => {
                 <p className="is-size-7">{actor.name}</p>
                 <p className="is-size-7 has-text-weight-light">{actor.role}</p>
               </div>
-            </Actor>
+            </div>
           ))}
-      </Carousel>
-    </RowLayout>
+      </RowLayout>
+    </Carousel>
   );
 };
 
@@ -192,42 +194,61 @@ const MediaCard = ({ media }) => {
   return (
     <MediaDetailsCard artUrl={media.artUrl}>
       <RowLayout alignItems="flex-start" childMargin="1%">
-        <ColumnLayout width="25%">
-          <MediaDetailsPoster src={media.thumbUrl} alt={media.title} />
-        </ColumnLayout>
-
-        <ColumnLayout justifyContent="space-around" width="75%" height="100%">
+        <MediaDetailsPoster src={media.thumbUrl} alt={media.title} />
+        <ColumnLayout justifyContent="space-around" height="100%">
           <ColumnLayout>
             {media.type === "movie" && (
-              <p className="is-size-2">{media.title}</p>
+              <p className="is-size-2-desktop is-size-4-tablet is-size-6-mobile">
+                {media.title}
+              </p>
             )}
             {media.type === "episode" && (
-              <p className="is-size-2">
+              <p className="is-size-2 is-size-4-tablet is-size-6-mobile">
                 S{media.seasonNumber}・E{media.episodeNumber} - {media.title}
               </p>
             )}
             <RowLayout wrap="wrap" childMarginRight="1%">
-              <p className="is-size-7" data-tooltip="Released">
+              <p
+                className="is-size-7"
+                style={{ cursor: "default" }}
+                data-tooltip="Released"
+              >
                 {media.releaseDate}
               </p>
               <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
-              <p className="is-size-7" data-tooltip="Duration">
+              <p
+                className="is-size-7"
+                style={{ cursor: "default" }}
+                data-tooltip="Duration"
+              >
                 {msToHoursMinutes(media.duration)}
               </p>
               <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
-              <p className="is-size-7" data-tooltip="Content rating">
+              <p
+                className="is-size-7"
+                style={{ cursor: "default" }}
+                data-tooltip="Content rating"
+              >
                 {media.contentRating}
               </p>
-              {!media.isWatched && (
-                <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
-              )}
-              {!media.isWatched && <p className="is-size-7">Unplayed</p>}
             </RowLayout>
 
-            <RowLayout childMargin="1%">
+            {!media.isWatched && (
+              <RowLayout childMarginTop="1%" childMarginBottom="1%">
+                <Tag type={TagColor.DARK} content="Unplayed" />
+              </RowLayout>
+            )}
+
+            <RowLayout
+              childMarginTop="1%"
+              childMarginBottom="1%"
+              childMarginRight="3%"
+              wrap="wrap"
+            >
               {media.rating && (
                 <MediaDetailsRating
                   data-tooltip="Rating"
+                  style={{ cursor: "default" }}
                   backgroundColor={getColorRating(
                     getRatingPercentage(media.rating)
                   )}
@@ -248,7 +269,7 @@ const MediaCard = ({ media }) => {
             </RowLayout>
           </ColumnLayout>
 
-          <RowLayout childMarginTop="1%">
+          <RowLayout className="is-summary-desktop" childMarginTop="1%">
             <ColumnLayout>
               <div className="is-size-5">Overview</div>
               <div className="is-size-6">{media.summary}</div>
@@ -257,59 +278,51 @@ const MediaCard = ({ media }) => {
 
           {media.type === "movie" && <br />}
           {media.type === "movie" && (
-            <ColumnLayout>
-              <RowLayout alignItems="flex-start" childMarginRight="2%">
-                <div>
-                  <p className="is-size-6">Directed</p>
-                  {media.directors.map((director, index) => (
-                    <p className="is-size-7" key={index}>
-                      {director.name +
-                        (index + 1 === media.directors.length ? "" : ", ")}
-                    </p>
-                  ))}
-                </div>
-                <div>
-                  <p className="is-size-6">Studio</p>
-                  <p className="is-size-7">{media.studio}</p>
-                </div>
-
-                <div>
-                  <p className="is-size-6">
-                    Genres{" "}
-                    {media.type === "movie" && !movieDetails && <Spinner />}
+            <RowLayout alignItems="flex-start" childMarginRight="2%">
+              <div>
+                <p className="is-size-6">Directed</p>
+                {media.directors.map((director, index) => (
+                  <p className="is-size-7" key={index}>
+                    {director.name +
+                      (index + 1 === media.directors.length ? "" : ", ")}
                   </p>
-                  {movieDetails && (
-                    <RowLayout
-                      childMarginTop="1%"
-                      childMarginBottom="1%"
-                      childMarginRight="1%"
-                    >
-                      {movieDetails.genres.map((genre, index) => (
-                        <Tag
-                          key={index}
-                          type={TagColor.INFO}
-                          content={genre.name}
-                        />
-                      ))}
-                    </RowLayout>
-                  )}
-                </div>
-              </RowLayout>
-            </ColumnLayout>
+                ))}
+              </div>
+
+              <div>
+                <p className="is-size-6">Studio</p>
+                <p className="is-size-7">{media.studio}</p>
+              </div>
+
+              <ColumnLayout>
+                <p className="is-size-6">Genres</p>
+                <RowLayout childMarginRight="1%" wrap="wrap">
+                  {media.type === "movie" && !movieDetails && <Spinner />}
+                  {movieDetails &&
+                    movieDetails.genres.map((genre, index) => (
+                      <Tag
+                        key={index}
+                        type={TagColor.INFO}
+                        content={genre.name}
+                      />
+                    ))}
+                </RowLayout>
+              </ColumnLayout>
+            </RowLayout>
           )}
         </ColumnLayout>
       </RowLayout>
 
       {media.type === "movie" && (
-        <RowLayout childMargin="1%">
-          <ColumnLayout>
+        <ColumnLayout>
+          <RowLayout childMarginLeft="1%" childMarginBottom="1%">
             <p className="is-size-6">
               Actors{" "}
               {!movieDetails && <FontAwesomeIcon icon={faSpinner} pulse />}
             </p>
-            {movieDetails && <Actors actors={movieDetails.actors} />}
-          </ColumnLayout>
-        </RowLayout>
+          </RowLayout>
+          {movieDetails && <Actors actors={movieDetails.actors} />}
+        </ColumnLayout>
       )}
     </MediaDetailsCard>
   );

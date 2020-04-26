@@ -17,7 +17,7 @@ const RowLayout = styled.div`
   justify-content: ${(props) =>
     props.justifyContent ? props.justifyContent : "flex-start"};
   align-items: ${(props) => (props.alignItems ? props.alignItems : "center")};
-  width: 100%;
+  width: ${(props) => (props.width ? props.width : "100%")};
   border-bottom: ${(props) =>
     props.borderBottom ? props.borderBottom : "none"};
 
