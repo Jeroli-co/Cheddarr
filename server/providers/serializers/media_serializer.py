@@ -24,11 +24,7 @@ class PlexVideoSerializer(ma.Schema):
     thumbUrl = fields.URL()
     artUrl = fields.URL()
     summary = fields.String()
-    duration = fields.Integer()
     originallyAvailableAt = fields.Date(data_key="releaseDate")
-    actors = fields.Nested(PlexMediaTag, many=True)
-    studio = fields.String()
-    genres = fields.Nested(PlexMediaTag, many=True)
     rating = fields.Float()
     contentRating = fields.String()
     isWatched = fields.Boolean()
@@ -45,7 +41,17 @@ class PlexVideoSerializer(ma.Schema):
 
 
 class PlexMovieSerializer(PlexVideoSerializer):
+    duration = fields.Integer()
+    actors = fields.Nested(PlexMediaTag, many=True)
     directors = fields.Nested(PlexMediaTag, many=True)
+    studio = fields.String()
+    genres = fields.Nested(PlexMediaTag, many=True)
+
+    @pre_dump
+    def movie_actors(self, media, **kwargs):
+        del media.actors[25:]
+        print(media.actors)
+        return media
 
 
 class PlexEpisodeSerializer(PlexVideoSerializer):
@@ -54,6 +60,7 @@ class PlexEpisodeSerializer(PlexVideoSerializer):
     seasonNumber = fields.Integer()
     index = fields.Integer(data_key="episodeNumber")
     seasonThumbUrl = fields.Function(lambda ep: ep.url(ep.parentThumb))
+    duration = fields.Integer()
 
     @pre_dump
     def season_poster_url(self, episode, **kwargs):
@@ -75,11 +82,19 @@ class PlexSeasonSerializer(PlexVideoSerializer):
 
 class PlexSeriesSerializer(PlexVideoSerializer):
     seasons = fields.Nested(PlexSeasonSerializer, many=True, exclude=["episodes"])
+    actors = fields.Nested(PlexMediaTag, many=True)
+    studio = fields.String()
+    genres = fields.Nested(PlexMediaTag, many=True)
 
     @pre_dump
     def series_seasons(self, series, **kwargs):
         series.seasons = series.seasons()
         return series
+
+    @pre_dump
+    def series_actors(self, media, **kwargs):
+        del media.actors[25:]
+        return media
 
 
 plex_movies_serializer = PlexMovieSerializer()
