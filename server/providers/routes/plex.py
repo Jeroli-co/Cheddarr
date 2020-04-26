@@ -6,7 +6,6 @@ from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
 
 from server.exceptions import HTTPError
-from server.extensions import cache
 from server.providers.forms import PlexConfigForm
 from server.providers.models import PlexConfig
 from server.providers.routes import provider
@@ -73,7 +72,6 @@ def get_user_servers():
 
 @provider.route("/plex/movies/recent/", methods=["GET"])
 @login_required
-@cache.cached(timeout=180)
 def get_recent_movies():
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -89,7 +87,6 @@ def get_recent_movies():
 
 @provider.route("/plex/movies/<movie_id>/", methods=["GET"])
 @login_required
-@cache.memoize(timeout=600)
 def get_movie(movie_id):
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -101,7 +98,6 @@ def get_movie(movie_id):
 
 @provider.route("/plex/series/recent/", methods=["GET"])
 @login_required
-@cache.memoize(timeout=180)
 def get_recent_series():
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -117,7 +113,6 @@ def get_recent_series():
 
 @provider.route("/plex/series/<series_id>/", methods=["GET"])
 @login_required
-@cache.memoize(timeout=180)
 def get_series(series_id):
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -131,7 +126,6 @@ def get_series(series_id):
     "/plex/series/<series_id>/seasons/<season_number>/", methods=["GET"],
 )
 @login_required
-@cache.memoize(timeout=180)
 def get_season(series_id, season_number):
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -147,7 +141,6 @@ def get_season(series_id, season_number):
     methods=["GET"],
 )
 @login_required
-@cache.memoize(timeout=600)
 def get_episode(series_id, season_number, episode_number):
     plex_server = user_server(current_user)
     if plex_server is None:
@@ -160,7 +153,6 @@ def get_episode(series_id, season_number, episode_number):
 
 @provider.route("/plex/onDeck/", methods=["GET"])
 @login_required
-@cache.memoize(timeout=180)
 def get_on_deck():
     plex_server = user_server(current_user)
     if plex_server is None:
