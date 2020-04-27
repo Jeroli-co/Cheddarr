@@ -32,13 +32,14 @@ const ServersModal = ({ onClose }) => {
 
     return (
       <div className="level is-mobile">
-        <div className="level-left">
+        <div className="level-left is-pointed" onClick={_onChange}>
           <div className="level-item">
             <input
               type="radio"
               name={server.name}
               checked={serverSelected && server.name === serverSelected.name}
               onChange={_onChange}
+              className="is-pointed"
             />
           </div>
           <div className="level-item has-text-grey-dark">{server.name}</div>
