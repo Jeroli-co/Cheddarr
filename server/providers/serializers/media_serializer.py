@@ -50,7 +50,6 @@ class PlexMovieSerializer(PlexVideoSerializer):
     @pre_dump
     def movie_actors(self, media, **kwargs):
         del media.actors[25:]
-        print(media.actors)
         return media
 
 
