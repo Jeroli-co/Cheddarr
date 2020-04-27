@@ -65,6 +65,7 @@ const PlexConfig = ({ location }) => {
                   type="button"
                   className="button is-small is-rounded is-info"
                   onClick={() => setIsServersModalActive(true)}
+                  data-tooltip="Change server"
                 >
                   <FontAwesomeIcon icon={faEdit} />
                 </button>
@@ -72,6 +73,7 @@ const PlexConfig = ({ location }) => {
                   type="button"
                   className="button is-small is-rounded is-danger"
                   onClick={() => setIsUnlinkServerModalActive(true)}
+                  data-tooltip="Unlink server"
                 >
                   <FontAwesomeIcon icon={faTrash} />
                 </button>
