@@ -1,4 +1,4 @@
-import {keyframes} from "styled-components";
+import { keyframes } from "styled-components";
 
 const FadeInUp = (height) => {
   return keyframes`
@@ -7,7 +7,7 @@ const FadeInUp = (height) => {
       opacity: 0;
       margin-bottom: -${height}px;
     }
-    
+
     to {
       opacity: 1;
       visibility: visible;
@@ -18,12 +18,16 @@ const FadeInUp = (height) => {
 
 const FadeOutDown = (height) => {
   return keyframes`
-    from {
+    0% {
       opacity: 1;
       margin-bottom: 0px;
     }
-    
-    to {
+
+    50% {
+      opacity: .8;
+    }
+
+    100% {
       visibility: hidden;
       opacity: 0;
       margin-bottom: -${height}px;
@@ -37,7 +41,7 @@ const FadeIn = () => {
       visibility: visible;
       opacity: 0;
     }
-  
+
     to {
       visibility: visible;
       opacity: 1;
@@ -48,7 +52,7 @@ const FadeIn = () => {
 const FadeOut = () => {
   return keyframes`
     from {
-      opacity: 1; 
+      opacity: 1;
     }
 
     to {
@@ -58,9 +62,4 @@ const FadeOut = () => {
   `;
 };
 
-export {
-  FadeInUp,
-  FadeOutDown,
-  FadeIn,
-  FadeOut
-}
+export { FadeInUp, FadeOutDown, FadeIn, FadeOut };

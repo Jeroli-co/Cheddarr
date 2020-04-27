@@ -10,14 +10,14 @@ from server.exceptions import HTTPError
 from server.extensions import db, limiter
 from server.profile.forms import ChangePasswordForm, PictureForm, UsernameForm
 from server.profile.routes import profile
-from server.profile.serializers.profile_serializer import profile_serializer
+from server.profile.serializers.profile_serializer import profiles_serializer
 from server.tasks import send_email
 
 
 @profile.route("/", methods=["GET"])
 @login_required
 def get_profile():
-    return profile_serializer.jsonify(current_user), HTTPStatus.OK
+    return profiles_serializer.jsonify(current_user), HTTPStatus.OK
 
 
 @profile.route("/", methods=["DELETE"])

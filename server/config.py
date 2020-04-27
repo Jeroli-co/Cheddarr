@@ -58,8 +58,8 @@ class Config(object):
     ##########################################################################
     # celery                                                                 #
     ##########################################################################
-    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "localhost:5672")
-    CELERY_RESULT_BACKEND = "rpc://"
+    CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")
+    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 
 class ProdConfig(Config):
@@ -86,6 +86,13 @@ class ProdConfig(Config):
     ##########################################################################
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
+    ##########################################################################
+    # cache                                                                  #
+    ##########################################################################
+    CACHE_TYPE = "redis"
+    CACHE_REDIS_URL = os.environ.get("REDIS_URL", "localhost:6379")
+    CACHE_DEFAULT_TIMEOUT = 60
+
 
 class DevConfig(Config):
     ##########################################################################
@@ -98,6 +105,11 @@ class DevConfig(Config):
     ##########################################################################
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(PROJECT_ROOT, "dev.db")
 
+    ##########################################################################
+    # cache                                                                  #
+    ##########################################################################
+    CACHE_TYPE = "null"
+
 
 class TestConfig(Config):
     FLASK_DOMAIN = "localhost"
@@ -105,3 +117,4 @@ class TestConfig(Config):
     DEBUG = True
     SERVER_NAME = "localhost"
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    CACHE_TYPE = "null"

@@ -16,15 +16,15 @@ from server.config import (
     REACT_TEMPLATE_FOLDER,
 )
 from server.exceptions import HTTPError
-from server.extensions import celery, db, limiter, ma, mail, migrate
+from server.extensions import cache, celery, db, limiter, ma, mail, migrate
 from server.extensions.login_manager import register_login_manager
 
 
 def create_app():
     """Creates a pre-configured Flask application.
-    Defaults to using :class:`backend.config.ProdConfig`, unless the
+    Defaults to using :class:`server.config.ProdConfig`, unless the
     :envvar:`FLASK_DEBUG` environment variable is explicitly set to "true",
-    in which case it uses :class:`backend.config.DevConfig`. Also configures
+    in which case it uses :class:`server.config.DevConfig`. Also configures
     paths for the templates folder and static files.
     """
     dev = get_debug_flag()
@@ -49,6 +49,7 @@ def _create_app(config_object: Config, **kwargs):
     db.init_app(app)
     ma.init_app(app)
     limiter.init_app(app)
+    cache.init_app(app)
     mail.api_key = config_object.MAIL_SENDGRID_API_KEY
 
     """Security patches"""
@@ -103,10 +104,11 @@ def register_blueprints(app):
 
 def register_commands(app):
     """Register application's CLI commands"""
-    from server.commands import init_db, worker
+    from server.commands import init_db, worker, test
 
     app.cli.add_command(init_db)
     app.cli.add_command(worker)
+    app.cli.add_command(test)
 
 
 class CustomSessionInterface(SecureCookieSessionInterface):

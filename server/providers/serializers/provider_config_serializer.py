@@ -8,4 +8,5 @@ class PlexConfigSerializer(ma.SQLAlchemyAutoSchema):
         exclude = ("id", "provider_name", "plex_user_id")
 
 
-plex_serializer = PlexConfigSerializer()
+plex_config_serializer = PlexConfigSerializer()
+provider_status_serializer = PlexConfigSerializer(only=["enabled"])

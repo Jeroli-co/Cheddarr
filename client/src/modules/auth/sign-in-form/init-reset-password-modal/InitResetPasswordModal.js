@@ -1,27 +1,28 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {useForm} from "react-hook-form";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 import {AuthContext} from "../../../../contexts/AuthContext";
 import {FORM_DEFAULT_VALIDATOR} from "../../../../forms/formDefaultValidators";
+import {NotificationContext} from "../../../../contexts/NotificationContext";
 
 const InitResetPasswordModal = (props) => {
 
 		const { register, handleSubmit, errors } = useForm();
 		const { initResetPassword } = useContext(AuthContext);
-		const [httpResponse, setHttpResponse] = useState(null);
-		const [disableSendButton, setDisableSendButton] = useState(false);
+		const [httpError, setHttpError] = useState(null);
+    const { pushInfo } = useContext(NotificationContext);
 
 		const submitResetPassword = (data) => {
 		  initResetPassword(data).then(res => {
 		    if (res) {
 		      switch (res.status) {
             case 200:
-              setDisableSendButton(true);
-              setHttpResponse(res);
+              pushInfo("Check your email to change your password");
+              closeModal();
               return;
             default:
-              setHttpResponse(res);
+              setHttpError(res);
           }
         }
 		  });
@@ -30,11 +31,6 @@ const InitResetPasswordModal = (props) => {
 		const closeModal = () => {
 		  props.history.goBack();
     };
-
-		useEffect(() => {
-		  const timer = disableSendButton && setInterval(() => setDisableSendButton(false), 5000);
-      return () => clearInterval(timer);
-    }, [disableSendButton]);
 
 		return (
 			<div className="modal is-active">
@@ -74,15 +70,11 @@ const InitResetPasswordModal = (props) => {
                 )}
               </div>
 
-              { httpResponse && (
-                  (httpResponse.status === 200 && <p className="help is-success">{httpResponse.message}</p>) ||
-                  (httpResponse.status === 400 && <p className="help is-danger">{httpResponse.message}</p>)
-                )
-						  }
+              { httpError && <p className="help is-danger">{httpError.message}</p> }
 
             </section>
             <footer className="modal-card-foot">
-              <button className="button is-info" disabled={disableSendButton}>Reset password</button>
+              <button className="button is-info">Reset password</button>
               <button className="button" type="button" onClick={closeModal}>Cancel</button>
             </footer>
           </form>

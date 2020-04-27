@@ -1,3 +1,4 @@
+from .cache import cache
 from .celery import celery
 from .db import db, migrate
 from .limiter import limiter
