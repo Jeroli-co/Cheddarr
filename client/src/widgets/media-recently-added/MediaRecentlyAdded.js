@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { usePlex } from "../hooks/usePlex";
+import { usePlex } from "../../hooks/usePlex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleRight } from "@fortawesome/free-solid-svg-icons";
-import { Carousel } from "../elements/Carousel";
-import { Spinner } from "../elements/Spinner";
-import styled from "styled-components";
-import { MediaPreview } from "../elements/MediaCardComponents";
-import { RowLayout } from "../elements/layouts";
-
-const MediaRecentlyAddedStyle = styled.section``;
+import { Carousel } from "../../elements/Carousel";
+import { Spinner } from "../../elements/Spinner";
+import { RowLayout } from "../../elements/layouts";
+import { MediaExtendedCardLayout } from "./elements/MediaExtendedCardLayout";
+import { MediaPreview } from "./elements/MediaPreviewCard";
 
 const MediaRecentlyAdded = ({ type }) => {
   const {
@@ -18,6 +16,7 @@ const MediaRecentlyAdded = ({ type }) => {
   } = usePlex();
   const [medias, setMedias] = useState(null);
   const [isShow, setIsShow] = useState(true);
+  const [mediaSelectedIndex, setMediaSelectedIndex] = useState(-1);
 
   useEffect(() => {
     if (type === "movies") {
@@ -38,18 +37,22 @@ const MediaRecentlyAdded = ({ type }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onPreviewClick = (index) => {
+    setMediaSelectedIndex(index);
+  };
+
+  const collapseWidget = () => {
+    setIsShow(!isShow);
+    setMediaSelectedIndex(-1);
+  };
+
   return (
-    <MediaRecentlyAddedStyle data-testid="MediaRecentlyAdded">
+    <div data-testid="MediaRecentlyAdded">
       <div
         className={!medias ? "" : "is-pointed"}
-        onClick={medias ? () => setIsShow(!isShow) : null}
+        onClick={medias ? () => collapseWidget() : null}
       >
-        <RowLayout
-          align-items="center"
-          marginBottom="1%"
-          childMargin="2%"
-          borderBottom="1px solid #f8813f"
-        >
+        <RowLayout align-items="center" marginTop="2%" childMarginRight="5%">
           <p className="is-size-4 has-text-primary has-text-weight-semibold">
             {type === "movies" && "Movies recently added"}
             {type === "series" && "Series recently added"}
@@ -68,11 +71,25 @@ const MediaRecentlyAdded = ({ type }) => {
       {medias && isShow && (
         <Carousel>
           {medias.map((media, index) => (
-            <MediaPreview key={index} media={media} />
+            <div id={media.id} key={index}>
+              <MediaPreview
+                media={media}
+                isActive={mediaSelectedIndex === index}
+                oneIsActive={mediaSelectedIndex !== -1}
+                _onClick={() => onPreviewClick(index)}
+              />
+            </div>
           ))}
         </Carousel>
       )}
-    </MediaRecentlyAddedStyle>
+
+      {mediaSelectedIndex !== -1 && (
+        <MediaExtendedCardLayout
+          media={medias[mediaSelectedIndex]}
+          onClose={() => setMediaSelectedIndex(-1)}
+        />
+      )}
+    </div>
   );
 };
 

@@ -58,6 +58,7 @@ const PaginationButton = styled.button`
   background: ${(props) => props.theme.dark};
   color: white;
   border-radius: 50%;
+  cursor: pointer;
   z-index: 1;
 `;
 

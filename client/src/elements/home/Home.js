@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import "./Home.scss";
 import logo from "../../assets/cheddarr.png";
 import { AuthContext } from "../../contexts/AuthContext";
-import { MediaRecentlyAdded } from "../../widgets/MediaRecentlyAdded";
+import { MediaRecentlyAdded } from "../../widgets/media-recently-added/MediaRecentlyAdded";
 import { usePlex } from "../../hooks/usePlex";
 import { Link } from "react-router-dom";
 import { routes } from "../../router/routes";
