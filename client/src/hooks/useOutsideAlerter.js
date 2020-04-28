@@ -22,7 +22,7 @@ const useOutsideAlerter = (refs, onOutsideClick) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refs]);
+  }, [ref]);
 };
 
 export { useOutsideAlerter };

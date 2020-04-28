@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { routes } from "../../../router/routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,7 +9,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../../../contexts/AuthContext";
 import styled from "styled-components";
-import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
 import { UserDropdownImage } from "../elements/UserDropdownImage";
 
 const UserDropdownStyle = styled.div`
@@ -59,29 +58,19 @@ const DropdownMenuItemIcon = styled.div`
   margin-right: 1em;
 `;
 
-const UserDropdown = () => {
+const UserDropdown = ({ dropdownRef, isVisible, toggle }) => {
   const { userPicture, username, signOut } = useContext(AuthContext);
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const dropdownToggleRef = useRef(null);
-  const dropdownMenuRef = useRef(null);
-  useOutsideAlerter(dropdownMenuRef, dropdownToggleRef, () =>
-    setIsMenuVisible(false)
-  );
 
   return (
-    <UserDropdownStyle data-testid="UserDropdown">
-      <UserDropdownImage
-        ref={dropdownToggleRef}
-        className="is-pointed"
-        onClick={() => setIsMenuVisible(!isMenuVisible)}
-      >
+    <UserDropdownStyle ref={dropdownRef} data-testid="UserDropdown">
+      <UserDropdownImage className="is-pointed" onClick={() => toggle()}>
         {userPicture && (
           <img src={userPicture} alt="User" data-testid="UserDropdownPicture" />
         )}
         {!userPicture && <p data-testid="UserDropdownUsername">{username}</p>}
       </UserDropdownImage>
 
-      <DropdownMenuStyle ref={dropdownMenuRef} isVisible={isMenuVisible}>
+      <DropdownMenuStyle isVisible={isVisible}>
         <Link to={routes.USER_PROFILE.url} data-testid="UserProfileLink">
           <DropdownMenuItem>
             <DropdownMenuItemIcon>
