@@ -4,7 +4,6 @@ import { SignInButton } from "../../../modules/auth/elements/SignInButton";
 import { SignUpButton } from "../../../modules/auth/elements/SignUpButton";
 import { RowLayout } from "../../layouts";
 import { GitHubButton } from "../elements/GithubButton";
-import { UserDropdown } from "./UserDropdown";
 import { UserDropdownImage } from "../elements/UserDropdownImage";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { Link } from "react-router-dom";
@@ -15,11 +14,16 @@ import {
   faSignOutAlt,
   faUserCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import { SearchBar } from "../elements/SearchBar";
 
 const UserDropdownMobileStyle = styled.div`
   display: ${(props) => (props.isVisible ? "block" : "none")};
   background-color: ${(props) => props.theme.primary};
   width: 100%;
+
+  @media only screen and (min-width: 600px) {
+    display: none;
+  }
 `;
 
 const DropdownMenuMobileStyle = styled.div`
@@ -46,10 +50,18 @@ const DropdownMenuMobileItem = styled.div`
   }
 `;
 
-const UserDropdownMobile = ({ isVisible, isAuthenticated, isLoading }) => {
+const UserDropdownMobile = ({
+  dropdownRef,
+  isVisible,
+  isAuthenticated,
+  isLoading,
+}) => {
   const { userPicture, username, signOut } = useContext(AuthContext);
   return (
-    <UserDropdownMobileStyle isVisible={isVisible}>
+    <UserDropdownMobileStyle ref={dropdownRef} isVisible={isVisible}>
+      <RowLayout padding="1%" justifyContent="center" alignItems="center">
+        <SearchBar />
+      </RowLayout>
       <RowLayout
         padding="10px"
         justifyContent="space-between"
