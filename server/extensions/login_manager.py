@@ -5,7 +5,7 @@ from server.exceptions import Unauthorized
 
 
 def register_login_manager(app):
-    from server.auth.models.user import User
+    from server.auth.models import User
 
     login_manager.init_app(app)
 

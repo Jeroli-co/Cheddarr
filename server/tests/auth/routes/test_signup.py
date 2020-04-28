@@ -1,5 +1,5 @@
 from flask import url_for
-from server.auth.models.user import User
+from server.auth.models import User
 from server.tests.conftest import user1_username, user1_password, user1_email
 
 
