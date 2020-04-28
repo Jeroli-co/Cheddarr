@@ -1,5 +1,4 @@
-import React, { useContext, useState } from "react";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
+import React, { useContext, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import logo from "../../assets/cheddarr-small.png";
@@ -12,6 +11,7 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { GitHubButton } from "./elements/GithubButton";
 import { UserDropdownMobile } from "./user-dropdown/UserDropdownMobile";
 import { SearchBar } from "./elements/SearchBar";
+import { useOutsideAlerter } from "../../hooks/useOutsideAlerter";
 
 const NavbarLogoKeyframes = () => {
   return keyframes`
@@ -96,9 +96,16 @@ const NavbarBurgerStyle = styled.div`
   }
 `;
 
-const NavbarBurger = ({ onClick }) => {
+const SearchBarDesktop = styled.div`
+  width: 50%;
+  @media only screen and (max-width: 600px) {
+    display: none;
+  }
+`;
+
+const NavbarBurger = ({ toggle, burgerRef }) => {
   return (
-    <NavbarBurgerStyle onClick={onClick}>
+    <NavbarBurgerStyle ref={burgerRef} onClick={() => toggle()}>
       <FontAwesomeIcon icon={faBars} size="lg" />
     </NavbarBurgerStyle>
   );
@@ -106,7 +113,17 @@ const NavbarBurger = ({ onClick }) => {
 
 const Navbar = () => {
   const { isAuthenticated, isLoading } = useContext(AuthContext);
-  const [isBurgerOpen, setIsBurgerOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const burgerRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const dropdownMobileRef = useRef(null);
+  useOutsideAlerter(dropdownRef, dropdownMobileRef, burgerRef, () =>
+    setIsDropdownOpen(false)
+  );
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
   return (
     <div className="noselect">
@@ -118,10 +135,18 @@ const Navbar = () => {
             </NavbarAppLogo>
           </Link>
         </NavbarStart>
-        {!isLoading && isAuthenticated && <SearchBar />}
+        <SearchBarDesktop>
+          {!isLoading && isAuthenticated && <SearchBar />}
+        </SearchBarDesktop>
         <NavbarEnd>
           <GitHubButton />
-          {!isLoading && isAuthenticated && <UserDropdown />}
+          {!isLoading && isAuthenticated && (
+            <UserDropdown
+              dropdownRef={dropdownRef}
+              isVisible={isDropdownOpen}
+              toggle={() => toggleDropdown()}
+            />
+          )}
           {!isLoading && !isAuthenticated && (
             <NavbarEndNoAuthentications>
               <SignInButton />
@@ -129,10 +154,11 @@ const Navbar = () => {
             </NavbarEndNoAuthentications>
           )}
         </NavbarEnd>
-        <NavbarBurger onClick={() => setIsBurgerOpen(!isBurgerOpen)} />
+        <NavbarBurger burgerRef={burgerRef} toggle={toggleDropdown} />
       </NavbarStyle>
       <UserDropdownMobile
-        isVisible={isBurgerOpen}
+        dropdownRef={dropdownMobileRef}
+        isVisible={isDropdownOpen}
         isAuthenticated={isAuthenticated}
         isLoading={isLoading}
       />

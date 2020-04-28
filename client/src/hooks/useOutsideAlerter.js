@@ -1,16 +1,23 @@
 import { useEffect } from "react";
 
-const useOutsideAlerter = (ref, excludedRef, onOutsideClick) => {
+const useOutsideAlerter = (
+  excludedRef1,
+  excludedRef2,
+  excludedRef3,
+  onOutsideClick
+) => {
   useEffect(() => {
     /**
      * Alert if clicked on outside of element
      */
     function handleClickOutside(event) {
       if (
-        ref.current &&
-        !ref.current.contains(event.target) &&
-        excludedRef.current &&
-        !excludedRef.current.contains(event.target)
+        excludedRef1.current &&
+        !excludedRef1.current.contains(event.target) &&
+        excludedRef2.current &&
+        !excludedRef2.current.contains(event.target) &&
+        excludedRef3.current &&
+        !excludedRef3.current.contains(event.target)
       ) {
         onOutsideClick();
       }
@@ -22,7 +29,7 @@ const useOutsideAlerter = (ref, excludedRef, onOutsideClick) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref]);
+  }, [excludedRef1, excludedRef2, excludedRef3]);
 };
 
 export { useOutsideAlerter };
