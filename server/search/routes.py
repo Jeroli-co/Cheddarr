@@ -15,3 +15,15 @@ def search_friends():
         if user in current_user.friends_received or user in current_user.friends_sent:
             result.append(user)
     return profiles_serializer.jsonify(result, many=True)
+
+
+@search.route("/movies/")
+@login_required
+def search_movies():
+    pass
+
+
+@search.route("/series/")
+@login_required
+def search_series():
+    pass
