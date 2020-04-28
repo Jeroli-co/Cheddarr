@@ -3,7 +3,7 @@ from flask import url_for
 
 from server import utils
 from server.app import _create_app, db
-from server.auth.models.user import Friendship, User
+from server.auth.models import Friendship, User
 from server.config import TestConfig
 
 user1_username = "user1"

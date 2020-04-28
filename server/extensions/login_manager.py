@@ -7,7 +7,7 @@ from server.exceptions import HTTPError
 
 
 def register_login_manager(app):
-    from server.auth.models.user import User
+    from server.auth.models import User
 
     login_manager.init_app(app)
 
