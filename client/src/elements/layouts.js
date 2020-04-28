@@ -34,6 +34,27 @@ const RowLayout = styled.div`
   margin-right: ${(props) =>
     props.marginRight ? props.marginRight : props.margin ? props.margin : "0"};
 
+  padding-top: ${(props) =>
+    props.paddingTop ? props.paddingTop : props.padding ? props.padding : "0"};
+  padding-left: ${(props) =>
+    props.paddingLeft
+      ? props.paddingLeft
+      : props.padding
+      ? props.padding
+      : "0"};
+  margin-bottom: ${(props) =>
+    props.paddingBottom
+      ? props.paddingBottom
+      : props.padding
+      ? props.padding
+      : "0"};
+  margin-right: ${(props) =>
+    props.paddingRight
+      ? props.paddingRight
+      : props.padding
+      ? props.padding
+      : "0"};
+
   > * {
     margin-top: ${(props) =>
       props.childMarginTop
