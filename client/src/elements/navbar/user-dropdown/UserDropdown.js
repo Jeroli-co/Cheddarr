@@ -1,60 +1,103 @@
-import React, {useContext} from 'react';
-import {Link} from "react-router-dom";
-import {routes} from "../../../router/routes";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCog, faSignOutAlt, faUserCircle} from "@fortawesome/free-solid-svg-icons";
-import {AuthContext} from "../../../contexts/AuthContext";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { routes } from "../../../router/routes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCog,
+  faSignOutAlt,
+  faUserCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import { AuthContext } from "../../../contexts/AuthContext";
+import styled from "styled-components";
+import { UserDropdownImage } from "../elements/UserDropdownImage";
 
-const UserDropdown = () => {
+const UserDropdownStyle = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+`;
 
+const DropdownMenuStyle = styled.div`
+  position: absolute;
+  top: 75px;
+  right: 0;
+  display: ${(props) => (props.isVisible ? "flex" : "none")};
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 10vw;
+  border: 2px solid ${(props) => props.theme.primary};
+  border-radius: 6px;
+  background: white;
+  z-index: 10;
+
+  > *:not(:last-child) {
+    border-bottom: 1px solid ${(props) => props.theme.primary};
+  }
+
+  > * {
+    width: 100%;
+  }
+`;
+
+const DropdownMenuItem = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: ${(props) => props.theme.primary};
+  padding: 10px;
+
+  &:hover {
+    color: ${(props) => props.theme.dark};
+  }
+`;
+
+const DropdownMenuItemIcon = styled.div`
+  margin-right: 1em;
+`;
+
+const UserDropdown = ({ dropdownRef, isVisible, toggle }) => {
   const { userPicture, username, signOut } = useContext(AuthContext);
 
   return (
-    <div className="navbar-item has-dropdown is-hoverable" data-testid="UserDropdown">
+    <UserDropdownStyle ref={dropdownRef} data-testid="UserDropdown">
+      <UserDropdownImage className="is-pointed" onClick={() => toggle()}>
+        {userPicture && (
+          <img src={userPicture} alt="User" data-testid="UserDropdownPicture" />
+        )}
+        {!userPicture && <p data-testid="UserDropdownUsername">{username}</p>}
+      </UserDropdownImage>
 
-      { userPicture &&
-        <div className="navbar-link is-pointed">
-          <img src={userPicture} alt="User" data-testid="UserDropdownPicture"/>
-        </div>
-      }
-
-      { !userPicture &&
-        <div className="navbar-link is-pointed">
-          <p data-testid="UserDropdownUsername">{username}</p>
-        </div>
-      }
-
-      <div className="navbar-dropdown is-right">
-
-        <Link className="navbar-item" to={routes.USER_PROFILE.url} data-testid="UserProfileLink">
-          <span className="icon">
-            <FontAwesomeIcon icon={faUserCircle}/>
-          </span>
-          <span>Profile</span>
+      <DropdownMenuStyle isVisible={isVisible}>
+        <Link to={routes.USER_PROFILE.url} data-testid="UserProfileLink">
+          <DropdownMenuItem>
+            <DropdownMenuItemIcon>
+              <FontAwesomeIcon icon={faUserCircle} />
+            </DropdownMenuItemIcon>
+            <span>Profile</span>
+          </DropdownMenuItem>
         </Link>
 
-        <Link className="navbar-item" to={routes.USER_SETTINGS.url} data-testid="UserSettingsLink">
-          <span className="icon">
-            <FontAwesomeIcon icon={faCog}/>
-          </span>
-          <span>Settings</span>
+        <Link to={routes.USER_SETTINGS.url} data-testid="UserSettingsLink">
+          <DropdownMenuItem>
+            <DropdownMenuItemIcon>
+              <FontAwesomeIcon icon={faCog} />
+            </DropdownMenuItemIcon>
+            <span>Settings</span>
+          </DropdownMenuItem>
         </Link>
 
-        <hr className="navbar-divider"/>
-
-        <div className="navbar-item is-pointed" onClick={signOut} data-testid="SignOutButton">
-          <span className="icon">
-            <FontAwesomeIcon icon={faSignOutAlt}/>
-          </span>
+        <DropdownMenuItem onClick={signOut} data-testid="SignOutButton">
+          <DropdownMenuItemIcon>
+            <FontAwesomeIcon icon={faSignOutAlt} />
+          </DropdownMenuItemIcon>
           <span>Sign out</span>
-        </div>
-
-      </div>
-
-    </div>
-  )
+        </DropdownMenuItem>
+      </DropdownMenuStyle>
+    </UserDropdownStyle>
+  );
 };
 
-export {
-  UserDropdown
-}
+export { UserDropdown };
