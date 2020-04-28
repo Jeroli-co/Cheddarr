@@ -4,6 +4,7 @@ import { SignInButton } from "../../../modules/auth/elements/SignInButton";
 import { SignUpButton } from "../../../modules/auth/elements/SignUpButton";
 import { RowLayout } from "../../layouts";
 import { GitHubButton } from "../elements/GithubButton";
+import { UserDropdown } from "./UserDropdown";
 import { UserDropdownImage } from "../elements/UserDropdownImage";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { Link } from "react-router-dom";
@@ -17,14 +18,8 @@ import {
 
 const UserDropdownMobileStyle = styled.div`
   display: ${(props) => (props.isVisible ? "block" : "none")};
-  background-color: white;
-  border-radius: 12px;
-  margin-top: 2%;
+  background-color: ${(props) => props.theme.primary};
   width: 100%;
-
-  @media only screen and (min-width: 600px) {
-    display: none;
-  }
 `;
 
 const DropdownMenuMobileStyle = styled.div`
@@ -33,10 +28,11 @@ const DropdownMenuMobileStyle = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
+  background: white;
 
   > * {
     width: 100%;
-    border-top: 1px solid LightGrey;
+    border-bottom: 1px solid ${(props) => props.theme.primary};
   }
 `;
 
@@ -50,15 +46,10 @@ const DropdownMenuMobileItem = styled.div`
   }
 `;
 
-const UserDropdownMobile = ({
-  dropdownRef,
-  isVisible,
-  isAuthenticated,
-  isLoading,
-}) => {
+const UserDropdownMobile = ({ isVisible, isAuthenticated, isLoading }) => {
   const { userPicture, username, signOut } = useContext(AuthContext);
   return (
-    <UserDropdownMobileStyle ref={dropdownRef} isVisible={isVisible}>
+    <UserDropdownMobileStyle isVisible={isVisible}>
       <RowLayout
         padding="10px"
         justifyContent="space-between"
@@ -69,14 +60,14 @@ const UserDropdownMobile = ({
             {userPicture && (
               <img
                 src={userPicture}
-                alt={username}
+                alt="User"
                 data-testid="UserDropdownPicture"
               />
             )}
+            {!userPicture && (
+              <p data-testid="UserDropdownUsername">{username}</p>
+            )}
           </UserDropdownImage>
-        )}
-        {!isLoading && isAuthenticated && (
-          <p data-testid="UserDropdownUsername">{username}</p>
         )}
         <GitHubButton />
         {!isLoading && !isAuthenticated && <SignInButton />}

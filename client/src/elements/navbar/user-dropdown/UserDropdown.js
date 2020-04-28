@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { routes } from "../../../router/routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../../../contexts/AuthContext";
 import styled from "styled-components";
+import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
 import { UserDropdownImage } from "../elements/UserDropdownImage";
 
 const UserDropdownStyle = styled.div`
@@ -16,6 +17,7 @@ const UserDropdownStyle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
 `;
 
 const DropdownMenuStyle = styled.div`
@@ -27,15 +29,13 @@ const DropdownMenuStyle = styled.div`
   justify-content: center;
   align-items: center;
   min-width: 10vw;
-  border: 1px solid transparent;
-  box-shadow: 1px 1px 8px 1px;
+  border: 2px solid ${(props) => props.theme.primary};
   border-radius: 6px;
   background: white;
   z-index: 10;
-  padding: 2%;
 
   > *:not(:last-child) {
-    border-bottom: 1px solid LightGrey;
+    border-bottom: 1px solid ${(props) => props.theme.primary};
   }
 
   > * {
@@ -59,19 +59,29 @@ const DropdownMenuItemIcon = styled.div`
   margin-right: 1em;
 `;
 
-const UserDropdown = ({ dropdownRef, isVisible, toggle }) => {
+const UserDropdown = () => {
   const { userPicture, username, signOut } = useContext(AuthContext);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const dropdownToggleRef = useRef(null);
+  const dropdownMenuRef = useRef(null);
+  useOutsideAlerter(dropdownMenuRef, dropdownToggleRef, () =>
+    setIsMenuVisible(false)
+  );
 
   return (
-    <UserDropdownStyle ref={dropdownRef} data-testid="UserDropdown">
-      <UserDropdownImage className="is-pointed" onClick={() => toggle()}>
+    <UserDropdownStyle data-testid="UserDropdown">
+      <UserDropdownImage
+        ref={dropdownToggleRef}
+        className="is-pointed"
+        onClick={() => setIsMenuVisible(!isMenuVisible)}
+      >
         {userPicture && (
           <img src={userPicture} alt="User" data-testid="UserDropdownPicture" />
         )}
         {!userPicture && <p data-testid="UserDropdownUsername">{username}</p>}
       </UserDropdownImage>
 
-      <DropdownMenuStyle isVisible={isVisible}>
+      <DropdownMenuStyle ref={dropdownMenuRef} isVisible={isMenuVisible}>
         <Link to={routes.USER_PROFILE.url} data-testid="UserProfileLink">
           <DropdownMenuItem>
             <DropdownMenuItemIcon>
