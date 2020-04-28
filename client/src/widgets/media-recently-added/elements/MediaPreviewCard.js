@@ -5,6 +5,7 @@ const MediaPreviewCardStyle = styled.div`
   position: relative;
   min-width: 10vw;
   max-width: 10vw;
+  height: 100%;
   cursor: pointer;
   transition: 0.5s ease;
 

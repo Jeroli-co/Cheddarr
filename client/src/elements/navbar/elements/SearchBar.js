@@ -3,13 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 
-const SearchBarStyle = styled.div`
-  width: 50%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+const SearchBarStyle = styled.div``;
 
 const SearchBar = () => {
   return (
@@ -30,7 +24,7 @@ const SearchBar = () => {
         </span>
       </div>
       <div className="control">
-        <a className="button is-info">Search</a>
+        <button className="button is-info">Search</button>
       </div>
     </SearchBarStyle>
   );
