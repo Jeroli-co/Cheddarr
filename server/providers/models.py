@@ -1,35 +1,29 @@
 from server.extensions import db
-from enum import Enum, auto
-
-
-class ProviderType(Enum):
-    MEDIA_SERVER = auto()
-    MOVIE_REQUEST = auto()
-    SERIES_REQUEST = auto()
+from sqlalchemy.orm import with_polymorphic
 
 
 class ProviderConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(32), nullable=False)
-    api_key = db.Column(db.String(256), nullable=False, unique=True)
+    provider_name = db.Column(db.String(32), nullable=False)
+    provider_api_key = db.Column(db.String(256), unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     enabled = db.Column(db.Boolean, default=False, nullable=False)
-    type = db.Column(db.Enum(ProviderType))
     __mapper_args__ = {
-        "polymorphic_on": name,
+        "polymorphic_on": provider_name,
     }
 
     def __repr__(self):
-        return "%s/%s/%s" % (self.name, self.api_key, self.enabled)
+        return "%s/%s/%s" % (self.provider_name, self.provider_api_key, self.enabled)
 
-    def update(self, updated_config):
+    def update_config(self, updated_config):
+        user_config = (
+            db.session.query(with_polymorphic(ProviderConfig, "*"))
+            .filter_by(id=self.id)
+            .one()
+        )
         for config, value in updated_config.items():
-            setattr(self, config, value)
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
+            if value != "":
+                setattr(user_config, config, value)
         db.session.commit()
 
     @classmethod
@@ -38,12 +32,6 @@ class ProviderConfig(db.Model):
 
 
 class PlexConfig(ProviderConfig):
-    def __init__(self, plex_user_id, api_key):
-        self.plex_user_id = plex_user_id
-        self.api_key = api_key
-        self.type = ProviderType.MEDIA_SERVER
-        self.enabled = True
-
     id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
     plex_user_id = db.Column(db.Integer, unique=True, nullable=False)
     machine_id = db.Column(db.String(64))
@@ -53,47 +41,3 @@ class PlexConfig(ProviderConfig):
 
     def __repr__(self):
         return "%s/%s" % (super().__repr__(), self.machine_name)
-
-
-class SonarrConfig(ProviderConfig):
-    def __init__(self, api_key):
-        self.api_key = api_key
-        self.type = ProviderType.SERIES_REQUEST
-
-    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
-    host = db.Column(db.String(128))
-    port = db.Column(db.String(5))
-    ssl = db.Column(db.Boolean())
-
-    __mapper_args__ = {"polymorphic_identity": "sonarr"}
-
-    def __repr__(self):
-        return "%s/%s/%s/%s/%s" % (
-            super().__repr__(),
-            self.name,
-            self.host,
-            self.port,
-            self.ssl,
-        )
-
-
-class RadarrConfig(ProviderConfig):
-    def __init__(self, api_key):
-        self.api_key = api_key
-        self.type = ProviderType.MOVIE_REQUEST
-
-    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
-    host = db.Column(db.String(128))
-    port = db.Column(db.String(5))
-    ssl = db.Column(db.Boolean())
-
-    __mapper_args__ = {"polymorphic_identity": "radarr"}
-
-    def __repr__(self):
-        return "%s/%s/%s/%s/%s" % (
-            super().__repr__(),
-            self.name,
-            self.host,
-            self.port,
-            self.ssl,
-        )
