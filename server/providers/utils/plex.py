@@ -53,18 +53,12 @@ def search(plex_server, section_type, title, filters, max_results=5):
     return result
 
 
-def search(plex_server, section_type, media_search, max_results=5):
+def search(plex_server, section_type, filters, max_results=5):
     if section_type == "movies":
         sections = library_sections(plex_server, section_type="movies")
     elif section_type == "series":
         sections = library_sections(plex_server, section_type="series")
     else:
         raise ValueError("Wrong value: section_type must be 'movies' or 'series'.")
-    result = [
-        media
-        for section in sections
-        for media in section.search(
-            title=media_search.title.data, maxresults=max_results
-        )
-    ]
+    result = [media for section in sections for media in section.search(**filters)]
     return result
