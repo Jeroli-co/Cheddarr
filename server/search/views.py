@@ -25,12 +25,16 @@ def search_friends():
             payload=username_or_email.errors,
         )
     result = []
-    for user in User.query.filter(
-        or_(
-            User.username.contains(username_or_email.usernameOrEmail.data),
-            User.email.contains(username_or_email.usernameOrEmail.data),
+    for user in (
+        User.query.filter(
+            or_(
+                User.username.contains(username_or_email.usernameOrEmail.data),
+                User.email.contains(username_or_email.usernameOrEmail.data),
+            )
         )
-    ).all():
+        .limit(5)
+        .all()
+    ):
         if user in current_user.friends_received or user in current_user.friends_sent:
             result.append(user)
     return profiles_serializer.jsonify(result, many=True)

@@ -76,7 +76,7 @@ def get_recent_movies():
     plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
-    movie_sections = plex.library_sections(plex_server, section_type="movie")
+    movie_sections = plex.library_sections(plex_server, section_type="movies")
     recent_movies = [
         movie
         for section in movie_sections
