@@ -8,8 +8,12 @@ from server.exceptions import InternalServerError, BadRequest
 from server.providers import provider
 from server.providers.forms import PlexConfigForm
 from server.providers.models import PlexConfig
-from server.providers.serializers.media_serializer import (plex_episodes_serializer, plex_movies_serializer,
-                                                           plex_seasons_serializer, plex_series_serializer)
+from server.providers.serializers.media_serializer import (
+    plex_episodes_serializer,
+    plex_movies_serializer,
+    plex_seasons_serializer,
+    plex_series_serializer,
+)
 from server.providers.serializers.provider_config_serializer import (
     plex_config_serializer,
 )
