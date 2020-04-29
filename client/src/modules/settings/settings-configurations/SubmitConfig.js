@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import {Animate} from "../../../../animations/Animate";
-import {FadeIn, FadeOut} from "../../../../animations/Animations";
+import { Animate } from "../../animations/Animate";
+import { FadeIn, FadeOut } from "../../animations/Animations";
 
 const SubmitButton = styled.button`
   background: transparent;
@@ -35,20 +35,19 @@ const SubmitContainer = styled.div`
   background-color: ${(props) => props.theme.primaryLighter};
 `;
 
-const SubmitPlexConfig = ({ isFormDirty }) => {
-
+const SubmitConfig = ({ isFormDirty }) => {
   return (
-    <Animate animationIn={FadeIn} animationOut={FadeOut} isVisible={isFormDirty} duration={0.3}>
+    <Animate
+      animationIn={FadeIn}
+      animationOut={FadeOut}
+      isVisible={isFormDirty}
+      duration={0.3}
+    >
       <SubmitContainer>
-        <SubmitButton type="submit">
-          Save changes
-        </SubmitButton>
+        <SubmitButton type="submit">Save changes</SubmitButton>
       </SubmitContainer>
     </Animate>
   );
-
 };
 
-export {
-  SubmitPlexConfig
-}
+export { SubmitConfig };

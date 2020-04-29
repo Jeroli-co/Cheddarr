@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ServersModal } from "./elements/ServersModal";
 import { useForm } from "react-hook-form";
-import { SubmitPlexConfig } from "./elements/SubmitPlexConfig";
+import { SubmitConfig } from "../SubmitConfig";
 import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
 import { Spinner } from "../../../../elements/Spinner";
 import { RowLayout } from "../../../../elements/layouts";
@@ -103,7 +103,7 @@ const PlexConfig = ({ location }) => {
                 </button>
               </RowLayout>
             )}
-            <SubmitPlexConfig isFormDirty={formState.dirty} />
+            <SubmitConfig isFormDirty={formState.dirty} />
           </form>
         </div>
       )}

@@ -4,6 +4,7 @@ from flask import jsonify
 from flask_login import current_user, login_required
 from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
+from sqlalchemy.orm.exc import NoResultFound
 
 from server.exceptions import HTTPError
 from server.providers.forms import PlexConfigForm
@@ -24,42 +25,53 @@ from server.providers.utils.plex import user_server, library_sections
 
 @provider.route("/plex/config/", methods=["GET"])
 @login_required
-def get_user_config():
-    plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
+def get_plex_config():
+    plex_user_config = PlexConfig.find(current_user)
     return plex_config_serializer.jsonify(plex_user_config), HTTPStatus.OK
 
 
 @provider.route("/plex/config/status/", methods=["GET"])
 @login_required
-def get_user_config_status():
-    plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
-    return provider_status_serializer.dump(plex_user_config), HTTPStatus.OK
+def get_plex_config_status():
+    try:
+        plex_config = PlexConfig.find(current_user)
+    except NoResultFound:
+        raise HTTPError(
+            "No config for this provider.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
+        )
+    return provider_status_serializer.dump(plex_config), HTTPStatus.OK
 
 
 @provider.route("/plex/config/", methods=["PATCH"])
 @login_required
-def update_config():
+def update_plex_config():
     config_form = PlexConfigForm()
     if not config_form.validate():
         raise HTTPError(
-            "Error while updating provider's config",
+            "Error while updating Plex config.",
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             payload=config_form.errors,
         )
-    updated_config = config_form.data
-    user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
-    if not user_config:
+    try:
+        user_config = PlexConfig.find(current_user)
+    except NoResultFound:
         raise HTTPError(
-            "No config created for this provider", status_code=HTTPStatus.BAD_REQUEST
+            "No config for this provider.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
         )
-    user_config.update_config(updated_config)
+    updated_config = config_form.data
+    user_config.update(updated_config)
     return plex_config_serializer.jsonify(user_config), HTTPStatus.OK
 
 
 @provider.route("/plex/servers/", methods=["GET"])
 @login_required
-def get_user_servers():
-    plex_config = PlexConfig.find(current_user)
+def get_plex_servers():
+    try:
+        plex_config = PlexConfig.find(current_user)
+    except NoResultFound:
+        raise HTTPError(
+            "No config for this provider.", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
+        )
     api_key = plex_config.provider_api_key
     plex_account = MyPlexAccount(api_key)
     servers = [
