@@ -88,11 +88,13 @@ def register_blueprints(app):
     from server.auth import auth
     from server.profile import profile
     from server.providers import provider
+    from server.search import search
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix=API_ROOT)
     app.register_blueprint(profile, url_prefix=API_ROOT + "/profile")
     app.register_blueprint(provider, url_prefix=API_ROOT + "/provider")
+    app.register_blueprint(search, url_prefix=API_ROOT + "/search")
 
 
 def register_commands(app):
