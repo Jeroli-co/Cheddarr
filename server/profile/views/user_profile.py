@@ -8,9 +8,9 @@ from server.auth.forms import EmailForm, PasswordForm
 from server.auth.models import User
 from server.exceptions import HTTPError
 from server.extensions import db, limiter
+from server.profile import profile
 from server.profile.forms import ChangePasswordForm, PictureForm, UsernameForm
-from server.profile.routes import profile
-from server.profile.serializers.profile_serializer import profiles_serializer
+from server.profile.serializers import profiles_serializer
 from server.tasks import send_email
 
 

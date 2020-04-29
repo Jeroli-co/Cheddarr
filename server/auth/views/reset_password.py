@@ -3,9 +3,9 @@ from http import HTTPStatus
 from flask import render_template, request, url_for
 
 from server import utils
+from server.auth import auth
 from server.auth.forms import EmailForm, PasswordForm
 from server.auth.models import User
-from server.auth.routes import auth
 from server.exceptions import HTTPError
 from server.extensions import limiter
 from server.tasks import send_email

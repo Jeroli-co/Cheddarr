@@ -6,20 +6,16 @@ from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
 
 from server.exceptions import HTTPError
+from server.providers import provider
 from server.providers.forms import PlexConfigForm
 from server.providers.models import PlexConfig
-from server.providers.routes import provider
-from server.providers.serializers.media_serializer import (
-    plex_movies_serializer,
-    plex_series_serializer,
-    plex_seasons_serializer,
-    plex_episodes_serializer,
-)
+from server.providers.serializers.media_serializer import (plex_episodes_serializer, plex_movies_serializer,
+                                                           plex_seasons_serializer, plex_series_serializer)
 from server.providers.serializers.provider_config_serializer import (
     plex_config_serializer,
     provider_status_serializer,
 )
-from server.providers.utils.plex import user_server, library_sections
+from server.providers.utils import plex
 
 
 @provider.route("/plex/config/", methods=["GET"])
@@ -73,10 +69,10 @@ def get_user_servers():
 @provider.route("/plex/movies/recent/", methods=["GET"])
 @login_required
 def get_recent_movies():
-    plex_server = user_server(current_user)
+    plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
-    movie_sections = library_sections(plex_server, section_type="movies")
+    movie_sections = plex.library_sections(plex_server, section_type="movies")
     recent_movies = [
         movie
         for section in movie_sections
@@ -88,7 +84,7 @@ def get_recent_movies():
 @provider.route("/plex/movies/<movie_id>/", methods=["GET"])
 @login_required
 def get_movie(movie_id):
-    plex_server = user_server(current_user)
+    plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     movie = plex_server.fetchItem(ekey=int(movie_id))
@@ -99,10 +95,10 @@ def get_movie(movie_id):
 @provider.route("/plex/series/recent/", methods=["GET"])
 @login_required
 def get_recent_series():
-    plex_server = user_server(current_user)
+    plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
-    series_section = library_sections(plex_server, section_type="series")
+    series_section = plex.library_sections(plex_server, section_type="series")
     recent_series = [
         series
         for section in series_section
@@ -114,7 +110,7 @@ def get_recent_series():
 @provider.route("/plex/series/<series_id>/", methods=["GET"])
 @login_required
 def get_series(series_id):
-    plex_server = user_server(current_user)
+    plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
@@ -127,7 +123,7 @@ def get_series(series_id):
 )
 @login_required
 def get_season(series_id, season_number):
-    plex_server = user_server(current_user)
+    plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
@@ -142,7 +138,7 @@ def get_season(series_id, season_number):
 )
 @login_required
 def get_episode(series_id, season_number, episode_number):
-    plex_server = user_server(current_user)
+    plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
@@ -154,7 +150,7 @@ def get_episode(series_id, season_number, episode_number):
 @provider.route("/plex/onDeck/", methods=["GET"])
 @login_required
 def get_on_deck():
-    plex_server = user_server(current_user)
+    plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     on_deck = plex_server.library.onDeck()

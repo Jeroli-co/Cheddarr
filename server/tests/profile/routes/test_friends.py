@@ -4,12 +4,7 @@ from flask import url_for
 from sqlalchemy import and_
 
 from server.auth.models import Friendship, User
-from server.tests.conftest import (
-    user2_username,
-    user2_email,
-    user3_username,
-    user1_username,
-)
+from server.tests.conftest import (user1_username, user2_email, user2_username, user3_username)
 
 
 def test_friend_profile(client, auth):

@@ -40,3 +40,20 @@ def library_sections(plex_server, section_id=None, section_type=None):
         ]
         return sections
     raise ValueError("Missing argument: section_id or section_type are required.")
+
+
+def search(plex_server, section_type, media_search, max_results=5):
+    if section_type == "movies":
+        sections = library_sections(plex_server, section_type="movies")
+    elif section_type == "series":
+        sections = library_sections(plex_server, section_type="series")
+    else:
+        raise ValueError("Wrong value: section_type must be 'movies' or 'series'.")
+    result = [
+        media
+        for section in sections
+        for media in section.search(
+            title=media_search.title.data, maxresults=max_results
+        )
+    ]
+    return result
