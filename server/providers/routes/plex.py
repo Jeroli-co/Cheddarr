@@ -2,6 +2,7 @@ from flask import jsonify
 from flask_login import current_user, login_required
 from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
+from sqlalchemy.orm.exc import NoResultFound
 
 from server.exceptions import InternalServerError, BadRequest
 from server.providers.forms import PlexConfigForm
@@ -23,38 +24,37 @@ from server.providers.utils.plex import user_server, library_sections
 @provider.route("/plex/config/", methods=["GET"])
 @login_required
 def get_user_config():
-    plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
+    plex_user_config = PlexConfig.find(current_user)
     return plex_config_serializer.jsonify(plex_user_config)
 
 
 @provider.route("/plex/config/status/", methods=["GET"])
 @login_required
-def get_user_config_status():
-    plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
+def get_plex_config_status():
+    plex_config = PlexConfig.find(current_user)
     return provider_status_serializer.dump(plex_user_config)
 
 
 @provider.route("/plex/config/", methods=["PATCH"])
 @login_required
-def update_config():
+def update_plex_config():
     config_form = PlexConfigForm()
     if not config_form.validate():
         raise InternalServerError(
             "Error while updating provider's config", payload=config_form.errors,
         )
-
     updated_config = config_form.data
-    user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
+    user_config = PlexConfig.find(current_user)
     if not user_config:
         raise BadRequest("No config created for this provider")
 
-    user_config.update_config(updated_config)
+    user_config.update(updated_config)
     return plex_config_serializer.jsonify(user_config)
 
 
 @provider.route("/plex/servers/", methods=["GET"])
 @login_required
-def get_user_servers():
+def get_plex_servers():
     plex_config = PlexConfig.find(current_user)
     api_key = plex_config.provider_api_key
     plex_account = MyPlexAccount(api_key)

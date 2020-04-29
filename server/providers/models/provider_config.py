@@ -15,15 +15,11 @@ class ProviderConfig(db.Model):
     def __repr__(self):
         return "%s/%s/%s" % (self.provider_name, self.provider_api_key, self.enabled)
 
-    def update_config(self, updated_config):
-        user_config = (
-            db.session.query(with_polymorphic(ProviderConfig, "*"))
-            .filter_by(id=self.id)
-            .one()
-        )
+    def update(self, updated_config):
         for config, value in updated_config.items():
             if value != "":
-                setattr(user_config, config, value)
+                setattr(self, config, value)
+        db.session.add(self)
         db.session.commit()
 
     @classmethod
@@ -41,3 +37,15 @@ class PlexConfig(ProviderConfig):
 
     def __repr__(self):
         return "%s/%s" % (super().__repr__(), self.machine_name)
+
+
+class RadarrConfig(ProviderConfig):
+    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
+    host = db.Column(db.String(128))
+    port = db.Column(db.String(5))
+    ssl = db.Column(db.Boolean())
+
+    __mapper_args__ = {"polymorphic_identity": "radarr"}
+
+    def __repr__(self):
+        return "%s/%s/%s/%s" % (super().__repr__(), self.host, self.port, self.ssl)
