@@ -1,6 +1,7 @@
 from flask import url_for
+
 from server.auth.models import User
-from server.tests.conftest import user1_username, user1_password, user1_email
+from server.tests.conftest import user1_email, user1_password, user1_username
 
 
 def test_signup_ok(client, mocks):

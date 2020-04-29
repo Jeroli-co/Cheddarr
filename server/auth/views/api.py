@@ -1,7 +1,7 @@
 from flask_login import current_user, fresh_login_required
 
 from server import utils
-from server.auth.routes import auth
+from server.auth import auth
 from server.extensions import db, limiter
 
 

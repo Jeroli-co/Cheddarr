@@ -5,10 +5,10 @@ from requests import get, post
 from sqlalchemy.orm.exc import NoResultFound
 
 from server import utils
+from server.auth import auth
 from server.auth.forms import SigninForm
 from server.auth.models import User
-from server.auth.routes import auth
-from server.auth.serializers.auth_serializer import session_serializer
+from server.auth.serializers import session_serializer
 from server.config import (
     APP_NAME,
     PLEX_ACCESS_TOKEN_URL,
