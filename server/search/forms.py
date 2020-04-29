@@ -6,4 +6,4 @@ from server.forms import ModelForm
 
 class MediaSearchForm(ModelForm):
     title = StringField("Name", [InputRequired()])
-    type = StringField("Type", [InputRequired(), AnyOf(["movies", "series"])])
+    type = StringField("Type", [InputRequired(), AnyOf(["all", "movie", "series"])])
