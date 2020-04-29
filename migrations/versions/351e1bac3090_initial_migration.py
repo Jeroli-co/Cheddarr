@@ -66,8 +66,6 @@ def upgrade():
         sa.Column("machine_name", sa.String(length=64), nullable=True),
         sa.ForeignKeyConstraint(["id"], ["provider_config.id"],),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("machine_id"),
-        sa.UniqueConstraint("machine_name"),
         sa.UniqueConstraint("plex_user_id"),
     )
     # ### end Alembic commands ###
