@@ -9,8 +9,12 @@ from server.exceptions import HTTPError
 from server.providers import provider
 from server.providers.forms import PlexConfigForm
 from server.providers.models import PlexConfig
-from server.providers.serializers.media_serializer import (plex_episodes_serializer, plex_movies_serializer,
-                                                           plex_seasons_serializer, plex_series_serializer)
+from server.providers.serializers.media_serializer import (
+    plex_episodes_serializer,
+    plex_movies_serializer,
+    plex_seasons_serializer,
+    plex_series_serializer,
+)
 from server.providers.serializers.provider_config_serializer import (
     plex_config_serializer,
     provider_status_serializer,
@@ -72,7 +76,7 @@ def get_recent_movies():
     plex_server = plex.user_server(current_user)
     if plex_server is None:
         raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
-    movie_sections = plex.library_sections(plex_server, section_type="movies")
+    movie_sections = plex.library_sections(plex_server, section_type="movie")
     recent_movies = [
         movie
         for section in movie_sections
