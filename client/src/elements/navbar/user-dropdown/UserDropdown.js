@@ -16,7 +16,6 @@ const UserDropdownStyle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
 `;
 
 const DropdownMenuStyle = styled.div`
@@ -28,13 +27,15 @@ const DropdownMenuStyle = styled.div`
   justify-content: center;
   align-items: center;
   min-width: 10vw;
-  border: 2px solid ${(props) => props.theme.primary};
+  border: 1px solid transparent;
+  box-shadow: 1px 1px 8px 1px;
   border-radius: 6px;
   background: white;
   z-index: 10;
+  padding: 2%;
 
   > *:not(:last-child) {
-    border-bottom: 1px solid ${(props) => props.theme.primary};
+    border-bottom: 1px solid LightGrey;
   }
 
   > * {

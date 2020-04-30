@@ -14,11 +14,12 @@ import {
   faSignOutAlt,
   faUserCircle,
 } from "@fortawesome/free-solid-svg-icons";
-import { SearchBar } from "../elements/SearchBar";
 
 const UserDropdownMobileStyle = styled.div`
   display: ${(props) => (props.isVisible ? "block" : "none")};
-  background-color: ${(props) => props.theme.primary};
+  background-color: white;
+  border-radius: 12px;
+  margin-top: 2%;
   width: 100%;
 
   @media only screen and (min-width: 600px) {
@@ -32,11 +33,10 @@ const DropdownMenuMobileStyle = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  background: white;
 
   > * {
     width: 100%;
-    border-bottom: 1px solid ${(props) => props.theme.primary};
+    border-top: 1px solid LightGrey;
   }
 `;
 
@@ -59,9 +59,6 @@ const UserDropdownMobile = ({
   const { userPicture, username, signOut } = useContext(AuthContext);
   return (
     <UserDropdownMobileStyle ref={dropdownRef} isVisible={isVisible}>
-      <RowLayout padding="1%" justifyContent="center" alignItems="center">
-        <SearchBar />
-      </RowLayout>
       <RowLayout
         padding="10px"
         justifyContent="space-between"
@@ -72,14 +69,14 @@ const UserDropdownMobile = ({
             {userPicture && (
               <img
                 src={userPicture}
-                alt="User"
+                alt={username}
                 data-testid="UserDropdownPicture"
               />
             )}
-            {!userPicture && (
-              <p data-testid="UserDropdownUsername">{username}</p>
-            )}
           </UserDropdownImage>
+        )}
+        {!isLoading && isAuthenticated && (
+          <p data-testid="UserDropdownUsername">{username}</p>
         )}
         <GitHubButton />
         {!isLoading && !isAuthenticated && <SignInButton />}
