@@ -21,7 +21,7 @@ const App = () => {
     secondaryLight: "#ffd679",
     secondaryLighter: "#fff7c9",
     secondaryDark: "#9a702a",
-    dark: "rgb(40,40,40)",
+    dark: "#4f4d4d",
     transparent: "rgba(198,198,198,0.17)",
     transparentDark: "rgba(146,146,146,0.5)",
   };
