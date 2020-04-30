@@ -10,14 +10,14 @@ from server.profile.forms import UsernameOrEmailForm
 from server.profile.serializers import profiles_serializer
 from server.providers.utils import plex
 from server.search import search
-from server.search.forms import MediaSearchForm
+from server.search.forms import MediaSearchForm, UserSearchForm
 from server.search.serializers import media_search_serializer
 
 
 @search.route("/friends/")
 @login_required
 def search_friends():
-    username_or_email = UsernameOrEmailForm(request.args)
+    username_or_email = UserSearchForm(request.args)
     if not username_or_email.validate():
         raise HTTPError(
             "Error while searching user.",
