@@ -36,7 +36,7 @@ def test_add_friend_ok(client, auth):
         client.post(
             url_for("profile.add_friend"), data={"usernameOrEmail": user3_username},
         ).status_code
-        == 201
+        == 200
     )
     user = User.find(username=user1_username)
     friend = User.find(username=user3_username)

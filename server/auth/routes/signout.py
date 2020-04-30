@@ -1,5 +1,5 @@
-from http import HTTPStatus
 from flask_login import login_required, logout_user
+
 from server.auth.routes import auth
 
 
@@ -7,4 +7,4 @@ from server.auth.routes import auth
 @login_required
 def signout():
     logout_user()
-    return {"message": "User signed out"}, HTTPStatus.OK
+    return {"message": "User signed out"}

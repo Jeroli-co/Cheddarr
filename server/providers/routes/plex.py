@@ -1,11 +1,9 @@
-from http import HTTPStatus
-
 from flask import jsonify
 from flask_login import current_user, login_required
 from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
 
-from server.exceptions import HTTPError
+from server.exceptions import InternalServerError, BadRequest
 from server.providers.forms import PlexConfigForm
 from server.providers.models import PlexConfig
 from server.providers.routes import provider
@@ -26,14 +24,14 @@ from server.providers.utils.plex import user_server, library_sections
 @login_required
 def get_user_config():
     plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
-    return plex_config_serializer.jsonify(plex_user_config), HTTPStatus.OK
+    return plex_config_serializer.jsonify(plex_user_config)
 
 
 @provider.route("/plex/config/status/", methods=["GET"])
 @login_required
 def get_user_config_status():
     plex_user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
-    return provider_status_serializer.dump(plex_user_config), HTTPStatus.OK
+    return provider_status_serializer.dump(plex_user_config)
 
 
 @provider.route("/plex/config/", methods=["PATCH"])
@@ -41,19 +39,17 @@ def get_user_config_status():
 def update_config():
     config_form = PlexConfigForm()
     if not config_form.validate():
-        raise HTTPError(
-            "Error while updating provider's config",
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            payload=config_form.errors,
+        raise InternalServerError(
+            "Error while updating provider's config", payload=config_form.errors,
         )
+
     updated_config = config_form.data
     user_config = PlexConfig.query.filter_by(user_id=current_user.id).one_or_none()
     if not user_config:
-        raise HTTPError(
-            "No config created for this provider", status_code=HTTPStatus.BAD_REQUEST
-        )
+        raise BadRequest("No config created for this provider")
+
     user_config.update_config(updated_config)
-    return plex_config_serializer.jsonify(user_config), HTTPStatus.OK
+    return plex_config_serializer.jsonify(user_config)
 
 
 @provider.route("/plex/servers/", methods=["GET"])
@@ -67,59 +63,51 @@ def get_user_servers():
         for resource in plex_account.resources()
         if resource.provides == "server"
     ]
-    return jsonify(servers), HTTPStatus.OK
+    return jsonify(servers)
 
 
 @provider.route("/plex/movies/recent/", methods=["GET"])
 @login_required
 def get_recent_movies():
     plex_server = user_server(current_user)
-    if plex_server is None:
-        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     movie_sections = library_sections(plex_server, section_type="movies")
     recent_movies = [
         movie
         for section in movie_sections
         for movie in section.recentlyAdded(maxresults=20)
     ]
-    return plex_movies_serializer.jsonify(recent_movies, many=True), HTTPStatus.OK
+    return plex_movies_serializer.jsonify(recent_movies, many=True)
 
 
 @provider.route("/plex/movies/<movie_id>/", methods=["GET"])
 @login_required
 def get_movie(movie_id):
     plex_server = user_server(current_user)
-    if plex_server is None:
-        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     movie = plex_server.fetchItem(ekey=int(movie_id))
     movie.reload()
-    return plex_movies_serializer.jsonify(movie), HTTPStatus.OK
+    return plex_movies_serializer.jsonify(movie)
 
 
 @provider.route("/plex/series/recent/", methods=["GET"])
 @login_required
 def get_recent_series():
     plex_server = user_server(current_user)
-    if plex_server is None:
-        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series_section = library_sections(plex_server, section_type="series")
     recent_series = [
         series
         for section in series_section
         for series in section.recentlyAdded(maxresults=20)
     ]
-    return plex_episodes_serializer.jsonify(recent_series, many=True), HTTPStatus.OK
+    return plex_episodes_serializer.jsonify(recent_series, many=True)
 
 
 @provider.route("/plex/series/<series_id>/", methods=["GET"])
 @login_required
 def get_series(series_id):
     plex_server = user_server(current_user)
-    if plex_server is None:
-        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
     series.reload()
-    return plex_series_serializer.jsonify(series), HTTPStatus.OK
+    return plex_series_serializer.jsonify(series)
 
 
 @provider.route(
@@ -128,12 +116,10 @@ def get_series(series_id):
 @login_required
 def get_season(series_id, season_number):
     plex_server = user_server(current_user)
-    if plex_server is None:
-        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
     season = series.episode(season=int(season_number))
     season.reload()
-    return plex_seasons_serializer.jsonify(season), HTTPStatus.OK
+    return plex_seasons_serializer.jsonify(season)
 
 
 @provider.route(
@@ -143,20 +129,16 @@ def get_season(series_id, season_number):
 @login_required
 def get_episode(series_id, season_number, episode_number):
     plex_server = user_server(current_user)
-    if plex_server is None:
-        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     series = plex_server.fetchItem(ekey=int(series_id))
     episode = series.episode(season=int(season_number), episode=int(episode_number))
     episode.reload()
-    return plex_episodes_serializer.jsonify(episode), HTTPStatus.OK
+    return plex_episodes_serializer.jsonify(episode)
 
 
 @provider.route("/plex/onDeck/", methods=["GET"])
 @login_required
 def get_on_deck():
     plex_server = user_server(current_user)
-    if plex_server is None:
-        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     on_deck = plex_server.library.onDeck()
     on_deck = [
         plex_movies_serializer.dump(media)
@@ -164,4 +146,4 @@ def get_on_deck():
         else plex_episodes_serializer.dump(media)
         for media in on_deck
     ]
-    return jsonify(on_deck), HTTPStatus.OK
+    return jsonify(on_deck)

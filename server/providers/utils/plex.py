@@ -1,10 +1,8 @@
-from http import HTTPStatus
-
 from plexapi.exceptions import PlexApiException
 from plexapi.library import MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
 
-from server.exceptions import HTTPError
+from server.exceptions import InternalServerError, BadRequest
 from server.providers.models import PlexConfig
 
 
@@ -13,14 +11,11 @@ def user_server(user):
     api_key = plex_config.provider_api_key
     server_name = plex_config.machine_name
     if server_name is None:
-        return None
+        raise BadRequest("No Plex server linked.")
     try:
         return MyPlexAccount(api_key).resource(server_name).connect()
     except PlexApiException:
-        raise HTTPError(
-            "Error while connecting to Plex server",
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-        )
+        raise InternalServerError("Error while connecting to Plex server.")
 
 
 def library_sections(plex_server, section_id=None, section_type=None):

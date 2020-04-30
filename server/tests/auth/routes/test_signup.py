@@ -14,7 +14,7 @@ def test_signup_ok(client, mocks):
                 "email": "test@test.com",
             },
         ).status_code
-        == 201
+        == 200
     )
     assert User.exists("test@test.com")
 
