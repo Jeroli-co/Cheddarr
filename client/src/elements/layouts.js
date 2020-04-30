@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
 const ColumnLayout = styled.div`
   display: flex;
@@ -18,8 +18,16 @@ const RowLayout = styled.div`
     props.justifyContent ? props.justifyContent : "flex-start"};
   align-items: ${(props) => (props.alignItems ? props.alignItems : "center")};
   width: ${(props) => (props.width ? props.width : "100%")};
+  height: ${(props) => (props.width ? props.width : "100%")};
   border-bottom: ${(props) =>
     props.borderBottom ? props.borderBottom : "none"};
+  border-top: ${(props) => (props.borderTop ? props.borderTop : "none")};
+  background-color: ${(props) =>
+    props.backgroundColor
+      ? props.theme[props.backgroundColor]
+        ? props.theme[props.backgroundColor]
+        : props.backgroundColor
+      : "transparent"};
 
   margin-top: ${(props) =>
     props.marginTop ? props.marginTop : props.margin ? props.margin : "0"};
@@ -42,13 +50,13 @@ const RowLayout = styled.div`
       : props.padding
       ? props.padding
       : "0"};
-  margin-bottom: ${(props) =>
+  padding-bottom: ${(props) =>
     props.paddingBottom
       ? props.paddingBottom
       : props.padding
       ? props.padding
       : "0"};
-  margin-right: ${(props) =>
+  padding-right: ${(props) =>
     props.paddingRight
       ? props.paddingRight
       : props.padding
@@ -80,20 +88,31 @@ const RowLayout = styled.div`
         : props.childMargin
         ? props.childMargin
         : "0"};
-  }
 
-  @media only screen and (max-width: 768px) {
-    ${(props) =>
-      props.justifyContentTablet &&
-      css`
-        justify-content: ${props.justifyContentTablet};
-      `};
-
-    ${(props) =>
-      props.alignItemsTablet &&
-      css`
-        align-items: ${props.alignItemsTablet};
-      `};
+    padding-top: ${(props) =>
+      props.childPaddingTop
+        ? props.childPaddingTop
+        : props.childPadding
+        ? props.childPadding
+        : "0"};
+    padding-left: ${(props) =>
+      props.childPaddingLeft
+        ? props.childPaddingLeft
+        : props.childPadding
+        ? props.childPadding
+        : "0"};
+    padding-bottom: ${(props) =>
+      props.childPaddingBottom
+        ? props.childPaddingBottom
+        : props.childPadding
+        ? props.childPadding
+        : "0"};
+    padding-right: ${(props) =>
+      props.childPaddingRight
+        ? props.childPaddingRight
+        : props.childPadding
+        ? props.childPadding
+        : "0"};
   }
 `;
 
