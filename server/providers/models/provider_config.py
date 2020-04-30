@@ -1,5 +1,4 @@
 from server.extensions import db
-from sqlalchemy.orm import with_polymorphic
 
 
 class ProviderConfig(db.Model):
@@ -39,7 +38,27 @@ class PlexConfig(ProviderConfig):
         return "%s/%s" % (super().__repr__(), self.machine_name)
 
 
+class SonarrConfig(ProviderConfig):
+
+    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
+    host = db.Column(db.String(128))
+    port = db.Column(db.String(5))
+    ssl = db.Column(db.Boolean())
+
+    __mapper_args__ = {"polymorphic_identity": "sonarr"}
+
+    def __repr__(self):
+        return "%s/%s/%s/%s/%s" % (
+            super().__repr__(),
+            self.name,
+            self.host,
+            self.port,
+            self.ssl,
+        )
+
+
 class RadarrConfig(ProviderConfig):
+
     id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
     host = db.Column(db.String(128))
     port = db.Column(db.String(5))
@@ -48,4 +67,10 @@ class RadarrConfig(ProviderConfig):
     __mapper_args__ = {"polymorphic_identity": "radarr"}
 
     def __repr__(self):
-        return "%s/%s/%s/%s" % (super().__repr__(), self.host, self.port, self.ssl)
+        return "%s/%s/%s/%s/%s" % (
+            super().__repr__(),
+            self.name,
+            self.host,
+            self.port,
+            self.ssl,
+        )

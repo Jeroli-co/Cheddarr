@@ -16,23 +16,33 @@ from server.providers.serializers.media_serializer import (
 )
 from server.providers.serializers.provider_config_serializer import (
     plex_config_serializer,
-    provider_status_serializer,
 )
 from server.providers.utils.plex import user_server, library_sections
+
+
+@provider.route("/plex/status/", methods=["GET"])
+@login_required
+def get_plex_status():
+    try:
+        plex_config = PlexConfig.find(current_user)
+    except NoResultFound:
+        raise InternalServerError("No existing config for Plex.")
+    up = (
+        MyPlexAccount(plex_config.provider_api_key)
+        .resource(plex_config.machine_name)
+        .presence
+    )
+    return {"status": plex_config.enabled and up}
 
 
 @provider.route("/plex/config/", methods=["GET"])
 @login_required
 def get_plex_config():
-    plex_user_config = PlexConfig.find(current_user)
+    try:
+        plex_user_config = PlexConfig.find(current_user)
+    except NoResultFound:
+        raise InternalServerError("No existing config for Plex.")
     return plex_config_serializer.jsonify(plex_user_config)
-
-
-@provider.route("/plex/config/status/", methods=["GET"])
-@login_required
-def get_plex_config_status():
-    plex_config = PlexConfig.find(current_user)
-    return provider_status_serializer.dump(plex_config)
 
 
 @provider.route("/plex/config/", methods=["PATCH"])
@@ -44,7 +54,10 @@ def update_plex_config():
             "Error while updating provider's config", payload=config_form.errors,
         )
     updated_config = config_form.data
-    user_config = PlexConfig.find(current_user)
+    try:
+        user_config = PlexConfig.find(current_user)
+    except NoResultFound:
+        raise InternalServerError("No existing config for Plex.")
     if not user_config:
         raise BadRequest("No config created for this provider")
 
@@ -55,7 +68,10 @@ def update_plex_config():
 @provider.route("/plex/servers/", methods=["GET"])
 @login_required
 def get_plex_servers():
-    plex_config = PlexConfig.find(current_user)
+    try:
+        plex_config = PlexConfig.find(current_user)
+    except NoResultFound:
+        raise InternalServerError("No existing config for Plex.")
     api_key = plex_config.provider_api_key
     plex_account = MyPlexAccount(api_key)
     servers = [
