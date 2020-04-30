@@ -10,11 +10,16 @@ const SpinnerStyle = styled.div`
   align-items: center;
   color: ${(props) =>
     props.color ? props.theme[props.color] : props.theme.dark};
+  padding: ${(props) => (props.padding ? props.padding : "0")};
 `;
 
-const Spinner = ({ color, size, justifyContent }) => {
+const Spinner = ({ padding, color, size, justifyContent }) => {
   return (
-    <SpinnerStyle color={color} justifyContent={justifyContent}>
+    <SpinnerStyle
+      padding={padding}
+      color={color}
+      justifyContent={justifyContent}
+    >
       <FontAwesomeIcon icon={faSpinner} pulse size={size ? size : "1x"} />
     </SpinnerStyle>
   );

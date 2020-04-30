@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import {
   faAngleDown,
@@ -10,16 +10,24 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
 import { useSearch } from "../../../hooks/useSearch";
 import { RowLayout } from "../../layouts";
+import { isEmpty } from "../../../utils/strings";
+import { Spinner } from "../../Spinner";
 
 const SearchBarStyle = styled.div`
   position: relative;
-  width: 33%;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   transition: 0.3s ease;
 
+  @media only screen and (min-width: 1024px) {
+    width: 33%;
+  }
+
   .search-input {
     width: 100%;
+    height: 50%;
     padding: 0.5em;
     border: 1px solid ${(props) => props.theme.primaryLight};
     border-top-right-radius: 3px;
@@ -28,26 +36,11 @@ const SearchBarStyle = styled.div`
     transition: 0.3s ease;
     color: black;
     opacity: 0.8;
-    font-size: 0.8em;
     text-indent: 25px;
     outline: none;
 
-    ::-webkit-input-placeholder {
-      /* Edge */
-      color: ${(props) => props.theme.dark};
-    }
-
-    :-ms-input-placeholder {
-      /* Internet Explorer 10-11 */
-      color: ${(props) => props.theme.dark};
-    }
-
     ::placeholder {
       color: ${(props) => props.theme.dark};
-    }
-
-    @media only screen and (max-width: 768px) {
-      width: 75%;
     }
   }
 
@@ -58,12 +51,12 @@ const SearchBarStyle = styled.div`
   ${({ isInputFocus }) =>
     isInputFocus &&
     css`
-      width: 50%;
+      @media only screen and (min-width: 1024px) {
+        width: 50%;
+      }
 
       .search-input {
-        height: 100%;
         opacity: 1;
-        font-size: 1em;
 
         @media only screen and (max-width: 768px) {
           width: 100%;
@@ -72,9 +65,6 @@ const SearchBarStyle = styled.div`
 
       .search-type {
         opacity: 1;
-        font-size: 1em;
-        padding-top: calc(0.5em - 2px);
-        padding-bottom: calc(0.5em - 2px);
       }
 
       .search-result {
@@ -88,18 +78,15 @@ const SearchTypesStyle = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: calc(0.5em - 1px);
-  padding-bottom: calc(0.5em - 1px);
-  padding-left: 0.5em;
-  padding-right: 0.5em;
+  padding: 0.5em;
   background-color: ${(props) => props.theme.secondary};
-  font-size: 0.8em;
   border-top-left-radius: 3px;
   border-bottom-left-radius: ${(props) => (!props.isActive ? "3px" : "none")};
   cursor: pointer;
   transition: 0.3s ease;
-  min-width: 100px;
-  max-width: 100px;
+  min-width: 120px;
+  max-width: 120px;
+  height: 50%;
 
   .search-types-items {
     position: absolute;
@@ -117,16 +104,11 @@ const SearchTypesStyle = styled.div`
   .search-types-item {
     display: flex;
     align-items: center;
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
-    min-width: 100px;
-    max-width: 100px;
+    justify-content: space-between;
 
-    .tag-icon {
-      margin-right: 1em;
-    }
+    padding: 0.5em;
+    min-width: 120px;
+    max-width: 120px;
   }
 `;
 
@@ -135,9 +117,9 @@ const SearchResults = styled.div`
   border-right: 1px solid LightGrey;
   border-bottom: 1px solid LightGrey;
   position: absolute;
-  top: 100%;
-  left: 100px;
-  width: calc(100% - 99px);
+  top: 75%;
+  left: 120px;
+  width: calc(100% - 120px);
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   background: white;
@@ -157,37 +139,72 @@ const MediaResult = ({ media }) => {
   );
 };
 
+const FriendResult = ({ user }) => {
+  return (
+    <RowLayout
+      justifyContent="space-between"
+      borderTop="1px solid LightGrey"
+      padding="1%"
+    >
+      <img src={user["user_picture"]} alt="Movie" width="50" height="70" />
+      <p>@{user.username}</p>
+      <p>{user.email}</p>
+    </RowLayout>
+  );
+};
+
 const searchTypes = ["all", "movies", "series", "friends"];
+let timer = null;
 
 const SearchBar = () => {
   const [isInputFocus, setIsInputFocus] = useState(false);
   const [isDropdownTypeOpen, setIsDropdownTypeOpen] = useState(false);
   const [typeSelectedIndex, setTypeSelectedIndex] = useState(0);
+  const searchBarRef = useRef(null);
   const toggleDropdownButtonRef = useRef(null);
+  const [inputValue, setInputValue] = useState("");
+  // click outside this component
+  useOutsideAlerter([searchBarRef], () => setIsDropdownTypeOpen(false));
+  // Click outside dropdown type
   useOutsideAlerter([toggleDropdownButtonRef], () =>
     setIsDropdownTypeOpen(false)
   );
 
   const [searchResult, setSearchResult] = useState(null);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
   const { search } = useSearch();
-  const _onInputChange = (e) => {
-    const value = e.target.value;
-    if (value.replace(/\s/g, "").length > 0) {
-      search(searchTypes[typeSelectedIndex], value).then((res) => {
-        console.log(res);
-        if (res && res.length > 0) {
-          setSearchResult(res);
-        } else {
-          setSearchResult(null);
-        }
-      });
+
+  const _search = (value) => {
+    if (!isEmpty(value)) {
+      setIsSearchLoading(true);
+      search(searchTypes[typeSelectedIndex], value)
+        .then((res) => {
+          console.log(res);
+          if (res && res.length > 0) {
+            setSearchResult(res);
+          } else {
+            setSearchResult(null);
+          }
+        })
+        .finally(() => setIsSearchLoading(false));
     } else {
       setSearchResult(null);
     }
   };
 
+  const _onInputChange = (e) => {
+    clearTimeout(timer);
+    const value = e.target.value;
+    setInputValue(value);
+    timer = setTimeout(() => _search(value), 750);
+  };
+
+  useEffect(() => {
+    _search(inputValue);
+  }, [typeSelectedIndex]);
+
   return (
-    <SearchBarStyle isInputFocus={isInputFocus}>
+    <SearchBarStyle ref={searchBarRef} isInputFocus={isInputFocus}>
       <SearchTypesStyle
         ref={toggleDropdownButtonRef}
         className="search-type"
@@ -225,21 +242,31 @@ const SearchBar = () => {
         type="text"
         placeholder="Search..."
       />
-      {searchResult && (
-        <SearchResults className="search-result">
-          {searchResult.map((result) => {
+      <SearchResults className="search-result">
+        {searchResult &&
+          !isSearchLoading &&
+          searchResult.map((result, index) => {
             if (
               searchTypes[typeSelectedIndex] === "movies" ||
               searchTypes[typeSelectedIndex] === "series" ||
               searchTypes[typeSelectedIndex] === "all"
             ) {
-              return <MediaResult key={result.id} media={result} />;
+              return <MediaResult key={index} media={result} />;
+            } else if (searchTypes[typeSelectedIndex] === "friends") {
+              return <FriendResult key={index} />;
             } else {
               return <div />;
             }
           })}
-        </SearchResults>
-      )}
+        {isSearchLoading && (
+          <Spinner
+            justifyContent="center"
+            color="primary"
+            size="2x"
+            padding="1em"
+          />
+        )}
+      </SearchResults>
     </SearchBarStyle>
   );
 };
