@@ -23,7 +23,7 @@ from server.providers.utils.plex import user_server, library_sections
 
 @provider.route("/plex/config/", methods=["GET"])
 @login_required
-def get_user_config():
+def get_plex_config():
     plex_user_config = PlexConfig.find(current_user)
     return plex_config_serializer.jsonify(plex_user_config)
 
@@ -32,7 +32,7 @@ def get_user_config():
 @login_required
 def get_plex_config_status():
     plex_config = PlexConfig.find(current_user)
-    return provider_status_serializer.dump(plex_user_config)
+    return provider_status_serializer.dump(plex_config)
 
 
 @provider.route("/plex/config/", methods=["PATCH"])
