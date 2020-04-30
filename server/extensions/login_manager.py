@@ -1,9 +1,7 @@
-from http import HTTPStatus
-
 from flask import g
 from flask_login import LoginManager, user_loaded_from_header
 
-from server.exceptions import HTTPError
+from server.exceptions import Unauthorized
 
 
 def register_login_manager(app):
@@ -17,13 +15,12 @@ def register_login_manager(app):
 
     @login_manager.unauthorized_handler
     def unauthorized():
-        raise HTTPError("Unauthorized", status_code=HTTPStatus.UNAUTHORIZED)
+        raise Unauthorized()
 
     @login_manager.needs_refresh_handler
     def refresh():
-        raise HTTPError(
-            "Need to refresh session through web browser (API unavailable)",
-            status_code=HTTPStatus.UNAUTHORIZED,
+        raise Unauthorized(
+            "Need to refresh session through web browser (API unavailable)"
         )
 
     @login_manager.request_loader

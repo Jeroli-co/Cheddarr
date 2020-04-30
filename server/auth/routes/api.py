@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from flask_login import current_user, fresh_login_required
 
 from server import utils
@@ -18,7 +16,7 @@ def get_api_key():
 def delete_api_key():
     current_user.api_key = None
     db.session.commit()
-    return {"message": "API key deleted"}, HTTPStatus.OK
+    return {"message": "API key deleted"}
 
 
 @auth.route("/key/cheddarr/reset/", methods=["GET"])

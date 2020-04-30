@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from flask import make_response, redirect, request, url_for
 from flask_login import current_user, login_user
 from passlib import pwd
@@ -19,7 +17,7 @@ from server.config import (
     PLEX_REQUEST_TOKEN_URL,
     PLEX_USER_RESOURCE_URL,
 )
-from server.exceptions import HTTPError
+from server.exceptions import BadRequest, InternalServerError, Unauthorized
 from server.extensions import db
 from server.providers.models import PlexConfig
 
@@ -34,37 +32,29 @@ plex_headers = {
 def signin():
     if request.method == "GET":
         if current_user.is_authenticated:
-            return session_serializer.jsonify(current_user), HTTPStatus.OK
+            return session_serializer.jsonify(current_user)
         else:
-            raise HTTPError(
-                "User not authenticated", status_code=HTTPStatus.UNAUTHORIZED
-            )
+            raise Unauthorized("User not authenticated.")
 
     else:
         signin_form = SigninForm()
         if not signin_form.validate():
-            raise HTTPError(
-                "Error while signing in.",
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                payload=signin_form.errors,
+            raise InternalServerError(
+                "Error while signing in.", payload=signin_form.errors,
             )
 
         user = User.find(email=signin_form.usernameOrEmail.data) or User.find(
             username=signin_form.usernameOrEmail.data
         )
         if not user or not user.password == signin_form.password.data:
-            raise HTTPError(
-                "Wrong username/email or password.", status_code=HTTPStatus.BAD_REQUEST
-            )
+            raise BadRequest("Wrong username/email or password.")
 
         if not user.confirmed:
-            raise HTTPError(
-                "The email needs to be confirmed.", status_code=HTTPStatus.UNAUTHORIZED,
-            )
+            raise Unauthorized("The email needs to be confirmed.")
 
         remember = signin_form.remember.data if signin_form.remember else False
         login_user(user, remember=remember)
-        return session_serializer.jsonify(user), HTTPStatus.OK
+        return session_serializer.jsonify(user)
 
 
 @auth.route("/sign-in/plex/", methods=["GET"])
@@ -87,7 +77,7 @@ def plex_signin():
         + "?token="
         + token
     )
-    return redirect(authorize_url), HTTPStatus.OK
+    return redirect(authorize_url), 200
 
 
 @auth.route("/sign-in/plex/authorize/", methods=["GET"])
@@ -99,9 +89,8 @@ def authorize_plex():
     r = get(PLEX_ACCESS_TOKEN_URL + state, headers=plex_headers)
     auth_token = r.json().get("authToken")
     if not auth_token:
-        raise HTTPError(
-            "Error while authorizing Plex", status_code=HTTPStatus.INTERNAL_SERVER_ERROR
-        )
+        raise InternalServerError("Error while authorizing Plex.",)
+
     plex_headers["X-Plex-Token"] = auth_token
     r = get(PLEX_USER_RESOURCE_URL, headers=plex_headers)
     info = r.json().get("user")

@@ -1,9 +1,8 @@
-import {useApi} from "./useApi";
-import {useContext} from "react";
-import {AuthContext} from "../contexts/AuthContext";
+import { useApi } from "./useApi";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 const useFriends = () => {
-
   const friendsURI = "/profile/friends/";
 
   const { executeRequest, methods } = useApi();
@@ -44,10 +43,10 @@ const useFriends = () => {
 
   const addFriend = async (username) => {
     const fd = new FormData();
-    fd.append('usernameOrEmail', username);
+    fd.append("usernameOrEmail", username);
     const res = await executeRequest(methods.POST, friendsURI, fd);
     switch (res.status) {
-      case 201:
+      case 200:
       case 400:
       case 409:
         return res;
@@ -58,7 +57,10 @@ const useFriends = () => {
   };
 
   const acceptRequest = async (username) => {
-    const res = await executeRequest(methods.GET, friendsURI + username + "/accept/");
+    const res = await executeRequest(
+      methods.GET,
+      friendsURI + username + "/accept/"
+    );
     switch (res.status) {
       case 200:
         return res;
@@ -69,7 +71,10 @@ const useFriends = () => {
   };
 
   const deleteFriend = async (username) => {
-    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    const res = await executeRequest(
+      methods.DELETE,
+      friendsURI + username + "/"
+    );
     switch (res.status) {
       case 200:
         return res;
@@ -80,7 +85,10 @@ const useFriends = () => {
   };
 
   const refuseFriend = async (username) => {
-    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    const res = await executeRequest(
+      methods.DELETE,
+      friendsURI + username + "/"
+    );
     switch (res.status) {
       case 200:
         return res;
@@ -91,7 +99,10 @@ const useFriends = () => {
   };
 
   const cancelFriend = async (username) => {
-    const res = await executeRequest(methods.DELETE, friendsURI + username + "/");
+    const res = await executeRequest(
+      methods.DELETE,
+      friendsURI + username + "/"
+    );
     switch (res.status) {
       case 200:
         return res;
@@ -121,11 +132,8 @@ const useFriends = () => {
     getFriends,
     getReceived,
     getRequested,
-    getFriend
-  }
-
+    getFriend,
+  };
 };
 
-export {
-  useFriends
-}
+export { useFriends };
