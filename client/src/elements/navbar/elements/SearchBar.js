@@ -9,8 +9,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
 import { useSearch } from "../../../hooks/useSearch";
-import { RowLayout } from "../../layouts";
-import { isEmpty } from "../../../utils/strings";
+import { ColumnLayout, RowLayout } from "../../layouts";
+import { cutString, isEmpty, Text } from "../../../utils/strings";
 import { Spinner } from "../../Spinner";
 
 const SearchBarStyle = styled.div`
@@ -48,7 +48,7 @@ const SearchBarStyle = styled.div`
     isInputFocus &&
     css`
       @media only screen and (min-width: 1024px) {
-        width: 50%;
+        width: 40%;
       }
 
       .search-input {
@@ -104,9 +104,6 @@ const SearchTypesStyle = styled.div`
 `;
 
 const SearchResults = styled.div`
-  border-left: 1px solid LightGrey;
-  border-right: 1px solid LightGrey;
-  border-bottom: 1px solid LightGrey;
   position: absolute;
   top: 75%;
   left: 120px;
@@ -115,31 +112,35 @@ const SearchResults = styled.div`
   border-bottom-right-radius: 3px;
   background: white;
   z-index: 1;
+  border: 1px solid LightGrey;
+`;
+
+const ResultSectionTitle = styled.div`
+  font-size: 0.8em;
+  font-weight: 400;
+  background-color: rgba(212, 212, 212, 0.5);
+  border-bottom: 1px solid LightGrey;
 `;
 
 const MediaResult = ({ media }) => {
   return (
-    <RowLayout
-      justifyContent="space-between"
-      borderTop="1px solid LightGrey"
-      padding="1%"
-    >
-      <img src={media.thumbUrl} alt="Movie" width="50" height="70" />
-      <p>{media.title}</p>
+    <RowLayout padding="1%" childMarginRight="2%">
+      <img src={media.thumbUrl} alt="Movie" width="30" height="50" />
+      <ColumnLayout>
+        <Text fontSize="0.9em">{cutString(media.title, 40)}</Text>
+        <Text fontSize="0.8em" fontWeight="lighter">
+          {media.year}
+        </Text>
+      </ColumnLayout>
     </RowLayout>
   );
 };
 
 const FriendResult = ({ user }) => {
   return (
-    <RowLayout
-      justifyContent="space-between"
-      borderTop="1px solid LightGrey"
-      padding="1%"
-    >
-      <img src={user["user_picture"]} alt="Movie" width="50" height="70" />
-      <p>@{user.username}</p>
-      <p>{user.email}</p>
+    <RowLayout padding="1%" childMarginRight="2%">
+      <img src={user["user_picture"]} alt="User" width="30" height="50" />
+      <Text fontSize="0.9em">@{user.username}</Text>
     </RowLayout>
   );
 };
@@ -151,7 +152,7 @@ const SearchResultsItems = ({ type, results }) => {
       <div>
         {sortedResult.friends.length > 0 && (
           <div>
-            <div>Friends</div>
+            <ResultSectionTitle>Friends</ResultSectionTitle>
             {sortedResult.friends.map((friend, index) => (
               <FriendResult key={index} user={friend} />
             ))}
@@ -159,7 +160,7 @@ const SearchResultsItems = ({ type, results }) => {
         )}
         {sortedResult.movies.length > 0 && (
           <div>
-            <div>Movies</div>
+            <ResultSectionTitle>Movies</ResultSectionTitle>
             {sortedResult.movies.map((movie, index) => (
               <MediaResult key={index} media={movie} />
             ))}
@@ -167,7 +168,7 @@ const SearchResultsItems = ({ type, results }) => {
         )}
         {sortedResult.series.length > 0 && (
           <div>
-            <div>Series</div>
+            <ResultSectionTitle>Series</ResultSectionTitle>
             {sortedResult.series.map((series, index) => (
               <MediaResult key={index} media={series} />
             ))}
@@ -177,10 +178,14 @@ const SearchResultsItems = ({ type, results }) => {
     );
   }
 
+  if (results.length === 0) {
+    return <div>No results</div>;
+  }
+
   return results.map((result, index) => {
-    if (type === "movies" || type === "series") {
+    if (result.type === "movie" || result.type === "series") {
       return <MediaResult key={index} media={result} />;
-    } else if (type === "friends") {
+    } else if (result.type === "friend") {
       return <FriendResult key={index} />;
     } else {
       return <div />;
@@ -259,7 +264,12 @@ const reducer = (state, action) => {
         results: action.payload.results,
       };
     case actionTypes.LOAD_SEARCH:
-      return { ...state, isSearchLoading: true, resultsShow: true };
+      return {
+        ...state,
+        results: [],
+        isSearchLoading: true,
+        resultsShow: true,
+      };
     default:
       throw new Error("No types matched");
   }
@@ -284,6 +294,11 @@ const SearchBar = () => {
   const _search = () => {
     if (!isEmpty(state.searchValue)) {
       dispatch({ type: actionTypes.LOAD_SEARCH });
+    } else {
+      dispatch({
+        type: actionTypes.UPDATE_RESULT,
+        payload: { results: [] },
+      });
     }
   };
 
@@ -316,7 +331,7 @@ const SearchBar = () => {
 
   useEffect(() => {
     if (state.resultsShow) {
-      _search();
+      dispatch({ type: actionTypes.LOAD_SEARCH });
     }
   }, [state.type]);
 

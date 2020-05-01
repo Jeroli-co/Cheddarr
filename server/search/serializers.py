@@ -7,6 +7,7 @@ from server.extensions import ma
 class MediaSearchResult(ma.Schema):
     ratingKey = fields.String(data_key="id")
     title = fields.String()
+    year = fields.Integer()
     thumbUrl = fields.String()
     type = fields.String()
 
