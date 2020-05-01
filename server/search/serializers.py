@@ -26,7 +26,7 @@ class FriendSearchSerializer(ma.SQLAlchemySchema):
     username = ma.auto_field()
     user_picture = ma.auto_field()
     email = ma.auto_field()
-    type = fields.Constant("friends")
+    type = fields.Constant("friend")
 
 
 friends_search_serializer = FriendSearchSerializer(many=True)
