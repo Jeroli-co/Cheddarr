@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import {
   faAngleDown,
@@ -44,10 +44,6 @@ const SearchBarStyle = styled.div`
     }
   }
 
-  .search-result {
-    display: none;
-  }
-
   ${({ isInputFocus }) =>
     isInputFocus &&
     css`
@@ -66,10 +62,6 @@ const SearchBarStyle = styled.div`
       .search-type {
         opacity: 1;
       }
-
-      .search-result {
-        display: block;
-      }
     `}
 `;
 
@@ -78,7 +70,6 @@ const SearchTypesStyle = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5em;
   background-color: ${(props) => props.theme.secondary};
   border-top-left-radius: 3px;
   border-bottom-left-radius: ${(props) => (!props.isActive ? "3px" : "none")};
@@ -153,77 +144,212 @@ const FriendResult = ({ user }) => {
   );
 };
 
+const SearchResultsItems = ({ type, results }) => {
+  if (type === "all") {
+    const sortedResult = sortSearchResult(results);
+    return (
+      <div>
+        {sortedResult.friends.length > 0 && (
+          <div>
+            <div>Friends</div>
+            {sortedResult.friends.map((friend, index) => (
+              <FriendResult key={index} user={friend} />
+            ))}
+          </div>
+        )}
+        {sortedResult.movies.length > 0 && (
+          <div>
+            <div>Movies</div>
+            {sortedResult.movies.map((movie, index) => (
+              <MediaResult key={index} media={movie} />
+            ))}
+          </div>
+        )}
+        {sortedResult.series.length > 0 && (
+          <div>
+            <div>Series</div>
+            {sortedResult.series.map((series, index) => (
+              <MediaResult key={index} media={series} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return results.map((result, index) => {
+    if (type === "movies" || type === "series") {
+      return <MediaResult key={index} media={result} />;
+    } else if (type === "friends") {
+      return <FriendResult key={index} />;
+    } else {
+      return <div />;
+    }
+  });
+};
+
+const sortSearchResult = (results) => {
+  const sortedResults = { friends: [], movies: [], series: [] };
+  results.forEach((result) => {
+    if (result.type === "movie") {
+      sortedResults.movies.push(result);
+    } else if (result.type === "series") {
+      sortedResults.series.push(result);
+    } else if (result.type === "friend") {
+      sortedResults.friends.push(result);
+    }
+  });
+  return sortedResults;
+};
+
 const searchTypes = ["all", "movies", "series", "friends"];
 let timer = null;
 
-const SearchBar = () => {
-  const [isInputFocus, setIsInputFocus] = useState(false);
-  const [isDropdownTypeOpen, setIsDropdownTypeOpen] = useState(false);
-  const [typeSelectedIndex, setTypeSelectedIndex] = useState(0);
-  const searchBarRef = useRef(null);
-  const toggleDropdownButtonRef = useRef(null);
-  const [inputValue, setInputValue] = useState("");
-  // click outside this component
-  useOutsideAlerter([searchBarRef], () => setIsDropdownTypeOpen(false));
-  // Click outside dropdown type
-  useOutsideAlerter([toggleDropdownButtonRef], () =>
-    setIsDropdownTypeOpen(false)
-  );
+const initialState = {
+  inputFocus: false,
+  typesOpen: false,
+  type: "all",
+  searchValue: "",
+  resultsShow: false,
+  results: [],
+  isSearchLoading: false,
+};
 
-  const [searchResult, setSearchResult] = useState(null);
-  const [isSearchLoading, setIsSearchLoading] = useState(false);
+const initReducer = () => initialState;
+
+const actionTypes = {
+  LEAVE_FOCUS: "leave-focus",
+  FOCUS_INPUT: "focus-input",
+  TOGGLE_TYPES: "toggle-types",
+  CLOSE_TYPES: "close-types",
+  SELECT_TYPES: "select-type",
+  UPDATE_VALUE: "update-value",
+  UPDATE_RESULT: "update-results",
+  LOAD_SEARCH: "load-search",
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case actionTypes.LEAVE_FOCUS:
+      return {
+        ...state,
+        inputFocus: false,
+        typesOpen: false,
+        resultsShow: false,
+      };
+    case actionTypes.FOCUS_INPUT:
+      return {
+        ...state,
+        typesOpen: false,
+        resultsShow: true,
+        inputFocus: true,
+      };
+    case actionTypes.TOGGLE_TYPES:
+      return { ...state, typesOpen: !state.typesOpen };
+    case actionTypes.CLOSE_TYPES:
+      return { ...state, typesOpen: false };
+    case actionTypes.SELECT_TYPES:
+      return { ...state, typesOpen: false, type: action.payload.type };
+    case actionTypes.UPDATE_VALUE:
+      return { ...state, searchValue: action.payload.searchValue };
+    case actionTypes.UPDATE_RESULT:
+      return {
+        ...state,
+        isSearchLoading: false,
+        results: action.payload.results,
+      };
+    case actionTypes.LOAD_SEARCH:
+      return { ...state, isSearchLoading: true, resultsShow: true };
+    default:
+      throw new Error("No types matched");
+  }
+};
+
+const SearchBar = () => {
+  const [state, dispatch] = useReducer(reducer, initialState, initReducer);
+
+  const searchBarRef = useRef(null);
+  const typesDropdownRef = useRef(null);
+  // click outside this component
+  useOutsideAlerter([searchBarRef], () => {
+    dispatch({ type: actionTypes.LEAVE_FOCUS });
+  });
+  // Click outside dropdown type
+  useOutsideAlerter([typesDropdownRef], () => {
+    dispatch({ type: actionTypes.CLOSE_TYPES });
+  });
+
   const { search } = useSearch();
 
-  const _search = (value) => {
-    if (!isEmpty(value)) {
-      setIsSearchLoading(true);
-      search(searchTypes[typeSelectedIndex], value)
-        .then((res) => {
-          console.log(res);
-          if (res && res.length > 0) {
-            setSearchResult(res);
-          } else {
-            setSearchResult(null);
-          }
-        })
-        .finally(() => setIsSearchLoading(false));
-    } else {
-      setSearchResult(null);
+  const _search = () => {
+    if (!isEmpty(state.searchValue)) {
+      dispatch({ type: actionTypes.LOAD_SEARCH });
     }
   };
 
   const _onInputChange = (e) => {
-    clearTimeout(timer);
     const value = e.target.value;
-    setInputValue(value);
-    timer = setTimeout(() => _search(value), 750);
+    dispatch({
+      type: actionTypes.UPDATE_VALUE,
+      payload: { searchValue: value },
+    });
   };
 
   useEffect(() => {
-    _search(inputValue);
-  }, [typeSelectedIndex]);
+    clearTimeout(timer);
+    timer = setTimeout(() => _search(), 750);
+  }, [state.searchValue]);
+
+  useEffect(() => {
+    if (state.isSearchLoading) {
+      search(state.type, state.searchValue).then((data) => {
+        console.log(data);
+        if (data) {
+          dispatch({
+            type: actionTypes.UPDATE_RESULT,
+            payload: { results: data },
+          });
+        }
+      });
+    }
+  }, [state.isSearchLoading]);
+
+  useEffect(() => {
+    if (state.resultsShow) {
+      _search();
+    }
+  }, [state.type]);
 
   return (
-    <SearchBarStyle ref={searchBarRef} isInputFocus={isInputFocus}>
+    <SearchBarStyle ref={searchBarRef} isInputFocus={state.inputFocus}>
       <SearchTypesStyle
-        ref={toggleDropdownButtonRef}
+        ref={typesDropdownRef}
         className="search-type"
-        onClick={() => setIsDropdownTypeOpen(!isDropdownTypeOpen)}
-        isActive={isDropdownTypeOpen}
+        isActive={state.typesOpen}
       >
-        <FontAwesomeIcon icon={faTags} />
-        <div className="search-types-selected-item">
-          {searchTypes[typeSelectedIndex]}
+        <div
+          className="search-types-item"
+          onClick={() => dispatch({ type: actionTypes.TOGGLE_TYPES })}
+        >
+          <FontAwesomeIcon icon={faTags} />
+          {state.type}
+          {!state.typesOpen && <FontAwesomeIcon icon={faAngleRight} />}
+          {state.typesOpen && <FontAwesomeIcon icon={faAngleDown} />}
         </div>
         <div className="search-types-items">
-          {isDropdownTypeOpen &&
+          {state.typesOpen &&
             searchTypes.map(
               (st, index) =>
-                index !== typeSelectedIndex && (
+                st !== state.type && (
                   <div
                     key={index}
                     className="search-types-item"
-                    onClick={() => setTypeSelectedIndex(index)}
+                    onClick={() =>
+                      dispatch({
+                        type: actionTypes.SELECT_TYPES,
+                        payload: { type: st },
+                      })
+                    }
                   >
                     <FontAwesomeIcon className="tag-icon" icon={faTag} />
                     {st}
@@ -231,42 +357,29 @@ const SearchBar = () => {
                 )
             )}
         </div>
-        {!isDropdownTypeOpen && <FontAwesomeIcon icon={faAngleRight} />}
-        {isDropdownTypeOpen && <FontAwesomeIcon icon={faAngleDown} />}
       </SearchTypesStyle>
       <input
         onChange={(e) => _onInputChange(e)}
-        onFocus={() => setIsInputFocus(true)}
-        onBlur={() => setIsInputFocus(false)}
+        onFocus={() => dispatch({ type: actionTypes.FOCUS_INPUT })}
         className="search-input"
         type="text"
         placeholder="Search..."
       />
-      <SearchResults className="search-result">
-        {searchResult &&
-          !isSearchLoading &&
-          searchResult.map((result, index) => {
-            if (
-              searchTypes[typeSelectedIndex] === "movies" ||
-              searchTypes[typeSelectedIndex] === "series" ||
-              searchTypes[typeSelectedIndex] === "all"
-            ) {
-              return <MediaResult key={index} media={result} />;
-            } else if (searchTypes[typeSelectedIndex] === "friends") {
-              return <FriendResult key={index} />;
-            } else {
-              return <div />;
-            }
-          })}
-        {isSearchLoading && (
-          <Spinner
-            justifyContent="center"
-            color="primary"
-            size="2x"
-            padding="1em"
-          />
-        )}
-      </SearchResults>
+      {state.resultsShow && (
+        <SearchResults className="search-result">
+          {!state.isSearchLoading && (
+            <SearchResultsItems type={state.type} results={state.results} />
+          )}
+          {state.isSearchLoading && (
+            <Spinner
+              justifyContent="center"
+              color="primary"
+              size="2x"
+              padding="1em"
+            />
+          )}
+        </SearchResults>
+      )}
     </SearchBarStyle>
   );
 };
