@@ -95,6 +95,11 @@ class PlexSeriesSerializer(PlexVideoSerializer):
         del media.actors[25:]
         return media
 
+    @pre_dump
+    def media_type(self, media, **kwargs):
+        media.type = media.type.replace("show", "series")
+        return media
+
 
 plex_movies_serializer = PlexMovieSerializer()
 plex_series_serializer = PlexSeriesSerializer()
