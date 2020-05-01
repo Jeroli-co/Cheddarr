@@ -17,7 +17,7 @@ def get_radarr_status():
     try:
         radarr_config = RadarrConfig.find(current_user)
     except NoResultFound:
-        raise InternalServerError("No existing config for Radarr.")
+        return {"status": False}
     host = radarr_config.host
     port = radarr_config.port
     api_key = radarr_config.provider_api_key
@@ -56,7 +56,7 @@ def get_radarr_config():
     try:
         radarr_config = RadarrConfig.find(current_user)
     except NoResultFound:
-        raise InternalServerError("No existing config for Radarr.")
+        return {}
     return radarr_config_serializer.jsonify(radarr_config)
 
 

@@ -2,13 +2,13 @@ import { RowLayout } from "../../../../elements/layouts";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { SubmitConfig } from "../SubmitConfig";
-import { useRadarr } from "../../../../hooks/useRadarr";
+import { useSonarr } from "../../../../hooks/useSonarr";
 
-const RadarrConfig = () => {
+const SonarrConfig = () => {
   const { register, handleSubmit, formState, reset, getValues } = useForm();
-  const { testRadarrConfig, updateRadarrConfig, getRadarrConfig } = useRadarr();
+  const { testSonarrConfig, updateSonarrConfig, getSonarrConfig } = useSonarr();
   useEffect(() => {
-    getRadarrConfig().then((data) => {
+    getSonarrConfig().then((data) => {
       if (data) reset(data);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -19,18 +19,18 @@ const RadarrConfig = () => {
     formState.dirtyFields.forEach((key) => {
       newConfig[key] = data[key];
     });
-    updateRadarrConfig(newConfig).then((res) => {
+    updateSonarrConfig(newConfig).then((res) => {
       if (res) reset(res.data);
     });
   };
 
   return (
-    <div className="RadarrConfig" data-testid="RadarrConfig">
+    <div className="SonarrConfig" data-testid="SonarrConfig">
       <RowLayout
         justifyContent="space-between"
         borderBottom="1px solid LightGrey"
       >
-        <h1 className="is-size-1">Radarr</h1>
+        <h1 className="is-size-1">Sonarr</h1>
       </RowLayout>
 
       <div className="container">
@@ -91,7 +91,7 @@ const RadarrConfig = () => {
           <div className="control">
             <button
               className="button is-secondary-button"
-              onClick={() => testRadarrConfig(getValues())}
+              onClick={() => testSonarrConfig(getValues())}
             >
               Test
             </button>
@@ -102,4 +102,4 @@ const RadarrConfig = () => {
   );
 };
 
-export { RadarrConfig };
+export { SonarrConfig };

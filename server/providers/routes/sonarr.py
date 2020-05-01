@@ -18,7 +18,7 @@ def get_sonarr_status():
     try:
         sonarr_config = SonarrConfig.find(current_user)
     except NoResultFound:
-        raise InternalServerError("No existing config for Sonarr.")
+        {"status": False}
     host = sonarr_config.host
     port = sonarr_config.port
     api_key = sonarr_config.provider_api_key
@@ -36,7 +36,7 @@ def get_sonarr_config():
     try:
         sonarr_config = SonarrConfig.find(current_user)
     except NoResultFound:
-        raise InternalServerError("No existing config for Sonarr.")
+        return {}
     return radarr_config_serializer.jsonify(sonarr_config)
 
 

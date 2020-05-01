@@ -26,7 +26,7 @@ def get_plex_status():
     try:
         plex_config = PlexConfig.find(current_user)
     except NoResultFound:
-        raise InternalServerError("No existing config for Plex.")
+        return {"status": False}
     up = (
         MyPlexAccount(plex_config.provider_api_key)
         .resource(plex_config.machine_name)
@@ -41,7 +41,7 @@ def get_plex_config():
     try:
         plex_user_config = PlexConfig.find(current_user)
     except NoResultFound:
-        raise InternalServerError("No existing config for Plex.")
+        return {}
     return plex_config_serializer.jsonify(plex_user_config)
 
 

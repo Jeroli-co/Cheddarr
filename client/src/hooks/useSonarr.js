@@ -3,13 +3,13 @@ import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { NotificationContext } from "../contexts/NotificationContext";
 
-const useRadarr = () => {
-  const providerUrl = "/provider/radarr/";
+const useSonarr = () => {
+  const providerUrl = "/provider/sonarr/";
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
   const { pushSuccess, pushDanger } = useContext(NotificationContext);
 
-  const getRadarrStatus = async () => {
+  const getSonarrStatus = async () => {
     const res = await executeRequest(methods.GET, providerUrl + "status/");
     switch (res.status) {
       case 200:
@@ -19,7 +19,7 @@ const useRadarr = () => {
     }
   };
 
-  const testRadarrConfig = async (config) => {
+  const testSonarrConfig = async (config) => {
     const res = await executeRequest(
       methods.POST,
       providerUrl + "config/test/",
@@ -35,7 +35,7 @@ const useRadarr = () => {
     }
   };
 
-  const getRadarrConfig = async () => {
+  const getSonarrConfig = async () => {
     const res = await executeRequest(methods.GET, providerUrl + "config/");
     switch (res.status) {
       case 200:
@@ -46,7 +46,7 @@ const useRadarr = () => {
     }
   };
 
-  const updateRadarrConfig = async (newConfig) => {
+  const updateSonarrConfig = async (newConfig) => {
     const res = await executeRequest(
       methods.PATCH,
       providerUrl + "config/",
@@ -63,11 +63,11 @@ const useRadarr = () => {
   };
 
   return {
-    getRadarrStatus,
-    testRadarrConfig,
-    getRadarrConfig,
-    updateRadarrConfig,
+    getSonarrStatus,
+    testSonarrConfig,
+    getSonarrConfig,
+    updateSonarrConfig,
   };
 };
 
-export { useRadarr };
+export { useSonarr };
