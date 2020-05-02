@@ -1,90 +1,44 @@
-import React, { useEffect, useState } from "react";
-import "./Settings.scss";
-import { Link } from "react-router-dom";
-import { routes } from "../../router/routes";
-import { Route } from "react-router";
+import React, { useState } from "react";
 import { PlexConfigContextProvider } from "../../contexts/PlexConfigContext";
+import { SettingsAccount } from "./settings-account/SettingsAccount";
+import { PlexConfig } from "./settings-providers/plex-config/PlexConfig";
+import { RadarrConfig } from "./settings-providers/radarr-config/RadarrConfig";
+import { SonarrConfig } from "./settings-providers/sonarr-config/SonarrConfig";
+import styled from "styled-components";
+
+const SettingsStyle = styled.div`
+  margin: 1%;
+`;
+
+const tabsName = ["Account", "Plex", "Radarr", "Sonarr"];
 
 const Settings = ({ location }) => {
-  const [activeLink, setActiveLink] = useState("");
-
-  useEffect(() => {
-    setActiveLink(location.pathname);
-  }, [location.pathname]);
+  const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div className="Settings" data-testid="Settings">
+    <SettingsStyle data-testid="Settings">
       <div className="tabs is-centered is-boxed is-medium">
         <ul>
-          <li
-            className={
-              activeLink === routes.USER_SETTINGS.url ||
-              activeLink === routes.USER_SETTINGS_ACCOUNT.url
-                ? "is-active"
-                : ""
-            }
-          >
-            <Link to={routes.USER_SETTINGS_ACCOUNT.url}>
-              <p>Account</p>
-            </Link>
-          </li>
-          <li
-            className={
-              activeLink === routes.USER_SETTINGS_PLEX.url ? "is-active" : ""
-            }
-          >
-            <Link to={routes.USER_SETTINGS_PLEX.url}>
-              <p>Plex</p>
-            </Link>
-          </li>
-          <li
-            className={
-              activeLink === routes.USER_SETTINGS_RADARR.url ? "is-active" : ""
-            }
-          >
-            <Link to={routes.USER_SETTINGS_RADARR.url}>
-              <p>Radarr</p>
-            </Link>
-          </li>
-          <li
-            className={
-              activeLink === routes.USER_SETTINGS_SONARR.url ? "is-active" : ""
-            }
-          >
-            <Link to={routes.USER_SETTINGS_SONARR.url}>
-              <p>Sonarr</p>
-            </Link>
-          </li>
+          {tabsName.map((name, index) => (
+            <li
+              className={activeTab === index ? "is-active" : ""}
+              onClick={() => setActiveTab(index)}
+            >
+              <a href={"#" + tabsName[index]}>{tabsName[index]}</a>
+            </li>
+          ))}
         </ul>
       </div>
-      <Route
-        exact
-        path={routes.USER_SETTINGS.url}
-        component={routes.USER_SETTINGS_ACCOUNT.component}
-      />
-      <Route
-        exact
-        path={routes.USER_SETTINGS_ACCOUNT.url}
-        component={routes.USER_SETTINGS_ACCOUNT.component}
-      />
-      <PlexConfigContextProvider>
-        <Route
-          exact
-          path={routes.USER_SETTINGS_PLEX.url}
-          component={routes.USER_SETTINGS_PLEX.component}
-        />
-      </PlexConfigContextProvider>
-      <Route
-        exact
-        path={routes.USER_SETTINGS_RADARR.url}
-        component={routes.USER_SETTINGS_RADARR.component}
-      />
-      <Route
-        exact
-        path={routes.USER_SETTINGS_SONARR.url}
-        component={routes.USER_SETTINGS_SONARR.component}
-      />
-    </div>
+
+      {activeTab === 0 && <SettingsAccount id={tabsName[0]} />}
+      {activeTab === 1 && (
+        <PlexConfigContextProvider>
+          <PlexConfig id={tabsName[1]} location={location} />
+        </PlexConfigContextProvider>
+      )}
+      {activeTab === 2 && <RadarrConfig id={tabsName[2]} />}
+      {activeTab === 3 && <SonarrConfig id={tabsName[3]} />}
+    </SettingsStyle>
   );
 };
 

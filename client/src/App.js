@@ -39,7 +39,6 @@ const App = () => {
                 path={routes.HOME.url}
                 component={routes.HOME.component}
               />
-
               <Route
                 exact
                 path={routes.CONFIRM_EMAIL.url(":token")}
@@ -55,7 +54,6 @@ const App = () => {
                 path={routes.AUTHORIZE_PLEX.url}
                 component={routes.AUTHORIZE_PLEX.component}
               />
-
               <ProtectedRoute
                 path={routes.SIGN_IN.url}
                 component={routes.SIGN_IN.component}
@@ -75,7 +73,6 @@ const App = () => {
                 path={routes.RESEND_EMAIL_CONFIRMATION.url}
                 component={routes.RESEND_EMAIL_CONFIRMATION.component}
               />
-
               <PrivateRoute
                 path={routes.USER_PROFILE.url}
                 component={routes.USER_PROFILE.component}
@@ -86,10 +83,10 @@ const App = () => {
                 component={routes.USER_FRIEND_PROFILE.component}
               />
               <PrivateRoute
+                exact
                 path={routes.USER_SETTINGS.url}
                 component={routes.USER_SETTINGS.component}
               />
-
               <Route
                 exact
                 path={routes.BAD_REQUEST.url}
@@ -105,7 +102,6 @@ const App = () => {
                 path={routes.INTERNAL_SERVER_ERROR.url}
                 component={routes.INTERNAL_SERVER_ERROR.component}
               />
-
               <Route component={routes.NOT_FOUND.component} />
             </Switch>
           </div>

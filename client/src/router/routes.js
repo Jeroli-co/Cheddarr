@@ -11,17 +11,17 @@ import { InternalServerError } from "../elements/errors/InternalServerError";
 import { ResendEmailConfirmationModal } from "../modules/auth/elements/ResendEmailConfirmationModal";
 import { InitResetPasswordModal } from "../modules/auth/sign-in-form/init-reset-password-modal/InitResetPasswordModal";
 import { BadRequest } from "../elements/errors/BadRequest";
-import { ChangePasswordModal } from "../modules/settings/settings-profile/element/ChangePasswordModal";
-import { ChangeUsernameModal } from "../modules/settings/settings-profile/element/ChangeUsernameModal";
-import { ChangeEmailModal } from "../modules/settings/settings-profile/element/ChangeEmailModal";
-import { DeleteAccountModal } from "../modules/settings/settings-profile/element/DeleteAccountModal";
 import { FriendProfile } from "../modules/profile/friends/elements/FriendProfile";
 import { Friends } from "../modules/profile/friends/Friends";
 import { PageLoader } from "../elements/PageLoader";
-import { PlexConfig } from "../modules/settings/settings-configurations/plex-config/PlexConfig";
-import { RadarrConfig } from "../modules/settings/settings-configurations/radarr-config/RadarrConfig";
-import { SonarrConfig } from "../modules/settings/settings-configurations/sonarr-config/SonarrConfig";
 import { SettingsAccount } from "../modules/settings/settings-account/SettingsAccount";
+import { ChangeEmailModal } from "../modules/settings/settings-account/element/ChangeEmailModal";
+import { ChangeUsernameModal } from "../modules/settings/settings-account/element/ChangeUsernameModal";
+import { ChangePasswordModal } from "../modules/settings/settings-account/element/ChangePasswordModal";
+import { SonarrConfig } from "../modules/settings/settings-providers/sonarr-config/SonarrConfig";
+import { RadarrConfig } from "../modules/settings/settings-providers/radarr-config/RadarrConfig";
+import { PlexConfig } from "../modules/settings/settings-providers/plex-config/PlexConfig";
+import { DeleteAccountModal } from "../modules/settings/settings-account/element/DeleteAccountModal";
 
 const routes = {
   HOME: { url: "/", component: Home },
