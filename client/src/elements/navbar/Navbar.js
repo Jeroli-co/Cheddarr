@@ -12,7 +12,7 @@ import { GitHubButton } from "./elements/GithubButton";
 import { UserDropdownMobile } from "./user-dropdown/UserDropdownMobile";
 import { useOutsideAlerter } from "../../hooks/useOutsideAlerter";
 import { RowLayout } from "../layouts";
-import { SearchBar } from "./elements/SearchBar";
+import { SearchBar } from "./elements/search-bar/SearchBar";
 
 const NavbarLogoKeyframes = () => {
   return keyframes`
