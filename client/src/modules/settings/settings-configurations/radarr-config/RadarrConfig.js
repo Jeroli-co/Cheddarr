@@ -32,26 +32,36 @@ const RadarrConfig = () => {
       >
         <h1 className="is-size-1">Radarr</h1>
       </RowLayout>
-
+      <br />
       <div className="container">
         <form id="radarr-config-form" onSubmit={handleSubmit(_onSubmit)}>
-          <RowLayout marginTop="1%" className="field">
-            <div>
-              <label className="label">API Key</label>
-              <div className="control has-icons-left">
-                <input
-                  name="provider_api_key"
-                  className="input"
-                  type="text"
-                  placeholder="API Key"
-                  ref={register}
-                />
-              </div>
+          <div className="field">
+            <div className="control">
+              <input
+                id="enabled"
+                type="checkbox"
+                name="enabled"
+                className="switch is-primary"
+                ref={register}
+              />
+              <label htmlFor="enabled">Enabled</label>
             </div>
-          </RowLayout>
+          </div>
+          <div className="field">
+            <label className="label">API Key</label>
+            <div className="control">
+              <input
+                name="provider_api_key"
+                className="input"
+                type="text"
+                placeholder="API Key"
+                ref={register}
+              />
+            </div>
+          </div>
           <div className="field">
             <label className="label">Hostname or IP Address</label>
-            <div className="control has-icons-left">
+            <div className="control">
               <input
                 name="host"
                 className="input"
@@ -63,7 +73,7 @@ const RadarrConfig = () => {
           </div>
           <div className="field">
             <label className="label">Port Number</label>
-            <div className="control has-icons-left">
+            <div className="control">
               <input
                 name="port"
                 className="input"

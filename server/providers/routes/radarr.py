@@ -1,5 +1,4 @@
 from flask_login import current_user, login_required
-from requests.exceptions import InvalidURL
 from sqlalchemy.orm.exc import NoResultFound
 from requests import get
 from server.exceptions import InternalServerError, BadRequest
@@ -18,15 +17,7 @@ def get_radarr_status():
         radarr_config = RadarrConfig.find(current_user)
     except NoResultFound:
         return {"status": False}
-    host = radarr_config.host
-    port = radarr_config.port
-    api_key = radarr_config.provider_api_key
-    ssl = "https" if radarr_config.ssl else "http"
-    try:
-        r = get(f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}")
-    except InvalidURL:
-        raise BadRequest("Invalid config for Radarr.")
-    return {"status": radarr_config.enabled and r.status_code == 200}
+    return {"status": radarr_config.enabled}
 
 
 @provider.route("/radarr/config/test/", methods=["POST"])
@@ -43,8 +34,8 @@ def test_radarr_config():
     ssl = "https" if config_form.ssl.data else "http"
     try:
         r = get(f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}")
-    except InvalidURL:
-        raise BadRequest("Invalid config for Sonarr.")
+    except Exception:
+        raise BadRequest("Failed to connect to Radarr.")
     return {"status": r.status_code == 200}
 
 

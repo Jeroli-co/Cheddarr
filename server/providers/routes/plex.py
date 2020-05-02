@@ -27,12 +27,7 @@ def get_plex_status():
         plex_config = PlexConfig.find(current_user)
     except NoResultFound:
         return {"status": False}
-    up = (
-        MyPlexAccount(plex_config.provider_api_key)
-        .resource(plex_config.machine_name)
-        .presence
-    )
-    return {"status": plex_config.enabled and up}
+    return {"status": plex_config.enabled}
 
 
 @provider.route("/plex/config/", methods=["GET"])

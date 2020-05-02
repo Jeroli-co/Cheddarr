@@ -25,7 +25,7 @@ const Settings = ({ location }) => {
             }
           >
             <Link to={routes.USER_SETTINGS_PROFILE.url}>
-              <p>Profile</p>
+              <p>Account</p>
             </Link>
           </li>
           <li

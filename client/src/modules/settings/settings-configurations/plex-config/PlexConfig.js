@@ -55,12 +55,26 @@ const PlexConfig = ({ location }) => {
       {isPlexAccountLinked(config) && (
         <div className="container">
           <form onSubmit={handleSubmit(_onSubmit)}>
+            <br />
+            <p className="subtitle is-3">Plex server</p>
             {isPlexServerLinked(config) && (
               <RowLayout justifyContent="space-between" marginTop="2%">
-                <p className="is-size-4">Plex server</p>
                 <p className="is-size-5 has-text-weight-light">
                   {config["machine_name"]}
                 </p>
+                <div className="field">
+                  <div className="control">
+                    <input
+                      id="enabled"
+                      type="checkbox"
+                      name="enabled"
+                      className="switch is-primary"
+                      ref={register}
+                      defaultChecked={config.enabled}
+                    />
+                    <label htmlFor="enabled">Enabled</label>
+                  </div>
+                </div>
                 <button
                   type="button"
                   className="button is-small is-rounded is-info"
@@ -77,19 +91,6 @@ const PlexConfig = ({ location }) => {
                 >
                   <FontAwesomeIcon icon={faTrash} />
                 </button>
-                <div className="field">
-                  <div className="control">
-                    <input
-                      id="enabled"
-                      type="checkbox"
-                      name="enabled"
-                      className="switch is-primary"
-                      ref={register}
-                      defaultChecked={config.enabled}
-                    />
-                    <label htmlFor="enabled">Enabled</label>
-                  </div>
-                </div>
               </RowLayout>
             )}
             {!isPlexServerLinked(config) && (
