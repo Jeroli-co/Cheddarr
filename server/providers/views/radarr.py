@@ -3,8 +3,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from requests import get
 from server.exceptions import InternalServerError, BadRequest
 from server.providers.forms import RadarrConfigForm
-from server.providers.models.provider_config import RadarrConfig
-from server.providers.routes import provider
+from server.providers.models import RadarrConfig
+from server.providers import provider
 from server.providers.serializers.provider_config_serializer import (
     radarr_config_serializer,
 )

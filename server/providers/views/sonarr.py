@@ -1,12 +1,10 @@
-import re
-
 from flask_login import current_user, login_required
 from sqlalchemy.orm.exc import NoResultFound
 from requests import get
 from server.exceptions import InternalServerError, BadRequest
 from server.providers.forms import SonarrConfigForm
-from server.providers.models.provider_config import SonarrConfig
-from server.providers.routes import provider
+from server.providers.models import SonarrConfig
+from server.providers import provider
 from server.providers.serializers.provider_config_serializer import (
     radarr_config_serializer,
     sonarr_config_serializer,

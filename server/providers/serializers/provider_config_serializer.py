@@ -1,6 +1,5 @@
 from server.extensions import ma
-from server.providers.models import PlexConfig
-from server.providers.models.provider_config import SonarrConfig, RadarrConfig
+from server.providers.models import PlexConfig, SonarrConfig, RadarrConfig
 
 
 class PlexConfigSerializer(ma.SQLAlchemyAutoSchema):

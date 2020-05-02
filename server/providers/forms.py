@@ -1,6 +1,5 @@
 from server.forms import ModelForm
-from server.providers.models import PlexConfig
-from server.providers.models.provider_config import RadarrConfig, SonarrConfig
+from server.providers.models import PlexConfig, SonarrConfig, RadarrConfig
 
 
 class PlexConfigForm(ModelForm):
