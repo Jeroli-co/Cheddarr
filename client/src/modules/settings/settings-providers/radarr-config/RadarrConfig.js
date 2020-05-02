@@ -34,7 +34,13 @@ const RadarrConfig = () => {
       </RowLayout>
       <br />
       <div className="container">
-        <form id="radarr-config-form" onSubmit={handleSubmit(_onSubmit)}>
+        <form
+          id="radarr-config-form"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          onSubmit={handleSubmit(_onSubmit)}
+        >
           <div className="field">
             <div className="control">
               <input

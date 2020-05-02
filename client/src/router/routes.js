@@ -11,7 +11,6 @@ import { InternalServerError } from "../elements/errors/InternalServerError";
 import { ResendEmailConfirmationModal } from "../modules/auth/elements/ResendEmailConfirmationModal";
 import { InitResetPasswordModal } from "../modules/auth/sign-in-form/init-reset-password-modal/InitResetPasswordModal";
 import { BadRequest } from "../elements/errors/BadRequest";
-import { SettingsProfile } from "../modules/settings/settings-profile/SettingsProfile";
 import { ChangePasswordModal } from "../modules/settings/settings-profile/element/ChangePasswordModal";
 import { ChangeUsernameModal } from "../modules/settings/settings-profile/element/ChangeUsernameModal";
 import { ChangeEmailModal } from "../modules/settings/settings-profile/element/ChangeEmailModal";
@@ -22,6 +21,7 @@ import { PageLoader } from "../elements/PageLoader";
 import { PlexConfig } from "../modules/settings/settings-configurations/plex-config/PlexConfig";
 import { RadarrConfig } from "../modules/settings/settings-configurations/radarr-config/RadarrConfig";
 import { SonarrConfig } from "../modules/settings/settings-configurations/sonarr-config/SonarrConfig";
+import { SettingsAccount } from "../modules/settings/settings-account/SettingsAccount";
 
 const routes = {
   HOME: { url: "/", component: Home },
@@ -58,20 +58,20 @@ const routes = {
     component: FriendProfile,
   },
   USER_SETTINGS: { url: "/settings", component: Settings },
-  USER_SETTINGS_PROFILE: {
-    url: "/settings/profile",
-    component: SettingsProfile,
+  USER_SETTINGS_ACCOUNT: {
+    url: "/settings/account",
+    component: SettingsAccount,
   },
-  USER_SETTINGS_CONFIGURATIONS_PLEX: {
-    url: "/settings/configurations/plex",
+  USER_SETTINGS_PLEX: {
+    url: "/settings/plex",
     component: PlexConfig,
   },
-  USER_SETTINGS_CONFIGURATIONS_RADARR: {
-    url: "/settings/configurations/radarr",
+  USER_SETTINGS_RADARR: {
+    url: "/settings/radarr",
     component: RadarrConfig,
   },
-  USER_SETTINGS_CONFIGURATIONS_SONARR: {
-    url: "/settings/configurations/sonarr",
+  USER_SETTINGS_SONARR: {
+    url: "/settings/sonarr",
     component: SonarrConfig,
   },
   CHANGE_PASSWORD: {
