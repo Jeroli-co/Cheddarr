@@ -7,6 +7,7 @@ from server.extensions import cache
 from server.providers.models import PlexConfig
 
 
+@cache.memoize(timeout=300)
 def user_server(user):
     plex_config = PlexConfig.find(user)
     api_key = plex_config.api_key
@@ -19,6 +20,7 @@ def user_server(user):
         raise InternalServerError("Error while connecting to Plex server.")
 
 
+@cache.memoize(timeout=300)
 def library_sections(plex_server, section_id=None, section_type=None):
     if section_id is not None:
         # TODO get section by id

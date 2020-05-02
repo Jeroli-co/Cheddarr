@@ -1,11 +1,9 @@
-from http import HTTPStatus
-
 from flask import jsonify, request
 from flask_login import current_user, login_required
 from sqlalchemy import or_
 
 from server.auth.models import User
-from server.exceptions import HTTPError
+from server.exceptions import BadRequest
 from server.providers.utils import plex
 from server.search import search
 from server.search.forms import SearchForm
@@ -17,10 +15,8 @@ from server.search.serializers import media_search_serializer, friends_search_se
 def search():
     search_form = SearchForm(request.args)
     if not search_form.validate():
-        raise HTTPError(
-            "Error while searching.",
-            status_code=HTTPStatus.BAD_REQUEST,
-            payload=search_form.errors,
+        raise BadRequest(
+            "Error while searching.", payload=search_form.errors,
         )
     search_type = search_form.type.data
     if search_type == "friends":
@@ -54,8 +50,5 @@ def search_media(search_form: SearchForm):
         for field, value in search_form.data.items()
         if field != "type" and field != "value"
     }
-
-    if plex_server is None:
-        raise HTTPError("No Plex server linked.", status_code=HTTPStatus.BAD_REQUEST)
     result = plex.search(plex_server, section_type=type, title=value, filters=filters)
     return media_search_serializer.dump(result)
