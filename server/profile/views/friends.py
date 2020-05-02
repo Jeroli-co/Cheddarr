@@ -2,8 +2,8 @@ from flask_login import current_user, login_required
 
 from server.auth.models import User
 from server.exceptions import BadRequest, Conflict, InternalServerError, NotFound
-from server.profile import profile
 from server.profile.forms import UsernameOrEmailForm
+from server.profile import profile
 from server.profile.serializers import profiles_serializer
 
 
