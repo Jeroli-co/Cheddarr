@@ -57,7 +57,7 @@ const Home = () => {
           <br />
           <img src={logo} className="Home-logo" alt="logo" />
           <div className="is-divider" />
-          <Link to={routes.USER_SETTINGS_CONFIGURATIONS.url}>
+          <Link to={routes.USER_SETTINGS_PLEX.url}>
             <p className="is-size-5">Enable Plex to start using your hub</p>
           </Link>
         </div>

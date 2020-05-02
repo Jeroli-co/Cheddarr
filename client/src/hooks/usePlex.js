@@ -11,13 +11,10 @@ const usePlex = () => {
   const { handleError } = useContext(AuthContext);
 
   const getPlexStatus = async () => {
-    const res = await executeRequest(
-      methods.GET,
-      providerUrl + "config/status/"
-    );
+    const res = await executeRequest(methods.GET, providerUrl + "status/");
     switch (res.status) {
       case 200:
-        return !!res.data.enabled;
+        return !!res.data.status;
       default:
         return false;
     }

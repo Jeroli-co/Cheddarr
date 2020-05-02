@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ServersModal } from "./elements/ServersModal";
 import { useForm } from "react-hook-form";
-import { SubmitPlexConfig } from "./elements/SubmitPlexConfig";
+import { SubmitConfig } from "../SubmitConfig";
 import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
 import { Spinner } from "../../../../elements/Spinner";
 import { RowLayout } from "../../../../elements/layouts";
@@ -55,12 +55,26 @@ const PlexConfig = ({ location }) => {
       {isPlexAccountLinked(config) && (
         <div className="container">
           <form onSubmit={handleSubmit(_onSubmit)}>
+            <br />
+            <p className="subtitle is-3">Plex server</p>
             {isPlexServerLinked(config) && (
               <RowLayout justifyContent="space-between" marginTop="2%">
-                <p className="is-size-4">Plex server</p>
                 <p className="is-size-5 has-text-weight-light">
                   {config["machine_name"]}
                 </p>
+                <div className="field">
+                  <div className="control">
+                    <input
+                      id="enabled"
+                      type="checkbox"
+                      name="enabled"
+                      className="switch is-primary"
+                      ref={register}
+                      defaultChecked={config.enabled}
+                    />
+                    <label htmlFor="enabled">Enabled</label>
+                  </div>
+                </div>
                 <button
                   type="button"
                   className="button is-small is-rounded is-info"
@@ -77,19 +91,6 @@ const PlexConfig = ({ location }) => {
                 >
                   <FontAwesomeIcon icon={faTrash} />
                 </button>
-                <div className="field">
-                  <div className="control">
-                    <input
-                      id="enabled"
-                      type="checkbox"
-                      name="enabled"
-                      className="switch is-primary"
-                      ref={register}
-                      defaultChecked={config.enabled}
-                    />
-                    <label htmlFor="enabled">Enabled</label>
-                  </div>
-                </div>
               </RowLayout>
             )}
             {!isPlexServerLinked(config) && (
@@ -103,7 +104,7 @@ const PlexConfig = ({ location }) => {
                 </button>
               </RowLayout>
             )}
-            <SubmitPlexConfig isFormDirty={formState.dirty} />
+            <SubmitConfig isFormDirty={formState.dirty} />
           </form>
         </div>
       )}
