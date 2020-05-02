@@ -42,11 +42,9 @@ def test_radarr_config():
     api_key = config_form.provider_api_key.data
     ssl = "https" if config_form.ssl.data else "http"
     try:
-        print(f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}")
         r = get(f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}")
-
     except InvalidURL:
-        raise BadRequest("Invalid config for Radarr.")
+        raise BadRequest("Invalid config for Sonarr.")
     return {"status": r.status_code == 200}
 
 

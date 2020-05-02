@@ -23,4 +23,4 @@ class RadarrConfigSerializer(ma.SQLAlchemyAutoSchema):
 
 plex_config_serializer = PlexConfigSerializer()
 radarr_config_serializer = RadarrConfigSerializer()
-sonarr_config_serializer = SonarrConfig()
+sonarr_config_serializer = SonarrConfigSerializer()

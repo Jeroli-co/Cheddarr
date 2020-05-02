@@ -1,3 +1,5 @@
+import re
+
 from flask_login import current_user, login_required
 from requests.exceptions import InvalidURL
 from sqlalchemy.orm.exc import NoResultFound
@@ -18,7 +20,7 @@ def get_sonarr_status():
     try:
         sonarr_config = SonarrConfig.find(current_user)
     except NoResultFound:
-        {"status": False}
+        return {"status": False}
     host = sonarr_config.host
     port = sonarr_config.port
     api_key = sonarr_config.provider_api_key
@@ -28,6 +30,26 @@ def get_sonarr_status():
     except InvalidURL:
         raise BadRequest("Invalid config for Sonarr.")
     return {"status": sonarr_config.enabled and r.status_code == 200}
+
+
+@provider.route("/sonarr/config/test/", methods=["POST"])
+@login_required
+def test_sonarr_config():
+    config_form = SonarrConfigForm()
+    if not config_form.validate():
+        raise InternalServerError(
+            "Error while updating Sonarr config.", payload=config_form.errors,
+        )
+    host = config_form.host.data
+    port = config_form.port.data
+    api_key = config_form.provider_api_key.data
+    ssl = "https" if config_form.ssl.data else "http"
+    try:
+        url = f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}"
+        r = get(url)
+    except InvalidURL:
+        raise BadRequest("Invalid config for Sonarr.")
+    return {"status": r.status_code == 200}
 
 
 @provider.route("/sonarr/config/", methods=["GET"])

@@ -12,8 +12,10 @@ class PlexConfigForm(ModelForm):
 class SonarrConfigForm(ModelForm):
     class Meta:
         model = SonarrConfig
+        strip_string_fields = True
 
 
 class RadarrConfigForm(ModelForm):
     class Meta:
         model = RadarrConfig
+        strip_string_fields = True
