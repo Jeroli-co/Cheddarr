@@ -1,16 +1,16 @@
 import React from "react";
 
-const UnlinkServerModal = ({ onUnlink, onClose, machineName }) => {
+const UnlinkAccountModal = ({ onUnlink, onClose }) => {
   return (
     <div
-      className="UnlinkServerModal modal is-active"
-      data-testid="UnlinkServerModal"
+      className="UnlinkAccountModal modal is-active"
+      data-testid="UnlinkAccountModal"
     >
       <div className="modal-background" onClick={() => onClose()} />
 
       <div className="modal-card">
         <header className="modal-card-head">
-          <p className="modal-card-title">Unlink Plex Server</p>
+          <p className="modal-card-title">Unlink Plex Account</p>
           <button
             className="delete"
             aria-label="close"
@@ -21,18 +21,14 @@ const UnlinkServerModal = ({ onUnlink, onClose, machineName }) => {
 
         <section className="modal-card-body">
           <div className="content">
-            <p>
-              You are about to unlink <b>{machineName}</b> from Cheddarr.
-            </p>
-            <p>
-              You will no longer see the content of this server on your hub.
-            </p>
+            <p>You are about to unlink your Plex account from Cheddarr.</p>
+            <p>You will no longer have access to Plex related features.</p>
           </div>
         </section>
 
         <footer className="modal-card-foot">
           <button className="button is-danger" onClick={() => onUnlink()}>
-            Unlink Server
+            Unlink Account
           </button>
           <button className="button" type="button" onClick={() => onClose()}>
             Cancel
@@ -43,4 +39,4 @@ const UnlinkServerModal = ({ onUnlink, onClose, machineName }) => {
   );
 };
 
-export { UnlinkServerModal };
+export { UnlinkAccountModal };

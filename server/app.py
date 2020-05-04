@@ -7,14 +7,7 @@ from flask.sessions import SecureCookieSessionInterface
 from flask_cors import CORS
 from flask_talisman import Talisman
 
-from server.config import (
-    API_ROOT,
-    Config,
-    DevConfig,
-    ProdConfig,
-    REACT_STATIC_FOLDER,
-    REACT_TEMPLATE_FOLDER,
-)
+from server.config import (API_ROOT, Config, DevConfig, FLASK_TEMPLATE_FOLDER, ProdConfig, REACT_STATIC_FOLDER)
 from server.exceptions import HTTPError
 from server.extensions import cache, celery, db, limiter, ma, mail, migrate
 from server.extensions.login_manager import register_login_manager
@@ -30,7 +23,7 @@ def create_app():
     dev = get_debug_flag()
     return _create_app(
         DevConfig if dev else ProdConfig,
-        template_folder=REACT_TEMPLATE_FOLDER,
+        template_folder=FLASK_TEMPLATE_FOLDER,
         static_folder=REACT_STATIC_FOLDER,
     )
 
@@ -92,16 +85,14 @@ def _create_app(config_object: Config, **kwargs):
 def register_blueprints(app):
     """Register application's blueprints"""
     from server.site import site
-    from server.auth.routes import auth
-    from server.profile.routes import profile
-    from server.providers.routes import provider
-    from server.search import search
+    from server.auth import auth
+    from server.profile import profile
+    from server.providers import provider
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix=API_ROOT)
     app.register_blueprint(profile, url_prefix=API_ROOT + "/profile")
     app.register_blueprint(provider, url_prefix=API_ROOT + "/provider")
-    app.register_blueprint(search, url_prefix=API_ROOT + "/search")
 
 
 def register_commands(app):

@@ -12,7 +12,7 @@ const PlexConfigContextProvider = (props) => {
 
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
-  const { pushSuccess } = useContext(NotificationContext);
+  const { pushSuccess, pushInfo } = useContext(NotificationContext);
 
   useEffect(() => {
     getPlexConfig().then((data) => {
@@ -43,6 +43,18 @@ const PlexConfigContextProvider = (props) => {
     }
   };
 
+  const unlinkPlexAccount = async () => {
+    const res = await executeRequest(methods.GET, providerUrl + "unlink/");
+    switch (res.status) {
+      case 200:
+        pushInfo("Account unlinked");
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   const updateConfig = async (newConfig) => {
     const res = await executeRequest(
       methods.PATCH,
@@ -62,8 +74,7 @@ const PlexConfigContextProvider = (props) => {
 
   const isPlexAccountLinked = (config) => {
     return (
-      config["provider_api_key"] !== null &&
-      typeof config["provider_api_key"] !== "undefined"
+      (config["enabled"] === true) & (typeof config["enabled"] !== "undefined")
     );
   };
 
@@ -82,6 +93,7 @@ const PlexConfigContextProvider = (props) => {
         getPlexServers,
         isPlexServerLinked,
         isPlexAccountLinked,
+        unlinkPlexAccount,
       }}
     >
       {props.children}

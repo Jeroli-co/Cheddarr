@@ -108,7 +108,8 @@ class DevConfig(Config):
     ##########################################################################
     # cache                                                                  #
     ##########################################################################
-    CACHE_TYPE = "null"
+    CACHE_TYPE = "filesystem"
+    CACHE_DIR = "./tmp"
 
 
 class TestConfig(Config):

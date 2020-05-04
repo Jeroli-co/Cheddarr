@@ -57,7 +57,7 @@ const SonarrConfig = () => {
             <label className="label">API Key</label>
             <div className="control">
               <input
-                name="provider_api_key"
+                name="api_key"
                 className="input"
                 type="text"
                 placeholder="API Key"

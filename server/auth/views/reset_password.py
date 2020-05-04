@@ -1,9 +1,9 @@
 from flask import render_template, request, url_for
 
 from server import utils
+from server.auth import auth
 from server.auth.forms import EmailForm, PasswordForm
 from server.auth.models import User
-from server.auth.routes import auth
 from server.exceptions import (BadRequest, Forbidden, Gone, InternalServerError)
 from server.extensions import limiter
 from server.tasks import send_email
@@ -50,7 +50,6 @@ def confirm_reset(token):
             raise InternalServerError(
                 "Error while resetting the password.", payload=password_form.errors,
             )
-
         user.change_password(password_form.password.data)
         html = render_template("email/reset_password_notice.html",)
         subject = "Your password has been reset"
