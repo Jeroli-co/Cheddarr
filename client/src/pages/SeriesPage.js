@@ -33,7 +33,6 @@ const SeriesPage = () => {
 
   useEffect(() => {
     getSeries(id).then((s) => {
-      console.log(s);
       if (s) setSeries(s);
     });
   }, [id]);

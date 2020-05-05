@@ -19,20 +19,14 @@ const ResultsListStyle = styled.div`
   visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
 `;
 
-const ResultSectionTitle = styled.div`
+const ResultsSectionTitle = styled.div`
   font-size: 0.8em;
   font-weight: 400;
   background-color: rgba(212, 212, 212, 0.5);
   border-bottom: 1px solid LightGrey;
 `;
 
-const MediaResultStyle = styled.div`
-  &:hover {
-    background-color: #f5f5f5;
-  }
-`;
-
-const FriendResultStyle = styled.div`
+const ResultStyle = styled.div`
   &:hover {
     background-color: #f5f5f5;
   }
@@ -41,7 +35,6 @@ const FriendResultStyle = styled.div`
 const MediaResult = ({ media }) => {
   const history = useHistory();
   const redirectToMediaPage = () => {
-    console.log(media);
     let url = "";
     switch (media.type) {
       case "movie":
@@ -56,13 +49,8 @@ const MediaResult = ({ media }) => {
     history.push(url);
   };
   return (
-    <MediaResultStyle>
-      <RowLayout
-        className="is-pointed"
-        padding="1%"
-        childMarginRight="2%"
-        onClick={() => redirectToMediaPage()}
-      >
+    <ResultStyle onClick={() => redirectToMediaPage()}>
+      <RowLayout className="is-pointed" padding="1%" childMarginRight="2%">
         <img src={media.thumbUrl} alt="Movie" width="30" height="50" />
         <ColumnLayout>
           <Text fontSize="0.9em">{cutString(media.title, 40)}</Text>
@@ -71,18 +59,23 @@ const MediaResult = ({ media }) => {
           </Text>
         </ColumnLayout>
       </RowLayout>
-    </MediaResultStyle>
+    </ResultStyle>
   );
 };
 
 const FriendResult = ({ user }) => {
+  const history = useHistory();
   return (
-    <RowLayout padding="1%" childMarginRight="2%">
-      <FriendResultStyle>
+    <ResultStyle
+      onClick={() =>
+        history.push(routes.USER_FRIEND_PROFILE.url(user.username))
+      }
+    >
+      <RowLayout padding="1%" childMarginRight="2%">
         <img src={user["user_picture"]} alt="User" width="30" height="50" />
         <Text fontSize="0.9em">@{user.username}</Text>
-      </FriendResultStyle>
-    </RowLayout>
+      </RowLayout>
+    </ResultStyle>
   );
 };
 
@@ -103,11 +96,16 @@ const sortSearchResult = (results) => {
 const SearchResultsItems = ({ type, results }) => {
   if (type === "all") {
     const sortedResult = sortSearchResult(results);
+
+    if (results.length === 0) {
+      return <p>No results found</p>;
+    }
+
     return (
       <div>
         {sortedResult.friends.length > 0 && (
           <div>
-            <ResultSectionTitle>Friends</ResultSectionTitle>
+            <ResultsSectionTitle>Friends</ResultsSectionTitle>
             {sortedResult.friends.map((friend, index) => (
               <FriendResult key={index} user={friend} />
             ))}
@@ -115,7 +113,7 @@ const SearchResultsItems = ({ type, results }) => {
         )}
         {sortedResult.movies.length > 0 && (
           <div>
-            <ResultSectionTitle>Movies</ResultSectionTitle>
+            <ResultsSectionTitle>Movies</ResultsSectionTitle>
             {sortedResult.movies.map((movie, index) => (
               <MediaResult key={index} media={movie} />
             ))}
@@ -123,7 +121,7 @@ const SearchResultsItems = ({ type, results }) => {
         )}
         {sortedResult.series.length > 0 && (
           <div>
-            <ResultSectionTitle>Series</ResultSectionTitle>
+            <ResultsSectionTitle>Series</ResultsSectionTitle>
             {sortedResult.series.map((series, index) => (
               <MediaResult key={index} media={series} />
             ))}
@@ -131,10 +129,6 @@ const SearchResultsItems = ({ type, results }) => {
         )}
       </div>
     );
-  }
-
-  if (results.length === 0) {
-    return <p>No results found</p>;
   }
 
   return results.map((result, index) => {

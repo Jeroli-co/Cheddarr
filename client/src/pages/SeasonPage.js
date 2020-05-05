@@ -31,7 +31,6 @@ const SeasonPage = () => {
 
   useEffect(() => {
     getSeason(seriesId, seasonNumber).then((s) => {
-      console.log(s);
       if (s) setSeason(s);
     });
   }, []);
