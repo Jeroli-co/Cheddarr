@@ -3,6 +3,8 @@ import { Spinner } from "../../../../Spinner";
 import styled from "styled-components";
 import { ColumnLayout, RowLayout } from "../../../../layouts";
 import { cutString, Text } from "../../../../../utils/strings";
+import { useHistory } from "react-router";
+import { routes } from "../../../../../router/routes";
 
 const ResultsListStyle = styled.div`
   position: absolute;
@@ -24,25 +26,62 @@ const ResultSectionTitle = styled.div`
   border-bottom: 1px solid LightGrey;
 `;
 
+const MediaResultStyle = styled.div`
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
+const FriendResultStyle = styled.div`
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
 const MediaResult = ({ media }) => {
+  const history = useHistory();
+  const redirectToMediaPage = () => {
+    console.log(media);
+    let url = "";
+    switch (media.type) {
+      case "movie":
+        url = routes.MOVIE.url(media.id);
+        break;
+      case "series":
+        url = routes.SERIES.url(media.id);
+        break;
+      default:
+        throw new Error("No media type matched");
+    }
+    history.push(url);
+  };
   return (
-    <RowLayout padding="1%" childMarginRight="2%">
-      <img src={media.thumbUrl} alt="Movie" width="30" height="50" />
-      <ColumnLayout>
-        <Text fontSize="0.9em">{cutString(media.title, 40)}</Text>
-        <Text fontSize="0.8em" fontWeight="lighter">
-          {media.year}
-        </Text>
-      </ColumnLayout>
-    </RowLayout>
+    <MediaResultStyle>
+      <RowLayout
+        className="is-pointed"
+        padding="1%"
+        childMarginRight="2%"
+        onClick={() => redirectToMediaPage()}
+      >
+        <img src={media.thumbUrl} alt="Movie" width="30" height="50" />
+        <ColumnLayout>
+          <Text fontSize="0.9em">{cutString(media.title, 40)}</Text>
+          <Text fontSize="0.8em" fontWeight="lighter">
+            {media.year}
+          </Text>
+        </ColumnLayout>
+      </RowLayout>
+    </MediaResultStyle>
   );
 };
 
 const FriendResult = ({ user }) => {
   return (
     <RowLayout padding="1%" childMarginRight="2%">
-      <img src={user["user_picture"]} alt="User" width="30" height="50" />
-      <Text fontSize="0.9em">@{user.username}</Text>
+      <FriendResultStyle>
+        <img src={user["user_picture"]} alt="User" width="30" height="50" />
+        <Text fontSize="0.9em">@{user.username}</Text>
+      </FriendResultStyle>
     </RowLayout>
   );
 };

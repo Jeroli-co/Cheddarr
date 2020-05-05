@@ -6,11 +6,12 @@ import { MediaExtendedCard } from "./MediaExtendedCard";
 
 const MediaExtendedBox = styled.div`
   position: relative;
-  width: 100%;
-  min-height: 80vh;
+  min-width: 100%;
+  max-width: 100%;
   background: white;
   background-color: rgba(255, 255, 255, 0);
   border-top: 3px solid ${(props) => props.theme.primary};
+  z-index: 0;
 `;
 
 const MediaExtendedBoxBackground = styled.div`

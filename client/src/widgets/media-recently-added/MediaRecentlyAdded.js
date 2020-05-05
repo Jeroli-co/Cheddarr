@@ -7,6 +7,9 @@ import { Spinner } from "../../elements/Spinner";
 import { RowLayout } from "../../elements/layouts";
 import { MediaExtendedCardLayout } from "./elements/MediaExtendedCardLayout";
 import { MediaPreview } from "./elements/MediaPreviewCard";
+import styled from "styled-components";
+
+const MediaRecentlyAddedStyle = styled.div``;
 
 const MediaRecentlyAdded = ({ type }) => {
   const {
@@ -53,7 +56,7 @@ const MediaRecentlyAdded = ({ type }) => {
   };
 
   return (
-    <div data-testid="MediaRecentlyAdded">
+    <MediaRecentlyAddedStyle data-testid="MediaRecentlyAdded">
       <div
         ref={sectionTitleRef}
         className={!medias ? "" : "is-pointed"}
@@ -96,7 +99,7 @@ const MediaRecentlyAdded = ({ type }) => {
           onClose={() => setMediaSelectedIndex(-1)}
         />
       )}
-    </div>
+    </MediaRecentlyAddedStyle>
   );
 };
 
