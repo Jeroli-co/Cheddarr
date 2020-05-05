@@ -30,7 +30,6 @@ const EpisodePage = () => {
 
   useEffect(() => {
     getEpisode(seriesId, seasonNumber, episodeNumber).then((e) => {
-      console.log(e);
       if (e) setEpisode(e);
     });
   }, []);
