@@ -47,7 +47,8 @@ const PlexConfigContextProvider = (props) => {
     const res = await executeRequest(methods.GET, providerUrl + "unlink/");
     switch (res.status) {
       case 200:
-        pushInfo("Account unlinked");
+        pushInfo(res.message);
+        setConfig({});
         return res.data;
       default:
         handleError(res);
@@ -74,7 +75,7 @@ const PlexConfigContextProvider = (props) => {
 
   const isPlexAccountLinked = (config) => {
     return (
-      (config["enabled"] === true) & (typeof config["enabled"] !== "undefined")
+      config["enabled"] === true && typeof config["enabled"] !== "undefined"
     );
   };
 

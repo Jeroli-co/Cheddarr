@@ -3,8 +3,13 @@ import { Carousel } from "../../../elements/Carousel";
 import { getActorInitial } from "../../../utils/media-utils";
 import React from "react";
 
+const ActorsStyle = styled.div`
+  width: 100%;
+  margin-top: 1em;
+`;
+
 const Actor = styled.div`
-  margin: 1%;
+  margin: 1em;
 `;
 
 const ActorPicture = styled.img`
@@ -31,23 +36,26 @@ const ActorInitials = styled.div`
 
 const Actors = ({ actors }) => {
   return (
-    <Carousel>
-      {actors.map((actor, index) => (
-        <Actor key={index}>
-          {actor.thumbUrl ? (
-            <ActorPicture src={actor.thumbUrl} alt="" />
-          ) : (
-            <ActorInitials>
-              <p>{getActorInitial(actor.name)}</p>
-            </ActorInitials>
-          )}
-          <div className="content has-text-centered">
-            <p className="is-size-7">{actor.name}</p>
-            <p className="is-size-7 has-text-weight-light">{actor.role}</p>
-          </div>
-        </Actor>
-      ))}
-    </Carousel>
+    <ActorsStyle>
+      <p className="is-size-6">Actors</p>
+      <Carousel>
+        {actors.map((actor, index) => (
+          <Actor key={index}>
+            {actor.thumbUrl ? (
+              <ActorPicture src={actor.thumbUrl} alt="" />
+            ) : (
+              <ActorInitials>
+                <p>{getActorInitial(actor.name)}</p>
+              </ActorInitials>
+            )}
+            <div className="content has-text-centered">
+              <p className="is-size-7">{actor.name}</p>
+              <p className="is-size-7 has-text-weight-light">{actor.role}</p>
+            </div>
+          </Actor>
+        ))}
+      </Carousel>
+    </ActorsStyle>
   );
 };
 

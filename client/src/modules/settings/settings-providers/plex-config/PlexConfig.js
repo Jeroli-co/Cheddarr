@@ -1,6 +1,10 @@
 import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faExclamationCircle,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { ServersModal } from "./elements/ServersModal";
 import { useForm } from "react-hook-form";
 import { SubmitConfig } from "../SubmitConfig";
@@ -10,6 +14,7 @@ import { RowLayout } from "../../../../elements/layouts";
 import { UnlinkServerModal } from "./elements/UnlinkServerModal";
 import { UnlinkAccountModal } from "./elements/UnlinkAccountModal";
 import { LinkPlexAccount } from "./elements/LinkPlexAccount";
+import { routes } from "../../../../router/routes";
 
 const PlexConfig = ({ location }) => {
   const {
@@ -65,13 +70,6 @@ const PlexConfig = ({ location }) => {
 
       {isPlexAccountLinked(config) && (
         <div className="container">
-          <button
-            className="button is-primary"
-            type="button"
-            onClick={() => setIsUnlinkAccountModalActive(true)}
-          >
-            Unlink Plex Account
-          </button>
           <form onSubmit={handleSubmit(_onSubmit)}>
             <br />
             <p className="subtitle is-3">Plex server</p>
@@ -111,6 +109,21 @@ const PlexConfig = ({ location }) => {
             )}
             <SubmitConfig isFormDirty={formState.dirty} />
           </form>
+          <hr />
+          <p className="subtitle is-3">Danger zone</p>
+          <div className="content">
+            <p className="is-size-7">
+              <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
+              that option
+            </p>
+            <button
+              className="button is-danger"
+              type="button"
+              onClick={() => setIsUnlinkAccountModalActive(true)}
+            >
+              Unlink Plex Account
+            </button>
+          </div>
         </div>
       )}
 

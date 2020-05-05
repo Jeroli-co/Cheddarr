@@ -21,6 +21,7 @@ const Settings = ({ location }) => {
         <ul>
           {tabsName.map((name, index) => (
             <li
+              key={index}
               className={activeTab === index ? "is-active" : ""}
               onClick={() => setActiveTab(index)}
             >
