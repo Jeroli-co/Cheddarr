@@ -33,7 +33,7 @@ def search_friends(search_form: SearchForm):
         User.query.filter(
             or_(User.username.contains(value), User.email.contains(value),)
         )
-        .limit(5)
+        .limit(3)
         .all()
     ):
         if user in current_user.friends_received or user in current_user.friends_sent:
@@ -43,12 +43,14 @@ def search_friends(search_form: SearchForm):
 
 def search_media(search_form: SearchForm):
     plex_server = plex.user_server(current_user)
-    value = search_form.value.data
-    type = search_form.type.data
+    title = search_form.value.data
+    section_type = search_form.type.data
     filters = {
         field: value
         for field, value in search_form.data.items()
         if field != "type" and field != "value"
     }
-    result = plex.search(plex_server, section_type=type, title=value, filters=filters)
+    result = plex.search(
+        plex_server, section_type=section_type, title=title, filters=filters
+    )
     return media_search_serializer.dump(result)
