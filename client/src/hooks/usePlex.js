@@ -64,12 +64,60 @@ const usePlex = () => {
     }
   };
 
+  const getSeries = async (id) => {
+    const res = await executeRequest(methods.GET, seriesUrl + id + "/");
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const getSeason = async (seriesId, seasonNumber) => {
+    const res = await executeRequest(
+      methods.GET,
+      seriesUrl + seriesId + "/seasons/" + seasonNumber + "/"
+    );
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const getEpisode = async (seriesId, seasonNumber, episodeNumber) => {
+    const res = await executeRequest(
+      methods.GET,
+      seriesUrl +
+        seriesId +
+        "/seasons/" +
+        seasonNumber +
+        "/episodes/" +
+        episodeNumber +
+        "/"
+    );
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return {
     getPlexStatus,
     getMoviesRecentlyAdded,
     getSeriesRecentlyAdded,
     getOnDeck,
     getMovie,
+    getSeries,
+    getSeason,
+    getEpisode,
   };
 };
 

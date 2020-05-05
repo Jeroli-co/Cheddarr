@@ -8,6 +8,8 @@ const MediaPreviewCardStyle = styled.div`
   height: 100%;
   cursor: pointer;
   transition: 0.5s ease;
+  margin-right: 5px;
+  margin-left: 5px;
 
   @media only screen and (max-width: 1024px) {
     min-width: 30vw;

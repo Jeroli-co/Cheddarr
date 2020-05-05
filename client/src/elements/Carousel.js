@@ -3,11 +3,9 @@ import styled, { css } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import smoothscroll from "smoothscroll-polyfill";
-import { RowLayout } from "./layouts";
 
 const CarouselStyle = styled.div`
   position: relative;
-  max-width: 100%;
 
   .pagination-button {
     transition: 0.6s ease;
@@ -37,6 +35,8 @@ const CarouselItems = styled.div`
 
 const PaginationButton = styled.button`
   position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   ${(props) =>
     props.direction === "left" &&
     css`
@@ -104,26 +104,24 @@ const Carousel = ({ children }) => {
 
   return (
     <CarouselStyle>
-      <RowLayout>
-        <PaginationButton
-          className="pagination-button"
-          isNeeded={isButtonsNeeded}
-          direction="left"
-          onClick={() => _onSlideLeft()}
-        >
-          <FontAwesomeIcon icon={faAngleLeft} size="4x" />
-        </PaginationButton>
-        <PaginationButton
-          className="pagination-button"
-          isNeeded={isButtonsNeeded}
-          direction="right"
-          onClick={() => _onSlideRight()}
-        >
-          <FontAwesomeIcon icon={faAngleRight} size="4x" />
-        </PaginationButton>
+      <PaginationButton
+        className="pagination-button"
+        isNeeded={isButtonsNeeded}
+        direction="left"
+        onClick={() => _onSlideLeft()}
+      >
+        <FontAwesomeIcon icon={faAngleLeft} size="4x" />
+      </PaginationButton>
+      <PaginationButton
+        className="pagination-button"
+        isNeeded={isButtonsNeeded}
+        direction="right"
+        onClick={() => _onSlideRight()}
+      >
+        <FontAwesomeIcon icon={faAngleRight} size="4x" />
+      </PaginationButton>
 
-        <CarouselItems ref={scrollRef}>{children}</CarouselItems>
-      </RowLayout>
+      <CarouselItems ref={scrollRef}>{children}</CarouselItems>
     </CarouselStyle>
   );
 };

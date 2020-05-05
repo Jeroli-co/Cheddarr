@@ -128,7 +128,7 @@ def get_series(series_id):
 def get_season(series_id, season_number):
     plex_server = plex.user_server(current_user)
     series = plex_server.fetchItem(ekey=int(series_id))
-    season = series.episode(season=int(season_number))
+    season = series.season(title=int(season_number))
     season.reload()
     return plex_seasons_serializer.jsonify(season)
 

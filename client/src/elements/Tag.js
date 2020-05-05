@@ -9,25 +9,21 @@ const TagColor = {
   DARK: { color: "#525252", bgColor: "#e8e8e8" },
 };
 
-const TagStyle = styled.div`
+const TagStyle = styled.p`
   display: flex;
   justify-content: center;
   align-items: center;
   padding-left: 6px;
   padding-right: 8px;
   border-radius: 3px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: ${(props) => props.type.color};
   background-color: ${(props) => props.type.bgColor};
 `;
 
 const Tag = ({ type, content }) => {
-  return (
-    <TagStyle type={type}>
-      <p>{content}</p>
-    </TagStyle>
-  );
+  return <TagStyle type={type}>{content}</TagStyle>;
 };
 
 export { Tag, TagColor };

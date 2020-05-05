@@ -60,8 +60,9 @@ code {
   color: LightGrey;
   border: none;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
+  padding: 1em;
 
   &:hover {
     color: white;

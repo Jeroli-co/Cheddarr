@@ -1,33 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { usePlex } from "../../../hooks/usePlex";
-import { ColumnLayout, RowLayout } from "../../../elements/layouts";
+import { RowLayout } from "../../../elements/layouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import {
-  getColorRating,
-  getRatingPercentage,
-  msToHoursMinutes,
-} from "../../../utils/media-utils";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Tag, TagColor } from "../../../elements/Tag";
-import logo from "../../../assets/plex.png";
 import { Spinner } from "../../../elements/Spinner";
 import styled from "styled-components";
 import { Actors } from "./Actors";
+import { MediaExtendedCardHead } from "./MediaExtendedCardHead";
+
+const MediaExtendedCardStyle = styled.div`
+  margin: 0;
+  padding: 1%;
+`;
 
 const MediaDetailsPoster = styled.img`
-  width: 25%;
+  width: 20%;
   height: auto;
   border-radius: 12px;
 `;
 
-const MediaDetailsRating = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  background-color: ${(props) => props.backgroundColor};
+const MediaDetailsInfo = styled.div`
+  padding-left: 1%;
+  padding-right: 1%;
 `;
 
 const MediaExtendedCard = ({ media }) => {
@@ -44,145 +39,67 @@ const MediaExtendedCard = ({ media }) => {
   }, [media]);
 
   return (
-    <RowLayout alignItems="flex-start" childMargin="1%">
-      <MediaDetailsPoster src={media.thumbUrl} alt={media.title} />
-      <ColumnLayout justifyContent="space-around" width="70%" height="100%">
-        <ColumnLayout>
+    <MediaExtendedCardStyle>
+      <RowLayout alignItems="flex-start">
+        <MediaDetailsPoster src={media.thumbUrl} alt={media.title} />
+        <MediaDetailsInfo>
+          <MediaExtendedCardHead media={media} />
+
+          <RowLayout childMarginTop="1em">
+            <div>
+              <div className="is-size-5">Overview</div>
+              <div className="is-size-6">{media.summary}</div>
+            </div>
+          </RowLayout>
+
           {media.type === "movie" && (
-            <p className="is-size-2-desktop is-size-4-tablet is-size-6-mobile">
-              {media.title}
-            </p>
-          )}
-          {media.type === "episode" && (
-            <p className="is-size-2 is-size-4-tablet is-size-6-mobile">
-              S{media.seasonNumber}・E{media.episodeNumber} - {media.title}
-            </p>
-          )}
-          <RowLayout wrap="wrap" childMarginRight="1%">
-            <p
-              className="is-size-7"
-              style={{ cursor: "default" }}
-              data-tooltip="Released"
+            <RowLayout
+              alignItems="flex-start"
+              marginTop="1em"
+              childMarginRight="1%"
             >
-              {media.releaseDate}
-            </p>
-            <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
-            <p
-              className="is-size-7"
-              style={{ cursor: "default" }}
-              data-tooltip="Duration"
-            >
-              {msToHoursMinutes(media.duration)}
-            </p>
-            <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
-            <p
-              className="is-size-7"
-              style={{ cursor: "default" }}
-              data-tooltip="Content rating"
-            >
-              {media.contentRating}
-            </p>
-          </RowLayout>
+              <div>
+                <p className="is-size-6">Directed</p>
+                {media.directors.map((director, index) => (
+                  <p className="is-size-7" key={index}>
+                    {director.name +
+                      (index + 1 === media.directors.length ? "" : ", ")}
+                  </p>
+                ))}
+              </div>
 
-          {!media.isWatched && (
-            <RowLayout childMarginTop="1%" childMarginBottom="1%">
-              <Tag type={TagColor.DARK} content="Unplayed" />
+              <div>
+                <p className="is-size-6">Studio</p>
+                <p className="is-size-7">{media.studio}</p>
+              </div>
+
+              <div>
+                <p className="is-size-6">Genres</p>
+                <RowLayout childMarginRight="1%" wrap="wrap">
+                  {media.type === "movie" &&
+                    (!movieDetails || movieDetails.id !== media.id) && (
+                      <Spinner />
+                    )}
+                  {movieDetails &&
+                    movieDetails.id === media.id &&
+                    movieDetails.genres.map((genre, index) => (
+                      <Tag
+                        key={index}
+                        type={TagColor.INFO}
+                        content={genre.name}
+                      />
+                    ))}
+                </RowLayout>
+              </div>
             </RowLayout>
           )}
-
-          <RowLayout
-            childMarginTop="1%"
-            childMarginBottom="1%"
-            childMarginRight="3%"
-            wrap="wrap"
-          >
-            {media.rating && (
-              <MediaDetailsRating
-                data-tooltip="Rating"
-                style={{ cursor: "default" }}
-                backgroundColor={getColorRating(
-                  getRatingPercentage(media.rating)
-                )}
-              >
-                {getRatingPercentage(media.rating) + "%"}
-              </MediaDetailsRating>
-            )}
-            <button
-              className="button is-plex-button"
-              type="button"
-              onClick={() => window.open(media.webUrl)}
-            >
-              <span className="icon">
-                <img className="icon-left" src={logo} alt="Plex logo" />
-              </span>
-              <span>Open in Plex</span>
-            </button>
-          </RowLayout>
-        </ColumnLayout>
-
-        <RowLayout className="is-summary-desktop" childMarginTop="1%">
-          <ColumnLayout>
-            <div className="is-size-5">Overview</div>
-            <div className="is-size-6">{media.summary}</div>
-          </ColumnLayout>
-        </RowLayout>
-
-        {media.type === "movie" && <br />}
-        {media.type === "movie" && (
-          <RowLayout alignItems="flex-start" childMarginRight="10%">
-            <div>
-              <p className="is-size-6">Directed</p>
-              {media.directors.map((director, index) => (
-                <p className="is-size-7" key={index}>
-                  {director.name +
-                    (index + 1 === media.directors.length ? "" : ", ")}
-                </p>
-              ))}
-            </div>
-
-            <div>
-              <p className="is-size-6">Studio</p>
-              <p className="is-size-7">{media.studio}</p>
-            </div>
-
-            <ColumnLayout>
-              <p className="is-size-6">Genres</p>
-              <RowLayout childMarginRight="1%" wrap="wrap">
-                {media.type === "movie" &&
-                  (!movieDetails || movieDetails.id !== media.id) && (
-                    <Spinner />
-                  )}
-                {movieDetails &&
-                  movieDetails.id === media.id &&
-                  movieDetails.genres.map((genre, index) => (
-                    <Tag
-                      key={index}
-                      type={TagColor.INFO}
-                      content={genre.name}
-                    />
-                  ))}
-              </RowLayout>
-            </ColumnLayout>
-          </RowLayout>
-        )}
-
-        {media.type === "movie" && (
-          <ColumnLayout>
-            <RowLayout childMarginTop="1%">
-              <p className="is-size-6">
-                Actors{" "}
-                {(!movieDetails || movieDetails.id !== media.id) && (
-                  <FontAwesomeIcon icon={faSpinner} pulse />
-                )}
-              </p>
-            </RowLayout>
-            {movieDetails && movieDetails.id === media.id && (
-              <Actors actors={movieDetails.actors} />
-            )}
-          </ColumnLayout>
-        )}
-      </ColumnLayout>
-    </RowLayout>
+        </MediaDetailsInfo>
+      </RowLayout>
+      {media.type === "movie" &&
+        ((movieDetails && movieDetails.id === media.id && (
+          <Actors actors={movieDetails.actors} />
+        )) || <FontAwesomeIcon icon={faSpinner} pulse />)}
+    </MediaExtendedCardStyle>
   );
 };
 

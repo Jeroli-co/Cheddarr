@@ -24,6 +24,7 @@ const App = () => {
     dark: "#4f4d4d",
     transparent: "rgba(198,198,198,0.17)",
     transparentDark: "rgba(146,146,146,0.5)",
+    darkPlex: "#282a2d",
   };
 
   return (
@@ -83,9 +84,32 @@ const App = () => {
                 component={routes.USER_FRIEND_PROFILE.component}
               />
               <PrivateRoute
-                exact
                 path={routes.USER_SETTINGS.url}
                 component={routes.USER_SETTINGS.component}
+              />
+              <PrivateRoute
+                exact
+                path={routes.MOVIE.url(":id")}
+                component={routes.MOVIE.component}
+              />
+              <PrivateRoute
+                exact
+                path={routes.SERIES.url(":id")}
+                component={routes.SERIES.component}
+              />
+              <PrivateRoute
+                exact
+                path={routes.SEASON.url(":seriesId", ":seasonNumber")}
+                component={routes.SEASON.component}
+              />
+              <PrivateRoute
+                exact
+                path={routes.EPISODE.url(
+                  ":seriesId",
+                  ":seasonNumber",
+                  ":episodeNumber"
+                )}
+                component={routes.EPISODE.component}
               />
               <Route
                 exact

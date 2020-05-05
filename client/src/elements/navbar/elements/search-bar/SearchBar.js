@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import { useOutsideAlerter } from "../../../../hooks/useOutsideAlerter";
 import { useSearch } from "../../../../hooks/useSearch";
@@ -89,6 +89,7 @@ const SearchBar = () => {
   useEffect(() => {
     clearTimeout(timer);
     timer = setTimeout(() => _search(), 750);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   useEffect(() => {
@@ -99,10 +100,12 @@ const SearchBar = () => {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results.loading]);
 
   useEffect(() => {
     _search();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchType]);
 
   return (
