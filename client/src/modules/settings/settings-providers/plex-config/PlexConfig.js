@@ -14,7 +14,6 @@ import { RowLayout } from "../../../../elements/layouts";
 import { UnlinkServerModal } from "./elements/UnlinkServerModal";
 import { UnlinkAccountModal } from "./elements/UnlinkAccountModal";
 import { LinkPlexAccount } from "./elements/LinkPlexAccount";
-import { routes } from "../../../../router/routes";
 
 const PlexConfig = ({ location }) => {
   const {
