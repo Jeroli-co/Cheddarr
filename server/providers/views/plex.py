@@ -1,5 +1,5 @@
 from flask import jsonify
-from flask_login import current_user, login_required
+from flask_login import current_user, fresh_login_required, login_required
 from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
 from sqlalchemy.orm.exc import NoResultFound
@@ -60,6 +60,17 @@ def update_plex_config():
     return plex_config_serializer.jsonify(user_config)
 
 
+@provider.route("/plex/unlink/", methods=["GET"])
+@fresh_login_required
+def unlink_plex_account():
+    try:
+        plex_config = PlexConfig.find(current_user)
+    except NoResultFound:
+        raise BadRequest("No Plex account linked.")
+    plex_config.delete()
+    return {"message": "Plex account unlinked."}
+
+
 @provider.route("/plex/servers/", methods=["GET"])
 @login_required
 def get_plex_servers():
@@ -67,7 +78,7 @@ def get_plex_servers():
         plex_config = PlexConfig.find(current_user)
     except NoResultFound:
         raise InternalServerError("No existing config for Plex.")
-    api_key = plex_config.provider_api_key
+    api_key = plex_config.api_key
     plex_account = MyPlexAccount(api_key)
     servers = [
         {"name": resource.name, "machine_id": resource.clientIdentifier}

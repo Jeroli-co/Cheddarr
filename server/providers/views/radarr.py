@@ -33,7 +33,8 @@ def test_radarr_config():
     api_key = config_form.api_key.data
     ssl = "https" if config_form.ssl.data else "http"
     try:
-        r = get(f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}")
+        url = f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}"
+        r = get(url)
     except Exception:
         raise BadRequest("Failed to connect to Radarr.")
     return {"status": r.status_code == 200}
