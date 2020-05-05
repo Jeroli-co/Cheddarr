@@ -49,7 +49,6 @@ def update_plex_config():
             "Error while updating provider's config", payload=config_form.errors,
         )
     updated_config = config_form.data
-    print(updated_config)
     try:
         user_config = PlexConfig.find(current_user)
     except NoResultFound:

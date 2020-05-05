@@ -4,7 +4,8 @@ from enum import Enum, auto
 
 class ProviderType(Enum):
     MEDIA_SERVER = auto()
-    REQUESTS = auto()
+    MOVIE_REQUEST = auto()
+    SERIES_REQUEST = auto()
 
 
 class ProviderConfig(db.Model):
@@ -57,7 +58,7 @@ class PlexConfig(ProviderConfig):
 class SonarrConfig(ProviderConfig):
     def __init__(self, api_key):
         self.api_key = api_key
-        self.type = ProviderType.REQUESTS
+        self.type = ProviderType.SERIES_REQUEST
 
     id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
     host = db.Column(db.String(128))
@@ -79,7 +80,7 @@ class SonarrConfig(ProviderConfig):
 class RadarrConfig(ProviderConfig):
     def __init__(self, api_key):
         self.api_key = api_key
-        self.type = ProviderType.REQUESTS
+        self.type = ProviderType.MOVIE_REQUEST
 
     id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
     host = db.Column(db.String(128))
