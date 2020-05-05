@@ -1,24 +1,23 @@
 from server.extensions import ma
-from server.providers.models import PlexConfig
-from server.providers.models.provider_config import SonarrConfig, RadarrConfig
+from server.providers.models import PlexConfig, SonarrConfig, RadarrConfig
 
 
 class PlexConfigSerializer(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PlexConfig
-        exclude = ("id", "provider_name", "plex_user_id")
+        exclude = ("id", "name", "api_key", "plex_user_id", "type")
 
 
 class SonarrConfigSerializer(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = SonarrConfig
-        exclude = ("id",)
+        exclude = ("id", "type")
 
 
 class RadarrConfigSerializer(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = RadarrConfig
-        exclude = ("id",)
+        exclude = ("id", "type")
 
 
 plex_config_serializer = PlexConfigSerializer()

@@ -2,9 +2,9 @@ from flask import render_template, url_for
 from flask_login import current_user
 
 from server import utils
+from server.auth import auth
 from server.auth.forms import EmailForm, SignupForm
 from server.auth.models import User
-from server.auth.routes import auth
 from server.exceptions import (
     BadRequest,
     Conflict,

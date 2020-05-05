@@ -1,5 +1,6 @@
-from server.config import REACT_STATIC_FOLDER, REACT_TEMPLATE_FOLDER
 from flask import Blueprint
+
+from server.config import REACT_STATIC_FOLDER, REACT_TEMPLATE_FOLDER
 
 site = Blueprint(
     "site",
@@ -8,4 +9,4 @@ site = Blueprint(
     static_folder=REACT_STATIC_FOLDER,
 )
 
-from . import routes  # noqa
+from . import views  # noqa

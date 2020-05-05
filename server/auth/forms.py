@@ -1,11 +1,8 @@
-from wtforms import StringField, BooleanField
-from wtforms.validators import Length, InputRequired
+from wtforms import BooleanField, StringField
+from wtforms.validators import InputRequired, Length
+
 from server.auth.models import User
 from server.forms import ModelForm
-
-
-def username():
-    return False
 
 
 class SignupForm(ModelForm):

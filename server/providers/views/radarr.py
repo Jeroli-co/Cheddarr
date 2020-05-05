@@ -3,8 +3,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from requests import get
 from server.exceptions import InternalServerError, BadRequest
 from server.providers.forms import RadarrConfigForm
-from server.providers.models.provider_config import RadarrConfig
-from server.providers.routes import provider
+from server.providers.models import RadarrConfig
+from server.providers import provider
 from server.providers.serializers.provider_config_serializer import (
     radarr_config_serializer,
 )
@@ -30,7 +30,7 @@ def test_radarr_config():
         )
     host = config_form.host.data
     port = config_form.port.data
-    api_key = config_form.provider_api_key.data
+    api_key = config_form.api_key.data
     ssl = "https" if config_form.ssl.data else "http"
     try:
         r = get(f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}")
@@ -60,7 +60,7 @@ def update_radarr_config():
     try:
         user_config = RadarrConfig.find(current_user)
     except NoResultFound:
-        user_config = RadarrConfig()
+        user_config = RadarrConfig(api_key=config_form.api_key.data)
         user_config.user = current_user
 
     updated_config = config_form.data

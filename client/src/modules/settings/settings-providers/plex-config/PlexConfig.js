@@ -1,6 +1,10 @@
 import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faExclamationCircle,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { ServersModal } from "./elements/ServersModal";
 import { useForm } from "react-hook-form";
 import { SubmitConfig } from "../SubmitConfig";
@@ -8,6 +12,7 @@ import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
 import { Spinner } from "../../../../elements/Spinner";
 import { RowLayout } from "../../../../elements/layouts";
 import { UnlinkServerModal } from "./elements/UnlinkServerModal";
+import { UnlinkAccountModal } from "./elements/UnlinkAccountModal";
 import { LinkPlexAccount } from "./elements/LinkPlexAccount";
 
 const PlexConfig = ({ location }) => {
@@ -16,17 +21,27 @@ const PlexConfig = ({ location }) => {
     updateConfig,
     isPlexAccountLinked,
     isPlexServerLinked,
+    unlinkPlexAccount,
   } = useContext(PlexConfigContext);
   const [isServersModalActive, setIsServersModalActive] = useState(false);
   const [isUnlinkServerModalActive, setIsUnlinkServerModalActive] = useState(
     false
   );
+  const [isUnlinkAccountModalActive, setIsUnlinkAccountModalActive] = useState(
+    false
+  );
 
-  const { register, handleSubmit, formState, reset } = useForm();
+  const { handleSubmit, formState, reset } = useForm();
 
   const _onUnlinkPlexServer = () => {
-    updateConfig({ machine_name: null }).then((res) => {
+    updateConfig({ machine_name: null, machine_id: null }).then((res) => {
       if (res) setIsUnlinkServerModalActive(false);
+    });
+  };
+
+  const _onUnlinkPlexAccount = () => {
+    unlinkPlexAccount().then((res) => {
+      if (res) setIsUnlinkAccountModalActive(false);
     });
   };
 
@@ -62,19 +77,6 @@ const PlexConfig = ({ location }) => {
                 <p className="is-size-5 has-text-weight-light">
                   {config["machine_name"]}
                 </p>
-                <div className="field">
-                  <div className="control">
-                    <input
-                      id="enabled"
-                      type="checkbox"
-                      name="enabled"
-                      className="switch is-primary"
-                      ref={register}
-                      defaultChecked={config.enabled}
-                    />
-                    <label htmlFor="enabled">Enabled</label>
-                  </div>
-                </div>
                 <button
                   type="button"
                   className="button is-small is-rounded is-info"
@@ -106,6 +108,21 @@ const PlexConfig = ({ location }) => {
             )}
             <SubmitConfig isFormDirty={formState.dirty} />
           </form>
+          <hr />
+          <p className="subtitle is-3">Danger zone</p>
+          <div className="content">
+            <p className="is-size-7">
+              <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
+              that option
+            </p>
+            <button
+              className="button is-danger"
+              type="button"
+              onClick={() => setIsUnlinkAccountModalActive(true)}
+            >
+              Unlink Plex Account
+            </button>
+          </div>
         </div>
       )}
 
@@ -118,6 +135,13 @@ const PlexConfig = ({ location }) => {
           machineName={config["machine_name"]}
           onUnlink={() => _onUnlinkPlexServer()}
           onClose={() => setIsUnlinkServerModalActive(false)}
+        />
+      )}
+
+      {isUnlinkAccountModalActive && (
+        <UnlinkAccountModal
+          onUnlink={() => _onUnlinkPlexAccount()}
+          onClose={() => setIsUnlinkAccountModalActive(false)}
         />
       )}
     </div>

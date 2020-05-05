@@ -5,10 +5,10 @@ from requests import get, post
 from sqlalchemy.orm.exc import NoResultFound
 
 from server import utils
+from server.auth import auth
 from server.auth.forms import SigninForm
 from server.auth.models import User
-from server.auth.routes import auth
-from server.auth.serializers.auth_serializer import session_serializer
+from server.auth.serializers import session_serializer
 from server.config import (
     APP_NAME,
     PLEX_ACCESS_TOKEN_URL,
@@ -101,7 +101,7 @@ def authorize_plex():
     try:
         plex_config = query.one()
     except NoResultFound:
-        plex_config = PlexConfig(plex_user_id=user_id)
+        plex_config = PlexConfig(plex_user_id=user_id, api_key=auth_token)
 
     if not plex_config.user:
         email = info["email"]
@@ -117,9 +117,8 @@ def authorize_plex():
                 user_picture=user_picture,
                 confirmed=True,
             )
-
-        # Associate the API key (auth token)
-        plex_config.provider_api_key = auth_token
+        # Associate the API key (possibly new at each login)
+        plex_config.api_key = auth_token
         # Associate the local user account with the ProviderConfig (Plex) table
         plex_config.user = user
 

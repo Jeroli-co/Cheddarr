@@ -1,14 +1,15 @@
-import {useApi} from "./useApi";
-import {useContext} from "react";
-import {AuthContext} from "../contexts/AuthContext";
-import {NotificationContext} from "../contexts/NotificationContext";
+import { useApi } from "./useApi";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
+import { NotificationContext } from "../contexts/NotificationContext";
 
 const useProfile = () => {
-
-  const profileURI = '/profile/';
+  const profileURI = "/profile/";
 
   const { executeRequest, methods } = useApi();
-  const { handleError, clearSession, setUsername, setUserPicture } = useContext(AuthContext);
+  const { handleError, clearSession, setUsername, setUserPicture } = useContext(
+    AuthContext
+  );
   const { pushSuccess, pushInfo } = useContext(NotificationContext);
 
   const getUser = async () => {
@@ -24,7 +25,7 @@ const useProfile = () => {
 
   const changeUsername = async (data) => {
     const fd = new FormData();
-    fd.append('username', data['newUsername']);
+    fd.append("username", data["newUsername"]);
     const res = await executeRequest(methods.PUT, profileURI + "username/", fd);
     switch (res.status) {
       case 200:
@@ -42,8 +43,10 @@ const useProfile = () => {
 
   const changeUserPicture = async (data) => {
     const fd = new FormData();
-    fd.append('picture', data);
-    const res = await executeRequest(methods.PUT, profileURI + "picture/", fd, { 'content-type': 'multipart/form-data' });
+    fd.append("picture", data);
+    const res = await executeRequest(methods.PUT, profileURI + "picture/", fd, {
+      "content-type": "multipart/form-data",
+    });
     switch (res.status) {
       case 200:
         const userPicture = res.data["user_picture"];
@@ -58,8 +61,8 @@ const useProfile = () => {
 
   const changeEmail = async (data) => {
     const fd = new FormData();
-    fd.append('email', data['email']);
-    const res = await executeRequest(methods.PUT, profileURI + 'email/', fd);
+    fd.append("email", data["email"]);
+    const res = await executeRequest(methods.PUT, profileURI + "email/", fd);
     switch (res.status) {
       case 200:
         pushInfo("Please check your email to confirm it.");
@@ -74,8 +77,8 @@ const useProfile = () => {
 
   const changePassword = async (data) => {
     const fd = new FormData();
-    fd.append('oldPassword', data['oldPassword']);
-    fd.append('newPassword', data['newPassword']);
+    fd.append("oldPassword", data["oldPassword"]);
+    fd.append("newPassword", data["newPassword"]);
     const res = await executeRequest(methods.PUT, profileURI + "password/", fd);
     switch (res.status) {
       case 200:
@@ -92,11 +95,11 @@ const useProfile = () => {
 
   const deleteAccount = async (data) => {
     const fd = new FormData();
-    fd.append('password', data['password']);
+    fd.append("password", data["password"]);
     const res = await executeRequest(methods.DELETE, profileURI, fd);
     switch (res.status) {
       case 200:
-        pushSuccess("Your account has been deleted");
+        pushInfo("Your account has been deleted");
         clearSession();
         return res;
       case 400:
@@ -113,10 +116,8 @@ const useProfile = () => {
     changeUserPicture,
     changeEmail,
     changePassword,
-    deleteAccount
-  }
+    deleteAccount,
+  };
 };
 
-export {
-  useProfile
-}
+export { useProfile };
