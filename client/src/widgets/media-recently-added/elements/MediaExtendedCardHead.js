@@ -1,16 +1,14 @@
 import React from "react";
-import { ColumnLayout, RowLayout } from "../../../elements/layouts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle } from "@fortawesome/free-solid-svg-icons";
+import { RowLayout } from "../../../elements/layouts";
 import {
   getColorRating,
   getRatingPercentage,
   msToHoursMinutes,
 } from "../../../utils/media-utils";
 import { Tag, TagColor } from "../../../elements/Tag";
-import logo from "../../../assets/plex.png";
 import styled from "styled-components";
 import { PlexButton } from "../../../elements/PlexButton";
+import { LineBulletList } from "../../../elements/media/LineBulletList";
 
 const MediaDetailsRating = styled.div`
   display: flex;
@@ -35,7 +33,7 @@ const MediaExtendedCardHead = ({ media }) => {
           S{media.seasonNumber}・E{media.episodeNumber} - {media.title}
         </p>
       )}
-      <RowLayout wrap="wrap" childMarginRight="1%">
+      <LineBulletList>
         <p
           className="is-size-7"
           style={{ cursor: "default" }}
@@ -43,7 +41,6 @@ const MediaExtendedCardHead = ({ media }) => {
         >
           {media.releaseDate}
         </p>
-        <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
         <p
           className="is-size-7"
           style={{ cursor: "default" }}
@@ -51,7 +48,6 @@ const MediaExtendedCardHead = ({ media }) => {
         >
           {msToHoursMinutes(media.duration)}
         </p>
-        <FontAwesomeIcon icon={faCircle} style={{ fontSize: "5px" }} />
         <p
           className="is-size-7"
           style={{ cursor: "default" }}
@@ -59,7 +55,7 @@ const MediaExtendedCardHead = ({ media }) => {
         >
           {media.contentRating}
         </p>
-      </RowLayout>
+      </LineBulletList>
 
       {!media.isWatched && (
         <RowLayout marginTop="1em">
@@ -70,7 +66,7 @@ const MediaExtendedCardHead = ({ media }) => {
       <RowLayout marginTop="1em" childMarginRight="2%" wrap="wrap">
         {media.rating && (
           <MediaDetailsRating
-            data-tooltip="Rating"
+            data-tooltip="MediaRating"
             style={{ cursor: "default" }}
             backgroundColor={getColorRating(getRatingPercentage(media.rating))}
           >

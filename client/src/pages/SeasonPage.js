@@ -33,6 +33,7 @@ const SeasonPage = () => {
     getSeason(seriesId, seasonNumber).then((s) => {
       if (s) setSeason(s);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!season)

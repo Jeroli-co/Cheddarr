@@ -21,7 +21,7 @@ const DropdownTypeStyle = styled.div`
   transition: 0.3s ease;
   min-width: 120px;
   max-width: 120px;
-  height: 50%;
+  height: 60%;
 
   .search-types-items {
     position: absolute;

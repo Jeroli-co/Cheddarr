@@ -20,7 +20,7 @@ const SearchBarStyle = styled.div`
 
   .search-input {
     width: 100%;
-    height: 50%;
+    height: 60%;
     padding: 0.5em;
     border: 1px solid ${(props) => props.theme.primaryLight};
     border-top-right-radius: 3px;
@@ -79,7 +79,7 @@ const SearchBar = () => {
   };
 
   const _search = () => {
-    if (!isEmpty(value)) {
+    if (!isEmpty(value) && value.length > 1) {
       setResults({ ...results, loading: true, visible: true });
     } else {
       setResults({ value: [], loading: false, visible: false });
