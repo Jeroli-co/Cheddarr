@@ -12,6 +12,7 @@ Flask-SQLAlchemy
 Flask-Talisman
 Flask-WTF
 gunicorn
+imdbpy
 itsdangerous
 marshmallow-sqlalchemy
 passlib
