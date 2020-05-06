@@ -6,7 +6,6 @@ from server.providers.forms import SonarrConfigForm
 from server.providers.models import SonarrConfig
 from server.providers import provider
 from server.providers.serializers.provider_config_serializer import (
-    radarr_config_serializer,
     sonarr_config_serializer,
 )
 
@@ -48,7 +47,7 @@ def get_sonarr_config():
         sonarr_config = SonarrConfig.find(current_user)
     except NoResultFound:
         return {}
-    return radarr_config_serializer.jsonify(sonarr_config)
+    return sonarr_config_serializer.jsonify(sonarr_config)
 
 
 @provider.route("/sonarr/config/", methods=["PATCH"])

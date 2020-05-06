@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePlex } from "../../hooks/usePlex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleRight } from "@fortawesome/free-solid-svg-icons";
@@ -7,6 +7,9 @@ import { Spinner } from "../../elements/Spinner";
 import { RowLayout } from "../../elements/layouts";
 import { MediaExtendedCardLayout } from "./elements/MediaExtendedCardLayout";
 import { MediaPreview } from "./elements/MediaPreviewCard";
+import styled from "styled-components";
+
+const MediaRecentlyAddedStyle = styled.div``;
 
 const MediaRecentlyAdded = ({ type }) => {
   const {
@@ -17,6 +20,7 @@ const MediaRecentlyAdded = ({ type }) => {
   const [medias, setMedias] = useState(null);
   const [isShow, setIsShow] = useState(true);
   const [mediaSelectedIndex, setMediaSelectedIndex] = useState(-1);
+  const sectionTitleRef = useRef(null);
 
   useEffect(() => {
     if (type === "movies") {
@@ -39,6 +43,11 @@ const MediaRecentlyAdded = ({ type }) => {
 
   const onPreviewClick = (index) => {
     setMediaSelectedIndex(index);
+    sectionTitleRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+      inline: "nearest",
+    });
   };
 
   const collapseWidget = () => {
@@ -47,8 +56,9 @@ const MediaRecentlyAdded = ({ type }) => {
   };
 
   return (
-    <div data-testid="MediaRecentlyAdded">
+    <MediaRecentlyAddedStyle data-testid="MediaRecentlyAdded">
       <div
+        ref={sectionTitleRef}
         className={!medias ? "" : "is-pointed"}
         onClick={medias ? () => collapseWidget() : null}
       >
@@ -89,7 +99,7 @@ const MediaRecentlyAdded = ({ type }) => {
           onClose={() => setMediaSelectedIndex(-1)}
         />
       )}
-    </div>
+    </MediaRecentlyAddedStyle>
   );
 };
 

@@ -22,6 +22,10 @@ import { SonarrConfig } from "../modules/settings/settings-providers/sonarr-conf
 import { RadarrConfig } from "../modules/settings/settings-providers/radarr-config/RadarrConfig";
 import { PlexConfig } from "../modules/settings/settings-providers/plex-config/PlexConfig";
 import { DeleteAccountModal } from "../modules/settings/settings-account/element/DeleteAccountModal";
+import { MoviePage } from "../pages/MoviePage";
+import { SeasonPage } from "../pages/SeasonPage";
+import { EpisodePage } from "../pages/EpisodePage";
+import { SeriesPage } from "../pages/SeriesPage";
 
 const routes = {
   HOME: { url: "/", component: Home },
@@ -87,6 +91,23 @@ const routes = {
     component: ChangeEmailModal,
   },
   DELETE: { url: "/settings/profile/delete", component: DeleteAccountModal },
+  MOVIE: { url: (id) => "/movie/" + id, component: MoviePage },
+  SERIES: { url: (id) => "/series/" + id, component: SeriesPage },
+  SEASON: {
+    url: (seriesId, seasonNumber) =>
+      "/series/" + seriesId + "/seasons/" + seasonNumber,
+    component: SeasonPage,
+  },
+  EPISODE: {
+    url: (seriesId, seasonNumber, episodeNumber) =>
+      "/series/" +
+      seriesId +
+      "/seasons/" +
+      seasonNumber +
+      "/episodes/" +
+      episodeNumber,
+    component: EpisodePage,
+  },
 };
 
 export { routes };

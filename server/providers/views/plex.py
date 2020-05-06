@@ -27,7 +27,7 @@ def get_plex_status():
         plex_config = PlexConfig.find(current_user)
     except NoResultFound:
         return {"status": False}
-    return {"status": plex_config.enabled and plex_config.machine_id is not None}
+    return {"status": plex_config.enabled}
 
 
 @provider.route("/plex/config/", methods=["GET"])
@@ -53,6 +53,8 @@ def update_plex_config():
         user_config = PlexConfig.find(current_user)
     except NoResultFound:
         raise InternalServerError("No existing config for Plex.")
+    if not user_config:
+        raise BadRequest("No config created for this provider")
 
     user_config.update(updated_config)
     return plex_config_serializer.jsonify(user_config)
@@ -137,7 +139,7 @@ def get_series(series_id):
 def get_season(series_id, season_number):
     plex_server = plex.user_server(current_user)
     series = plex_server.fetchItem(ekey=int(series_id))
-    season = series.episode(season=int(season_number))
+    season = series.season(title=int(season_number))
     season.reload()
     return plex_seasons_serializer.jsonify(season)
 

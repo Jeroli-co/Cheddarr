@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { PlexConfigContextProvider } from "../../contexts/PlexConfigContext";
-import { SettingsAccount } from "./settings-account/SettingsAccount";
-import { PlexConfig } from "./settings-providers/plex-config/PlexConfig";
-import { RadarrConfig } from "./settings-providers/radarr-config/RadarrConfig";
-import { SonarrConfig } from "./settings-providers/sonarr-config/SonarrConfig";
 import styled from "styled-components";
+import { routes } from "../../router/routes";
+import { Link, Redirect, Route, Switch, useLocation } from "react-router-dom";
 
 const SettingsStyle = styled.div`
   margin: 1%;
@@ -12,33 +10,59 @@ const SettingsStyle = styled.div`
 
 const tabsName = ["Account", "Plex", "Radarr", "Sonarr"];
 
-const Settings = ({ location }) => {
-  const [activeTab, setActiveTab] = useState(0);
+const Settings = () => {
+  const url = routes.USER_SETTINGS.url;
+  const location = useLocation();
+
+  if (location.pathname === url || location.pathname === url + "/") {
+    return <Redirect to={routes.USER_SETTINGS_ACCOUNT.url} />;
+  }
+
+  const isActiveTab = (name) => {
+    return (
+      location.pathname === url + "/" + name.toLowerCase() ||
+      location.pathname === url + "/" + name.toLowerCase() + "/"
+    );
+  };
 
   return (
     <SettingsStyle data-testid="Settings">
       <div className="tabs is-centered is-boxed is-medium">
         <ul>
           {tabsName.map((name, index) => (
-            <li
-              key={index}
-              className={activeTab === index ? "is-active" : ""}
-              onClick={() => setActiveTab(index)}
-            >
-              <a href={"#" + tabsName[index]}>{tabsName[index]}</a>
+            <li key={index} className={isActiveTab(name) ? "is-active" : ""}>
+              <Link to={routes.USER_SETTINGS.url + "/" + name.toLowerCase()}>
+                {name}
+              </Link>
             </li>
           ))}
         </ul>
       </div>
-
-      {activeTab === 0 && <SettingsAccount id={tabsName[0]} />}
-      {activeTab === 1 && (
-        <PlexConfigContextProvider>
-          <PlexConfig id={tabsName[1]} location={location} />
-        </PlexConfigContextProvider>
-      )}
-      {activeTab === 2 && <RadarrConfig id={tabsName[2]} />}
-      {activeTab === 3 && <SonarrConfig id={tabsName[3]} />}
+      <PlexConfigContextProvider>
+        <Switch>
+          <Route
+            exact
+            path={routes.USER_SETTINGS_ACCOUNT.url}
+            component={routes.USER_SETTINGS_ACCOUNT.component}
+          />
+          <Route
+            exact
+            path={routes.USER_SETTINGS_PLEX.url}
+            component={routes.USER_SETTINGS_PLEX.component}
+          />
+          <Route
+            exact
+            path={routes.USER_SETTINGS_RADARR.url}
+            component={routes.USER_SETTINGS_RADARR.component}
+          />
+          <Route
+            exact
+            path={routes.USER_SETTINGS_SONARR.url}
+            component={routes.USER_SETTINGS_SONARR.component}
+          />
+          <Route render={() => <Redirect to={routes.NOT_FOUND.url} />} />
+        </Switch>
+      </PlexConfigContextProvider>
     </SettingsStyle>
   );
 };

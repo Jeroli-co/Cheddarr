@@ -1,11 +1,13 @@
 from plexapi.exceptions import PlexApiException
-from plexapi.library import MovieSection, ShowSection
+from plexapi.library import LibrarySection, MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
 
 from server.exceptions import InternalServerError, BadRequest
+from server.extensions import cache
 from server.providers.models import PlexConfig
 
 
+@cache.memoize(timeout=300)
 def user_server(user):
     plex_config = PlexConfig.find(user)
     api_key = plex_config.api_key
@@ -18,37 +20,36 @@ def user_server(user):
         raise InternalServerError("Error while connecting to Plex server.")
 
 
+@cache.memoize(timeout=300)
 def library_sections(plex_server, section_id=None, section_type=None):
     if section_id is not None:
+        # TODO get section by id
         pass
-    if section_type is not None:
-        if section_type == "movies":
-            libtype = MovieSection
-        elif section_type == "series":
-            libtype = ShowSection
-        else:
-            raise ValueError("Wrong value: section_type must be 'movies' or 'series'.")
-        sections = [
-            section
-            for section in plex_server.library.sections()
-            if isinstance(section, libtype)
-        ]
-        return sections
-    raise ValueError("Missing argument: section_id or section_type are required.")
+    if section_type == "movies":
+        libtype = MovieSection
+    elif section_type == "series":
+        libtype = ShowSection
+    else:
+        libtype = LibrarySection
+    sections = [
+        section
+        for section in plex_server.library.sections()
+        if isinstance(section, libtype)
+    ]
+    return sections
 
 
-def search(plex_server, section_type, media_search, max_results=5):
+@cache.memoize(timeout=300)
+def search(plex_server, section_type, title, filters, max_results=3):
     if section_type == "movies":
         sections = library_sections(plex_server, section_type="movies")
     elif section_type == "series":
         sections = library_sections(plex_server, section_type="series")
     else:
-        raise ValueError("Wrong value: section_type must be 'movies' or 'series'.")
+        sections = library_sections(plex_server)
     result = [
         media
         for section in sections
-        for media in section.search(
-            title=media_search.title.data, maxresults=max_results
-        )
+        for media in section.search(maxresults=max_results, title=title, **filters)
     ]
     return result
