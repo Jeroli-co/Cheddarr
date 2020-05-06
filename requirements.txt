@@ -11,6 +11,7 @@ Flask-Migrate
 Flask-SQLAlchemy
 Flask-Talisman
 gunicorn
+imdbpy
 itsdangerous
 marshmallow-sqlalchemy
 passlib
