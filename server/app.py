@@ -7,7 +7,14 @@ from flask.sessions import SecureCookieSessionInterface
 from flask_cors import CORS
 from flask_talisman import Talisman
 
-from server.config import (API_ROOT, Config, DevConfig, FLASK_TEMPLATE_FOLDER, ProdConfig, REACT_STATIC_FOLDER)
+from server.config import (
+    API_ROOT,
+    Config,
+    DevConfig,
+    FLASK_TEMPLATE_FOLDER,
+    ProdConfig,
+    REACT_STATIC_FOLDER,
+)
 from server.exceptions import HTTPError
 from server.extensions import cache, celery, db, limiter, ma, mail, migrate
 from server.extensions.login_manager import register_login_manager
@@ -40,6 +47,7 @@ def _create_app(config_object: Config, **kwargs):
     """Initialize extensions"""
     celery.init_app(app)
     db.init_app(app)
+    migrate.init_app(app, db)
     ma.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
@@ -57,13 +65,6 @@ def _create_app(config_object: Config, **kwargs):
         supports_credentials=True,
         resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}},
     )
-
-    """Patch db migration for sqlite"""
-    with app.app_context():
-        if db.engine.url.drivername == "sqlite":
-            migrate.init_app(app, db, render_as_batch=True)
-        else:
-            migrate.init_app(app, db)
 
     @app.errorhandler(HTTPError)
     def handle_invalid_usage(error):
