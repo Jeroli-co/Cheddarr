@@ -32,6 +32,7 @@ const EpisodePage = () => {
     getEpisode(seriesId, seasonNumber, episodeNumber).then((e) => {
       if (e) setEpisode(e);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!episode)

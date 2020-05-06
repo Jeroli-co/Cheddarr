@@ -33,6 +33,7 @@ const MoviePage = () => {
     getMovie(id).then((m) => {
       if (m) setMovie(m);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (!movie || movie.id !== id)

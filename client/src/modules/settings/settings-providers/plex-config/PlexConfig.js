@@ -58,7 +58,7 @@ const PlexConfig = ({ location }) => {
   if (!config) return <Spinner color="primary" size="3x" />;
 
   return (
-    <div className="PlexConfig" data-testid="PlexConfig">
+    <div className="PlexConfig container" data-testid="PlexConfig">
       <RowLayout
         justifyContent="space-between"
         borderBottom="1px solid LightGrey"
@@ -68,7 +68,7 @@ const PlexConfig = ({ location }) => {
       </RowLayout>
 
       {isPlexAccountLinked(config) && (
-        <div className="container">
+        <div>
           <form onSubmit={handleSubmit(_onSubmit)}>
             <br />
             <p className="subtitle is-3">Plex server</p>
@@ -96,15 +96,13 @@ const PlexConfig = ({ location }) => {
               </RowLayout>
             )}
             {!isPlexServerLinked(config) && (
-              <RowLayout marginTop="2%">
-                <button
-                  className="button is-primary"
-                  type="button"
-                  onClick={() => setIsServersModalActive(true)}
-                >
-                  Link Plex server
-                </button>
-              </RowLayout>
+              <button
+                className="button is-primary"
+                type="button"
+                onClick={() => setIsServersModalActive(true)}
+              >
+                Link Plex server
+              </button>
             )}
             <SubmitConfig isFormDirty={formState.dirty} />
           </form>

@@ -23,9 +23,9 @@ import { RadarrConfig } from "../modules/settings/settings-providers/radarr-conf
 import { PlexConfig } from "../modules/settings/settings-providers/plex-config/PlexConfig";
 import { DeleteAccountModal } from "../modules/settings/settings-account/element/DeleteAccountModal";
 import { MoviePage } from "../pages/MoviePage";
-import { SeriesPage } from "../pages/SeriesPage";
 import { SeasonPage } from "../pages/SeasonPage";
 import { EpisodePage } from "../pages/EpisodePage";
+import { SeriesPage } from "../pages/SeriesPage";
 
 const routes = {
   HOME: { url: "/", component: Home },
