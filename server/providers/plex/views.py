@@ -29,7 +29,7 @@ def get_plex_status():
         plex_config = PlexConfig.find(current_user)
     except NoResultFound:
         return {"status": False}
-    return {"status": plex_config.enabled}
+    return {"status": plex_config.enabled and plex_config.machine_id is not None}
 
 
 @login_required
