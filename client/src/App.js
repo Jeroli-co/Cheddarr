@@ -106,6 +106,10 @@ const App = () => {
                 path={routes.SEARCH.url(":type")}
                 component={routes.SEARCH.component}
               />
+              <PrivateRoute
+                path={routes.SEARCH.url(":type")}
+                component={routes.SEARCH.component}
+              />
               <Route
                 exact
                 path={routes.BAD_REQUEST.url}
