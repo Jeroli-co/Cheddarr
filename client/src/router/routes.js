@@ -102,6 +102,10 @@ const routes = {
     url: (type) => "/search/" + type,
     component: SearchPage,
   },
+  SEARCH: {
+    url: (type) => "/search/" + type,
+    component: SearchPage,
+  },
 };
 
 export { routes };

@@ -4,8 +4,9 @@ import { usePlex } from "../../hooks/usePlex";
 import { Spinner } from "../Spinner";
 import { ColumnLayout, RowLayout } from "../layouts";
 import { Tag, TagColor } from "../Tag";
-import { Actors } from "./Actors";
+import { Actors } from "../../widgets/media-recently-added/elements/Actors";
 import { Image } from "../Image";
+import { LineBulletList } from "./LineBulletList";
 import { MediaTitle } from "./MediaTitle";
 import { Container } from "../Container";
 import { PlexButton } from "../PlexButton";
@@ -31,7 +32,7 @@ const MovieCard = ({ movie }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (!movieInfo || (!movie && movieInfo.id !== id))
+  if (!movieInfo || movieInfo.id !== id)
     return (
       <Spinner
         justifyContent="center"
@@ -55,37 +56,23 @@ const MovieCard = ({ movie }) => {
 
           <Container paddingRight="1%" paddingLeft="1%">
             <MediaTitle media={movieInfo} />
-            <RowLayout childPaddingRight="1em">
-              {movieInfo.releaseDate && (
-                <p
-                  className="is-size-7"
-                  style={{ cursor: "default" }}
-                  data-tooltip="Released"
-                >
-                  {movieInfo.releaseDate}
-                </p>
-              )}
-              {movieInfo.releaseDate && <p className="is-size-7">•</p>}
-              {movieInfo.contentRating && (
-                <p
-                  className="is-size-7"
-                  style={{ cursor: "default" }}
-                  data-tooltip="Content rating"
-                >
-                  {movieInfo.contentRating}
-                </p>
-              )}
-              {movieInfo.contentRating && <p className="is-size-7">•</p>}
-              {movieInfo.duration && (
-                <p
-                  className="is-size-7"
-                  style={{ cursor: "default" }}
-                  data-tooltip="Content rating"
-                >
-                  {movieInfo.duration}
-                </p>
-              )}
-            </RowLayout>
+
+            <LineBulletList>
+              <p
+                className="is-size-7"
+                style={{ cursor: "default" }}
+                data-tooltip="Released"
+              >
+                {movieInfo.releaseDate}
+              </p>
+              <p
+                className="is-size-7"
+                style={{ cursor: "default" }}
+                data-tooltip="Content rating"
+              >
+                {movieInfo.contentRating}
+              </p>
+            </LineBulletList>
 
             {!movieInfo.isWatched && (
               <RowLayout marginTop="1em">

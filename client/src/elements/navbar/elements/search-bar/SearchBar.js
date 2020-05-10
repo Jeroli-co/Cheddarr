@@ -10,6 +10,7 @@ import { routes } from "../../../../router/routes";
 const SearchBarStyle = styled.div`
   position: relative;
   width: 100%;
+  height: 60%;
   display: flex;
   align-items: center;
   transition: 0.3s ease;
@@ -22,6 +23,7 @@ const SearchBarStyle = styled.div`
     border: 1px solid green;
     width: 100%;
     height: 100%;
+    padding: 0.5em;
     border: 1px solid ${(props) => props.theme.primaryLight};
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
