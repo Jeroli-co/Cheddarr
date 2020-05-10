@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
-import { useOutsideAlerter } from "../../../../hooks/useOutsideAlerter";
 import { useSearch } from "../../../../hooks/useSearch";
 import { isEmpty } from "../../../../utils/strings";
 import { DropdownType } from "./elements/DropdownType";
 import { ResultsList } from "./elements/ResultsList";
+import { useHistory } from "react-router";
+import { routes } from "../../../../router/routes";
 
 const SearchBarStyle = styled.div`
   position: relative;
   width: 100%;
-  height: 100%;
+  height: 60%;
   display: flex;
   align-items: center;
   transition: 0.3s ease;
@@ -19,8 +20,9 @@ const SearchBarStyle = styled.div`
   }
 
   .search-input {
+    border: 1px solid green;
     width: 100%;
-    height: 60%;
+    height: 100%;
     padding: 0.5em;
     border: 1px solid ${(props) => props.theme.primaryLight};
     border-top-right-radius: 3px;
@@ -61,34 +63,45 @@ const SearchBar = () => {
   const [searchType, setSearchType] = useState(searchTypes[0]);
   const [isInputFocus, setIsInputFocus] = useState(false);
   const [value, setValue] = useState("");
-  const [results, setResults] = useState({
-    value: [],
+
+  const initialResult = {
+    value: null,
     loading: false,
-    visible: false,
-  });
+  };
+  const [results, setResults] = useState(initialResult);
 
-  const searchBarRef = useRef(null);
-  useOutsideAlerter([searchBarRef], () =>
-    setResults({ ...results, visible: false })
-  );
-
+  const history = useHistory();
   const { search } = useSearch();
+  const inputRef = useRef(null);
 
   const _onInputChange = (e) => {
     setValue(e.target.value);
   };
 
+  const _onSearchTypeChange = (type) => {
+    setSearchType(type);
+    inputRef.current.focus();
+  };
+
+  const _onKeyPress = (e) => {
+    if (e.key === "Enter") {
+      setValue("");
+      history.push(routes.SEARCH.url);
+      e.preventDefault();
+    }
+  };
+
   const _search = () => {
     if (!isEmpty(value) && value.length > 1) {
-      setResults({ ...results, loading: true, visible: true });
+      setResults({ ...results, loading: true });
     } else {
-      setResults({ value: [], loading: false, visible: false });
+      setResults(initialResult);
     }
   };
 
   useEffect(() => {
     clearTimeout(timer);
-    timer = setTimeout(() => _search(), 750);
+    timer = setTimeout(() => _search(), 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
@@ -96,7 +109,7 @@ const SearchBar = () => {
     if (results.loading) {
       search(searchType, value).then((data) => {
         if (data) {
-          setResults({ ...results, value: data, loading: false });
+          setResults({ value: data, loading: false });
         }
       });
     }
@@ -109,28 +122,27 @@ const SearchBar = () => {
   }, [searchType]);
 
   return (
-    <SearchBarStyle ref={searchBarRef} isInputFocus={isInputFocus}>
+    <SearchBarStyle isInputFocus={isInputFocus}>
       <DropdownType
         options={searchTypes}
         selectedOption={searchType}
-        onChange={(type) => setSearchType(type)}
+        onChange={(type) => _onSearchTypeChange(type)}
       />
       <input
+        ref={inputRef}
+        value={value}
         onChange={(e) => _onInputChange(e)}
-        onFocus={() => {
-          setIsInputFocus(true);
-          setResults({ ...results, visible: results.value.length > 0 });
-        }}
+        onFocus={() => setIsInputFocus(true)}
         onBlur={() => setIsInputFocus(false)}
+        onKeyPress={(e) => _onKeyPress(e)}
         className="search-input"
         type="text"
         placeholder="Search..."
       />
       <ResultsList
-        isVisible={results.visible}
-        isLoading={results.loading}
+        isVisible={isInputFocus}
         searchType={searchType}
-        results={results.value}
+        results={results}
       />
     </SearchBarStyle>
   );

@@ -19,9 +19,7 @@ const DropdownTypeStyle = styled.div`
   border-bottom-left-radius: ${(props) => (!props.isActive ? "3px" : "none")};
   cursor: pointer;
   transition: 0.3s ease;
-  min-width: 120px;
-  max-width: 120px;
-  height: 60%;
+  height: 100%;
 
   .search-types-items {
     position: absolute;
