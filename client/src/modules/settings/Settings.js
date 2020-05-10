@@ -1,12 +1,8 @@
 import React from "react";
 import { PlexConfigContextProvider } from "../../contexts/PlexConfigContext";
-import styled from "styled-components";
 import { routes } from "../../router/routes";
 import { Link, Redirect, Route, Switch, useLocation } from "react-router-dom";
-
-const SettingsStyle = styled.div`
-  margin: 1%;
-`;
+import { Container } from "../../elements/Container";
 
 const tabsName = ["Account", "Plex", "Radarr", "Sonarr"];
 
@@ -26,7 +22,7 @@ const Settings = () => {
   };
 
   return (
-    <SettingsStyle data-testid="Settings">
+    <Container padding="1%" data-testid="Settings">
       <div className="tabs is-centered is-boxed is-medium">
         <ul>
           {tabsName.map((name, index) => (
@@ -63,7 +59,7 @@ const Settings = () => {
           <Route render={() => <Redirect to={routes.NOT_FOUND.url} />} />
         </Switch>
       </PlexConfigContextProvider>
-    </SettingsStyle>
+    </Container>
   );
 };
 

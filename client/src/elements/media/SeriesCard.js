@@ -95,8 +95,11 @@ const SeriesCard = ({ series }) => {
         <hr />
         <div className="is-size-5">Seasons</div>
         <RowLayout childMarginRight="1em" wrap="wrap">
-          {seriesInfo.seasons.map((season) => (
-            <Link to={routes.SEASON.url(season.seriesId, season.seasonNumber)}>
+          {seriesInfo.seasons.map((season, index) => (
+            <Link
+              key={index}
+              to={routes.SEASON.url(season.seriesId, season.seasonNumber)}
+            >
               <ColumnLayout alignItems="center">
                 <Image
                   src={season.thumbUrl}

@@ -7,14 +7,11 @@ const MediaTitleStyle = styled.h1`
   margin: 10px;
 `;
 
-const SeriesTitle = ({ series }) => {
-  return <MediaTitleStyle>{series.title}</MediaTitleStyle>;
-};
-
 const MediaTitle = ({ media }) => {
   switch (media.type) {
     case "series":
-      return <SeriesTitle series={media} />;
+    case "movie":
+      return <MediaTitleStyle>{media.title}</MediaTitleStyle>;
     default:
       throw new Error("No media type matched");
   }

@@ -1,30 +1,28 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import "./Home.scss";
 import logo from "../../assets/cheddarr.png";
 import { AuthContext } from "../../contexts/AuthContext";
 import { MediaRecentlyAdded } from "../../widgets/media-recently-added/MediaRecentlyAdded";
-import { usePlex } from "../../hooks/usePlex";
 import { Link } from "react-router-dom";
 import { routes } from "../../router/routes";
+import { usePlexStatus } from "../../hooks/usePlexStatus";
+import { Spinner } from "../Spinner";
 
 const Home = () => {
   const { isAuthenticated, isLoading } = useContext(AuthContext);
-  const { getPlexStatus } = usePlex();
-  const [isPlexEnabled, setIsPlexEnabled] = useState({
-    enabled: false,
-    loaded: false,
-  });
+  const plexStatus = usePlexStatus();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      getPlexStatus().then((enabled) =>
-        setIsPlexEnabled({ enabled: enabled, loaded: true })
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
-
-  if (isLoading) return <div />;
+  if (isLoading) {
+    return (
+      <Spinner
+        justifyContent="center"
+        alignItems="center"
+        height="500px"
+        color="primary"
+        size="2x"
+      />
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -42,7 +40,9 @@ const Home = () => {
         </header>
       </div>
     );
-  } else if (isPlexEnabled.enabled) {
+  }
+
+  if (plexStatus.enabled) {
     return (
       <div className="noselect">
         <MediaRecentlyAdded type="onDeck" />
@@ -50,7 +50,9 @@ const Home = () => {
         <MediaRecentlyAdded type="series" />
       </div>
     );
-  } else if (!isPlexEnabled.enabled && isPlexEnabled.loaded) {
+  }
+
+  if (!plexStatus.enabled && plexStatus.loaded) {
     return (
       <div className="container">
         <div className="content has-text-centered">
@@ -63,9 +65,9 @@ const Home = () => {
         </div>
       </div>
     );
-  } else {
-    return <div />;
   }
+
+  return <div />;
 };
 
 export { Home };
