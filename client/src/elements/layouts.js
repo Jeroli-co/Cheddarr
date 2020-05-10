@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 const ColumnLayout = styled.div`
   display: flex;
@@ -114,6 +114,16 @@ const RowLayout = styled.div`
         ? props.childPadding
         : "0"};
   }
+
+  ${(props) =>
+    props.flexGrow &&
+    props.flexGrow.forEach(
+      (itemGrow, index) => css`
+        &:nth-child(${index}) {
+          flex-grow: ${itemGrow};
+        }
+      `
+    )};
 `;
 
 export { ColumnLayout, RowLayout };
