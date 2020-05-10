@@ -66,6 +66,19 @@ const routes = {
     url: "/settings/account",
     component: SettingsAccount,
   },
+  CHANGE_PASSWORD: {
+    url: "/settings/account/change-password",
+    component: ChangePasswordModal,
+  },
+  CHANGE_USERNAME: {
+    url: "/settings/account/change-username",
+    component: ChangeUsernameModal,
+  },
+  CHANGE_EMAIL: {
+    url: "/settings/account/change-email",
+    component: ChangeEmailModal,
+  },
+  DELETE: { url: "/settings/account/delete", component: DeleteAccountModal },
   USER_SETTINGS_PLEX: {
     url: "/settings/plex",
     component: PlexConfig,
@@ -78,19 +91,6 @@ const routes = {
     url: "/settings/sonarr",
     component: SonarrConfig,
   },
-  CHANGE_PASSWORD: {
-    url: "/settings/profile/change-password",
-    component: ChangePasswordModal,
-  },
-  CHANGE_USERNAME: {
-    url: "/settings/profile/change-username",
-    component: ChangeUsernameModal,
-  },
-  CHANGE_EMAIL: {
-    url: "/settings/profile/change-email",
-    component: ChangeEmailModal,
-  },
-  DELETE: { url: "/settings/profile/delete", component: DeleteAccountModal },
   MOVIE: { url: (id) => "/movie/" + id, component: MoviePage },
   SERIES: { url: (id) => "/series/" + id, component: SeriesPage },
   SEASON: {

@@ -37,7 +37,6 @@ const Settings = () => {
       <PlexConfigContextProvider>
         <Switch>
           <Route
-            exact
             path={routes.USER_SETTINGS_ACCOUNT.url}
             component={routes.USER_SETTINGS_ACCOUNT.component}
           />
