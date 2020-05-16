@@ -7,6 +7,7 @@ import { routes } from "../../router/routes";
 import { Container } from "../../elements/Container";
 import { MoviesSearchTab } from "./elements/MoviesSearchTab";
 import { SeriesSearchTab } from "./elements/SeriesSearchTab";
+import { SearchFilters } from "./elements/SearchFilters";
 
 const SearchTabs = ({ type }) => {
   return (
@@ -37,6 +38,7 @@ const SearchPage = () => {
   const { type } = useParams();
   return (
     <Container padding="1em">
+      <SearchFilters />
       <SearchTabs type={type} />
       <Switch>
         <Route
