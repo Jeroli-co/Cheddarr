@@ -2,7 +2,7 @@ import React from "react";
 import { Spinner } from "../../../../Spinner";
 import styled from "styled-components";
 import { ColumnLayout, RowLayout } from "../../../../layouts";
-import { cutString, Text } from "../../../../../utils/strings";
+import { Text } from "../../../../../utils/strings";
 import { useHistory } from "react-router";
 import { routes } from "../../../../../router/routes";
 
