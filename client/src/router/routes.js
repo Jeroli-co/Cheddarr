@@ -24,7 +24,6 @@ import { PlexConfig } from "../modules/settings/settings-providers/plex-config/P
 import { DeleteAccountModal } from "../modules/settings/settings-account/element/DeleteAccountModal";
 import { MoviePage } from "../pages/MoviePage";
 import { SeasonPage } from "../pages/SeasonPage";
-import { EpisodePage } from "../pages/EpisodePage";
 import { SeriesPage } from "../pages/SeriesPage";
 import { SearchPage } from "../pages/search-page/SearchPage";
 
@@ -98,16 +97,6 @@ const routes = {
     url: (seriesId, seasonNumber) =>
       "/series/" + seriesId + "/seasons/" + seasonNumber,
     component: SeasonPage,
-  },
-  EPISODE: {
-    url: (seriesId, seasonNumber, episodeNumber) =>
-      "/series/" +
-      seriesId +
-      "/seasons/" +
-      seasonNumber +
-      "/episodes/" +
-      episodeNumber,
-    component: EpisodePage,
   },
   SEARCH: {
     url: (type) => "/search/" + type,

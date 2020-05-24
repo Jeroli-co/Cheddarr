@@ -16,11 +16,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const UserDropdownMobileStyle = styled.div`
+  position: absolute;
+  top: 75px;
+  left: 0;
   display: ${(props) => (props.isVisible ? "block" : "none")};
-  background-color: white;
   border-radius: 12px;
   margin-top: 2%;
   width: 100%;
+  z-index: 10;
+  background: white;
 
   @media only screen and (min-width: 600px) {
     display: none;
@@ -33,6 +37,7 @@ const DropdownMenuMobileStyle = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
+  background: white;
 
   > * {
     width: 100%;
