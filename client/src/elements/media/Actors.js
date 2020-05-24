@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { Carousel } from "../../../elements/Carousel";
-import { getActorInitial } from "../../../utils/media-utils";
+import { Carousel } from "../Carousel";
+import { getActorInitial } from "../../utils/media-utils";
 import React from "react";
 
 const ActorsStyle = styled.div`

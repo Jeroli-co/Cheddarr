@@ -17,6 +17,7 @@ const PlexButtonStyle = styled.button`
   padding-bottom: 0.5em;
   padding-left: 1em;
   padding-right: 1em;
+  max-height: 45px;
 
   &:hover {
     color: white;

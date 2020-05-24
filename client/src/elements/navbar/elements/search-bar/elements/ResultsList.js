@@ -18,6 +18,11 @@ const ResultsListStyle = styled.div`
   visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
 `;
 
+const ResultImage = styled.img`
+  width: 30px;
+  height: 50px;
+`;
+
 const ResultsSectionTitle = styled.div`
   font-size: 0.8em;
   font-weight: 400;
@@ -50,7 +55,7 @@ const MediaResult = ({ media }) => {
   return (
     <ResultStyle onMouseDown={() => redirectToMediaPage()}>
       <RowLayout className="is-pointed" padding="1%" childMarginRight="2%">
-        <img src={media.thumbUrl} alt="Movie" width="30" height="50" />
+        <ResultImage src={media.thumbUrl} alt="Thumb" />
         <ColumnLayout>
           <Text fontSize="0.9em" lineClamp={1}>
             {media.title}
@@ -73,7 +78,7 @@ const FriendResult = ({ user }) => {
       }
     >
       <RowLayout padding="1%" childMarginRight="2%">
-        <img src={user["user_picture"]} alt="User" width="30" height="50" />
+        <ResultImage src={user["user_picture"]} alt="User" />
         <Text fontSize="0.9em">@{user.username}</Text>
       </RowLayout>
     </ResultStyle>
