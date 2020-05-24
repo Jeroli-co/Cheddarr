@@ -1,15 +1,14 @@
-import {useContext, useEffect, useState} from "react";
-import {useApi} from "./useApi";
-import {AuthContext} from "../contexts/AuthContext";
+import { useContext, useEffect, useState } from "react";
+import { useApi } from "./useApi";
+import { AuthContext } from "../contexts/AuthContext";
 
 const useApiKey = () => {
-
   const [apiKey, setApiKey] = useState("");
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
 
   useEffect(() => {
-    getApiKey().then(res => {
+    getApiKey().then((res) => {
       if (res) {
         const key = res.data["key"];
         if (key) {
@@ -21,7 +20,7 @@ const useApiKey = () => {
   }, []);
 
   const getApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/cheddarr/");
+    const res = await executeRequest(methods.GET, "/key/");
     switch (res.status) {
       case 200:
         return res;
@@ -32,7 +31,7 @@ const useApiKey = () => {
   };
 
   const resetApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/cheddarr/reset/");
+    const res = await executeRequest(methods.PUT, "/key/");
     switch (res.status) {
       case 200:
         setApiKey(res.data["key"]);
@@ -44,7 +43,7 @@ const useApiKey = () => {
   };
 
   const deleteApiKey = async () => {
-    const res = await executeRequest(methods.DELETE, "/key/cheddarr/");
+    const res = await executeRequest(methods.DELETE, "/key/");
     switch (res.status) {
       case 200:
         setApiKey("");
@@ -58,10 +57,8 @@ const useApiKey = () => {
   return {
     apiKey,
     resetApiKey,
-    deleteApiKey
+    deleteApiKey,
   };
 };
 
-export {
-  useApiKey
-}
+export { useApiKey };

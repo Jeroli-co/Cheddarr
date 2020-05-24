@@ -1,4 +1,3 @@
-blinker
 celery[redis]
 cloudinary
 Flask
@@ -10,7 +9,6 @@ Flask-Marshmallow
 Flask-Migrate
 Flask-SQLAlchemy
 Flask-Talisman
-Flask-WTF
 gunicorn
 itsdangerous
 marshmallow-sqlalchemy
@@ -23,6 +21,3 @@ requests
 sendgrid
 sqlalchemy
 Werkzeug
-wtforms
-wtforms-validators
-WTForms-Alchemy
