@@ -41,6 +41,7 @@ def library_sections(plex_server, section_id=None, section_type=None):
 
 @cache.memoize(timeout=300)
 def search(plex_server, section_type, title, filters, max_results=3):
+    print(filters)
     if section_type == "movies":
         sections = library_sections(plex_server, section_type="movies")
     elif section_type == "series":
