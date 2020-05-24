@@ -58,8 +58,8 @@ const useFriends = () => {
 
   const acceptRequest = async (username) => {
     const res = await executeRequest(
-      methods.GET,
-      friendsURI + username + "/accept/"
+      methods.PATCH,
+      friendsURI + username + "/"
     );
     switch (res.status) {
       case 200:

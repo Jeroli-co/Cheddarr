@@ -15,7 +15,6 @@ python manage.py [--env=production|development] COMMAND [OPTIONS] [ARGS]
 
 @click.group(
     cls=FlaskGroup,
-    add_default_commands=False,
     create_app=lambda _: create_app(),
     help="""\
 A utility script for the Cheddarr application.

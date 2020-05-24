@@ -67,23 +67,16 @@ const AuthContextProvider = (props) => {
   };
 
   const signIn = async (data, redirectURI) => {
-    const get = async () => {
-      return await executeRequest(methods.GET, "/sign-in/");
-    };
+    const username = data["usernameOrEmail"] || data["username"];
+    const fd = new FormData();
+    fd.append("usernameOrEmail", username);
+    fd.append("password", data["password"]);
+    const remember = data["remember"];
+    if (typeof remember !== "undefined" && remember !== null) {
+      fd.append("remember", remember);
+    }
+    const res = await executeRequest(methods.POST, "/sign-in/", fd);
 
-    const post = async (data) => {
-      const username = data["usernameOrEmail"] || data["username"];
-      const fd = new FormData();
-      fd.append("usernameOrEmail", username);
-      fd.append("password", data["password"]);
-      const remember = data["remember"];
-      if (typeof remember !== "undefined" && remember !== null) {
-        fd.append("remember", remember);
-      }
-      return await executeRequest(methods.POST, "/sign-in/", fd);
-    };
-
-    const res = data ? await post(data) : await get();
     switch (res.status) {
       case 200:
         initSession(res.data.username, res.data["user_picture"]);
@@ -152,7 +145,10 @@ const AuthContextProvider = (props) => {
   };
 
   const confirmEmail = async (token) => {
-    const res = await executeRequest(methods.GET, "/confirm/" + token + "/");
+    const res = await executeRequest(
+      methods.GET,
+      "/sign-up/confirm/" + token + "/"
+    );
     switch (res.status) {
       case 200:
         clearSession();
@@ -169,51 +165,10 @@ const AuthContextProvider = (props) => {
   const resendConfirmation = async (email) => {
     const fd = new FormData();
     fd.append("email", email);
-    const res = await executeRequest(methods.POST, "/confirm/resend/", fd);
+    const res = await executeRequest(methods.POST, "/sign-up/resend/", fd);
     switch (res.status) {
       case 200:
       case 400:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const initResetPassword = async (data) => {
-    const fd = new FormData();
-    fd.append("email", data["email"]);
-    const res = await executeRequest(methods.POST, "/reset/password/", fd);
-    switch (res.status) {
-      case 200:
-      case 400:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const checkResetPasswordToken = async (token) => {
-    const res = await executeRequest(methods.GET, "/reset/" + token + "/");
-    switch (res.status) {
-      case 200:
-      case 403:
-      case 410:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const resetPassword = async (token, data) => {
-    const fd = new FormData();
-    fd.append("password", data["password"]);
-    const res = await executeRequest(methods.POST, "/reset/" + token + "/", fd);
-    switch (res.status) {
-      case 200:
-        props.history.push(routes.SIGN_IN.url);
         return res;
       default:
         handleError(res);
@@ -274,9 +229,6 @@ const AuthContextProvider = (props) => {
         signUp,
         confirmEmail,
         resendConfirmation,
-        initResetPassword,
-        checkResetPasswordToken,
-        resetPassword,
         setUsername,
         setUserPicture,
         handleError,

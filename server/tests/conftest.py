@@ -53,7 +53,7 @@ def client(app):
         db.session.add_all((user1, user2, user3))
         db.session.commit()
         friendship1 = Friendship(
-            friend_a_id=user1.id, friend_b_id=user2.id, pending=True
+            friend_a_id=user1.id, friend_b_id=user2.id, pending=False
         )
         db.session.add(friendship1)
         db.session.commit()

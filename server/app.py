@@ -6,6 +6,7 @@ from flask.helpers import get_debug_flag
 from flask.sessions import SecureCookieSessionInterface
 from flask_cors import CORS
 from flask_talisman import Talisman
+from werkzeug.exceptions import HTTPException
 
 from server.config import (
     API_ROOT,
@@ -15,7 +16,6 @@ from server.config import (
     ProdConfig,
     REACT_STATIC_FOLDER,
 )
-from server.exceptions import HTTPError
 from server.extensions import cache, celery, db, limiter, ma, mail, migrate
 from server.extensions.login_manager import register_login_manager
 
@@ -66,11 +66,14 @@ def _create_app(config_object: Config, **kwargs):
         resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}},
     )
 
-    @app.errorhandler(HTTPError)
+    @app.errorhandler(Exception)
     def handle_invalid_usage(error):
-        response = jsonify(error.to_dict())
-        response.status_code = error.status_code
-        return response
+        message = str(error)
+        code = 500
+        if isinstance(error, HTTPException):
+            message = error.description
+            code = error.code
+        return jsonify({"message": message}), code
 
     @app.context_processor
     def inject_now():
@@ -88,13 +91,17 @@ def register_blueprints(app):
     from server.site import site
     from server.auth import auth
     from server.profile import profile
-    from server.providers import provider
+    from server.providers.plex import plex
+    from server.providers.radarr import radarr
+    from server.providers.sonarr import sonarr
     from server.search import search
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix=API_ROOT)
     app.register_blueprint(profile, url_prefix=API_ROOT + "/profile")
-    app.register_blueprint(provider, url_prefix=API_ROOT + "/provider")
+    app.register_blueprint(plex, url_prefix=API_ROOT + "/providers/plex")
+    app.register_blueprint(radarr, url_prefix=API_ROOT + "/providers/radarr")
+    app.register_blueprint(sonarr, url_prefix=API_ROOT + "/providers/sonarr")
     app.register_blueprint(search, url_prefix=API_ROOT + "/search")
 
 

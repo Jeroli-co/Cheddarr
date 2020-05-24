@@ -8,7 +8,7 @@ const PlexConfigContext = createContext();
 const PlexConfigContextProvider = (props) => {
   const [config, setConfig] = useState(null);
 
-  const providerUrl = "/provider/plex/";
+  const providerUrl = "/providers/plex/";
 
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
@@ -44,7 +44,7 @@ const PlexConfigContextProvider = (props) => {
   };
 
   const unlinkPlexAccount = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "unlink/");
+    const res = await executeRequest(methods.DELETE, providerUrl + "config/");
     switch (res.status) {
       case 200:
         pushInfo(res.message);

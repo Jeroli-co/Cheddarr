@@ -37,7 +37,7 @@ const routes = {
   },
   SIGN_UP: { url: "/sign-up", component: SignUpForm },
   CONFIRM_EMAIL: {
-    url: (token) => "/confirm/" + token,
+    url: (token) => "/sign-up/confirm/" + token,
     component: ConfirmEmail,
   },
   WAIT_EMAIL_CONFIRMATION: {
@@ -45,7 +45,7 @@ const routes = {
     component: WaitingEmailConfirmation,
   },
   RESET_PASSWORD: {
-    url: (token) => "/reset/" + token,
+    url: (token) => "/profile/password/reset/" + token,
     component: ResetPassword,
   },
   RESEND_EMAIL_CONFIRMATION: {
