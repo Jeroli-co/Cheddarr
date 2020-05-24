@@ -1,12 +1,12 @@
 import functools
 
 from flask_marshmallow import Marshmallow
-from webargs.flaskparser import use_args, use_kwargs
+from webargs.flaskparser import use_args as webargs, use_kwargs as webkwargs
 
 ma = Marshmallow()
 
 
-def webargs(schema_cls, only=None, schema_kwargs=None, **kwargs):
+def use_args(schema_cls, only=None, schema_kwargs=None, **kwargs):
     schema_kwargs = schema_kwargs or {}
 
     def factory(request):
@@ -16,10 +16,10 @@ def webargs(schema_cls, only=None, schema_kwargs=None, **kwargs):
             only=only, partial=partial, context={"request": request}, **schema_kwargs
         )
 
-    return use_args(factory, **kwargs)
+    return webargs(factory, **kwargs)
 
 
-def webkwargs(schema_cls, only=None, schema_kwargs=None, **kwargs):
+def use_kwargs(schema_cls, only=None, schema_kwargs=None, **kwargs):
     schema_kwargs = schema_kwargs or {}
 
     def factory(request):
@@ -29,10 +29,10 @@ def webkwargs(schema_cls, only=None, schema_kwargs=None, **kwargs):
             only=only, partial=partial, context={"request": request}, **schema_kwargs
         )
 
-    return use_kwargs(factory, **kwargs)
+    return webkwargs(factory, **kwargs)
 
 
-query = functools.partial(webkwargs, location="query")
-form = functools.partial(webkwargs, location="form")
-files = functools.partial(webkwargs, location="files")
-body = functools.partial(webargs, location="json")
+query = functools.partial(use_kwargs, location="query")
+form = functools.partial(use_kwargs, location="form")
+files = functools.partial(use_kwargs, location="files")
+body = functools.partial(use_args, location="json")

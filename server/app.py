@@ -45,9 +45,6 @@ def _create_app(config_object: Config, **kwargs):
     app.session_interface = CustomSessionInterface()
 
     """Initialize extensions"""
-    # used to register tasks to celery
-    from server import tasks  # noqa
-
     celery.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
@@ -71,7 +68,7 @@ def _create_app(config_object: Config, **kwargs):
 
     @app.errorhandler(Exception)
     def handle_invalid_usage(error):
-        message = str("Internal Server Error")
+        message = str(error)
         code = 500
         if isinstance(error, HTTPException):
             message = error.description
@@ -82,7 +79,6 @@ def _create_app(config_object: Config, **kwargs):
     def inject_now():
         return {"now": datetime.utcnow()}
 
-    # Registrations
     register_blueprints(app)
     register_commands(app)
     register_login_manager(app)
