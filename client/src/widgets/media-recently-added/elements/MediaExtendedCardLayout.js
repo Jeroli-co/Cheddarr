@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
-import { MediaExtendedCard } from "./MediaExtendedCard";
+import { MediaCard } from "../../../elements/media/MediaCard";
 
 const MediaExtendedBox = styled.div`
   position: relative;
@@ -61,7 +61,7 @@ const MediaCollapseBox = styled.div`
 const MediaExtendedCardLayout = ({ media, onClose }) => {
   return (
     <MediaExtendedBox>
-      <MediaExtendedCard media={media} />
+      <MediaCard media={media} />
       <MediaExtendedBoxBackgroundImage backgroundImage={media.artUrl} />
       <MediaExtendedBoxBackground />
       <MediaCollapseBox onClick={() => onClose()}>

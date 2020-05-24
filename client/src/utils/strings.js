@@ -1,5 +1,10 @@
 import styled, { css } from "styled-components";
 
+const TITLE_SIZES = {
+  one: "36px",
+  two: "28px",
+};
+
 const isEmpty = (s) => {
   return s.replace(/\s/g, "").length === 0;
 };
@@ -21,4 +26,4 @@ const Text = styled.p`
     `}
 `;
 
-export { isEmpty, cutString, Text };
+export { isEmpty, cutString, Text, TITLE_SIZES };

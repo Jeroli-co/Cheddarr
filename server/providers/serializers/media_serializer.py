@@ -70,6 +70,7 @@ class PlexEpisodeSerializer(PlexVideoSerializer):
 
 class PlexSeasonSerializer(PlexVideoSerializer):
     parentRatingKey = fields.String(data_key="seriesId")
+    parentTitle = fields.String(data_key="seriesTitle")
     seasonNumber = fields.Integer()
     episodes = fields.Nested(PlexEpisodeSerializer, many=True)
 
