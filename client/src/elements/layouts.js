@@ -218,16 +218,6 @@ const RowLayout = styled.div`
         padding: ${props.childPadding};
       `};
   }
-
-  ${(props) =>
-    props.flexGrow &&
-    props.flexGrow.forEach(
-      (itemGrow, index) => css`
-        &:nth-child(${index}) {
-          flex-grow: ${itemGrow};
-        }
-      `
-    )};
 `;
 
 export { ColumnLayout, RowLayout };
