@@ -10,7 +10,6 @@ Flask-Marshmallow
 Flask-Migrate
 Flask-SQLAlchemy
 Flask-Talisman
-Flask-WTF
 gunicorn
 itsdangerous
 marshmallow-sqlalchemy
@@ -22,7 +21,6 @@ pytest-mock
 requests
 sendgrid
 sqlalchemy
+sqlalchemy_utils
+webargs
 Werkzeug
-wtforms
-wtforms-validators
-WTForms-Alchemy

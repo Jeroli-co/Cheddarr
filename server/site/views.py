@@ -13,8 +13,3 @@ def index(path=None):
 @site.route("/favicon.ico")
 def favicon():
     return send_from_directory(site.template_folder, "favicon.ico")
-
-
-@site.route("/manifest.json")
-def manifest():
-    return send_from_directory(site.template_folder, "manifest.json")

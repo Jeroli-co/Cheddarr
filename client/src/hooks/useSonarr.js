@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { NotificationContext } from "../contexts/NotificationContext";
 
 const useSonarr = () => {
-  const providerUrl = "/provider/sonarr/";
+  const providerUrl = "/providers/sonarr/";
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
   const { pushSuccess, pushDanger } = useContext(NotificationContext);

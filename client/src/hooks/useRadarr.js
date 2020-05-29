@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { NotificationContext } from "../contexts/NotificationContext";
 
 const useRadarr = () => {
-  const providerUrl = "/provider/radarr/";
+  const providerUrl = "/providers/radarr/";
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
   const { pushSuccess, pushDanger } = useContext(NotificationContext);

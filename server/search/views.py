@@ -1,56 +1,43 @@
-from flask import jsonify, request
+from flask import jsonify
 from flask_login import current_user, login_required
 from sqlalchemy import or_
 
 from server.auth.models import User
-from server.exceptions import BadRequest
-from server.providers.utils import plex
-from server.search import search
-from server.search.forms import SearchForm
-from server.search.serializers import media_search_serializer, friends_search_serializer
+from server.extensions.marshmallow import query
+from server.providers.plex import utils
+from server.search.schemas import (
+    FriendSearchResultSchema,
+    MediaSearchResultSchema,
+    SearchSchema,
+)
 
 
-@search.route("/")
 @login_required
-def search():
-    search_form = SearchForm(request.args)
-    if not search_form.validate():
-        raise BadRequest(
-            "Error while searching.", payload=search_form.errors,
-        )
-    search_type = search_form.type.data
-    if search_type == "friends":
-        return jsonify(search_friends(search_form))
-    if search_type == "movies" or search_type == "series":
-        return jsonify(search_media(search_form))
-    return jsonify(search_friends(search_form) + search_media(search_form))
+@query(SearchSchema)
+def search_all(value, type=None, **kwargs):
+    if type == "friends":
+        return jsonify(search_friends(value))
+    if type == "movies" or type == "series":
+        return jsonify(search_media(value, type))
+    return jsonify(search_friends(value) + search_media(value, type, filters=kwargs))
 
 
-def search_friends(search_form: SearchForm):
-    value = search_form.value.data
+def search_friends(name):
     result = []
     for user in (
-        User.query.filter(
-            or_(User.username.contains(value), User.email.contains(value),)
-        )
+        User.query.filter(or_(User.username.contains(name), User.email.contains(name)))
         .limit(3)
         .all()
     ):
         if user in current_user.friends_received or user in current_user.friends_sent:
             result.append(user)
-    return friends_search_serializer.dump(result)
+    return FriendSearchResultSchema().dump(result, many=True)
 
 
-def search_media(search_form: SearchForm):
-    plex_server = plex.user_server(current_user)
-    title = search_form.value.data
-    section_type = search_form.type.data
-    filters = {
-        field: value
-        for field, value in search_form.data.items()
-        if field != "type" and field != "value"
-    }
-    result = plex.search(
-        plex_server, section_type=section_type, title=title, filters=filters
+def search_media(title, section=None, filters=None):
+    filters = filters or {}
+    plex_server = utils.user_server(current_user)
+    result = utils.search(
+        plex_server, section_type=section, title=title, filters=filters
     )
-    return media_search_serializer.dump(result)
+    return MediaSearchResultSchema().dump(result, many=True)

@@ -1,5 +1,6 @@
+from enum import auto, Enum
+
 from server.extensions import db
-from enum import Enum, auto
 
 
 class ProviderType(Enum):
@@ -26,74 +27,16 @@ class ProviderConfig(db.Model):
         for config, value in updated_config.items():
             setattr(self, config, value)
         db.session.add(self)
-        db.session.commit()
+        return db.session.commit()
+
+    def save(self):
+        db.session.add(self)
+        return db.session.commit()
 
     def delete(self):
         db.session.delete(self)
-        db.session.commit()
+        return db.session.commit()
 
     @classmethod
     def find(cls, user):
         return cls.query.filter_by(user_id=user.id).one()
-
-
-class PlexConfig(ProviderConfig):
-    def __init__(self, plex_user_id, api_key):
-        self.plex_user_id = plex_user_id
-        self.api_key = api_key
-        self.type = ProviderType.MEDIA_SERVER
-        self.enabled = True
-
-    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
-    plex_user_id = db.Column(db.Integer, unique=True, nullable=False)
-    machine_id = db.Column(db.String(64))
-    machine_name = db.Column(db.String(64))
-
-    __mapper_args__ = {"polymorphic_identity": "plex"}
-
-    def __repr__(self):
-        return "%s/%s" % (super().__repr__(), self.machine_name)
-
-
-class SonarrConfig(ProviderConfig):
-    def __init__(self, api_key):
-        self.api_key = api_key
-        self.type = ProviderType.SERIES_REQUEST
-
-    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
-    host = db.Column(db.String(128))
-    port = db.Column(db.String(5))
-    ssl = db.Column(db.Boolean())
-
-    __mapper_args__ = {"polymorphic_identity": "sonarr"}
-
-    def __repr__(self):
-        return "%s/%s/%s/%s/%s" % (
-            super().__repr__(),
-            self.name,
-            self.host,
-            self.port,
-            self.ssl,
-        )
-
-
-class RadarrConfig(ProviderConfig):
-    def __init__(self, api_key):
-        self.api_key = api_key
-        self.type = ProviderType.MOVIE_REQUEST
-
-    id = db.Column(db.Integer, db.ForeignKey("provider_config.id"), primary_key=True)
-    host = db.Column(db.String(128))
-    port = db.Column(db.String(5))
-    ssl = db.Column(db.Boolean())
-
-    __mapper_args__ = {"polymorphic_identity": "radarr"}
-
-    def __repr__(self):
-        return "%s/%s/%s/%s/%s" % (
-            super().__repr__(),
-            self.name,
-            self.host,
-            self.port,
-            self.ssl,
-        )

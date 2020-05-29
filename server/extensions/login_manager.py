@@ -1,7 +1,6 @@
 from flask import g
 from flask_login import LoginManager, user_loaded_from_header
-
-from server.exceptions import Unauthorized
+from werkzeug.exceptions import Unauthorized
 
 
 def register_login_manager(app):
