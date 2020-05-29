@@ -71,7 +71,7 @@ def _create_app(config_object: Config, **kwargs):
 
     @app.errorhandler(Exception)
     def handle_invalid_usage(error):
-        message = str(error)
+        message = str("Internal Server Error")
         code = 500
         if isinstance(error, HTTPException):
             message = error.description
