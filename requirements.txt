@@ -1,3 +1,4 @@
+blinker
 celery[redis]
 cloudinary
 Flask
@@ -20,4 +21,6 @@ pytest-mock
 requests
 sendgrid
 sqlalchemy
+sqlalchemy_utils
+webargs
 Werkzeug
