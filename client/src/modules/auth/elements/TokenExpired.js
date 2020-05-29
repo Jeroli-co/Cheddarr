@@ -1,4 +1,3 @@
-import { SignUpButton } from "./SignUpButton";
 import React from "react";
 
 const TokenExpired = () => {
