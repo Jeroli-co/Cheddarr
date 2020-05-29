@@ -4,13 +4,14 @@ import click
 from flask.cli import with_appcontext
 
 from server.extensions import db
+from server.extensions.db import db_drop_everything
 
 
 @click.command("init-db")
 @with_appcontext
 def init_db():
     """Initialize the database."""
-    db.drop_all()
+    db_drop_everything(db)
     db.create_all()
     click.echo("Initialized database.")
 
