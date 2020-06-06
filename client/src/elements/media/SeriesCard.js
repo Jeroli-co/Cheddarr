@@ -6,9 +6,8 @@ import { ColumnLayout, RowLayout } from "../layouts";
 import { Tag, TagColor } from "../Tag";
 import { Link } from "react-router-dom";
 import { routes } from "../../router/routes";
-import { Actors } from "../../widgets/media-recently-added/elements/Actors";
+import { Actors } from "./Actors";
 import { Image } from "../Image";
-import { LineBulletList } from "./LineBulletList";
 import { MediaTitle } from "./MediaTitle";
 import { Container } from "../Container";
 import { PlexButton } from "../PlexButton";
@@ -54,29 +53,38 @@ const SeriesCard = ({ series }) => {
           />
           <Container paddingRight="1%" paddingLeft="1%">
             <MediaTitle media={seriesInfo} />
-            <LineBulletList>
-              <p
-                className="is-size-7"
-                style={{ cursor: "default" }}
-                data-tooltip="Released"
-              >
-                {seriesInfo.releaseDate}
-              </p>
-              <p
-                className="is-size-7"
-                style={{ cursor: "default" }}
-                data-tooltip="Content rating"
-              >
-                {seriesInfo.contentRating}
-              </p>
-            </LineBulletList>
+            <RowLayout childPaddingRight="1em">
+              {seriesInfo.releaseDate && (
+                <p
+                  className="is-size-7"
+                  style={{ cursor: "default" }}
+                  data-tooltip="Released"
+                >
+                  {seriesInfo.releaseDate}
+                </p>
+              )}
+              {seriesInfo.releaseDate && <p className="is-size-7">•</p>}
+              {seriesInfo.contentRating && (
+                <p
+                  className="is-size-7"
+                  style={{ cursor: "default" }}
+                  data-tooltip="Content rating"
+                >
+                  {seriesInfo.contentRating}
+                </p>
+              )}
+            </RowLayout>
             {!seriesInfo.isWatched && (
               <RowLayout marginTop="1em">
-                <Tag type={TagColor.DARK} content="Unplayed" />
+                <Tag type={TagColor.DARK}>Unplayed</Tag>
               </RowLayout>
             )}
-            <RowLayout marginTop="1em" childMarginRight="1em">
-              <MediaRating media={seriesInfo} />
+            <RowLayout
+              marginTop="1em"
+              childMarginRight="1em"
+              alignItems="center"
+            >
+              {seriesInfo.rating && <MediaRating media={seriesInfo} />}
               <PlexButton
                 onClick={() => window.open(seriesInfo.webUrl)}
                 text="Open in plex"
@@ -90,13 +98,42 @@ const SeriesCard = ({ series }) => {
                 </div>
               </RowLayout>
             )}
+            <RowLayout
+              marginTop="1em"
+              childMarginRight="2%"
+              alignItems="flex-start"
+            >
+              {seriesInfo.studio && (
+                <div>
+                  <div className="is-size-6">Studio</div>
+                  <div className="is-size-7">{seriesInfo.studio}</div>
+                </div>
+              )}
+              {seriesInfo.genres && seriesInfo.genres.length > 0 && (
+                <ColumnLayout width="50%">
+                  <div className="is-size-6">Genres</div>
+                  <RowLayout childMarginRight="1em">
+                    {seriesInfo.genres.map((genre, index) => (
+                      <Tag key={index} type={TagColor.INFO}>
+                        {genre.name}
+                      </Tag>
+                    ))}
+                  </RowLayout>
+                </ColumnLayout>
+              )}
+            </RowLayout>
           </Container>
         </RowLayout>
         <hr />
-        <div className="is-size-5">Seasons</div>
+        <RowLayout marginBottom="1em">
+          <div className="is-size-4">Seasons</div>
+        </RowLayout>
         <RowLayout childMarginRight="1em" wrap="wrap">
-          {seriesInfo.seasons.map((season) => (
-            <Link to={routes.SEASON.url(season.seriesId, season.seasonNumber)}>
+          {seriesInfo.seasons.map((season, index) => (
+            <Link
+              key={index}
+              to={routes.SEASON.url(season.seriesId, season.seasonNumber)}
+            >
               <ColumnLayout alignItems="center">
                 <Image
                   src={season.thumbUrl}

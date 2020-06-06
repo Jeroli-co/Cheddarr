@@ -5,6 +5,7 @@ const MediaBackgroundContainerStyle = styled.div`
   position: relative;
   min-width: 100%;
   max-width: 100%;
+  min-height: 100vh;
   background-color: white;
   z-index: 0;
 `;

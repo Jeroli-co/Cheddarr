@@ -103,13 +103,8 @@ const App = () => {
                 component={routes.SEASON.component}
               />
               <PrivateRoute
-                exact
-                path={routes.EPISODE.url(
-                  ":seriesId",
-                  ":seasonNumber",
-                  ":episodeNumber"
-                )}
-                component={routes.EPISODE.component}
+                path={routes.SEARCH.url(":type")}
+                component={routes.SEARCH.component}
               />
               <Route
                 exact

@@ -26,6 +26,7 @@ const NavbarLogoKeyframes = () => {
 };
 
 const NavbarStyle = styled.div`
+  position: relative;
   padding: 10px;
   height: 75px;
   background-color: ${(props) => props.theme.primary};
@@ -93,23 +94,20 @@ const Navbar = () => {
 
   return (
     <NavbarStyle className="noselect">
-      <RowLayout data-testid="Navbar">
-        <RowLayout childMarginRight="1%">
+      <RowLayout data-testid="Navbar" alignItems="center">
+        <RowLayout childMarginRight="40px">
           <Link to="/">
             <NavbarAppLogo>
               <img src={logo} alt="Chedarr" width="40px" height="24px" />
             </NavbarAppLogo>
           </Link>
-          {!isLoading && isAuthenticated && (
-            <RowLayout childMarginLeft="30px">
-              <SearchBar />
-            </RowLayout>
-          )}
+          {!isLoading && isAuthenticated && <SearchBar />}
         </RowLayout>
         <NavbarEnd>
           <RowLayout
             className="navbar-end-desktop"
             justifyContent="flex-end"
+            alignItems="center"
             childMarginLeft="30px"
           >
             <GitHubButton />
