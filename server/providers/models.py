@@ -40,3 +40,9 @@ class ProviderConfig(db.Model):
     @classmethod
     def find(cls, user):
         return cls.query.filter_by(user_id=user.id).one()
+
+
+# Sub-models
+from .plex import models  # noqa
+from .radarr import models  # noqa
+from .sonarr import models  # noqa
