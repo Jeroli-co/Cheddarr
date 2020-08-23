@@ -89,6 +89,7 @@ const Navbar = () => {
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+    console.log("HEHE");
   };
 
   return (
@@ -132,7 +133,7 @@ const Navbar = () => {
           </RowLayout>
         </NavbarEnd>
       </RowLayout>
-      {!isLoading && isAuthenticated && (
+      {!isLoading && (
         <UserDropdownMobile
           dropdownRef={dropdownMobileRef}
           isVisible={isDropdownOpen}

@@ -82,38 +82,43 @@ const UserDropdownMobile = ({
         {!isLoading && !isAuthenticated && <SignInButton />}
         {!isLoading && !isAuthenticated && <SignUpButton />}
       </RowLayout>
-      <DropdownMenuMobileStyle>
-        <Link to={routes.USER_PROFILE.url} data-testid="UserProfileLinkMobile">
-          <DropdownMenuMobileItem>
+      {!isLoading && isAuthenticated && (
+        <DropdownMenuMobileStyle>
+          <Link
+            to={routes.USER_PROFILE.url}
+            data-testid="UserProfileLinkMobile"
+          >
+            <DropdownMenuMobileItem>
+              <RowLayout childMarginRight="2%" justifyContent="space-between">
+                <FontAwesomeIcon icon={faUserCircle} />
+                <span>Profile</span>
+              </RowLayout>
+            </DropdownMenuMobileItem>
+          </Link>
+
+          <Link
+            to={routes.USER_SETTINGS.url}
+            data-testid="UserSettingsLinkMobile"
+          >
+            <DropdownMenuMobileItem>
+              <RowLayout childMarginRight="2%" justifyContent="space-between">
+                <FontAwesomeIcon icon={faCog} />
+                <span>Settings</span>
+              </RowLayout>
+            </DropdownMenuMobileItem>
+          </Link>
+
+          <DropdownMenuMobileItem
+            onClick={signOut}
+            data-testid="SignOutButtonMobile"
+          >
             <RowLayout childMarginRight="2%" justifyContent="space-between">
-              <FontAwesomeIcon icon={faUserCircle} />
-              <span>Profile</span>
+              <FontAwesomeIcon icon={faSignOutAlt} />
+              <span>Sign out</span>
             </RowLayout>
           </DropdownMenuMobileItem>
-        </Link>
-
-        <Link
-          to={routes.USER_SETTINGS.url}
-          data-testid="UserSettingsLinkMobile"
-        >
-          <DropdownMenuMobileItem>
-            <RowLayout childMarginRight="2%" justifyContent="space-between">
-              <FontAwesomeIcon icon={faCog} />
-              <span>Settings</span>
-            </RowLayout>
-          </DropdownMenuMobileItem>
-        </Link>
-
-        <DropdownMenuMobileItem
-          onClick={signOut}
-          data-testid="SignOutButtonMobile"
-        >
-          <RowLayout childMarginRight="2%" justifyContent="space-between">
-            <FontAwesomeIcon icon={faSignOutAlt} />
-            <span>Sign out</span>
-          </RowLayout>
-        </DropdownMenuMobileItem>
-      </DropdownMenuMobileStyle>
+        </DropdownMenuMobileStyle>
+      )}
     </UserDropdownMobileStyle>
   );
 };
