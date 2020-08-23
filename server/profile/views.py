@@ -185,7 +185,6 @@ def remove_friend(username):
 
 @login_required
 def accept_friend(username):
-    print("*******", username)
     friend = User.find(username=username)
     if not friend:
         raise NotFound("The user does not exist.")

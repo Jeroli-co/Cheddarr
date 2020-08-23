@@ -22,7 +22,6 @@ def test_get_friends(client, auth):
 
 def test_friend_profile(client, auth):
     friend = client.get(url_for("profile.get_friends", username=user2_username))
-    print(friend)
     assert json.loads(friend.data) == {
         "username": user2_username,
         "user_picture": None,
