@@ -46,7 +46,6 @@ session_serializer = UserSchema(only=["username", "user_picture"])
 @limiter.limit("10/hour")
 @form(UserSchema, only=["username", "password", "email"])
 def signup(username, password, email):
-    print(username)
     existing_email = User.exists(email=email)
     if existing_email:
         raise Conflict("This email is already taken.")
@@ -61,6 +60,7 @@ def signup(username, password, email):
         password=password,
         user_picture=utils.random_user_picture(),
     )
+
     token = utils.generate_timed_token(user.email)
     send_email.delay(
         user.email,
