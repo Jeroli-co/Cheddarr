@@ -21,11 +21,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), unique=True, nullable=False)
 
-    @validates("username")
-    def validate_username(self, key, username):
-        assert re.compile("^[a-zA-Z0-9_]*$").match(username)
-        return username
-
     email = db.Column(EmailType, unique=True, nullable=False)
     password = db.Column(
         PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"]),

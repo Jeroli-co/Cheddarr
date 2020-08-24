@@ -44,24 +44,6 @@ const useProfile = () => {
     }
   };
 
-  const changeUserPicture = async (data) => {
-    const fd = new FormData();
-    fd.append("user_picture", data);
-    const res = await executeRequest(methods.PUT, profileURI + "picture/", fd, {
-      "content-type": "multipart/form-data",
-    });
-    switch (res.status) {
-      case 200:
-        const userPicture = res.data["user_picture"];
-        setUserPicture(userPicture);
-        pushSuccess("Picture has changed");
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
   const changeEmail = async (data) => {
     const fd = new FormData();
     fd.append("email", data["email"]);
@@ -169,7 +151,6 @@ const useProfile = () => {
   return {
     getUser,
     changeUsername,
-    changeUserPicture,
     changeEmail,
     changePassword,
     initResetPassword,

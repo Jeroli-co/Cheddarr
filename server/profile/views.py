@@ -1,7 +1,6 @@
 from flask import request, session, url_for
 from flask_login import current_user, fresh_login_required, login_required
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
-from werkzeug.utils import secure_filename
 
 from server import utils
 from server.auth.models import User
@@ -10,7 +9,6 @@ from server.extensions import limiter
 from server.extensions.marshmallow import files, form
 from server.profile.schemas import ChangePasswordSchema, UsernameOrEmailSchema
 from server.tasks import send_email
-from server.utils import allowed_file
 
 profile_serializer = UserSchema(only=["username", "user_picture", "email"])
 
@@ -30,18 +28,6 @@ def delete_user(password):
     current_user.delete()
     session.clear()
     return {"message": "User deleted."}
-
-
-@limiter.limit("10/hour")
-@login_required
-@files(UserSchema, only=["user_picture"])
-def change_picture(user_picture):
-    if not allowed_file(secure_filename(user_picture.filename)):
-        raise BadRequest("Wrong file type.")
-    picture = utils.upload_picture(user_picture.stream)
-    current_user.user_picture = picture
-    current_user.save()
-    return {"user_picture": current_user.user_picture}
 
 
 @limiter.limit("3/hour")
