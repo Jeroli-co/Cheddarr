@@ -9,9 +9,7 @@ const useProfile = () => {
   const profileURI = "/profile/";
 
   const { executeRequest, methods } = useApi();
-  const { handleError, clearSession, setUsername, setUserPicture } = useContext(
-    AuthContext
-  );
+  const { handleError, clearSession, setUsername } = useContext(AuthContext);
   const { pushSuccess, pushInfo } = useContext(NotificationContext);
   const history = useHistory();
 
