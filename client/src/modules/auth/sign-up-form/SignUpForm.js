@@ -42,8 +42,8 @@ function reducer(state, action) {
       };
     case "goToEmail":
       return {
-        current: SIGN_UP_STATES.EMAIL,
         user: { ...state.user, username: action.payload.username },
+        current: SIGN_UP_STATES.EMAIL,
       };
     case "backFromPassword":
       return {
@@ -52,8 +52,8 @@ function reducer(state, action) {
       };
     case "goToPassword":
       return {
-        current: SIGN_UP_STATES.PASSWORD,
         user: { ...state.user, email: action.payload.email },
+        current: SIGN_UP_STATES.PASSWORD,
       };
     case "backFromAvatar":
       return {
@@ -62,23 +62,23 @@ function reducer(state, action) {
       };
     case "goToAvatar":
       return {
-        current: SIGN_UP_STATES.AVATAR,
         user: { ...state.user, password: action.payload.password },
+        current: SIGN_UP_STATES.AVATAR,
       };
     case "validate":
       return {
-        current: SIGN_UP_STATES.IN_PROGRESS,
         user: { ...state.user, avatar: action.payload.avatar },
+        current: SIGN_UP_STATES.IN_PROGRESS,
       };
     case "goToSuccess":
       return {
+        ...state,
         current: SIGN_UP_STATES.SUCCESS,
-        user: null,
       };
     case "goToErrors":
       return {
+        ...state,
         current: SIGN_UP_STATES.ERROR,
-        user: null,
       };
     default:
       throw new Error("No action type matched");

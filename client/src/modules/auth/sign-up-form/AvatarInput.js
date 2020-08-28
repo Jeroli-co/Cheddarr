@@ -46,8 +46,13 @@ const AvatarInput = ({ onPrevious, onValidInput }) => {
     return title === selectedImage;
   };
 
+  const onSubmit = (e) => {
+    onValidInput(selectedImage);
+    e.preventDefault();
+  };
+
   return (
-    <form onSubmit={() => onValidInput(selectedImage)}>
+    <form onSubmit={onSubmit}>
       <RowLayout childMargin="10px" wrap="wrap">
         {avatars.map((avatar) => (
           <Image

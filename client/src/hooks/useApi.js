@@ -1,18 +1,22 @@
 import axios from "axios";
-import {createErrorResponse, createResponse} from "../service/http-service";
+import { createErrorResponse, createResponse } from "../service/http-service";
 
 const useApi = () => {
-
   const apiUrl = "/api";
   const methods = {
     GET: "get",
     POST: "post",
     PUT: "put",
     DELETE: "delete",
-    PATCH: "patch"
+    PATCH: "patch",
   };
 
-  const executeRequest = async (method, url, formData = null, headers = null) => {
+  const executeRequest = async (
+    method,
+    url,
+    formData = null,
+    headers = null
+  ) => {
     const reqUrl = apiUrl + url;
     const reqHeaders = headers ? { headers: headers } : {};
     let res = null;
@@ -28,7 +32,9 @@ const useApi = () => {
           res = await axios.put(reqUrl, formData, reqHeaders);
           break;
         case methods.DELETE:
-          const deleteHeaders = formData ? { headers: headers, data: formData } : reqHeaders; // Only required for the delete account who is checking the password
+          const deleteHeaders = formData
+            ? { headers: headers, data: formData }
+            : reqHeaders; // Only required for the delete account who is checking the password
           res = await axios.delete(reqUrl, deleteHeaders);
           break;
         case methods.PATCH:
@@ -47,10 +53,7 @@ const useApi = () => {
   return {
     methods,
     executeRequest,
-  }
-
+  };
 };
 
-export {
-  useApi
-}
+export { useApi };
