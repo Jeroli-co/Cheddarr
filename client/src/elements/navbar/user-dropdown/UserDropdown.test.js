@@ -1,18 +1,25 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import { Router } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
-import {routes} from "../../../router/routes";
+import React from "react";
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/extend-expect";
+import { Router } from "react-router-dom";
+import { createMemoryHistory } from "history";
+import { routes } from "../../../router/routes";
 import { AuthContext } from "../../../contexts/AuthContext";
-import {Navbar} from "../Navbar";
-import logo from "../../../assets/cheddarr-small.png"
+import { Navbar } from "../Navbar";
+import logo from "../../../assets/cheddarr-small.png";
 
-test('UserDropdown always shows static elment', () => {
+test("UserDropdown always shows static elment", () => {
   const history = createMemoryHistory({ initialEntries: [routes.HOME.url] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ isAuthenticated: true, userPicture: null, username: "", signOut: () => {} }}>
+      <AuthContext.Provider
+        value={{
+          isAuthenticated: true,
+          avatar: null,
+          username: "",
+          signOut: () => {},
+        }}
+      >
         <Navbar />
       </AuthContext.Provider>
     </Router>
@@ -23,11 +30,18 @@ test('UserDropdown always shows static elment', () => {
   expect(getByTestId("SignOutButton")).toBeInTheDocument();
 });
 
-test('UserDropdown shows user picture if it\'s set', () => {
+test("UserDropdown shows user picture if it's set", () => {
   const history = createMemoryHistory({ initialEntries: [routes.HOME.url] });
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ isAuthenticated: true, userPicture: logo, username: "", signOut: () => {} }}>
+      <AuthContext.Provider
+        value={{
+          isAuthenticated: true,
+          avatar: logo,
+          username: "",
+          signOut: () => {},
+        }}
+      >
         <Navbar />
       </AuthContext.Provider>
     </Router>
@@ -36,12 +50,19 @@ test('UserDropdown shows user picture if it\'s set', () => {
   expect(getByTestId("UserDropdownPicture")).toBeInTheDocument();
 });
 
-test('UserDropdown shows username if userPicture is not set', () => {
+test("UserDropdown shows username if avatar is not set", () => {
   const history = createMemoryHistory({ initialEntries: [routes.HOME.url] });
   const username = "Jerolico";
   const tree = (
     <Router history={history}>
-      <AuthContext.Provider value={{ isAuthenticated: true, userPicture: null, username: username, signOut: () => {} }}>
+      <AuthContext.Provider
+        value={{
+          isAuthenticated: true,
+          avatar: null,
+          username: username,
+          signOut: () => {},
+        }}
+      >
         <Navbar />
       </AuthContext.Provider>
     </Router>
@@ -51,4 +72,3 @@ test('UserDropdown shows username if userPicture is not set', () => {
   expect(userDropdownUsername).toBeInTheDocument();
   expect(userDropdownUsername).toHaveTextContent(username);
 });
-

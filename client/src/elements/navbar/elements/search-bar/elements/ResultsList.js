@@ -78,7 +78,7 @@ const FriendResult = ({ user }) => {
       }
     >
       <RowLayout padding="1%" childMarginRight="2%">
-        <ResultImage src={user["user_picture"]} alt="User" />
+        <ResultImage src={user["avatar"]} alt="User" />
         <Text fontSize="0.9em">@{user.username}</Text>
       </RowLayout>
     </ResultStyle>

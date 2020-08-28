@@ -61,7 +61,7 @@ const UserDropdownMobile = ({
   isAuthenticated,
   isLoading,
 }) => {
-  const { userPicture, username, signOut } = useContext(AuthContext);
+  const { avatar, username, signOut } = useContext(AuthContext);
   return (
     <UserDropdownMobileStyle ref={dropdownRef} isVisible={isVisible}>
       <RowLayout
@@ -71,9 +71,9 @@ const UserDropdownMobile = ({
       >
         {!isLoading && isAuthenticated && (
           <UserDropdownImage>
-            {userPicture && (
+            {avatar && (
               <img
-                src={userPicture}
+                src={avatar}
                 alt={username}
                 data-testid="UserDropdownPictureMobile"
               />

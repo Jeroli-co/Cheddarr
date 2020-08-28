@@ -12,7 +12,7 @@ import cheeseRed from "../../../assets/profile/cheese-red.png";
 import { Image } from "../../../elements/Image";
 import { RowLayout } from "../../../elements/layouts";
 
-const PictureInput = ({ onPrevious, onValidInput }) => {
+const AvatarInput = ({ onPrevious, onValidInput }) => {
   const avatars = [
     { title: "cheese-cyan.png", src: cheeseCyan, description: "Cyan cheese" },
     {
@@ -75,4 +75,4 @@ const PictureInput = ({ onPrevious, onValidInput }) => {
   );
 };
 
-export { PictureInput };
+export { AvatarInput };
