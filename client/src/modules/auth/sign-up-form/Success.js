@@ -1,7 +1,7 @@
 import React from "react";
 
-const OperationConfirmed = () => {
+const Success = () => {
   return <p>Sign up confirmed</p>;
 };
 
-export { OperationConfirmed };
+export { Success };

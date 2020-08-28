@@ -5,9 +5,21 @@ import { AuthContext } from "../../../contexts/AuthContext";
 import { ColumnLayout } from "../../../elements/layouts";
 import { PasswordInput } from "./PasswordInput";
 import { PictureInput } from "./PictureInput";
-import { OperationConfirmed } from "./OperationConfirmed";
+import { Success } from "./Success";
+import { PageLoader } from "../../../elements/PageLoader";
+import { Errors } from "./Errors";
 
-const initialState = {
+const SIGN_UP_STATES = {
+  USERNAME: 0,
+  EMAIL: 1,
+  PASSWORD: 2,
+  PICTURE: 3,
+  IN_PROGRESS: 4,
+  SUCCESS: 5,
+  ERROR: 6,
+};
+
+const initialInfoState = {
   username: null,
   email: null,
   password: null,
@@ -15,29 +27,23 @@ const initialState = {
 };
 
 const SignUpForm = () => {
-  const [signUpInfo, setSignUpInfo] = useState(initialState);
+  const [signUpInfo, setSignUpInfo] = useState(initialInfoState);
   const [currentState, setCurrentState] = useState(-1);
   const { signUp } = useContext(AuthContext);
 
-  const previous = () => {
-    if (currentState > 0) {
-      setCurrentState(currentState - 1);
-    }
-  };
-
   const onValidInput = (data) => {
     switch (currentState) {
-      case 0:
+      case SIGN_UP_STATES.USERNAME:
         setSignUpInfo({ ...signUpInfo, username: data.username });
         break;
-      case 1:
+      case SIGN_UP_STATES.EMAIL:
         setSignUpInfo({ ...signUpInfo, email: data.email });
         break;
-      case 2:
+      case SIGN_UP_STATES.PASSWORD:
         setSignUpInfo({ ...signUpInfo, password: data.password });
         break;
-      case 3:
-        setSignUpInfo({ ...signUpInfo, picture: data.picture });
+      case SIGN_UP_STATES.PICTURE:
+        setSignUpInfo({ ...signUpInfo, picture: data });
         break;
       default:
         console.log("No value matched");
@@ -45,23 +51,42 @@ const SignUpForm = () => {
   };
 
   useEffect(() => {
-    setCurrentState((c) => c + 1);
+    switch (currentState) {
+      case -1:
+        setCurrentState(SIGN_UP_STATES.USERNAME);
+        break;
+      case SIGN_UP_STATES.USERNAME:
+        setCurrentState(SIGN_UP_STATES.EMAIL);
+        break;
+      case SIGN_UP_STATES.EMAIL:
+        setCurrentState(SIGN_UP_STATES.PASSWORD);
+        break;
+      case SIGN_UP_STATES.PASSWORD:
+        setCurrentState(SIGN_UP_STATES.PICTURE);
+        break;
+      case SIGN_UP_STATES.PICTURE:
+        setCurrentState(SIGN_UP_STATES.IN_PROGRESS);
+        break;
+      default:
+        console.log("No states matched");
+    }
   }, [signUpInfo]);
 
-  const onSignUp = () => {
-    console.log(signUpInfo);
-    signUp(signUpInfo).then((res) => {
-      if (res) {
-        switch (res.status) {
-          case 200:
-            console.log("200");
-            break;
-          default:
-            console.log("No match");
+  useEffect(() => {
+    if (currentState === SIGN_UP_STATES.IN_PROGRESS) {
+      signUp(signUpInfo).then((res) => {
+        if (res) {
+          switch (res.status) {
+            case 200:
+              setCurrentState(SIGN_UP_STATES.SUCCESS);
+              break;
+            default:
+              setCurrentState(SIGN_UP_STATES.ERROR);
+          }
         }
-      }
-    });
-  };
+      });
+    }
+  });
 
   return (
     <div className="SignUpForm" data-testid="SignUpForm">
@@ -81,30 +106,35 @@ const SignUpForm = () => {
       <br />
 
       <ColumnLayout alignItems="center">
-        {currentState === 0 && (
+        {currentState === SIGN_UP_STATES.USERNAME && (
           <UsernameInput
             onValidInput={onValidInput}
             defaultValue={signUpInfo.username}
           />
         )}
-        {currentState === 1 && (
+        {currentState === SIGN_UP_STATES.EMAIL && (
           <EmailInput
-            onPrevious={previous}
+            onPrevious={() => setCurrentState(SIGN_UP_STATES.USERNAME)}
             onValidInput={onValidInput}
             defaultValue={signUpInfo.email}
           />
         )}
-        {currentState === 2 && (
+        {currentState === SIGN_UP_STATES.PASSWORD && (
           <PasswordInput
-            onPrevious={previous}
+            onPrevious={() => setCurrentState(SIGN_UP_STATES.EMAIL)}
             onValidInput={onValidInput}
             defaultValue={signUpInfo.password}
           />
         )}
-        {currentState === 3 && (
-          <PictureInput onPrevious={previous} onValidInput={onSignUp} />
+        {currentState === SIGN_UP_STATES.PICTURE && (
+          <PictureInput
+            onPrevious={() => setCurrentState(SIGN_UP_STATES.PASSWORD)}
+            onValidInput={onValidInput}
+          />
         )}
-        {currentState === 4 && <OperationConfirmed />}
+        {currentState === SIGN_UP_STATES.IN_PROGRESS && <PageLoader />}
+        {currentState === SIGN_UP_STATES.SUCCESS && <Success />}
+        {currentState === SIGN_UP_STATES.ERROR && <Errors />}
         <br />
         <div className="content has-text-centered">
           <p>Step: {currentState + 1} / 4</p>
