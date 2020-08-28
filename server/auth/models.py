@@ -30,7 +30,7 @@ class User(db.Model, UserMixin):
 
     @validates("password")
     def validate_password(self, key, password):
-        assert 8 < len(password) < 128
+        assert 8 <= len(password) <= 128
         return password
 
     avatar = db.Column(db.String(256))
