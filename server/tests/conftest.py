@@ -15,6 +15,7 @@ user2_password = "password2"
 user3_username = "user3"
 user3_email = "email3@test.com"
 user3_password = "password3"
+avatar = "avatar.png"
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -35,18 +36,21 @@ def client(app):
             username=user1_username,
             email=user1_email,
             password=user1_password,
+            avatar=avatar,
             confirmed=True,
         )
         user2 = User(
             username=user2_username,
             email=user2_email,
             password=user2_password,
+            avatar=avatar,
             confirmed=False,
         )
         user3 = User(
             username=user3_username,
             email=user3_email,
             password=user3_password,
+            avatar=avatar,
             confirmed=True,
         )
 

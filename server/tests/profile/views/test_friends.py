@@ -5,6 +5,7 @@ from sqlalchemy import and_
 
 from server.auth.models import Friendship, User
 from server.tests.conftest import (
+    avatar,
     user1_username,
     user2_email,
     user2_username,
@@ -15,7 +16,11 @@ from server.tests.conftest import (
 def test_get_friends(client, auth):
     friends = client.get(url_for("profile.get_friends"))
     assert json.loads(friends.data) == [
-        {"username": user2_username, "avatar": None, "email": user2_email,}
+        {
+            "username": user2_username,
+            "avatar": avatar,
+            "email": user2_email,
+        }
     ]
     assert friends.status_code == 200
 
@@ -24,7 +29,7 @@ def test_friend_profile(client, auth):
     friend = client.get(url_for("profile.get_friends", username=user2_username))
     assert json.loads(friend.data) == {
         "username": user2_username,
-        "avatar": None,
+        "avatar": avatar,
         "email": user2_email,
     }
     assert friend.status_code == 200
@@ -42,7 +47,8 @@ def test_friend_profile_not_existing(client, auth):
 def test_add_friend_ok(client, auth):
     assert (
         client.post(
-            url_for("profile.add_friend"), data={"usernameOrEmail": user3_username},
+            url_for("profile.add_friend"),
+            data={"usernameOrEmail": user3_username},
         ).status_code
         == 200
     )
@@ -69,7 +75,8 @@ def test_add_friend_not_existing(client, auth):
 def test_add_already_friend(client, auth):
     assert (
         client.post(
-            url_for("profile.add_friend"), data={"usernameOrEmail": user2_username},
+            url_for("profile.add_friend"),
+            data={"usernameOrEmail": user2_username},
         ).status_code
         == 409
     )

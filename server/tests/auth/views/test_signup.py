@@ -12,6 +12,7 @@ def test_signup_ok(client, mocks):
                 "username": "UsernameTest",
                 "password": "Test_password1",
                 "email": "test@test.com",
+                "avatar": "avatar.png",
             },
         ).status_code
         == 200
@@ -27,6 +28,7 @@ def test_signup_user_already_exist(client, mocks):
                 "username": user1_username,
                 "password": user1_password,
                 "email": user1_email,
+                "avatar": "avatar.png",
             },
         ).status_code
         == 409

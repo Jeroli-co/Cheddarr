@@ -128,10 +128,6 @@ def change_email(email):
 @login_required
 @form(UserSchema, only=["avatar"])
 def change_picture(avatar):
-    ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-    filename, extension = splitext(avatar)
-    if extension not in ALLOWED_EXTENSIONS:
-        raise BadRequest("Error while changing user's avatar.")
     current_user.avatar = avatar
     current_user.save()
     return {"avatar": current_user.avatar}
