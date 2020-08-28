@@ -135,16 +135,6 @@ const AuthContextProvider = (props) => {
     fd.append("password", data["password"]);
     fd.append("avatar", data["avatar"]);
     return await executeRequest(methods.POST, "/sign-up/", fd);
-    /*
-    switch (res.status) {
-      case 200:
-      case 409:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-    */
   };
 
   const confirmEmail = async (token) => {

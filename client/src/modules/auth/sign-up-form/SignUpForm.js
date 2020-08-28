@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { UsernameInput } from "./UsernameInput";
 import { EmailInput } from "./EmailInput";
 import { AuthContext } from "../../../contexts/AuthContext";
@@ -19,31 +19,89 @@ const SIGN_UP_STATES = {
   ERROR: 6,
 };
 
-const initialInfoState = {
-  username: null,
-  email: null,
-  password: null,
-  avatar: null,
+const initialState = {
+  current: 0,
+  user: {
+    username: null,
+    email: null,
+    password: null,
+    avatar: null,
+  },
 };
 
+function init(initialState) {
+  return initialState;
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "backFromEmail":
+      return {
+        ...state,
+        current: SIGN_UP_STATES.USERNAME,
+      };
+    case "goToEmail":
+      return {
+        current: SIGN_UP_STATES.EMAIL,
+        user: { ...state.user, username: action.payload.username },
+      };
+    case "backFromPassword":
+      return {
+        ...state,
+        current: SIGN_UP_STATES.EMAIL,
+      };
+    case "goToPassword":
+      return {
+        current: SIGN_UP_STATES.PASSWORD,
+        user: { ...state.user, email: action.payload.email },
+      };
+    case "backFromAvatar":
+      return {
+        ...state,
+        current: SIGN_UP_STATES.PASSWORD,
+      };
+    case "goToAvatar":
+      return {
+        current: SIGN_UP_STATES.AVATAR,
+        user: { ...state.user, password: action.payload.password },
+      };
+    case "validate":
+      return {
+        current: SIGN_UP_STATES.IN_PROGRESS,
+        user: { ...state.user, avatar: action.payload.avatar },
+      };
+    case "goToSuccess":
+      return {
+        current: SIGN_UP_STATES.SUCCESS,
+        user: null,
+      };
+    case "goToErrors":
+      return {
+        current: SIGN_UP_STATES.ERROR,
+        user: null,
+      };
+    default:
+      throw new Error("No action type matched");
+  }
+}
+
 const SignUpForm = () => {
-  const [signUpInfo, setSignUpInfo] = useState(initialInfoState);
-  const [currentState, setCurrentState] = useState(-1);
+  const [state, dispatch] = useReducer(reducer, initialState, init);
   const { signUp } = useContext(AuthContext);
 
   const onValidInput = (data) => {
-    switch (currentState) {
+    switch (state.current) {
       case SIGN_UP_STATES.USERNAME:
-        setSignUpInfo({ ...signUpInfo, username: data.username });
+        dispatch({ type: "goToEmail", payload: { username: data.username } });
         break;
       case SIGN_UP_STATES.EMAIL:
-        setSignUpInfo({ ...signUpInfo, email: data.email });
+        dispatch({ type: "goToPassword", payload: { email: data.email } });
         break;
       case SIGN_UP_STATES.PASSWORD:
-        setSignUpInfo({ ...signUpInfo, password: data.password });
+        dispatch({ type: "goToAvatar", payload: { password: data.password } });
         break;
       case SIGN_UP_STATES.AVATAR:
-        setSignUpInfo({ ...signUpInfo, avatar: data });
+        dispatch({ type: "validate", payload: { avatar: data } });
         break;
       default:
         console.log("No value matched");
@@ -51,38 +109,15 @@ const SignUpForm = () => {
   };
 
   useEffect(() => {
-    switch (currentState) {
-      case -1:
-        setCurrentState(SIGN_UP_STATES.USERNAME);
-        break;
-      case SIGN_UP_STATES.USERNAME:
-        setCurrentState(SIGN_UP_STATES.EMAIL);
-        break;
-      case SIGN_UP_STATES.EMAIL:
-        setCurrentState(SIGN_UP_STATES.PASSWORD);
-        break;
-      case SIGN_UP_STATES.PASSWORD:
-        setCurrentState(SIGN_UP_STATES.AVATAR);
-        break;
-      case SIGN_UP_STATES.AVATAR:
-        setCurrentState(SIGN_UP_STATES.IN_PROGRESS);
-        break;
-      default:
-        console.log("No states matched");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signUpInfo]);
-
-  useEffect(() => {
-    if (currentState === SIGN_UP_STATES.IN_PROGRESS) {
-      signUp(signUpInfo).then((res) => {
+    if (state.current === SIGN_UP_STATES.IN_PROGRESS) {
+      signUp(state.user).then((res) => {
         if (res) {
           switch (res.status) {
             case 200:
-              setCurrentState(SIGN_UP_STATES.SUCCESS);
+              dispatch({ type: "goToSuccess" });
               break;
             default:
-              setCurrentState(SIGN_UP_STATES.ERROR);
+              dispatch({ type: "goToErrors" });
           }
         }
       });
@@ -107,38 +142,38 @@ const SignUpForm = () => {
       <br />
 
       <ColumnLayout alignItems="center">
-        {currentState === SIGN_UP_STATES.USERNAME && (
+        {state.current === SIGN_UP_STATES.USERNAME && (
           <UsernameInput
             onValidInput={onValidInput}
-            defaultValue={signUpInfo.username}
+            defaultValue={state.user.username}
           />
         )}
-        {currentState === SIGN_UP_STATES.EMAIL && (
+        {state.current === SIGN_UP_STATES.EMAIL && (
           <EmailInput
-            onPrevious={() => setCurrentState(SIGN_UP_STATES.USERNAME)}
+            onPrevious={() => dispatch({ type: "backFromEmail" })}
             onValidInput={onValidInput}
-            defaultValue={signUpInfo.email}
+            defaultValue={state.user.email}
           />
         )}
-        {currentState === SIGN_UP_STATES.PASSWORD && (
+        {state.current === SIGN_UP_STATES.PASSWORD && (
           <PasswordInput
-            onPrevious={() => setCurrentState(SIGN_UP_STATES.EMAIL)}
+            onPrevious={() => dispatch({ type: "backFromPassword" })}
             onValidInput={onValidInput}
-            defaultValue={signUpInfo.password}
+            defaultValue={state.user.password}
           />
         )}
-        {currentState === SIGN_UP_STATES.AVATAR && (
+        {state.current === SIGN_UP_STATES.AVATAR && (
           <AvatarInput
-            onPrevious={() => setCurrentState(SIGN_UP_STATES.PASSWORD)}
+            onPrevious={() => dispatch({ type: "backFromAvatar" })}
             onValidInput={onValidInput}
           />
         )}
-        {currentState === SIGN_UP_STATES.IN_PROGRESS && <PageLoader />}
-        {currentState === SIGN_UP_STATES.SUCCESS && <Success />}
-        {currentState === SIGN_UP_STATES.ERROR && <Errors />}
+        {state.current === SIGN_UP_STATES.IN_PROGRESS && <PageLoader />}
+        {state.current === SIGN_UP_STATES.SUCCESS && <Success />}
+        {state.current === SIGN_UP_STATES.ERROR && <Errors />}
         <br />
         <div className="content has-text-centered">
-          <p>Step: {currentState + 1} / 4</p>
+          <p>Step: {state.current + 1} / 4</p>
         </div>
       </ColumnLayout>
     </div>
