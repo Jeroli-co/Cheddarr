@@ -63,8 +63,6 @@ def client(app):
 @pytest.fixture
 def mocks(mocker):
     mocker.patch("server.tasks.send_email.delay")
-    ran_img = mocker.patch.object(utils, "random_user_picture")
-    ran_img.return_value = ""
 
 
 @pytest.fixture

@@ -1,3 +1,6 @@
+from os import listdir
+from os.path import splitext
+
 from flask import request, session, url_for
 from flask_login import current_user, fresh_login_required, login_required
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
@@ -5,12 +8,13 @@ from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
 from server import utils
 from server.auth.models import User
 from server.auth.schemas import UserSchema
+from server.config import REACT_STATIC_FOLDER
 from server.extensions import limiter
-from server.extensions.marshmallow import files, form
+from server.extensions.marshmallow import form
 from server.profile.schemas import ChangePasswordSchema, UsernameOrEmailSchema
 from server.tasks import send_email
 
-profile_serializer = UserSchema(only=["username", "user_picture", "email"])
+profile_serializer = UserSchema(only=["username", "avatar", "email"])
 
 
 @login_required
@@ -118,6 +122,19 @@ def change_email(email):
         {"confirm_url": url_for("auth.confirm_email", token=token, _external=True)},
     )
     return {"message": "Confirmation email sent."}
+
+
+@limiter.limit("10/hour")
+@login_required
+@form(UserSchema, only=["avatar"])
+def change_picture(avatar):
+    ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+    filename, extension = splitext(avatar)
+    if extension not in ALLOWED_EXTENSIONS:
+        raise BadRequest("Error while changing user's avatar.")
+    current_user.avatar = avatar
+    current_user.save()
+    return {"avatar": current_user.avatar}
 
 
 @login_required

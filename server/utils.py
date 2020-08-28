@@ -44,9 +44,3 @@ def confirm_timed_token(token, expiration=600):
         raise Exception
     return data
 
-
-
-def random_user_picture():
-    random_picture = choice(listdir(REACT_STATIC_FOLDER + "/profile"))
-    print(random_picture)
-    return random_picture

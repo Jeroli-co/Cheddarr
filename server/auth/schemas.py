@@ -6,8 +6,6 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
 
-    user_picture = ma.Field()
-
 
 class SigninSchema(ma.Schema):
     usernameOrEmail = ma.String(required=True)
