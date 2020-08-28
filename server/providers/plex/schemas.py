@@ -77,6 +77,7 @@ class PlexEpisodeSchema(PlexVideoSchema):
 
 class PlexSeasonSchema(PlexVideoSchema):
     parentRatingKey = ma.String(data_key="seriesId")
+    parentTitle = ma.String(data_key = "seriesTitle")
     seasonNumber = ma.Integer()
     episodes = ma.Nested(PlexEpisodeSchema, many=True)
 

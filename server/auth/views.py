@@ -40,12 +40,12 @@ plex_headers = {
     "Accept": "application/json",
 }
 
-session_serializer = UserSchema(only=["username", "user_picture"])
+session_serializer = UserSchema(only=["username", "avatar"])
 
 
 @limiter.limit("10/hour")
-@form(UserSchema, only=["username", "password", "email"])
-def signup(username, password, email):
+@form(UserSchema, only=["username", "password", "email", "avatar"])
+def signup(username, password, email, avatar):
     existing_email = User.exists(email=email)
     if existing_email:
         raise Conflict("This email is already taken.")
@@ -58,7 +58,7 @@ def signup(username, password, email):
         username=username,
         email=email,
         password=password,
-        user_picture=utils.random_user_picture(),
+        avatar=avatar,
     )
 
     token = utils.generate_timed_token(user.email)
@@ -167,19 +167,18 @@ def authorize_plex(token, redirectURI):
         plex_config = PlexConfig.query.filter_by(plex_user_id=user_id).one()
     except NoResultFound:
         plex_config = PlexConfig(plex_user_id=user_id, api_key=auth_token)
-
     if not plex_config.user:
         email = info["email"]
         user = User.find(email=email)
         # If the user does not exist we create him
         if not user:
             username = info["username"]
-            user_picture = info["thumb"]
+            avatar = info["thumb"]
             user = User(
                 username=username,
                 email=email,
                 password=pwd.genword(entropy=56),
-                user_picture=user_picture,
+                avatar=avatar,
                 confirmed=True,
             )
         # The user is considered confirmed if he signs in with Plex

@@ -15,7 +15,7 @@ from server.tests.conftest import (
 def test_get_friends(client, auth):
     friends = client.get(url_for("profile.get_friends"))
     assert json.loads(friends.data) == [
-        {"username": user2_username, "user_picture": None, "email": user2_email,}
+        {"username": user2_username, "avatar": None, "email": user2_email,}
     ]
     assert friends.status_code == 200
 
@@ -24,7 +24,7 @@ def test_friend_profile(client, auth):
     friend = client.get(url_for("profile.get_friends", username=user2_username))
     assert json.loads(friend.data) == {
         "username": user2_username,
-        "user_picture": None,
+        "avatar": None,
         "email": user2_email,
     }
     assert friend.status_code == 200

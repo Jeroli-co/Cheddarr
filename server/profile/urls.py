@@ -4,7 +4,6 @@ from . import profile
 
 url(profile, "get_profile", ["/"], methods=["GET"])
 url(profile, "delete_user", ["/"], methods=["DELETE"])
-url(profile, "change_picture", ["/picture/"], methods=["PUT"])
 url(profile, "change_password", ["/password/"], methods=["PUT"])
 url(
     profile,

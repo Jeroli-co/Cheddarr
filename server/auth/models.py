@@ -32,7 +32,7 @@ class User(db.Model, UserMixin):
         assert 8 < len(password) < 128
         return password
 
-    user_picture = db.Column(URLType)
+    avatar = db.Column(db.String(256))
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
     api_key = db.Column(db.String(256))
@@ -47,12 +47,12 @@ class User(db.Model, UserMixin):
     providers_configs = db.relationship(ProviderConfig, backref="user", cascade="all")
 
     def __init__(
-        self, username, email, password, user_picture=None, confirmed=False,
+        self, username, email, password, avatar=None, confirmed=False,
     ):
         self.username = username
         self.email = email
         self.password = password
-        self.user_picture = user_picture
+        self.avatar = avatar
         self.confirmed = confirmed
         self.api_key = None
         self.session_token = utils.generate_token(str(uuid4()))
@@ -61,7 +61,7 @@ class User(db.Model, UserMixin):
         return "%s/%s/%s/%s" % (
             self.username,
             self.email,
-            self.user_picture,
+            self.avatar,
             self.confirmed,
         )
 
