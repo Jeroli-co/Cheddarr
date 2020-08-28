@@ -70,6 +70,7 @@ const SignUpForm = () => {
       default:
         console.log("No states matched");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signUpInfo]);
 
   useEffect(() => {
