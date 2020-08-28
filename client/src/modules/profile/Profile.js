@@ -6,13 +6,13 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { useProfile } from "../../hooks/useProfile";
 import styled from "styled-components";
 
-const UserPictureStyle = styled.img`
+const avatarStyle = styled.img`
   object-fit: cover;
 `;
 
 const Profile = () => {
   const { getUser } = useProfile();
-  const { username, userPicture } = useContext(AuthContext);
+  const { username, avatar } = useContext(AuthContext);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -35,8 +35,8 @@ const Profile = () => {
             >
               <div className="tile is-parent is-vertical">
                 <div className="tile is-child has-text-centered">
-                  <UserPictureStyle
-                    src={userPicture}
+                  <avatarStyle
+                    src={avatar}
                     alt="User"
                     width={260}
                     height={260}

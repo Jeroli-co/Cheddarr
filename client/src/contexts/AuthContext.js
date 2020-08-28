@@ -9,7 +9,7 @@ const AuthContext = createContext();
 const initialSessionState = {
   isAuthenticated: false,
   username: null,
-  userPicture: null,
+  avatar: null,
   isLoading: true,
 };
 
@@ -35,9 +35,9 @@ const AuthContextProvider = (props) => {
     if (session.isLoading) {
       const authenticated = Cookies.get("authenticated");
       const username = Cookies.get("username");
-      const userPicture = Cookies.get("userPicture");
+      const avatar = Cookies.get("avatar");
       if (authenticated === "yes") {
-        initSession(username, userPicture);
+        initSession(username, avatar);
       } else {
         setSession({ ...initialSessionState, isLoading: false });
       }
@@ -46,15 +46,15 @@ const AuthContextProvider = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const initSession = (username, userPicture) => {
+  const initSession = (username, avatar) => {
     Cookies.set("authenticated", "yes", { expires: 365 });
     Cookies.set("username", username, { expires: 365 });
-    Cookies.set("userPicture", userPicture, { expires: 365 });
+    Cookies.set("avatar", avatar, { expires: 365 });
     setSession({
       ...session,
       isAuthenticated: true,
       username: username,
-      userPicture: userPicture,
+      avatar: avatar,
       isLoading: false,
     });
   };
@@ -62,7 +62,7 @@ const AuthContextProvider = (props) => {
   const clearSession = () => {
     Cookies.remove("authenticated");
     Cookies.remove("username");
-    Cookies.remove("userPicture");
+    Cookies.remove("avatar");
     setSession({ ...initialSessionState, isLoading: false });
   };
 
@@ -79,7 +79,7 @@ const AuthContextProvider = (props) => {
 
     switch (res.status) {
       case 200:
-        initSession(res.data.username, res.data["user_picture"]);
+        initSession(res.data.username, res.data["avatar"]);
         props.history.push(redirectURI);
         return res;
       case 400:
@@ -113,7 +113,7 @@ const AuthContextProvider = (props) => {
     );
     switch (res.status) {
       case 200:
-        initSession(res.data.username, res.data["user_picture"]);
+        initSession(res.data.username, res.data["avatar"]);
         return res;
       default:
         clearSession();
@@ -179,9 +179,9 @@ const AuthContextProvider = (props) => {
     setSession({ ...session, username: username });
   };
 
-  const setUserPicture = (userPicture) => {
-    Cookies.set("userPicture", userPicture);
-    setSession({ ...session, userPicture: userPicture });
+  const setavatar = (avatar) => {
+    Cookies.set("avatar", avatar);
+    setSession({ ...session, avatar: avatar });
   };
 
   const handleError = (error) => {
@@ -228,7 +228,7 @@ const AuthContextProvider = (props) => {
         confirmEmail,
         resendConfirmation,
         setUsername,
-        setUserPicture,
+        setavatar,
         handleError,
       }}
     >

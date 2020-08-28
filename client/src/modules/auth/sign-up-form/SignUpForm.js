@@ -4,7 +4,7 @@ import { EmailInput } from "./EmailInput";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { ColumnLayout } from "../../../elements/layouts";
 import { PasswordInput } from "./PasswordInput";
-import { PictureInput } from "./PictureInput";
+import { AvatarInput } from "./AvatarInput";
 import { Success } from "./Success";
 import { PageLoader } from "../../../elements/PageLoader";
 import { Errors } from "./Errors";
@@ -13,7 +13,7 @@ const SIGN_UP_STATES = {
   USERNAME: 0,
   EMAIL: 1,
   PASSWORD: 2,
-  PICTURE: 3,
+  AVATAR: 3,
   IN_PROGRESS: 4,
   SUCCESS: 5,
   ERROR: 6,
@@ -23,7 +23,7 @@ const initialInfoState = {
   username: null,
   email: null,
   password: null,
-  picture: null,
+  avatar: null,
 };
 
 const SignUpForm = () => {
@@ -42,8 +42,8 @@ const SignUpForm = () => {
       case SIGN_UP_STATES.PASSWORD:
         setSignUpInfo({ ...signUpInfo, password: data.password });
         break;
-      case SIGN_UP_STATES.PICTURE:
-        setSignUpInfo({ ...signUpInfo, picture: data });
+      case SIGN_UP_STATES.AVATAR:
+        setSignUpInfo({ ...signUpInfo, avatar: data });
         break;
       default:
         console.log("No value matched");
@@ -62,9 +62,9 @@ const SignUpForm = () => {
         setCurrentState(SIGN_UP_STATES.PASSWORD);
         break;
       case SIGN_UP_STATES.PASSWORD:
-        setCurrentState(SIGN_UP_STATES.PICTURE);
+        setCurrentState(SIGN_UP_STATES.AVATAR);
         break;
-      case SIGN_UP_STATES.PICTURE:
+      case SIGN_UP_STATES.AVATAR:
         setCurrentState(SIGN_UP_STATES.IN_PROGRESS);
         break;
       default:
@@ -127,8 +127,8 @@ const SignUpForm = () => {
             defaultValue={signUpInfo.password}
           />
         )}
-        {currentState === SIGN_UP_STATES.PICTURE && (
-          <PictureInput
+        {currentState === SIGN_UP_STATES.AVATAR && (
+          <AvatarInput
             onPrevious={() => setCurrentState(SIGN_UP_STATES.PASSWORD)}
             onValidInput={onValidInput}
           />
