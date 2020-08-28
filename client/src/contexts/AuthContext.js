@@ -129,7 +129,12 @@ const AuthContextProvider = (props) => {
   };
 
   const signUp = async (data) => {
-    return await executeRequest(methods.POST, "/sign-up/", data);
+    const fd = new FormData();
+    fd.append("username", data["username"]);
+    fd.append("email", data["email"]);
+    fd.append("password", data["password"]);
+    fd.append("avatar", data["avatar"]);
+    return await executeRequest(methods.POST, "/sign-up/", fd);
     /*
     switch (res.status) {
       case 200:
