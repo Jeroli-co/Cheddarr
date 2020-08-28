@@ -1,6 +1,5 @@
 import { Home } from "../elements/home/Home";
 import { SignInForm } from "../modules/auth/sign-in-form/SignInForm";
-import { SignUpForm } from "../modules/auth/SignUpForm";
 import { ConfirmEmail } from "../modules/auth/confirm-email/ConfirmEmail";
 import { WaitingEmailConfirmation } from "../modules/auth/WaitingEmailConfirmation";
 import { ResetPassword } from "../modules/auth/reset-password/ResetPassword";
@@ -26,6 +25,7 @@ import { MoviePage } from "../pages/MoviePage";
 import { SeasonPage } from "../pages/SeasonPage";
 import { SeriesPage } from "../pages/SeriesPage";
 import { SearchPage } from "../pages/search-page/SearchPage";
+import { SignUpForm } from "../modules/auth/sign-up-form/SignUpForm";
 
 const routes = {
   HOME: { url: "/", component: Home },
