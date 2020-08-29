@@ -8,7 +8,6 @@ from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
 from server import utils
 from server.auth.models import User
 from server.auth.schemas import UserSchema
-from server.config import REACT_STATIC_FOLDER
 from server.extensions import limiter
 from server.extensions.marshmallow import form
 from server.profile.schemas import ChangePasswordSchema, UsernameOrEmailSchema

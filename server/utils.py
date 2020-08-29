@@ -4,8 +4,6 @@ from random import choice
 from flask import current_app as app
 from itsdangerous import Signer, URLSafeSerializer, URLSafeTimedSerializer
 
-from server.config import REACT_STATIC_FOLDER
-
 
 def sign(value):
     s = Signer(app.secret_key)
@@ -43,4 +41,3 @@ def confirm_timed_token(token, expiration=600):
     except Exception:
         raise Exception
     return data
-
