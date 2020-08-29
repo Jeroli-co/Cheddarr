@@ -17,7 +17,6 @@ const SignUpForm = ({ history }) => {
 
   const onSubmit = (data) => {
     signUp(data).then((res) => {
-      console.log(res);
       setSignUpRes(res);
     });
   };
