@@ -9,8 +9,8 @@ import cheeseOrange from "../../../assets/profile/cheese-orange.png";
 import cheesePink from "../../../assets/profile/cheese-pink.png";
 import cheesePurple from "../../../assets/profile/cheese-purple.png";
 import cheeseRed from "../../../assets/profile/cheese-red.png";
-import { Image } from "../../../elements/Image";
-import { RowLayout } from "../../../elements/layouts";
+import { Image } from "./Image";
+import { RowLayout } from "./layouts";
 
 const avatars = [
   { title: "cheese-cyan.png", src: cheeseCyan, description: "Cyan cheese" },
