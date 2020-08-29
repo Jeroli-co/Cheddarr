@@ -39,6 +39,7 @@ plex_headers = {
     "X-Plex-Product": APP_NAME,
     "Accept": "application/json",
 }
+plex_avatar = "plex.png"
 
 session_serializer = UserSchema(only=["username", "avatar"])
 
@@ -46,6 +47,21 @@ session_serializer = UserSchema(only=["username", "avatar"])
 @limiter.limit("10/hour")
 @form(UserSchema, only=["username", "password", "email", "avatar"])
 def signup(username, password, email, avatar):
+    """Create a new user
+
+    Args:
+        username (string): name of the user
+        password (string): password of the user
+        email (string): email of the user
+        avatar (string): image name of the user
+
+    Raises:
+        Conflict: The email address is already taken
+        Conflict: The username is already taken
+
+    Returns:
+        json: A confirmation for the email sending
+    """
     existing_email = User.exists(email=email)
     if existing_email:
         raise Conflict("This email is already taken.")
@@ -173,7 +189,7 @@ def authorize_plex(token, redirectURI):
         # If the user does not exist we create him
         if not user:
             username = info["username"]
-            avatar = info["thumb"]
+            avatar = plex_avatar
             user = User(
                 username=username,
                 email=email,
