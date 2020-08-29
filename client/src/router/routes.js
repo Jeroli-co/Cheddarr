@@ -1,7 +1,6 @@
 import { Home } from "../elements/home/Home";
 import { SignInForm } from "../modules/auth/sign-in-form/SignInForm";
 import { ConfirmEmail } from "../modules/auth/confirm-email/ConfirmEmail";
-import { WaitingEmailConfirmation } from "../modules/auth/WaitingEmailConfirmation";
 import { ResetPassword } from "../modules/auth/reset-password/ResetPassword";
 import { Profile } from "../modules/profile/Profile";
 import { NotFound } from "../elements/errors/NotFound";
@@ -39,10 +38,6 @@ const routes = {
   CONFIRM_EMAIL: {
     url: (token) => "/sign-up/confirm/" + token,
     component: ConfirmEmail,
-  },
-  WAIT_EMAIL_CONFIRMATION: {
-    url: (email) => "/wait-email-confirmation/" + email,
-    component: WaitingEmailConfirmation,
   },
   RESET_PASSWORD: {
     url: (token) => "/profile/password/reset/" + token,

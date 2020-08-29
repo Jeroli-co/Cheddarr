@@ -133,7 +133,6 @@ const AuthContextProvider = (props) => {
     fd.append("username", data["username"]);
     fd.append("email", data["email"]);
     fd.append("password", data["password"]);
-    fd.append("avatar", data["avatar"]);
     return await executeRequest(methods.POST, "/sign-up/", fd);
   };
 

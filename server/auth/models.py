@@ -34,14 +34,6 @@ class User(db.Model, UserMixin):
         return password
 
     avatar = db.Column(db.String(256))
-
-    @validates("avatar")
-    def validate_avatar(self, key, avatar):
-        ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif"}
-        _, extension = splitext(avatar)
-        assert extension in ALLOWED_EXTENSIONS
-        return avatar
-
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
     api_key = db.Column(db.String(256))

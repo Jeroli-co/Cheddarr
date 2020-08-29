@@ -65,11 +65,6 @@ const App = () => {
                 component={routes.SIGN_UP.component}
               />
               <ProtectedRoute
-                exaxt
-                path={routes.WAIT_EMAIL_CONFIRMATION.url(":email")}
-                component={routes.WAIT_EMAIL_CONFIRMATION.component}
-              />
-              <ProtectedRoute
                 exact
                 path={routes.RESEND_EMAIL_CONFIRMATION.url}
                 component={routes.RESEND_EMAIL_CONFIRMATION.component}
