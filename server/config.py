@@ -118,5 +118,7 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = True
     SERVER_NAME = "localhost"
+    SESSION_COOKIE_DOMAIN = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     CACHE_TYPE = "null"
+    CACHE_NO_NULL_WARNING = True

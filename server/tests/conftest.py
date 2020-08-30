@@ -16,6 +16,7 @@ user3_email = "email3@test.com"
 user3_password = "password3"
 avatar = "http://avatar"
 
+
 @pytest.fixture(autouse=True, scope="session")
 def app():
     app = _create_app(TestConfig)
