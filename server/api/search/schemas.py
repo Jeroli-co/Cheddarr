@@ -1,7 +1,7 @@
 from marshmallow import INCLUDE, pre_dump
 from marshmallow.validate import OneOf
 
-from server.auth.models import User
+from server.api.auth.models import User
 from server.extensions import ma
 
 

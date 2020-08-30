@@ -1,4 +1,4 @@
-from enum import auto, Enum
+from enum import Enum, auto
 
 from server.extensions import db
 

@@ -1,4 +1,4 @@
-from server.auth.models import User
+from server.api.auth.models import User
 from server.extensions import ma
 
 

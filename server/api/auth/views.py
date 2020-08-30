@@ -8,19 +8,10 @@ from flask_login import (
 )
 from passlib import pwd
 from requests import get, post
-from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import (
-    BadRequest,
-    Conflict,
-    Forbidden,
-    Gone,
-    InternalServerError,
-    Unauthorized,
-)
-
 from server import utils
-from server.auth.models import User
-from server.auth.schemas import PlexAuthSchema, SigninSchema, UserSchema
+from server.api.auth.models import User
+from server.api.auth.schemas import PlexAuthSchema, SigninSchema, UserSchema
+from server.api.providers.plex.models import PlexConfig
 from server.config import (
     APP_NAME,
     PLEX_ACCESS_TOKEN_URL,
@@ -31,8 +22,16 @@ from server.config import (
 )
 from server.extensions import limiter
 from server.extensions.marshmallow import form, query
-from server.providers.plex.models import PlexConfig
 from server.tasks import send_email
+from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import (
+    BadRequest,
+    Conflict,
+    Forbidden,
+    Gone,
+    InternalServerError,
+    Unauthorized,
+)
 
 plex_headers = {
     "X-Plex-Client-Identifier": PLEX_CLIENT_IDENTIFIER,
