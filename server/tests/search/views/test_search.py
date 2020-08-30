@@ -1,6 +1,6 @@
 from flask import url_for
 
-from server.search.views import search_friends
+from server.api.search.views import search_friends
 from server.tests.conftest import user2_email, user2_username
 
 

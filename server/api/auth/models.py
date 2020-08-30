@@ -1,13 +1,12 @@
 from uuid import uuid4
 
 from flask_login import UserMixin
+from server import utils
+from server.api.providers.models import ProviderConfig
+from server.extensions import db
 from sqlalchemy import and_
 from sqlalchemy.orm import validates
 from sqlalchemy_utils import EmailType, PasswordType, URLType
-
-from server import utils
-from server.extensions import db
-from server.providers.models import ProviderConfig
 
 
 class Friendship(db.Model):

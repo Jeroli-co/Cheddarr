@@ -2,19 +2,18 @@ from flask import jsonify
 from flask_login import current_user, fresh_login_required, login_required
 from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
-from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest, InternalServerError
-
-from server.extensions.marshmallow import body
-from server.providers.plex import utils
-from server.providers.plex.models import PlexConfig
-from server.providers.plex.schemas import (
+from server.api.providers.plex import utils
+from server.api.providers.plex.models import PlexConfig
+from server.api.providers.plex.schemas import (
     PlexConfigSchema,
     PlexEpisodeSchema,
     PlexMovieSchema,
     PlexSeasonSchema,
     PlexSeriesSchema,
 )
+from server.extensions.marshmallow import body
+from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import BadRequest, InternalServerError
 
 plex_config_serializer = PlexConfigSchema()
 plex_movie_serializer = PlexMovieSchema()

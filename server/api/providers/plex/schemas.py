@@ -2,7 +2,7 @@ from marshmallow import pre_dump
 from plexapi.media import Role
 
 from server.extensions import ma
-from server.providers.plex.models import PlexConfig
+from server.api.providers.plex.models import PlexConfig
 
 
 class PlexConfigSchema(ma.SQLAlchemyAutoSchema):
@@ -77,7 +77,7 @@ class PlexEpisodeSchema(PlexVideoSchema):
 
 class PlexSeasonSchema(PlexVideoSchema):
     parentRatingKey = ma.String(data_key="seriesId")
-    parentTitle = ma.String(data_key = "seriesTitle")
+    parentTitle = ma.String(data_key="seriesTitle")
     seasonNumber = ma.Integer()
     episodes = ma.Nested(PlexEpisodeSchema, many=True)
 

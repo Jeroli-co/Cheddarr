@@ -4,7 +4,7 @@ from plexapi.myplex import MyPlexAccount
 from werkzeug.exceptions import BadRequest, InternalServerError
 
 from server.extensions import cache
-from server.providers.plex.models import PlexConfig
+from server.api.providers.plex.models import PlexConfig
 
 
 @cache.memoize(timeout=300)

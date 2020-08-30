@@ -2,10 +2,10 @@ from flask import jsonify
 from flask_login import current_user, login_required
 from sqlalchemy import or_
 
-from server.auth.models import User
+from server.api.auth.models import User
 from server.extensions.marshmallow import query
-from server.providers.plex import utils
-from server.search.schemas import (
+from server.api.providers.plex import utils
+from server.api.search.schemas import (
     FriendSearchResultSchema,
     MediaSearchResultSchema,
     SearchSchema,

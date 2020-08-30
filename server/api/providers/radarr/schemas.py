@@ -1,5 +1,5 @@
 from server.extensions import ma
-from server.providers.radarr.models import RadarrConfig
+from server.api.providers.radarr.models import RadarrConfig
 
 
 class RadarrConfigSchema(ma.SQLAlchemyAutoSchema):

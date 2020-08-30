@@ -1,7 +1,6 @@
 from flask import url_for
-
-from server.auth.models import User
-from server.tests.conftest import (user1_password, user2_email, user2_username)
+from server.api.auth.models import User
+from server.tests.conftest import user1_password, user2_email, user2_username
 
 
 def test_change_password(client, auth, mocks):

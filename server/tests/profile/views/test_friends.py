@@ -1,9 +1,7 @@
 import json
 
 from flask import url_for
-from sqlalchemy import and_
-
-from server.auth.models import Friendship, User
+from server.api.auth.models import Friendship, User
 from server.tests.conftest import (
     avatar,
     user1_username,
@@ -11,6 +9,7 @@ from server.tests.conftest import (
     user2_username,
     user3_username,
 )
+from sqlalchemy import and_
 
 
 def test_get_friends(client, auth):

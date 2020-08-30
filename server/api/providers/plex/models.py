@@ -1,5 +1,5 @@
 from server.extensions import db
-from server.providers.models import ProviderConfig, ProviderType
+from server.api.providers.models import ProviderConfig, ProviderType
 
 
 class PlexConfig(ProviderConfig):

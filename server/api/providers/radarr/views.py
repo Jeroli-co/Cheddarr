@@ -4,8 +4,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest
 
 from server.extensions.marshmallow import body
-from server.providers.radarr.models import RadarrConfig
-from server.providers.radarr.schemas import RadarrConfigSchema
+from server.api.providers.radarr.models import RadarrConfig
+from server.api.providers.radarr.schemas import RadarrConfigSchema
 
 radarr_config_serializer = RadarrConfigSchema()
 

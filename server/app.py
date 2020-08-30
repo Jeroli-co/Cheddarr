@@ -8,14 +8,8 @@ from flask_cors import CORS
 from flask_talisman import Talisman
 from werkzeug.exceptions import HTTPException
 
-from server.config import (
-    API_ROOT,
-    Config,
-    DevConfig,
-    FLASK_TEMPLATE_FOLDER,
-    ProdConfig,
-    REACT_STATIC_FOLDER,
-)
+from server.config import (API_ROOT, FLASK_TEMPLATE_FOLDER,
+                           REACT_STATIC_FOLDER, Config, DevConfig, ProdConfig)
 from server.extensions import cache, celery, db, limiter, ma, mail, migrate
 from server.extensions.login_manager import register_login_manager
 
@@ -97,13 +91,13 @@ def _create_app(config_object: Config, **kwargs):
 
 def register_blueprints(app):
     """Register application's blueprints"""
+    from server.api.auth import auth
+    from server.api.profile import profile
+    from server.api.providers.plex import plex
+    from server.api.providers.radarr import radarr
+    from server.api.providers.sonarr import sonarr
+    from server.api.search import search
     from server.site import site
-    from server.auth import auth
-    from server.profile import profile
-    from server.providers.plex import plex
-    from server.providers.radarr import radarr
-    from server.providers.sonarr import sonarr
-    from server.search import search
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix=API_ROOT)
@@ -116,7 +110,7 @@ def register_blueprints(app):
 
 def register_commands(app):
     """Register application's CLI commands"""
-    from server.commands import init_db, worker, test
+    from server.commands import init_db, test, worker
 
     app.cli.add_command(init_db)
     app.cli.add_command(worker)

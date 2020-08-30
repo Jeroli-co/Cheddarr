@@ -3,11 +3,11 @@ from flask_login import current_user, fresh_login_required, login_required
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
 
 from server import utils
-from server.auth.models import User
-from server.auth.schemas import UserSchema
+from server.api.auth.models import User
+from server.api.auth.schemas import UserSchema
 from server.extensions import limiter
 from server.extensions.marshmallow import form
-from server.profile.schemas import ChangePasswordSchema, UsernameOrEmailSchema
+from server.api.profile.schemas import ChangePasswordSchema, UsernameOrEmailSchema
 from server.tasks import send_email
 
 profile_serializer = UserSchema(only=["username", "avatar", "email"])
