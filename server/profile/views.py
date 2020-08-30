@@ -1,6 +1,3 @@
-from os import listdir
-from os.path import splitext
-
 from flask import request, session, url_for
 from flask_login import current_user, fresh_login_required, login_required
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
@@ -123,13 +120,14 @@ def change_email(email):
     return {"message": "Confirmation email sent."}
 
 
+"""
+TODO: Implement later
 @limiter.limit("10/hour")
 @login_required
 @form(UserSchema, only=["avatar"])
 def change_picture(avatar):
-    current_user.avatar = avatar
-    current_user.save()
     return {"avatar": current_user.avatar}
+"""
 
 
 @login_required
