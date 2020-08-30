@@ -1,5 +1,3 @@
-from os.path import splitext
-import re
 from uuid import uuid4
 
 from flask_login import UserMixin
@@ -33,7 +31,7 @@ class User(db.Model, UserMixin):
         assert 8 <= len(password) <= 128
         return password
 
-    avatar = db.Column(db.String(256))
+    avatar = db.Column(URLType)
     session_token = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
     api_key = db.Column(db.String(256))

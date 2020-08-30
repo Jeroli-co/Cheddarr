@@ -21,7 +21,7 @@ class ProviderConfig(db.Model):
     }
 
     def __repr__(self):
-        return "%s/%s/%s" % (self.name, self.api_key, self.enabled)
+        return "%s/%s/%s/%s" % (self.name, self.api_key, self.enabled, self.type)
 
     def update(self, updated_config):
         for config, value in updated_config.items():

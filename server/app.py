@@ -71,12 +71,17 @@ def _create_app(config_object: Config, **kwargs):
 
     @app.errorhandler(Exception)
     def handle_invalid_usage(error):
-        message = str("Internal Server Error")
-        code = 500
         if isinstance(error, HTTPException):
+            name = error.name
             message = error.description
             code = error.code
-        return jsonify({"message": message}), code
+        else:
+            name = "Internal Server Error"
+            message = "An error has occured."
+            code = 500
+            app.logger.error(error, exc_info=error)
+
+        return jsonify({name: message}), code
 
     @app.context_processor
     def inject_now():

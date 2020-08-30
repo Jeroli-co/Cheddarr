@@ -69,9 +69,7 @@ def signup(username, password, email):
         raise Conflict("This username is not available.")
 
     user = User(
-        username=username,
-        email=email,
-        password=password,
+        username=username, email=email, password=password, avatar=utils.random_avatar()
     )
 
     token = utils.generate_timed_token(user.email)
