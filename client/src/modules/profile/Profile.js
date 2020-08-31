@@ -6,8 +6,10 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { useProfile } from "../../hooks/useProfile";
 import styled from "styled-components";
 
-const avatarStyle = styled.img`
+const UserPictureStyle = styled.img`
   object-fit: cover;
+  width: 260px;
+  height: 260px;
 `;
 
 const Profile = () => {
@@ -35,11 +37,9 @@ const Profile = () => {
             >
               <div className="tile is-parent is-vertical">
                 <div className="tile is-child has-text-centered">
-                  <avatarStyle
+                  <UserPictureStyle
                     src={avatar}
                     alt="User"
-                    width={260}
-                    height={260}
                     data-testid="UserProfileImage"
                   />
                 </div>
