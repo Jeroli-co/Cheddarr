@@ -8,8 +8,14 @@ from flask_cors import CORS
 from flask_talisman import Talisman
 from werkzeug.exceptions import HTTPException
 
-from server.config import (API_ROOT, FLASK_TEMPLATE_FOLDER,
-                           REACT_STATIC_FOLDER, Config, DevConfig, ProdConfig)
+from server.config import (
+    API_ROOT,
+    FLASK_TEMPLATE_FOLDER,
+    REACT_STATIC_FOLDER,
+    Config,
+    DevConfig,
+    ProdConfig,
+)
 from server.extensions import cache, celery, db, limiter, ma, mail, migrate
 from server.extensions.login_manager import register_login_manager
 

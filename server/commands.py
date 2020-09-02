@@ -4,7 +4,7 @@ import click
 from flask.cli import with_appcontext
 
 from server.extensions import db
-from server.extensions.db import db_drop_everything
+from server.extensions.sqlalchemy import db_drop_everything
 
 
 @click.command("init-db")

@@ -4,7 +4,7 @@ import { Spinner } from "../../../../../elements/Spinner";
 
 const ServersModal = ({ onClose }) => {
   const [serverSelected, setServerSelected] = useState(null);
-  const { getPlexServers, updateConfig } = useContext(PlexConfigContext);
+  const { getPlexServers, addPlexServer } = useContext(PlexConfigContext);
   const [servers, setServers] = useState(null);
 
   useEffect(() => {
@@ -16,8 +16,8 @@ const ServersModal = ({ onClose }) => {
 
   const linkServer = () => {
     if (serverSelected) {
-      updateConfig({
-        machine_name: serverSelected.name,
+      addPlexServer({
+        name: serverSelected.name,
         machine_id: serverSelected.machine_id,
       }).then((res) => {
         if (res) onClose();

@@ -1,20 +1,17 @@
 from flask_login import current_user, login_required
 from requests import get
-from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest
-
-from server.extensions.marshmallow import body
 from server.api.providers.radarr.models import RadarrConfig
 from server.api.providers.radarr.schemas import RadarrConfigSchema
+from server.extensions.marshmallow import body
+from werkzeug.exceptions import BadRequest
 
 radarr_config_serializer = RadarrConfigSchema()
 
 
 @login_required
 def get_radarr_status():
-    try:
-        radarr_config = RadarrConfig.find(current_user)
-    except NoResultFound:
+    radarr_config = RadarrConfig.find(user=current_user)
+    if not radarr_config:
         return {"status": False}
     return {"status": radarr_config.enabled}
 
@@ -36,9 +33,8 @@ def test_radarr_config(config):
 
 @login_required
 def get_radarr_config():
-    try:
-        radarr_config = RadarrConfig.find(current_user)
-    except NoResultFound:
+    radarr_config = RadarrConfig.find(user=current_user)
+    if not radarr_config:
         return {}
     return radarr_config_serializer.jsonify(radarr_config)
 
@@ -46,11 +42,10 @@ def get_radarr_config():
 @login_required
 @body(RadarrConfigSchema)
 def update_radarr_config(config):
-    try:
-        user_config = RadarrConfig.find(current_user)
-    except NoResultFound:
-        user_config = RadarrConfig(api_key=config["api_key"])
-        user_config.user = current_user
+    radarr_config = RadarrConfig.find(user=current_user)
+    if not radarr_config:
+        radarr_config = RadarrConfig(api_key=config["api_key"])
+        radarr_config.user = current_user
 
-    user_config.update(config)
-    return radarr_config_serializer.jsonify(user_config)
+    radarr_config.update(config)
+    return radarr_config_serializer.jsonify(radarr_config)

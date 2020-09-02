@@ -1,11 +1,19 @@
-import { RowLayout } from "../../../../elements/layouts";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { SubmitConfig } from "../SubmitConfig";
+import { RowLayout } from "../../../../elements/layouts";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../forms/formDefaultValidators";
 import { useSonarr } from "../../../../hooks/useSonarr";
+import { SubmitConfig } from "../SubmitConfig";
 
 const SonarrConfig = () => {
-  const { register, handleSubmit, formState, reset, getValues } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState,
+    reset,
+    getValues,
+    errors,
+  } = useForm();
   const { testSonarrConfig, updateSonarrConfig, getSonarrConfig } = useSonarr();
   useEffect(() => {
     getSonarrConfig().then((data) => {
@@ -60,8 +68,15 @@ const SonarrConfig = () => {
               className="input"
               type="text"
               placeholder="API Key"
-              ref={register}
+              ref={register({
+                required: true,
+              })}
             />
+            {errors["api_key"] && errors["api_key"].type === "required" && (
+              <p className="help is-danger">
+                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+              </p>
+            )}
           </div>
         </div>
         <div className="field">
@@ -72,8 +87,15 @@ const SonarrConfig = () => {
               className="input"
               type="text"
               placeholder="Hostname or IP"
-              ref={register}
+              ref={register({
+                required: true,
+              })}
             />
+            {errors["host"] && errors["host"].type === "required" && (
+              <p className="help is-danger">
+                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+              </p>
+            )}
           </div>
         </div>
         <div className="field">

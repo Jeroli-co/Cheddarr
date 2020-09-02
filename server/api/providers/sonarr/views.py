@@ -1,20 +1,17 @@
 from flask_login import current_user, login_required
 from requests import get
-from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest
-
-from server.extensions.marshmallow import body
 from server.api.providers.sonarr.models import SonarrConfig
 from server.api.providers.sonarr.schemas import SonarrConfigSchema
+from server.extensions.marshmallow import body
+from werkzeug.exceptions import BadRequest
 
 sonarr_config_serializer = SonarrConfigSchema()
 
 
 @login_required
 def get_sonarr_status():
-    try:
-        sonarr_config = SonarrConfig.find(current_user)
-    except NoResultFound:
+    sonarr_config = SonarrConfig.find(user=current_user)
+    if not sonarr_config:
         return {"status": False}
     return {"status": sonarr_config.enabled}
 
@@ -36,9 +33,8 @@ def test_sonarr_config(config):
 
 @login_required
 def get_sonarr_config():
-    try:
-        sonarr_config = SonarrConfig.find(current_user)
-    except NoResultFound:
+    sonarr_config = SonarrConfig.find(user=current_user)
+    if not sonarr_config:
         return {}
     return sonarr_config_serializer.jsonify(sonarr_config)
 
@@ -46,11 +42,10 @@ def get_sonarr_config():
 @login_required
 @body(SonarrConfigSchema)
 def update_sonarr_config(config):
-    try:
-        user_config = SonarrConfig.find(current_user)
-    except NoResultFound:
-        user_config = SonarrConfig(api_key=config["api_key"])
-        user_config.user = current_user
+    sonarr_config = SonarrConfig.find(user=current_user)
+    if not sonarr_config:
+        sonarr_config = SonarrConfig(api_key=config["api_key"])
+        sonarr_config.user = current_user
 
-    user_config.update(config)
-    return sonarr_config_serializer.jsonify(user_config)
+    sonarr_config.update(config)
+    return sonarr_config_serializer.jsonify(sonarr_config)

@@ -1,14 +1,23 @@
 from marshmallow import pre_dump
+from marshmallow_sqlalchemy import auto_field
+from marshmallow_sqlalchemy.fields import Nested
 from plexapi.media import Role
-
+from server.api.providers.plex.models import PlexConfig, PlexServer
 from server.extensions import ma
-from server.api.providers.plex.models import PlexConfig
 
 
-class PlexConfigSchema(ma.SQLAlchemyAutoSchema):
+class PlexServerSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = PlexServer
+        load_instance = True
+
+
+class PlexConfigSchema(ma.SQLAlchemySchema):
     class Meta:
         model = PlexConfig
-        exclude = ("id", "name", "type", "api_key", "plex_user_id")
+
+    enabled = auto_field()
+    servers = Nested(PlexServerSchema, many=True)
 
 
 class PlexMediaTag(ma.Schema):

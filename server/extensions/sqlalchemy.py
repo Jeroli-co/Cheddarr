@@ -1,11 +1,10 @@
-from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+
 from sqlalchemy import ForeignKeyConstraint, MetaData, Table
 from sqlalchemy.engine import reflection
 from sqlalchemy.sql.ddl import DropConstraint, DropTable
 
 db = SQLAlchemy()
-migrate = Migrate()
 
 
 def db_drop_everything(db):
