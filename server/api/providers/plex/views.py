@@ -3,17 +3,17 @@ from flask_login import current_user, fresh_login_required, login_required
 from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
 from server.api.providers.plex import utils
-from server.api.providers.plex.models import PlexConfig
+from server.api.providers.plex.models import PlexConfig, PlexServer
 from server.api.providers.plex.schemas import (
     PlexConfigSchema,
     PlexEpisodeSchema,
     PlexMovieSchema,
     PlexSeasonSchema,
     PlexSeriesSchema,
+    PlexServerSchema,
 )
 from server.extensions.marshmallow import body
-from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest, InternalServerError
+from werkzeug.exceptions import BadRequest, Unauthorized
 
 plex_config_serializer = PlexConfigSchema()
 plex_movie_serializer = PlexMovieSchema()
@@ -24,41 +24,58 @@ plex_episode_serializer = PlexEpisodeSchema()
 
 @login_required
 def get_plex_status():
-    try:
-        plex_config = PlexConfig.find(current_user)
-    except NoResultFound:
+    plex_config = PlexConfig.find(user=current_user)
+    if not plex_config:
         return {"status": False}
-    return {"status": plex_config.enabled and plex_config.machine_id is not None}
+    return {"status": plex_config.enabled and len(plex_config.servers) != 0}
 
 
 @login_required
 def get_plex_config():
-    try:
-        plex_user_config = PlexConfig.find(current_user)
-    except NoResultFound:
+    plex_config = PlexConfig.find(user=current_user)
+    if not plex_config:
         return {}
-    return plex_config_serializer.jsonify(plex_user_config)
+    return plex_config_serializer.jsonify(plex_config)
 
 
 @login_required
 @body(PlexConfigSchema)
 def update_plex_config(args):
-    try:
-        user_config = PlexConfig.find(current_user)
-    except NoResultFound:
-        raise InternalServerError("No existing config for Plex.")
-    if not user_config:
-        raise BadRequest("No config created for this provider")
+    plex_config = PlexConfig.find(user=current_user)
+    if not plex_config:
+        raise BadRequest("No config created for this provider.")
+    plex_config.update(args)
+    return plex_config_serializer.jsonify(plex_config)
 
-    user_config.update(args)
-    return plex_config_serializer.jsonify(user_config)
+
+@login_required
+@body(PlexServerSchema)
+def add_plex_server(server):
+    plex_config = PlexConfig.find(user=current_user)
+    if not plex_config:
+        raise BadRequest("No config created for this provider")
+    plex_config.servers.append(server)
+    plex_config.save()
+    return plex_config_serializer.jsonify(plex_config)
+
+
+@login_required
+def remove_plex_server(machine_id):
+    plex_server = PlexServer.find(machine_id=machine_id)
+    if not plex_server:
+        raise BadRequest("This server is not linked.")
+    plex_config = plex_server.plex_config
+    if plex_config.user_id != current_user.id:
+        raise Unauthorized("This server is not linked to you account.")
+    plex_server.delete()
+    plex_config.save()
+    return plex_config_serializer.jsonify(plex_config)
 
 
 @fresh_login_required
 def unlink_plex_account():
-    try:
-        plex_config = PlexConfig.find(current_user)
-    except NoResultFound:
+    plex_config = PlexConfig.find(user=current_user)
+    if not plex_config:
         raise BadRequest("No Plex account linked.")
     plex_config.delete()
     return {"message": "Plex account unlinked."}
@@ -66,10 +83,9 @@ def unlink_plex_account():
 
 @login_required
 def get_plex_servers():
-    try:
-        plex_config = PlexConfig.find(current_user)
-    except NoResultFound:
-        raise InternalServerError("No existing config for Plex.")
+    plex_config = PlexConfig.find(user=current_user)
+    if not plex_config:
+        raise BadRequest("No existing config for Plex.")
     api_key = plex_config.api_key
     plex_account = MyPlexAccount(api_key)
     servers = [

@@ -73,6 +73,40 @@ const PlexConfigContextProvider = (props) => {
     }
   };
 
+  const addPlexServer = async (server) => {
+    const res = await executeRequest(
+      methods.POST,
+      providerUrl + "config/servers/",
+      server
+    );
+    switch (res.status) {
+      case 200:
+        setConfig(res.data);
+        pushSuccess("Server added");
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const removePlexServer = async (machine_id) => {
+    console.log(machine_id);
+    const res = await executeRequest(
+      methods.DELETE,
+      providerUrl + "config/servers/" + machine_id.machine_id
+    );
+    switch (res.status) {
+      case 200:
+        setConfig(res.data);
+        pushSuccess("Server removed");
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   const isPlexAccountLinked = (config) => {
     return (
       config["enabled"] === true && typeof config["enabled"] !== "undefined"
@@ -81,8 +115,9 @@ const PlexConfigContextProvider = (props) => {
 
   const isPlexServerLinked = (config) => {
     return (
-      config["machine_name"] !== null &&
-      typeof config["machine_name"] !== "undefined"
+      config.servers.length > 0 &&
+      config.servers[0]["name"] !== null &&
+      typeof config.servers[0]["name"] !== "undefined"
     );
   };
 
@@ -95,6 +130,8 @@ const PlexConfigContextProvider = (props) => {
         isPlexServerLinked,
         isPlexAccountLinked,
         unlinkPlexAccount,
+        addPlexServer,
+        removePlexServer,
       }}
     >
       {props.children}

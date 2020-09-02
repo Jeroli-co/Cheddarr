@@ -1,12 +1,16 @@
 from server.helpers import url
+
 from . import plex
 
 # Plex config management
 url(plex, "get_plex_status", ["/status/"], methods=["GET"])
+url(plex, "get_plex_servers", ["/servers/"], methods=["GET"])
 url(plex, "get_plex_config", ["/config/"], methods=["GET"])
 url(plex, "update_plex_config", ["/config/"], methods=["PATCH"])
 url(plex, "unlink_plex_account", ["/config/"], methods=["DELETE"])
-url(plex, "get_plex_servers", ["/servers/"], methods=["GET"])
+url(plex, "add_plex_server", ["/config/servers/"], methods=["POST"])
+url(plex, "remove_plex_server", ["/config/servers/<machine_id>"], methods=["DELETE"])
+
 
 # Plex medias
 url(plex, "get_recent_movies", ["/movies/recent/"], methods=["GET"])

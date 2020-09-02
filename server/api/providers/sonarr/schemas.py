@@ -1,8 +1,10 @@
-from server.extensions import ma
 from server.api.providers.sonarr.models import SonarrConfig
+from server.extensions import ma
 
 
 class SonarrConfigSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = SonarrConfig
-        exclude = ("id", "name", "type")
+        table = (
+            SonarrConfig.__table__
+        )  # table instead of model for the AutoSchema with Concrete Inheritance
+        exclude = ("id", "provider_type")

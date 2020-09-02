@@ -68,4 +68,4 @@ def test_delete_user(client, auth, mocks):
         ).status_code
         == 200
     )
-    assert not User.find(user1_username)
+    assert not User.find(username=user1_username)

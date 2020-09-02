@@ -1,17 +1,23 @@
 from plexapi.exceptions import PlexApiException
 from plexapi.library import LibrarySection, MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
-from werkzeug.exceptions import BadRequest, InternalServerError
-
+from server.api.providers.plex.models import PlexConfig, PlexServer
 from server.extensions import cache
-from server.api.providers.plex.models import PlexConfig
+from werkzeug.exceptions import BadRequest, InternalServerError
 
 
 @cache.memoize(timeout=300)
 def user_server(user):
-    plex_config = PlexConfig.find(user)
+    plex_config = PlexConfig.find(user=user)
+    if not plex_config:
+        raise InternalServerError("No existing config for Plex.")
+    plex_servers = PlexServer.findAll(plex_config_id=plex_config.id)[
+        0
+    ]  # only one server for now
+    if not plex_servers:
+        raise BadRequest("No Plex server linked.")
     api_key = plex_config.api_key
-    server_name = plex_config.machine_name
+    server_name = plex_servers.name
     if server_name is None:
         raise BadRequest("No Plex server linked.")
     try:

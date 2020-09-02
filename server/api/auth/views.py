@@ -23,7 +23,6 @@ from server.config import (
 from server.extensions import limiter
 from server.extensions.marshmallow import form, query
 from server.tasks import send_email
-from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import (
     BadRequest,
     Conflict,
@@ -173,9 +172,8 @@ def authorize_plex(token, redirectURI):
     user_id = info["id"]
 
     # Find this OAuth user in the database, or create it
-    try:
-        plex_config = PlexConfig.query.filter_by(plex_user_id=user_id).one()
-    except NoResultFound:
+    plex_config = PlexConfig.find(plex_user_id=user_id)
+    if not plex_config:
         plex_config = PlexConfig(plex_user_id=user_id, api_key=auth_token)
     if not plex_config.user:
         email = info["email"]

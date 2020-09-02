@@ -1,19 +1,19 @@
-import React, { useContext, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEdit,
   faExclamationCircle,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { ServersModal } from "./elements/ServersModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { SubmitConfig } from "../SubmitConfig";
 import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
-import { Spinner } from "../../../../elements/Spinner";
 import { RowLayout } from "../../../../elements/layouts";
-import { UnlinkServerModal } from "./elements/UnlinkServerModal";
-import { UnlinkAccountModal } from "./elements/UnlinkAccountModal";
+import { Spinner } from "../../../../elements/Spinner";
+import { SubmitConfig } from "../SubmitConfig";
 import { LinkPlexAccount } from "./elements/LinkPlexAccount";
+import { ServersModal } from "./elements/ServersModal";
+import { UnlinkAccountModal } from "./elements/UnlinkAccountModal";
+import { UnlinkServerModal } from "./elements/UnlinkServerModal";
 
 const PlexConfig = ({ location }) => {
   const {
@@ -22,6 +22,7 @@ const PlexConfig = ({ location }) => {
     isPlexAccountLinked,
     isPlexServerLinked,
     unlinkPlexAccount,
+    removePlexServer,
   } = useContext(PlexConfigContext);
   const [isServersModalActive, setIsServersModalActive] = useState(false);
   const [isUnlinkServerModalActive, setIsUnlinkServerModalActive] = useState(
@@ -33,8 +34,8 @@ const PlexConfig = ({ location }) => {
 
   const { handleSubmit, formState, reset } = useForm();
 
-  const _onUnlinkPlexServer = () => {
-    updateConfig({ machine_name: null, machine_id: null }).then((res) => {
+  const _onUnlinkPlexServer = (machine_id) => {
+    removePlexServer({ machine_id }).then((res) => {
       if (res) setIsUnlinkServerModalActive(false);
     });
   };
@@ -75,7 +76,7 @@ const PlexConfig = ({ location }) => {
             {isPlexServerLinked(config) && (
               <RowLayout justifyContent="space-between" marginTop="2%">
                 <p className="is-size-5 has-text-weight-light">
-                  {config["machine_name"]}
+                  {config.servers[0]["name"]}
                 </p>
                 <button
                   type="button"
@@ -127,11 +128,10 @@ const PlexConfig = ({ location }) => {
       {isServersModalActive && (
         <ServersModal onClose={() => setIsServersModalActive(false)} />
       )}
-
       {isUnlinkServerModalActive && (
         <UnlinkServerModal
-          machineName={config["machine_name"]}
-          onUnlink={() => _onUnlinkPlexServer()}
+          machineName={config.servers[0]["name"]}
+          onUnlink={() => _onUnlinkPlexServer(config.servers[0]["machine_id"])}
           onClose={() => setIsUnlinkServerModalActive(false)}
         />
       )}

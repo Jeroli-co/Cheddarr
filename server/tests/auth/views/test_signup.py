@@ -15,7 +15,7 @@ def test_signup_ok(client, mocks):
         ).status_code
         == 200
     )
-    assert User.exists("test@test.com")
+    assert User.exists(email="test@test.com")
 
 
 def test_signup_user_already_exist(client, mocks):
