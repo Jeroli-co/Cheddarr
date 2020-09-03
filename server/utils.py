@@ -1,9 +1,12 @@
 import secrets
+import urllib.parse
 from os import listdir
 from random import choice
+
 from flask import current_app as app
 from flask import url_for
 from itsdangerous import Signer, URLSafeSerializer, URLSafeTimedSerializer
+
 from server.config import IMAGES_FOLDER
 
 
@@ -48,3 +51,8 @@ def confirm_timed_token(token, expiration=600):
 def random_avatar():
     avatar = choice(listdir(IMAGES_FOLDER))
     return url_for("site.images", image_name=avatar, _external=True)
+
+
+def make_url(url, queries_dict={}):
+    parameters = urllib.parse.urlencode(queries_dict)
+    return url + "?" + parameters
