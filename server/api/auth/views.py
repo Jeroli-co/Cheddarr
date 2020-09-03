@@ -136,6 +136,8 @@ def signin_plex(redirectURI):
         queries_dict={
             "strong": "true",
             "X-Plex-Product": APP_NAME,
+            "X-Plex-Device-Name": APP_NAME,
+            "X-Plex-Platform": "Web",
             "X-Plex-Client-Identifier": PLEX_CLIENT_IDENTIFIER,
         },
     )
@@ -152,6 +154,7 @@ def signin_plex(redirectURI):
             PLEX_AUTHORIZE_URL,
             queries_dict={
                 "context[device][product]": APP_NAME,
+                "context[device][platform]": "Web",
                 "clientID": PLEX_CLIENT_IDENTIFIER,
                 "code": code,
                 "forwardUrl": forward_url,
