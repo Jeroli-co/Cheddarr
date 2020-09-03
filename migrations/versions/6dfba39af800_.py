@@ -40,26 +40,6 @@ def upgrade():
         sa.UniqueConstraint("api_key"),
     )
     op.create_table(
-        "providerconfig",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("api_key", sa.String(length=256), nullable=False),
-        sa.Column("enabled", sa.Boolean(), nullable=False),
-        sa.Column(
-            "provider_type",
-            sa.Enum(
-                "MEDIA_SERVER", "MOVIE_REQUEST", "SERIES_REQUEST", name="providertype"
-            ),
-            nullable=False,
-        ),
-        sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["user.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("api_key"),
-    )
-    op.create_table(
         "radarrconfig",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("api_key", sa.String(length=256), nullable=False),
