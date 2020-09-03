@@ -14,15 +14,15 @@ from server.api.auth.schemas import PlexAuthSchema, SigninSchema, UserSchema
 from server.api.providers.plex.models import PlexConfig
 from server.config import (
     APP_NAME,
-    PLEX_ACCESS_TOKEN_URL,
     PLEX_AUTHORIZE_URL,
     PLEX_CLIENT_IDENTIFIER,
-    PLEX_REQUEST_TOKEN_URL,
+    PLEX_TOKEN_URL,
     PLEX_USER_RESOURCE_URL,
 )
 from server.extensions import limiter
 from server.extensions.marshmallow import form, query
 from server.tasks import send_email
+from server.utils import make_url
 from werkzeug.exceptions import (
     BadRequest,
     Conflict,
@@ -31,12 +31,6 @@ from werkzeug.exceptions import (
     InternalServerError,
     Unauthorized,
 )
-
-plex_headers = {
-    "X-Plex-Client-Identifier": PLEX_CLIENT_IDENTIFIER,
-    "X-Plex-Product": APP_NAME,
-    "Accept": "application/json",
-}
 
 session_serializer = UserSchema(only=["username", "avatar"])
 
@@ -137,20 +131,32 @@ def signin(usernameOrEmail, password, remember):
 
 @query(PlexAuthSchema)
 def signin_plex(redirectURI):
-    r = post(PLEX_REQUEST_TOKEN_URL, headers=plex_headers)
+    request_url = make_url(
+        PLEX_TOKEN_URL,
+        queries_dict={
+            "strong": "true",
+            "X-Plex-Product": APP_NAME,
+            "X-Plex-Client-Identifier": PLEX_CLIENT_IDENTIFIER,
+        },
+    )
+    r = post(request_url, headers={"Accept": "application/json"})
     info = r.json()
     code = info["code"]
     state = info["id"]
     forward_url = url_for("auth.authorize_plex", _external=True).replace("/api", "")
-    token = utils.generate_token({"id": str(state), "redirectURI": redirectURI})
+    token = utils.generate_token(
+        {"id": str(state), "code": str(code), "redirectURI": redirectURI}
+    )
     authorize_url = (
-        PLEX_AUTHORIZE_URL
-        + "?clientID="
-        + PLEX_CLIENT_IDENTIFIER
-        + "&code="
-        + code
-        + "&forwardUrl="
-        + forward_url
+        make_url(
+            PLEX_AUTHORIZE_URL,
+            queries_dict={
+                "context[device][product]": APP_NAME,
+                "clientID": PLEX_CLIENT_IDENTIFIER,
+                "code": code,
+                "forwardUrl": forward_url,
+            },
+        )
         + "?token="
         + token
     )
@@ -161,14 +167,21 @@ def signin_plex(redirectURI):
 def authorize_plex(token, redirectURI):
     token = utils.confirm_token(token)
     state = token.get("id")
-    r = get(PLEX_ACCESS_TOKEN_URL + state, headers=plex_headers)
+    code = token.get("code")
+    access_url = make_url(
+        PLEX_TOKEN_URL + state,
+        queries_dict={"code": code, "X-Plex-Client-Identifier": PLEX_CLIENT_IDENTIFIER},
+    )
+    r = get(access_url, headers={"Accept": "application/json"})
     auth_token = r.json().get("authToken")
     if not auth_token:
         raise InternalServerError("Error while authorizing Plex.")
 
-    plex_headers["X-Plex-Token"] = auth_token
-    r = get(PLEX_USER_RESOURCE_URL, headers=plex_headers)
-    info = r.json().get("user")
+    r = get(
+        PLEX_USER_RESOURCE_URL,
+        headers={"X-Plex-Token": auth_token, "Accept": "application/json"},
+    )
+    info = r.json()
     user_id = info["id"]
 
     # Find this OAuth user in the database, or create it
