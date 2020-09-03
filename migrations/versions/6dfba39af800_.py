@@ -142,26 +142,6 @@ def downgrade():
     op.drop_column("user", "avatar")
     op.alter_column("friendship", "pending", existing_type=sa.BOOLEAN(), nullable=True)
     op.create_table(
-        "provider_config",
-        sa.Column("id", sa.INTEGER(), nullable=False),
-        sa.Column("name", sa.VARCHAR(length=32), nullable=False),
-        sa.Column("api_key", sa.VARCHAR(length=256), nullable=False),
-        sa.Column("user_id", sa.INTEGER(), nullable=False),
-        sa.Column("enabled", sa.BOOLEAN(), nullable=False),
-        sa.Column("type", sa.VARCHAR(length=14), nullable=True),
-        sa.CheckConstraint(
-            "type IN ('MEDIA_SERVER', 'MOVIE_REQUEST', 'SERIES_REQUEST')",
-            name="providertype",
-        ),
-        sa.CheckConstraint("enabled IN (0, 1)"),
-        sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["user.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("api_key"),
-    )
-    op.create_table(
         "radarr_config",
         sa.Column("id", sa.INTEGER(), nullable=False),
         sa.Column("host", sa.VARCHAR(length=128), nullable=True),
