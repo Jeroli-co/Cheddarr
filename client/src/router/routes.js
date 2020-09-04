@@ -1,35 +1,35 @@
-import { Home } from "../elements/home/Home";
-import { SignInForm } from "../modules/auth/sign-in-form/SignInForm";
-import { ConfirmEmail } from "../modules/auth/confirm-email/ConfirmEmail";
-import { ResetPassword } from "../modules/auth/reset-password/ResetPassword";
-import { Profile } from "../modules/profile/Profile";
-import { NotFound } from "../elements/errors/NotFound";
-import { Settings } from "../modules/settings/Settings";
-import { InternalServerError } from "../elements/errors/InternalServerError";
-import { ResendEmailConfirmationModal } from "../modules/auth/elements/ResendEmailConfirmationModal";
-import { InitResetPasswordModal } from "../modules/auth/sign-in-form/init-reset-password-modal/InitResetPasswordModal";
 import { BadRequest } from "../elements/errors/BadRequest";
+import { InternalServerError } from "../elements/errors/InternalServerError";
+import { NotFound } from "../elements/errors/NotFound";
+import { Home } from "../elements/home/Home";
+import { PageLoader } from "../elements/PageLoader";
+import { ConfirmEmail } from "../modules/auth/confirm-email/ConfirmEmail";
+import { ResendEmailConfirmationModal } from "../modules/auth/elements/ResendEmailConfirmationModal";
+import { ResetPassword } from "../modules/auth/reset-password/ResetPassword";
+import { InitResetPasswordModal } from "../modules/auth/sign-in-form/init-reset-password-modal/InitResetPasswordModal";
+import { SignInForm } from "../modules/auth/sign-in-form/SignInForm";
+import { SignUpForm } from "../modules/auth/sign-up-form/SignUpForm";
 import { FriendProfile } from "../modules/profile/friends/elements/FriendProfile";
 import { Friends } from "../modules/profile/friends/Friends";
-import { PageLoader } from "../elements/PageLoader";
-import { SettingsAccount } from "../modules/settings/settings-account/SettingsAccount";
+import { Profile } from "../modules/profile/Profile";
+import { Settings } from "../modules/settings/Settings";
 import { ChangeEmailModal } from "../modules/settings/settings-account/element/ChangeEmailModal";
-import { ChangeUsernameModal } from "../modules/settings/settings-account/element/ChangeUsernameModal";
 import { ChangePasswordModal } from "../modules/settings/settings-account/element/ChangePasswordModal";
-import { SonarrConfig } from "../modules/settings/settings-providers/sonarr-config/SonarrConfig";
-import { RadarrConfig } from "../modules/settings/settings-providers/radarr-config/RadarrConfig";
-import { PlexConfig } from "../modules/settings/settings-providers/plex-config/PlexConfig";
+import { ChangeUsernameModal } from "../modules/settings/settings-account/element/ChangeUsernameModal";
 import { DeleteAccountModal } from "../modules/settings/settings-account/element/DeleteAccountModal";
+import { SettingsAccount } from "../modules/settings/settings-account/SettingsAccount";
+import { PlexConfig } from "../modules/settings/settings-providers/plex-config/PlexConfig";
+import { RadarrConfig } from "../modules/settings/settings-providers/radarr-config/RadarrConfig";
+import { SonarrConfig } from "../modules/settings/settings-providers/sonarr-config/SonarrConfig";
 import { MoviePage } from "../pages/MoviePage";
+import { SearchPage } from "../pages/search-page/SearchPage";
 import { SeasonPage } from "../pages/SeasonPage";
 import { SeriesPage } from "../pages/SeriesPage";
-import { SearchPage } from "../pages/search-page/SearchPage";
-import { SignUpForm } from "../modules/auth/sign-up-form/SignUpForm";
 
 const routes = {
   HOME: { url: "/", component: Home },
   SIGN_IN: { url: "/sign-in", component: SignInForm },
-  AUTHORIZE_PLEX: { url: "/sign-in/plex/authorize/", component: PageLoader },
+  CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm/", component: PageLoader },
   INIT_RESET_PASSWORD: {
     url: "/sign-in/init-reset-password",
     component: InitResetPasswordModal,

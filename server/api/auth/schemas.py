@@ -14,5 +14,10 @@ class SigninSchema(ma.Schema):
 
 
 class PlexAuthSchema(ma.Schema):
+    key = ma.Int()
+    code = ma.String()
     redirectURI = ma.String(missing="")
+
+
+class PlexConfirmSigninSchema(ma.Schema):
     token = ma.String()

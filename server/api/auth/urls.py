@@ -1,5 +1,6 @@
-from . import auth
 from server.helpers import url
+
+from . import auth
 
 # Sign-up
 url(auth, "signup", ["/sign-up/"], methods=["POST"])
@@ -8,8 +9,9 @@ url(auth, "resend_confirmation", ["/sign-up/resend/"], methods=["POST"])
 
 # Sign-in
 url(auth, "signin", ["/sign-in/"], methods=["POST"])
-url(auth, "signin_plex", ["/sign-in/plex/"], methods=["GET"])
-url(auth, "authorize_plex", ["/sign-in/plex/authorize/"], methods=["GET"])
+url(auth, "start_signin_plex", ["/sign-in/plex/"], methods=["GET"])
+url(auth, "authorize_signin_plex", ["/sign-in/plex/authorize/"], methods=["POST"])
+url(auth, "confirm_signin_plex", ["/sign-in/plex/confirm/"], methods=["GET"])
 
 # Sign-out
 url(auth, "signout", ["/sign-out/"], methods=["GET"])
