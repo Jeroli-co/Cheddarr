@@ -7,10 +7,15 @@ from flask_login import (
     logout_user,
 )
 from passlib import pwd
-from requests import get, post
+from requests import get
 from server import utils
 from server.api.auth.models import User
-from server.api.auth.schemas import PlexAuthSchema, SigninSchema, UserSchema
+from server.api.auth.schemas import (
+    PlexAuthSchema,
+    PlexConfirmSigninSchema,
+    SigninSchema,
+    UserSchema,
+)
 from server.api.providers.plex.models import PlexConfig
 from server.config import (
     APP_NAME,
@@ -20,7 +25,7 @@ from server.config import (
     PLEX_USER_RESOURCE_URL,
 )
 from server.extensions import limiter
-from server.extensions.marshmallow import form, query
+from server.extensions.marshmallow import body, form, query
 from server.tasks import send_email
 from server.utils import make_url
 from werkzeug.exceptions import (
@@ -129,32 +134,34 @@ def signin(usernameOrEmail, password, remember):
     return session_serializer.jsonify(user)
 
 
-@query(PlexAuthSchema)
-def signin_plex(redirectURI):
-    request_url = make_url(
+def start_signin_plex():
+    request_pin_url = make_url(
         PLEX_TOKEN_URL,
         queries_dict={
             "strong": "true",
             "X-Plex-Product": APP_NAME,
-            "X-Plex-Device-Name": APP_NAME,
-            "X-Plex-Platform": "Web",
             "X-Plex-Client-Identifier": PLEX_CLIENT_IDENTIFIER,
         },
     )
-    r = post(request_url, headers={"Accept": "application/json"})
-    info = r.json()
-    code = info["code"]
-    state = info["id"]
-    forward_url = url_for("auth.authorize_plex", _external=True).replace("/api", "")
+    return request_pin_url
+
+
+@body(PlexAuthSchema)
+def authorize_signin_plex(args):
+    key = args["key"]
+    code = args["code"]
+    redirectURI = args["redirectURI"]
+    forward_url = url_for("auth.confirm_signin_plex", _external=True).replace(
+        "/api", ""
+    )
     token = utils.generate_token(
-        {"id": str(state), "code": str(code), "redirectURI": redirectURI}
+        {"id": str(key), "code": str(code), "redirectURI": redirectURI}
     )
     authorize_url = (
         make_url(
             PLEX_AUTHORIZE_URL,
             queries_dict={
                 "context[device][product]": APP_NAME,
-                "context[device][platform]": "Web",
                 "clientID": PLEX_CLIENT_IDENTIFIER,
                 "code": code,
                 "forwardUrl": forward_url,
@@ -166,11 +173,12 @@ def signin_plex(redirectURI):
     return redirect(authorize_url), 200
 
 
-@query(PlexAuthSchema)
-def authorize_plex(token, redirectURI):
+@query(PlexConfirmSigninSchema)
+def confirm_signin_plex(token):
     token = utils.confirm_token(token)
     state = token.get("id")
     code = token.get("code")
+    redirectURI = token.get("redirectURI", "")
     access_url = make_url(
         PLEX_TOKEN_URL + state,
         queries_dict={"code": code, "X-Plex-Client-Identifier": PLEX_CLIENT_IDENTIFIER},

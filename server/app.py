@@ -11,6 +11,7 @@ from werkzeug.exceptions import HTTPException
 from server.config import (
     API_ROOT,
     FLASK_TEMPLATE_FOLDER,
+    PLEX_TOKEN_URL,
     REACT_STATIC_FOLDER,
     Config,
     DevConfig,
@@ -61,6 +62,7 @@ def _create_app(config_object: Config, **kwargs):
         "default-src": "'self'",
         "img-src": ["*", "'self'", "data:"],
         "style-src": ["'self'", "'unsafe-inline'"],
+        "connect-src": ["'self'", PLEX_TOKEN_URL],
     }
     Talisman(app, content_security_policy=csp)
     CORS(

@@ -1,14 +1,14 @@
-import React from "react";
-import { Route, Switch } from "react-router-dom";
-import { Navbar } from "./elements/navbar/Navbar";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { routes } from "./router/routes";
+import React from "react";
+import { Route, Switch } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
+import { AuthContextWithRouterProvider } from "./contexts/AuthContext";
+import { NotificationContextProvider } from "./contexts/NotificationContext";
+import { Navbar } from "./elements/navbar/Navbar";
 import { PrivateRoute } from "./router/PrivateRoute";
 import { ProtectedRoute } from "./router/ProtectedRoute";
-import { NotificationContextProvider } from "./contexts/NotificationContext";
-import { AuthContextWithRouterProvider } from "./contexts/AuthContext";
-import { ThemeProvider } from "styled-components";
+import { routes } from "./router/routes";
 
 const App = () => {
   config.autoAddCss = false;
@@ -52,8 +52,8 @@ const App = () => {
               />
               <Route
                 exact
-                path={routes.AUTHORIZE_PLEX.url}
-                component={routes.AUTHORIZE_PLEX.component}
+                path={routes.CONFIRM_PLEX_SIGNIN.url}
+                component={routes.CONFIRM_PLEX_SIGNIN.component}
               />
               <ProtectedRoute
                 path={routes.SIGN_IN.url}

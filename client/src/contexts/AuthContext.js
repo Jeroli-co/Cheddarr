@@ -1,8 +1,9 @@
+import axios from "axios";
+import Cookies from "js-cookie";
 import React, { createContext, useEffect, useState } from "react";
 import { withRouter } from "react-router-dom";
-import { routes } from "../router/routes";
-import Cookies from "js-cookie";
 import { useApi } from "../hooks/useApi";
+import { routes } from "../router/routes";
 
 const AuthContext = createContext();
 
@@ -18,8 +19,8 @@ const AuthContextProvider = (props) => {
   const { executeRequest, methods } = useApi();
 
   useEffect(() => {
-    if (props.location.pathname === routes.AUTHORIZE_PLEX.url) {
-      authorizePlex(props.location.search).then((res) => {
+    if (props.location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
+      confirmSignInWithPlex(props.location.search).then((res) => {
         if (res) {
           let redirectURI = res.headers["redirect-uri"];
           redirectURI =
@@ -92,9 +93,34 @@ const AuthContextProvider = (props) => {
   };
 
   const signInWithPlex = async (redirectURI) => {
+    const res = await executeRequest(methods.GET, "/sign-in/plex/");
+    switch (res.status) {
+      case 200:
+        const plexRes = await axios.post(res.data, {
+          headers: { Accept: "application/json" },
+        });
+        switch (plexRes.status) {
+          case 201:
+            const key = plexRes.data["id"];
+            const code = plexRes.data["code"];
+            authorizePlex(key, code, redirectURI);
+            return null;
+          default:
+            handleError(res);
+            return null;
+        }
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const authorizePlex = async (key, code, redirectURI) => {
+    const body = { key: key, code: code, redirectURI: redirectURI };
     const res = await executeRequest(
-      methods.GET,
-      "/sign-in/plex/?redirectURI=" + redirectURI
+      methods.POST,
+      "/sign-in/plex/authorize/",
+      body
     );
     switch (res.status) {
       case 200:
@@ -106,10 +132,10 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const authorizePlex = async (search) => {
+  const confirmSignInWithPlex = async (search) => {
     const res = await executeRequest(
       methods.GET,
-      "/sign-in/plex/authorize/" + search
+      "/sign-in/plex/confirm/" + search
     );
     switch (res.status) {
       case 200:
