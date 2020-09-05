@@ -14,6 +14,7 @@ class ProviderType(str, Enum):
 
 
 class ProviderConfig(Model, AbstractConcreteBase):
+    __abstract__ = True
 
     __repr_props__ = ("enabled", "provider_type")
 
@@ -30,7 +31,7 @@ class ProviderConfig(Model, AbstractConcreteBase):
 
     @declared_attr
     def user(cls):
-        return relationship("User", back_populates="providers_configs")
+        return relationship("User")
 
     @declared_attr
     def user_id(cls):

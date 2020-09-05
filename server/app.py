@@ -44,6 +44,7 @@ def _create_app(config_object: Config, **kwargs):
     app = Flask(__name__, **kwargs)
     app.config.from_object(config_object)
     app.session_interface = CustomSessionInterface()
+    app.url_map.strict_slashes = False
 
     """Initialize extensions"""
     # used to register tasks to celery

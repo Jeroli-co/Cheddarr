@@ -19,6 +19,7 @@ SmallInteger = db.SmallInteger  # type: sqlalchemy.types.SmallInteger
 String = db.String  # type: sqlalchemy.types.String
 Text = db.Text  # type: sqlalchemy.types.Text
 Time = db.Time  # type: sqlalchemy.types.Time
+Table = db.Table
 
 
 # Small hack to make type-hinting work

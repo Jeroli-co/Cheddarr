@@ -93,7 +93,7 @@ const PlexConfigContextProvider = (props) => {
   const removePlexServer = async (machine_id) => {
     const res = await executeRequest(
       methods.DELETE,
-      providerUrl + "config/servers/" + machine_id.machine_id
+      providerUrl + "config/servers/" + machine_id.machine_id + "/"
     );
     switch (res.status) {
       case 200:

@@ -9,7 +9,7 @@ url(plex, "get_plex_config", ["/config/"], methods=["GET"])
 url(plex, "update_plex_config", ["/config/"], methods=["PATCH"])
 url(plex, "unlink_plex_account", ["/config/"], methods=["DELETE"])
 url(plex, "add_plex_server", ["/config/servers/"], methods=["POST"])
-url(plex, "remove_plex_server", ["/config/servers/<machine_id>"], methods=["DELETE"])
+url(plex, "remove_plex_server", ["/config/servers/<machine_id>/"], methods=["DELETE"])
 
 
 # Plex medias
