@@ -43,7 +43,7 @@ def get_plex_config():
 def update_plex_config(args):
     plex_config = PlexConfig.find(user=current_user)
     if not plex_config:
-        raise BadRequest("No config created for this provider.")
+        raise BadRequest("No existing Plex config.")
     plex_config.update(args)
     return plex_config_serializer.jsonify(plex_config)
 
@@ -53,7 +53,7 @@ def update_plex_config(args):
 def add_plex_server(server):
     plex_config = PlexConfig.find(user=current_user)
     if not plex_config:
-        raise BadRequest("No config created for this provider")
+        raise BadRequest("No existing Plex config.")
     plex_config.servers.append(server)
     plex_config.save()
     return plex_config_serializer.jsonify(plex_config)
@@ -61,13 +61,15 @@ def add_plex_server(server):
 
 @login_required
 def remove_plex_server(machine_id):
+    plex_config = PlexConfig.find(user=current_user)
+    if not plex_config:
+        raise BadRequest("No existing Plex config.")
     plex_server = PlexServer.find(machine_id=machine_id)
     if not plex_server:
         raise BadRequest("This server is not linked.")
-    plex_config = plex_server.plex_config
-    if plex_config.user_id != current_user.id:
+    if plex_server not in plex_config.servers:
         raise Unauthorized("This server is not linked to you account.")
-    plex_server.delete()
+    plex_config.servers.remove(plex_server)
     plex_config.save()
     return plex_config_serializer.jsonify(plex_config)
 
@@ -85,7 +87,7 @@ def unlink_plex_account():
 def get_plex_servers():
     plex_config = PlexConfig.find(user=current_user)
     if not plex_config:
-        raise BadRequest("No existing config for Plex.")
+        raise BadRequest("No existing Plex config.")
     api_key = plex_config.api_key
     plex_account = MyPlexAccount(api_key)
     servers = [

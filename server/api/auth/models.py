@@ -2,7 +2,6 @@ from uuid import uuid4
 
 from flask_login import UserMixin
 from server import utils
-from server.api.providers.models import ProviderConfig
 from server.database import (
     Boolean,
     Column,
@@ -51,7 +50,6 @@ class User(Model, UserMixin):
         backref=backref("friends_received", lazy="dynamic"),
         lazy="dynamic",
     )
-    providers_configs = relationship(ProviderConfig, back_populates="user")
 
     def __init__(
         self,

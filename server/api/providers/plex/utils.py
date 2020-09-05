@@ -1,19 +1,20 @@
+from typing import List, Type
+
 from plexapi.exceptions import PlexApiException
 from plexapi.library import LibrarySection, MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
-from server.api.providers.plex.models import PlexConfig, PlexServer
+from plexapi.server import PlexServer
+from server.api.providers.plex.models import PlexConfig
 from server.extensions import cache
 from werkzeug.exceptions import BadRequest, InternalServerError
 
 
 @cache.memoize(timeout=300)
-def user_server(user):
+def user_server(user) -> PlexServer:
     plex_config = PlexConfig.find(user=user)
     if not plex_config:
         raise InternalServerError("No existing config for Plex.")
-    plex_servers = PlexServer.findAll(plex_config_id=plex_config.id)[
-        0
-    ]  # only one server for now
+    plex_servers = plex_config.servers[0]
     if not plex_servers:
         raise BadRequest("No Plex server linked.")
     api_key = plex_config.api_key
@@ -27,7 +28,9 @@ def user_server(user):
 
 
 @cache.memoize(timeout=300)
-def library_sections(plex_server, section_id=None, section_type=None):
+def library_sections(
+    plex_server: PlexServer, section_id=None, section_type=None
+) -> List[Type[LibrarySection]]:
     if section_id is not None:
         # TODO get section by id
         pass
