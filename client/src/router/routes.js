@@ -94,7 +94,7 @@ const routes = {
     component: SeasonPage,
   },
   SEARCH: {
-    url: (type) => "/search/" + type,
+    url: (type, title) => "/search/" + type + "/" + title,
     component: SearchPage,
   },
 };

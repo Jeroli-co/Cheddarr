@@ -7,7 +7,8 @@ import {
   faTag,
   faTags,
 } from "@fortawesome/free-solid-svg-icons";
-import { useOutsideAlerter } from "../../../../../hooks/useOutsideAlerter";
+import { useOutsideAlerter } from "../../../../hooks/useOutsideAlerter";
+import { SEARCH_TYPES } from "../../../../enums/SearchTypes";
 
 const DropdownTypeStyle = styled.div`
   position: relative;
@@ -45,7 +46,7 @@ const DropdownTypeStyle = styled.div`
   }
 `;
 
-const DropdownType = ({ options, selectedOption, onChange }) => {
+const DropdownType = ({ selectedOption, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   useOutsideAlerter([dropdownRef], () => setIsOpen(false));
@@ -65,7 +66,7 @@ const DropdownType = ({ options, selectedOption, onChange }) => {
       </div>
       <div className="search-types-items">
         {isOpen &&
-          options.map(
+          SEARCH_TYPES.map(
             (st, index) =>
               st !== selectedOption && (
                 <div
