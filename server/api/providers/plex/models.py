@@ -14,8 +14,8 @@ class PlexServer(Model):
 
     __repr_props__ = ("mahcine_id", "name")
 
-    machine_id = Column(String(64), primary_key=True)
-    name = Column(String(64))
+    machine_id = Column(String(128), primary_key=True)
+    name = Column(String(128))
 
 
 class PlexConfig(ProviderConfig):
@@ -36,6 +36,6 @@ class PlexConfig(ProviderConfig):
 
 plex_configs_servers = Table(
     "plexconfigserver",
-    Column("config_id", Integer, ForeignKey("plexconfig.id")),
+    Column("config_id", String(128), ForeignKey("plexconfig.id")),
     Column("server_id", Integer, ForeignKey("plexserver.machine_id")),
 )
