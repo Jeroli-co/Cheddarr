@@ -12,7 +12,7 @@ from server.database import (
 
 class PlexServer(Model):
 
-    __repr_props__ = ("mahcine_id", "name")
+    __repr_props__ = ("machine_id", "name")
 
     machine_id = Column(String(128), primary_key=True)
     name = Column(String(128))
