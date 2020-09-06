@@ -9,7 +9,7 @@ import { FORM_DEFAULT_VALIDATOR } from "../../../forms/formDefaultValidators";
 import logo from "../../../assets/plex.png";
 import { WaitingEmailConfirmation } from "./WaitingEmailConfirmation";
 
-const SignUpForm = ({ history }) => {
+const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm();
   const { signUp, signInWithPlex } = useContext(AuthContext);
   const [signUpRes, setSignUpRes] = useState(null);

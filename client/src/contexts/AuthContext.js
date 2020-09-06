@@ -1,9 +1,10 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { withRouter } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
 import { routes } from "../router/routes";
+import { NotificationContext } from "./NotificationContext";
 
 const AuthContext = createContext();
 
@@ -17,6 +18,7 @@ const initialSessionState = {
 const AuthContextProvider = (props) => {
   const [session, setSession] = useState(initialSessionState);
   const { executeRequest, methods } = useApi();
+  const { pushDanger } = useContext(NotificationContext);
 
   useEffect(() => {
     if (props.location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
@@ -85,6 +87,7 @@ const AuthContextProvider = (props) => {
         return res;
       case 400:
       case 401:
+        pushDanger(res.message);
         return res;
       default:
         handleError(res);
@@ -159,7 +162,16 @@ const AuthContextProvider = (props) => {
     fd.append("username", data["username"]);
     fd.append("email", data["email"]);
     fd.append("password", data["password"]);
-    return await executeRequest(methods.POST, "/sign-up/", fd);
+    const res = await executeRequest(methods.POST, "/sign-up/", fd);
+    switch (res.status) {
+      case 200:
+        return res;
+      case 409:
+        pushDanger(res.message);
+        return res;
+      default:
+        return null;
+    }
   };
 
   const confirmEmail = async (token) => {
@@ -199,7 +211,7 @@ const AuthContextProvider = (props) => {
     setSession({ ...session, username: username });
   };
 
-  const setavatar = (avatar) => {
+  const setAvatar = (avatar) => {
     Cookies.set("avatar", avatar);
     setSession({ ...session, avatar: avatar });
   };
@@ -248,7 +260,7 @@ const AuthContextProvider = (props) => {
         confirmEmail,
         resendConfirmation,
         setUsername,
-        setavatar,
+        setAvatar,
         handleError,
       }}
     >
