@@ -21,7 +21,7 @@ const SearchPage = () => {
     searchOnline(type, title).then((res) => {
       setData({ media: res.results, isLoading: false });
     });
-  }, []);
+  }, [type, title]);
 
   if (data.isLoading)
     return <Spinner color="primary" size="2x" justifyContent="center" />;
