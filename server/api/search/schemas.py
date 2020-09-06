@@ -1,16 +1,13 @@
-from marshmallow import INCLUDE, pre_dump
+from marshmallow import pre_dump
 from marshmallow.validate import OneOf
-
 from server.api.auth.models import User
 from server.extensions import ma
 
 
 class SearchSchema(ma.Schema):
-    class Meta:
-        unknown = INCLUDE
-
     value = ma.String(required=True)
     type = ma.String(validate=OneOf(["movies", "series", "friends"]))
+    page = ma.Int()
 
 
 class MediaSearchResultSchema(ma.Schema):

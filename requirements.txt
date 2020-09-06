@@ -21,5 +21,6 @@ requests
 sendgrid
 sqlalchemy
 sqlalchemy_utils
+tmdbsimple
 webargs
 Werkzeug
