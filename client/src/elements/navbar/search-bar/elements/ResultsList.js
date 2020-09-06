@@ -1,10 +1,10 @@
 import React from "react";
-import { Spinner } from "../../../../Spinner";
+import { Spinner } from "../../../Spinner";
 import styled from "styled-components";
-import { ColumnLayout, RowLayout } from "../../../../layouts";
-import { Text } from "../../../../../utils/strings";
+import { ColumnLayout, RowLayout } from "../../../layouts";
+import { Text } from "../../../../utils/strings";
 import { useHistory } from "react-router";
-import { routes } from "../../../../../router/routes";
+import { routes } from "../../../../router/routes";
 
 const ResultsListStyle = styled.div`
   position: absolute;
@@ -110,9 +110,10 @@ const SeeAllResultSectionStyle = styled.div`
   cursor: pointer;
 `;
 
-const SeeAllResultSection = ({ type }) => {
+const SeeAllResultSection = ({ searchValue, type }) => {
   const history = useHistory();
-  const seeAllResultRedirection = () => history.push(routes.SEARCH.url(type));
+  const seeAllResultRedirection = () =>
+    history.push(routes.SEARCH.url(searchValue, type));
   return (
     <SeeAllResultSectionStyle onMouseDown={() => seeAllResultRedirection()}>
       {type === "movies" && "Search in movies"}
@@ -121,7 +122,7 @@ const SeeAllResultSection = ({ type }) => {
   );
 };
 
-const SearchResultsItems = ({ type, results }) => {
+const SearchResultsItems = ({ searchValue, type, results }) => {
   if (!results) {
     return <div />;
   }
@@ -135,8 +136,8 @@ const SearchResultsItems = ({ type, results }) => {
 
     return (
       <div>
-        <SeeAllResultSection type="movies" />
-        <SeeAllResultSection type="series" />
+        <SeeAllResultSection searchValue={searchValue} type="movies" />
+        <SeeAllResultSection searchValue={searchValue} type="series" />
         {sortedResult.friends.length > 0 && (
           <div>
             <ResultsSectionTitle>Friends</ResultsSectionTitle>
@@ -176,13 +177,17 @@ const SearchResultsItems = ({ type, results }) => {
   });
 };
 
-const ResultsList = ({ isVisible, searchType, results }) => {
+const ResultsList = ({ searchValue, isVisible, searchType, results }) => {
   return (
     <ResultsListStyle
       isVisible={isVisible && (results.value || results.loading)}
     >
       {!results.loading && (
-        <SearchResultsItems type={searchType} results={results.value} />
+        <SearchResultsItems
+          searchValue={searchValue}
+          type={searchType}
+          results={results.value}
+        />
       )}
       {results.loading && (
         <Spinner
