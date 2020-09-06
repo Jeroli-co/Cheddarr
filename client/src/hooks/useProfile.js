@@ -9,9 +9,7 @@ const useProfile = () => {
   const profileURI = "/profile/";
 
   const { executeRequest, methods } = useApi();
-  const { handleError, clearSession, setUsername, setUserPicture } = useContext(
-    AuthContext
-  );
+  const { handleError, clearSession, setUsername } = useContext(AuthContext);
   const { pushSuccess, pushInfo } = useContext(NotificationContext);
   const history = useHistory();
 
@@ -37,24 +35,6 @@ const useProfile = () => {
         pushSuccess("Username has changed");
         return res;
       case 409:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const changeUserPicture = async (data) => {
-    const fd = new FormData();
-    fd.append("user_picture", data);
-    const res = await executeRequest(methods.PUT, profileURI + "picture/", fd, {
-      "content-type": "multipart/form-data",
-    });
-    switch (res.status) {
-      case 200:
-        const userPicture = res.data["user_picture"];
-        setUserPicture(userPicture);
-        pushSuccess("Picture has changed");
         return res;
       default:
         handleError(res);
@@ -169,7 +149,6 @@ const useProfile = () => {
   return {
     getUser,
     changeUsername,
-    changeUserPicture,
     changeEmail,
     changePassword,
     initResetPassword,

@@ -60,15 +60,15 @@ const DropdownMenuItemIcon = styled.div`
 `;
 
 const UserDropdown = ({ dropdownRef, isVisible, toggle }) => {
-  const { userPicture, username, signOut } = useContext(AuthContext);
+  const { avatar, username, signOut } = useContext(AuthContext);
 
   return (
     <UserDropdownStyle ref={dropdownRef} data-testid="UserDropdown">
       <UserDropdownImage className="is-pointed" onClick={() => toggle()}>
-        {userPicture && (
-          <img src={userPicture} alt="User" data-testid="UserDropdownPicture" />
+        {avatar && (
+          <img src={avatar} alt="User" data-testid="UserDropdownPicture" />
         )}
-        {!userPicture && <p data-testid="UserDropdownUsername">{username}</p>}
+        {!avatar && <p data-testid="UserDropdownUsername">{username}</p>}
       </UserDropdownImage>
 
       <DropdownMenuStyle isVisible={isVisible}>

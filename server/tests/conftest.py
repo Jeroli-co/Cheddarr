@@ -1,9 +1,8 @@
 import pytest
 from flask import url_for
-
 from server import utils
+from server.api.auth.models import Friendship, User
 from server.app import _create_app, db
-from server.auth.models import Friendship, User
 from server.config import TestConfig
 
 user1_username = "user1"
@@ -15,6 +14,7 @@ user2_password = "password2"
 user3_username = "user3"
 user3_email = "email3@test.com"
 user3_password = "password3"
+avatar = "http://avatar"
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -35,18 +35,21 @@ def client(app):
             username=user1_username,
             email=user1_email,
             password=user1_password,
+            avatar=avatar,
             confirmed=True,
         )
         user2 = User(
             username=user2_username,
             email=user2_email,
             password=user2_password,
+            avatar=avatar,
             confirmed=False,
         )
         user3 = User(
             username=user3_username,
             email=user3_email,
             password=user3_password,
+            avatar=avatar,
             confirmed=True,
         )
 
@@ -63,8 +66,8 @@ def client(app):
 @pytest.fixture
 def mocks(mocker):
     mocker.patch("server.tasks.send_email.delay")
-    ran_img = mocker.patch.object(utils, "random_user_picture")
-    ran_img.return_value = ""
+    ran_img = mocker.patch.object(utils, "random_avatar")
+    ran_img.return_value = avatar
 
 
 @pytest.fixture

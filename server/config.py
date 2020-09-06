@@ -10,16 +10,16 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir
 REACT_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "client", "build")
 REACT_STATIC_FOLDER = os.path.join(PROJECT_ROOT, "client", "build", "static")
 FLASK_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "server", "templates")
+IMAGES_FOLDER = os.path.join(PROJECT_ROOT, "server", "images")
 
 ##########################################################################
 # api                                                                    #
 ##########################################################################
 API_ROOT = "/api"
 PLEX_CLIENT_IDENTIFIER = os.environ.get("PLEX_CLIENT_IDENTIFIER", APP_NAME)
-PLEX_REQUEST_TOKEN_URL = "https://plex.tv/api/v2/pins/?strong=true"
+PLEX_TOKEN_URL = "https://plex.tv/api/v2/pins/"
 PLEX_AUTHORIZE_URL = "https://app.plex.tv/auth#/"
-PLEX_ACCESS_TOKEN_URL = "https://plex.tv/api/v2/pins/"
-PLEX_USER_RESOURCE_URL = "https://plex.tv/users/account.json/"
+PLEX_USER_RESOURCE_URL = "https://plex.tv/api/v2/user/"
 ##########################################################################
 
 
@@ -117,5 +117,7 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = True
     SERVER_NAME = "localhost"
+    SESSION_COOKIE_DOMAIN = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     CACHE_TYPE = "null"
+    CACHE_NO_NULL_WARNING = True

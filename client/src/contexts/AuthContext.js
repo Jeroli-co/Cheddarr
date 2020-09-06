@@ -1,25 +1,28 @@
-import React, { createContext, useEffect, useState } from "react";
-import { withRouter } from "react-router-dom";
-import { routes } from "../router/routes";
+import axios from "axios";
 import Cookies from "js-cookie";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { withRouter } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
+import { routes } from "../router/routes";
+import { NotificationContext } from "./NotificationContext";
 
 const AuthContext = createContext();
 
 const initialSessionState = {
   isAuthenticated: false,
   username: null,
-  userPicture: null,
+  avatar: null,
   isLoading: true,
 };
 
 const AuthContextProvider = (props) => {
   const [session, setSession] = useState(initialSessionState);
   const { executeRequest, methods } = useApi();
+  const { pushDanger } = useContext(NotificationContext);
 
   useEffect(() => {
-    if (props.location.pathname === routes.AUTHORIZE_PLEX.url) {
-      authorizePlex(props.location.search).then((res) => {
+    if (props.location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
+      confirmSignInWithPlex(props.location.search).then((res) => {
         if (res) {
           let redirectURI = res.headers["redirect-uri"];
           redirectURI =
@@ -35,9 +38,9 @@ const AuthContextProvider = (props) => {
     if (session.isLoading) {
       const authenticated = Cookies.get("authenticated");
       const username = Cookies.get("username");
-      const userPicture = Cookies.get("userPicture");
+      const avatar = Cookies.get("avatar");
       if (authenticated === "yes") {
-        initSession(username, userPicture);
+        initSession(username, avatar);
       } else {
         setSession({ ...initialSessionState, isLoading: false });
       }
@@ -46,15 +49,15 @@ const AuthContextProvider = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const initSession = (username, userPicture) => {
+  const initSession = (username, avatar) => {
     Cookies.set("authenticated", "yes", { expires: 365 });
     Cookies.set("username", username, { expires: 365 });
-    Cookies.set("userPicture", userPicture, { expires: 365 });
+    Cookies.set("avatar", avatar, { expires: 365 });
     setSession({
       ...session,
       isAuthenticated: true,
       username: username,
-      userPicture: userPicture,
+      avatar: avatar,
       isLoading: false,
     });
   };
@@ -62,7 +65,7 @@ const AuthContextProvider = (props) => {
   const clearSession = () => {
     Cookies.remove("authenticated");
     Cookies.remove("username");
-    Cookies.remove("userPicture");
+    Cookies.remove("avatar");
     setSession({ ...initialSessionState, isLoading: false });
   };
 
@@ -79,11 +82,12 @@ const AuthContextProvider = (props) => {
 
     switch (res.status) {
       case 200:
-        initSession(res.data.username, res.data["user_picture"]);
+        initSession(res.data.username, res.data["avatar"]);
         props.history.push(redirectURI);
         return res;
       case 400:
       case 401:
+        pushDanger(res.message);
         return res;
       default:
         handleError(res);
@@ -92,13 +96,40 @@ const AuthContextProvider = (props) => {
   };
 
   const signInWithPlex = async (redirectURI) => {
+    const res = await executeRequest(methods.GET, "/sign-in/plex/");
+    switch (res.status) {
+      case 200:
+        const plexRes = await axios.post(res.data, {
+          headers: { Accept: "application/json" },
+        });
+        switch (plexRes.status) {
+          case 201:
+            const key = plexRes.data["id"];
+            const code = plexRes.data["code"];
+            const authRes = await authorizePlex(key, code, redirectURI);
+            if (authRes && authRes.status === 200) {
+              window.location.href = authRes.headers.location;
+            }
+            return plexRes;
+          default:
+            handleError(res);
+            return null;
+        }
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const authorizePlex = async (key, code, redirectURI) => {
+    const body = { key: key, code: code, redirectURI: redirectURI };
     const res = await executeRequest(
-      methods.GET,
-      "/sign-in/plex/?redirectURI=" + redirectURI
+      methods.POST,
+      "/sign-in/plex/authorize/",
+      body
     );
     switch (res.status) {
       case 200:
-        window.location.href = res.headers.location;
         return res;
       default:
         handleError(res);
@@ -106,14 +137,14 @@ const AuthContextProvider = (props) => {
     }
   };
 
-  const authorizePlex = async (search) => {
+  const confirmSignInWithPlex = async (search) => {
     const res = await executeRequest(
       methods.GET,
-      "/sign-in/plex/authorize/" + search
+      "/sign-in/plex/confirm/" + search
     );
     switch (res.status) {
       case 200:
-        initSession(res.data.username, res.data["user_picture"]);
+        initSession(res.data.username, res.data["avatar"]);
         return res;
       default:
         clearSession();
@@ -136,10 +167,11 @@ const AuthContextProvider = (props) => {
     const res = await executeRequest(methods.POST, "/sign-up/", fd);
     switch (res.status) {
       case 200:
+        return res;
       case 409:
+        pushDanger(res.message);
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
@@ -181,9 +213,9 @@ const AuthContextProvider = (props) => {
     setSession({ ...session, username: username });
   };
 
-  const setUserPicture = (userPicture) => {
-    Cookies.set("userPicture", userPicture);
-    setSession({ ...session, userPicture: userPicture });
+  const setAvatar = (avatar) => {
+    Cookies.set("avatar", avatar);
+    setSession({ ...session, avatar: avatar });
   };
 
   const handleError = (error) => {
@@ -230,7 +262,7 @@ const AuthContextProvider = (props) => {
         confirmEmail,
         resendConfirmation,
         setUsername,
-        setUserPicture,
+        setAvatar,
         handleError,
       }}
     >

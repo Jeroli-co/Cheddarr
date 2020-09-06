@@ -10,11 +10,12 @@ from werkzeug.exceptions import HTTPException
 
 from server.config import (
     API_ROOT,
+    FLASK_TEMPLATE_FOLDER,
+    PLEX_TOKEN_URL,
+    REACT_STATIC_FOLDER,
     Config,
     DevConfig,
-    FLASK_TEMPLATE_FOLDER,
     ProdConfig,
-    REACT_STATIC_FOLDER,
 )
 from server.extensions import cache, celery, db, limiter, ma, mail, migrate
 from server.extensions.login_manager import register_login_manager
@@ -43,6 +44,7 @@ def _create_app(config_object: Config, **kwargs):
     app = Flask(__name__, **kwargs)
     app.config.from_object(config_object)
     app.session_interface = CustomSessionInterface()
+    app.url_map.strict_slashes = False
 
     """Initialize extensions"""
     # used to register tasks to celery
@@ -61,6 +63,7 @@ def _create_app(config_object: Config, **kwargs):
         "default-src": "'self'",
         "img-src": ["*", "'self'", "data:"],
         "style-src": ["'self'", "'unsafe-inline'"],
+        "connect-src": ["'self'", PLEX_TOKEN_URL],
     }
     Talisman(app, content_security_policy=csp)
     CORS(
@@ -71,12 +74,17 @@ def _create_app(config_object: Config, **kwargs):
 
     @app.errorhandler(Exception)
     def handle_invalid_usage(error):
-        message = str("Internal Server Error")
-        code = 500
         if isinstance(error, HTTPException):
+            name = error.name
             message = error.description
             code = error.code
-        return jsonify({"message": message}), code
+        else:
+            name = "Internal Server Error"
+            message = "An error has occured."
+            code = 500
+            app.logger.error(error, exc_info=error)
+
+        return jsonify({name: message}), code
 
     @app.context_processor
     def inject_now():
@@ -92,13 +100,13 @@ def _create_app(config_object: Config, **kwargs):
 
 def register_blueprints(app):
     """Register application's blueprints"""
+    from server.api.auth import auth
+    from server.api.profile import profile
+    from server.api.providers.plex import plex
+    from server.api.providers.radarr import radarr
+    from server.api.providers.sonarr import sonarr
+    from server.api.search import search
     from server.site import site
-    from server.auth import auth
-    from server.profile import profile
-    from server.providers.plex import plex
-    from server.providers.radarr import radarr
-    from server.providers.sonarr import sonarr
-    from server.search import search
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix=API_ROOT)
@@ -111,7 +119,7 @@ def register_blueprints(app):
 
 def register_commands(app):
     """Register application's CLI commands"""
-    from server.commands import init_db, worker, test
+    from server.commands import init_db, test, worker
 
     app.cli.add_command(init_db)
     app.cli.add_command(worker)

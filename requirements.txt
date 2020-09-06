@@ -1,6 +1,5 @@
 blinker
 celery[redis]
-cloudinary
 Flask
 Flask-Caching
 Flask-Cors

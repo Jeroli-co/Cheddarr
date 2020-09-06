@@ -1,14 +1,14 @@
-import React from "react";
-import { Route, Switch } from "react-router-dom";
-import { Navbar } from "./elements/navbar/Navbar";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { routes } from "./router/routes";
+import React from "react";
+import { Route, Switch } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
+import { AuthContextWithRouterProvider } from "./contexts/AuthContext";
+import { NotificationContextProvider } from "./contexts/NotificationContext";
+import { Navbar } from "./elements/navbar/Navbar";
 import { PrivateRoute } from "./router/PrivateRoute";
 import { ProtectedRoute } from "./router/ProtectedRoute";
-import { NotificationContextProvider } from "./contexts/NotificationContext";
-import { AuthContextWithRouterProvider } from "./contexts/AuthContext";
-import { ThemeProvider } from "styled-components";
+import { routes } from "./router/routes";
 
 const App = () => {
   config.autoAddCss = false;
@@ -52,8 +52,8 @@ const App = () => {
               />
               <Route
                 exact
-                path={routes.AUTHORIZE_PLEX.url}
-                component={routes.AUTHORIZE_PLEX.component}
+                path={routes.CONFIRM_PLEX_SIGNIN.url}
+                component={routes.CONFIRM_PLEX_SIGNIN.component}
               />
               <ProtectedRoute
                 path={routes.SIGN_IN.url}
@@ -63,11 +63,6 @@ const App = () => {
                 exact
                 path={routes.SIGN_UP.url}
                 component={routes.SIGN_UP.component}
-              />
-              <ProtectedRoute
-                exaxt
-                path={routes.WAIT_EMAIL_CONFIRMATION.url(":email")}
-                component={routes.WAIT_EMAIL_CONFIRMATION.component}
               />
               <ProtectedRoute
                 exact
@@ -103,13 +98,8 @@ const App = () => {
                 component={routes.SEASON.component}
               />
               <PrivateRoute
-                exact
-                path={routes.EPISODE.url(
-                  ":seriesId",
-                  ":seasonNumber",
-                  ":episodeNumber"
-                )}
-                component={routes.EPISODE.component}
+                path={routes.SEARCH.url(":type")}
+                component={routes.SEARCH.component}
               />
               <Route
                 exact
