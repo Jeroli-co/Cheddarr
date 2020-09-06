@@ -106,8 +106,11 @@ const AuthContextProvider = (props) => {
           case 201:
             const key = plexRes.data["id"];
             const code = plexRes.data["code"];
-            authorizePlex(key, code, redirectURI);
-            return null;
+            const authRes = await authorizePlex(key, code, redirectURI);
+            if (authRes && authRes.status === 200) {
+              window.location.href = authRes.headers.location;
+            }
+            return plexRes;
           default:
             handleError(res);
             return null;
@@ -127,7 +130,6 @@ const AuthContextProvider = (props) => {
     );
     switch (res.status) {
       case 200:
-        window.location.href = res.headers.location;
         return res;
       default:
         handleError(res);
