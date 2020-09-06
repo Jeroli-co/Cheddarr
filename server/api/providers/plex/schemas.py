@@ -3,6 +3,7 @@ from marshmallow_sqlalchemy import auto_field
 from marshmallow_sqlalchemy.fields import Nested
 from plexapi.media import Role
 from server.api.providers.plex.models import PlexConfig, PlexServer
+from server.database import session
 from server.extensions import ma
 
 

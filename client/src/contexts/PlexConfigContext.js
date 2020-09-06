@@ -93,7 +93,7 @@ const PlexConfigContextProvider = (props) => {
   const removePlexServer = async (machine_id) => {
     const res = await executeRequest(
       methods.DELETE,
-      providerUrl + "config/servers/" + machine_id.machine_id + "/"
+      providerUrl + "config/servers/" + machine_id + "/"
     );
     switch (res.status) {
       case 200:
@@ -106,16 +106,16 @@ const PlexConfigContextProvider = (props) => {
     }
   };
 
-  const isPlexAccountLinked = (config) => {
+  const isPlexAccountLinked = () => {
     return (
       config["enabled"] === true && typeof config["enabled"] !== "undefined"
     );
   };
 
-  const isPlexServerLinked = (config) => {
+  const isPlexServerLinked = () => {
     return (
-      config.servers.length > 0 &&
-      config.servers[0]["name"] !== null &&
+      config["servers"].length > 0 &&
+      config["servers"][0]["name"] !== null &&
       typeof config.servers[0]["name"] !== "undefined"
     );
   };

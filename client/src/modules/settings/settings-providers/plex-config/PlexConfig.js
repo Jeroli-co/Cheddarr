@@ -35,7 +35,7 @@ const PlexConfig = ({ location }) => {
   const { handleSubmit, formState, reset } = useForm();
 
   const _onUnlinkPlexServer = (machine_id) => {
-    removePlexServer({ machine_id }).then((res) => {
+    removePlexServer(machine_id).then((res) => {
       if (res) setIsUnlinkServerModalActive(false);
     });
   };
@@ -68,12 +68,12 @@ const PlexConfig = ({ location }) => {
         <LinkPlexAccount config={config} location={location} />
       </RowLayout>
 
-      {isPlexAccountLinked(config) && (
+      {isPlexAccountLinked() && (
         <div>
           <form onSubmit={handleSubmit(_onSubmit)}>
             <br />
             <p className="subtitle is-3">Plex server</p>
-            {isPlexServerLinked(config) && (
+            {isPlexServerLinked() && (
               <RowLayout justifyContent="space-between" marginTop="2%">
                 <p className="is-size-5 has-text-weight-light">
                   {config.servers[0]["name"]}
@@ -96,7 +96,7 @@ const PlexConfig = ({ location }) => {
                 </button>
               </RowLayout>
             )}
-            {!isPlexServerLinked(config) && (
+            {!isPlexServerLinked() && (
               <button
                 className="button is-primary"
                 type="button"
@@ -128,7 +128,7 @@ const PlexConfig = ({ location }) => {
       {isServersModalActive && (
         <ServersModal onClose={() => setIsServersModalActive(false)} />
       )}
-      {isUnlinkServerModalActive && (
+      {isUnlinkServerModalActive && config["servers"].length > 0 && (
         <UnlinkServerModal
           machineName={config.servers[0]["name"]}
           onUnlink={() => _onUnlinkPlexServer(config.servers[0]["machine_id"])}
