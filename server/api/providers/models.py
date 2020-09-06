@@ -14,7 +14,6 @@ class ProviderType(str, Enum):
 
 
 class ProviderConfig(Model, AbstractConcreteBase):
-    __abstract__ = True
 
     __repr_props__ = ("enabled", "provider_type")
 
