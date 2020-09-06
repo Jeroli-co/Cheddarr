@@ -22,11 +22,11 @@ class BaseModel(db.Model):
 
     @classmethod
     def find(cls, **filters):
-        return cls.query.filter_by(**filters).one_or_none()
+        return db.session.query(cls).filter_by(**filters).one_or_none()
 
     @classmethod
     def findAll(cls, **filters):
-        return cls.query.filter_by(**filters).all()
+        return db.session.query(cls).filter_by(**filters).all()
 
     @classmethod
     def exists(cls, **filters):
