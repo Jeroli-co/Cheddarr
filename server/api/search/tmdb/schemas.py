@@ -1,7 +1,7 @@
 from marshmallow.decorators import post_dump
 from server.extensions import ma
 
-from . import tmdb_images_url, tmdb_poster_sizes
+from . import tmdb_images_url, tmdb_poster_size
 
 
 class TmdbMediaSchema(ma.Schema):
@@ -12,9 +12,7 @@ class TmdbMediaSchema(ma.Schema):
 
     @post_dump
     def get_thumbUrl(self, media, **kwargs):
-        media[
-            "thumbUrl"
-        ] = f"{tmdb_images_url}{tmdb_poster_sizes[4]}/{media['thumbUrl']}"
+        media["thumbUrl"] = f"{tmdb_images_url}{tmdb_poster_size}/{media['thumbUrl']}"
         return media
 
     @post_dump
@@ -35,7 +33,7 @@ class TmdbSeriesSchema(TmdbMediaSchema):
     media_type = ma.String(default="series")
 
 
-class TmdbSearchResultSchema(ma.Schema):
+class TmdbMediaSearchResultSchema(ma.Schema):
     page = ma.Integer()
     total_pages = ma.Integer()
     total_results = ma.Integer()
@@ -48,6 +46,14 @@ class TmdbSearchResultSchema(ma.Schema):
             else tmdb_series_serializer.dump(media)
             for media in search_results["results"]
         ]
+
+
+class TmdbMovieSearchResultSchema(TmdbMediaSearchResultSchema):
+    results = ma.List(ma.Nested(TmdbMovieSchema))
+
+
+class TmdbSeriesSearchResultSchema(TmdbMediaSearchResultSchema):
+    results = ma.List(ma.Nested(TmdbSeriesSchema))
 
 
 tmdb_movie_serializer = TmdbMovieSchema()
