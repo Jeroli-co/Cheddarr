@@ -1,15 +1,15 @@
 import React from "react";
 import { SEARCH_TYPES } from "../../../enums/SearchTypes";
-import { MovieCard } from "../../../elements/media/MovieCard";
-import { SeriesCard } from "../../../elements/media/SeriesCard";
+import { OnlineMovieCard } from "./OnlineMovieCard";
+import { OnlineSeriesCard } from "./OnlineSeriesCard";
 
 const MediaSearchTab = ({ data }) => {
-  return data.map((media) => {
+  return data.map((media, index) => {
     switch (media["media_type"]) {
       case SEARCH_TYPES.MOVIES:
-        return <MovieCard movie={media} />;
+        return <OnlineMovieCard key={index} movie={media} />;
       case SEARCH_TYPES.SERIES:
-        return <SeriesCard series={media} />;
+        return <OnlineSeriesCard key={index} series={media} />;
       default:
         console.log("No type matched");
         break;

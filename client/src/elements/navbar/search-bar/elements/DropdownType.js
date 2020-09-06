@@ -66,7 +66,7 @@ const DropdownType = ({ selectedOption, onChange }) => {
       </div>
       <div className="search-types-items">
         {isOpen &&
-          SEARCH_TYPES.map(
+          Object.values(SEARCH_TYPES).map(
             (st, index) =>
               st !== selectedOption && (
                 <div
