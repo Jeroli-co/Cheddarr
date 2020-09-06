@@ -61,20 +61,18 @@ def search_media(title, section=None, filters=None):
 @query(SearchSchema)
 def search_online_media(value, page=1):
     results = tmdb_search.multi(query=value, page=page)
-    print(results)
     return tmdb_result_serializer.jsonify(results)
 
 
 @login_required
 @query(SearchSchema)
 def search_online_movies(value, page=1):
-    results = tmdb_search.multi(query=value, page=page)
-    print(results)
+    results = tmdb_search.movie(query=value, page=page)
     return tmdb_result_serializer.jsonify(results)
 
 
 @login_required
 @query(SearchSchema)
 def search_online_series(value, page=1):
-    result = []
-    return result
+    results = tmdb_search.tv(query=value, page=page)
+    return tmdb_result_serializer.jsonify(results)
