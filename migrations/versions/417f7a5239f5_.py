@@ -106,8 +106,8 @@ def upgrade():
     )
     op.drop_table("radarr_config")
     op.drop_table("sonarr_config")
-    op.drop_table("provider_config")
     op.drop_table("plex_config")
+    op.drop_table("provider_config")
     op.alter_column("friendship", "pending", existing_type=sa.BOOLEAN(), nullable=False)
     op.add_column(
         "user", sa.Column("avatar", sqlalchemy_utils.types.url.URLType(), nullable=True)
