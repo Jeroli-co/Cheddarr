@@ -8,13 +8,16 @@ from server.api.search.schemas import (
     MediaSearchResultSchema,
     SearchSchema,
 )
-from server.api.search.tmdb.schemas import TmdbSearchResultSchema
+from server.api.search.tmdb.schemas import (
+    TmdbMediaSearchResultSchema,
+    TmdbMovieSearchResultSchema,
+    TmdbSeriesSearchResultSchema,
+)
+from server.extensions import cache
 from server.extensions.marshmallow import query
 from sqlalchemy import or_
 
 from .tmdb import tmdb_search
-
-tmdb_result_serializer = TmdbSearchResultSchema()
 
 
 @login_required
@@ -59,20 +62,23 @@ def search_media(title, section=None, filters=None):
 
 @login_required
 @query(SearchSchema)
+@cache.memoize(timeout=3600)
 def search_online_media(value, page=1):
     results = tmdb_search.multi(query=value, page=page)
-    return tmdb_result_serializer.jsonify(results)
+    return TmdbMediaSearchResultSchema().jsonify(results)
 
 
 @login_required
 @query(SearchSchema)
+@cache.memoize(timeout=3600)
 def search_online_movies(value, page=1):
     results = tmdb_search.movie(query=value, page=page)
-    return tmdb_result_serializer.jsonify(results)
+    return TmdbMovieSearchResultSchema().jsonify(results)
 
 
 @login_required
 @query(SearchSchema)
+@cache.memoize(timeout=3600)
 def search_online_series(value, page=1):
     results = tmdb_search.tv(query=value, page=page)
-    return tmdb_result_serializer.jsonify(results)
+    return TmdbSeriesSearchResultSchema().jsonify(results)

@@ -1,8 +1,13 @@
 import tmdbsimple as tmdb
+from server.extensions import cache
 
-tmdb_config = tmdb.Configuration().info()
-tmdb_movies = tmdb.Movies()
 tmdb_search = tmdb.Search()
 
-tmdb_images_url = tmdb_config.get("images").get("secure_base_url")
-tmdb_poster_sizes = tmdb_config.get("images").get("poster_sizes")
+
+@cache.cached(100000)  # cached for about a day
+def tmdb_images_config():
+    return tmdb.Configuration().info()
+
+
+tmdb_images_url = tmdb_images_config().get("images").get("secure_base_url")
+tmdb_poster_size = tmdb_images_config().get("images").get("poster_sizes")[4]
