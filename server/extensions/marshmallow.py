@@ -1,4 +1,5 @@
 import functools
+import inspect
 
 from flask_marshmallow import Marshmallow
 from webargs.flaskparser import use_args, use_kwargs
@@ -6,30 +7,34 @@ from webargs.flaskparser import use_args, use_kwargs
 ma = Marshmallow()
 
 
-def webargs(schema_cls, only=None, schema_kwargs=None, **kwargs):
+def webargs(schema, only=None, schema_kwargs=None, **kwargs):
     schema_kwargs = schema_kwargs or {}
 
     def factory(request):
         # Respect partial updates for PATCH requests
         partial = request.method == "PATCH" or only is not None
-        return schema_cls(
+        return schema(
             only=only, partial=partial, context={"request": request}, **schema_kwargs
         )
 
-    return use_args(factory, **kwargs)
+    if inspect.isclass(schema):
+        return use_args(factory, **kwargs)
+    return use_args(schema, **kwargs)
 
 
-def webkwargs(schema_cls, only=None, schema_kwargs=None, **kwargs):
+def webkwargs(schema, only=None, schema_kwargs=None, **kwargs):
     schema_kwargs = schema_kwargs or {}
 
     def factory(request):
         # Respect partial updates for PATCH requests
         partial = request.method == "PATCH" or only is not None
-        return schema_cls(
+        return schema(
             only=only, partial=partial, context={"request": request}, **schema_kwargs
         )
 
-    return use_kwargs(factory, **kwargs)
+    if inspect.isclass(schema):
+        return use_kwargs(factory, **kwargs)
+    return use_kwargs(schema, **kwargs)
 
 
 query = functools.partial(webkwargs, location="query")

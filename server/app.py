@@ -101,19 +101,17 @@ def _create_app(config_object: Config, **kwargs):
 def register_blueprints(app):
     """Register application's blueprints"""
     from server.api.auth import auth
+    from server.api.friends import friends
     from server.api.profile import profile
-    from server.api.providers.plex import plex
-    from server.api.providers.radarr import radarr
-    from server.api.providers.sonarr import sonarr
+    from server.api.providers import providers
     from server.api.search import search
     from server.site import site
 
     app.register_blueprint(site)
     app.register_blueprint(auth, url_prefix=API_ROOT)
+    app.register_blueprint(friends, url_prefix=API_ROOT + "/friends")
     app.register_blueprint(profile, url_prefix=API_ROOT + "/profile")
-    app.register_blueprint(plex, url_prefix=API_ROOT + "/providers/plex")
-    app.register_blueprint(radarr, url_prefix=API_ROOT + "/providers/radarr")
-    app.register_blueprint(sonarr, url_prefix=API_ROOT + "/providers/sonarr")
+    app.register_blueprint(providers, url_prefix=API_ROOT + "/providers")
     app.register_blueprint(search, url_prefix=API_ROOT + "/search")
 
 
