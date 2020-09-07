@@ -1,8 +1,10 @@
 from server.helpers import url
-from . import sonarr
+
+from .. import providers
+from . import views
 
 # Sonarr config management
-url(sonarr, "get_sonarr_status", ["/status/"], methods=["GET"])
-url(sonarr, "test_sonarr_config", ["/config/test/"], methods=["POST"])
-url(sonarr, "get_sonarr_config", ["/config/"], methods=["GET"])
-url(sonarr, "update_sonarr_config", ["/config/"], methods=["PATCH"])
+url(providers, views.get_sonarr_status, ["/sonarr/status/"], methods=["GET"])
+url(providers, views.test_sonarr_config, ["/sonarr/config/test/"], methods=["POST"])
+url(providers, views.get_sonarr_config, ["/sonarr/config/"], methods=["GET"])
+url(providers, views.update_sonarr_config, ["/sonarr/config/"], methods=["PATCH"])

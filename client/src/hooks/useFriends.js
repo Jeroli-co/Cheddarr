@@ -1,9 +1,9 @@
-import { useApi } from "./useApi";
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { useApi } from "./useApi";
 
 const useFriends = () => {
-  const friendsURI = "/profile/friends/";
+  const friendsURI = "/friends/";
 
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
