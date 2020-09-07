@@ -1,4 +1,4 @@
-from marshmallow import pre_dump
+from marshmallow import post_dump, pre_dump
 from marshmallow_sqlalchemy import auto_field
 from marshmallow_sqlalchemy.fields import Nested
 from plexapi.media import Role
@@ -112,7 +112,7 @@ class PlexSeriesSchema(PlexVideoSchema):
         del media.actors[25:]
         return media
 
-    @pre_dump
+    @post_dump
     def media_type(self, media, **kwargs):
-        media.type = media.type.replace("show", "series")
+        media["type"] = media.get("type").replace("show", "series")
         return media

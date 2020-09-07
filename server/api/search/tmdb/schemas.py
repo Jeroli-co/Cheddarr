@@ -22,7 +22,7 @@ class TmdbMediaSchema(ma.Schema):
 
     @post_dump
     def media_type(self, media, **kwargs):
-        media["media_type"] = media["media_type"].replace("tv", "series")
+        media["media_type"] = media.get("media_type").replace("tv", "series")
         return media
 
 
