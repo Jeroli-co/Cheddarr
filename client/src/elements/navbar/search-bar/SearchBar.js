@@ -82,7 +82,7 @@ const SearchBar = () => {
   };
 
   const _onKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && value.length > 0) {
       history.push(routes.SEARCH.url(searchType, value));
       setValue("");
       e.preventDefault();

@@ -13,7 +13,7 @@ const RatingStyle = styled.div`
 `;
 
 const MediaRating = ({ media }) => {
-  if (!media) return <div />;
+  if (!media || !media.rating) return <div />;
 
   return (
     <RatingStyle
