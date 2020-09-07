@@ -2,7 +2,6 @@ import React from "react";
 import { Container } from "../../../elements/Container";
 import { RowLayout } from "../../../elements/layouts";
 import { Image } from "../../../elements/Image";
-import { MediaTitle } from "../../../elements/media/MediaTitle";
 
 const OnlineSeriesCard = ({ series }) => {
   return (
@@ -11,11 +10,11 @@ const OnlineSeriesCard = ({ series }) => {
         <Image
           src={series["thumbUrl"]}
           alt={series.title}
-          width="16%"
+          width="12%"
           borderRadius="12px"
         />
         <Container paddingRight="1%" paddingLeft="1%">
-          <h1>{series.title}</h1>
+          <h1 className="title is-3">{series.title}</h1>
           <RowLayout childPaddingRight="1em">
             {series["releaseDate"] && (
               <p

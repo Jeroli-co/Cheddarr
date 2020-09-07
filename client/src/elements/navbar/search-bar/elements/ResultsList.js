@@ -5,6 +5,7 @@ import { ColumnLayout, RowLayout } from "../../../layouts";
 import { Text } from "../../../../utils/strings";
 import { useHistory } from "react-router";
 import { routes } from "../../../../router/routes";
+import { SEARCH_TYPES } from "../../../../enums/SearchTypes";
 
 const ResultsListStyle = styled.div`
   position: absolute;
@@ -99,7 +100,7 @@ const sortSearchResult = (results) => {
   return sortedResults;
 };
 
-const SeeAllResultSectionStyle = styled.div`
+const SearchOnlineButtonStyle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -110,34 +111,37 @@ const SeeAllResultSectionStyle = styled.div`
   cursor: pointer;
 `;
 
-const SeeAllResultSection = ({ searchValue, type }) => {
+const SearchOnlineButton = ({ type, searchValue }) => {
   const history = useHistory();
-  const seeAllResultRedirection = () =>
-    history.push(routes.SEARCH.url(searchValue, type));
+  const searchOnlineRedirect = () =>
+    history.push(routes.SEARCH.url(type, searchValue));
   return (
-    <SeeAllResultSectionStyle onMouseDown={() => seeAllResultRedirection()}>
-      {type === "movies" && "Search in movies"}
-      {type === "series" && "Search in series"}
-    </SeeAllResultSectionStyle>
+    <SearchOnlineButtonStyle onMouseDown={() => searchOnlineRedirect()}>
+      Search online
+    </SearchOnlineButtonStyle>
   );
 };
 
-const SearchResultsItems = ({ searchValue, type, results }) => {
+const SearchResultsItems = ({ type, searchValue, results }) => {
   if (!results) {
     return <div />;
   }
 
   if (results.length === 0) {
-    return <p>No results found</p>;
+    return (
+      <div>
+        <SearchOnlineButton type={type} searchValue={searchValue} />
+        <p>No results found</p>
+      </div>
+    );
   }
 
-  if (type === "all") {
+  if (type === SEARCH_TYPES.ALL) {
     const sortedResult = sortSearchResult(results);
 
     return (
       <div>
-        <SeeAllResultSection searchValue={searchValue} type="movies" />
-        <SeeAllResultSection searchValue={searchValue} type="series" />
+        <SearchOnlineButton type={type} searchValue={searchValue} />
         {sortedResult.friends.length > 0 && (
           <div>
             <ResultsSectionTitle>Friends</ResultsSectionTitle>

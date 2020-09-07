@@ -2,7 +2,6 @@ import React from "react";
 import { Container } from "../../../elements/Container";
 import { RowLayout } from "../../../elements/layouts";
 import { Image } from "../../../elements/Image";
-import { MediaTitle } from "../../../elements/media/MediaTitle";
 
 const OnlineMovieCard = ({ movie }) => {
   return (
@@ -11,12 +10,11 @@ const OnlineMovieCard = ({ movie }) => {
         <Image
           src={movie["thumbUrl"]}
           alt={movie.title}
-          width="16%"
+          width="12%"
           borderRadius="12px"
         />
-
         <Container paddingRight="1%" paddingLeft="1%">
-          <h1>{movie.title}</h1>
+          <h1 className="title is-3">{movie.title}</h1>
           <RowLayout childPaddingRight="1em">
             {movie["releaseDate"] && (
               <p
@@ -28,19 +26,16 @@ const OnlineMovieCard = ({ movie }) => {
               </p>
             )}
           </RowLayout>
+          {movie.summary && (
+            <RowLayout marginTop="1em">
+              <div>
+                <div className="is-size-5">Overview</div>
+                <div className="is-size-6">{movie.summary}</div>
+              </div>
+            </RowLayout>
+          )}
         </Container>
       </RowLayout>
-
-      <div>
-        {movie.summary && (
-          <RowLayout marginTop="1em">
-            <div>
-              <div className="is-size-5">Overview</div>
-              <div className="is-size-6">{movie.summary}</div>
-            </div>
-          </RowLayout>
-        )}
-      </div>
     </Container>
   );
 };
