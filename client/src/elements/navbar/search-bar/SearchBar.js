@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
-import { useSearch } from "../../../../hooks/useSearch";
-import { isEmpty } from "../../../../utils/strings";
+import { useSearch } from "../../../hooks/useSearch";
+import { isEmpty } from "../../../utils/strings";
 import { DropdownType } from "./elements/DropdownType";
 import { ResultsList } from "./elements/ResultsList";
 import { useHistory } from "react-router";
-import { routes } from "../../../../router/routes";
+import { routes } from "../../../router/routes";
+import { SEARCH_TYPES } from "../../../enums/SearchTypes";
 
 const SearchBarStyle = styled.div`
   position: relative;
@@ -54,11 +55,10 @@ const SearchBarStyle = styled.div`
     `}
 `;
 
-const searchTypes = ["all", "movies", "series", "friends"];
 let timer = null;
 
 const SearchBar = () => {
-  const [searchType, setSearchType] = useState(searchTypes[0]);
+  const [searchType, setSearchType] = useState(SEARCH_TYPES.ALL);
   const [isInputFocus, setIsInputFocus] = useState(false);
   const [value, setValue] = useState("");
 
@@ -82,9 +82,9 @@ const SearchBar = () => {
   };
 
   const _onKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && value.length > 0) {
+      history.push(routes.SEARCH.url(searchType, value));
       setValue("");
-      history.push(routes.SEARCH.url);
       e.preventDefault();
     }
   };
@@ -122,7 +122,6 @@ const SearchBar = () => {
   return (
     <SearchBarStyle isInputFocus={isInputFocus}>
       <DropdownType
-        options={searchTypes}
         selectedOption={searchType}
         onChange={(type) => _onSearchTypeChange(type)}
       />
@@ -138,6 +137,7 @@ const SearchBar = () => {
         placeholder="Search..."
       />
       <ResultsList
+        searchValue={value}
         isVisible={isInputFocus}
         searchType={searchType}
         results={results}

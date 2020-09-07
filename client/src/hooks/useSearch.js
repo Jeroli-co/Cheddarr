@@ -24,8 +24,21 @@ const useSearch = () => {
     }
   };
 
+  const searchOnline = async (type, value) => {
+    const url = searchURI + type + "/?value=" + value;
+    const res = await executeRequest(methods.GET, url);
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return {
     search,
+    searchOnline,
   };
 };
 

@@ -8,8 +8,16 @@ from server.api.search.schemas import (
     MediaSearchResultSchema,
     SearchSchema,
 )
+from server.api.search.tmdb.schemas import (
+    TmdbMediaSearchResultSchema,
+    TmdbMovieSearchResultSchema,
+    TmdbSeriesSearchResultSchema,
+)
+from server.extensions import cache
 from server.extensions.marshmallow import query
 from sqlalchemy import or_
+
+from .tmdb import tmdb_search
 
 
 @login_required
@@ -50,3 +58,27 @@ def search_media(title, section=None, filters=None):
         plex_server, section_type=section, title=title, filters=filters
     )
     return MediaSearchResultSchema().dump(result, many=True)
+
+
+@login_required
+@query(SearchSchema)
+@cache.memoize(timeout=3600)
+def search_media_online(value, page=1):
+    results = tmdb_search.multi(query=value, page=page)
+    return TmdbMediaSearchResultSchema().jsonify(results)
+
+
+@login_required
+@query(SearchSchema)
+@cache.memoize(timeout=3600)
+def search_movies_online(value, page=1):
+    results = tmdb_search.movie(query=value, page=page)
+    return TmdbMovieSearchResultSchema().jsonify(results)
+
+
+@login_required
+@query(SearchSchema)
+@cache.memoize(timeout=3600)
+def search_series_online(value, page=1):
+    results = tmdb_search.tv(query=value, page=page)
+    return TmdbSeriesSearchResultSchema().jsonify(results)

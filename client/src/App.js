@@ -98,7 +98,7 @@ const App = () => {
                 component={routes.SEASON.component}
               />
               <PrivateRoute
-                path={routes.SEARCH.url(":type")}
+                path={routes.SEARCH.url(":type", ":title")}
                 component={routes.SEARCH.component}
               />
               <Route

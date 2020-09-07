@@ -1,60 +1,58 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilm, faTv } from "@fortawesome/free-solid-svg-icons";
-import { Link, Redirect, Route, Switch } from "react-router-dom";
-import { routes } from "../../router/routes";
+import { useSearch } from "../../hooks/useSearch";
+import { Spinner } from "../../elements/Spinner";
+import { SEARCH_RESULTS } from "../../enums/SearchResults";
+import { OnlineMovieCard } from "./elements/OnlineMovieCard";
+import { OnlineSeriesCard } from "./elements/OnlineSeriesCard";
 import { Container } from "../../elements/Container";
-import { MoviesSearchTab } from "./elements/MoviesSearchTab";
-import { SeriesSearchTab } from "./elements/SeriesSearchTab";
-import { SearchFilters } from "./elements/SearchFilters";
 
-const SearchTabs = ({ type }) => {
-  return (
-    <div className="tabs is-fullwidth">
-      <ul>
-        <li className={type === "movies" ? "is-active" : ""}>
-          <Link to={routes.SEARCH.url("movies")}>
-            <span className="icon">
-              <FontAwesomeIcon icon={faFilm} />
-            </span>
-            <span>Movies</span>
-          </Link>
-        </li>
-        <li className={type === "series" ? "is-active" : ""}>
-          <Link to={routes.SEARCH.url("series")}>
-            <span className="icon">
-              <FontAwesomeIcon icon={faTv} />
-            </span>
-            <span>Series</span>
-          </Link>
-        </li>
-      </ul>
-    </div>
-  );
+const initialState = {
+  results: [],
+  isLoading: true,
 };
 
 const SearchPage = () => {
-  const { type } = useParams();
-  return (
-    <Container padding="1em">
-      <SearchFilters />
-      <SearchTabs type={type} />
-      <Switch>
-        <Route
-          exact
-          path={routes.SEARCH.url("movies")}
-          component={MoviesSearchTab}
-        />
-        <Route
-          exact
-          path={routes.SEARCH.url("series")}
-          component={SeriesSearchTab}
-        />
-        <Route render={() => <Redirect to={routes.NOT_FOUND.url} />} />
-      </Switch>
-    </Container>
-  );
+  const { type, title } = useParams();
+  const [data, setData] = useState(initialState);
+  const { searchOnline } = useSearch();
+
+  useEffect(() => {
+    searchOnline(type, title).then((res) => {
+      setData({ results: res.results, isLoading: false });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type, title]);
+
+  let content;
+
+  if (data.isLoading) {
+    content = <Spinner color="primary" size="2x" justifyContent="center" />;
+  } else {
+    if (data.results.length === 0) {
+      content = (
+        <div className="content has-text-centered">
+          <h1 className="title is-3 has-text-grey-dark has-text-weight-light">
+            Could not find any result for "{title}"
+          </h1>
+        </div>
+      );
+    } else {
+      content = data.results.map((media, index) => {
+        switch (media["media_type"]) {
+          case SEARCH_RESULTS.MOVIE:
+            return <OnlineMovieCard key={index} movie={media} />;
+          case SEARCH_RESULTS.SERIES:
+            return <OnlineSeriesCard key={index} series={media} />;
+          default:
+            console.log("No type matched");
+            return <div />;
+        }
+      });
+    }
+  }
+
+  return <Container padding="1%">{content}</Container>;
 };
 
 export { SearchPage };

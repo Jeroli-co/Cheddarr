@@ -1,16 +1,13 @@
-from marshmallow import INCLUDE, pre_dump
+from marshmallow import post_dump
 from marshmallow.validate import OneOf
-
 from server.api.auth.models import User
 from server.extensions import ma
 
 
 class SearchSchema(ma.Schema):
-    class Meta:
-        unknown = INCLUDE
-
     value = ma.String(required=True)
     type = ma.String(validate=OneOf(["movies", "series", "friends"]))
+    page = ma.Int()
 
 
 class MediaSearchResultSchema(ma.Schema):
@@ -20,9 +17,9 @@ class MediaSearchResultSchema(ma.Schema):
     thumbUrl = ma.String()
     type = ma.String()
 
-    @pre_dump
+    @post_dump
     def media_type(self, media, **kwargs):
-        media.type = media.type.replace("show", "series")
+        media["type"] = media.get("type").replace("show", "series")
         return media
 
 
