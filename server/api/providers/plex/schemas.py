@@ -1,5 +1,4 @@
 from marshmallow import post_dump, pre_dump
-from marshmallow_sqlalchemy import auto_field
 from marshmallow_sqlalchemy.fields import Nested
 from plexapi.media import Role
 from server.api.providers.plex.models import PlexConfig, PlexServer
@@ -16,7 +15,7 @@ class PlexConfigSchema(ma.SQLAlchemySchema):
     class Meta:
         model = PlexConfig
 
-    enabled = auto_field()
+    enabled = ma.auto_field()
     servers = Nested(PlexServerSchema, many=True)
 
 

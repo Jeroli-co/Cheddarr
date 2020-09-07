@@ -1,8 +1,10 @@
 from server.helpers import url
-from . import radarr
+
+from .. import providers
+from . import views
 
 # Radarr config management
-url(radarr, "get_radarr_status", ["/status/"], methods=["GET"])
-url(radarr, "test_radarr_config", ["/config/test/"], methods=["POST"])
-url(radarr, "get_radarr_config", ["/config/"], methods=["GET"])
-url(radarr, "update_radarr_config", ["/config/"], methods=["PATCH"])
+url(providers, views.get_radarr_status, ["/radarr/status/"], methods=["GET"])
+url(providers, views.test_radarr_config, ["/radarr/config/test/"], methods=["POST"])
+url(providers, views.get_radarr_config, ["/radarr/config/"], methods=["GET"])
+url(providers, views.update_radarr_config, ["/radarr/config/"], methods=["PATCH"])
