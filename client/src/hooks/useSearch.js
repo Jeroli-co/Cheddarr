@@ -25,13 +25,7 @@ const useSearch = () => {
   };
 
   const searchOnline = async (type, value) => {
-    const url =
-      searchURI +
-      "media/" +
-      "?" +
-      (type !== "all" ? "media_type=" + type + "&" : "") +
-      "value=" +
-      value;
+    const url = searchURI + type + "/?value=" + value;
     const res = await executeRequest(methods.GET, url);
     switch (res.status) {
       case 200:
