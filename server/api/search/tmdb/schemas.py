@@ -12,8 +12,8 @@ class TmdbMediaSchema(ma.Schema):
 
     @post_dump
     def get_thumbUrl(self, media, **kwargs):
-        if media["thumbUrl"] is None:
-            media["thumbUrl"] = ""
+        if media.get("thumbUrl") is None:
+            return media
         else:
             media[
                 "thumbUrl"
@@ -45,12 +45,15 @@ class TmdbMediaSearchResultSchema(ma.Schema):
     results = ma.Method("get_results")
 
     def get_results(self, search_results):
-        return [
-            tmdb_movie_serializer.dump(media)
-            if media["media_type"] == "movie"
-            else tmdb_series_serializer.dump(media)
-            for media in search_results["results"]
-        ]
+        res = []
+        for media in search_results["results"]:
+            if media["media_type"] == "movie":
+                res.append(tmdb_movie_serializer.dump(media))
+            elif media["media_type"] == "tv":
+                res.append(tmdb_series_serializer.dump(media))
+            else:
+                continue
+        return res
 
 
 class TmdbMovieSearchResultSchema(TmdbMediaSearchResultSchema):
