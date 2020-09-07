@@ -1,7 +1,6 @@
 from marshmallow.decorators import post_dump
+from server.api.search.tmdb import TMDB_IMAGES_URL, TMDB_POSTER_SIZE
 from server.extensions import ma
-
-from . import tmdb_images_url, tmdb_poster_size
 
 
 class TmdbMediaSchema(ma.Schema):
@@ -17,7 +16,7 @@ class TmdbMediaSchema(ma.Schema):
         else:
             media[
                 "thumbUrl"
-            ] = f"{tmdb_images_url}{tmdb_poster_size}{media['thumbUrl']}"
+            ] = f"{TMDB_IMAGES_URL}{TMDB_POSTER_SIZE}{media['thumbUrl']}"
         return media
 
     @post_dump

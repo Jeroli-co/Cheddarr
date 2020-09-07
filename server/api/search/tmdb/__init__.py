@@ -1,6 +1,6 @@
 import tmdbsimple as tmdb
 
+TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"
+TMDB_POSTER_SIZE = "w500"
+
 tmdb_search = tmdb.Search()
-tmdb_config = tmdb.Configuration().info()
-tmdb_images_url = tmdb_config.get("images").get("secure_base_url")
-tmdb_poster_size = tmdb_config.get("images").get("poster_sizes")[4]
