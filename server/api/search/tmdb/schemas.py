@@ -12,7 +12,12 @@ class TmdbMediaSchema(ma.Schema):
 
     @post_dump
     def get_thumbUrl(self, media, **kwargs):
-        media["thumbUrl"] = f"{tmdb_images_url}{tmdb_poster_size}/{media['thumbUrl']}"
+        if media["thumbUrl"] is None:
+            media["thumbUrl"] = ""
+        else:
+            media[
+                "thumbUrl"
+            ] = f"{tmdb_images_url}{tmdb_poster_size}{media['thumbUrl']}"
         return media
 
     @post_dump
