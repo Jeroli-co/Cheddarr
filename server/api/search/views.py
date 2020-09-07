@@ -63,7 +63,7 @@ def search_media(title, section=None, filters=None):
 @login_required
 @query(SearchSchema)
 @cache.memoize(timeout=3600)
-def search_online_media(value, page=1):
+def search_media_online(value, page=1):
     results = tmdb_search.multi(query=value, page=page)
     return TmdbMediaSearchResultSchema().jsonify(results)
 
@@ -71,7 +71,7 @@ def search_online_media(value, page=1):
 @login_required
 @query(SearchSchema)
 @cache.memoize(timeout=3600)
-def search_online_movies(value, page=1):
+def search_movies_online(value, page=1):
     results = tmdb_search.movie(query=value, page=page)
     return TmdbMovieSearchResultSchema().jsonify(results)
 
@@ -79,6 +79,6 @@ def search_online_movies(value, page=1):
 @login_required
 @query(SearchSchema)
 @cache.memoize(timeout=3600)
-def search_online_series(value, page=1):
+def search_series_online(value, page=1):
     results = tmdb_search.tv(query=value, page=page)
     return TmdbSeriesSearchResultSchema().jsonify(results)
