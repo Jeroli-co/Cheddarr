@@ -55,12 +55,7 @@ const DropdownMenuMobileItem = styled.div`
   }
 `;
 
-const UserDropdownMobile = ({
-  dropdownRef,
-  isVisible,
-  isAuthenticated,
-  isLoading,
-}) => {
+const UserDropdownMobile = ({ dropdownRef, isVisible, isAuthenticated }) => {
   const { avatar, username, signOut } = useContext(AuthContext);
   return (
     <UserDropdownMobileStyle ref={dropdownRef} isVisible={isVisible}>
@@ -69,7 +64,7 @@ const UserDropdownMobile = ({
         justifyContent="space-between"
         childMarginRight="5%"
       >
-        {!isLoading && isAuthenticated && (
+        {isAuthenticated && (
           <UserDropdownImage>
             {avatar && (
               <img
@@ -80,45 +75,50 @@ const UserDropdownMobile = ({
             )}
           </UserDropdownImage>
         )}
-        {!isLoading && isAuthenticated && (
+        {isAuthenticated && (
           <p data-testid="UserDropdownUsernameMobile">{username}</p>
         )}
         <GitHubButton />
-        {!isLoading && !isAuthenticated && <SignInButton />}
-        {!isLoading && !isAuthenticated && <SignUpButton />}
+        {!isAuthenticated && <SignInButton data-testid="SignInMobileButton" />}
+        {!isAuthenticated && <SignUpButton data-testid="SignUpMobileButton" />}
       </RowLayout>
-      <DropdownMenuMobileStyle>
-        <Link to={routes.USER_PROFILE.url} data-testid="UserProfileLinkMobile">
-          <DropdownMenuMobileItem>
+      {isAuthenticated && (
+        <DropdownMenuMobileStyle>
+          <Link
+            to={routes.USER_PROFILE.url}
+            data-testid="UserProfileLinkMobile"
+          >
+            <DropdownMenuMobileItem>
+              <RowLayout childMarginRight="2%" justifyContent="space-between">
+                <FontAwesomeIcon icon={faUserCircle} />
+                <span>Profile</span>
+              </RowLayout>
+            </DropdownMenuMobileItem>
+          </Link>
+
+          <Link
+            to={routes.USER_SETTINGS.url}
+            data-testid="UserSettingsLinkMobile"
+          >
+            <DropdownMenuMobileItem>
+              <RowLayout childMarginRight="2%" justifyContent="space-between">
+                <FontAwesomeIcon icon={faCog} />
+                <span>Settings</span>
+              </RowLayout>
+            </DropdownMenuMobileItem>
+          </Link>
+
+          <DropdownMenuMobileItem
+            onClick={signOut}
+            data-testid="SignOutButtonMobile"
+          >
             <RowLayout childMarginRight="2%" justifyContent="space-between">
-              <FontAwesomeIcon icon={faUserCircle} />
-              <span>Profile</span>
+              <FontAwesomeIcon icon={faSignOutAlt} />
+              <span>Sign out</span>
             </RowLayout>
           </DropdownMenuMobileItem>
-        </Link>
-
-        <Link
-          to={routes.USER_SETTINGS.url}
-          data-testid="UserSettingsLinkMobile"
-        >
-          <DropdownMenuMobileItem>
-            <RowLayout childMarginRight="2%" justifyContent="space-between">
-              <FontAwesomeIcon icon={faCog} />
-              <span>Settings</span>
-            </RowLayout>
-          </DropdownMenuMobileItem>
-        </Link>
-
-        <DropdownMenuMobileItem
-          onClick={signOut}
-          data-testid="SignOutButtonMobile"
-        >
-          <RowLayout childMarginRight="2%" justifyContent="space-between">
-            <FontAwesomeIcon icon={faSignOutAlt} />
-            <span>Sign out</span>
-          </RowLayout>
-        </DropdownMenuMobileItem>
-      </DropdownMenuMobileStyle>
+        </DropdownMenuMobileStyle>
+      )}
     </UserDropdownMobileStyle>
   );
 };

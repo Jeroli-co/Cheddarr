@@ -118,8 +118,12 @@ const Navbar = () => {
                 toggle={() => toggleDropdown()}
               />
             )}
-            {!isLoading && !isAuthenticated && <SignInButton />}
-            {!isLoading && !isAuthenticated && <SignUpButton />}
+            {!isLoading && !isAuthenticated && (
+              <SignInButton data-testid="SignInButton" />
+            )}
+            {!isLoading && !isAuthenticated && (
+              <SignUpButton data-testid="SignUpButton" />
+            )}
           </RowLayout>
           <RowLayout
             className="navbar-end-mobile"
@@ -130,12 +134,11 @@ const Navbar = () => {
           </RowLayout>
         </NavbarEnd>
       </RowLayout>
-      {!isLoading && isAuthenticated && (
+      {!isLoading && (
         <UserDropdownMobile
           dropdownRef={dropdownMobileRef}
           isVisible={isDropdownOpen}
           isAuthenticated={isAuthenticated}
-          isLoading={isLoading}
         />
       )}
     </NavbarStyle>
