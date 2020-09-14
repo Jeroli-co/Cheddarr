@@ -1,22 +1,17 @@
 from flask import make_response, redirect, url_for
 from flask_login import (
     current_user,
-    fresh_login_required,
     login_required,
     login_user,
     logout_user,
 )
+from marshmallow import fields
 from passlib import pwd
 from requests import get
 from server import utils
-from server.api.auth.models import User
-from server.api.auth.schemas import (
-    PlexAuthSchema,
-    PlexConfirmSigninSchema,
-    SigninSchema,
-    UserSchema,
-)
 from server.api.providers.plex.models import PlexConfig
+from server.api.users.models import User
+from server.api.users.schemas import UserSchema
 from server.config import (
     APP_NAME,
     PLEX_AUTHORIZE_URL,
@@ -41,22 +36,8 @@ session_serializer = UserSchema(only=["username", "avatar"])
 
 
 @limiter.limit("10/hour")
-@form(UserSchema, only=["username", "password", "email"])
+@form(UserSchema, only=["username", "email", "password"])
 def signup(username, password, email):
-    """Create a new user
-
-    Args:
-        username (string): name of the user
-        password (string): password of the user
-        email (string): email of the user
-
-    Raises:
-        Conflict: The email address is already taken
-        Conflict: The username is already taken
-
-    Returns:
-        json: A confirmation for the email sending
-    """
     existing_email = User.exists(email=email)
     if existing_email:
         raise Conflict("This email is already taken.")
@@ -120,7 +101,13 @@ def resend_confirmation(email):
     return {"message": "Confirmation email sent."}
 
 
-@form(SigninSchema)
+@form(
+    {
+        "usernameOrEmail": fields.String(required=True),
+        "password": fields.String(required=True),
+        "remember": fields.Boolean(required=False, missing=False),
+    }
+)
 def signin(usernameOrEmail, password, remember):
     user = User.find(email=usernameOrEmail) or User.find(username=usernameOrEmail)
     if not user or not user.password == password:
@@ -132,6 +119,12 @@ def signin(usernameOrEmail, password, remember):
     remember = remember if remember else False
     login_user(user, remember=remember)
     return session_serializer.jsonify(user)
+
+
+@login_required
+def signout():
+    logout_user()
+    return {"message": "User signed out"}
 
 
 def start_signin_plex():
@@ -146,7 +139,13 @@ def start_signin_plex():
     return request_pin_url
 
 
-@body(PlexAuthSchema)
+@body(
+    {
+        "key": fields.Int(),
+        "code": fields.String(),
+        "redirectURI": fields.String(missing=""),
+    }
+)
 def authorize_signin_plex(args):
     key = args["key"]
     code = args["code"]
@@ -173,7 +172,7 @@ def authorize_signin_plex(args):
     return redirect(authorize_url), 200
 
 
-@query(PlexConfirmSigninSchema)
+@query({"token": fields.String()})
 def confirm_signin_plex(token):
     token = utils.confirm_token(token)
     state = token.get("id")
@@ -228,29 +227,3 @@ def confirm_signin_plex(token):
     res = make_response(session_serializer.jsonify(plex_config.user))
     res.headers["redirect-uri"] = redirectURI
     return res
-
-
-@login_required
-def signout():
-    logout_user()
-    return {"message": "User signed out"}
-
-
-@fresh_login_required
-def get_api_key():
-    return {"key": current_user.api_key}
-
-
-@fresh_login_required
-def delete_api_key():
-    current_user.api_key = None
-    current_user.save()
-    return {"message": "API key deleted"}
-
-
-@limiter.limit("3/hour")
-@fresh_login_required
-def reset_api_key():
-    current_user.api_key = utils.generate_api_key()
-    current_user.save()
-    return {"key": current_user.api_key}

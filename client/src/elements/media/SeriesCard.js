@@ -132,7 +132,7 @@ const SeriesCard = ({ series }) => {
           {seriesInfo.seasons.map((season, index) => (
             <Link
               key={index}
-              to={routes.SEASON.url(season.seriesId, season.seasonNumber)}
+              to={routes.SEASON.url(season.seriesId, season.id)}
             >
               <ColumnLayout alignItems="center">
                 <Image

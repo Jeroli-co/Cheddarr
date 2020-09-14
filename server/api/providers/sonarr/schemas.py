@@ -1,5 +1,6 @@
-from server.api.providers.sonarr.models import SonarrConfig
 from server.extensions import ma
+
+from .models import SonarrConfig
 
 
 class SonarrConfigSchema(ma.SQLAlchemyAutoSchema):

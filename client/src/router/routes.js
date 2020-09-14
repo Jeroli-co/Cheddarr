@@ -89,8 +89,7 @@ const routes = {
   MOVIE: { url: (id) => "/movie/" + id, component: MoviePage },
   SERIES: { url: (id) => "/series/" + id, component: SeriesPage },
   SEASON: {
-    url: (seriesId, seasonNumber) =>
-      "/series/" + seriesId + "/seasons/" + seasonNumber,
+    url: (seriesId, seasonId) => "/series/" + seriesId + "/seasons/" + seasonId,
     component: SeasonPage,
   },
   SEARCH: {

@@ -4,7 +4,7 @@ from werkzeug.exceptions import Unauthorized
 
 
 def register_login_manager(app):
-    from server.api.auth.models import User
+    from server.api.users.models import User
 
     login_manager.init_app(app)
 

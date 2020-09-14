@@ -1,6 +1,5 @@
 from marshmallow import post_dump
 from marshmallow.validate import OneOf
-from server.api.auth.models import User
 from server.extensions import ma
 
 
@@ -23,11 +22,8 @@ class MediaSearchResultSchema(ma.Schema):
         return media
 
 
-class FriendSearchResultSchema(ma.SQLAlchemySchema):
-    class Meta:
-        model = User
-
-    username = ma.auto_field()
-    avatar = ma.auto_field()
-    email = ma.auto_field()
+class FriendSearchResultSchema(ma.Schema):
+    username = ma.String()
+    avatar = ma.URL()
+    email = ma.Email()
     type = ma.Constant("friend")

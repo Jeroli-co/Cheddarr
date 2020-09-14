@@ -1,8 +1,9 @@
 from marshmallow import post_dump, pre_dump
 from marshmallow_sqlalchemy.fields import Nested
 from plexapi.media import Role
-from server.api.providers.plex.models import PlexConfig, PlexServer
 from server.extensions import ma
+
+from .models import PlexConfig, PlexServer
 
 
 class PlexServerSchema(ma.SQLAlchemyAutoSchema):
@@ -43,16 +44,14 @@ class PlexVideoSchema(ma.Schema):
     rating = ma.Float()
     contentRating = ma.String()
     isWatched = ma.Boolean()
-    webUrl = ma.String()
-
-    @pre_dump
-    def plex_media_web_url(self, media, **kwargs):
-        media.webUrl = "%s/web/index.html#!/server/%s/details?key=%s" % (
+    webUrl = ma.Function(
+        lambda media: "%s/web/index.html#!/server/%s/details?key=%s"
+        % (
             media._server._baseurl,
             media._server.machineIdentifier,
             media.key,
         )
-        return media
+    )
 
 
 class PlexMovieSchema(PlexVideoSchema):
@@ -75,6 +74,14 @@ class PlexEpisodeSchema(PlexVideoSchema):
     index = ma.Integer(data_key="episodeNumber")
     seasonThumbUrl = ma.Function(lambda ep: ep.url(ep.parentThumb))
     duration = ma.Integer()
+    _links = ma.Hyperlinks(
+        {
+            "self": ma.AbsoluteURLFor(
+                "providers.get_plex_episode",
+                episode_id="<ratingKey>",
+            ),
+        }
+    )
 
     @pre_dump
     def season_poster_url(self, episode, **kwargs):
@@ -88,6 +95,14 @@ class PlexSeasonSchema(PlexVideoSchema):
     parentTitle = ma.String(data_key="seriesTitle")
     seasonNumber = ma.Integer()
     episodes = ma.Nested(PlexEpisodeSchema, many=True)
+    _links = ma.Hyperlinks(
+        {
+            "self": ma.AbsoluteURLFor(
+                "providers.get_plex_season",
+                season_id="<ratingKey>",
+            ),
+        }
+    )
 
     @pre_dump
     def season_episodes(self, season, **kwargs):
@@ -100,6 +115,13 @@ class PlexSeriesSchema(PlexVideoSchema):
     actors = ma.Nested(PlexMediaTag, many=True)
     studio = ma.String()
     genres = ma.Nested(PlexMediaTag, many=True)
+    _links = ma.Hyperlinks(
+        {
+            "self": ma.AbsoluteURLFor(
+                "providers.get_plex_series", series_id="<ratingKey>"
+            ),
+        }
+    )
 
     @pre_dump
     def series_seasons(self, series, **kwargs):

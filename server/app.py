@@ -46,18 +46,6 @@ def _create_app(config_object: Config, **kwargs):
     app.session_interface = CustomSessionInterface()
     app.url_map.strict_slashes = False
 
-    """Initialize extensions"""
-    # used to register tasks to celery
-    from server import tasks  # noqa
-
-    celery.init_app(app)
-    db.init_app(app)
-    migrate.init_app(app, db)
-    ma.init_app(app)
-    limiter.init_app(app)
-    cache.init_app(app)
-    mail.api_key = config_object.MAIL_SENDGRID_API_KEY
-
     """Security patches"""
     csp = {
         "default-src": "'self'",
@@ -91,6 +79,7 @@ def _create_app(config_object: Config, **kwargs):
         return {"now": datetime.utcnow()}
 
     # Registrations
+    register_extensions(app)
     register_blueprints(app)
     register_commands(app)
     register_login_manager(app)
@@ -98,21 +87,35 @@ def _create_app(config_object: Config, **kwargs):
     return app
 
 
+def register_extensions(app):
+    """Initialize extensions"""
+    with app.app_context():
+
+        # used to register tasks to celery
+        from server import tasks  # noqa
+
+        celery.init_app(app)
+        db.init_app(app)
+        migrate.init_app(app, db)
+        ma.init_app(app)
+        limiter.init_app(app)
+        cache.init_app(app)
+        mail.api_key = app.config.get("MAIL_SENDGRID_API_KEY")
+
+
 def register_blueprints(app):
     """Register application's blueprints"""
-    from server.api.auth import auth
-    from server.api.friends import friends
-    from server.api.profile import profile
-    from server.api.providers import providers
-    from server.api.search import search
-    from server.site import site
+    from server.site.urls import site_bp
+    from server.auth.urls import auth_bp
+    from server.api.users.urls import users_bp
+    from server.api.providers.urls import providers_bp
+    from server.api.search.urls import search_bp
 
-    app.register_blueprint(site)
-    app.register_blueprint(auth, url_prefix=API_ROOT)
-    app.register_blueprint(friends, url_prefix=API_ROOT + "/friends")
-    app.register_blueprint(profile, url_prefix=API_ROOT + "/profile")
-    app.register_blueprint(providers, url_prefix=API_ROOT + "/providers")
-    app.register_blueprint(search, url_prefix=API_ROOT + "/search")
+    app.register_blueprint(site_bp)
+    app.register_blueprint(auth_bp, url_prefix=API_ROOT)
+    app.register_blueprint(users_bp, url_prefix=API_ROOT)
+    app.register_blueprint(providers_bp, url_prefix=API_ROOT + "/providers")
+    app.register_blueprint(search_bp, url_prefix=API_ROOT + "/search")
 
 
 def register_commands(app):
