@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RowLayout } from "../../../../elements/layouts";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../forms/formDefaultValidators";
 import { useRadarr } from "../../../../hooks/useRadarr";
 import { SubmitConfig } from "../SubmitConfig";
+import { isEmptyObject } from "../../../../utils/objects";
 
 const RadarrConfig = () => {
   const {
@@ -14,13 +15,42 @@ const RadarrConfig = () => {
     getValues,
     errors,
   } = useForm();
-  const { testRadarrConfig, updateRadarrConfig, getRadarrConfig } = useRadarr();
+
+  const {
+    testRadarrConfig,
+    updateRadarrConfig,
+    getRadarrConfig,
+    getRadarrRootFolders,
+    getRadarrProfiles,
+  } = useRadarr();
+  const [rootFolders, setRootFolders] = useState(null);
+  const [profiles, setProfiles] = useState(null);
+
   useEffect(() => {
     getRadarrConfig().then((data) => {
-      if (data) reset(data);
+      console.log(data);
+      if (data) {
+        reset(data);
+        if (!isEmptyObject(data)) {
+          getRadarrRootFolders().then((data) => {
+            if (data) setRootFolders(data);
+          });
+          /*
+          getRadarrProfiles().then((data) => {
+            if (data) setProfiles(data);
+          });
+           */
+        }
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    console.log(rootFolders);
+    console.log(profiles);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
 
   const _onSubmit = (data) => {
     let newConfig = {};
@@ -122,6 +152,22 @@ const RadarrConfig = () => {
             <label htmlFor="ssl">SSL Enabled</label>
           </div>
         </div>
+        {rootFolders && (
+          <div className="field">
+            <label className="label">Root folder</label>
+            <div className="control">
+              <div className="select is-fullwidth">
+                <select name="root_folder" ref={register}>
+                  {rootFolders.map((rf, index) => (
+                    <option key={index} value={rf}>
+                      {rf}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
         <SubmitConfig isFormDirty={formState.dirty} />
       </form>
       <div className="field">

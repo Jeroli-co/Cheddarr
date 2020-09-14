@@ -62,11 +62,38 @@ const useRadarr = () => {
     }
   };
 
+  const getRadarrRootFolders = async () => {
+    const res = await executeRequest(
+      methods.GET,
+      providerUrl + "root-folders/"
+    );
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const getRadarrProfiles = async () => {
+    const res = await executeRequest(methods.GET, providerUrl + "profiles/");
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return {
     getRadarrStatus,
     testRadarrConfig,
     getRadarrConfig,
     updateRadarrConfig,
+    getRadarrRootFolders,
+    getRadarrProfiles,
   };
 };
 
