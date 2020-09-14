@@ -1,9 +1,15 @@
 from enum import Enum, auto
 
-from server.database import Boolean, Column
 from server.database import Enum as DBEnum
-from server.database import ForeignKey, Integer, String, relationship, session
-from server.database.model import Model
+from server.database import (
+    ForeignKey,
+    Integer,
+    Model,
+    String,
+    Boolean,
+    Column,
+    relationship,
+)
 from sqlalchemy.ext.declarative import AbstractConcreteBase, declared_attr
 
 
@@ -35,12 +41,6 @@ class ProviderConfig(Model, AbstractConcreteBase):
     @declared_attr
     def user_id(cls):
         return Column(Integer, ForeignKey("user.id"), nullable=False)
-
-    def update(self, updated_config):
-        for config, value in updated_config.items():
-            setattr(self, config, value)
-        session.add(self)
-        return session.commit()
 
 
 # Sub-models

@@ -22,7 +22,7 @@ const EpisodeSelectedLayout = styled.div`
 const SeasonCard = ({ season }) => {
   smoothscroll.polyfill();
 
-  const { seriesId, seasonNumber } = useParams();
+  const { seasonId } = useParams();
   const [seasonInfo, setSeasonInfo] = useState(null);
   const { getSeason } = usePlex();
 
@@ -31,7 +31,7 @@ const SeasonCard = ({ season }) => {
 
   useEffect(() => {
     if (!season) {
-      getSeason(seriesId, seasonNumber).then((s) => {
+      getSeason(seasonId).then((s) => {
         if (s) setSeasonInfo(s);
       });
     } else {

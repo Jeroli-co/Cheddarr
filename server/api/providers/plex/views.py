@@ -2,9 +2,12 @@ from flask import jsonify
 from flask_login import current_user, fresh_login_required, login_required
 from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
-from server.api.providers.plex import utils
-from server.api.providers.plex.models import PlexConfig, PlexServer
-from server.api.providers.plex.schemas import (
+from server.extensions.marshmallow import body
+from .helpers import connect_plex_servers, plex_library_sections
+from werkzeug.exceptions import BadRequest, Unauthorized
+
+from .models import PlexConfig, PlexServer
+from .schemas import (
     PlexConfigSchema,
     PlexEpisodeSchema,
     PlexMovieSchema,
@@ -12,8 +15,6 @@ from server.api.providers.plex.schemas import (
     PlexSeriesSchema,
     PlexServerSchema,
 )
-from server.extensions.marshmallow import body
-from werkzeug.exceptions import BadRequest, Unauthorized
 
 plex_config_serializer = PlexConfigSchema()
 plex_movie_serializer = PlexMovieSchema()
@@ -70,6 +71,8 @@ def remove_plex_server(machine_id):
     if plex_server not in plex_config.servers:
         raise Unauthorized("This server is not linked to you account.")
     plex_config.servers.remove(plex_server)
+    if not plex_server.configs:
+        plex_server.delete()
     plex_config.save()
     return plex_config_serializer.jsonify(plex_config)
 
@@ -99,9 +102,9 @@ def get_plex_servers():
 
 
 @login_required
-def get_recent_movies():
-    plex_server = utils.user_server(current_user)
-    movie_sections = utils.library_sections(plex_server, section_type="movies")
+def get_plex_recent_movies():
+    plex_server = connect_plex_servers(current_user)
+    movie_sections = plex_library_sections(plex_server, section_type="movies")
     recent_movies = [
         movie
         for section in movie_sections
@@ -111,17 +114,17 @@ def get_recent_movies():
 
 
 @login_required
-def get_movie(movie_id):
-    plex_server = utils.user_server(current_user)
+def get_plex_movie(movie_id):
+    plex_server = connect_plex_servers(current_user)
     movie = plex_server.fetchItem(ekey=int(movie_id))
     movie.reload()
     return plex_movie_serializer.jsonify(movie)
 
 
 @login_required
-def get_recent_series():
-    plex_server = utils.user_server(current_user)
-    series_section = utils.library_sections(plex_server, section_type="series")
+def get_plex_recent_series():
+    plex_server = connect_plex_servers(current_user)
+    series_section = plex_library_sections(plex_server, section_type="series")
     recent_series = [
         series
         for section in series_section
@@ -131,34 +134,33 @@ def get_recent_series():
 
 
 @login_required
-def get_series(series_id):
-    plex_server = utils.user_server(current_user)
-    series = plex_server.fetchItem(ekey=int(series_id))
+def get_plex_series(series_id):
+    plex_server = connect_plex_servers(current_user)
+    series = plex_server.fetchItem(ekey=series_id)
     series.reload()
     return plex_series_serializer.jsonify(series)
 
 
 @login_required
-def get_season(series_id, season_number):
-    plex_server = utils.user_server(current_user)
-    series = plex_server.fetchItem(ekey=int(series_id))
-    season = series.season(title=int(season_number))
+def get_plex_season(season_id):
+    plex_server = connect_plex_servers(current_user)
+    season = plex_server.fetchItem(ekey=season_id)
     season.reload()
     return plex_season_serializer.jsonify(season)
 
 
 @login_required
-def get_episode(series_id, season_number, episode_number):
-    plex_server = utils.user_server(current_user)
-    series = plex_server.fetchItem(ekey=int(series_id))
-    episode = series.episode(season=int(season_number), episode=int(episode_number))
+def get_plex_episode(episode_id):
+    plex_server = connect_plex_servers(current_user)
+    episode = plex_server.fetchItem(ekey=episode_id)
     episode.reload()
+    print(episode)
     return plex_episode_serializer.jsonify(episode)
 
 
 @login_required
-def get_on_deck():
-    plex_server = utils.user_server(current_user)
+def get_plex_on_deck():
+    plex_server = connect_plex_servers(current_user)
     on_deck = plex_server.library.onDeck()
     on_deck = [
         plex_movie_serializer.dump(media)

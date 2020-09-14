@@ -6,6 +6,7 @@ const useApiKey = () => {
   const [apiKey, setApiKey] = useState("");
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
+  const apiKeyUri = "/user/key/";
 
   useEffect(() => {
     getApiKey().then((res) => {
@@ -20,7 +21,7 @@ const useApiKey = () => {
   }, []);
 
   const getApiKey = async () => {
-    const res = await executeRequest(methods.GET, "/key/");
+    const res = await executeRequest(methods.GET, apiKeyUri);
     switch (res.status) {
       case 200:
         return res;
@@ -31,7 +32,7 @@ const useApiKey = () => {
   };
 
   const resetApiKey = async () => {
-    const res = await executeRequest(methods.PUT, "/key/");
+    const res = await executeRequest(methods.PUT, apiKeyUri);
     switch (res.status) {
       case 200:
         setApiKey(res.data["key"]);
@@ -43,7 +44,7 @@ const useApiKey = () => {
   };
 
   const deleteApiKey = async () => {
-    const res = await executeRequest(methods.DELETE, "/key/");
+    const res = await executeRequest(methods.DELETE, apiKeyUri);
     switch (res.status) {
       case 200:
         setApiKey("");

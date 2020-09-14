@@ -13,13 +13,13 @@ import { MediaBackground } from "./MediaBackground";
 import { msToHoursMinutes } from "../../utils/media-utils";
 
 const EpisodeCard = ({ episode }) => {
-  const { seriesId, seasonNumber, episodeNumber } = useParams();
+  const { episodeId } = useParams();
   const [episodeInfo, setEpisodeInfo] = useState(null);
   const { getEpisode } = usePlex();
 
   useEffect(() => {
     if (!episode) {
-      getEpisode(seriesId, seasonNumber, episodeNumber).then((e) => {
+      getEpisode(episodeId).then((e) => {
         if (e) setEpisodeInfo(e);
       });
     } else {

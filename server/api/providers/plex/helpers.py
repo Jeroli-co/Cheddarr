@@ -4,21 +4,22 @@ from plexapi.exceptions import PlexApiException
 from plexapi.library import LibrarySection, MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
-from server.api.providers.plex.models import PlexConfig
 from server.extensions import cache
 from werkzeug.exceptions import BadRequest, InternalServerError
 
+from .models import PlexConfig
+
 
 @cache.memoize(timeout=300)
-def user_server(user) -> PlexServer:
-    plex_config = PlexConfig.find(user=user)
+def connect_plex_servers(user) -> PlexServer:
+    plex_config = PlexConfig.find(user=user, enabled=True)
     if not plex_config:
-        raise InternalServerError("No existing config for Plex.")
-    plex_servers = plex_config.servers[0]
+        raise BadRequest("No existing config for Plex.")
+    plex_servers = plex_config.servers
     if not plex_servers:
         raise BadRequest("No Plex server linked.")
     api_key = plex_config.api_key
-    server_name = plex_servers.name
+    server_name = plex_servers[0].name  # only one server for the moment
     if server_name is None:
         raise BadRequest("No Plex server linked.")
     try:
@@ -28,7 +29,7 @@ def user_server(user) -> PlexServer:
 
 
 @cache.memoize(timeout=300)
-def library_sections(
+def plex_library_sections(
     plex_server: PlexServer, section_id=None, section_type=None
 ) -> List[Type[LibrarySection]]:
     if section_id is not None:
@@ -49,13 +50,13 @@ def library_sections(
 
 
 @cache.memoize(timeout=300)
-def search(plex_server, section_type, title, filters, max_results=3):
+def plex_search(plex_server, section_type, title, filters, max_results=3):
     if section_type == "movies":
-        sections = library_sections(plex_server, section_type="movies")
+        sections = plex_library_sections(plex_server, section_type="movies")
     elif section_type == "series":
-        sections = library_sections(plex_server, section_type="series")
+        sections = plex_library_sections(plex_server, section_type="series")
     else:
-        sections = library_sections(plex_server)
+        sections = plex_library_sections(plex_server)
     result = [
         media
         for section in sections

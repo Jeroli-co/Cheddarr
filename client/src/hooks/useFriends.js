@@ -3,7 +3,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { useApi } from "./useApi";
 
 const useFriends = () => {
-  const friendsURI = "/friends/";
+  const friendsURI = "/user/friends/";
 
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
@@ -112,17 +112,6 @@ const useFriends = () => {
     }
   };
 
-  const getFriend = async (username) => {
-    const res = await executeRequest(methods.GET, friendsURI + username + "/");
-    switch (res.status) {
-      case 200:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
   return {
     addFriend,
     acceptRequest,
@@ -132,7 +121,6 @@ const useFriends = () => {
     getFriends,
     getReceived,
     getRequested,
-    getFriend,
   };
 };
 

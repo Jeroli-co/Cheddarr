@@ -94,7 +94,7 @@ const App = () => {
               />
               <PrivateRoute
                 exact
-                path={routes.SEASON.url(":seriesId", ":seasonNumber")}
+                path={routes.SEASON.url(":seriesId", ":seasonId")}
                 component={routes.SEASON.component}
               />
               <PrivateRoute

@@ -1,20 +1,25 @@
-import { useApi } from "./useApi";
 import { useContext } from "react";
+import { useHistory } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
 import { NotificationContext } from "../contexts/NotificationContext";
 import { routes } from "../router/routes";
-import { useHistory } from "react-router";
+import { useApi } from "./useApi";
 
 const useProfile = () => {
-  const profileURI = "/profile/";
+  const profileURI = "/user/";
 
   const { executeRequest, methods } = useApi();
   const { handleError, clearSession, setUsername } = useContext(AuthContext);
   const { pushSuccess, pushInfo } = useContext(NotificationContext);
   const history = useHistory();
 
-  const getUser = async () => {
-    const res = await executeRequest(methods.GET, profileURI);
+  const getUser = async (username) => {
+    let res = null;
+    if (username === null) {
+      res = await executeRequest(methods.GET, profileURI);
+    } else {
+      res = await executeRequest(methods.GET, "/users/" + username);
+    }
     switch (res.status) {
       case 200:
         return res;
@@ -25,9 +30,8 @@ const useProfile = () => {
   };
 
   const changeUsername = async (data) => {
-    const fd = new FormData();
-    fd.append("username", data["newUsername"]);
-    const res = await executeRequest(methods.PUT, profileURI + "username/", fd);
+    console.log(data);
+    const res = await executeRequest(methods.PATCH, profileURI, data);
     switch (res.status) {
       case 200:
         const username = res.data.username;
@@ -43,9 +47,7 @@ const useProfile = () => {
   };
 
   const changeEmail = async (data) => {
-    const fd = new FormData();
-    fd.append("email", data["email"]);
-    const res = await executeRequest(methods.PUT, profileURI + "email/", fd);
+    const res = await executeRequest(methods.PATCH, profileURI, data);
     switch (res.status) {
       case 200:
         pushInfo("Please check your email to confirm it.");

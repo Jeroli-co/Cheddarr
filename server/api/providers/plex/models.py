@@ -1,4 +1,3 @@
-from server.api.providers.models import ProviderConfig, ProviderType
 from server.database import (
     Column,
     ForeignKey,
@@ -8,6 +7,8 @@ from server.database import (
     Table,
     relationship,
 )
+
+from ..models import ProviderConfig, ProviderType
 
 
 class PlexServer(Model):

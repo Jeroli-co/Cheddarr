@@ -1,5 +1,6 @@
-from server.api.providers.models import ProviderConfig, ProviderType
 from server.database import Boolean, Column, String
+
+from ..models import ProviderConfig, ProviderType
 
 
 class SonarrConfig(ProviderConfig):
