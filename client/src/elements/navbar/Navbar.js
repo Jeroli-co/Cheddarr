@@ -130,7 +130,7 @@ const Navbar = () => {
           </RowLayout>
         </NavbarEnd>
       </RowLayout>
-      {!isLoading && (
+      {!isLoading && !isAuthenticated && (
         <UserDropdownMobile
           dropdownRef={dropdownMobileRef}
           isVisible={isDropdownOpen}
