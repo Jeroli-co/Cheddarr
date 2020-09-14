@@ -1,4 +1,4 @@
-from server.database import Boolean, Column, String
+from server.database import Boolean, Column, String, Integer
 
 from ..models import ProviderConfig, ProviderType
 
@@ -10,6 +10,11 @@ class SonarrConfig(ProviderConfig):
     ssl = Column(Boolean, default=False)
     root_folder = Column(String(128))
     anime_root_folder = Column(String(128), nullable=True)
+    quality_profile_id = Column(Integer, nullable=True)
+    anime_quality_profile_id = Column(Integer, nullable=True)
+    language_profile_id = Column(Integer, nullable=True)
+    anime_language_profile_id = Column(Integer, nullable=True)
+    v3 = Column(Boolean, default=False)
 
     __repr_props__ = (
         "id",
@@ -17,8 +22,6 @@ class SonarrConfig(ProviderConfig):
         "port",
         "ssl",
         "enabled",
-        "root_folder",
-        "anime_root_fodler",
     )
 
     def __init__(self):

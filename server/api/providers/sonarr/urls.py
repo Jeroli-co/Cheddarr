@@ -23,6 +23,12 @@ url(
 )
 url(
     providers_bp,
+    views.get_sonarr_languages_profiles,
+    ["/sonarr/languages-profiles/"],
+    methods=["GET"],
+)
+url(
+    providers_bp,
     views.sonarr_lookup,
     ["/sonarr/lookup/"],
     methods=["GET"],

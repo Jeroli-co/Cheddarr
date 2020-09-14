@@ -14,3 +14,8 @@ class SonarrConfigSchema(ma.SQLAlchemySchema):
     api_key = ma.auto_field()
     root_folder = ma.auto_field()
     anime_root_folder = ma.auto_field()
+    quality_profile_id = ma.auto_field()
+    anime_quality_profile_id = ma.auto_field()
+    language_profile_id = ma.auto_field()
+    anime_language_profile_id = ma.auto_field()
+    v3 = ma.auto_field()

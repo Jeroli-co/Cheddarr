@@ -57,7 +57,7 @@ def update_sonarr_config(config):
 def get_sonarr_root_folders():
     config = SonarrConfig.find(user=current_user)
     if not config:
-        raise BadRequest("No existing Radarr config.")
+        raise BadRequest("No existing Sonarr config.")
     url = sonarr_url(sonarr_config_serializer.dump(config), "/rootFolder")
     root_folders = [folder["path"] for folder in get(url).json()]
     return jsonify(root_folders)
@@ -67,8 +67,21 @@ def get_sonarr_root_folders():
 def get_sonarr_quality_profiles():
     config = SonarrConfig.find(user=current_user)
     if not config:
-        raise BadRequest("No existing Radarr config.")
+        raise BadRequest("No existing Sonarr config.")
     url = sonarr_url(sonarr_config_serializer.dump(config), "/profile")
+    profiles = [
+        {"id": profile["id"], "name": profile["name"]} for profile in get(url).json()
+    ]
+    return jsonify(profiles)
+
+
+def get_sonarr_languages_profiles():
+    config = SonarrConfig.find(user=current_user)
+    if not config:
+        raise BadRequest("No existing Sonarr config.")
+    if not config.v3:
+        raise BadRequest("Wrong Sonarr version.")
+    url = sonarr_url(sonarr_config_serializer.dump(config), "/languageprofile")
     profiles = [
         {"id": profile["id"], "name": profile["name"]} for profile in get(url).json()
     ]
@@ -80,7 +93,7 @@ def get_sonarr_quality_profiles():
 def sonarr_lookup(tvdb_id):
     config = SonarrConfig.find(user=current_user)
     if not config:
-        raise BadRequest("No existing Radarr config.")
+        raise BadRequest("No existing Sonarr config.")
     url = sonarr_url(
         sonarr_config_serializer.dump(config),
         "/series/lookup",
