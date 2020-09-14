@@ -55,12 +55,7 @@ const DropdownMenuMobileItem = styled.div`
   }
 `;
 
-const UserDropdownMobile = ({
-  dropdownRef,
-  isVisible,
-  isAuthenticated,
-  isLoading,
-}) => {
+const UserDropdownMobile = ({ dropdownRef, isVisible, isAuthenticated }) => {
   const { avatar, username, signOut } = useContext(AuthContext);
   return (
     <UserDropdownMobileStyle ref={dropdownRef} isVisible={isVisible}>
@@ -69,7 +64,7 @@ const UserDropdownMobile = ({
         justifyContent="space-between"
         childMarginRight="5%"
       >
-        {!isLoading && isAuthenticated && (
+        {isAuthenticated && (
           <UserDropdownImage>
             {avatar && (
               <img
@@ -80,14 +75,14 @@ const UserDropdownMobile = ({
             )}
           </UserDropdownImage>
         )}
-        {!isLoading && isAuthenticated && (
+        {isAuthenticated && (
           <p data-testid="UserDropdownUsernameMobile">{username}</p>
         )}
         <GitHubButton />
-        {!isLoading && !isAuthenticated && <SignInButton />}
-        {!isLoading && !isAuthenticated && <SignUpButton />}
+        {!isAuthenticated && <SignInButton />}
+        {!isAuthenticated && <SignUpButton />}
       </RowLayout>
-      {!isLoading && isAuthenticated && (
+      {isAuthenticated && (
         <DropdownMenuMobileStyle>
           <Link
             to={routes.USER_PROFILE.url}

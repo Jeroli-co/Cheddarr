@@ -90,7 +90,6 @@ const Navbar = () => {
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
-    console.log("HEHE");
   };
 
   return (
