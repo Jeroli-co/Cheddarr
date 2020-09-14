@@ -1,8 +1,11 @@
+from flask import jsonify
 from flask_login import current_user, login_required
+from marshmallow import fields
 from requests import get
-from server.extensions.marshmallow import body
+from server.extensions.marshmallow import body, query
 from werkzeug.exceptions import BadRequest
 
+from .helpers import sonarr_url
 from .models import SonarrConfig
 from .schemas import SonarrConfigSchema
 
@@ -20,12 +23,8 @@ def get_sonarr_status():
 @login_required
 @body(SonarrConfigSchema)
 def test_sonarr_config(config):
-    host = config["host"]
-    port = config["port"]
-    api_key = config["api_key"]
-    ssl = "https" if config["ssl"] else "http"
+    url = sonarr_url(config, "/system/status")
     try:
-        url = f"{ssl}://{host}:{port}/api/system/status?apikey={api_key}"
         r = get(url)
     except Exception:
         raise BadRequest("Failed to connect to Sonarr.")
@@ -45,8 +44,47 @@ def get_sonarr_config():
 def update_sonarr_config(config):
     sonarr_config = SonarrConfig.find(user=current_user)
     if not sonarr_config:
-        sonarr_config = SonarrConfig(api_key=config["api_key"])
+        sonarr_config = SonarrConfig()
+        sonarr_config.api_key = config["api_key"]
+        sonarr_config.host = config["host"]
         sonarr_config.user = current_user
 
     sonarr_config.update(config)
     return sonarr_config_serializer.jsonify(sonarr_config)
+
+
+@login_required
+def get_sonarr_root_folders():
+    config = SonarrConfig.find(user=current_user)
+    if not config:
+        raise BadRequest("No existing Radarr config.")
+    url = sonarr_url(sonarr_config_serializer.dump(config), "/rootFolder")
+    root_folders = [folder["path"] for folder in get(url).json()]
+    return jsonify(root_folders)
+
+
+@login_required
+def get_sonarr_quality_profiles():
+    config = SonarrConfig.find(user=current_user)
+    if not config:
+        raise BadRequest("No existing Radarr config.")
+    url = sonarr_url(sonarr_config_serializer.dump(config), "/profile")
+    profiles = [
+        {"id": profile["id"], "name": profile["name"]} for profile in get(url).json()
+    ]
+    return jsonify(profiles)
+
+
+@login_required
+@query({"tvdb_id": fields.Integer()})
+def sonarr_lookup(tvdb_id):
+    config = SonarrConfig.find(user=current_user)
+    if not config:
+        raise BadRequest("No existing Radarr config.")
+    url = sonarr_url(
+        sonarr_config_serializer.dump(config),
+        "/series/lookup",
+        queries={"term": f"tvdb:{tvdb_id}"},
+    )
+    lookup = get(url).json()
+    return jsonify(lookup)
