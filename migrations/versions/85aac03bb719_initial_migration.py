@@ -128,8 +128,8 @@ def upgrade():
     )
     op.create_table(
         "plexconfigserver",
-        sa.Column("config_id", sa.String(length=128), nullable=False),
-        sa.Column("server_id", sa.Integer(), nullable=False),
+        sa.Column("config_id", sa.Integer(), nullable=False),
+        sa.Column("server_id", sa.String(length=128), nullable=False),
         sa.ForeignKeyConstraint(
             ["config_id"],
             ["plexconfig.id"],
