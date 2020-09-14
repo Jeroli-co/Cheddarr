@@ -6,6 +6,8 @@ const usePlex = () => {
   const providerUrl = "/providers/plex/";
   const moviesUrl = providerUrl + "movies/";
   const seriesUrl = providerUrl + "series/";
+  const seasonUrl = providerUrl + "seasons/";
+  const episodeUrl = providerUrl + "episodes/";
 
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
@@ -75,11 +77,8 @@ const usePlex = () => {
     }
   };
 
-  const getSeason = async (seriesId, seasonNumber) => {
-    const res = await executeRequest(
-      methods.GET,
-      seriesUrl + seriesId + "/seasons/" + seasonNumber + "/"
-    );
+  const getSeason = async (seasonId) => {
+    const res = await executeRequest(methods.GET, seasonUrl + seasonId + "/");
     switch (res.status) {
       case 200:
         return res.data;
@@ -89,17 +88,8 @@ const usePlex = () => {
     }
   };
 
-  const getEpisode = async (seriesId, seasonNumber, episodeNumber) => {
-    const res = await executeRequest(
-      methods.GET,
-      seriesUrl +
-        seriesId +
-        "/seasons/" +
-        seasonNumber +
-        "/episodes/" +
-        episodeNumber +
-        "/"
-    );
+  const getEpisode = async (episodeId) => {
+    const res = await executeRequest(methods.GET, episodeUrl + episodeId + "/");
     switch (res.status) {
       case 200:
         return res.data;

@@ -1,9 +1,10 @@
 from flask_login import current_user, login_required
 from requests import get
-from server.api.providers.radarr.models import RadarrConfig
-from server.api.providers.radarr.schemas import RadarrConfigSchema
 from server.extensions.marshmallow import body
 from werkzeug.exceptions import BadRequest
+
+from .models import RadarrConfig
+from .schemas import RadarrConfigSchema
 
 radarr_config_serializer = RadarrConfigSchema()
 

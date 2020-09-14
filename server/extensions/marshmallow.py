@@ -7,14 +7,18 @@ from webargs.flaskparser import use_args, use_kwargs
 ma = Marshmallow()
 
 
-def webargs(schema, only=None, schema_kwargs=None, **kwargs):
+def webargs(schema, only=None, exclude=[], schema_kwargs=None, **kwargs):
     schema_kwargs = schema_kwargs or {}
 
     def factory(request):
         # Respect partial updates for PATCH requests
         partial = request.method == "PATCH" or only is not None
         return schema(
-            only=only, partial=partial, context={"request": request}, **schema_kwargs
+            only=only,
+            exclude=exclude,
+            partial=partial,
+            context={"request": request},
+            **schema_kwargs
         )
 
     if inspect.isclass(schema):
@@ -22,14 +26,18 @@ def webargs(schema, only=None, schema_kwargs=None, **kwargs):
     return use_args(schema, **kwargs)
 
 
-def webkwargs(schema, only=None, schema_kwargs=None, **kwargs):
+def webkwargs(schema, only=None, exclude=[], schema_kwargs=None, **kwargs):
     schema_kwargs = schema_kwargs or {}
 
     def factory(request):
         # Respect partial updates for PATCH requests
         partial = request.method == "PATCH" or only is not None
         return schema(
-            only=only, partial=partial, context={"request": request}, **schema_kwargs
+            only=only,
+            exclude=exclude,
+            partial=partial,
+            context={"request": request},
+            **schema_kwargs
         )
 
     if inspect.isclass(schema):

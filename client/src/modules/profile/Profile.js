@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { routes } from "../../router/routes";
-import { Link } from "react-router-dom";
-import { Route } from "react-router-dom";
+import { Link, Route } from "react-router-dom";
+import styled from "styled-components";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useProfile } from "../../hooks/useProfile";
-import styled from "styled-components";
+import { routes } from "../../router/routes";
 
 const UserPictureStyle = styled.img`
   object-fit: cover;
@@ -18,7 +17,7 @@ const Profile = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    getUser().then((res) => {
+    getUser(null).then((res) => {
       if (res) setUser(res.data);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -20,6 +20,12 @@ class BaseModel(db.Model):
         db.session.delete(self)
         return db.session.commit()
 
+    def update(self, data):
+        for field, value in data.items():
+            if hasattr(self, field):
+                setattr(self, field, value)
+        return self.save()
+
     @classmethod
     def find(cls, **filters):
         return db.session.query(cls).filter_by(**filters).one_or_none()
@@ -31,6 +37,10 @@ class BaseModel(db.Model):
     @classmethod
     def exists(cls, **filters):
         return db.session.query(cls.id).filter_by(**filters).scalar()
+
+    @classmethod
+    def search(cls, field: str, value, limit=3):
+        return cls.query.filter(getattr(cls, field).contains(value)).limit(limit).all()
 
     def __repr__(self):
         properties = [
@@ -61,4 +71,4 @@ class Model(BaseModel):
         return cls.__name__.lower()
 
 
-session = db.session  # type: orm.session.Session
+session: orm.session.Session = db.session

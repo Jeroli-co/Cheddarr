@@ -1,25 +1,20 @@
 # alias common names
-import sqlalchemy
 from server.extensions import db
-from sqlalchemy.dialects import sqlite
+from sqlalchemy import schema, types
 from sqlalchemy.orm.relationships import RelationshipProperty
 
-BigInteger = db.BigInteger().with_variant(
-    sqlite.INTEGER(), "sqlite"
-)  # type: sqlalchemy.types.BigInteger
-Boolean = db.Boolean  # type: sqlalchemy.types.Boolean
-Date = db.Date  # type: sqlalchemy.types.Date
-Enum = db.Enum  # type: sqlalchemy.types.Enum
-Float = db.Float  # type: sqlalchemy.types.Float
-ForeignKey = db.ForeignKey  # type: sqlalchemy.schema.ForeignKey
-Integer = db.Integer  # type: sqlalchemy.types.Integer
-Interval = db.Interval  # type: sqlalchemy.types.Interval
-Numeric = db.Numeric  # type: sqlalchemy.types.Numeric
-SmallInteger = db.SmallInteger  # type: sqlalchemy.types.SmallInteger
-String = db.String  # type: sqlalchemy.types.String
-Text = db.Text  # type: sqlalchemy.types.Text
-Time = db.Time  # type: sqlalchemy.types.Time
-Table = db.Table
+Boolean: types.Boolean = db.Boolean
+Date: types.Date = db.Date
+Enum: types.Enum = db.Enum
+Float: types.Float = db.Float
+Integer: types.Integer = db.Integer
+Interval: types.Interval = db.Interval
+Numeric: types.Date = db.Numeric
+String: types.String = db.String
+Text: types.Text = db.Text
+Time: types.Time = db.Time
+Table: schema.Table = db.Table
+ForeignKey: schema.ForeignKey = db.ForeignKey
 
 
 # Small hack to make type-hinting work
@@ -30,5 +25,5 @@ class __relationship_type_hinter__(RelationshipProperty):
 
 
 # alias common names
-backref = db.backref  # type: __relationship_type_hinter__
-relationship = db.relationship  # type: __relationship_type_hinter__
+backref: __relationship_type_hinter__ = db.backref
+relationship: __relationship_type_hinter__ = db.relationship

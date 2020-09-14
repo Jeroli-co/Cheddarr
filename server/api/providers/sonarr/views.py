@@ -1,9 +1,10 @@
 from flask_login import current_user, login_required
 from requests import get
-from server.api.providers.sonarr.models import SonarrConfig
-from server.api.providers.sonarr.schemas import SonarrConfigSchema
 from server.extensions.marshmallow import body
 from werkzeug.exceptions import BadRequest
+
+from .models import SonarrConfig
+from .schemas import SonarrConfigSchema
 
 sonarr_config_serializer = SonarrConfigSchema()
 

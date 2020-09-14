@@ -1,6 +1,9 @@
 from marshmallow.decorators import post_dump
-from server.api.search.tmdb import TMDB_IMAGES_URL, TMDB_POSTER_SIZE
 from server.extensions import ma
+
+TMDB_URL = "https://www.themoviedb.org/"
+TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"
+TMDB_POSTER_SIZE = "w500"
 
 
 class TmdbMediaSchema(ma.Schema):
@@ -8,6 +11,8 @@ class TmdbMediaSchema(ma.Schema):
     overview = ma.String(data_key="summary")
     vote_average = ma.Float(data_key="rating")
     poster_path = ma.String(data_key="thumbUrl")
+    media_type = ma.String()
+    link = ma.Function(lambda media: f"{TMDB_URL}{media['media_type']}/{media[ 'id']}")
 
     @post_dump
     def get_thumbUrl(self, media, **kwargs):
