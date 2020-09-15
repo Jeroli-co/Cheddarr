@@ -139,7 +139,7 @@ const SonarrConfig = () => {
               className="switch is-rounded is-small"
               ref={register}
             />
-            <label htmlFor="ssl">SSL Enabled</label>
+            <label htmlFor="ssl">SSL</label>
           </div>
         </div>
         <div className="field">
@@ -154,12 +154,12 @@ const SonarrConfig = () => {
         </div>
         <div className="is-divider is-primary" />
         <RowLayout borderBottom="1px solid LightGrey">
-          <h3 className="is-size-3">Requests config</h3>
+          <h3 className="is-size-4">Requests configurations</h3>
         </RowLayout>
         <br />
         {rootFolders && (
           <div className="field">
-            <label className="label">Root folder</label>
+            <label className="label">Default Root Folder</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="root_folder" ref={register}>
@@ -175,7 +175,7 @@ const SonarrConfig = () => {
         )}
         {rootFolders && (
           <div className="field">
-            <label className="label">Anime root folder</label>
+            <label className="label">Default Root Folder (Anime)</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="anime_root_folder" ref={register}>
@@ -191,7 +191,7 @@ const SonarrConfig = () => {
         )}
         {profiles && (
           <div className="field">
-            <label className="label">Series profiles</label>
+            <label className="label">Default Quality Profile</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="quality_profile_id" ref={register}>
@@ -207,7 +207,7 @@ const SonarrConfig = () => {
         )}
         {profiles && (
           <div className="field">
-            <label className="label">Anime profiles</label>
+            <label className="label">Default Quality Profile (Anime)</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="anime_quality_profile_id" ref={register}>
@@ -235,7 +235,7 @@ const SonarrConfig = () => {
         </div>
         {languages && watchV3 && (
           <div className="field">
-            <label className="label">Language</label>
+            <label className="label">Default Language Profile</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="language_profile_id" ref={register}>
@@ -251,7 +251,7 @@ const SonarrConfig = () => {
         )}
         {languages && watchV3 && (
           <div className="field">
-            <label className="label">Anime language</label>
+            <label className="label">Default Language Profile (Anime)</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="anime_language_profile_id" ref={register}>

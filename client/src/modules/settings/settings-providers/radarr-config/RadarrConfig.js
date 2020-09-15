@@ -4,7 +4,6 @@ import { RowLayout } from "../../../../elements/layouts";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../forms/formDefaultValidators";
 import { useRadarr } from "../../../../hooks/useRadarr";
 import { isEmptyObject } from "../../../../utils/objects";
-import { Container } from "../../../../elements/Container";
 
 const RadarrConfig = () => {
   const {
@@ -135,7 +134,7 @@ const RadarrConfig = () => {
               className="switch is-rounded is-small"
               ref={register}
             />
-            <label htmlFor="ssl">SSL Enabled</label>
+            <label htmlFor="ssl">SSL</label>
           </div>
         </div>
         <div className="field">
@@ -150,12 +149,12 @@ const RadarrConfig = () => {
         </div>
         <div className="is-divider is-primary" />
         <RowLayout borderBottom="1px solid LightGrey">
-          <h3 className="is-size-3">Requests config</h3>
+          <h3 className="is-size-4">Requests configurations</h3>
         </RowLayout>
         <br />
         {rootFolders && (
           <div className="field">
-            <label className="label">Root folder</label>
+            <label className="label">Default Root Folder</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="root_folder" ref={register}>
@@ -171,7 +170,7 @@ const RadarrConfig = () => {
         )}
         {profiles && (
           <div className="field">
-            <label className="label">Profiles</label>
+            <label className="label">Default Quality Profile</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="quality_profile_id" ref={register}>
