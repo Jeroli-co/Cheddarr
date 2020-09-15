@@ -13,3 +13,4 @@ class RadarrConfigSchema(ma.SQLAlchemySchema):
     enabled = ma.auto_field()
     api_key = ma.auto_field()
     root_folder = ma.auto_field()
+    quality_profile_id = ma.auto_field()

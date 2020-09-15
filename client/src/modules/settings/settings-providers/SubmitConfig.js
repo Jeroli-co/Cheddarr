@@ -9,7 +9,6 @@ const SubmitButton = styled.button`
   border: 2px solid ${(props) => props.theme.primary};
   background-color: white;
   color: ${(props) => props.theme.primary};
-  margin: 0 1em;
   padding: 0.25em 1em;
   font-size: 1em;
   width: 150px;

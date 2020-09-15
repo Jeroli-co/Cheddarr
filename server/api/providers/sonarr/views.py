@@ -68,7 +68,11 @@ def get_sonarr_quality_profiles():
     config = SonarrConfig.find(user=current_user)
     if not config:
         raise BadRequest("No existing Sonarr config.")
-    url = sonarr_url(sonarr_config_serializer.dump(config), "/profile")
+    if config.v3:
+      url = sonarr_url(sonarr_config_serializer.dump(config), "/qualityprofile")
+    else:
+      url = sonarr_url(sonarr_config_serializer.dump(config), "/profile")
+    print(url)
     profiles = [
         {"id": profile["id"], "name": profile["name"]} for profile in get(url).json()
     ]

@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { RowLayout } from "../../../../elements/layouts";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../forms/formDefaultValidators";
 import { useRadarr } from "../../../../hooks/useRadarr";
-import { SubmitConfig } from "../SubmitConfig";
 import { isEmptyObject } from "../../../../utils/objects";
+import { Container } from "../../../../elements/Container";
 
 const RadarrConfig = () => {
   const {
@@ -28,46 +28,32 @@ const RadarrConfig = () => {
 
   useEffect(() => {
     getRadarrConfig().then((data) => {
-      console.log(data);
       if (data) {
         reset(data);
         if (!isEmptyObject(data)) {
           getRadarrRootFolders().then((data) => {
             if (data) setRootFolders(data);
           });
-          /*
           getRadarrProfiles().then((data) => {
             if (data) setProfiles(data);
           });
-           */
         }
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    console.log(rootFolders);
-    console.log(profiles);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  });
-
   const _onSubmit = (data) => {
     let newConfig = {};
     formState.dirtyFields.forEach((key) => {
       newConfig[key] = data[key];
     });
-    updateRadarrConfig(newConfig).then((res) => {
-      if (res) reset(res.data);
-    });
+    updateRadarrConfig(newConfig);
   };
 
   return (
     <div className="RadarrConfig container" data-testid="RadarrConfig">
-      <RowLayout
-        justifyContent="space-between"
-        borderBottom="1px solid LightGrey"
-      >
+      <RowLayout borderBottom="1px solid LightGrey">
         <h1 className="is-size-1">Radarr</h1>
       </RowLayout>
       <br />
@@ -152,6 +138,21 @@ const RadarrConfig = () => {
             <label htmlFor="ssl">SSL Enabled</label>
           </div>
         </div>
+        <div className="field">
+          <div className="control">
+            <button
+              className="button is-secondary-button"
+              onClick={() => testRadarrConfig(getValues())}
+            >
+              Test
+            </button>
+          </div>
+        </div>
+        <div className="is-divider is-primary" />
+        <RowLayout borderBottom="1px solid LightGrey">
+          <h3 className="is-size-3">Requests config</h3>
+        </RowLayout>
+        <br />
         {rootFolders && (
           <div className="field">
             <label className="label">Root folder</label>
@@ -168,18 +169,33 @@ const RadarrConfig = () => {
             </div>
           </div>
         )}
-        <SubmitConfig isFormDirty={formState.dirty} />
-      </form>
-      <div className="field">
-        <div className="control">
-          <button
-            className="button is-secondary-button"
-            onClick={() => testRadarrConfig(getValues())}
-          >
-            Test
-          </button>
+        {profiles && (
+          <div className="field">
+            <label className="label">Profiles</label>
+            <div className="control">
+              <div className="select is-fullwidth">
+                <select name="quality_profile_id" ref={register}>
+                  {profiles.map((p, index) => (
+                    <option key={index} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+        <div className="field">
+          <div className="control">
+            <button
+              type="submit"
+              className="button is-primary is-outlined is-fullwidth"
+            >
+              Save changes
+            </button>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

@@ -62,11 +62,53 @@ const useSonarr = () => {
     }
   };
 
+  const getSonarrRootFolders = async () => {
+    const res = await executeRequest(
+      methods.GET,
+      providerUrl + "root-folders/"
+    );
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const getSonarrProfiles = async () => {
+    const res = await executeRequest(methods.GET, providerUrl + "profiles/");
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const getSonarrLanguages = async () => {
+    const res = await executeRequest(
+      methods.GET,
+      providerUrl + "languages-profiles/"
+    );
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return {
     getSonarrStatus,
     testSonarrConfig,
     getSonarrConfig,
     updateSonarrConfig,
+    getSonarrRootFolders,
+    getSonarrProfiles,
+    getSonarrLanguages,
   };
 };
 
