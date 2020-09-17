@@ -15,8 +15,8 @@ from sqlalchemy.ext.declarative import AbstractConcreteBase, declared_attr
 
 class ProviderType(str, Enum):
     MEDIA_SERVER = auto()
-    MOVIE_REQUEST = auto()
-    SERIES_REQUEST = auto()
+    MOVIE_PROVIDER = auto()
+    SERIES_PROVIDER = auto()
 
 
 class ProviderConfig(Model, AbstractConcreteBase):
