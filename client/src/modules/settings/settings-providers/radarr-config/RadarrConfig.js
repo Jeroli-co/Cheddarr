@@ -6,14 +6,7 @@ import { useRadarr } from "../../../../hooks/useRadarr";
 import { isEmptyObject } from "../../../../utils/objects";
 
 const RadarrConfig = () => {
-  const {
-    register,
-    handleSubmit,
-    formState,
-    reset,
-    getValues,
-    errors,
-  } = useForm();
+  const { register, handleSubmit, reset, getValues, errors } = useForm();
 
   const {
     testRadarrConfig,
@@ -42,14 +35,6 @@ const RadarrConfig = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const _onSubmit = (data) => {
-    let newConfig = {};
-    formState.dirtyFields.forEach((key) => {
-      newConfig[key] = data[key];
-    });
-    updateRadarrConfig(newConfig);
-  };
-
   return (
     <div className="RadarrConfig container" data-testid="RadarrConfig">
       <RowLayout borderBottom="1px solid LightGrey">
@@ -61,7 +46,7 @@ const RadarrConfig = () => {
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
-        onSubmit={handleSubmit(_onSubmit)}
+        onSubmit={handleSubmit(updateRadarrConfig)}
       >
         <div className="field">
           <div className="control">

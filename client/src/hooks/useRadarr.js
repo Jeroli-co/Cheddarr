@@ -48,7 +48,7 @@ const useRadarr = () => {
 
   const updateRadarrConfig = async (newConfig) => {
     const res = await executeRequest(
-      methods.PATCH,
+      methods.PUT,
       providerUrl + "config/",
       newConfig
     );

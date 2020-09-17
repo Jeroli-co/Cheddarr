@@ -6,15 +6,7 @@ import { useSonarr } from "../../../../hooks/useSonarr";
 import { isEmptyObject } from "../../../../utils/objects";
 
 const SonarrConfig = () => {
-  const {
-    register,
-    handleSubmit,
-    formState,
-    reset,
-    getValues,
-    errors,
-    watch,
-  } = useForm();
+  const { register, handleSubmit, reset, getValues, errors, watch } = useForm();
   const {
     testSonarrConfig,
     updateSonarrConfig,
@@ -47,14 +39,6 @@ const SonarrConfig = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const _onSubmit = (data) => {
-    let newConfig = {};
-    formState.dirtyFields.forEach((key) => {
-      newConfig[key] = data[key];
-    });
-    updateSonarrConfig(newConfig);
-  };
-
   return (
     <div className="SonarrConfig container" data-testid="SonarrConfig">
       <RowLayout borderBottom="1px solid LightGrey">
@@ -66,7 +50,7 @@ const SonarrConfig = () => {
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
-        onSubmit={handleSubmit(_onSubmit)}
+        onSubmit={handleSubmit(updateSonarrConfig)}
       >
         <div className="field">
           <div className="control">
