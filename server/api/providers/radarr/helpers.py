@@ -1,3 +1,4 @@
+from requests import get
 from server.utils import make_url
 
 
@@ -14,3 +15,14 @@ def radarr_url(config_dict, resource_path, queries=None) -> str:
         ),
         queries_dict={**queries, "apikey": config_dict["api_key"]},
     )
+
+
+def test_radarr_status(config):
+    url = radarr_url(config, "/system/status")
+    try:
+        r = get(url)
+    except Exception:
+        return False
+    if r.status_code != 200:
+        return False
+    return r.json()

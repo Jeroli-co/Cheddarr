@@ -21,7 +21,7 @@ const useRadarr = () => {
 
   const testRadarrConfig = async (config) => {
     const res = await executeRequest(
-      methods.POST,
+      methods.PATCH,
       providerUrl + "config/test/",
       config
     );

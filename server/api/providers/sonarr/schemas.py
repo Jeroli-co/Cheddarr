@@ -8,3 +8,4 @@ class SonarrConfigSchema(ma.SQLAlchemyAutoSchema):
         table = (
             SonarrConfig.__table__
         )  # table instead of model for the AutoSchema with Concrete Inheritance
+        exclude = ("provider_type",)

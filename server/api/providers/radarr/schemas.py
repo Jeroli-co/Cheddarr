@@ -8,3 +8,4 @@ class RadarrConfigSchema(ma.SQLAlchemyAutoSchema):
         table = (
             RadarrConfig.__table__
         )  # table instead of model for the AutoSchema with Concrete Inheritance
+        exclude = ("provider_type",)
