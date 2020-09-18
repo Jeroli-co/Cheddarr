@@ -1,6 +1,5 @@
 from marshmallow.decorators import post_dump
 from server.extensions import ma
-import tmdbsimple as tmdb
 
 TMDB_URL = "https://www.themoviedb.org/"
 TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"
@@ -35,15 +34,14 @@ class TmdbMovieSchema(TmdbMediaSchema):
     title = ma.String()
     release_date = ma.String(data_key="releaseDate")
     media_type = ma.String(default="movie")
+    link = ma.Function(lambda media: f"{TMDB_URL}movie/{media[ 'id']}")
 
 
 class TmdbSeriesSchema(TmdbMediaSchema):
     name = ma.String(data_key="title")
     first_air_date = ma.String(data_key="releaseDate")
     media_type = ma.String(default="series")
-    tvdb_id = ma.Function(
-        lambda series: tmdb.TV(series["id"]).external_ids().get("tvdb_id")
-    )
+    link = ma.Function(lambda media: f"{TMDB_URL}tv/{media[ 'id']}")
 
 
 class TmdbMediaSearchResultSchema(ma.Schema):

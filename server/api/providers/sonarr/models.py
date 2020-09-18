@@ -25,4 +25,4 @@ class SonarrConfig(ProviderConfig):
     )
 
     def __init__(self):
-        self.provider_type = ProviderType.SERIES_REQUEST
+        self.provider_type = ProviderType.SERIES_PROVIDER

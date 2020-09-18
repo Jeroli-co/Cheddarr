@@ -35,6 +35,7 @@ class User(Model, UserMixin):
     session_token = Column(String(256))
     confirmed = Column(Boolean, default=False)
     api_key = Column(String(256), nullable=True)
+    providers = relationship("ProviderConfig", back_populates="user")
 
     __repr_props__ = ("username", "email", "confirmed")
 

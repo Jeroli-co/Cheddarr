@@ -37,3 +37,6 @@ url(users_bp, views.get_received_friends, ["/user/friends/received/"], methods=[
 url(
     users_bp, views.get_requested_friends, ["/user/friends/requested/"], methods=["GET"]
 )
+url(
+    users_bp, views.get_friends_providers, ["/user/friends/providers/"], methods=["GET"]
+)

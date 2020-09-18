@@ -20,4 +20,4 @@ class RadarrConfig(ProviderConfig):
     )
 
     def __init__(self):
-        self.provider_type = ProviderType.MOVIE_REQUEST
+        self.provider_type = ProviderType.MOVIE_PROVIDER

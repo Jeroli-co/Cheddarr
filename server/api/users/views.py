@@ -1,9 +1,10 @@
 from flask import request, session, url_for
 from flask_login import current_user, fresh_login_required, login_required
 from marshmallow import fields
+from marshmallow.validate import OneOf
 from server import utils
 from server.extensions import limiter
-from server.extensions.marshmallow import body, form
+from server.extensions.marshmallow import body, form, query
 from server.tasks import send_email
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
 
@@ -215,3 +216,26 @@ def reset_api_key():
     current_user.api_key = utils.generate_api_key()
     current_user.save()
     return {"key": current_user.api_key}
+
+
+@login_required
+@query({"type": fields.String(validate=OneOf(["movies", "series"]))})
+def get_friends_providers(type):
+
+    friends = current_user.friends
+    if type == "movies":
+        friends_available = [
+            friend
+            for friend in friends
+            for provider in friend.providers
+            if provider.provides_movies()
+        ]
+    else:
+        friends_available = [
+            friend
+            for friend in friends
+            for provider in friend.providers
+            if provider.provides_series()
+        ]
+
+    return profile_serializer.jsonify(friends_available, many=True)

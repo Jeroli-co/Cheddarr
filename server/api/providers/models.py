@@ -36,11 +36,17 @@ class ProviderConfig(Model, AbstractConcreteBase):
 
     @declared_attr
     def user(cls):
-        return relationship("User")
+        return relationship("User", back_populates="providers")
 
     @declared_attr
     def user_id(cls):
         return Column(Integer, ForeignKey("user.id"), nullable=False)
+
+    def provides_movies(self):
+        return self.provider_type == ProviderType.MOVIE_PROVIDER
+
+    def provides_series(self):
+        return self.provider_type == ProviderType.SERIES_PROVIDER
 
 
 # Sub-models
