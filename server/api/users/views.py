@@ -107,7 +107,6 @@ def reset_password(email=None, password=None, token=None):
 @limiter.limit("10/hour")
 @body(UserSchema, only=["username", "email"])
 def update_user(fields):
-    print(fields)
     if "username" in fields.keys():
         username = fields["username"]
         if User.exists(username=username):

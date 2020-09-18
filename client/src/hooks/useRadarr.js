@@ -21,17 +21,17 @@ const useRadarr = () => {
 
   const testRadarrConfig = async (config) => {
     const res = await executeRequest(
-      methods.POST,
+      methods.PATCH,
       providerUrl + "config/test/",
       config
     );
     switch (res.status) {
       case 200:
         pushSuccess("Connection successful");
-        return !!res.data.status;
+        return res.data;
       default:
         pushDanger("Connection failed");
-        return false;
+        return null;
     }
   };
 
@@ -48,7 +48,7 @@ const useRadarr = () => {
 
   const updateRadarrConfig = async (newConfig) => {
     const res = await executeRequest(
-      methods.PATCH,
+      methods.PUT,
       providerUrl + "config/",
       newConfig
     );

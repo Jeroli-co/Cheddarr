@@ -55,6 +55,7 @@ def random_avatar():
     return url_for("site.images", image_name="profile/" + avatar, _external=True)
 
 
-def make_url(url, queries_dict={}):
+def make_url(url, queries_dict=None):
+    queries_dict = queries_dict or {}
     parameters = urllib.parse.urlencode(queries_dict)
     return url + "?" + parameters
