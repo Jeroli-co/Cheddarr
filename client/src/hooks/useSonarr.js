@@ -28,10 +28,10 @@ const useSonarr = () => {
     switch (res.status) {
       case 200:
         pushSuccess("Connection successful");
-        return !!res.data.status;
+        return res.data;
       default:
         pushDanger("Connection failed");
-        return false;
+        return null;
     }
   };
 
@@ -62,53 +62,11 @@ const useSonarr = () => {
     }
   };
 
-  const getSonarrRootFolders = async () => {
-    const res = await executeRequest(
-      methods.GET,
-      providerUrl + "root-folders/"
-    );
-    switch (res.status) {
-      case 200:
-        return res.data;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const getSonarrProfiles = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "profiles/");
-    switch (res.status) {
-      case 200:
-        return res.data;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const getSonarrLanguages = async () => {
-    const res = await executeRequest(
-      methods.GET,
-      providerUrl + "languages-profiles/"
-    );
-    switch (res.status) {
-      case 200:
-        return res.data;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
   return {
     getSonarrStatus,
     testSonarrConfig,
     getSonarrConfig,
     updateSonarrConfig,
-    getSonarrRootFolders,
-    getSonarrProfiles,
-    getSonarrLanguages,
   };
 };
 

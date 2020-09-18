@@ -154,7 +154,6 @@ def get_plex_episode(episode_id):
     plex_server = connect_plex_servers(current_user)
     episode = plex_server.fetchItem(ekey=episode_id)
     episode.reload()
-    print(episode)
     return plex_episode_serializer.jsonify(episode)
 
 

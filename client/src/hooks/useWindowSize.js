@@ -14,7 +14,6 @@ const useWindowSize = () => {
   useEffect(() => {
     const handleResize = () => {
       const size = getWindowSize();
-      console.log(size);
       setWindowSize(size);
     };
 

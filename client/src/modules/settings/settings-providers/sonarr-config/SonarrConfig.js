@@ -6,38 +6,29 @@ import { useSonarr } from "../../../../hooks/useSonarr";
 import { isEmptyObject } from "../../../../utils/objects";
 
 const SonarrConfig = () => {
-  const { register, handleSubmit, reset, getValues, errors, watch } = useForm();
-  const {
-    testSonarrConfig,
-    updateSonarrConfig,
-    getSonarrConfig,
-    getSonarrRootFolders,
-    getSonarrProfiles,
-    getSonarrLanguages,
-  } = useSonarr();
-  const [rootFolders, setRootFolders] = useState(null);
-  const [profiles, setProfiles] = useState(null);
-  const [languages, setLanguages] = useState(null);
-  const watchV3 = watch("v3");
+  const { register, handleSubmit, reset, getValues, errors } = useForm();
+  const { testSonarrConfig, updateSonarrConfig, getSonarrConfig } = useSonarr();
+  const [requestsConfig, setRequestsConfig] = useState(null);
   useEffect(() => {
     getSonarrConfig().then((data) => {
       if (data) {
-        reset(data);
         if (!isEmptyObject(data)) {
-          getSonarrRootFolders().then((data) => {
-            if (data) setRootFolders(data);
-          });
-          getSonarrProfiles().then((data) => {
-            if (data) setProfiles(data);
-          });
-          getSonarrLanguages().then((data) => {
-            if (data) setLanguages(data);
-          });
+          reset(data);
         }
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const testConfig = (data) => {
+    testSonarrConfig(data).then((c) => {
+      if (c) setRequestsConfig(c);
+    });
+  };
+
+  const isVersionThree = (config) => {
+    return config.version[0] === "3";
+  };
 
   return (
     <div className="SonarrConfig container" data-testid="SonarrConfig">
@@ -129,25 +120,30 @@ const SonarrConfig = () => {
         <div className="field">
           <div className="control">
             <button
+              type="button"
               className="button is-secondary-button"
-              onClick={() => testSonarrConfig(getValues())}
+              onClick={() => testConfig(getValues())}
             >
               Test
             </button>
           </div>
         </div>
-        <div className="is-divider is-primary" />
-        <RowLayout borderBottom="1px solid LightGrey">
-          <h3 className="is-size-4">Requests configurations</h3>
-        </RowLayout>
-        <br />
-        {rootFolders && (
+        {requestsConfig && (
+          <div>
+            <div className="is-divider is-primary" />
+            <RowLayout borderBottom="1px solid LightGrey">
+              <h3 className="is-size-4">Requests configurations</h3>
+            </RowLayout>
+            <br />
+          </div>
+        )}
+        {requestsConfig && (
           <div className="field">
             <label className="label">Default Root Folder</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="root_folder" ref={register}>
-                  {rootFolders.map((rf, index) => (
+                  {requestsConfig["root_folders"].map((rf, index) => (
                     <option key={index} value={rf}>
                       {rf}
                     </option>
@@ -157,13 +153,13 @@ const SonarrConfig = () => {
             </div>
           </div>
         )}
-        {rootFolders && (
+        {requestsConfig && (
           <div className="field">
             <label className="label">Default Root Folder (Anime)</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="anime_root_folder" ref={register}>
-                  {rootFolders.map((rf, index) => (
+                  {requestsConfig["root_folders"].map((rf, index) => (
                     <option key={index} value={rf}>
                       {rf}
                     </option>
@@ -173,13 +169,13 @@ const SonarrConfig = () => {
             </div>
           </div>
         )}
-        {profiles && (
+        {requestsConfig && (
           <div className="field">
             <label className="label">Default Quality Profile</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="quality_profile_id" ref={register}>
-                  {profiles.map((p, index) => (
+                  {requestsConfig["quality_profiles"].map((p, index) => (
                     <option key={index} value={p.id}>
                       {p.name}
                     </option>
@@ -189,13 +185,13 @@ const SonarrConfig = () => {
             </div>
           </div>
         )}
-        {profiles && (
+        {requestsConfig && (
           <div className="field">
             <label className="label">Default Quality Profile (Anime)</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="anime_quality_profile_id" ref={register}>
-                  {profiles.map((p, index) => (
+                  {requestsConfig["quality_profiles"].map((p, index) => (
                     <option key={index} value={p.id}>
                       {p.name}
                     </option>
@@ -205,25 +201,13 @@ const SonarrConfig = () => {
             </div>
           </div>
         )}
-        <div className="field">
-          <div className="control">
-            <input
-              id="v3"
-              type="checkbox"
-              name="v3"
-              className="switch is-rounded is-small"
-              ref={register}
-            />
-            <label htmlFor="v3">V3</label>
-          </div>
-        </div>
-        {languages && watchV3 && (
+        {requestsConfig && isVersionThree(requestsConfig) && (
           <div className="field">
             <label className="label">Default Language Profile</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="language_profile_id" ref={register}>
-                  {languages.map((l, index) => (
+                  {requestsConfig["language_profiles"].map((l, index) => (
                     <option key={index} value={l.id}>
                       {l.name}
                     </option>
@@ -233,13 +217,13 @@ const SonarrConfig = () => {
             </div>
           </div>
         )}
-        {languages && watchV3 && (
+        {requestsConfig && isVersionThree(requestsConfig) && (
           <div className="field">
             <label className="label">Default Language Profile (Anime)</label>
             <div className="control">
               <div className="select is-fullwidth">
                 <select name="anime_language_profile_id" ref={register}>
-                  {languages.map((l, index) => (
+                  {requestsConfig["language_profiles"].map((l, index) => (
                     <option key={index} value={l.id}>
                       {l.name}
                     </option>
@@ -249,16 +233,18 @@ const SonarrConfig = () => {
             </div>
           </div>
         )}
-        <div className="field">
-          <div className="control">
-            <button
-              type="submit"
-              className="button is-primary is-outlined is-fullwidth"
-            >
-              Save changes
-            </button>
+        {requestsConfig && (
+          <div className="field">
+            <div className="control">
+              <button
+                type="submit"
+                className="button is-primary is-outlined is-fullwidth"
+              >
+                Save changes
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </div>
   );

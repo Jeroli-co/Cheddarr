@@ -30,7 +30,6 @@ const useProfile = () => {
   };
 
   const changeUsername = async (data) => {
-    console.log(data);
     const res = await executeRequest(methods.PATCH, profileURI, data);
     switch (res.status) {
       case 200:
