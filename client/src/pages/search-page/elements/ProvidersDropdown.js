@@ -5,7 +5,7 @@ const ProvidersDropdown = ({ providers, handleChange }) => {
   return (
     <div className="select is-primary">
       <select name="friends-movies-provider" onChange={handleChange}>
-        {!providers && <Spinner color="LightSlateGray" size="small" />}
+        {!providers && <Spinner color="LightSlateGray" size="sm" />}
         {providers &&
           providers.map((p, index) => (
             <option key={index} value={p}>
