@@ -149,11 +149,11 @@ const useFriends = () => {
   const requestMedia = async (provider, media) => {
     const res = await executeRequest(
       methods.GET,
-      friendsURI + "/media/request?provider=" + provider + "&media=" + media.id
+      friendsURI + "/media/request?provider=" + provider.username + "&media=" + media.id
     );
     switch (res.status) {
       case 200:
-        pushSuccess(media.title + " has been requested to " + provider);
+        pushSuccess(media.title + " has been requested to " + provider.username);
         return res;
       default:
         handleError(res);
