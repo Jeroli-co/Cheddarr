@@ -3,19 +3,20 @@ import { Container } from "../../../elements/Container";
 import { RowLayout } from "../../../elements/layouts";
 import { Image } from "../../../elements/Image";
 import { MediaRating } from "../../../elements/media/MediaRating";
-import { Spinner } from "../../../elements/Spinner";
+import { MediaRequest } from "./MediaRequest";
+import { ProvidersDropdown } from "./ProvidersDropdown";
 
 const OnlineMovieCard = ({ movie, friendsProviders }) => {
-  const [friendProvider, setFriendProvider] = useState(null);
+  const [providerSelected, setProviderSelected] = useState(null);
 
   useEffect(() => {
     if (friendsProviders.length > 0) {
-      setFriendProvider(friendsProviders[0]);
+      setProviderSelected(friendsProviders[0]);
     }
   }, [friendsProviders]);
 
   const handleChange = (event) => {
-    setFriendProvider(event.target.value);
+    setProviderSelected(event.target.value);
   };
 
   return (
@@ -33,19 +34,13 @@ const OnlineMovieCard = ({ movie, friendsProviders }) => {
           borderRadius="12px"
         />
         <Container width="100%" padding="1%">
-          <RowLayout justifyContent="space-between">
+          <RowLayout justifyContent="space-between" alignItems="center">
             <h1 className="title is-3">{movie.title}</h1>
-            <select name="friends-movies-provider" onChange={handleChange}>
-              {!friendsProviders && (
-                <Spinner color="LightSlateGray" size="small" />
-              )}
-              {friendsProviders &&
-                friendsProviders.map((u, index) => (
-                  <option key={index} value={u}>
-                    {u.username}
-                  </option>
-                ))}
-            </select>
+            <ProvidersDropdown
+              providers={friendsProviders}
+              handleChange={handleChange}
+            />
+            <MediaRequest userProvider={providerSelected} media={movie} />
             <MediaRating media={movie} />
           </RowLayout>
           <div>

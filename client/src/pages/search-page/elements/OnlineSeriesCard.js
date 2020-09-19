@@ -1,11 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container } from "../../../elements/Container";
 import { RowLayout } from "../../../elements/layouts";
 import { Image } from "../../../elements/Image";
 import { MediaRating } from "../../../elements/media/MediaRating";
 import { Spinner } from "../../../elements/Spinner";
+import { ProvidersDropdown } from "./ProvidersDropdown";
+import { MediaRequest } from "./MediaRequest";
 
 const OnlineSeriesCard = ({ series, friendsProviders }) => {
+  const [providerSelected, setProviderSelected] = useState(null);
+
+  useEffect(() => {
+    if (friendsProviders.length > 0) {
+      setProviderSelected(friendsProviders[0]);
+    }
+  }, [friendsProviders]);
+
+  const handleChange = (event) => {
+    setProviderSelected(event.target.value);
+  };
+
   return (
     <Container
       padding="1%"
@@ -21,19 +35,13 @@ const OnlineSeriesCard = ({ series, friendsProviders }) => {
           borderRadius="12px"
         />
         <Container width="100%" padding="1%">
-          <RowLayout justifyContent="space-between">
+          <RowLayout justifyContent="space-between" alignItems="center">
             <h1 className="title is-3">{series.title}</h1>
-            <select name="friends-series-provider">
-              {!friendsProviders && (
-                <Spinner color="LightSlateGray" size="small" />
-              )}
-              {friendsProviders &&
-                friendsProviders.map((u, index) => (
-                  <option key={index} value={u}>
-                    {u.username}
-                  </option>
-                ))}
-            </select>
+            <ProvidersDropdown
+              providers={friendsProviders}
+              handleChange={handleChange}
+            />
+            <MediaRequest userProvider={providerSelected} media={series} />
             <MediaRating media={series} />
           </RowLayout>
           <div>

@@ -131,11 +131,15 @@ const useFriends = () => {
   const getMediaStatus = async (provider, media_id) => {
     const res = await executeRequest(
       methods.GET,
-      friendsURI + "/media/status/?provider=" + provider + "&media=" + media_id
+      friendsURI +
+        "/media/status/?provider=" +
+        provider.username +
+        "&media=" +
+        media_id
     );
     switch (res.status) {
       case 200:
-        return res.data;
+        return res.data.hasOwnProperty("status") ? res.data.status : null;
       default:
         handleError(res);
         return null;
