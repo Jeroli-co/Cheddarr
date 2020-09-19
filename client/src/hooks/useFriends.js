@@ -1,11 +1,13 @@
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { useApi } from "./useApi";
+import { NotificationContext } from "../contexts/NotificationContext";
 
 const useFriends = () => {
   const friendsURI = "/user/friends/";
 
   const { executeRequest, methods } = useApi();
+  const { pushSuccess, pushDanger } = useContext(NotificationContext);
   const { handleError } = useContext(AuthContext);
 
   const getFriends = async () => {
@@ -112,6 +114,49 @@ const useFriends = () => {
     }
   };
 
+  const getFriendsProvider = async (type) => {
+    const res = await executeRequest(
+      methods.GET,
+      friendsURI + "providers/?type=" + type
+    );
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const getMediaStatus = async (provider, media_id) => {
+    const res = await executeRequest(
+      methods.GET,
+      friendsURI + "/media/status/?provider=" + provider + "&media=" + media_id
+    );
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
+  const requestMedia = async (provider, media) => {
+    const res = await executeRequest(
+      methods.GET,
+      friendsURI + "/media/request?provider=" + provider + "&media=" + media.id
+    );
+    switch (res.status) {
+      case 200:
+        pushSuccess(media.title + " has been requested to " + provider);
+        return res;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return {
     addFriend,
     acceptRequest,
@@ -121,6 +166,9 @@ const useFriends = () => {
     getFriends,
     getReceived,
     getRequested,
+    getFriendsProvider,
+    getMediaStatus,
+    requestMedia,
   };
 };
 

@@ -3,8 +3,9 @@ import { Container } from "../../../elements/Container";
 import { RowLayout } from "../../../elements/layouts";
 import { Image } from "../../../elements/Image";
 import { MediaRating } from "../../../elements/media/MediaRating";
+import { Spinner } from "../../../elements/Spinner";
 
-const OnlineSeriesCard = ({ series }) => {
+const OnlineSeriesCard = ({ series, friendsProviders }) => {
   return (
     <Container
       padding="1%"
@@ -22,9 +23,20 @@ const OnlineSeriesCard = ({ series }) => {
         <Container width="100%" padding="1%">
           <RowLayout justifyContent="space-between">
             <h1 className="title is-3">{series.title}</h1>
+            <select name="friends-series-provider">
+              {!friendsProviders && (
+                <Spinner color="LightSlateGray" size="small" />
+              )}
+              {friendsProviders &&
+                friendsProviders.map((u, index) => (
+                  <option key={index} value={u}>
+                    {u.username}
+                  </option>
+                ))}
+            </select>
             <MediaRating media={series} />
           </RowLayout>
-          <RowLayout childPaddingRight="1em">
+          <div>
             {series["releaseDate"] && (
               <p
                 className="is-size-7"
@@ -34,7 +46,7 @@ const OnlineSeriesCard = ({ series }) => {
                 {series["releaseDate"]}
               </p>
             )}
-          </RowLayout>
+          </div>
           {series.summary && (
             <RowLayout marginTop="1em">
               <div>

@@ -6,6 +6,7 @@ import { SEARCH_RESULTS } from "../../enums/SearchResults";
 import { OnlineMovieCard } from "./elements/OnlineMovieCard";
 import { OnlineSeriesCard } from "./elements/OnlineSeriesCard";
 import { Container } from "../../elements/Container";
+import { useFriends } from "../../hooks/useFriends";
 
 const initialState = {
   results: [],
@@ -16,10 +17,19 @@ const SearchPage = () => {
   const { type, title } = useParams();
   const [data, setData] = useState(initialState);
   const { searchOnline } = useSearch();
+  const { getFriendsProvider } = useFriends();
+  const [friendsMoviesProviders, setFriendsMoviesProviders] = useState([]);
+  const [friendsSeriesProviders, setFriendsSeriesProviders] = useState([]);
 
   useEffect(() => {
     searchOnline(type, title).then((res) => {
       setData({ results: res.results, isLoading: false });
+      getFriendsProvider("movies").then((fmp) =>
+        setFriendsMoviesProviders(fmp)
+      );
+      getFriendsProvider("series").then((fsp) =>
+        setFriendsSeriesProviders(fsp)
+      );
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, title]);
@@ -41,9 +51,21 @@ const SearchPage = () => {
       content = data.results.map((media, index) => {
         switch (media["media_type"]) {
           case SEARCH_RESULTS.MOVIE:
-            return <OnlineMovieCard key={index} movie={media} />;
+            return (
+              <OnlineMovieCard
+                key={index}
+                movie={media}
+                friendsProviders={friendsMoviesProviders}
+              />
+            );
           case SEARCH_RESULTS.SERIES:
-            return <OnlineSeriesCard key={index} series={media} />;
+            return (
+              <OnlineSeriesCard
+                key={index}
+                series={media}
+                friendsProviders={friendsSeriesProviders}
+              />
+            );
           default:
             console.log("No type matched");
             return <div />;
