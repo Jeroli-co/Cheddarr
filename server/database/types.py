@@ -1,7 +1,8 @@
 # alias common names
-from server.extensions import db
 from sqlalchemy import schema, types
 from sqlalchemy.orm.relationships import RelationshipProperty
+
+from server.extensions import db
 
 Boolean: types.Boolean = db.Boolean
 Date: types.Date = db.Date
@@ -15,6 +16,8 @@ Text: types.Text = db.Text
 Time: types.Time = db.Time
 Table: schema.Table = db.Table
 ForeignKey: schema.ForeignKey = db.ForeignKey
+UniqueConstraint: schema.UniqueConstraint = db.UniqueConstraint
+ForeignKeyConstraint: schema.ForeignKeyConstraint = db.ForeignKeyConstraint
 
 
 # Small hack to make type-hinting work

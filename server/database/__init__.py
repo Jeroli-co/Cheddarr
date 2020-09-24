@@ -1,5 +1,3 @@
-from server.extensions.sqlalchemy import db
-
 from .column import Column
 from .model import Model, session
 from .types import (
@@ -17,4 +15,6 @@ from .types import (
     Time,
     backref,
     relationship,
+    UniqueConstraint,
+    ForeignKeyConstraint,
 )

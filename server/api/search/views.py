@@ -1,10 +1,12 @@
 import tmdbsimple as tmdb
 from flask import jsonify
 from flask_login import login_required
+from requests import HTTPError
+from werkzeug.exceptions import abort
+
 from server.extensions import cache
 from server.extensions.marshmallow import query
 from .helpers import search_friends, search_media
-
 from .schemas import (
     FriendSearchResultSchema,
     MediaSearchResultSchema,
@@ -12,9 +14,10 @@ from .schemas import (
     TmdbMediaSearchResultSchema,
     TmdbMovieSearchResultSchema,
     TmdbSeriesSearchResultSchema,
+    TmdbMovieSchema,
+    TmdbSeriesSchema,
+    TmdbSeasonSchema,
 )
-
-tmdb_search = tmdb.Search()
 
 
 @login_required
@@ -37,22 +40,55 @@ def search_all(value, type=None, **kwargs):
 @login_required
 @query(SearchSchema)
 @cache.memoize(timeout=3600)
-def search_media_online(value, page=1):
-    results = tmdb_search.multi(query=value, page=page)
+def search_tmdb_media(value, page=1):
+    results = tmdb.Search().multi(query=value, page=page)
     return TmdbMediaSearchResultSchema().jsonify(results)
 
 
 @login_required
 @query(SearchSchema)
 @cache.memoize(timeout=3600)
-def search_movies_online(value, page=1):
-    results = tmdb_search.movie(query=value, page=page)
+def search_tmdb_movies(value, page=1):
+    results = tmdb.Search().movie(query=value, page=page)
     return TmdbMovieSearchResultSchema().jsonify(results)
 
 
 @login_required
 @query(SearchSchema)
 @cache.memoize(timeout=3600)
-def search_series_online(value, page=1):
-    results = tmdb_search.tv(query=value, page=page)
+def search_tmdb_series(value, page=1):
+    results = tmdb.Search().tv(query=value, page=page)
     return TmdbSeriesSearchResultSchema().jsonify(results)
+
+
+@login_required
+@cache.memoize(timeout=3600)
+def get_tmdb_movie(tmdb_id):
+    try:
+        movie = tmdb.Movies(tmdb_id).info()
+    except HTTPError as e:
+        abort(e.response.status_code)
+        return {}
+    return TmdbMovieSchema().jsonify(movie)
+
+
+@login_required
+@cache.memoize(timeout=3600)
+def get_tmdb_series(tmdb_id):
+    try:
+        series = tmdb.TV(tmdb_id).info()
+    except HTTPError as e:
+        abort(e.response.status_code)
+        return {}
+    return TmdbSeriesSchema().jsonify(series)
+
+
+@login_required
+@cache.memoize(timeout=3600)
+def get_tmdb_season(tmdb_id, season_number):
+    try:
+        season = tmdb.TV_Seasons(tmdb_id, season_number).info()
+    except HTTPError as e:
+        abort(e.response.status_code)
+        return {}
+    return TmdbSeasonSchema().jsonify(season)

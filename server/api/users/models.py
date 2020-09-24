@@ -1,6 +1,9 @@
 from uuid import uuid4
 
 from flask_login import UserMixin
+from sqlalchemy.orm import validates
+from sqlalchemy_utils import EmailType, PasswordType, URLType
+
 from server import utils
 from server.database import (
     Boolean,
@@ -13,8 +16,6 @@ from server.database import (
     relationship,
     session,
 )
-from sqlalchemy.orm import validates
-from sqlalchemy_utils import EmailType, PasswordType, URLType
 
 
 class User(Model, UserMixin):
@@ -102,12 +103,12 @@ class Friendship(Model):
     receiving_user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
     requesting_user = relationship(
         "User",
-        primaryjoin=(User.id == requesting_user_id),
+        foreign_keys=[requesting_user_id],
         backref=backref("requested_friends", cascade="all,delete", lazy="dynamic"),
     )
     receiving_user = relationship(
         "User",
-        primaryjoin=(User.id == receiving_user_id),
+        foreign_keys=[receiving_user_id],
         backref=backref("received_friends", cascade="all,delete", lazy="dynamic"),
     )
     pending = Column(Boolean, default=True)

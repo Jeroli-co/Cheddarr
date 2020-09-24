@@ -1,9 +1,11 @@
 from marshmallow.decorators import post_dump
+
 from server.extensions import ma
 
 TMDB_URL = "https://www.themoviedb.org/"
 TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"
 TMDB_POSTER_SIZE = "w500"
+TMDB_ART_SIZE = "w1280"
 
 
 class TmdbMediaSchema(ma.Schema):
@@ -11,7 +13,9 @@ class TmdbMediaSchema(ma.Schema):
     overview = ma.String(data_key="summary")
     vote_average = ma.Float(data_key="rating")
     poster_path = ma.String(data_key="thumbUrl")
+    backdrop_path = ma.String(data_key="art_url")
     media_type = ma.String()
+    status = ma.String()
     link = ma.Function(lambda media: f"{TMDB_URL}{media['media_type']}/{media[ 'id']}")
 
     @post_dump
@@ -22,6 +26,14 @@ class TmdbMediaSchema(ma.Schema):
             media[
                 "thumbUrl"
             ] = f"{TMDB_IMAGES_URL}{TMDB_POSTER_SIZE}{media['thumbUrl']}"
+        return media
+
+    @post_dump
+    def get_art_url(self, media, **kwargs):
+        if media.get("art_url") is None:
+            return media
+        else:
+            media["art_url"] = f"{TMDB_IMAGES_URL}{TMDB_POSTER_SIZE}{media['art_url']}"
         return media
 
     @post_dump
@@ -41,7 +53,21 @@ class TmdbSeriesSchema(TmdbMediaSchema):
     name = ma.String(data_key="title")
     first_air_date = ma.String(data_key="releaseDate")
     media_type = ma.String(default="series")
+    seasons = ma.Nested("TmdbSeasonSchema", many=True)
     link = ma.Function(lambda media: f"{TMDB_URL}tv/{media[ 'id']}")
+
+
+class TmdbSeasonSchema(ma.Schema):
+    season_number = ma.Int()
+    name = ma.String()
+    air_date = ma.String(data_key="release_date")
+    episodes = ma.Nested("TmdbEpisodeSchema", many=True)
+
+
+class TmdbEpisodeSchema(ma.Schema):
+    episode_number = ma.Int()
+    name = ma.String()
+    air_date = ma.String(data_key="release_date")
 
 
 class TmdbMediaSearchResultSchema(ma.Schema):

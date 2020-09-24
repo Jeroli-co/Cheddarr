@@ -1,6 +1,7 @@
-from server.extensions.sqlalchemy import db
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
+
+from server.extensions import db
 
 
 class BaseModel(db.Model):

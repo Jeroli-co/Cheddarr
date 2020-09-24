@@ -60,6 +60,11 @@ def _create_app(config_object: Config, **kwargs):
         resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}},
     )
 
+    @app.errorhandler(422)
+    def handle_error(err):
+        messages = err.data.get("messages", ["Invalid request."])
+        return jsonify({"errors": messages}), err.code
+
     @app.errorhandler(Exception)
     def handle_invalid_usage(error):
         if isinstance(error, HTTPException):
@@ -109,12 +114,14 @@ def register_blueprints(app):
     from server.auth.urls import auth_bp
     from server.api.users.urls import users_bp
     from server.api.providers.urls import providers_bp
+    from server.api.requests.urls import requests_bp
     from server.api.search.urls import search_bp
 
     app.register_blueprint(site_bp)
     app.register_blueprint(auth_bp, url_prefix=API_ROOT)
     app.register_blueprint(users_bp, url_prefix=API_ROOT)
     app.register_blueprint(providers_bp, url_prefix=API_ROOT + "/providers")
+    app.register_blueprint(requests_bp, url_prefix=API_ROOT + "/requests")
     app.register_blueprint(search_bp, url_prefix=API_ROOT + "/search")
 
 
