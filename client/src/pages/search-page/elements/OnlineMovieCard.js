@@ -3,13 +3,15 @@ import { Container } from "../../../elements/Container";
 import { RowLayout } from "../../../elements/layouts";
 import { Image } from "../../../elements/Image";
 import { MediaRating } from "../../../elements/media/MediaRating";
-import { MediaRequest } from "./MediaRequest";
+import { MediaRequestButton } from "./MediaRequestButton";
 import { ProvidersDropdown } from "./ProvidersDropdown";
+import { MEDIA_TYPES } from "../../../modules/media/enums/MediaTypes";
 
 const OnlineMovieCard = ({ movie, friendsProviders }) => {
   const [providerSelected, setProviderSelected] = useState(null);
 
   useEffect(() => {
+    console.log(movie);
     if (friendsProviders.length > 0) {
       setProviderSelected(friendsProviders[0]);
     }
@@ -40,7 +42,13 @@ const OnlineMovieCard = ({ movie, friendsProviders }) => {
               providers={friendsProviders}
               handleChange={handleChange}
             />
-            <MediaRequest userProvider={providerSelected} media={movie} />
+            {providerSelected && (
+              <MediaRequestButton
+                requested_username={providerSelected.username}
+                media_type={MEDIA_TYPES.MOVIES}
+                media_id={movie.id}
+              />
+            )}
             <MediaRating media={movie} />
           </RowLayout>
           <div>

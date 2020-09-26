@@ -6,7 +6,7 @@ import { SEARCH_RESULTS } from "../../enums/SearchResults";
 import { OnlineMovieCard } from "./elements/OnlineMovieCard";
 import { OnlineSeriesCard } from "./elements/OnlineSeriesCard";
 import { Container } from "../../elements/Container";
-import { useFriends } from "../../hooks/useFriends";
+import { useFriends } from "../../modules/user/friends/hooks/useFriends";
 
 const initialState = {
   results: [],

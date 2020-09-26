@@ -114,8 +114,22 @@ const RowLayout = styled.div`
   align-items: ${(props) => (props.alignItems ? props.alignItems : "stretch")};
   width: ${(props) => (props.width ? props.width : "100%")};
   border-bottom: ${(props) =>
-    props.borderBottom ? props.borderBottom : "none"};
-  border-top: ${(props) => (props.borderTop ? props.borderTop : "none")};
+    props.border
+      ? props.border
+      : props.borderBottom
+      ? props.borderBottom
+      : "none"};
+  border-top: ${(props) =>
+    props.border ? props.border : props.borderTop ? props.borderTop : "none"};
+  border-left: ${(props) =>
+    props.border ? props.border : props.borderLeft ? props.borderLeft : "none"};
+  border-right: ${(props) =>
+    props.border
+      ? props.border
+      : props.borderRight
+      ? props.borderRight
+      : "none"};
+  border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
   background-color: ${(props) =>
     props.backgroundColor
       ? props.theme[props.backgroundColor]

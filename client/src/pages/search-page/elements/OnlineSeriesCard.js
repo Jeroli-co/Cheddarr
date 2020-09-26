@@ -3,9 +3,9 @@ import { Container } from "../../../elements/Container";
 import { RowLayout } from "../../../elements/layouts";
 import { Image } from "../../../elements/Image";
 import { MediaRating } from "../../../elements/media/MediaRating";
-import { Spinner } from "../../../elements/Spinner";
 import { ProvidersDropdown } from "./ProvidersDropdown";
-import { MediaRequest } from "./MediaRequest";
+import { MediaRequestButton } from "./MediaRequestButton";
+import { MEDIA_TYPES } from "../../../modules/media/enums/MediaTypes";
 
 const OnlineSeriesCard = ({ series, friendsProviders }) => {
   const [providerSelected, setProviderSelected] = useState(null);
@@ -41,7 +41,13 @@ const OnlineSeriesCard = ({ series, friendsProviders }) => {
               providers={friendsProviders}
               handleChange={handleChange}
             />
-            <MediaRequest userProvider={providerSelected} media={series} />
+            {providerSelected && (
+              <MediaRequestButton
+                requested_username={providerSelected.username}
+                media_type={MEDIA_TYPES.SERIES}
+                media_id={series.id}
+              />
+            )}
             <MediaRating media={series} />
           </RowLayout>
           <div>

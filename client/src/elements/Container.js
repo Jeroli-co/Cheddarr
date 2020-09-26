@@ -1,7 +1,15 @@
 import styled from "styled-components";
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: ${(props) =>
+    props.justifyContent ? props.justifyContent : "flex-start"};
+  align-items: ${(props) => (props.alignItems ? props.alignItems : "stretch")};
   width: ${(props) => (props.width ? props.width : "auto")};
+  height: ${(props) => (props.height ? props.height : "auto")};
+  min-height: ${(props) => (props.minHeight ? props.minHeight : "0")};
+  max-height: ${(props) => (props.maxHeight ? props.maxHeight : "none")};
   margin-top: ${(props) =>
     props.marginTop ? props.marginTop : props.margin ? props.margin : "0"};
   margin-left: ${(props) =>

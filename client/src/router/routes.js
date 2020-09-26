@@ -9,9 +9,9 @@ import { ResetPassword } from "../modules/auth/reset-password/ResetPassword";
 import { InitResetPasswordModal } from "../modules/auth/sign-in-form/init-reset-password-modal/InitResetPasswordModal";
 import { SignInForm } from "../modules/auth/sign-in-form/SignInForm";
 import { SignUpForm } from "../modules/auth/sign-up-form/SignUpForm";
-import { FriendProfile } from "../modules/profile/friends/elements/FriendProfile";
-import { Friends } from "../modules/profile/friends/Friends";
-import { Profile } from "../modules/profile/Profile";
+import { FriendProfile } from "../modules/user/friends/elements/FriendProfile";
+import { Friends } from "../modules/user/friends/Friends";
+import { Profile } from "../modules/user/profile/Profile";
 import { Settings } from "../modules/settings/Settings";
 import { ChangeEmailModal } from "../modules/settings/settings-account/element/ChangeEmailModal";
 import { ChangePasswordModal } from "../modules/settings/settings-account/element/ChangePasswordModal";
@@ -25,6 +25,9 @@ import { MoviePage } from "../pages/MoviePage";
 import { SearchPage } from "../pages/search-page/SearchPage";
 import { SeasonPage } from "../pages/SeasonPage";
 import { SeriesPage } from "../pages/SeriesPage";
+import { Requests } from "../modules/requests/Requests";
+import { RequestsSent } from "../modules/requests/elements/RequestsSent";
+import { RequestsReceived } from "../modules/requests/elements/RequestsReceived";
 
 const routes = {
   HOME: { url: "/", component: Home },
@@ -40,7 +43,7 @@ const routes = {
     component: ConfirmEmail,
   },
   RESET_PASSWORD: {
-    url: (token) => "/profile/password/reset/" + token,
+    url: (token) => "/user/password/reset/" + token,
     component: ResetPassword,
   },
   RESEND_EMAIL_CONFIRMATION: {
@@ -50,8 +53,8 @@ const routes = {
   INTERNAL_SERVER_ERROR: { url: "/500", component: InternalServerError },
   BAD_REQUEST: { url: "/400", component: BadRequest },
   NOT_FOUND: { url: "/404", component: NotFound },
-  USER_PROFILE: { url: "/profile", component: Profile },
-  USER_FRIENDS: { url: "/profile/friends", component: Friends },
+  USER_PROFILE: { url: "/user", component: Profile },
+  USER_FRIENDS: { url: "/user/friends", component: Friends },
   USER_FRIEND_PROFILE: {
     url: (username) => "/users/" + username,
     component: FriendProfile,
@@ -95,6 +98,18 @@ const routes = {
   SEARCH: {
     url: (type, title) => "/search/" + type + "/" + title,
     component: SearchPage,
+  },
+  REQUESTS: {
+    url: "/requests",
+    component: Requests,
+  },
+  REQUESTS_SENT: {
+    url: "/requests/sent",
+    component: RequestsSent,
+  },
+  REQUESTS_RECEIVED: {
+    url: "/requests/received",
+    component: RequestsReceived,
   },
 };
 

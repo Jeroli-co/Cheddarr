@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, Route } from "react-router-dom";
 import styled from "styled-components";
-import { AuthContext } from "../../contexts/AuthContext";
-import { useProfile } from "../../hooks/useProfile";
-import { routes } from "../../router/routes";
+import { AuthContext } from "../../../contexts/AuthContext";
+import { useProfile } from "../../../hooks/useProfile";
+import { routes } from "../../../router/routes";
 
 const UserPictureStyle = styled.img`
   object-fit: cover;

@@ -13,6 +13,8 @@ import { UserDropdownMobile } from "./user-dropdown/UserDropdownMobile";
 import { useOutsideAlerter } from "../../hooks/useOutsideAlerter";
 import { RowLayout } from "../layouts";
 import { SearchBar } from "./search-bar/SearchBar";
+import { routes } from "../../router/routes";
+import { STATIC_STYLE } from "../../STATIC_STYLE";
 
 const NavbarLogoKeyframes = () => {
   return keyframes`
@@ -28,7 +30,7 @@ const NavbarLogoKeyframes = () => {
 const NavbarStyle = styled.div`
   position: relative;
   padding: 10px;
-  height: 75px;
+  height: ${STATIC_STYLE.NAVBAR_HEIGHT}px;
   background-color: ${(props) => props.theme.primary};
 `;
 
@@ -111,6 +113,13 @@ const Navbar = () => {
             childMarginLeft="30px"
           >
             <GitHubButton />
+            {!isLoading && isAuthenticated && (
+              <Link to={routes.REQUESTS_SENT.url}>
+                <p className="has-text-dark has-text-weight-semibold">
+                  Requests
+                </p>
+              </Link>
+            )}
             {!isLoading && isAuthenticated && (
               <UserDropdown
                 dropdownRef={dropdownRef}

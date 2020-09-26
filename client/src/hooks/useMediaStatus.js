@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useFriends } from "./useFriends";
+import { useFriends } from "../modules/user/friends/hooks/useFriends";
 
 const useMediaStatus = (userProvider, media) => {
   const { getMediaStatus } = useFriends();

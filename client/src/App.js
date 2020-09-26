@@ -2,33 +2,19 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import { ThemeProvider } from "styled-components";
 import { AuthContextWithRouterProvider } from "./contexts/AuthContext";
 import { NotificationContextProvider } from "./contexts/NotificationContext";
 import { Navbar } from "./elements/navbar/Navbar";
 import { PrivateRoute } from "./router/PrivateRoute";
 import { ProtectedRoute } from "./router/ProtectedRoute";
 import { routes } from "./router/routes";
+import { ThemeContextProvider } from "./contexts/ThemeContext";
 
 const App = () => {
   config.autoAddCss = false;
 
-  const theme = {
-    primary: "#f8813f",
-    primaryLight: "#ff9761",
-    primaryLighter: "#ffe3d4",
-    secondary: "#f9c441",
-    secondaryLight: "#ffd679",
-    secondaryLighter: "#fff7c9",
-    secondaryDark: "#9a702a",
-    dark: "#4f4d4d",
-    transparent: "rgba(198,198,198,0.17)",
-    transparentDark: "rgba(146,146,146,0.5)",
-    darkPlex: "#282a2d",
-  };
-
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeContextProvider>
       <NotificationContextProvider>
         <AuthContextWithRouterProvider>
           <div className="App">
@@ -101,6 +87,10 @@ const App = () => {
                 path={routes.SEARCH.url(":type", ":title")}
                 component={routes.SEARCH.component}
               />
+              <PrivateRoute
+                path={routes.REQUESTS.url}
+                component={routes.REQUESTS.component}
+              />
               <Route
                 exact
                 path={routes.BAD_REQUEST.url}
@@ -121,7 +111,7 @@ const App = () => {
           </div>
         </AuthContextWithRouterProvider>
       </NotificationContextProvider>
-    </ThemeProvider>
+    </ThemeContextProvider>
   );
 };
 

@@ -4,7 +4,7 @@ import { AddFriendsInput } from "./elements/AddFriendsInput";
 import { FriendsList } from "./elements/FriendsList";
 import { RequestedList } from "./elements/RequestedList";
 import { ReceivedList } from "./elements/ReceivedList";
-import { useFriends } from "../../../hooks/useFriends";
+import { useFriends } from "./hooks/useFriends";
 
 const Friends = () => {
   const [friends, setFriends] = useState([]);
