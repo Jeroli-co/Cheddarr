@@ -59,7 +59,7 @@ const PlexConfig = ({ location }) => {
   if (!config) return <Spinner color="primary" size="3x" />;
 
   return (
-    <div className="PlexConfig container" data-testid="PlexConfig">
+    <div className="PlexConfig" data-testid="PlexConfig">
       <RowLayout
         justifyContent="space-between"
         borderBottom="1px solid LightGrey"

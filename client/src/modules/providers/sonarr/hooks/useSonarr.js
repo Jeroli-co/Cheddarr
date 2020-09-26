@@ -46,7 +46,7 @@ const useSonarr = () => {
     }
   };
 
-  const updateSonarrConfig = async (newConfig) => {
+  const updateSonarrConfig = async (newConfig, version) => {
     const res = await executeRequest(
       methods.PUT,
       providerUrl + "config/",

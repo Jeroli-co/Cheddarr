@@ -29,7 +29,7 @@ const RadarrConfig = () => {
   };
 
   return (
-    <div className="RadarrConfig container" data-testid="RadarrConfig">
+    <div className="RadarrConfig" data-testid="RadarrConfig">
       <RowLayout borderBottom="1px solid LightGrey">
         <h1 className="is-size-1">Radarr</h1>
       </RowLayout>

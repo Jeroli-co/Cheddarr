@@ -338,5 +338,6 @@ sketch
 
 ##Databases
 *.db
+db_local/
 
 # End of https://www.gitignore.io/api/node,react,python,jetbrains,visualstudiocode

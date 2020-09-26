@@ -22,7 +22,7 @@ const Settings = () => {
   };
 
   return (
-    <Container padding="1%" data-testid="Settings">
+    <Container padding="1%" data-testid="Settings" width="100%">
       <div className="tabs is-centered is-boxed is-medium">
         <ul>
           {tabsName.map((name, index) => (

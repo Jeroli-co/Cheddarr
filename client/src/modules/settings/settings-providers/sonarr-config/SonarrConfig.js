@@ -27,11 +27,11 @@ const SonarrConfig = () => {
   };
 
   const isVersionThree = (config) => {
-    return config.version[0] === "3";
+    return config.version === "3";
   };
 
   return (
-    <div className="SonarrConfig container" data-testid="SonarrConfig">
+    <div className="SonarrConfig" data-testid="SonarrConfig">
       <RowLayout borderBottom="1px solid LightGrey">
         <h1 className="is-size-1">Sonarr</h1>
       </RowLayout>
@@ -135,6 +135,21 @@ const SonarrConfig = () => {
               <h3 className="is-size-4">Requests configurations</h3>
             </RowLayout>
             <br />
+          </div>
+        )}
+        {requestsConfig && (
+          <div className="field">
+            <label className="label">Version</label>
+            <div className="control">
+              <input
+                name="version"
+                className="input"
+                type="text"
+                ref={register}
+                disabled={true}
+                value={requestsConfig.version}
+              />
+            </div>
           </div>
         )}
         {requestsConfig && (
