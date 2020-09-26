@@ -8,8 +8,8 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../router/routes";
-import { NotificationContext } from "../../../contexts/NotificationContext";
-import { useApiKey } from "../../../hooks/useApiKey";
+import { NotificationContext } from "../../notifications/contexts/NotificationContext";
+import { useApiKey } from "../../user/profile/hooks/useApiKey";
 
 const SettingsAccountBody = () => {
   const { apiKey, resetApiKey, deleteApiKey } = useApiKey();

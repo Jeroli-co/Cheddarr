@@ -2,9 +2,9 @@ import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../forms/formDefaultValidators";
-import { NotificationContext } from "../../../../contexts/NotificationContext";
-import { useProfile } from "../../../../hooks/useProfile";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../utils/enums/FormDefaultValidators";
+import { NotificationContext } from "../../../notifications/contexts/NotificationContext";
+import { useProfile } from "../../../user/profile/hooks/useProfile";
 
 const InitResetPasswordModal = (props) => {
   const { register, handleSubmit, errors } = useForm();

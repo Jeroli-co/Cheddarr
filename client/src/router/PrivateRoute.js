@@ -1,12 +1,11 @@
-import {useContext} from "react";
-import {AuthContext} from "../contexts/AuthContext";
-import {Redirect, Route} from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../modules/auth/contexts/AuthContext";
+import { Redirect, Route } from "react-router-dom";
 import React from "react";
-import {routes} from "./routes";
-import {PageLoader} from "../elements/PageLoader";
+import { routes } from "./routes";
+import { PageLoader } from "../utils/elements/PageLoader";
 
-const PrivateRoute = ({component: Component, location, ...rest}) => {
-
+const PrivateRoute = ({ component: Component, location, ...rest }) => {
   const { isAuthenticated, isLoading } = useContext(AuthContext);
 
   return (
@@ -14,18 +13,15 @@ const PrivateRoute = ({component: Component, location, ...rest}) => {
       {...rest}
       render={(props) => {
         if (isLoading) {
-          return <PageLoader/>;
+          return <PageLoader />;
         } else if (isAuthenticated) {
           return <Component {...props} />;
         } else {
-          return <Redirect to={routes.SIGN_IN.url}/>;
+          return <Redirect to={routes.SIGN_IN.url} />;
         }
       }}
     />
   );
-
 };
 
-export {
-  PrivateRoute
-}
+export { PrivateRoute };

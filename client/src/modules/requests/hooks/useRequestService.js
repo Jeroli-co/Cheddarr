@@ -1,6 +1,6 @@
-import { useApi } from "../../../hooks/useApi";
+import { useApi } from "../../api/hooks/useApi";
 import { useContext } from "react";
-import { NotificationContext } from "../../../contexts/NotificationContext";
+import { NotificationContext } from "../../notifications/contexts/NotificationContext";
 import { REQUEST_STATES } from "../enums/RequestStates";
 
 const useRequestService = () => {

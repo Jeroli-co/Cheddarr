@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { RowLayout } from "../../../../elements/layouts";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../forms/formDefaultValidators";
-import { useRadarr } from "../../../../hooks/useRadarr";
+import { RowLayout } from "../../../../utils/elements/layouts";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../utils/enums/FormDefaultValidators";
+import { useRadarr } from "../../../providers/radarr/hooks/useRadarr";
 import { isEmptyObject } from "../../../../utils/objects";
 
 const RadarrConfig = () => {

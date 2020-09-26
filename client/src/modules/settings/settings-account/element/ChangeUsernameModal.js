@@ -2,8 +2,8 @@ import { faUser } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../forms/formDefaultValidators";
-import { useProfile } from "../../../../hooks/useProfile";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../utils/enums/FormDefaultValidators";
+import { useProfile } from "../../../user/profile/hooks/useProfile";
 
 const ChangeUsernameModal = (props) => {
   const { register, handleSubmit, errors } = useForm();

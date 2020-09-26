@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { useProfile } from "../../../../hooks/useProfile";
+import { useProfile } from "../../profile/hooks/useProfile";
 
 const FriendProfile = () => {
   const { id } = useParams();

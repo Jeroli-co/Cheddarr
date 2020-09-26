@@ -1,8 +1,8 @@
 import React from "react";
-import { PlexConfigContextProvider } from "../../contexts/PlexConfigContext";
+import { PlexConfigContextProvider } from "../providers/plex/contexts/PlexConfigContext";
 import { routes } from "../../router/routes";
 import { Link, Redirect, Route, Switch, useLocation } from "react-router-dom";
-import { Container } from "../../elements/Container";
+import { Container } from "../../utils/elements/Container";
 
 const tabsName = ["Account", "Plex", "Radarr", "Sonarr"];
 

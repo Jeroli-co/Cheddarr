@@ -1,5 +1,5 @@
 import React from "react";
-import { Spinner } from "../../../elements/Spinner";
+import { Spinner } from "../../../utils/elements/Spinner";
 import { withTheme } from "styled-components";
 
 const RequestsSpinner = (props) => {

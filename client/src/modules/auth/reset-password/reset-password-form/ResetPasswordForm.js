@@ -2,8 +2,8 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../forms/formDefaultValidators";
-import { useProfile } from "../../../../hooks/useProfile";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../utils/enums/FormDefaultValidators";
+import { useProfile } from "../../../user/profile/hooks/useProfile";
 
 const ResetPasswordForm = (props) => {
   const { register, handleSubmit, errors, watch } = useForm();

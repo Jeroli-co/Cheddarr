@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import { TokenExpired } from "../elements/TokenExpired";
 import { ResetPasswordForm } from "./reset-password-form/ResetPasswordForm";
 import { AlreadyConfirmed } from "../elements/AlreadyConfirmed";
-import { useProfile } from "../../../hooks/useProfile";
+import { useProfile } from "../../user/profile/hooks/useProfile";
 
 const ResetPassword = () => {
   const { token } = useParams();

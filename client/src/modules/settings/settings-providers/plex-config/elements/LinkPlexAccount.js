@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import { AuthContext } from "../../../../../contexts/AuthContext";
+import { AuthContext } from "../../../../auth/contexts/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { PlexConfigContext } from "../../../../../contexts/PlexConfigContext";
+import { PlexConfigContext } from "../../../../providers/plex/contexts/PlexConfigContext";
 
 const LinkPlexAccount = ({ config, location }) => {
   const { signInWithPlex } = useContext(AuthContext);

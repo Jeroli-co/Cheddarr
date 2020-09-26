@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { PlexConfigContext } from "../../../../../contexts/PlexConfigContext";
-import { Spinner } from "../../../../../elements/Spinner";
+import { PlexConfigContext } from "../../../../providers/plex/contexts/PlexConfigContext";
+import { Spinner } from "../../../../../utils/elements/Spinner";
 
 const ServersModal = ({ onClose }) => {
   const [serverSelected, setServerSelected] = useState(null);

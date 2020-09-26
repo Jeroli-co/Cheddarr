@@ -1,4 +1,4 @@
-import { useApi } from "../../../hooks/useApi";
+import { useApi } from "../../api/hooks/useApi";
 
 const useMediaService = () => {
   const searchUrl = "/search/";

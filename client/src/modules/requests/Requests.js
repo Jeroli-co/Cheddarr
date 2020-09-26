@@ -2,7 +2,7 @@ import React from "react";
 import { Redirect, Route, Switch } from "react-router";
 import { routes } from "../../router/routes";
 import { RequestsTabs } from "./elements/RequestsTabs";
-import { Container } from "../../elements/Container";
+import { Container } from "../../utils/elements/Container";
 
 const Requests = (props) => {
   return (

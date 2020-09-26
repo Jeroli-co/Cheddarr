@@ -1,7 +1,7 @@
 import React from "react";
 import { useRequestService } from "../hooks/useRequestService";
-import { RowLayout } from "../../../elements/layouts";
-import { Container } from "../../../elements/Container";
+import { RowLayout } from "../../../utils/elements/layouts";
+import { Container } from "../../../utils/elements/Container";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";

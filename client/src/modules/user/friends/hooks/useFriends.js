@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { AuthContext } from "../../../../contexts/AuthContext";
-import { useApi } from "../../../../hooks/useApi";
+import { AuthContext } from "../../../auth/contexts/AuthContext";
+import { useApi } from "../../../api/hooks/useApi";
 
 const useFriends = () => {
   const friendsURI = "/user/friends/";

@@ -6,9 +6,9 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
-import { RowLayout } from "../../../../elements/layouts";
-import { Spinner } from "../../../../elements/Spinner";
+import { PlexConfigContext } from "../../../providers/plex/contexts/PlexConfigContext";
+import { RowLayout } from "../../../../utils/elements/layouts";
+import { Spinner } from "../../../../utils/elements/Spinner";
 import { SubmitConfig } from "../SubmitConfig";
 import { LinkPlexAccount } from "./elements/LinkPlexAccount";
 import { ServersModal } from "./elements/ServersModal";

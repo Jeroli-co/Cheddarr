@@ -2,13 +2,13 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import { AuthContextWithRouterProvider } from "./contexts/AuthContext";
-import { NotificationContextProvider } from "./contexts/NotificationContext";
-import { Navbar } from "./elements/navbar/Navbar";
+import { AuthContextWithRouterProvider } from "./modules/auth/contexts/AuthContext";
+import { NotificationContextProvider } from "./modules/notifications/contexts/NotificationContext";
+import { Navbar } from "./modules/navbar/Navbar";
 import { PrivateRoute } from "./router/PrivateRoute";
 import { ProtectedRoute } from "./router/ProtectedRoute";
 import { routes } from "./router/routes";
-import { ThemeContextProvider } from "./contexts/ThemeContext";
+import { ThemeContextProvider } from "./utils/contexts/ThemeContext";
 
 const App = () => {
   config.autoAddCss = false;
@@ -84,27 +84,13 @@ const App = () => {
                 component={routes.SEASON.component}
               />
               <PrivateRoute
+                exact
                 path={routes.SEARCH.url(":type", ":title")}
                 component={routes.SEARCH.component}
               />
               <PrivateRoute
                 path={routes.REQUESTS.url}
                 component={routes.REQUESTS.component}
-              />
-              <Route
-                exact
-                path={routes.BAD_REQUEST.url}
-                component={routes.BAD_REQUEST.component}
-              />
-              <Route
-                exact
-                path={routes.NOT_FOUND.url}
-                component={routes.NOT_FOUND.component}
-              />
-              <Route
-                exact
-                path={routes.INTERNAL_SERVER_ERROR.url}
-                component={routes.INTERNAL_SERVER_ERROR.component}
               />
               <Route component={routes.NOT_FOUND.component} />
             </Switch>

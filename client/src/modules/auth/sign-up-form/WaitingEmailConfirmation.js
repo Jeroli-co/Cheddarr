@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { SignInButton } from "../elements/SignInButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
-import { AuthContext } from "../../../contexts/AuthContext";
+import { AuthContext } from "../contexts/AuthContext";
 
 const WaitingEmailConfirmation = ({ email }) => {
   const { resendConfirmation } = useContext(AuthContext);

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import RequestsSpinner from "./RequestsSpinner";
-import { Container } from "../../../elements/Container";
+import { Container } from "../../../utils/elements/Container";
 import { useRequests } from "../hooks/useRequests";
 import { MEDIA_TYPES } from "../../media/enums/MediaTypes";
 import { REQUESTS_TYPE } from "../enums/RequestTypes";
