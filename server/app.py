@@ -6,7 +6,7 @@ from flask.helpers import get_debug_flag
 from flask.sessions import SecureCookieSessionInterface
 from flask_cors import CORS
 from flask_talisman import Talisman
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, UnprocessableEntity
 
 from server.config import (
     API_ROOT,
@@ -60,7 +60,7 @@ def _create_app(config_object: Config, **kwargs):
         resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}},
     )
 
-    @app.errorhandler(422)
+    @app.errorhandler(UnprocessableEntity)
     def handle_error(err):
         messages = err.data.get("messages", ["Invalid request."])
         return jsonify({"errors": messages}), err.code
@@ -95,9 +95,6 @@ def _create_app(config_object: Config, **kwargs):
 def register_extensions(app):
     """Initialize extensions"""
     with app.app_context():
-
-        # used to register tasks to celery
-        from server import tasks  # noqa
 
         celery.init_app(app)
         db.init_app(app)

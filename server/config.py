@@ -13,7 +13,7 @@ FLASK_TEMPLATE_FOLDER = os.path.join(PROJECT_ROOT, "server", "templates")
 IMAGES_FOLDER = os.path.join(PROJECT_ROOT, "server", "images")
 
 ##########################################################################
-# api                                                                    #
+# api paths                                                                    #
 ##########################################################################
 API_ROOT = "/api"
 PLEX_CLIENT_IDENTIFIER = os.environ.get("PLEX_CLIENT_IDENTIFIER", APP_NAME)
@@ -42,11 +42,6 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     ##########################################################################
-    # security                                                               #
-    ##########################################################################
-    WTF_CSRF_ENABLED = False
-
-    ##########################################################################
     # mail                                                                   #
     ##########################################################################
     MAIL_SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
@@ -58,8 +53,8 @@ class Config(object):
     ##########################################################################
     # celery                                                                 #
     ##########################################################################
-    CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")
-    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+    broker_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+    imports = ("server.tasks",)
 
 
 class ProdConfig(Config):
@@ -90,7 +85,7 @@ class ProdConfig(Config):
     # cache                                                                  #
     ##########################################################################
     CACHE_TYPE = "redis"
-    CACHE_REDIS_URL = os.environ.get("REDIS_URL", "localhost:6379")
+    CACHE_REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
     CACHE_DEFAULT_TIMEOUT = 60
 
 

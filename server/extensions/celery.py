@@ -29,7 +29,7 @@ class FlaskCelery(Celery):
 
     def init_app(self, app):
         self.app = app
-        self.config_from_object(app.config, namespace="CELERY")
+        self.config_from_object("server.config.Config")
 
 
 celery = FlaskCelery(__name__)

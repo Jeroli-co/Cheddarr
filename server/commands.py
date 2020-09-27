@@ -20,7 +20,7 @@ def init_db():
 @with_appcontext
 def worker():
     """Start the celery worker."""
-    subprocess.run("celery worker -A wsgi.celery -l debug", shell=True)
+    subprocess.run("celery --app wsgi.celery worker -l INFO", shell=True)
     click.echo("Celery worker started...")
 
 
