@@ -3,11 +3,11 @@ import { usePlex } from "../../providers/plex/hooks/usePlex";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { Carousel } from "../../../utils/elements/Carousel";
-import { Spinner } from "../../../utils/elements/Spinner";
 import { RowLayout } from "../../../utils/elements/layouts";
 import { MediaExtendedCardLayout } from "./elements/MediaExtendedCardLayout";
 import { MediaPreview } from "./elements/MediaPreviewCard";
 import styled from "styled-components";
+import Spinner from "../../../utils/elements/Spinner";
 
 const MediaRecentlyAddedStyle = styled.div``;
 
@@ -68,7 +68,7 @@ const MediaRecentlyAdded = ({ type }) => {
             {type === "series" && "Series recently added"}
             {type === "onDeck" && "On Deck"}
           </p>
-          {(!medias && <Spinner color="primary" justifyContent="center" />) || (
+          {(!medias && <Spinner color="primary" />) || (
             <p className="is-size-4 has-text-primary has-text-weight-semibold">
               {(isShow && <FontAwesomeIcon icon={faAngleDown} />) || (
                 <FontAwesomeIcon icon={faAngleRight} />

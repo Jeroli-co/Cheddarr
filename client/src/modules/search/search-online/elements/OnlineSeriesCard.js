@@ -6,8 +6,9 @@ import { MediaRating } from "../../../../utils/elements/media/MediaRating";
 import { ProvidersDropdown } from "./ProvidersDropdown";
 import { MediaRequestButton } from "./MediaRequestButton";
 import { MEDIA_TYPES } from "../../../media/enums/MediaTypes";
+import { SeasonsMenu } from "./SeasonsMenu";
 
-const OnlineSeriesCard = ({ series, friendsProviders }) => {
+const OnlineSeriesCard = ({ media, friendsProviders }) => {
   const [providerSelected, setProviderSelected] = useState(null);
 
   useEffect(() => {
@@ -29,14 +30,14 @@ const OnlineSeriesCard = ({ series, friendsProviders }) => {
     >
       <RowLayout alignItems="flex-start">
         <Image
-          src={series["thumbUrl"]}
-          alt={series.title}
+          src={media["thumbUrl"]}
+          alt={media.title}
           width="12%"
           borderRadius="12px"
         />
         <Container width="100%" padding="1%">
           <RowLayout justifyContent="space-between" alignItems="center">
-            <h1 className="title is-3">{series.title}</h1>
+            <h1 className="title is-3">{media.title}</h1>
             <ProvidersDropdown
               providers={friendsProviders}
               handleChange={handleChange}
@@ -45,32 +46,34 @@ const OnlineSeriesCard = ({ series, friendsProviders }) => {
               <MediaRequestButton
                 requested_username={providerSelected.username}
                 media_type={MEDIA_TYPES.SERIES}
-                media_id={series.id}
+                media_id={media.id}
               />
             )}
-            <MediaRating media={series} />
+            <MediaRating media={media} />
           </RowLayout>
           <div>
-            {series["releaseDate"] && (
+            {media["releaseDate"] && (
               <p
                 className="is-size-7"
                 style={{ cursor: "default" }}
                 data-tooltip="Released"
               >
-                {series["releaseDate"]}
+                {media["releaseDate"]}
               </p>
             )}
           </div>
-          {series.summary && (
+          {media.summary && (
             <RowLayout marginTop="1em">
               <div>
                 <div className="is-size-5">Overview</div>
-                <div className="is-size-6">{series.summary}</div>
+                <div className="is-size-6">{media.summary}</div>
               </div>
             </RowLayout>
           )}
         </Container>
       </RowLayout>
+      <div className="is-divider" />
+      <SeasonsMenu series_id={media.id} />
     </Container>
   );
 };

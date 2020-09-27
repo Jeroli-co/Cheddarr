@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { usePlex } from "../../../modules/providers/plex/hooks/usePlex";
-import { Spinner } from "../Spinner";
 import { MediaBackground } from "./MediaBackground";
 import { Container } from "../Container";
 import { ColumnLayout, RowLayout } from "../layouts";
@@ -14,6 +13,7 @@ import { Text, TITLE_SIZES } from "../../strings";
 import { EpisodeCard } from "./EpisodeCard";
 import smoothscroll from "smoothscroll-polyfill";
 import styled from "styled-components";
+import Spinner from "../Spinner";
 
 const EpisodeSelectedLayout = styled.div`
   border-top: 3px solid ${(props) => props.theme.primary};
@@ -50,16 +50,7 @@ const SeasonCard = ({ season }) => {
     }
   }, [episodeSelected]);
 
-  if (!seasonInfo)
-    return (
-      <Spinner
-        justifyContent="center"
-        alignItems="center"
-        height="500px"
-        color="primary"
-        size="2x"
-      />
-    );
+  if (!seasonInfo) return <Spinner color="primary" size="2x" />;
 
   return (
     <Container>

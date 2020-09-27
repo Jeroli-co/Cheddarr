@@ -8,12 +8,12 @@ import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PlexConfigContext } from "../../../providers/plex/contexts/PlexConfigContext";
 import { RowLayout } from "../../../../utils/elements/layouts";
-import { Spinner } from "../../../../utils/elements/Spinner";
 import { SubmitConfig } from "../SubmitConfig";
 import { LinkPlexAccount } from "./elements/LinkPlexAccount";
 import { ServersModal } from "./elements/ServersModal";
 import { UnlinkAccountModal } from "./elements/UnlinkAccountModal";
 import { UnlinkServerModal } from "./elements/UnlinkServerModal";
+import Spinner from "../../../../utils/elements/Spinner";
 
 const PlexConfig = ({ location }) => {
   const {

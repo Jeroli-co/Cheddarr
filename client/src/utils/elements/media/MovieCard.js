@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { usePlex } from "../../../modules/providers/plex/hooks/usePlex";
-import { Spinner } from "../Spinner";
 import { ColumnLayout, RowLayout } from "../layouts";
 import { Tag, TagColor } from "../Tag";
 import { Actors } from "./Actors";
@@ -13,6 +12,7 @@ import { MediaRating } from "./MediaRating";
 import { MediaBackground } from "./MediaBackground";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { STATIC_STYLE } from "../../../STATIC_STYLE";
+import Spinner from "../Spinner";
 
 const MovieCard = ({ movie }) => {
   const { id } = useParams();
@@ -32,15 +32,7 @@ const MovieCard = ({ movie }) => {
   }, [id]);
 
   if (!movieInfo || (!movie && movieInfo.id !== id))
-    return (
-      <Spinner
-        justifyContent="center"
-        alignItems="center"
-        height="500px"
-        color="primary"
-        size="2x"
-      />
-    );
+    return <Spinner color="primary" size="2x" />;
 
   return (
     <MediaBackground image={movieInfo.artUrl}>

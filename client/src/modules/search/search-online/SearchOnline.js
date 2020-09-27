@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useSearch } from "../hooks/useSearch";
-import { Spinner } from "../../../utils/elements/Spinner";
 import { SEARCH_RESULTS } from "../enums/SearchResults";
 import { OnlineMovieCard } from "./elements/OnlineMovieCard";
 import { OnlineSeriesCard } from "./elements/OnlineSeriesCard";
 import { Container } from "../../../utils/elements/Container";
 import { useFriends } from "../../user/friends/hooks/useFriends";
+import Spinner from "../../../utils/elements/Spinner";
 
 const initialState = {
   results: [],
@@ -37,7 +37,7 @@ const SearchOnline = () => {
   let content;
 
   if (data.isLoading) {
-    content = <Spinner color="primary" size="2x" justifyContent="center" />;
+    content = <Spinner color="primary" size="2x" />;
   } else {
     if (data.results.length === 0) {
       content = (
@@ -62,7 +62,7 @@ const SearchOnline = () => {
             return (
               <OnlineSeriesCard
                 key={index}
-                series={media}
+                media={media}
                 friendsProviders={friendsSeriesProviders}
               />
             );

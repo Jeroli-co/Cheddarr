@@ -16,6 +16,7 @@ const RadarrConfig = () => {
       if (data) {
         if (!isEmptyObject(data)) {
           reset(data);
+          testConfig(data);
         }
       }
     });
@@ -133,6 +134,21 @@ const RadarrConfig = () => {
               <h3 className="is-size-4">Requests configurations</h3>
             </RowLayout>
             <br />
+          </div>
+        )}
+        {requestsConfig && (
+          <div className="field">
+            <label className="label">Version</label>
+            <div className="control">
+              <input
+                name="version"
+                className="input"
+                type="text"
+                ref={register}
+                disabled={true}
+                value={requestsConfig.version}
+              />
+            </div>
           </div>
         )}
         {requestsConfig && (

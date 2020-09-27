@@ -1,11 +1,11 @@
 import React from "react";
-import { Spinner } from "../../../../utils/elements/Spinner";
 import styled from "styled-components";
 import { ColumnLayout, RowLayout } from "../../../../utils/elements/layouts";
 import { Text } from "../../../../utils/strings";
 import { useHistory } from "react-router";
 import { routes } from "../../../../router/routes";
 import { SEARCH_TYPES } from "../../../search/enums/SearchTypes";
+import Spinner from "../../../../utils/elements/Spinner";
 
 const ResultsListStyle = styled.div`
   position: absolute;

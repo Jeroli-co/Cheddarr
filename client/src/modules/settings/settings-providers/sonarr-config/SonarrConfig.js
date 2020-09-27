@@ -14,6 +14,7 @@ const SonarrConfig = () => {
       if (data) {
         if (!isEmptyObject(data)) {
           reset(data);
+          testConfig(data);
         }
       }
     });

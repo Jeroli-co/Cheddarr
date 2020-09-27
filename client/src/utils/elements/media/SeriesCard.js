@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { usePlex } from "../../../modules/providers/plex/hooks/usePlex";
-import { Spinner } from "../Spinner";
 import { ColumnLayout, RowLayout } from "../layouts";
 import { Tag, TagColor } from "../Tag";
 import { Link } from "react-router-dom";
@@ -13,6 +12,7 @@ import { Container } from "../Container";
 import { PlexButton } from "../PlexButton";
 import { MediaRating } from "./MediaRating";
 import { MediaBackground } from "./MediaBackground";
+import Spinner from "../Spinner";
 
 const SeriesCard = ({ series }) => {
   const { id } = useParams();
@@ -31,15 +31,7 @@ const SeriesCard = ({ series }) => {
   }, [id]);
 
   if (!seriesInfo || seriesInfo.id !== id)
-    return (
-      <Spinner
-        justifyContent="center"
-        alignItems="center"
-        height="500px"
-        color="primary"
-        size="2x"
-      />
-    );
+    return <Spinner color="primary" size="2x" />;
 
   return (
     <MediaBackground image={seriesInfo.artUrl}>

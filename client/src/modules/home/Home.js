@@ -5,8 +5,8 @@ import { AuthContext } from "../auth/contexts/AuthContext";
 import { MediaRecentlyAdded } from "./media-recently-added/MediaRecentlyAdded";
 import { Link } from "react-router-dom";
 import { routes } from "../../router/routes";
-import { Spinner } from "../../utils/elements/Spinner";
 import { usePlexStatus } from "../providers/plex/hooks/usePlexStatus";
+import Spinner from "../../utils/elements/Spinner";
 
 const Home = () => {
   const { isAuthenticated, isLoading } = useContext(AuthContext);

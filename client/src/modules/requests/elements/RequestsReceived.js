@@ -17,9 +17,7 @@ const RequestsReceived = () => {
     REQUESTS_TYPE.RECEIVED
   );
 
-  useEffect(() => {
-    console.log(moviesRequestsPending);
-  }, [moviesRequestsPending]);
+  useEffect(() => {}, [moviesRequestsPending]);
 
   return (
     <Container>
