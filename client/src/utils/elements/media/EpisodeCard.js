@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { usePlex } from "../../../modules/providers/plex/hooks/usePlex";
-import { Spinner } from "../Spinner";
 import { Container } from "../Container";
 import { ColumnLayout, RowLayout } from "../layouts";
 import { Image } from "../Image";
@@ -11,6 +10,7 @@ import { MediaRating } from "./MediaRating";
 import { PlexButton } from "../PlexButton";
 import { MediaBackground } from "./MediaBackground";
 import { msToHoursMinutes } from "../../media-utils";
+import Spinner from "../Spinner";
 
 const EpisodeCard = ({ episode }) => {
   const { episodeId } = useParams();
@@ -28,16 +28,7 @@ const EpisodeCard = ({ episode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [episode]);
 
-  if (!episodeInfo)
-    return (
-      <Spinner
-        justifyContent="center"
-        alignItems="center"
-        height="500px"
-        color="primary"
-        size="2x"
-      />
-    );
+  if (!episodeInfo) return <Spinner color="primary" size="2x" />;
 
   return (
     <MediaBackground image={episodeInfo.artUrl}>
