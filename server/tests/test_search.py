@@ -1,5 +1,7 @@
 import json
+
 from flask.helpers import url_for
+
 from server.tests.conftest import user2_email, user2_username
 
 

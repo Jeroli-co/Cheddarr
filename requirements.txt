@@ -11,6 +11,7 @@ Flask-SQLAlchemy
 Flask-Talisman
 gunicorn
 itsdangerous
+marshmallow
 marshmallow-sqlalchemy
 passlib
 PlexAPI

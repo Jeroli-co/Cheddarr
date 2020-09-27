@@ -1,9 +1,10 @@
 import pytest
 from flask import url_for
+
 from server import utils
 from server.app import _create_app, db
 from server.config import TestConfig
-from server.api.users.models import Friendship, User
+from server.models.users import Friendship, User
 
 user1_id = 1
 user1_username = "user1"
@@ -17,6 +18,10 @@ user3_id = 3
 user3_username = "user3"
 user3_email = "email3@test.com"
 user3_password = "password3"
+user4_id = 4
+user4_username = "user4"
+user4_email = "email4@test.com"
+user4_password = "password4"
 avatar = "http://avatar"
 
 
@@ -41,15 +46,15 @@ def client(app):
             avatar=avatar,
             confirmed=True,
         )
-        user1.id = 1
+        user1.id = user1_id
         user2 = User(
             username=user2_username,
             email=user2_email,
             password=user2_password,
             avatar=avatar,
-            confirmed=False,
+            confirmed=True,
         )
-        user2.id = 2
+        user2.id = user2_id
         user3 = User(
             username=user3_username,
             email=user3_email,
@@ -57,9 +62,17 @@ def client(app):
             avatar=avatar,
             confirmed=True,
         )
-        user3.id = 3
+        user3.id = user3_id
+        user4 = User(
+            username=user4_username,
+            email=user4_email,
+            password=user4_password,
+            avatar=avatar,
+            confirmed=False,
+        )
+        user4.id = user4_id
 
-        db.session.add_all((user1, user2, user3))
+        db.session.add_all((user1, user2, user3, user4))
         db.session.commit()
         friendship1 = Friendship(requesting_user=user1, receiving_user=user2)
         friendship1.pending = False

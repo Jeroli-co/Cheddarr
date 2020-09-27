@@ -22,8 +22,9 @@ class BaseModel(db.Model):
         return db.session.commit()
 
     def update(self, data):
+        data = data.__dict__ if isinstance(data, self.__class__) else data
         for field, value in data.items():
-            if hasattr(self, field):
+            if hasattr(self, field) and not field.startswith("_"):
                 setattr(self, field, value)
         return self.save()
 

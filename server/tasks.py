@@ -1,10 +1,10 @@
 from flask import current_app as app, render_template
 from sendgrid import Content, From, Mail, To
 
-from server.api.providers.sonarr.helpers import sonarr_lookup, add_sonarr_series
-from server.api.requests.models import SeriesChildRequest
 from server.config import API_ROOT
 from server.extensions import celery, mail
+from server.helpers.providers.sonarr import sonarr_lookup, add_sonarr_series
+from server.models import SeriesChildRequest
 
 
 @celery.task

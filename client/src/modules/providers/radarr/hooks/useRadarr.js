@@ -22,7 +22,7 @@ const useRadarr = () => {
   const testRadarrConfig = async (config) => {
     const res = await executeRequest(
       methods.PATCH,
-      providerUrl + "config/test/",
+      providerUrl + "config/",
       config
     );
     switch (res.status) {

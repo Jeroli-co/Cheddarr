@@ -45,7 +45,7 @@ const usePlex = () => {
   };
 
   const getOnDeck = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "onDeck/");
+    const res = await executeRequest(methods.GET, providerUrl + "on-deck/");
     switch (res.status) {
       case 200:
         return res.data;

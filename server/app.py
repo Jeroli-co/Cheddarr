@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask import g, jsonify
 from flask.app import Flask
 from flask.helpers import get_debug_flag
@@ -46,7 +44,18 @@ def _create_app(config_object: Config, **kwargs):
     app.session_interface = CustomSessionInterface()
     app.url_map.strict_slashes = False
 
-    """Security patches"""
+    # Registrations
+    register_error_handlers(app)
+    register_security_patches(app)
+    register_extensions(app)
+    register_blueprints(app)
+    register_commands(app)
+    register_login_manager(app)
+
+    return app
+
+
+def register_security_patches(app):
     csp = {
         "default-src": "'self'",
         "img-src": ["*", "'self'", "data:"],
@@ -60,12 +69,12 @@ def _create_app(config_object: Config, **kwargs):
         resources={r"/*": {"origins": app.config.get("FLASK_DOMAIN")}},
     )
 
-    @app.errorhandler(UnprocessableEntity)
+
+def register_error_handlers(app):
     def handle_error(err):
         messages = err.data.get("messages", ["Invalid request."])
         return jsonify({"errors": messages}), err.code
 
-    @app.errorhandler(Exception)
     def handle_invalid_usage(error):
         if isinstance(error, HTTPException):
             name = error.name
@@ -79,17 +88,8 @@ def _create_app(config_object: Config, **kwargs):
 
         return jsonify({name: message}), code
 
-    @app.context_processor
-    def inject_now():
-        return {"now": datetime.utcnow()}
-
-    # Registrations
-    register_extensions(app)
-    register_blueprints(app)
-    register_commands(app)
-    register_login_manager(app)
-
-    return app
+    app.register_error_handler(UnprocessableEntity, handle_error)
+    app.register_error_handler(Exception, handle_invalid_usage)
 
 
 def register_extensions(app):
@@ -107,16 +107,16 @@ def register_extensions(app):
 
 def register_blueprints(app):
     """Register application's blueprints"""
-    from server.site.urls import site_bp
-    from server.auth.urls import auth_bp
-    from server.api.users.urls import users_bp
-    from server.api.providers.urls import providers_bp
-    from server.api.requests.urls import requests_bp
-    from server.api.search.urls import search_bp
+    from server.site.index import site_bp
+    from server.api.users import users_bp
+    from server.api.auth import auth_bp
+    from server.api.requests import requests_bp
+    from server.api.search import search_bp
+    from server.api.providers.base import providers_bp
 
     app.register_blueprint(site_bp)
-    app.register_blueprint(auth_bp, url_prefix=API_ROOT)
     app.register_blueprint(users_bp, url_prefix=API_ROOT)
+    app.register_blueprint(auth_bp, url_prefix=API_ROOT)
     app.register_blueprint(providers_bp, url_prefix=API_ROOT + "/providers")
     app.register_blueprint(requests_bp, url_prefix=API_ROOT + "/requests")
     app.register_blueprint(search_bp, url_prefix=API_ROOT + "/search")

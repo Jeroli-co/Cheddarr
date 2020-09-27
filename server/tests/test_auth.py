@@ -1,11 +1,13 @@
 from flask import url_for
-from server.api.users.models import User
+
+from server.models.users import User
 from server.tests.conftest import (
     user1_email,
     user1_password,
     user1_username,
     user2_email,
-    user2_password,
+    user4_email,
+    user4_password,
 )
 
 
@@ -85,7 +87,7 @@ def test_signin_unconfimed_user(client):
     assert (
         client.post(
             url_for("auth.signin"),
-            data={"usernameOrEmail": user2_email, "password": user2_password},
+            data={"usernameOrEmail": user4_email, "password": user4_password},
         ).status_code
         == 401
     )

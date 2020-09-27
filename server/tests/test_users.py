@@ -1,7 +1,8 @@
 import json
 
 from flask import url_for
-from server.api.users.models import Friendship, User
+
+from server.models.users import Friendship, User
 from server.tests.conftest import (
     avatar,
     user1_email,
@@ -13,6 +14,7 @@ from server.tests.conftest import (
     user2_email,
     user2_username,
     user3_username,
+    user4_username,
 )
 
 
@@ -171,7 +173,6 @@ def test_add_friend_ok(client, auth):
         == 200
     )
     user = User.find(id=user1_id)
-    print(user)
     friend = User.find(id=user3_id)
     assert Friendship.find(requesting_user=user, receiving_user=friend)
 
@@ -181,6 +182,16 @@ def test_add_friend_not_existing(client, auth):
         client.post(
             url_for("users.add_friend"),
             data={"usernameOrEmail": "notExistingUsername"},
+        ).status_code
+        == 400
+    )
+
+
+def test_add_non_confirmed_friend(client, auth):
+    assert (
+        client.post(
+            url_for("users.add_friend"),
+            data={"usernameOrEmail": user4_username},
         ).status_code
         == 400
     )
