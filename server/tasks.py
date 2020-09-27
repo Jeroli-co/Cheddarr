@@ -1,6 +1,8 @@
 from flask import current_app as app, render_template
 from sendgrid import Content, From, Mail, To
 
+from server.api.providers.sonarr.helpers import sonarr_lookup, add_sonarr_series
+from server.api.requests.models import SeriesChildRequest
 from server.config import API_ROOT
 from server.extensions import celery, mail
 
@@ -18,7 +20,11 @@ def send_email(to_email, subject, html_template, html_kwargs=None):
         subject=subject,
         html_content=Content("text/html", html_content),
     )
-    try:
-        mail.send(message)
-    except Exception:
-        raise Exception
+    mail.send(message)
+
+
+def confirm_sonarr_request(request: SeriesChildRequest):
+    provider_config = request.selected_provider
+    lookup = sonarr_lookup(request.series.tvdb_id, provider_config)[0]
+    if not lookup.get("path"):
+        add_sonarr_series(provider_config, lookup)

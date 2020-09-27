@@ -1,4 +1,5 @@
 from requests import get
+
 from server.utils import make_url
 
 
@@ -26,3 +27,13 @@ def test_radarr_status(config):
     if r.status_code != 200:
         return False
     return r.json()
+
+
+def radarr_lookup(tmdb_id, config):
+    url = radarr_url(
+        config,
+        "/movie/lookup/tmdb",
+        queries={"tmdbId": tmdb_id},
+    )
+    lookup = get(url).json()
+    return lookup

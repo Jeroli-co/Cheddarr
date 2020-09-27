@@ -27,7 +27,7 @@ const SonarrConfig = () => {
   };
 
   const isVersionThree = (config) => {
-    return config.version === "3";
+    return config.version === 3;
   };
 
   return (

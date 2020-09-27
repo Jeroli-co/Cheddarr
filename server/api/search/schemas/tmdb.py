@@ -1,3 +1,4 @@
+import tmdbsimple as tmdb
 from marshmallow.decorators import post_dump
 
 from server.extensions import ma
@@ -54,6 +55,9 @@ class TmdbSeriesSchema(TmdbMediaSchema):
     first_air_date = ma.String(data_key="releaseDate")
     media_type = ma.String(default="series")
     seasons = ma.Nested("TmdbSeasonSchema", many=True)
+    tvdb_id = ma.Function(
+        lambda series: tmdb.TV(series["id"]).external_ids().get("tvdb_id")
+    )
     link = ma.Function(lambda media: f"{TMDB_URL}tv/{media[ 'id']}")
 
 

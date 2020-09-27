@@ -2,7 +2,6 @@ from uuid import uuid4
 
 from flask_login import UserMixin
 from sqlalchemy.orm import validates
-from sqlalchemy_utils import EmailType, PasswordType, URLType
 
 from server import utils
 from server.database import (
@@ -15,6 +14,9 @@ from server.database import (
     backref,
     relationship,
     session,
+    Email,
+    Password,
+    URL,
 )
 
 
@@ -22,9 +24,9 @@ class User(Model, UserMixin):
     id = Column(Integer, primary_key=True)
     username = Column(String(128), unique=True, index=True)
 
-    email = Column(EmailType, unique=True, index=True)
+    email = Column(Email, unique=True, index=True)
     password = Column(
-        PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"]),
+        Password(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"]),
     )
 
     @validates("password")
@@ -32,11 +34,11 @@ class User(Model, UserMixin):
         assert 8 <= len(password) <= 128
         return password
 
-    avatar = Column(URLType, nullable=True)
+    avatar = Column(URL, nullable=True)
     session_token = Column(String(256))
     confirmed = Column(Boolean, default=False)
     api_key = Column(String(256), nullable=True)
-    providers = relationship("ProviderConfig", back_populates="user")
+    providers = relationship("ProviderConfig", back_populates="user", lazy="dynamic")
 
     __repr_props__ = ("username", "email", "confirmed")
 
@@ -99,8 +101,8 @@ class User(Model, UserMixin):
 
 
 class Friendship(Model):
-    requesting_user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
-    receiving_user_id = Column(Integer, ForeignKey(User.id), primary_key=True)
+    requesting_user_id = Column(ForeignKey(User.id), primary_key=True)
+    receiving_user_id = Column(ForeignKey(User.id), primary_key=True)
     requesting_user = relationship(
         "User",
         foreign_keys=[requesting_user_id],

@@ -1,5 +1,3 @@
-from typing import List
-
 from flask_login import current_user
 from flask_login.utils import login_required
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound
@@ -10,10 +8,10 @@ from .models import (
     SeriesRequest,
     SeriesChildRequest,
     MovieRequest,
-    SeasonRequest,
     EpisodeRequest,
 )
-from .schemas import SeriesChildRequestSchema, SeasonRequestSchema, MovieRequestSchema
+from .schemas import SeriesChildRequestSchema, SeriesRequestSchema, MovieRequestSchema
+from ...tasks import confirm_sonarr_request
 
 
 @login_required
@@ -30,7 +28,7 @@ def get_sent_movie_requests():
 
 @login_required
 @body(MovieRequestSchema)
-def add_movie_request(request):
+def add_movie_request(request: dict):
     tmdb_id = request["tmdb_id"]
     requested_username = request["requested_username"]
 
@@ -54,7 +52,7 @@ def add_movie_request(request):
 @login_required
 def get_received_series_requests():
     requests = current_user.received_series_requests
-    return SeasonRequestSchema().jsonify(requests, many=True)
+    return SeriesRequestSchema().jsonify(requests, many=True)
 
 
 @login_required
@@ -66,7 +64,7 @@ def get_sent_series_requests():
 @login_required
 @body(SeriesChildRequestSchema)
 def add_series_request(request: dict):
-    tmdb_id = request["tmdb_id"]
+    tvdb_id = request["tvdb_id"]
     requested_username = request["requested_username"]
     requested_seasons = request["seasons"]
 
@@ -75,15 +73,15 @@ def add_series_request(request: dict):
         raise BadRequest("The requested user does not exist.")
 
     series: SeriesRequest = SeriesRequest.find(
-        tmdb_id=tmdb_id, requested_user=requested_user
+        tvdb_id=tvdb_id, requested_user=requested_user
     )
     if series is None:
-        series = SeriesRequest(tmdb_id=tmdb_id, requested_user=requested_user)
+        series = SeriesRequest(tvdb_id=tvdb_id, requested_user=requested_user)
 
-    children: List[SeriesChildRequest] = SeriesChildRequest.findAll(series_id=series.id)
+    children = SeriesChildRequest.findAll(series_id=series.id)
     for existing_child in children:
         for existing_season in existing_child.seasons:
-            duplicate_season: SeasonRequest = next(
+            duplicate_season = next(
                 (
                     season
                     for season in requested_seasons
@@ -92,6 +90,8 @@ def add_series_request(request: dict):
                 None,
             )
             if duplicate_season is not None:
+                if not existing_season.episodes:
+                    requested_seasons.remove(duplicate_season)
                 for existing_episode in existing_season.episodes:
                     duplicate_episode: EpisodeRequest = next(
                         (
@@ -111,20 +111,28 @@ def add_series_request(request: dict):
     child_request = SeriesChildRequest(
         requesting_user=current_user, seasons=requested_seasons
     )
-    series.children.append(child_request)
+    child_request.series = series
     series.save()
     return SeriesChildRequestSchema().jsonify(child_request)
 
 
 @login_required
-@body(SeriesChildRequestSchema, only=["approved", "refused"])
-def update_series_request(args, id: int):
+@body(SeriesChildRequestSchema, only=["approved", "refused", "selected_provider_id"])
+def update_series_request(args: dict, id: int):
     request: SeriesChildRequest = SeriesChildRequest.find(id=id)
     if request is None:
         raise NotFound("This request does not exist.")
     if request.series.requested_user != current_user:
         raise Forbidden("This is not one of your requests.")
+    if args.get("approved"):
+        selected_provider_id = args.get("selected_provider_id")
+        selected_provider = current_user.providers.filter_by(
+            id=selected_provider_id
+        ).one_or_none()
+        if selected_provider is None:
+            raise BadRequest("No matching provider.")
     request.update(args)
+    confirm_sonarr_request(request)
     return SeriesChildRequestSchema().jsonify(request)
 
 

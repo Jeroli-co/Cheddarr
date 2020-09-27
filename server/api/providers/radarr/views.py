@@ -1,10 +1,9 @@
 from flask.json import jsonify
 from flask_login import current_user, login_required
-from marshmallow import fields
 from requests import get
-from server.extensions.marshmallow import body, query
 from werkzeug.exceptions import BadRequest
 
+from server.extensions.marshmallow import body
 from .helpers import radarr_url, test_radarr_status
 from .models import RadarrConfig
 from .schemas import RadarrConfigSchema
@@ -61,18 +60,3 @@ def update_radarr_config(config):
 
     radarr_config.update(config)
     return radarr_config_serializer.jsonify(radarr_config)
-
-
-@login_required
-@query({"tmdb_id": fields.Integer()})
-def radarr_lookup(tmdb_id):
-    config = RadarrConfig.find(user=current_user)
-    if not config:
-        raise BadRequest("No existing Radarr config.")
-    url = radarr_url(
-        radarr_config_serializer.dump(config),
-        "/movie/lookup/tmdb",
-        queries={"tmdbId": tmdb_id},
-    )
-    lookup = get(url).json()
-    return jsonify(lookup)

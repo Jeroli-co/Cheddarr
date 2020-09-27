@@ -1,16 +1,18 @@
 from enum import Enum, auto
+from uuid import uuid4
 
-from server.database import Enum as DBEnum
+from sqlalchemy.ext.declarative import AbstractConcreteBase, declared_attr
+
 from server.database import (
+    Enum as DBEnum,
     ForeignKey,
-    Integer,
     Model,
     String,
     Boolean,
     Column,
     relationship,
+    UUID,
 )
-from sqlalchemy.ext.declarative import AbstractConcreteBase, declared_attr
 
 
 class ProviderType(str, Enum):
@@ -23,8 +25,8 @@ class ProviderConfig(Model, AbstractConcreteBase):
 
     __repr_props__ = ("enabled", "provider_type")
 
-    id = Column(Integer, primary_key=True)
-    api_key = Column(String(256), unique=True)
+    id = Column(UUID(binary=False), default=uuid4, primary_key=True)
+    api_key = Column(String(256))
     enabled = Column(Boolean, default=False)
     provider_type = Column(DBEnum(ProviderType))
 
@@ -40,7 +42,7 @@ class ProviderConfig(Model, AbstractConcreteBase):
 
     @declared_attr
     def user_id(cls):
-        return Column(Integer, ForeignKey("user.id"), nullable=False)
+        return Column(ForeignKey("user.id"), nullable=False)
 
     def provides_movies(self):
         return self.provider_type == ProviderType.MOVIE_PROVIDER

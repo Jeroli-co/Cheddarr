@@ -37,6 +37,6 @@ class PlexConfig(ProviderConfig):
 
 plex_configs_servers = Table(
     "plexconfigserver",
-    Column("config_id", Integer, ForeignKey("plexconfig.id")),
-    Column("server_id", String(128), ForeignKey("plexserver.machine_id")),
+    Column("config_id", ForeignKey("plexconfig.id")),
+    Column("server_id", ForeignKey("plexserver.machine_id")),
 )

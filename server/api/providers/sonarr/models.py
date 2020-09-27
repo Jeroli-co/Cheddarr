@@ -1,5 +1,5 @@
-from server.database import Boolean, Column, String, Integer
-
+from server.api.requests.models import SeriesChildRequest
+from server.database import Boolean, Column, String, Integer, relationship
 from ..models import ProviderConfig, ProviderType
 
 
@@ -14,7 +14,13 @@ class SonarrConfig(ProviderConfig):
     anime_quality_profile_id = Column(Integer, nullable=True)
     language_profile_id = Column(Integer, nullable=True)
     anime_language_profile_id = Column(Integer, nullable=True)
-
+    version = Column(Integer)
+    series_requests = relationship(
+        SeriesChildRequest,
+        primaryjoin="SeriesChildRequest.selected_provider_id==SonarrConfig.id",
+        foreign_keys="SeriesChildRequest.selected_provider_id",
+        backref="selected_provider",
+    )
     __repr_props__ = (
         "id",
         "host",

@@ -17,4 +17,8 @@ from .types import (
     relationship,
     UniqueConstraint,
     ForeignKeyConstraint,
+    UUID,
+    Password,
+    Email,
+    URL,
 )

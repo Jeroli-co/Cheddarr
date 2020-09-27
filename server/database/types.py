@@ -1,6 +1,7 @@
 # alias common names
 from sqlalchemy import schema, types
 from sqlalchemy.orm.relationships import RelationshipProperty
+from sqlalchemy_utils import types as utils_types
 
 from server.extensions import db
 
@@ -18,7 +19,10 @@ Table: schema.Table = db.Table
 ForeignKey: schema.ForeignKey = db.ForeignKey
 UniqueConstraint: schema.UniqueConstraint = db.UniqueConstraint
 ForeignKeyConstraint: schema.ForeignKeyConstraint = db.ForeignKeyConstraint
-
+UUID = utils_types.UUIDType
+Email = utils_types.EmailType
+Password = utils_types.PasswordType
+URL = utils_types.URLType
 
 # Small hack to make type-hinting work
 class __relationship_type_hinter__(RelationshipProperty):

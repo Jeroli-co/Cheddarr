@@ -2,12 +2,12 @@ from flask import request, session, url_for
 from flask_login import current_user, fresh_login_required, login_required
 from marshmallow import fields
 from marshmallow.validate import OneOf
+from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
+
 from server import utils
 from server.extensions import limiter
 from server.extensions.marshmallow import body, form, query
 from server.tasks import send_email
-from werkzeug.exceptions import BadRequest, Conflict, Forbidden, Gone, NotFound
-
 from .models import Friendship, User
 from .schemas import UserSchema, profile_serializer, user_serializer
 
@@ -153,7 +153,7 @@ def get_requested_friends():
 @form({"usernameOrEmail": fields.String(required=True)})
 def add_friend(usernameOrEmail):
     friend = User.find(username=usernameOrEmail) or User.find(email=usernameOrEmail)
-    if not friend or friend == current_user:
+    if not friend or friend == current_user or not friend.confirmed:
         raise BadRequest("The user does not exist.")
 
     if current_user.is_friend(friend):
@@ -221,8 +221,8 @@ def reset_api_key():
 @login_required
 @query({"type": fields.String(validate=OneOf(["movies", "series"]))})
 def get_friends_providers(type):
-
     friends = current_user.friends
+    friends.append(current_user)
     if type == "movies":
         friends_available = [
             friend
