@@ -83,26 +83,21 @@ def get_tmdb_movie(tmdb_id):
     return movie
 
 
-@search_bp.route("/series/<int:id>/")
+@search_bp.route("/series/<int:tvdb_id>/")
 @login_required
 @cache.memoize(timeout=3600)
 @jsonify_with(TmdbSeriesSchema)
-def get_tmdb_series(id):
+def get_tmdb_series_by_tvdb_id(tvdb_id):
+
+    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
+    if not tmdb_result:
+        raise NotFound("No series found.")
+    tmdb_id = tmdb_result[0]["id"]
     try:
-        series = tmdb.TV(id).info()
+        series = tmdb.TV(tmdb_id).info()
         return series
-    except HTTPError:
-        try:
-            tmdb_result = (
-                tmdb.Find(id).info(external_source="tvdb_id").get("tv_results")
-            )
-            if not tmdb_result:
-                raise NotFound("No series found.")
-            tmdb_id = tmdb_result[0]["id"]
-            series = tmdb.TV(tmdb_id).info()
-            return series
-        except HTTPError as e:
-            abort(e.response.status_code)
+    except HTTPError as e:
+        abort(e.response.status_code)
 
 
 @search_bp.route("/series/<int:tmdb_id>/seasons/<int:season_number>/")
