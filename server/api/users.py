@@ -213,6 +213,31 @@ def accept_friend(username):
     return friend
 
 
+@users_bp.route("/user/friends/")
+@login_required
+@query(GetFriendProvidersSchema)
+@jsonify_with(profile_serializer, many=True)
+def get_friends_providers(provides):
+    friends = current_user.friends
+    friends.append(current_user)
+    if provides == "movies":
+        friends_available = [
+            friend
+            for friend in friends
+            for provider in friend.providers
+            if provider.provides_movies()
+        ]
+    else:
+        friends_available = [
+            friend
+            for friend in friends
+            for provider in friend.providers
+            if provider.provides_series()
+        ]
+
+    return friends_available
+
+
 @users_bp.route("/user/key/")
 @fresh_login_required
 def get_api_key():
@@ -234,28 +259,3 @@ def reset_api_key():
     current_user.api_key = utils.generate_api_key()
     current_user.save()
     return {"key": current_user.api_key}
-
-
-@users_bp.route("/user/friends/providers/")
-@login_required
-@query(GetFriendProvidersSchema)
-@jsonify_with(profile_serializer, many=True)
-def get_friends_providers(type):
-    friends = current_user.friends
-    friends.append(current_user)
-    if type == "movies":
-        friends_available = [
-            friend
-            for friend in friends
-            for provider in friend.providers
-            if provider.provides_movies()
-        ]
-    else:
-        friends_available = [
-            friend
-            for friend in friends
-            for provider in friend.providers
-            if provider.provides_series()
-        ]
-
-    return friends_available

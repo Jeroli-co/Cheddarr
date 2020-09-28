@@ -3,8 +3,6 @@ from sendgrid import Content, From, Mail, To
 
 from server.config import API_ROOT
 from server.extensions import celery, mail
-from server.helpers.providers.sonarr import sonarr_lookup, add_sonarr_series
-from server.models import SeriesChildRequest
 
 
 @celery.task
@@ -21,10 +19,3 @@ def send_email(to_email, subject, html_template, html_kwargs=None):
         html_content=Content("text/html", html_content),
     )
     mail.send(message)
-
-
-def confirm_sonarr_request(request: SeriesChildRequest):
-    provider_config = request.selected_provider
-    lookup = sonarr_lookup(request.series.tvdb_id, provider_config)[0]
-    if not lookup.get("path"):
-        add_sonarr_series(provider_config, lookup)

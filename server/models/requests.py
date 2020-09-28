@@ -1,4 +1,5 @@
 from datetime import date
+from typing import TYPE_CHECKING, List
 
 from server.database import (
     Model,
@@ -11,6 +12,9 @@ from server.database import (
     Boolean,
     UniqueConstraint,
 )
+
+if TYPE_CHECKING:
+    from . import User  # noqa
 
 
 class MovieRequest(Model):
@@ -37,7 +41,7 @@ class MovieRequest(Model):
 
     __repr_props__ = ("tmdb_id", "requested_user", "requesting_user_id")
 
-    def __init__(self, tmdb_id, requested_user, requesting_user):
+    def __init__(self, tmdb_id: int, requested_user: "User", requesting_user: "User"):
         self.tmdb_id = tmdb_id
         self.requested_user = requested_user
         self.requesting_user = requesting_user
@@ -62,7 +66,7 @@ class SeriesRequest(Model):
 
     __repr_props__ = ("tvdb_id", "requested_user", "children")
 
-    def __init__(self, tvdb_id, requested_user):
+    def __init__(self, tvdb_id: int, requested_user: "User"):
         self.tvdb_id = tvdb_id
         self.requested_user = requested_user
 
@@ -95,7 +99,7 @@ class SeriesChildRequest(Model):
         "seasons",
     )
 
-    def __init__(self, requesting_user, seasons):
+    def __init__(self, requesting_user: "User", seasons: List["SeasonRequest"]):
         self.requesting_user = requesting_user
         self.seasons = seasons
         self.requested_date = date.today()

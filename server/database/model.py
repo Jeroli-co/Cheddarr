@@ -59,14 +59,7 @@ class Model(BaseModel):
     """
 
     __abstract__ = True
-
-    def __repr__(self):
-        properties = [
-            f"{prop}={getattr(self, prop)!r}"
-            for prop in self.__repr_props__
-            if hasattr(self, prop)
-        ]
-        return f"<{self.__class__.__name__} {' '.join(properties)}>"
+    __table_args__ = {"extend_existing": True}
 
     @declared_attr
     def __tablename__(cls):

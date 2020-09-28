@@ -21,12 +21,11 @@ class SonarrConfig(ProviderConfig):
         backref="selected_provider",
     )
     __repr_props__ = (
-        "id",
+        *ProviderConfig.__repr_props__,
         "host",
         "port",
         "ssl",
         "version",
-        "enabled",
     )
 
     def __init__(self, **kwargs):

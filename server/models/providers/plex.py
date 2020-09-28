@@ -21,7 +21,10 @@ class PlexServer(Model):
 
 class PlexConfig(ProviderConfig):
 
-    __repr_props__ = ("servers",)
+    __repr_props__ = (
+        *ProviderConfig.__repr_props__,
+        "servers",
+    )
 
     plex_user_id = Column(Integer)
     servers = relationship(

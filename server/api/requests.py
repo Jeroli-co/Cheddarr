@@ -4,6 +4,7 @@ from flask_login.utils import login_required
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound
 
 from server.extensions.marshmallow import body, jsonify_with
+from server.helpers.providers.sonarr import add_series_to_sonarr
 from server.models import (
     User,
     SeriesRequest,
@@ -16,7 +17,6 @@ from server.schemas import (
     SeriesRequestSchema,
     MovieRequestSchema,
 )
-from server.tasks import confirm_sonarr_request
 
 requests_bp = Blueprint("requests", __name__)
 
@@ -153,7 +153,8 @@ def update_series_request(args: dict, id: int):
         if selected_provider is None:
             raise BadRequest("No matching provider.")
     request.update(args)
-    confirm_sonarr_request(request)
+    if request.selected_provider.name == "Sonarr":
+        add_series_to_sonarr(request)
     return request
 
 

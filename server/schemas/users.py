@@ -29,4 +29,4 @@ class AddFriendSchema(ma.Schema):
 
 
 class GetFriendProvidersSchema(ma.Schema):
-    type = ma.String(validate=OneOf(["movies", "series"]))
+    provides = ma.String(validate=OneOf(["movies", "series"]))

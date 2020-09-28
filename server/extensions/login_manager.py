@@ -1,6 +1,11 @@
+from typing import TYPE_CHECKING
+
 from flask import g
-from flask_login import LoginManager, user_loaded_from_header
+from flask_login import LoginManager, user_loaded_from_header, current_user as user
 from werkzeug.exceptions import Unauthorized
+
+if TYPE_CHECKING:
+    from . import User  # noqa
 
 
 def register_login_manager(app):
@@ -42,3 +47,4 @@ def register_login_manager(app):
 
 
 login_manager = LoginManager()
+current_user: "User" = user

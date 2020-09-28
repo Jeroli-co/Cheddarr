@@ -115,7 +115,7 @@ const useFriends = () => {
   const getFriendsProvider = async (type) => {
     const res = await executeRequest(
       methods.GET,
-      friendsURI + "providers/?type=" + type
+      friendsURI + "?provides=" + type
     );
     switch (res.status) {
       case 200:

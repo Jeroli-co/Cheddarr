@@ -12,11 +12,10 @@ class RadarrConfig(ProviderConfig):
     version = Column(Integer)
 
     __repr_props__ = (
-        "id",
+        *ProviderConfig.__repr_props__,
         "host",
         "port",
         "ssl",
-        "enabled",
     )
 
     def __init__(self, **kwargs):

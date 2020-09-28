@@ -117,6 +117,6 @@ class Friendship(Model):
 
     __repr_props__ = ("requesting_user", "receiving_user", "pending")
 
-    def __init__(self, requesting_user, receiving_user):
+    def __init__(self, requesting_user: User, receiving_user: User):
         self.requesting_user = requesting_user
         self.receiving_user = receiving_user

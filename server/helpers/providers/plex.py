@@ -50,7 +50,9 @@ def plex_library_sections(
 
 
 @cache.memoize(timeout=300)
-def plex_search(plex_server, section_type, title, filters, max_results=3):
+def plex_search(
+    plex_server: PlexServer, section_type: str, title: str, filters: dict, max_results=3
+):
     if section_type == "movies":
         sections = plex_library_sections(plex_server, section_type="movies")
     elif section_type == "series":
