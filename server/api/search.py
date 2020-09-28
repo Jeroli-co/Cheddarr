@@ -77,10 +77,9 @@ def search_tmdb_series(value, page=1):
 def get_tmdb_movie(tmdb_id):
     try:
         movie = tmdb.Movies(tmdb_id).info()
+        return movie
     except HTTPError as e:
         abort(e.response.status_code)
-        return {}
-    return movie
 
 
 @search_bp.route("/series/<int:tvdb_id>/")
@@ -100,14 +99,17 @@ def get_tmdb_series_by_tvdb_id(tvdb_id):
         abort(e.response.status_code)
 
 
-@search_bp.route("/series/<int:tmdb_id>/seasons/<int:season_number>/")
+@search_bp.route("/series/<int:tvdb_id>/seasons/<int:season_number>/")
 @login_required
 @jsonify_with(TmdbSeasonSchema)
 @cache.memoize(timeout=3600)
-def get_tmdb_season(tmdb_id, season_number):
+def get_tmdb_season_by_tvdb_id(tvdb_id, season_number):
+    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
+    if not tmdb_result:
+        raise NotFound("No series found.")
+    tmdb_id = tmdb_result[0]["id"]
     try:
         season = tmdb.TV_Seasons(tmdb_id, season_number).info()
+        return season
     except HTTPError as e:
         abort(e.response.status_code)
-        return {}
-    return season
