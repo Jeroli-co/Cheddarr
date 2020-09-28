@@ -147,6 +147,17 @@ const useProfile = () => {
     }
   };
 
+  const getUsersProviders = async (type) => {
+    const res = await executeRequest(methods.GET, "/users/?provides=" + type);
+    switch (res.status) {
+      case 200:
+        return res.data;
+      default:
+        handleError(res);
+        return null;
+    }
+  };
+
   return {
     getUser,
     changeUsername,
@@ -156,6 +167,7 @@ const useProfile = () => {
     checkResetPasswordToken,
     resetPassword,
     deleteAccount,
+    getUsersProviders,
   };
 };
 

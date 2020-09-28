@@ -11,7 +11,6 @@ def test_search_friends(client, auth):
             url_for("search.search_all", value=user2_username, type="friends")
         ).data
     )
-    print(search_result)
     assert len(search_result) == 1
     assert (
         search_result[0]["username"] == user2_username

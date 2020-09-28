@@ -5,8 +5,8 @@ import { SEARCH_RESULTS } from "../enums/SearchResults";
 import { OnlineMovieCard } from "./elements/OnlineMovieCard";
 import { OnlineSeriesCard } from "./elements/OnlineSeriesCard";
 import { Container } from "../../../utils/elements/Container";
-import { useFriends } from "../../user/friends/hooks/useFriends";
 import Spinner from "../../../utils/elements/Spinner";
+import { useProfile } from "../../user/profile/hooks/useProfile";
 
 const initialState = {
   results: [],
@@ -17,19 +17,15 @@ const SearchOnline = () => {
   const { type, title } = useParams();
   const [data, setData] = useState(initialState);
   const { searchOnline } = useSearch();
-  const { getFriendsProvider } = useFriends();
+  const { getUsersProviders } = useProfile();
   const [friendsMoviesProviders, setFriendsMoviesProviders] = useState([]);
   const [friendsSeriesProviders, setFriendsSeriesProviders] = useState([]);
 
   useEffect(() => {
     searchOnline(type, title).then((res) => {
       setData({ results: res.results, isLoading: false });
-      getFriendsProvider("movies").then((fmp) =>
-        setFriendsMoviesProviders(fmp)
-      );
-      getFriendsProvider("series").then((fsp) =>
-        setFriendsSeriesProviders(fsp)
-      );
+      getUsersProviders("movies").then((fmp) => setFriendsMoviesProviders(fmp));
+      getUsersProviders("series").then((fsp) => setFriendsSeriesProviders(fsp));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, title]);

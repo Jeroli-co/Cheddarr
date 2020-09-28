@@ -112,20 +112,6 @@ const useFriends = () => {
     }
   };
 
-  const getFriendsProvider = async (type) => {
-    const res = await executeRequest(
-      methods.GET,
-      friendsURI + "?provides=" + type
-    );
-    switch (res.status) {
-      case 200:
-        return res.data;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
   const getMediaStatus = async (provider, media_id) => {
     const res = await executeRequest(
       methods.GET,
@@ -153,7 +139,6 @@ const useFriends = () => {
     getFriends,
     getReceived,
     getRequested,
-    getFriendsProvider,
     getMediaStatus,
   };
 };

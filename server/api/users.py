@@ -207,13 +207,12 @@ def accept_friend(username):
     ) or Friendship.find(receiving_user=friend, requesting_user=current_user)
     if not friendship:
         raise BadRequest("This user is not in your friend list.")
-    print(friend)
     friendship.pending = False
     friendship.save()
     return friend
 
 
-@users_bp.route("/user/friends/")
+@users_bp.route("/users/")
 @login_required
 @query(GetFriendProvidersSchema)
 @jsonify_with(profile_serializer, many=True)
@@ -234,7 +233,6 @@ def get_friends_providers(provides):
             for provider in friend.providers
             if provider.provides_series()
         ]
-
     return friends_available
 
 
