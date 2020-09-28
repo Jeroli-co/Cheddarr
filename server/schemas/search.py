@@ -37,7 +37,7 @@ class FriendSearchResultSchema(ma.Schema):
 
 
 class TmdbMediaSchema(ma.Schema):
-    id = ma.Integer()
+    id = ma.Integer(data_key="tmdb_id")
     overview = ma.String(data_key="summary")
     vote_average = ma.Float(data_key="rating")
     poster_path = ma.String(data_key="thumbUrl")
