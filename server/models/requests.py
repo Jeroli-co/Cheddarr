@@ -1,4 +1,5 @@
 from datetime import date
+from enum import Enum
 from typing import TYPE_CHECKING, List
 
 from server.database import (
@@ -46,6 +47,11 @@ class MovieRequest(Model):
         self.requested_user = requested_user
         self.requesting_user = requesting_user
         self.requested_date = date.today()
+
+
+class SeriesType(Enum):
+    ANIME = "anime"
+    STANDARD = "standard"
 
 
 class SeriesRequest(Model):

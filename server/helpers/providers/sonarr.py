@@ -44,7 +44,7 @@ def sonarr_lookup(tvdb_id: int, config: SonarrConfig) -> dict:
     return lookup
 
 
-def add_series_to_sonarr(request: SeriesChildRequest):
+def send_request_to_sonarr(request: SeriesChildRequest):
     config = request.selected_provider
     lookup = sonarr_lookup(request.series.tvdb_id, config)[0]
     if not lookup.get("path"):  # Series not present

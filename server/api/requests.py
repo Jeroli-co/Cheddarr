@@ -4,7 +4,7 @@ from flask_login.utils import login_required
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound
 
 from server.extensions.marshmallow import body, jsonify_with
-from server.helpers.providers.sonarr import add_series_to_sonarr
+from server.helpers.providers.sonarr import send_request_to_sonarr
 from server.models import (
     User,
     SeriesRequest,
@@ -154,7 +154,7 @@ def update_series_request(args: dict, id: int):
             raise BadRequest("No matching provider.")
     request.update(args)
     if request.selected_provider.name == "Sonarr":
-        add_series_to_sonarr(request)
+        send_request_to_sonarr(request)
     return request
 
 
