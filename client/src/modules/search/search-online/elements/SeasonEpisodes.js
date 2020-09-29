@@ -1,79 +1,78 @@
-import React, { useState } from "react";
-import { useTmdbMedia } from "../../../media/hooks/useTmdbMedia";
+import React from "react";
 import { MEDIA_TYPES } from "../../../media/enums/MediaTypes";
 import Spinner from "../../../../utils/elements/Spinner";
 import { Container } from "../../../../utils/elements/Container";
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { RowLayout } from "../../../../utils/elements/layouts";
+import { useMedia } from "../../../media/hooks/useMedia";
 
-const SeasonEpisodes = ({ series_id, season_number }) => {
-  const season = useTmdbMedia(MEDIA_TYPES.SERIES, series_id, season_number);
-  const [isAllEpisodesActive, setIsAllEpisodesActive] = useState(true);
+const SeasonEpisodes = ({
+  series_id,
+  season_number,
+  handleAddEpisode,
+  handleRemoveEpisode,
+  isEpisodeSelected,
+}) => {
+  const season = useMedia(MEDIA_TYPES.SERIES, series_id, season_number);
 
   if (season === null) {
     return <Spinner />;
   }
 
+  const onAddEpisode = (e, episode_number) => {
+    handleAddEpisode(season_number, episode_number);
+    e.preventDefault();
+  };
+
+  const onRemoveEpisode = (e, episode_number) => {
+    handleRemoveEpisode(season_number, episode_number);
+    e.preventDefault();
+  };
+
   return (
     <Container width="100%" marginLeft="1%">
-      <div className="field">
-        <input
-          id={"enable_all_season_" + series_id + "_" + season_number}
-          type="checkbox"
-          name={"enable_all_season_" + series_id + "_" + season_number}
-          className="switch is-primary"
-          checked={isAllEpisodesActive}
-          onClick={() => setIsAllEpisodesActive(!isAllEpisodesActive)}
-        />
-        <label htmlFor={"enable_all_season_" + series_id + "_" + season_number}>
-          Request all season
-        </label>
-      </div>
-      <div className="is-divider" />
-      {!isAllEpisodesActive && (
-        <div className="columns is-multiline">
-          {season.episodes.map((e) => {
-            return (
-              <div className="column is-one-third">
-                <Container>
-                  <div className="field">
-                    <input
-                      id={
-                        "enable_episode_" +
-                        series_id +
-                        "_" +
-                        season_number +
-                        "_" +
-                        e.episode_number
-                      }
-                      type="checkbox"
-                      name={
-                        "enable_episode_" +
-                        series_id +
-                        "_" +
-                        season_number +
-                        "_" +
-                        e.episode_number
-                      }
-                      className="switch is-primary"
-                    />
-                    <label
-                      htmlFor={
-                        "enable_episode_" +
-                        series_id +
-                        "_" +
-                        season_number +
-                        "_" +
-                        e.episode_number
-                      }
-                    >
-                      Episode {e.episode_number}: {e.name}
-                    </label>
-                  </div>
+      <div className="columns is-multiline">
+        {season.episodes.map((episode, index) => {
+          return (
+            <div key={index} className="column is-one-third">
+              <RowLayout alignItems="center">
+                <Container padding="10px">
+                  <button
+                    className={
+                      isEpisodeSelected(season_number, episode.episode_number)
+                        ? "button is-primary is-outlined"
+                        : "button is-primary"
+                    }
+                    type="button"
+                    onClick={(e) =>
+                      isEpisodeSelected(season_number, episode.episode_number)
+                        ? onRemoveEpisode(e, episode.episode_number)
+                        : onAddEpisode(e, episode.episode_number)
+                    }
+                  >
+                    <span className="icon">
+                      <FontAwesomeIcon
+                        icon={
+                          isEpisodeSelected(
+                            season_number,
+                            episode.episode_number
+                          )
+                            ? faMinus
+                            : faPlus
+                        }
+                      />
+                    </span>
+                  </button>
                 </Container>
-              </div>
-            );
-          })}
-        </div>
-      )}
+                <p>
+                  Episode {episode.episode_number}: {episode.name}
+                </p>
+              </RowLayout>
+            </div>
+          );
+        })}
+      </div>
     </Container>
   );
 };

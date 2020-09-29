@@ -16,7 +16,7 @@ const OnlineMovieCard = ({ movie, friendsProviders }) => {
     }
   }, [friendsProviders]);
 
-  const handleChange = (event) => {
+  const handleChanges = (event) => {
     setProviderSelected(event.target.value);
   };
 
@@ -39,13 +39,13 @@ const OnlineMovieCard = ({ movie, friendsProviders }) => {
             <h1 className="title is-3">{movie.title}</h1>
             <ProvidersDropdown
               providers={friendsProviders}
-              handleChange={handleChange}
+              handleChanges={handleChanges}
             />
             {providerSelected && (
               <MediaRequestButton
                 requested_username={providerSelected.username}
                 media_type={MEDIA_TYPES.MOVIES}
-                media_id={movie.id}
+                request_body={{ tmdb_id: movie.tmdb_id }}
               />
             )}
             <MediaRating media={movie} />

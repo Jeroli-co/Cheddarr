@@ -6,7 +6,7 @@ const useMediaService = () => {
 
   const { executeRequest, methods } = useApi();
 
-  const getMediaByTmdbId = async (
+  const getMediaById = async (
     media_type,
     tmdb_id,
     season_number = null,
@@ -29,7 +29,7 @@ const useMediaService = () => {
   };
 
   return {
-    getMediaByTmdbId,
+    getMediaById,
   };
 };
 

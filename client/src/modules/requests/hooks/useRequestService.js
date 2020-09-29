@@ -8,11 +8,15 @@ const useRequestService = () => {
   const { executeRequest, methods } = useApi();
   const { pushSuccess } = useContext(NotificationContext);
 
-  const request = async (requested_username, media_type, media_id) => {
-    const res = await executeRequest(methods.POST, requestUrl + media_type, {
-      requested_username: requested_username,
-      tmdb_id: media_id,
-    });
+  const request = async (requested_username, media_type, request) => {
+    const res = await executeRequest(
+      methods.POST,
+      requestUrl + media_type + "/",
+      {
+        requested_username: requested_username,
+        ...request,
+      }
+    );
     switch (res.status) {
       case 200:
         pushSuccess("Your request has been send to " + requested_username);

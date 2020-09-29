@@ -1,11 +1,11 @@
 import { RowLayout } from "../../../../utils/elements/layouts";
 import React, { useEffect, useState } from "react";
-import { useTmdbMedia } from "../../../media/hooks/useTmdbMedia";
-import { MEDIA_TYPES } from "../../../media/enums/MediaTypes";
 import { Container } from "../../../../utils/elements/Container";
 import Spinner from "../../../../utils/elements/Spinner";
 import styled from "styled-components";
 import { SeasonEpisodes } from "./SeasonEpisodes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const SeasonsMenuStyle = styled.ul`
   padding: 1%;
@@ -27,8 +27,15 @@ const SeasonsMenuItemStyle = styled.li`
   }
 `;
 
-const SeasonsMenu = ({ series_id }) => {
-  const series = useTmdbMedia(MEDIA_TYPES.SERIES, series_id);
+const SeasonsMenu = ({
+  series,
+  handleAddSeason,
+  handleAddEpisode,
+  handleRemoveSeason,
+  handleRemoveEpisode,
+  isSeasonSelected,
+  isEpisodeSelected,
+}) => {
   const [seasonNumberSelected, setSeasonNumberSelected] = useState(null);
 
   useEffect(() => {
@@ -45,8 +52,26 @@ const SeasonsMenu = ({ series_id }) => {
     );
   }
 
+  const onAddSeason = (e) => {
+    e.preventDefault();
+    handleAddSeason(seasonNumberSelected);
+  };
+
+  const onRemoveSeason = (e) => {
+    e.preventDefault();
+    handleRemoveSeason(seasonNumberSelected);
+  };
+
+  const onAddEpisode = (season_number, episode_number) => {
+    handleAddEpisode(season_number, episode_number);
+  };
+
+  const onRemoveEpisode = (season_number, episode_number) => {
+    handleRemoveEpisode(season_number, episode_number);
+  };
+
   return (
-    <RowLayout padding="1%">
+    <RowLayout padding="10px">
       <aside>
         <b>Seasons</b>
         <SeasonsMenuStyle>
@@ -66,10 +91,40 @@ const SeasonsMenu = ({ series_id }) => {
       </aside>
       <div className="is-divider-vertical" />
       {seasonNumberSelected !== null && (
-        <SeasonEpisodes
-          series_id={series_id}
-          season_number={seasonNumberSelected}
-        />
+        <div>
+          <div>
+            <button
+              className={
+                isSeasonSelected(seasonNumberSelected)
+                  ? "button is-primary is-outlined"
+                  : "button is-primary"
+              }
+              type="button"
+              onClick={
+                isSeasonSelected(seasonNumberSelected)
+                  ? onRemoveSeason
+                  : onAddSeason
+              }
+            >
+              <span className="icon">
+                <FontAwesomeIcon
+                  icon={
+                    isSeasonSelected(seasonNumberSelected) ? faMinus : faPlus
+                  }
+                />
+              </span>
+              <span>All season</span>
+            </button>
+          </div>
+          <div className="is-divider" />
+          <SeasonEpisodes
+            series_id={series.tvdb_id}
+            season_number={seasonNumberSelected}
+            handleAddEpisode={onAddEpisode}
+            handleRemoveEpisode={onRemoveEpisode}
+            isEpisodeSelected={isEpisodeSelected}
+          />
+        </div>
       )}
     </RowLayout>
   );

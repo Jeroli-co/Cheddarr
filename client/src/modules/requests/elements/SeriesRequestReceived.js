@@ -5,8 +5,8 @@ import { Container } from "../../../utils/elements/Container";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
-import { useTmdbMedia } from "../../media/hooks/useTmdbMedia";
 import { MEDIA_TYPES } from "../../media/enums/MediaTypes";
+import { useMedia } from "../../media/hooks/useMedia";
 
 const SeriesRequestReceivedStyle = styled.div`
   border: 2px solid ${(props) => props.theme.dark};
@@ -19,7 +19,7 @@ const SeriesRequestReceivedStyle = styled.div`
 
 const SeriesRequestReceived = ({ request }) => {
   const { getRequestState } = useRequestService();
-  const series = useTmdbMedia(MEDIA_TYPES.SERIES, request.tmdb_id);
+  const series = useMedia(MEDIA_TYPES.SERIES, request.tmdb_id);
   return (
     <SeriesRequestReceivedStyle>
       <RowLayout justifyContent="space-between" padding="1%">
