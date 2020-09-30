@@ -17,8 +17,6 @@ const RequestsReceived = () => {
     REQUESTS_TYPE.RECEIVED
   );
 
-  useEffect(() => {}, [moviesRequestsPending]);
-
   return (
     <Container>
       <h3 className="title is-3">Movies requested</h3>

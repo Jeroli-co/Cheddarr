@@ -60,7 +60,9 @@ const useRequestSeriesOptions = (series) => {
     let seasonToDeleteIndex = -1;
     seasons.forEach((season, index) => {
       if (season.season_number === season_number) {
-        season.episodes.filter((e) => e.episode_number !== episode_number);
+        season.episodes = season.episodes.filter(
+          (e) => e.episode_number !== episode_number
+        );
         if (season.episodes.length === 0) {
           seasonToDeleteIndex = index;
         }
