@@ -6,7 +6,11 @@ from werkzeug.exceptions import abort, NotFound
 
 from server.extensions import cache
 from server.extensions.marshmallow import query, jsonify_with
-from server.helpers.search import search_friends, search_media
+from server.helpers.search import (
+    search_friends,
+    search_media,
+    set_tmdb_series_info,
+)
 from server.schemas.search import (
     FriendSearchResultSchema,
     MediaSearchResultSchema,
@@ -47,6 +51,7 @@ def search_all(value, type=None, **kwargs):
 @cache.memoize(timeout=3600)
 def search_tmdb_media(value, page=1):
     results = tmdb.Search().multi(query=value, page=page)
+    set_tmdb_series_info(series=results["results"])
     return results
 
 
@@ -67,6 +72,7 @@ def search_tmdb_movies(value, page=1):
 @cache.memoize(timeout=3600)
 def search_tmdb_series(value, page=1):
     results = tmdb.Search().tv(query=value, page=page)
+    set_tmdb_series_info(series=results["results"])
     return results
 
 
@@ -94,6 +100,7 @@ def get_tmdb_series_by_tvdb_id(tvdb_id):
     tmdb_id = tmdb_result[0]["id"]
     try:
         series = tmdb.TV(tmdb_id).info()
+        set_tmdb_series_info(series=series)
         return series
     except HTTPError as e:
         abort(e.response.status_code)

@@ -1,10 +1,8 @@
-import re
-
-import tmdbsimple as tmdb
 from marshmallow import post_dump
 from marshmallow.validate import OneOf
 
 from server.extensions import ma
+from server.models.requests import SeriesType
 
 TMDB_URL = "https://www.themoviedb.org/"
 TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"
@@ -80,23 +78,13 @@ class TmdbMovieSchema(TmdbMediaSchema):
 
 
 class TmdbSeriesSchema(TmdbMediaSchema):
+    tvdb_id = ma.Int()
     name = ma.String(data_key="title")
     first_air_date = ma.String(data_key="releaseDate")
     media_type = ma.String(default="series")
     seasons = ma.Nested("TmdbSeasonSchema", many=True)
-    series_type = ma.Method("get_series_type")
-    tvdb_id = ma.Function(
-        lambda series: tmdb.TV(series["id"]).external_ids().get("tvdb_id")
-    )
+    series_type = ma.String(validate=OneOf([SeriesType.STANDARD, SeriesType.ANIME]))
     link = ma.Function(lambda media: f"{TMDB_URL}tv/{media['id']}")
-
-    def get_series_type(self, media):
-        genres = media["genres"]
-        for genre in genres:
-            pattern = re.compile("^(?i)anim(e|ation)$")
-            if pattern.match(genre["name"]):
-                return "anime"
-        return "standard"
 
 
 class TmdbSeasonSchema(ma.Schema):

@@ -12,6 +12,7 @@ from server.database import (
     Date,
     Boolean,
     UniqueConstraint,
+    Enum as DBEnum,
 )
 
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ class MovieRequest(Model):
         self.requested_date = date.today()
 
 
-class SeriesType(Enum):
+class SeriesType(str, Enum):
     ANIME = "anime"
     STANDARD = "standard"
 
@@ -57,6 +58,7 @@ class SeriesType(Enum):
 class SeriesRequest(Model):
     id = Column(Integer, primary_key=True)
     tvdb_id = Column(Integer)
+    series_type = Column(DBEnum(SeriesType))
     requested_user_id = Column(ForeignKey("user.id"))
     requested_user = relationship(
         "User",
@@ -72,9 +74,10 @@ class SeriesRequest(Model):
 
     __repr_props__ = ("tvdb_id", "requested_user", "children")
 
-    def __init__(self, tvdb_id: int, requested_user: "User"):
+    def __init__(self, tvdb_id: int, requested_user: "User", series_type: SeriesType):
         self.tvdb_id = tvdb_id
         self.requested_user = requested_user
+        self.series_type = series_type
 
 
 class SeriesChildRequest(Model):

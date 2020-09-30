@@ -12,6 +12,7 @@ from server.models import (
     MovieRequest,
     EpisodeRequest,
 )
+from server.models.requests import SeriesType
 from server.schemas import (
     SeriesChildRequestSchema,
     SeriesRequestSchema,
@@ -86,6 +87,7 @@ def add_series_request(request: dict):
     tvdb_id = request["tvdb_id"]
     requested_username = request["requested_username"]
     requested_seasons = request["seasons"]
+    series_type = SeriesType(request["series_type"])
 
     requested_user = User.find(username=requested_username)
     if requested_user is None:
@@ -95,7 +97,9 @@ def add_series_request(request: dict):
         tvdb_id=tvdb_id, requested_user=requested_user
     )
     if series is None:
-        series = SeriesRequest(tvdb_id=tvdb_id, requested_user=requested_user)
+        series = SeriesRequest(
+            tvdb_id=tvdb_id, requested_user=requested_user, series_type=series_type
+        )
 
     children = SeriesChildRequest.findAll(series_id=series.id)
     for existing_child in children:

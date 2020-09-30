@@ -1,4 +1,5 @@
 from marshmallow import pre_dump, validates_schema, ValidationError
+from marshmallow.validate import OneOf
 from marshmallow_sqlalchemy import auto_field
 
 from server.extensions import ma
@@ -9,6 +10,7 @@ from server.models import (
     EpisodeRequest,
     MovieRequest,
 )
+from server.models.requests import SeriesType
 
 
 class MovieRequestSchema(ma.SQLAlchemyAutoSchema):
@@ -42,6 +44,11 @@ class SeriesChildRequestSchema(ma.SQLAlchemyAutoSchema):
         only=["username", "avatar"],
     )
     requested_username = ma.String(load_only=True, required=True)
+    series_type = ma.String(
+        validate=OneOf([SeriesType.STANDARD, SeriesType.ANIME]),
+        load_only=True,
+        required=True,
+    )
     selected_provider_id = auto_field()
 
     @pre_dump

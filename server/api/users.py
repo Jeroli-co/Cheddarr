@@ -224,14 +224,14 @@ def get_friends_providers(provides):
             friend
             for friend in friends
             for provider in friend.providers
-            if provider.provides_movies()
+            if provider.enabled and provider.provides_movies()
         ]
     else:
         friends_available = [
             friend
             for friend in friends
             for provider in friend.providers
-            if provider.provides_series()
+            if provider.enabled and provider.provides_series()
         ]
     return friends_available
 

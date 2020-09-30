@@ -51,7 +51,7 @@ def confirm_timed_token(token, expiration=600):
 def random_avatar():
     profile_images_path = os.path.join(IMAGES_FOLDER, "user")
     avatar = choice(listdir(profile_images_path))
-    return url_for("site.images", image_name="user/" + avatar, _external=True)
+    return url_for("site.images", image_name="users/" + avatar, _external=True)
 
 
 def make_url(url, queries_dict=None):
