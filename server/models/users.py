@@ -38,8 +38,12 @@ class User(Model, UserMixin):
     session_token = Column(String(256))
     confirmed = Column(Boolean, default=False)
     api_key = Column(String(256), unique=True, nullable=True)
-    providers = relationship("ProviderConfig", back_populates="user", lazy="dynamic")
-
+    providers = relationship(
+        "ProviderConfig", back_populates="user", cascade="all,delete", lazy="dynamic"
+    )
+    media_servers = relationship(
+        "MediaServer", back_populates="user", cascade="all,delete", lazy="dynamic"
+    )
     __repr_props__ = ("username", "email", "confirmed")
 
     def __init__(

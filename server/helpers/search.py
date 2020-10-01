@@ -6,9 +6,8 @@ from flask_login import current_user
 from werkzeug.exceptions import BadRequest
 
 from server.extensions import cache
-from server.helpers.providers.plex import connect_plex_servers, plex_search
-from server.models.requests import SeriesType
-from server.models.users import User
+from server.helpers.media_servers.plex import connect_plex_servers, plex_search
+from server.models import SeriesType, User
 
 
 def search_friends(name, limit=3):

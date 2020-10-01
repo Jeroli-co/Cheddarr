@@ -16,7 +16,6 @@ class PlexConfigSchema(ma.SQLAlchemySchema):
     class Meta:
         model = PlexConfig
 
-    enabled = ma.auto_field()
     servers = Nested(PlexServerSchema, many=True)
 
 
@@ -77,7 +76,7 @@ class PlexEpisodeSchema(PlexVideoSchema):
     _links = ma.Hyperlinks(
         {
             "self": ma.AbsoluteURLFor(
-                "providers.get_plex_episode",
+                "media_servers.get_plex_episode",
                 episode_id="<ratingKey>",
             ),
         }
@@ -98,7 +97,7 @@ class PlexSeasonSchema(PlexVideoSchema):
     _links = ma.Hyperlinks(
         {
             "self": ma.AbsoluteURLFor(
-                "providers.get_plex_season",
+                "media_servers.get_plex_season",
                 season_id="<ratingKey>",
             ),
         }
@@ -118,7 +117,7 @@ class PlexSeriesSchema(PlexVideoSchema):
     _links = ma.Hyperlinks(
         {
             "self": ma.AbsoluteURLFor(
-                "providers.get_plex_series", series_id="<ratingKey>"
+                "media_servers.get_plex_series", series_id="<ratingKey>"
             ),
         }
     )

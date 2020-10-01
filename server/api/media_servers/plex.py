@@ -4,9 +4,8 @@ from plexapi.myplex import MyPlexAccount
 from plexapi.video import Movie
 from werkzeug.exceptions import BadRequest, Unauthorized
 
-from server.api.providers.base import providers_bp
 from server.extensions.marshmallow import body, jsonify_with
-from server.helpers.providers.plex import (
+from server.helpers.media_servers.plex import (
     connect_plex_servers,
     plex_library_sections,
 )
@@ -19,6 +18,7 @@ from server.schemas import (
     PlexSeriesSchema,
     PlexServerSchema,
 )
+from .base import media_servers_bp
 
 plex_config_serializer = PlexConfigSchema()
 plex_movie_serializer = PlexMovieSchema()
@@ -27,16 +27,14 @@ plex_season_serializer = PlexSeasonSchema()
 plex_episode_serializer = PlexEpisodeSchema()
 
 
-@providers_bp.route("/plex/status/")
+@media_servers_bp.route("/plex/status/")
 @login_required
 def get_plex_status():
     plex_config = PlexConfig.find(user=current_user)
-    if not plex_config:
-        return {"status": False}
-    return {"status": plex_config.enabled and len(plex_config.servers) != 0}
+    return {"status": plex_config is not None and len(plex_config.servers) != 0}
 
 
-@providers_bp.route("/plex/config/")
+@media_servers_bp.route("/plex/config/")
 @login_required
 @jsonify_with(PlexConfigSchema)
 def get_plex_config():
@@ -46,7 +44,7 @@ def get_plex_config():
     return plex_config
 
 
-@providers_bp.route("/plex/config/", methods=["PATCH"])
+@media_servers_bp.route("/plex/config/", methods=["PATCH"])
 @login_required
 @body(PlexConfigSchema)
 @jsonify_with(PlexConfigSchema)
@@ -58,7 +56,7 @@ def update_plex_config(args):
     return plex_config
 
 
-@providers_bp.route("/plex/config/", methods=["DELETE"])
+@media_servers_bp.route("/plex/config/", methods=["DELETE"])
 @fresh_login_required
 def unlink_plex_account():
     plex_config = PlexConfig.find(user=current_user)
@@ -68,7 +66,7 @@ def unlink_plex_account():
     return {"message": "Plex account unlinked."}
 
 
-@providers_bp.route("/plex/config/servers/", methods=["POST"])
+@media_servers_bp.route("/plex/config/servers/", methods=["POST"])
 @login_required
 @body(PlexServerSchema)
 @jsonify_with(PlexConfigSchema)
@@ -81,7 +79,7 @@ def add_plex_server(server):
     return plex_config
 
 
-@providers_bp.route("/plex/config/servers/<machine_id>/", methods=["DELETE"])
+@media_servers_bp.route("/plex/config/servers/<machine_id>/", methods=["DELETE"])
 @login_required
 @jsonify_with(PlexConfigSchema)
 def remove_plex_server(machine_id):
@@ -100,7 +98,7 @@ def remove_plex_server(machine_id):
     return plex_config
 
 
-@providers_bp.route("/plex/servers/")
+@media_servers_bp.route("/plex/servers/")
 @login_required
 def get_plex_servers():
     plex_config = PlexConfig.find(user=current_user)
@@ -116,7 +114,7 @@ def get_plex_servers():
     return jsonify(servers)
 
 
-@providers_bp.route("/plex/movies/recent/")
+@media_servers_bp.route("/plex/movies/recent/")
 @login_required
 @jsonify_with(PlexMovieSchema, many=True)
 def get_plex_recent_movies():
@@ -130,7 +128,7 @@ def get_plex_recent_movies():
     return recent_movies
 
 
-@providers_bp.route("/plex/movies/<int:movie_id>/")
+@media_servers_bp.route("/plex/movies/<int:movie_id>/")
 @login_required
 @jsonify_with(PlexMovieSchema)
 def get_plex_movie(movie_id):
@@ -140,7 +138,7 @@ def get_plex_movie(movie_id):
     return movie
 
 
-@providers_bp.route("/plex/series/recent/")
+@media_servers_bp.route("/plex/series/recent/")
 @login_required
 @jsonify_with(PlexEpisodeSchema, many=True)
 def get_plex_recent_series():
@@ -154,7 +152,7 @@ def get_plex_recent_series():
     return recent_series
 
 
-@providers_bp.route("/plex/series/<int:series_id>/")
+@media_servers_bp.route("/plex/series/<int:series_id>/")
 @login_required
 @jsonify_with(PlexSeriesSchema)
 def get_plex_series(series_id):
@@ -164,7 +162,7 @@ def get_plex_series(series_id):
     return series
 
 
-@providers_bp.route("/plex/seasons/<int:season_id>/")
+@media_servers_bp.route("/plex/seasons/<int:season_id>/")
 @login_required
 @jsonify_with(PlexSeasonSchema)
 def get_plex_season(season_id):
@@ -174,7 +172,7 @@ def get_plex_season(season_id):
     return season
 
 
-@providers_bp.route("/plex/episodes/<int:episode_id>/")
+@media_servers_bp.route("/plex/episodes/<int:episode_id>/")
 @login_required
 @jsonify_with(PlexEpisodeSchema)
 def get_plex_episode(episode_id):
@@ -184,7 +182,7 @@ def get_plex_episode(episode_id):
     return episode
 
 
-@providers_bp.route("/plex/on-deck/")
+@media_servers_bp.route("/plex/on-deck/")
 @login_required
 def get_plex_on_deck():
     plex_server = connect_plex_servers(current_user)

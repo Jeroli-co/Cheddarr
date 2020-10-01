@@ -1,1 +1,1 @@
-from . import plex, radarr, sonarr
+from . import radarr, sonarr

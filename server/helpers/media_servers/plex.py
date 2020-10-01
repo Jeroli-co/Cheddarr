@@ -12,7 +12,7 @@ from server.models import PlexConfig
 
 @cache.memoize(timeout=300)
 def connect_plex_servers(user) -> PlexServer:
-    plex_config = PlexConfig.find(user=user, enabled=True)
+    plex_config = PlexConfig.find(user=user)
     if not plex_config:
         raise BadRequest("No existing config for Plex.")
     plex_servers = plex_config.servers

@@ -13,7 +13,6 @@ class ProviderConfigSchema(ma.Schema):
     provider_type = ma.String(
         validate=OneOf(
             [
-                ProviderType.MEDIA_SERVER.value,
                 ProviderType.SERIES_PROVIDER.value,
                 ProviderType.MOVIE_PROVIDER.value,
             ]

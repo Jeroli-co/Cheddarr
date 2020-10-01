@@ -11,8 +11,9 @@ from server.models import (
     SeriesChildRequest,
     MovieRequest,
     EpisodeRequest,
+    SeriesType,
+    SonarrConfig,
 )
-from server.models.requests import SeriesType
 from server.schemas import (
     SeriesChildRequestSchema,
     SeriesRequestSchema,
@@ -157,7 +158,7 @@ def update_series_request(args: dict, id: int):
         if selected_provider is None:
             raise BadRequest("No matching provider.")
     request.update(args)
-    if request.selected_provider.name == "Sonarr":
+    if isinstance(request.selected_provider, SonarrConfig):
         send_request_to_sonarr(request)
     return request
 

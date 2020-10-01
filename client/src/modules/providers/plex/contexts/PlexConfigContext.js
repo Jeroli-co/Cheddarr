@@ -2,13 +2,14 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useApi } from "../../../api/hooks/useApi";
 import { AuthContext } from "../../../auth/contexts/AuthContext";
 import { NotificationContext } from "../../../notifications/contexts/NotificationContext";
+import { isEmptyObject } from "../../../../utils/objects";
 
 const PlexConfigContext = createContext();
 
 const PlexConfigContextProvider = (props) => {
   const [config, setConfig] = useState(null);
 
-  const providerUrl = "/providers/plex/";
+  const providerUrl = "/media-servers/plex/";
 
   const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
@@ -107,9 +108,7 @@ const PlexConfigContextProvider = (props) => {
   };
 
   const isPlexAccountLinked = () => {
-    return (
-      config["enabled"] === true && typeof config["enabled"] !== "undefined"
-    );
+    return !isEmptyObject(config);
   };
 
   const isPlexServerLinked = () => {

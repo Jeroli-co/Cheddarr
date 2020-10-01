@@ -113,10 +113,12 @@ def register_blueprints(app):
     from server.api.requests import requests_bp
     from server.api.search import search_bp
     from server.api.providers.base import providers_bp
+    from server.api.media_servers.base import media_servers_bp
 
     app.register_blueprint(site_bp)
     app.register_blueprint(users_bp, url_prefix=API_ROOT)
     app.register_blueprint(auth_bp, url_prefix=API_ROOT)
+    app.register_blueprint(media_servers_bp, url_prefix=API_ROOT + "/media-servers")
     app.register_blueprint(providers_bp, url_prefix=API_ROOT + "/providers")
     app.register_blueprint(requests_bp, url_prefix=API_ROOT + "/requests")
     app.register_blueprint(search_bp, url_prefix=API_ROOT + "/search")

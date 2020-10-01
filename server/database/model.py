@@ -10,7 +10,6 @@ class BaseModel(db.Model):
     """
 
     __abstract__ = True
-    __table_args__ = {"extend_existing": True}
     __repr_props__ = ()
 
     def save(self):
@@ -59,7 +58,6 @@ class Model(BaseModel):
     """
 
     __abstract__ = True
-    __table_args__ = {"extend_existing": True}
 
     @declared_attr
     def __tablename__(cls):

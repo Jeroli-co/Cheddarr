@@ -3,11 +3,11 @@ from flask_login import current_user, login_required
 from requests import get
 from werkzeug.exceptions import BadRequest
 
-from server.api.providers.base import providers_bp
 from server.extensions.marshmallow import body, jsonify_with
 from server.helpers.providers.sonarr import sonarr_url, test_sonarr_status
 from server.models import SonarrConfig
 from server.schemas import SonarrConfigSchema
+from .base import providers_bp
 
 
 @providers_bp.route("/sonarr/config/", methods=["PATCH"])

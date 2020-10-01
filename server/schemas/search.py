@@ -2,7 +2,7 @@ from marshmallow import post_dump
 from marshmallow.validate import OneOf
 
 from server.extensions import ma
-from server.models.requests import SeriesType
+from server.models import SeriesType
 
 TMDB_URL = "https://www.themoviedb.org/"
 TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"

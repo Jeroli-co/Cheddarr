@@ -7,8 +7,7 @@ from server.database import (
     Table,
     relationship,
 )
-
-from .base import ProviderConfig, ProviderType
+from server.models.media_servers.base import MediaServer
 
 
 class PlexServer(Model):
@@ -19,13 +18,12 @@ class PlexServer(Model):
     name = Column(String(128))
 
 
-class PlexConfig(ProviderConfig):
+class PlexConfig(MediaServer):
 
     __repr_props__ = (
-        *ProviderConfig.__repr_props__,
+        "user",
         "servers",
     )
-
     plex_user_id = Column(Integer)
     servers = relationship(
         "PlexServer", secondary="plexconfigserver", backref="configs"
@@ -34,8 +32,6 @@ class PlexConfig(ProviderConfig):
     def __init__(self, plex_user_id, api_key):
         self.plex_user_id = plex_user_id
         self.api_key = api_key
-        self.provider_type = ProviderType.MEDIA_SERVER
-        self.enabled = True
 
 
 plex_configs_servers = Table(

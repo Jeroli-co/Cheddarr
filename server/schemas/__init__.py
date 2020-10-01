@@ -1,5 +1,5 @@
 from .auth import SigninSchema, AuthorizePlexSigninSchema, ConfirmPlexSigninSchema
-from .providers.plex import (
+from server.schemas.media_servers.plex import (
     PlexConfigSchema,
     PlexEpisodeSchema,
     PlexMovieSchema,

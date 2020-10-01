@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { AuthContext } from "../../../auth/contexts/AuthContext";
 
 const usePlex = () => {
-  const providerUrl = "/providers/plex/";
+  const providerUrl = "/media-servers/plex/";
   const moviesUrl = providerUrl + "movies/";
   const seriesUrl = providerUrl + "series/";
   const seasonUrl = providerUrl + "seasons/";

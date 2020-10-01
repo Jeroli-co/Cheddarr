@@ -3,11 +3,11 @@ from flask_login import current_user, login_required
 from requests import get
 from werkzeug.exceptions import BadRequest
 
-from server.api.providers.base import providers_bp
 from server.extensions.marshmallow import body, jsonify_with
 from server.helpers.providers.radarr import radarr_url, test_radarr_status
 from server.models import RadarrConfig
 from server.schemas import RadarrConfigSchema
+from .base import providers_bp
 
 
 @providers_bp.route("/radarr/config/", methods=["PATCH"])
