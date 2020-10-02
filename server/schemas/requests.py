@@ -43,6 +43,10 @@ class SeriesChildRequestSchema(ma.SQLAlchemyAutoSchema):
         "UserSchema",
         only=["username", "avatar"],
     )
+    requesting_user = ma.Nested(
+      "UserSchema",
+      only=["username", "avatar"],
+    )
     requested_username = ma.String(load_only=True, required=True)
     series_type = ma.String(
         validate=OneOf([SeriesType.STANDARD, SeriesType.ANIME]),

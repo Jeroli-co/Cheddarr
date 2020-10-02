@@ -6,6 +6,13 @@ import { MediaRating } from "../../../../utils/elements/media/MediaRating";
 import { MediaRequestButton } from "./MediaRequestButton";
 import { ProvidersDropdown } from "./ProvidersDropdown";
 import { MEDIA_TYPES } from "../../../media/enums/MediaTypes";
+import { H3 } from "../../../../utils/elements/titles";
+import { Button } from "../../../../utils/elements/buttons/Button";
+import { PrimaryButton } from "../../../../utils/elements/buttons/PrimaryButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { ButtonsGroup } from "../../../../utils/elements/buttons/ButtonsGroup";
+import { Dropdown } from "../../../../utils/elements/buttons/Dropdown";
 
 const OnlineMovieCard = ({ movie, friendsProviders }) => {
   const [providerSelected, setProviderSelected] = useState(null);
@@ -36,7 +43,7 @@ const OnlineMovieCard = ({ movie, friendsProviders }) => {
         />
         <Container width="100%" padding="1%">
           <RowLayout justifyContent="space-between" alignItems="center">
-            <h1 className="title is-3">{movie.title}</h1>
+            <H3>{movie.title}</H3>
             <ProvidersDropdown
               providers={friendsProviders}
               handleChanges={handleChanges}

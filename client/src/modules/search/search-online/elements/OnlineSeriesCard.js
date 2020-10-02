@@ -58,10 +58,6 @@ const OnlineSeriesCard = ({ media, friendsProviders }) => {
     removeEpisode(season_number, episode_number);
   };
 
-  useEffect(() => {
-    console.log(request);
-  }, [request]);
-
   return (
     <Container
       padding="1%"
