@@ -13,7 +13,7 @@ TMDB_ART_SIZE = "w1280"
 class SearchSchema(ma.Schema):
     value = ma.String(required=True)
     type = ma.String(validate=OneOf(["movies", "series", "friends"]))
-    page = ma.Int()
+    page = ma.Integer()
 
 
 class MediaSearchResultSchema(ma.Schema):
@@ -78,7 +78,7 @@ class TmdbMovieSchema(TmdbMediaSchema):
 
 
 class TmdbSeriesSchema(TmdbMediaSchema):
-    tvdb_id = ma.Int()
+    tvdb_id = ma.Integer()
     name = ma.String(data_key="title")
     first_air_date = ma.String(data_key="releaseDate")
     media_type = ma.String(default="series")
@@ -88,14 +88,14 @@ class TmdbSeriesSchema(TmdbMediaSchema):
 
 
 class TmdbSeasonSchema(ma.Schema):
-    season_number = ma.Int()
+    season_number = ma.Integer()
     name = ma.String()
     air_date = ma.String(data_key="release_date")
     episodes = ma.Nested("TmdbEpisodeSchema", many=True)
 
 
 class TmdbEpisodeSchema(ma.Schema):
-    episode_number = ma.Int()
+    episode_number = ma.Integer()
     name = ma.String()
     air_date = ma.String(data_key="release_date")
 

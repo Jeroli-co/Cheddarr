@@ -15,6 +15,7 @@ from server.schemas.search import (
     FriendSearchResultSchema,
     MediaSearchResultSchema,
     SearchSchema,
+    TmdbEpisodeSchema,
     TmdbMediaSearchResultSchema,
     TmdbMovieSearchResultSchema,
     TmdbSeriesSearchResultSchema,
@@ -118,5 +119,23 @@ def get_tmdb_season_by_tvdb_id(tvdb_id, season_number):
     try:
         season = tmdb.TV_Seasons(tmdb_id, season_number).info()
         return season
+    except HTTPError as e:
+        abort(e.response.status_code)
+
+
+@search_bp.route(
+    "/series/<int:tvdb_id>/seasons/<int:season_number>/episodes/<int:episode_number>"
+)
+@login_required
+@jsonify_with(TmdbEpisodeSchema)
+@cache.memoize(timeout=3600)
+def get_tmdb_episode_by_tvdb_id(tvdb_id, season_number, episode_number):
+    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
+    if not tmdb_result:
+        raise NotFound("No series found.")
+    tmdb_id = tmdb_result[0]["id"]
+    try:
+        episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info()
+        return episode
     except HTTPError as e:
         abort(e.response.status_code)
