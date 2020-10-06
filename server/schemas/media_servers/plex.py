@@ -1,5 +1,4 @@
-from marshmallow import post_dump, pre_dump
-from marshmallow_sqlalchemy.fields import Nested
+from marshmallow import post_dump, pre_dump, post_load
 from plexapi.media import Role
 
 from server.extensions import ma
@@ -12,11 +11,17 @@ class PlexServerSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
 
 
-class PlexConfigSchema(ma.SQLAlchemySchema):
+class PlexConfigSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = PlexConfig
+        table = (
+            PlexConfig.__table__
+        )  # table instead of model for the AutoSchema with Concrete Inheritance
 
-    servers = Nested(PlexServerSchema, many=True)
+    servers = ma.Nested(PlexServerSchema, many=True)
+
+    @post_load
+    def make_config(self, data, **kwargs):
+        return PlexConfig(**data)
 
 
 class PlexMediaTag(ma.Schema):
