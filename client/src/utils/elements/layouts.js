@@ -299,74 +299,27 @@ const RowLayout2 = styled.div`
       ? props.padding
       : "0"};
 
-  > * {
-    ${(props) =>
-      props.childMarginTop &&
-      css`
-        margin-top: ${props.childMarginTop};
-      `};
-
-    ${(props) =>
-      props.childMarginLeft &&
-      css`
-        margin-left: ${props.childMarginLeft};
-      `};
-
-    ${(props) =>
-      props.childMarginBottom &&
-      css`
-        margin-bottom: ${props.childMarginBottom};
-      `};
-
-    ${(props) =>
-      props.childMarginRight &&
-      css`
-        margin-right: ${props.childMarginRight};
-      `};
-
-    ${(props) =>
-      props.childMargin &&
-      css`
-        margin: ${props.childMargin};
-      `};
-
-    ${(props) =>
-      props.childPaddingTop &&
-      css`
-        padding-top: ${props.childPaddingTop};
-      `};
-
-    ${(props) =>
-      props.childPaddingLeft &&
-      css`
-        padding-left: ${props.childPaddingLeft};
-      `};
-
-    ${(props) =>
-      props.childPaddingBottom &&
-      css`
-        padding-bottom: ${props.childPaddingBottom};
-      `};
-
-    ${(props) =>
-      props.childPaddingRight &&
-      css`
-        padding-right: ${props.childPaddingRight};
-      `};
-
-    ${(props) =>
-      props.childPadding &&
-      css`
-        padding: ${props.childPadding};
-      `};
+  @media (min-width: 1800px) {
+    width: ${(props) =>
+      props.widthBigScreen
+        ? props.widthBigScreen
+        : props.width
+        ? props.width
+        : "auto"};
   }
 `;
 
-const RowElement = styled.div`
-  flex: ${({ flexGrow, flexShrink, flexBasis }) =>
-    (flexGrow ? flexGrow + " " : "0 ") +
-    (flexShrink ? flexShrink + " " : "1 ") +
-    (flexBasis ? flexBasis : "auto")};
+const FlexElement = styled.div`
+  width: ${(props) => (props.width ? props.width : "auto")};
+  min-width: ${(props) => (props.minWidth ? props.minWidth : "0")};
+  max-width: ${(props) => (props.maxWidth ? props.maxWidth : "none")};
+  height: ${(props) => (props.height ? props.height : "auto")};
+  background-color: ${(props) =>
+    props.backgroundColor ? props.backgroundColor : "transparent"};
+  cursor: ${(props) => (props.cursor ? props.cursor : "auto")};
+  flex-grow: ${(props) => (props.flexGrow ? props.flexGrow : "0")};
+  flex-shrink: ${(props) => (props.flexShrink ? props.flexShrink : "1")};
+  flex-basis: ${(props) => (props.flexBasis ? props.flexBasis : "auto")};
   border-bottom: ${(props) =>
     props.border
       ? props.border
@@ -384,6 +337,39 @@ const RowElement = styled.div`
       ? props.borderRight
       : "none"};
   border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
+  margin-top: ${(props) =>
+    props.marginTop ? props.marginTop : props.margin ? props.margin : "0"};
+  margin-left: ${(props) =>
+    props.marginLeft ? props.marginLeft : props.margin ? props.margin : "0"};
+  margin-bottom: ${(props) =>
+    props.marginBottom
+      ? props.marginBottom
+      : props.margin
+      ? props.margin
+      : "0"};
+  margin-right: ${(props) =>
+    props.marginRight ? props.marginRight : props.margin ? props.margin : "0"};
+
+  padding-top: ${(props) =>
+    props.paddingTop ? props.paddingTop : props.padding ? props.padding : "0"};
+  padding-left: ${(props) =>
+    props.paddingLeft
+      ? props.paddingLeft
+      : props.padding
+      ? props.padding
+      : "0"};
+  padding-bottom: ${(props) =>
+    props.paddingBottom
+      ? props.paddingBottom
+      : props.padding
+      ? props.padding
+      : "0"};
+  padding-right: ${(props) =>
+    props.paddingRight
+      ? props.paddingRight
+      : props.padding
+      ? props.padding
+      : "0"};
 `;
 
-export { ColumnLayout, RowLayout, RowLayout2, RowElement };
+export { ColumnLayout, RowLayout, RowLayout2, FlexElement };

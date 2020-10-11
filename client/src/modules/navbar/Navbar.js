@@ -14,7 +14,7 @@ import { useOutsideAlerter } from "../../utils/hooks/useOutsideAlerter";
 import { RowLayout } from "../../utils/elements/layouts";
 import { SearchBar } from "./search-bar/SearchBar";
 import { routes } from "../../router/routes";
-import { STATIC_STYLE } from "../../STATIC_STYLE";
+import { STATIC_STYLE } from "../../utils/enums/StaticStyles";
 
 const NavbarLogoKeyframes = () => {
   return keyframes`

@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
 const Image = styled.img`
-  width: ${(props) => (props.width ? props.width : "100%")};
-  height: ${(props) => (props.height ? props.height : "100%")};
+  width: ${(props) => (props.width ? props.width : "auto")};
+  height: ${(props) => (props.height ? props.height : "auto")};
   border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
   border: ${(props) => (props.border ? props.border : "none")};
   opacity: ${(props) => (props.opacity ? props.opacity : "1")};

@@ -10,7 +10,7 @@ import { MediaRating } from "./MediaRating";
 import { PlexButton } from "../PlexButton";
 import { MediaBackground } from "./MediaBackground";
 import { msToHoursMinutes } from "../../media-utils";
-import Spinner from "../Spinner";
+import { Spinner } from "../Spinner";
 
 const EpisodeCard = ({ episode }) => {
   const { episodeId } = useParams();

@@ -3,12 +3,16 @@ import { Redirect, Route, Switch } from "react-router";
 import { routes } from "../../router/routes";
 import { RequestsTabs } from "./elements/RequestsTabs";
 import { Container } from "../../utils/elements/Container";
+import { H1 } from "../../utils/elements/titles";
+import { FlexElement } from "../../utils/elements/layouts";
 
 const Requests = (props) => {
   return (
-    <Container padding="1%" minHeight="100vh">
+    <Container padding="15px" minHeight="100vh">
+      <FlexElement padding="15px">
+        <H1>Requests Dashboards</H1>
+      </FlexElement>
       <RequestsTabs location={props.location} />
-      <div className="is-divider" />
       <Switch>
         <Route
           exact

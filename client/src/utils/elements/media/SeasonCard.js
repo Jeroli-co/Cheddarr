@@ -13,7 +13,7 @@ import { Text, TITLE_SIZES } from "../../strings";
 import { EpisodeCard } from "./EpisodeCard";
 import smoothscroll from "smoothscroll-polyfill";
 import styled from "styled-components";
-import Spinner from "../Spinner";
+import { Spinner } from "../Spinner";
 
 const EpisodeSelectedLayout = styled.div`
   border-top: 3px solid ${(props) => props.theme.primary};

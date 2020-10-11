@@ -25,7 +25,7 @@ import { SeasonPage } from "../utils/elements/media/SeasonPage";
 import { SeriesPage } from "../utils/elements/media/SeriesPage";
 import { Requests } from "../modules/requests/Requests";
 import { RequestsSent } from "../modules/requests/elements/RequestsSent";
-import { RequestsReceived } from "../modules/requests/elements/RequestsReceived";
+import { RequestsReceived } from "../modules/requests/elements/requests-received/RequestsReceived";
 
 const routes = {
   HOME: { url: "/", component: Home },

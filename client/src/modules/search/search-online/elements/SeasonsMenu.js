@@ -1,7 +1,7 @@
 import { RowLayout } from "../../../../utils/elements/layouts";
 import React, { useEffect, useState } from "react";
 import { Container } from "../../../../utils/elements/Container";
-import Spinner from "../../../../utils/elements/Spinner";
+import { Spinner } from "../../../../utils/elements/Spinner";
 import styled from "styled-components";
 import { SeasonEpisodes } from "./SeasonEpisodes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

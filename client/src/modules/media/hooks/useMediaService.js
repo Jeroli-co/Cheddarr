@@ -22,7 +22,7 @@ const useMediaService = () => {
     const res = await executeRequest(methods.GET, url);
     switch (res.status) {
       case 200:
-        return res;
+        return res.data;
       default:
         return null;
     }

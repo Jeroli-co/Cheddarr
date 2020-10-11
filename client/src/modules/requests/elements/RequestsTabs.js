@@ -6,7 +6,7 @@ const RequestsTabs = React.forwardRef((props, ref) => {
   const isActiveTab = (option) => props.location.pathname === option;
 
   return (
-    <div ref={ref} className="tabs is-toggle is-fullwidth">
+    <div ref={ref} className="tabs is-boxed">
       <ul>
         <li
           className={

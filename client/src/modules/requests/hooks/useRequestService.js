@@ -1,12 +1,13 @@
 import { useApi } from "../../api/hooks/useApi";
 import { useContext } from "react";
 import { NotificationContext } from "../../notifications/contexts/NotificationContext";
-import { REQUEST_STATES } from "../enums/RequestStates";
 
 const useRequestService = () => {
   const requestUrl = "/requests/";
   const { executeRequest, methods } = useApi();
-  const { pushSuccess } = useContext(NotificationContext);
+  const { pushSuccess, pushWarning, pushDanger } = useContext(
+    NotificationContext
+  );
 
   const request = async (requested_username, media_type, request) => {
     const res = await executeRequest(
@@ -22,6 +23,7 @@ const useRequestService = () => {
         pushSuccess("Your request has been send to " + requested_username);
         return res;
       default:
+        pushDanger("Error sending request. Try again later.");
         return null;
     }
   };
@@ -39,16 +41,43 @@ const useRequestService = () => {
     }
   };
 
-  const getRequestState = (request) => {
-    if (request["approved"]) return REQUEST_STATES.APPROVED;
-    if (request["refused"]) return REQUEST_STATES.REFUSED;
-    return REQUEST_STATES.PENDING;
+  const acceptRequest = async (media_type, request_id, provider_id) => {
+    const res = await executeRequest(
+      methods.PATCH,
+      requestUrl + media_type + "/" + request_id + "/",
+      { approved: true, selected_provider_id: provider_id }
+    );
+    switch (res.status) {
+      case 200:
+        pushSuccess("Request Accepted");
+        return res;
+      default:
+        pushDanger("An error occurred");
+        return null;
+    }
+  };
+
+  const refuseRequest = async (media_type, request_id) => {
+    const res = await executeRequest(
+      methods.PATCH,
+      requestUrl + media_type + "/" + request_id + "/",
+      { refused: true }
+    );
+    switch (res.status) {
+      case 200:
+        pushWarning("Request Refused");
+        return res;
+      default:
+        pushDanger("An error occurred");
+        return null;
+    }
   };
 
   return {
     request,
     getRequests,
-    getRequestState,
+    acceptRequest,
+    refuseRequest,
   };
 };
 

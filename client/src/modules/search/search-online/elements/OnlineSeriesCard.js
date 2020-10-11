@@ -14,6 +14,8 @@ import { useRequestSeriesOptions } from "../../../requests/hooks/useRequestSerie
 const OnlineSeriesCard = ({ media, friendsProviders }) => {
   const [providerSelected, setProviderSelected] = useState(null);
   const series = useMedia(MEDIA_TYPES.SERIES, media.tvdb_id);
+  const [requestScope, setRequestScope] = useState(REQUEST_SERIES_OPTIONS.ALL);
+  const [defaultRequest, setDefaultRequest] = useState(null);
   const {
     request,
     addSeasons,
@@ -22,8 +24,7 @@ const OnlineSeriesCard = ({ media, friendsProviders }) => {
     removeEpisode,
     isSeasonSelected,
     isEpisodeSelected,
-  } = useRequestSeriesOptions(series);
-  const [showSeasons, setShowSeasons] = useState(false);
+  } = useRequestSeriesOptions(series.data);
 
   useEffect(() => {
     if (friendsProviders.length > 0) {
@@ -31,14 +32,27 @@ const OnlineSeriesCard = ({ media, friendsProviders }) => {
     }
   }, [friendsProviders]);
 
+  useEffect(() => {
+    if (series.isLoaded && series.data !== null && providerSelected) {
+      setDefaultRequest({
+        tvdb_id: series.data.tvdb_id,
+        requested_username: providerSelected.username,
+        series_type: series.data.series_type,
+        seasons: series.data.seasons,
+      });
+    }
+  }, [series, providerSelected]);
+
   const handleProviderChanges = (event) => {
     setProviderSelected(event.target.value);
     event.preventDefault();
   };
 
   const handleSeriesScopeChanges = (e) => {
-    if (e.target.value === REQUEST_SERIES_OPTIONS.ALL) setShowSeasons(false);
-    if (e.target.value === REQUEST_SERIES_OPTIONS.SELECT) setShowSeasons(true);
+    if (e.target.value === REQUEST_SERIES_OPTIONS.ALL)
+      setRequestScope(REQUEST_SERIES_OPTIONS.ALL);
+    if (e.target.value === REQUEST_SERIES_OPTIONS.SELECT)
+      setRequestScope(REQUEST_SERIES_OPTIONS.SELECT);
     e.preventDefault();
   };
 
@@ -56,6 +70,18 @@ const OnlineSeriesCard = ({ media, friendsProviders }) => {
 
   const handleRemoveEpisode = (season_number, episode_number) => {
     removeEpisode(season_number, episode_number);
+  };
+
+  const getRequestBody = () => {
+    switch (requestScope) {
+      case REQUEST_SERIES_OPTIONS.ALL:
+        return defaultRequest;
+      case REQUEST_SERIES_OPTIONS.SELECT:
+        return request;
+      default:
+        console.log("No scope matched");
+        return null;
+    }
   };
 
   return (
@@ -83,7 +109,7 @@ const OnlineSeriesCard = ({ media, friendsProviders }) => {
               <MediaRequestButton
                 requested_username={providerSelected.username}
                 media_type={MEDIA_TYPES.SERIES}
-                request_body={request}
+                request_body={getRequestBody()}
                 onSeriesScopeChanges={handleSeriesScopeChanges}
               />
             )}
@@ -110,11 +136,11 @@ const OnlineSeriesCard = ({ media, friendsProviders }) => {
           )}
         </Container>
       </RowLayout>
-      {showSeasons && (
+      {requestScope === REQUEST_SERIES_OPTIONS.SELECT && (
         <div>
           <div className="is-divider" />
           <SeasonsMenu
-            series={series}
+            series={series.data}
             handleAddSeason={handleAddSeason}
             handleAddEpisode={handleAddEpisode}
             handleRemoveSeason={handleRemoveSeason}

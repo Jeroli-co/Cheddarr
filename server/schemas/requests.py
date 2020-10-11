@@ -1,4 +1,4 @@
-from marshmallow import pre_dump, validates_schema, ValidationError
+from marshmallow import pre_dump, validates_schema, ValidationError, EXCLUDE
 from marshmallow.validate import OneOf
 from marshmallow_sqlalchemy import auto_field
 
@@ -22,6 +22,10 @@ class MovieRequestSchema(ma.SQLAlchemyAutoSchema):
     requested_user = ma.Nested(
         "UserSchema",
         only=["username", "avatar"],
+    )
+    requesting_user = ma.Nested(
+      "UserSchema",
+      only=["username", "avatar"],
     )
 
 
@@ -74,6 +78,7 @@ class SeasonRequestSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = SeasonRequest
         load_instance = True
+        unknown = EXCLUDE
 
     episodes = ma.Nested("EpisodeRequestSchema", many=True)
 

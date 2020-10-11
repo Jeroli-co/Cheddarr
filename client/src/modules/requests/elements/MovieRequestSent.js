@@ -1,12 +1,13 @@
 import React from "react";
 import { RowLayout } from "../../../utils/elements/layouts";
-import { useRequestService } from "../hooks/useRequestService";
 import { Container } from "../../../utils/elements/Container";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { MEDIA_TYPES } from "../../media/enums/MediaTypes";
 import { useMedia } from "../../media/hooks/useMedia";
+import { useRequestUtils } from "../hooks/useRequestUtils";
+import { Spinner } from "../../../utils/elements/Spinner";
 
 const MovieRequestSentStyle = styled.div`
   border: 2px solid ${(props) => props.theme.dark};
@@ -18,8 +19,17 @@ const MovieRequestSentStyle = styled.div`
 `;
 
 const MovieRequestSent = ({ request }) => {
-  const { getRequestState } = useRequestService();
+  const { getRequestState } = useRequestUtils();
   const movie = useMedia(MEDIA_TYPES.MOVIES, request.tmdb_id);
+
+  if (!movie.isLoaded) {
+    return <Spinner />;
+  }
+
+  if (movie.isLoaded && movie.data === null) {
+    return <p>An error occured</p>;
+  }
+
   return (
     <MovieRequestSentStyle>
       <RowLayout justifyContent="space-between" padding="1%">
@@ -60,12 +70,10 @@ const MovieRequestSent = ({ request }) => {
         </div>
 
         {/* Media */}
-        {movie && (
-          <div>
-            <h5 className="title is-5">Media</h5>
-            <div>{movie.title}</div>
-          </div>
-        )}
+        <div>
+          <h5 className="title is-5">Media</h5>
+          <div>{movie.data.title}</div>
+        </div>
       </RowLayout>
       {/* See more */}
       <Container padding="1%">

@@ -1,12 +1,13 @@
 import React from "react";
 import { RowLayout } from "../../../utils/elements/layouts";
-import { useRequestService } from "../hooks/useRequestService";
 import { Container } from "../../../utils/elements/Container";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { MEDIA_TYPES } from "../../media/enums/MediaTypes";
 import { useMedia } from "../../media/hooks/useMedia";
+import { useRequestUtils } from "../hooks/useRequestUtils";
+import { Spinner } from "../../../utils/elements/Spinner";
 
 const SeriesRequestSentStyle = styled.div`
   border: 2px solid ${(props) => props.theme.dark};
@@ -18,8 +19,17 @@ const SeriesRequestSentStyle = styled.div`
 `;
 
 const SeriesRequestSent = ({ request }) => {
-  const { getRequestState } = useRequestService();
+  const { getRequestState } = useRequestUtils();
   const series = useMedia(MEDIA_TYPES.SERIES, request.tmdb_id);
+
+  if (!series.isLoaded) {
+    return <Spinner />;
+  }
+
+  if (series.isLoaded && series.data === null) {
+    return <p>An error occured</p>;
+  }
+
   return (
     <SeriesRequestSentStyle>
       <RowLayout justifyContent="space-between" padding="1%">
@@ -60,12 +70,10 @@ const SeriesRequestSent = ({ request }) => {
         </div>
 
         {/* Media */}
-        {series && (
-          <div>
-            <h5 className="title is-5">Media</h5>
-            <div>{series.title}</div>
-          </div>
-        )}
+        <div>
+          <h5 className="title is-5">Media</h5>
+          <div>{series.title}</div>
+        </div>
       </RowLayout>
       {/* See more */}
       <Container padding="1%">

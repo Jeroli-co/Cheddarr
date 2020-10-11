@@ -3,15 +3,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { withTheme } from "styled-components";
 
-const Spinner = ({ color, size, theme }) => {
+const Spinner = ({ color, size }) => {
   return (
-    <FontAwesomeIcon
-      icon={faSpinner}
-      color={theme[color]}
-      pulse
-      size={size ? size : "1x"}
-    />
+    <div>
+      <FontAwesomeIcon
+        icon={faSpinner}
+        color={color}
+        pulse
+        size={size ? size : "1x"}
+      />
+    </div>
   );
 };
 
-export default withTheme(Spinner);
+export { Spinner };

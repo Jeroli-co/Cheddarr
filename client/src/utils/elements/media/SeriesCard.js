@@ -12,7 +12,7 @@ import { Container } from "../Container";
 import { PlexButton } from "../PlexButton";
 import { MediaRating } from "./MediaRating";
 import { MediaBackground } from "./MediaBackground";
-import Spinner from "../Spinner";
+import { Spinner } from "../Spinner";
 
 const SeriesCard = ({ series }) => {
   const { id } = useParams();

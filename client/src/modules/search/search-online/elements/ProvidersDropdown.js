@@ -1,5 +1,5 @@
 import React from "react";
-import Spinner from "../../../../utils/elements/Spinner";
+import { Spinner } from "../../../../utils/elements/Spinner";
 
 const ProvidersDropdown = ({ providers, handleChanges }) => {
   if (!providers) return <Spinner color="LightSlateGray" size="sm" />;

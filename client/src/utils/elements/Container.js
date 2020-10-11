@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 const Container = styled.div`
   display: flex;
+  text-align: ${(props) => (props.textAlign ? props.textAlign : "left")};
   flex-direction: column;
   justify-content: ${(props) =>
     props.justifyContent ? props.justifyContent : "flex-start"};

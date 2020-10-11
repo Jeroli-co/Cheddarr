@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { STATIC_STYLE } from "../../STATIC_STYLE";
+import { STATIC_STYLE } from "../enums/StaticStyles";
 
 const getWindowSize = () => {
   const { innerWidth: width, innerHeight: height } = window;

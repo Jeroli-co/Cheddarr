@@ -7,7 +7,7 @@ import { RowLayout } from "../../../utils/elements/layouts";
 import { MediaExtendedCardLayout } from "./elements/MediaExtendedCardLayout";
 import { MediaPreview } from "./elements/MediaPreviewCard";
 import styled from "styled-components";
-import Spinner from "../../../utils/elements/Spinner";
+import { Spinner } from "../../../utils/elements/Spinner";
 
 const MediaRecentlyAddedStyle = styled.div``;
 
