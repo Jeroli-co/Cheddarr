@@ -23,6 +23,10 @@ const EpisodeRequest = ({ series_id, season_number, episode_number }) => {
     return <Spinner />;
   }
 
+  if (episode.isLoaded && episode.data === null) {
+    return <p>An error occurred</p>;
+  }
+
   return (
     <EpisodeRequestContainer>
       Episode {episode.data.episode_number}: {episode.data.name}

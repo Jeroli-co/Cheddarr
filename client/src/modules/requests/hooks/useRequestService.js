@@ -5,9 +5,7 @@ import { NotificationContext } from "../../notifications/contexts/NotificationCo
 const useRequestService = () => {
   const requestUrl = "/requests/";
   const { executeRequest, methods } = useApi();
-  const { pushSuccess, pushWarning, pushDanger } = useContext(
-    NotificationContext
-  );
+  const { pushSuccess, pushDanger } = useContext(NotificationContext);
 
   const request = async (requested_username, media_type, request) => {
     const res = await executeRequest(
@@ -49,8 +47,8 @@ const useRequestService = () => {
     );
     switch (res.status) {
       case 200:
-        pushSuccess("Request Accepted");
-        return res;
+        pushSuccess("Request accepted");
+        return res.hasOwnProperty("data") ? res.data : null;
       default:
         pushDanger("An error occurred");
         return null;
@@ -65,8 +63,23 @@ const useRequestService = () => {
     );
     switch (res.status) {
       case 200:
-        pushWarning("Request Refused");
-        return res;
+        pushSuccess("Request refused");
+        return res.hasOwnProperty("data") ? res.data : null;
+      default:
+        pushDanger("An error occurred");
+        return null;
+    }
+  };
+
+  const deleteRequest = async (media_type, request_id) => {
+    const res = await executeRequest(
+      methods.DELETE,
+      requestUrl + media_type + "/" + request_id + "/"
+    );
+    switch (res.status) {
+      case 200:
+        pushSuccess("Request deleted");
+        return res.hasOwnProperty("data") ? res.data : null;
       default:
         pushDanger("An error occurred");
         return null;
@@ -78,6 +91,7 @@ const useRequestService = () => {
     getRequests,
     acceptRequest,
     refuseRequest,
+    deleteRequest,
   };
 };
 

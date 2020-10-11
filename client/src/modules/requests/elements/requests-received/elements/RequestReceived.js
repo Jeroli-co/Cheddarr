@@ -10,6 +10,7 @@ import { Spinner } from "../../../../../utils/elements/Spinner";
 const RequestContainer = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   flex-grow: 1;
 
   & .request-infos-container {
@@ -18,8 +19,8 @@ const RequestContainer = styled.div`
       align-items: center;
       font-size: 1em;
       border-bottom: 1px solid ${(props) => props.theme.dark};
+      padding-top: 10px;
       padding-bottom: 10px;
-      margin-bottom: 10px;
 
       & :last-child {
         margin-left: 10px;
@@ -28,22 +29,20 @@ const RequestContainer = styled.div`
 
     & .request-details {
       border-bottom: 1px solid ${(props) => props.theme.dark};
+      padding-top: 10px;
       padding-bottom: 10px;
-      margin-bottom: 10px;
     }
   }
 
   & .request-series-container {
     display: flex;
-    border-bottom: 1px solid ${(props) => props.theme.dark};
-    margin-bottom: 10px;
-
+    flex-grow: 1;
+    padding-top: 10px;
+    padding-bottom: 10px;
     ${(props) =>
       props.isAllSeriesRequested &&
       css`
         align-items: center;
-        padding-top: 15px;
-        padding-bottom: 15px;
       `}
   }
 `;

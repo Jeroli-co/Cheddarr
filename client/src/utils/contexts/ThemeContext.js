@@ -13,6 +13,8 @@ const theme = {
   transparent: "rgba(198,198,198,0.17)",
   transparentDark: "rgba(146,146,146,0.5)",
   darkPlex: "#282a2d",
+  danger: "#c92828",
+  dangerLight: "#c66969",
 };
 
 const ThemeContextProvider = (props) => {

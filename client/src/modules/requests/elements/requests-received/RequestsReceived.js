@@ -18,7 +18,6 @@ const RequestsReceived = () => {
     MEDIA_TYPES.MOVIES,
     REQUESTS_TYPE.RECEIVED
   );
-
   const seriesRequestsReceived = useRequests(
     MEDIA_TYPES.SERIES,
     REQUESTS_TYPE.RECEIVED

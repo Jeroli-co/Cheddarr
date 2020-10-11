@@ -2,9 +2,6 @@ import { useEffect } from "react";
 
 const useOutsideAlerter = (refs, onOutsideClick) => {
   useEffect(() => {
-    /**
-     * Alert if clicked on outside of element
-     */
     function handleClickOutside(event) {
       let isOutside = true;
       refs.forEach((ref) => {
@@ -15,10 +12,8 @@ const useOutsideAlerter = (refs, onOutsideClick) => {
         onOutsideClick();
       }
     }
-    // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Unbind the event listener on clean up
       document.removeEventListener("mousedown", handleClickOutside);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

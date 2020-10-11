@@ -7,7 +7,6 @@ import { faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { SCREEN_SIZE } from "../../../utils/enums/ScreenSizes";
 
 const SeasonsListContainer = styled.ul`
-  padding: 0 10px 10px 0;
   flex-basis: 50%;
 
   @media (min-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {

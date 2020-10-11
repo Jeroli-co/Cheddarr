@@ -44,7 +44,6 @@ const RequestReceivedContainer = styled.div`
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      padding-bottom: 20px;
 
       & > a {
         font-size: 1.5em;
