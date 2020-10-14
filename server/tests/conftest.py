@@ -1,10 +1,16 @@
-import pytest
-from flask import url_for
+from typing import Dict
 
-from server import utils
-from server.app import _create_app, db
-from server.config import TestConfig
+import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+
+from server.api import dependencies
+from server.database.base import Base
 from server.models.users import Friendship, User
+from server.tests.utils import user_authentication_headers
 
 user1_id = 1
 user1_username = "user1"
@@ -22,85 +28,98 @@ user4_id = 4
 user4_username = "user4"
 user4_email = "email4@test.com"
 user4_password = "password4"
-avatar = "http://avatar"
+avatar_url = "http://avatar.fake"
+
+url = "sqlite://"
+_db_conn = create_engine(
+    url, connect_args={"check_same_thread": False}, poolclass=StaticPool
+)
+TestingSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=_db_conn, expire_on_commit=False
+)
 
 
-@pytest.fixture(autouse=True, scope="session")
-def app():
-    app = _create_app(TestConfig)
-    ctx = app.app_context()
-    ctx.push()
-    yield app
-    ctx.pop()
+# Override dependency
+def get_test_db():
+    session = TestingSessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
 
 
-@pytest.yield_fixture(scope="session")
-def client(app):
-    with app.test_client() as client:
-        db.drop_all()
-        db.create_all()
-        user1 = User(
-            username=user1_username,
-            email=user1_email,
-            password=user1_password,
-            avatar=avatar,
-            confirmed=True,
-        )
-        user1.id = user1_id
-        user2 = User(
-            username=user2_username,
-            email=user2_email,
-            password=user2_password,
-            avatar=avatar,
-            confirmed=True,
-        )
-        user2.id = user2_id
-        user3 = User(
-            username=user3_username,
-            email=user3_email,
-            password=user3_password,
-            avatar=avatar,
-            confirmed=True,
-        )
-        user3.id = user3_id
-        user4 = User(
-            username=user4_username,
-            email=user4_email,
-            password=user4_password,
-            avatar=avatar,
-            confirmed=False,
-        )
-        user4.id = user4_id
+@pytest.fixture(scope="module")
+def app() -> FastAPI:
+    from server.main import setup_app  # local import for testing purpose
 
-        db.session.add_all((user1, user2, user3, user4))
-        db.session.commit()
-        friendship1 = Friendship(requesting_user=user1, receiving_user=user2)
-        friendship1.pending = False
-        db.session.add(friendship1)
-        db.session.commit()
-        yield client
+    app_ = setup_app()
+    app_.dependency_overrides[dependencies.db] = get_test_db
+    return app_
 
 
-@pytest.fixture(autouse=True, scope="function")
-def mocks(mocker):
-    mocker.patch("server.tasks.send_email.delay")
-    ran_img = mocker.patch.object(utils, "random_avatar")
-    ran_img.return_value = avatar
+@pytest.fixture(scope="module")
+def client(app: FastAPI):
+    with TestClient(app) as c:
+        yield c
+
+
+@pytest.fixture(scope="function")
+def db():
+    session = TestingSessionLocal()
+    yield session
+    session.rollback()
+
+
+@pytest.fixture(scope="function", autouse=True)
+def datasets():
+    Base.metadata.drop_all(_db_conn)
+    Base.metadata.create_all(_db_conn)
+    session = TestingSessionLocal()
+    user1 = User(
+        id=user1_id,
+        username=user1_username,
+        email=user1_email,
+        password=user1_password,
+        avatar=avatar_url,
+        confirmed=True,
+        admin=False,
+    )
+    user2 = User(
+        id=user2_id,
+        username=user2_username,
+        email=user2_email,
+        password=user2_password,
+        avatar=avatar_url,
+        confirmed=True,
+        admin=False,
+    )
+    user3 = User(
+        id=user3_id,
+        username=user3_username,
+        email=user3_email,
+        password=user3_password,
+        avatar=avatar_url,
+        confirmed=True,
+        admin=False,
+    )
+    user4 = User(
+        id=user4_id,
+        username=user4_username,
+        email=user4_email,
+        password=user4_password,
+        avatar=avatar_url,
+        confirmed=True,
+        admin=False,
+    )
+    session.add_all((user1, user2, user3))
+    friendship1 = Friendship(requesting_user=user1, receiving_user=user2, pending=False)
+    friendship2 = Friendship(requesting_user=user1, receiving_user=user4, pending=True)
+    session.add_all((friendship1, friendship2))
+    session.commit()
 
 
 @pytest.fixture
-def auth(client):
-    return client.post(
-        url_for("auth.signin"),
-        data={"usernameOrEmail": user1_email, "password": user1_password},
+def normal_user_token_headers(client: TestClient) -> Dict[str, str]:
+    return user_authentication_headers(
+        client=client, email=user1_email, password=user1_password
     )
-
-
-@pytest.fixture(autouse=True, scope="function")
-def session():
-    session = db.session
-    session.begin_nested()
-
-    yield session
-
-    session.rollback()

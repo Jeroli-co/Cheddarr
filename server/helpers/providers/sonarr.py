@@ -1,16 +1,18 @@
-from typing import Union
+from typing import Union, List
 
-from requests import get
+from requests import get, post
 
-from server.models import SonarrConfig, SeriesChildRequest
-from server.utils import make_url
+from server.models import SonarrConfig, SeriesChildRequest, SeriesType
+from server.models.providers.sonarr import SonarrSeries, SonarrAddOptions, SonarrEpisode
+from server.schemas.providers.sonarr import SonarrSeriesSchema, SonarrEpisodeSchema
+from server import utils
 
 
-def sonarr_url(config: SonarrConfig, resource_path: str, queries: dict = None) -> str:
+def make_url(config: SonarrConfig, resource_path: str, queries: dict = None) -> str:
     queries = queries or {}
     port = config.port
     version = config.version
-    return make_url(
+    return utils.make_url(
         "%s://%s%s/api%s%s"
         % (
             "https" if config.ssl else "http",
@@ -23,8 +25,8 @@ def sonarr_url(config: SonarrConfig, resource_path: str, queries: dict = None) -
     )
 
 
-def test_sonarr_status(config: SonarrConfig) -> Union[bool, dict]:
-    url = sonarr_url(config, "/system/status")
+def check_status(config: SonarrConfig) -> Union[bool, dict]:
+    url = make_url(config, "/system/status")
     try:
         r = get(url)
     except Exception:
@@ -34,47 +36,68 @@ def test_sonarr_status(config: SonarrConfig) -> Union[bool, dict]:
     return r.json()
 
 
-def sonarr_lookup(tvdb_id: int, config: SonarrConfig) -> dict:
-    url = sonarr_url(
+def lookup(
+    config: SonarrConfig,
+    tvdb_id: int,
+) -> SonarrSeries:
+    url = make_url(
         config,
         "/series/lookup",
         queries={"term": f"tvdb:{tvdb_id}"},
     )
-    lookup = get(url).json()
-    return lookup
+    lookup_result = get(url).json()[0]
+    return SonarrSeriesSchema().load(lookup_result)
 
 
-def send_request_to_sonarr(request: SeriesChildRequest):
-    config = request.selected_provider
-    lookup = sonarr_lookup(request.series.tvdb_id, config)[0]
-    if not lookup.get("path"):  # Series not present
+def add_series(config: SonarrConfig, series: SonarrSeries) -> SonarrSeries:
+    url = make_url(config, "/series")
+    res = post(url, data=SonarrSeriesSchema().dumps(series))
+    return SonarrSeriesSchema().load(res.json())
 
-        lookup["rootFolderPath"] = config.root_folder
+
+def get_episodes(config: SonarrConfig, series_id: int) -> List[SonarrEpisode]:
+    url = make_url(config, "/episode", queries={"seriesId": series_id})
+    res = get(url)
+    return SonarrEpisodeSchema(many=True).load(res.json())
+
+
+def send_request(request: SeriesChildRequest):
+    config: SonarrConfig = request.selected_provider
+    series = lookup(config, request.parent.tvdb_id)
+    if series.id is None:  # series is not added to sonarr yet.
+        root_folder_path = config.root_folder
+        quality_profile_id = config.quality_profile_id
+        language_profile_id = config.language_profile_id
+        if series.series_type == SeriesType.anime:
+            series.root_folder_path = config.anime_root_folder or root_folder_path
+            series.quality_profile_id = (
+                config.anime_quality_profile_id or quality_profile_id
+            )
+            series.language_profile_id = (
+                config.anime_language_profile_id or language_profile_id
+            )
+        series.root_folder_path = root_folder_path
+        series.quality_profile_id = quality_profile_id
         if config.version == 3:
-            lookup["qualityProfileId"] = config.quality_profile_id
-            lookup["languageProfileId"] = config.language_profile_id
-        else:
-            lookup["profileId"] = config.quality_profile_id
-
-        for season in lookup["seasons"]:
-            season["monitored"] = False
-        add_url = sonarr_url(config, "/series")
-        # print(lookup)
-        # print(request)
-        for season in request.seasons:
-            if not season.episodes:
-                next(
-                    (
-                        item
-                        for item in lookup["seasons"]
-                        if item["seasonNumber"] == season.season_number
-                    )
-                )["monitored"] = True
-            lookup["addOptions"] = {
-                "ignoreEpisodesWithFiles": False,
-                "ignoreEpisodesWithoutFiles": False,
-                "searchForMissingEpisodes": False,
-            }
-        print(lookup)
-        # res = post(add_url, data=json.dumps(lookup))
-        # print(res.json())
+            series.language_profile_id = language_profile_id
+        series.add_options = SonarrAddOptions(
+            ignore_episodes_with_files=False,
+            ignore_episodes_without_files=False,
+            search_for_missing_episodes=False,
+        )
+        series = add_series(config, series)
+    episodes = get_episodes(config, series.id)
+    # request seasons is empty so we are requesting all the series
+    if not request.seasons:
+        series.seasons = [set(episode.season_number) for episode in episodes]
+        print(series.seasons)
+    for season in request.seasons:
+        # request episodes are empty so we are requesting all the episodes
+        if not season.episodes:
+            season.episodes = [
+                episode
+                for episode in episodes
+                if episode.season_number == season.season_number
+            ]
+        for episode in season.episodes:
+            print(episodes)

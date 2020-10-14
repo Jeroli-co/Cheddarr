@@ -1,18 +1,11 @@
 import React, { useContext } from "react";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCopy,
-  faExclamationCircle,
-  faSyncAlt,
-  faTrash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../router/routes";
 import { NotificationContext } from "../../notifications/contexts/NotificationContext";
-import { useApiKey } from "../../user/profile/hooks/useApiKey";
 
 const SettingsAccountBody = () => {
-  const { apiKey, resetApiKey, deleteApiKey } = useApiKey();
   const { pushSuccess } = useContext(NotificationContext);
   const history = useHistory();
 
@@ -78,65 +71,6 @@ const SettingsAccountBody = () => {
             >
               Change email
             </button>
-          </div>
-
-          <div className="is-divider" data-content="OR" />
-
-          {/* API KEY */}
-          <h3 className="subtitle is-3 is-danger">API Key</h3>
-          <div className="content">
-            <div className="columns">
-              <div className="column is-two-thirds">
-                <input
-                  id="apiKeyInput"
-                  className="input is-primary"
-                  type="text"
-                  disabled={apiKey.length === 0}
-                  placeholder="No api key is set"
-                  value={apiKey}
-                  readOnly={true}
-                  contentEditable={false}
-                />
-              </div>
-              <div className="column">
-                <div className="buttons">
-                  {apiKey.length > 0 && (
-                    <button
-                      className="button is-rounded is-info"
-                      type="button"
-                      onClick={_onCopyToClipboard}
-                      data-tooltip="Copy to clipboard"
-                    >
-                      <span className="icon">
-                        <FontAwesomeIcon icon={faCopy} />
-                      </span>
-                    </button>
-                  )}
-                  <button
-                    className="button is-rounded is-info"
-                    type="button"
-                    onClick={resetApiKey}
-                    data-tooltip="Generate new API key"
-                  >
-                    <span className="icon">
-                      <FontAwesomeIcon icon={faSyncAlt} />
-                    </span>
-                  </button>
-                  {apiKey.length > 0 && (
-                    <button
-                      className="button is-rounded is-danger"
-                      type="button"
-                      onClick={deleteApiKey}
-                      data-tooltip="Delete API key"
-                    >
-                      <span className="icon">
-                        <FontAwesomeIcon icon={faTrash} />
-                      </span>
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
 
           <div className="is-divider is-danger" data-content="OR" />

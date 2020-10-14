@@ -1,34 +1,34 @@
-from datetime import date
-from enum import Enum
-from typing import TYPE_CHECKING, List
+from __future__ import annotations
 
-from server.database import (
-    Model,
-    Column,
-    Integer,
-    ForeignKey,
-    relationship,
-    backref,
-    Date,
+from enum import Enum
+
+from typing import TYPE_CHECKING
+
+from sqlalchemy import (
     Boolean,
-    UniqueConstraint,
+    Column,
     Enum as DBEnum,
+    ForeignKey,
+    Integer,
+    UniqueConstraint,
 )
+from sqlalchemy.orm import backref, relationship
+from sqlalchemy_utils import Timestamp
+
+from server.database import Model
 
 if TYPE_CHECKING:
     from . import User  # noqa
 
 
-class MovieRequest(Model):
+class MovieRequest(Model, Timestamp):
     id = Column(Integer, primary_key=True)
-    tmdb_id = Column(Integer)
-    requested_date = Column(Date)
-    response_date = Column(Date, nullable=True)
+    tmdb_id = Column(Integer, nullable=False)
     approved = Column(Boolean, default=False)
     refused = Column(Boolean, default=False)
     available = Column(Boolean, default=False)
-    requested_user_id = Column(ForeignKey("user.id"))
-    requesting_user_id = Column(ForeignKey("user.id"))
+    requested_user_id = Column(ForeignKey("user.id"), nullable=False)
+    requesting_user_id = Column(ForeignKey("user.id"), nullable=False)
     requested_user = relationship(
         "User",
         foreign_keys=[requested_user_id],
@@ -43,23 +43,17 @@ class MovieRequest(Model):
 
     __repr_props__ = ("tmdb_id", "requested_user", "requesting_user_id")
 
-    def __init__(self, tmdb_id: int, requested_user: "User", requesting_user: "User"):
-        self.tmdb_id = tmdb_id
-        self.requested_user = requested_user
-        self.requesting_user = requesting_user
-        self.requested_date = date.today()
-
 
 class SeriesType(str, Enum):
-    ANIME = "anime"
-    STANDARD = "standard"
+    anime = "anime"
+    standard = "standard"
 
 
 class SeriesRequest(Model):
     id = Column(Integer, primary_key=True)
-    tvdb_id = Column(Integer)
-    series_type = Column(DBEnum(SeriesType))
-    requested_user_id = Column(ForeignKey("user.id"))
+    tvdb_id = Column(Integer, nullable=False)
+    series_type = Column(DBEnum(SeriesType), nullable=False)
+    requested_user_id = Column(ForeignKey("user.id"), nullable=False)
     requested_user = relationship(
         "User",
         foreign_keys=[requested_user_id],
@@ -68,33 +62,26 @@ class SeriesRequest(Model):
     children = relationship(
         "SeriesChildRequest",
         cascade="all,delete,delete-orphan",
-        back_populates="series",
+        back_populates="parent",
     )
     UniqueConstraint(requested_user_id, tvdb_id)
 
     __repr_props__ = ("tvdb_id", "requested_user", "children")
 
-    def __init__(self, tvdb_id: int, requested_user: "User", series_type: SeriesType):
-        self.tvdb_id = tvdb_id
-        self.requested_user = requested_user
-        self.series_type = series_type
 
-
-class SeriesChildRequest(Model):
+class SeriesChildRequest(Model, Timestamp):
     id = Column(Integer, primary_key=True)
-    requested_date = Column(Date)
-    response_date = Column(Date, nullable=True)
     approved = Column(Boolean, default=False)
     refused = Column(Boolean, default=False)
-    series_id = Column(ForeignKey("seriesrequest.id"))
-    selected_provider_id = Column(ForeignKey("providerconfig.id"), nullable=True)
-    requesting_user_id = Column(ForeignKey("user.id"))
+    series_id = Column(ForeignKey("seriesrequest.id"), nullable=False)
+    selected_provider_id = Column(ForeignKey("providerconfig.id"), nullable=False)
+    requesting_user_id = Column(ForeignKey("user.id"), nullable=False)
     requesting_user = relationship(
         "User",
         foreign_keys=[requesting_user_id],
         backref=backref("sent_series_requests", cascade="all,delete", lazy=True),
     )
-    series = relationship("SeriesRequest", back_populates="children")
+    parent = relationship("SeriesRequest", back_populates="children")
     seasons = relationship(
         "SeasonRequest", cascade="all,delete,delete-orphan", backref="series_child"
     )
@@ -108,17 +95,14 @@ class SeriesChildRequest(Model):
         "seasons",
     )
 
-    def __init__(self, requesting_user: "User", seasons: List["SeasonRequest"]):
-        self.requesting_user = requesting_user
-        self.seasons = seasons
-        self.requested_date = date.today()
-
 
 class SeasonRequest(Model):
     id = Column(Integer, primary_key=True)
-    season_number = Column(Integer)
-    series_child_id = Column(ForeignKey("serieschildrequest.id"))
-    episodes = relationship("EpisodeRequest", cascade="all,delete", backref="season")
+    season_number = Column(Integer, nullable=False)
+    series_child_id = Column(ForeignKey("serieschildrequest.id"), nullable=False)
+    episodes = relationship(
+        "EpisodeRequest", cascade="all,delete,delete-orphan", backref="season"
+    )
 
     __repr_props__ = (
         "season_number",
@@ -128,8 +112,8 @@ class SeasonRequest(Model):
 
 class EpisodeRequest(Model):
     id = Column(Integer, primary_key=True)
-    episode_number = Column(Integer)
+    episode_number = Column(Integer, nullable=False)
     available = Column(Boolean, default=False)
-    season_id = Column(ForeignKey("seasonrequest.id"))
+    season_id = Column(ForeignKey("seasonrequest.id"), nullable=False)
 
     __repr_props__ = ("episode_number", "available")

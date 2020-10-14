@@ -1,13 +1,13 @@
 from requests import get
 
 from server.models import RadarrConfig
-from server.utils import make_url
+from server import utils
 
 
-def radarr_url(config: RadarrConfig, resource_path: str, queries: dict = None) -> str:
+def make_url(config: RadarrConfig, resource_path: str, queries: dict = None) -> str:
     queries = queries or {}
     port = config.port
-    return make_url(
+    return utils.make_url(
         "%s://%s%s/api%s"
         % (
             "https" if config.ssl else "http",
@@ -19,8 +19,8 @@ def radarr_url(config: RadarrConfig, resource_path: str, queries: dict = None) -
     )
 
 
-def test_radarr_status(config: RadarrConfig):
-    url = radarr_url(config, "/system/status")
+def check_status(config: RadarrConfig):
+    url = make_url(config, "/system/status")
     try:
         r = get(url)
     except Exception:
@@ -30,11 +30,11 @@ def test_radarr_status(config: RadarrConfig):
     return r.json()
 
 
-def radarr_lookup(tmdb_id: int, config: RadarrConfig):
-    url = radarr_url(
+def lookup(config: RadarrConfig, tmdb_id: int):
+    url = make_url(
         config,
         "/movie/lookup/tmdb",
         queries={"tmdbId": tmdb_id},
     )
-    lookup = get(url).json()
-    return lookup
+    lookup_result = get(url).json()
+    return lookup_result

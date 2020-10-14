@@ -1,8 +1,12 @@
-from marshmallow import post_dump
-from marshmallow.validate import OneOf
+from __future__ import annotations
 
-from server.extensions import ma
-from server.models import SeriesType
+from enum import Enum
+from typing import List, Optional
+
+from pydantic import AnyHttpUrl, BaseModel, Field
+
+from server.models.requests import SeriesType
+from server.schemas import APIModel, UserPublic
 
 TMDB_URL = "https://www.themoviedb.org/"
 TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"
@@ -10,13 +14,20 @@ TMDB_POSTER_SIZE = "w500"
 TMDB_ART_SIZE = "w1280"
 
 
-class SearchSchema(ma.Schema):
-    value = ma.String(required=True)
-    type = ma.String(validate=OneOf(["movies", "series", "friends"]))
-    page = ma.Integer()
+class QuickSearchType(str, Enum):
+    movies = "movies"
+    series = "series"
+    friends = "friends"
 
 
-class MediaSearchResultSchema(ma.Schema):
+class QuickSearch(APIModel):
+    value: str
+    type: Optional[QuickSearchType]
+    page: int = 1
+
+
+"""
+class MediaSearchResultSchema(APIModel):
     ratingKey = ma.String(data_key="id")
     title = ma.String()
     year = ma.Integer()
@@ -27,24 +38,26 @@ class MediaSearchResultSchema(ma.Schema):
     def media_type(self, media, **kwargs):
         media["type"] = media.get("type").replace("show", "series")
         return media
+"""
 
 
-class FriendSearchResultSchema(ma.Schema):
-    username = ma.String()
-    avatar = ma.URL()
-    email = ma.Email()
-    type = ma.Constant("friend")
+class FriendSearchResult(UserPublic):
+    type: QuickSearchType = Field(default=QuickSearchType.friends, const=True)
 
 
-class TmdbMediaSchema(ma.Schema):
-    id = ma.Integer(data_key="tmdb_id")
-    overview = ma.String(data_key="summary")
-    vote_average = ma.Float(data_key="rating")
-    poster_path = ma.String(data_key="thumbUrl")
-    backdrop_path = ma.String(data_key="art_url")
-    media_type = ma.String()
-    status = ma.String()
-    link = ma.Function(lambda media: f"{TMDB_URL}{media['media_type']}/{media['id']}")
+class TmdbMedia(APIModel):
+    tmdb_id: int = Field(alias="id")
+    summary: str = Field(alias="overview")
+    rating: float = Field(alias="vote_average")
+    thumbUrl: str = Field(alias="poster_path")
+    art_url: str = Field(alias="backdrop_path")
+    media_type: str
+    status: str
+    link: AnyHttpUrl = Field(
+        default=lambda media: f"{TMDB_URL}{media['media_type']}/{media['id']}",
+        const=True,
+    )
+    """
 
     @post_dump
     def get_thumbUrl(self, media, **kwargs):
@@ -68,42 +81,48 @@ class TmdbMediaSchema(ma.Schema):
     def media_type(self, media, **kwargs):
         media["media_type"] = media.get("media_type").replace("tv", "series")
         return media
+"""
 
 
-class TmdbMovieSchema(TmdbMediaSchema):
-    title = ma.String()
-    release_date = ma.String(data_key="releaseDate")
-    media_type = ma.String(default="movie")
-    link = ma.Function(lambda media: f"{TMDB_URL}movie/{media['id']}")
+class TmdbMovie(TmdbMedia):
+    title: str
+    release_date: str
+    media_type = Field(default="movie", const=True)
+    link: AnyHttpUrl = Field(
+        default=lambda media: f"{TMDB_URL}movie/{media['id']}", const=True
+    )
 
 
-class TmdbSeriesSchema(TmdbMediaSchema):
-    tvdb_id = ma.Integer()
-    name = ma.String(data_key="title")
-    first_air_date = ma.String(data_key="releaseDate")
-    media_type = ma.String(default="series")
-    seasons = ma.Nested("TmdbSeasonSchema", many=True)
-    series_type = ma.String(validate=OneOf([SeriesType.STANDARD, SeriesType.ANIME]))
-    link = ma.Function(lambda media: f"{TMDB_URL}tv/{media['id']}")
+class TmdbSeries(TmdbMedia):
+    tvdb_id: int
+    title: str = Field(alias="name")
+    releaseDate: str = Field(alias="first_air_date")
+    media_type = Field(default="series", const=True)
+    seasons: List[TmdbSeason]
+    series_type: SeriesType
+    link: AnyHttpUrl = Field(
+        default=lambda media: f"{TMDB_URL}tv/{media['id']}", const=True
+    )
 
 
-class TmdbSeasonSchema(ma.Schema):
-    season_number = ma.Integer()
-    name = ma.String()
-    air_date = ma.String(data_key="release_date")
-    episodes = ma.Nested("TmdbEpisodeSchema", many=True)
+class TmdbSeason(APIModel):
+    season_number: int
+    name: str
+    release_date = Field(alias="air_date")
+    episodes: List[TmdbEpisode]
 
 
-class TmdbEpisodeSchema(ma.Schema):
-    episode_number = ma.Integer()
-    name = ma.String()
-    air_date = ma.String(data_key="release_date")
+class TmdbEpisode(APIModel):
+    episode_number: int
+    name: str
+    release_date = Field(alias="air_date")
 
 
-class TmdbMediaSearchResultSchema(ma.Schema):
-    page = ma.Integer()
-    total_pages = ma.Integer()
-    total_results = ma.Integer()
+class TmdbMediaSearchResult(APIModel):
+    page: int = 1
+    total_pages: int
+    total_results: int
+    """
     results = ma.Method("get_results")
 
     def get_results(self, search_results):
@@ -116,15 +135,12 @@ class TmdbMediaSearchResultSchema(ma.Schema):
             else:
                 continue
         return res
+"""
 
 
-class TmdbMovieSearchResultSchema(TmdbMediaSearchResultSchema):
-    results = ma.List(ma.Nested(TmdbMovieSchema))
+class TmdbMovieSearchResult(TmdbMediaSearchResult):
+    results: List[TmdbMovie]
 
 
-class TmdbSeriesSearchResultSchema(TmdbMediaSearchResultSchema):
-    results = ma.List(ma.Nested(TmdbSeriesSchema))
-
-
-tmdb_movie_serializer = TmdbMovieSchema()
-tmdb_series_serializer = TmdbSeriesSchema()
+class TmdbSeriesSearchResultSchema(TmdbMediaSearchResult):
+    results: List[TmdbSeries]

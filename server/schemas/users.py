@@ -1,32 +1,49 @@
-from marshmallow.validate import OneOf
+from __future__ import annotations
 
-from server.extensions import ma
-from server.models.users import User
+from typing import List, Optional
 
+from pydantic import AnyHttpUrl, EmailStr
 
-class UserSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = User
-        exclude = ("session_token",)
-
-    friends = ma.Nested(
-        lambda: UserSchema(only=("username", "avatar", "email", "_links")), many=True
-    )
-    _links = ma.Hyperlinks(
-        {
-            "self": ma.AbsoluteURLFor("users.get_user", username="<username>"),
-        }
-    )
+from . import APIModel
 
 
-class ChangePasswordSchema(ma.Schema):
-    oldPassword = ma.String(required=True)
-    newPassword = ma.String(required=True)
+class UserBase(APIModel):
+    username: Optional[str]
+    email: Optional[EmailStr]
 
 
-class AddFriendSchema(ma.Schema):
-    usernameOrEmail = ma.String(required=True)
+class User(UserBase):
+    avatar: Optional[AnyHttpUrl]
+    friends: List[UserPublic]
+    confirmed: bool
+    admin: bool
 
 
-class GetFriendProvidersSchema(ma.Schema):
-    provides = ma.String(validate=OneOf(["movies", "series"]))
+class UserCreate(UserBase):
+    username: str
+    email: EmailStr
+    password: str
+
+
+class UserUpdate(UserBase):
+    old_password: Optional[str] = None
+    password: Optional[str]
+
+
+class UserPublic(UserBase):
+    avatar: Optional[AnyHttpUrl]
+
+
+class FriendshipCreate(APIModel):
+    username_or_email: str
+
+
+class PasswordResetCreate(APIModel):
+    email: EmailStr
+
+
+class PasswordResetConfirm(APIModel):
+    password: str
+
+
+User.update_forward_refs()

@@ -72,13 +72,13 @@ const AuthContextProvider = (props) => {
   const signIn = async (data, redirectURI) => {
     const username = data["usernameOrEmail"] || data["username"];
     const fd = new FormData();
-    fd.append("usernameOrEmail", username);
+    fd.append("username", username);
     fd.append("password", data["password"]);
     const remember = data["remember"];
     if (typeof remember !== "undefined" && remember !== null) {
       fd.append("remember", remember);
     }
-    const res = await executeRequest(methods.POST, "/sign-in/", fd);
+    const res = await executeRequest(methods.POST, "/sign-in", fd);
 
     switch (res.status) {
       case 200:
@@ -96,7 +96,7 @@ const AuthContextProvider = (props) => {
   };
 
   const signInWithPlex = async (redirectURI) => {
-    const res = await executeRequest(methods.GET, "/sign-in/plex/");
+    const res = await executeRequest(methods.GET, "/sign-in/plex");
     switch (res.status) {
       case 200:
         const plexRes = await axios.post(res.data, {
@@ -122,10 +122,10 @@ const AuthContextProvider = (props) => {
   };
 
   const authorizePlex = async (key, code, redirectURI) => {
-    const body = { key: key, code: code, redirectURI: redirectURI };
+    const body = { key: key, code: code, redirectUri: redirectURI };
     const res = await executeRequest(
       methods.POST,
-      "/sign-in/plex/authorize/",
+      "/sign-in/plex/authorize",
       body
     );
     switch (res.status) {
@@ -140,7 +140,7 @@ const AuthContextProvider = (props) => {
   const confirmSignInWithPlex = async (search) => {
     const res = await executeRequest(
       methods.GET,
-      "/sign-in/plex/confirm/" + search
+      "/sign-in/plex/confirm" + search
     );
     switch (res.status) {
       case 200:
@@ -154,17 +154,13 @@ const AuthContextProvider = (props) => {
   };
 
   const signOut = async () => {
-    await executeRequest(methods.GET, "/sign-out/");
+    await executeRequest(methods.GET, "/sign-out");
     clearSession();
     props.history.push(routes.SIGN_IN.url);
   };
 
   const signUp = async (data) => {
-    const fd = new FormData();
-    fd.append("username", data["username"]);
-    fd.append("email", data["email"]);
-    fd.append("password", data["password"]);
-    const res = await executeRequest(methods.POST, "/sign-up/", fd);
+    const res = await executeRequest(methods.POST, "/sign-up", data);
     switch (res.status) {
       case 200:
         return res;
@@ -177,10 +173,7 @@ const AuthContextProvider = (props) => {
   };
 
   const confirmEmail = async (token) => {
-    const res = await executeRequest(
-      methods.GET,
-      "/sign-up/confirm/" + token + "/"
-    );
+    const res = await executeRequest(methods.GET, "/sign-up/" + token);
     switch (res.status) {
       case 200:
         clearSession();
@@ -195,9 +188,7 @@ const AuthContextProvider = (props) => {
   };
 
   const resendConfirmation = async (email) => {
-    const fd = new FormData();
-    fd.append("email", email);
-    const res = await executeRequest(methods.POST, "/sign-up/resend/", fd);
+    const res = await executeRequest(methods.PATCH, "/sign-up", email);
     switch (res.status) {
       case 200:
       case 400:

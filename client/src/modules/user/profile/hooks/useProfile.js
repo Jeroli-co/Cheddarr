@@ -6,7 +6,7 @@ import { routes } from "../../../../router/routes";
 import { useApi } from "../../../api/hooks/useApi";
 
 const useProfile = () => {
-  const profileURI = "/user/";
+  const profileURI = "/me/";
 
   const { executeRequest, methods } = useApi();
   const { handleError, clearSession, setUsername } = useContext(AuthContext);
@@ -30,7 +30,7 @@ const useProfile = () => {
   };
 
   const changeUsername = async (data) => {
-    const res = await executeRequest(methods.PATCH, profileURI, data);
+    const res = await executeRequest(methods.PUT, profileURI, data);
     switch (res.status) {
       case 200:
         const username = res.data.username;
@@ -46,7 +46,7 @@ const useProfile = () => {
   };
 
   const changeEmail = async (data) => {
-    const res = await executeRequest(methods.PATCH, profileURI, data);
+    const res = await executeRequest(methods.PUT, profileURI, data);
     switch (res.status) {
       case 200:
         pushInfo("Please check your email to confirm it.");
@@ -60,10 +60,10 @@ const useProfile = () => {
   };
 
   const changePassword = async (data) => {
-    const fd = new FormData();
-    fd.append("oldPassword", data["oldPassword"]);
-    fd.append("newPassword", data["newPassword"]);
-    const res = await executeRequest(methods.PUT, profileURI + "password/", fd);
+    const res = await executeRequest(methods.PUT, profileURI + "password/", {
+      oldPassword: data["oldPassword"],
+      newPassword: data["newPassword"],
+    });
     switch (res.status) {
       case 200:
         pushInfo("Password changed. Please sign in again.");
@@ -78,13 +78,9 @@ const useProfile = () => {
   };
 
   const initResetPassword = async (data) => {
-    const fd = new FormData();
-    fd.append("email", data["email"]);
-    const res = await executeRequest(
-      methods.POST,
-      profileURI + "password/reset/",
-      fd
-    );
+    const res = await executeRequest(methods.PUT, profileURI + "password", {
+      email: data["email"],
+    });
     switch (res.status) {
       case 200:
       case 400:
@@ -98,7 +94,7 @@ const useProfile = () => {
   const checkResetPasswordToken = async (token) => {
     const res = await executeRequest(
       methods.GET,
-      profileURI + "password/reset/" + token + "/"
+      profileURI + "password/" + token
     );
     switch (res.status) {
       case 200:
@@ -112,12 +108,10 @@ const useProfile = () => {
   };
 
   const resetPassword = async (token, data) => {
-    const fd = new FormData();
-    fd.append("password", data["password"]);
     const res = await executeRequest(
       methods.POST,
-      profileURI + "password/reset/" + token + "/",
-      fd
+      profileURI + "password/" + token,
+      { password: data["password"] }
     );
     switch (res.status) {
       case 200:
@@ -131,9 +125,7 @@ const useProfile = () => {
   };
 
   const deleteAccount = async (data) => {
-    const fd = new FormData();
-    fd.append("password", data["password"]);
-    const res = await executeRequest(methods.DELETE, profileURI, fd);
+    const res = await executeRequest(methods.DELETE, profileURI);
     switch (res.status) {
       case 200:
         pushInfo("Your account has been deleted");

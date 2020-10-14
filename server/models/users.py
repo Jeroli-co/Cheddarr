@@ -1,82 +1,41 @@
-from uuid import uuid4
+from __future__ import annotations
 
-from flask_login import UserMixin
-from sqlalchemy.orm import validates
+from typing import List, Optional, TYPE_CHECKING
 
-from server import utils
-from server.database import (
-    Boolean,
-    Column,
-    ForeignKey,
-    Integer,
-    Model,
-    String,
-    backref,
-    relationship,
-    session,
-    Email,
-    Password,
-    URL,
-)
+from sqlalchemy import Boolean, Column, ForeignKey, func, Integer, String
+from sqlalchemy.orm import backref, relationship, Session, validates
+from sqlalchemy_utils import EmailType, PasswordType, URLType
+
+from server.core import utils
+from server.database.model import Model
+
+if TYPE_CHECKING:
+    from server.schemas import UserCreate, UserUpdate  # noqa
 
 
-class User(Model, UserMixin):
+class User(Model["User", "UserCreate", "UserUpdate"]):
     id = Column(Integer, primary_key=True)
-    username = Column(String(128), unique=True, index=True)
-
-    email = Column(Email, unique=True, index=True)
+    username = Column(String, nullable=False, unique=True, index=True)
+    email = Column(EmailType, nullable=False, unique=True, index=True)
     password = Column(
-        Password(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"]),
+        PasswordType(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"]),
+        nullable=False,
     )
-
-    @validates("password")
-    def validate_password(self, key, password):
-        assert 8 <= len(password) <= 128
-        return password
-
-    avatar = Column(URL, nullable=True)
-    session_token = Column(String(256))
+    avatar = Column(URLType)
     confirmed = Column(Boolean, default=False)
-    api_key = Column(String(256), unique=True, nullable=True)
+    admin = Column(Boolean, default=False)
     providers = relationship(
         "ProviderConfig", back_populates="user", cascade="all,delete", lazy="dynamic"
     )
-    media_servers = relationship(
-        "MediaServer", back_populates="user", cascade="all,delete", lazy="dynamic"
-    )
-    __repr_props__ = ("username", "email", "confirmed")
+    __repr_props__ = ("username", "email", "admin", "confirmed")
 
-    def __init__(
-        self,
-        username,
-        email,
-        password,
-        avatar=None,
-        confirmed=False,
-    ):
-        self.username = username
-        self.email = email
-        self.password = password
-        self.avatar = avatar
-        self.confirmed = confirmed
-        self.api_key = None
-        self.session_token = utils.generate_token(str(uuid4()))
-
-    def get_id(self):
-        return str(self.session_token)
-
-    def change_password(self, new_password):
-        self.password = new_password
-        self.session_token = utils.generate_token(str(uuid4()))
-        return session.commit()
-
-    def change_email(self, new_email):
-        self.email = new_email
-        self.session_token = utils.generate_token(str(uuid4()))
-        return session.commit()
+    @validates("password")
+    def validate_password(self, key, password):
+        assert len(password) >= 8
+        return password
 
     @property
-    def friends(self):
+    def friends(self) -> List[User]:
         friendships = (
             self.requested_friends.filter_by(pending=False).union(
                 self.received_friends.filter_by(pending=False)
@@ -89,11 +48,13 @@ class User(Model, UserMixin):
             for friendship in friendships
         ]
 
-    def get_pending_requested_friends(self):
+    @property
+    def pending_requested_friends(self) -> List[User]:
         friendships = self.requested_friends.filter_by(pending=True).all()
         return [friendship.receiving_user for friendship in friendships]
 
-    def get_pending_received_friends(self):
+    @property
+    def pending_received_friends(self) -> List[User]:
         friendships = self.received_friends.filter_by(pending=True).all()
         return [friendship.requesting_user for friendship in friendships]
 
@@ -102,6 +63,33 @@ class User(Model, UserMixin):
             self.requested_friends.filter_by(receiving_user_id=user.id).count()
             + self.received_friends.filter_by(requesting_user_id=user.id).count()
         ) > 0
+
+    @classmethod
+    def create(cls, db: Session, obj_in: UserCreate, commit=True) -> User:
+        db_obj = User(
+            username=obj_in.username,
+            email=obj_in.email,
+            password=obj_in.password,
+            avatar=utils.random_avatar(),
+        )
+        db_obj.save(db, commit=commit)
+        return db_obj
+
+    @classmethod
+    def get_by_email(cls, db: Session, email: str) -> Optional[User]:
+        return db.query(cls).filter(cls.email == email).first()
+
+    @classmethod
+    def get_by_username(cls, db: Session, username: str) -> Optional[User]:
+        return (
+            db.query(cls).filter(func.lower(cls.username) == username.lower()).first()
+        )
+
+    @classmethod
+    def get_by_username_or_email(cls, db: Session, username_or_email: str):
+        return cls.get_by_email(db, email=username_or_email) or cls.get_by_username(
+            db, username=username_or_email
+        )
 
 
 class Friendship(Model):
@@ -119,8 +107,17 @@ class Friendship(Model):
     )
     pending = Column(Boolean, default=True)
 
-    __repr_props__ = ("requesting_user", "receiving_user", "pending")
+    @classmethod
+    def get_by_user_ids(
+        cls, db: Session, user_id: int, friend_id: int
+    ) -> Optional[Friendship]:
+        return (
+            db.query(cls)
+            .filter_by(requesting_user_id=user_id, receiving_user_id=friend_id)
+            .one_or_none()
+            or db.query(cls)
+            .filter_by(requesting_user_id=friend_id, receiving_user_id=user_id)
+            .one_or_none()
+        )
 
-    def __init__(self, requesting_user: User, receiving_user: User):
-        self.requesting_user = requesting_user
-        self.receiving_user = receiving_user
+    __repr_props__ = ("requesting_user", "receiving_user", "pending")

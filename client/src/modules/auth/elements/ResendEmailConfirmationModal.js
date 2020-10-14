@@ -11,7 +11,7 @@ const ResendEmailConfirmationModal = (props) => {
   const [httpResponse, setHttpResponse] = useState(null);
 
   const submitResendConfirmAccount = (data) => {
-    resendConfirmation(data["email"]).then((res) => {
+    resendConfirmation(data).then((res) => {
       if (res) {
         switch (res.status) {
           case 200:

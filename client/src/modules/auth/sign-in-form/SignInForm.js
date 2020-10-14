@@ -126,10 +126,10 @@ const SignInForm = (props) => {
             </div>
 
             {httpError &&
-              ((httpError.status === 400 && (
+              ((httpError.status === 401 && (
                 <p className="help is-danger">{httpError.message}</p>
               )) ||
-                (httpError.status === 401 && (
+                (httpError.status === 400 && (
                   <p className="help is-danger">
                     {httpError.message}{" "}
                     <span

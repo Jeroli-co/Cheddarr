@@ -2,12 +2,9 @@ import re
 from typing import List, Union
 
 import tmdbsimple as tmdb
-from flask_login import current_user
-from werkzeug.exceptions import BadRequest
 
-from server.extensions import cache
-from server.helpers.media_servers.plex import connect_plex_servers, plex_search
-from server.models import SeriesType, User
+from server.helpers.providers.plex import connect_plex_servers, plex_search
+from server.models import User
 
 
 def search_friends(name, limit=3):
@@ -62,6 +59,6 @@ def set_tmdb_series_info(series: Union[List[dict], dict]):
         series["tvdb_id"] = tmdb.TV(series["id"]).external_ids().get("tvdb_id")
         for genre in series["genres"]:
             if anime_pattern.match(genre["name"]):
-                series["series_type"] = SeriesType.ANIME.value
+                series["series_type"] = SeriesType.anime.value
                 return
-        series["series_type"] = SeriesType.STANDARD.value
+        series["series_type"] = SeriesType.standard.value

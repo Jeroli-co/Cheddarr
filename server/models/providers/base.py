@@ -1,41 +1,32 @@
 from enum import Enum
-from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase, declared_attr
+from sqlalchemy.orm import relationship
+from sqlalchemy_utils import UUIDType
 
-from server.database import (
-    Enum as DBEnum,
-    ForeignKey,
-    Model,
-    String,
-    Boolean,
-    Column,
-    relationship,
-    UUID,
-)
-
-if TYPE_CHECKING:
-    from . import User  # noqa
+from server.database.base import Base
 
 
 class ProviderType(str, Enum):
-    MOVIE_PROVIDER = "movie_provider"
-    SERIES_PROVIDER = "series_provider"
+    movie_provider = "movie"
+    series_provider = "series"
+    media_server = "server"
 
 
-class ProviderConfig(Model, AbstractConcreteBase):
+class ProviderConfig(Base, AbstractConcreteBase):
 
-    id = Column(UUID(binary=False), default=uuid4, primary_key=True)
-    api_key = Column(String(256))
-    enabled = Column(Boolean, default=False)
+    id = Column(UUIDType(binary=False), default=uuid4, primary_key=True)
+    api_key = Column(String)
+    enabled = Column(Boolean, default=True)
     provider_type = Column(DBEnum(ProviderType))
 
     __repr_props__ = ("id", "name", "enabled", "provider_type")
 
     @declared_attr
     def name(cls):
-        return Column(String(256), default=cls.__name__.replace("Config", ""))
+        return Column(String, default=cls.__name__.replace("Config", ""))
 
     @declared_attr
     def user_id(cls):
@@ -50,9 +41,3 @@ class ProviderConfig(Model, AbstractConcreteBase):
         if cls == ProviderConfig:
             return {"concrete": False}
         return {"polymorphic_identity": cls.__name__, "concrete": True}
-
-    def provides_movies(self):
-        return self.provider_type == ProviderType.MOVIE_PROVIDER
-
-    def provides_series(self):
-        return self.provider_type == ProviderType.SERIES_PROVIDER

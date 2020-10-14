@@ -1,5 +1,6 @@
-from server.database import Boolean, Column, String, Integer
-from .base import ProviderConfig, ProviderType
+from sqlalchemy import Boolean, Column, Integer, String
+
+from .base import ProviderConfig
 
 
 class RadarrConfig(ProviderConfig):
@@ -17,9 +18,3 @@ class RadarrConfig(ProviderConfig):
         "port",
         "ssl",
     )
-
-    def __init__(self, **kwargs):
-        self.provider_type = ProviderType.MOVIE_PROVIDER
-        for field, value in kwargs.items():
-            if hasattr(self, field):
-                setattr(self, field, value)

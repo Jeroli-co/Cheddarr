@@ -1,61 +1,19 @@
-from sqlalchemy import orm
+from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
+
+from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import Session
 
-from server.extensions import db
+from server.database.base import Base
 
-
-class BaseModel(db.Model):
-    """Base Model class. It includes convenience methods for creating,
-    querying, saving, updating and deleting models.
-    """
-
-    __abstract__ = True
-    __repr_props__ = ()
-
-    def save(self):
-        db.session.add(self)
-        return db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        return db.session.commit()
-
-    def update(self, data):
-        data = data.__dict__ if isinstance(data, self.__class__) else data
-        for field, value in data.items():
-            if hasattr(self, field) and not field.startswith("_"):
-                setattr(self, field, value)
-        return self.save()
-
-    @classmethod
-    def find(cls, **filters):
-        return db.session.query(cls).filter_by(**filters).one_or_none()
-
-    @classmethod
-    def findAll(cls, **filters):
-        return db.session.query(cls).filter_by(**filters).all()
-
-    @classmethod
-    def exists(cls, **filters):
-        return db.session.query(cls.id).filter_by(**filters).scalar()
-
-    @classmethod
-    def search(cls, field: str, value, limit=3):
-        return cls.query.filter(getattr(cls, field).contains(value)).limit(limit).all()
-
-    def __repr__(self):
-        properties = [
-            f"{prop}={getattr(self, prop)!r}"
-            for prop in self.__repr_props__
-            if hasattr(self, prop)
-        ]
-        return f"<{self.__class__.__name__} {' '.join(properties)}>"
+ModelType = TypeVar("ModelType", bound=Base)
+CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
+UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
-class Model(BaseModel):
-    """Base table class that extends :class:`server.database.model.BaseModel` and
-    includes a primary key :attr:`id` field .
-    """
+class Model(Base, Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
+    """Base Model class with CRUD operations."""
 
     __abstract__ = True
 
@@ -63,5 +21,59 @@ class Model(BaseModel):
     def __tablename__(cls):
         return cls.__name__.lower()
 
+    @classmethod
+    def create(
+        cls, db: Session, obj_in: CreateSchemaType, commit: bool = True
+    ) -> ModelType:
+        obj_in_data = jsonable_encoder(obj_in, by_alias=False)
+        db_obj = cls().fill(obj_in_data)
+        db_obj.save(db, commit=commit)
+        return db_obj
 
-session: orm.session.Session = db.session
+    @classmethod
+    def get(cls, db: Session, id: Any) -> Optional[ModelType]:
+        return db.query(cls).filter(cls.id == id).first()
+
+    @classmethod
+    def find_by(cls, db: Session, **filters) -> Optional[ModelType]:
+        return db.query(cls).filter_by(**filters).one_or_none()
+
+    @classmethod
+    def find_all_by(cls, db: Session, limit: int = 100, **filters) -> List[ModelType]:
+        return db.query(cls).filter_by(**filters).limit(limit).all()
+
+    def save(self, db: Session, commit: bool = True) -> ModelType:
+        db.add(self)
+        if commit:
+            db.commit()
+            db.refresh(self)
+        return self
+
+    def update(
+        self,
+        db: Session,
+        obj_in: Union[UpdateSchemaType, Dict[str, Any]],
+        commit: bool = True,
+    ) -> ModelType:
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+        self.fill(update_data)
+        print(self)
+        self.save(db, commit=commit)
+        return self
+
+    def delete(self, db: Session) -> ModelType:
+        db.delete(self)
+        db.commit()
+        return self
+
+    def fill(self, data: Dict[str, Any]) -> ModelType:
+        for name in data.keys():
+            if hasattr(self, name) and not name.startswith("_"):
+                setattr(self, name, data[name])
+            else:
+                raise KeyError("Attribute '{}' doesn't exist".format(name))
+
+        return self

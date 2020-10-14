@@ -1,5 +1,11 @@
-from server.database import Boolean, Column, String, Integer, relationship
-from .base import ProviderConfig, ProviderType
+from dataclasses import dataclass, field
+from typing import List, Optional
+
+
+from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy.orm import relationship
+
+from .base import ProviderConfig
 
 
 class SonarrConfig(ProviderConfig):
@@ -28,8 +34,46 @@ class SonarrConfig(ProviderConfig):
         "version",
     )
 
-    def __init__(self, **kwargs):
-        self.provider_type = ProviderType.SERIES_PROVIDER
-        for field, value in kwargs.items():
-            if hasattr(self, field):
-                setattr(self, field, value)
+
+@dataclass
+class SonarrAddOptions:
+    ignore_episodes_with_files: bool = field(
+        metadata={"data_key": "ignoreEpisodesWithFiles"}
+    )
+    ignore_episodes_without_files: bool = field(
+        metadata={"data_key": "ignoreEpisodesWithoutFiles"}
+    )
+    search_for_missing_episodes: bool = field(
+        metadata={"data_key": "searchForMissingEpisodes"}
+    )
+
+
+@dataclass
+class SonarrSeason:
+    season_number: int = field(metadata={"data_key": "seasonNumber"})
+    monitored: bool
+
+
+@dataclass
+class SonarrSeries:
+
+    id: Optional[int]
+    title: str
+    tvdb_id: int = field(metadata={"data_key": "tvdbId"})
+    title_slug: str = field(metadata={"data_key": "titleSlug"})
+    quality_profile_id: int = field(metadata={"data_key": "qualityProfileId"})
+    language_profile_id: int = field(metadata={"data_key": "languageProfileId"})
+    root_folder_path: Optional[str] = field(metadata={"data_key": "rootFolderPath"})
+    series_type: str
+    add_options: Optional[SonarrAddOptions] = field(metadata={"data_key": "addOptions"})
+    seasons: List[SonarrSeason]
+
+
+@dataclass
+class SonarrEpisode:
+
+    id: int
+    episode_number: int = field(metadata={"data_key": "episodeNumber"})
+    season_number: int = field(metadata={"data_key": "seasonNumber"})
+    monitored: bool
+    has_file: bool = field(metadata={"data_key": "hasFile"})

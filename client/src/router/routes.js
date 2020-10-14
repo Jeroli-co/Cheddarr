@@ -30,18 +30,18 @@ import { RequestsReceived } from "../modules/requests/elements/RequestsReceived"
 const routes = {
   HOME: { url: "/", component: Home },
   SIGN_IN: { url: "/sign-in", component: SignInForm },
-  CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm/", component: PageLoader },
+  CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm", component: PageLoader },
   INIT_RESET_PASSWORD: {
     url: "/sign-in/init-reset-password",
     component: InitResetPasswordModal,
   },
   SIGN_UP: { url: "/sign-up", component: SignUpForm },
   CONFIRM_EMAIL: {
-    url: (token) => "/sign-up/confirm/" + token,
+    url: (token) => "/sign-up/" + token,
     component: ConfirmEmail,
   },
   RESET_PASSWORD: {
-    url: (token) => "/user/password/reset/" + token,
+    url: (token) => "/me/password/" + token,
     component: ResetPassword,
   },
   RESEND_EMAIL_CONFIRMATION: {
@@ -49,8 +49,8 @@ const routes = {
     component: ResendEmailConfirmationModal,
   },
   NOT_FOUND: { url: "/404", component: NotFound },
-  USER_PROFILE: { url: "/user", component: Profile },
-  USER_FRIENDS: { url: "/user/friends", component: Friends },
+  USER_PROFILE: { url: "/me", component: Profile },
+  USER_FRIENDS: { url: "/me/friends", component: Friends },
   USER_FRIEND_PROFILE: {
     url: (username) => "/users/" + username,
     component: FriendProfile,
