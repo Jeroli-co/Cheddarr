@@ -1,7 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import { SCREEN_SIZE } from "../../../../../utils/enums/ScreenSizes";
 import { useOutsideAlerter } from "../../../../../utils/hooks/useOutsideAlerter";
+import { RequestsReceivedContext } from "../../../contexts/RequestsReceivedContext";
+import { RequestReceivedContext } from "../../../contexts/RequestReceivedContext";
+import { MEDIA_TYPES } from "../../../../media/enums/MediaTypes";
 
 const DeleteRequestButtonStyle = styled.button`
   -moz-appearance: none;
@@ -11,7 +14,6 @@ const DeleteRequestButtonStyle = styled.button`
   background: white;
   border: 1px solid ${(props) => props.theme.danger};
   box-shadow: none;
-  border: none;
   border-radius: 6px;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -28,22 +30,29 @@ const DeleteRequestButtonStyle = styled.button`
       color: white;
       border: white;
     `}
-
-  @media (max-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {
-    margin-top: 10px;
-  }
 `;
 
-const DeleteRequestButton = ({ handleDeleteRequest }) => {
+const DeleteRequestButton = ({ currentRequest }) => {
+  const { deleteRequest } = useContext(RequestsReceivedContext);
+  const { request, media } = useContext(RequestReceivedContext);
   const [isDeleteInitiated, setIsDeleteInitiated] = useState(false);
   const componentRef = useRef(null);
   useOutsideAlerter([componentRef], () => setIsDeleteInitiated(false));
+
+  useEffect(() => {
+    setIsDeleteInitiated(false);
+    console.log(currentRequest);
+  }, [currentRequest]);
 
   const onDeleteClick = (e) => {
     if (!isDeleteInitiated) {
       setIsDeleteInitiated(true);
     } else {
-      handleDeleteRequest();
+      const currentRequestId =
+        media.media_type === MEDIA_TYPES.SERIES
+          ? currentRequest.childRequest.id
+          : currentRequest.id;
+      deleteRequest(request.id, currentRequestId);
     }
     e.preventDefault();
   };

@@ -8,7 +8,7 @@ const useProvidersService = () => {
     const res = await executeRequest(methods.GET, baseUrl);
     switch (res.status) {
       case 200:
-        return res;
+        return res.data;
       default:
         return null;
     }

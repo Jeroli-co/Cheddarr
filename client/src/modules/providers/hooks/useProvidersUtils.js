@@ -20,7 +20,6 @@ const useProvidersUtils = () => {
   };
 
   return {
-    getFilteredProviders,
     getProvidersByMediasType,
   };
 };

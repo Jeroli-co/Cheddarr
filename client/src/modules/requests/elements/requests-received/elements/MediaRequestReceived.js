@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { MEDIA_TYPES } from "../../../../media/enums/MediaTypes";
-import { useMedia } from "../../../../media/hooks/useMedia";
-import { Spinner } from "../../../../../utils/elements/Spinner";
-import { Container } from "../../../../../utils/elements/Container";
 import { RequestReceived } from "./RequestReceived";
 import styled, { css } from "styled-components";
 import { SCREEN_SIZE } from "../../../../../utils/enums/ScreenSizes";
-import { RequestsPagination } from "./RequestsPagination";
+import { RequestReceivedContext } from "../../../contexts/RequestReceivedContext";
 
 const RequestReceivedContainer = styled.div`
   display: flex;
   width: 100%;
-  flex-wrap: wrap;
   justify-content: space-between;
   border-bottom: 1px solid ${(props) => props.theme.dark};
   border-right: 1px solid ${(props) => props.theme.dark};
@@ -25,10 +21,18 @@ const RequestReceivedContainer = styled.div`
 
     & > img {
       width: 100%;
-      height: 100%;
+      height: auto;
+
+      @media (max-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {
+        height: 100%;
+      }
     }
 
-    @media (max-width: ${SCREEN_SIZE.TABLET_SMALL}px) {
+    @media (max-width: ${SCREEN_SIZE.TABLET_LARGE}px) {
+      flex-basis: 50%;
+    }
+
+    @media (max-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {
       flex-basis: 100%;
     }
   }
@@ -118,89 +122,33 @@ const RequestReceivedContainer = styled.div`
         margin-right: 15%;
       `}
   }
+
+  @media (max-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {
+    flex-wrap: wrap;
+  }
 `;
 
-const MediaRequestReceived = ({ media_type, request, providers }) => {
-  const media = useMedia(media_type, request.tmdb_id || request.tvdb_id);
-  const [childRequestSelected, setChildRequestSelected] = useState(null);
-  const isSeries = media_type === MEDIA_TYPES.SERIES;
-  const childrenCount = isSeries ? request.children.length : -1;
-
-  useEffect(() => {
-    setChildRequestSelected(
-      isSeries
-        ? { index: 0, data: request.children[0] }
-        : { index: -1, data: request }
-    );
-  }, [media]);
-
-  const onPrevRequest = () => {
-    let prevIndex = childRequestSelected.index;
-    if (childRequestSelected.index === 0) {
-      prevIndex = request.children.length - 1;
-    } else {
-      prevIndex = prevIndex - 1;
-    }
-    setChildRequestSelected({
-      index: prevIndex,
-      data: request.children[prevIndex],
-    });
-  };
-
-  const onNextRequest = () => {
-    let nextIndex = childRequestSelected.index;
-    if (childRequestSelected.index === request.children.length - 1) {
-      nextIndex = 0;
-    } else {
-      nextIndex = nextIndex + 1;
-    }
-    setChildRequestSelected({
-      index: nextIndex,
-      data: request.children[nextIndex],
-    });
-  };
-
-  if (!media.isLoaded) {
-    return (
-      <Container padding="15px">
-        <Spinner size="2x" />
-      </Container>
-    );
-  }
-
-  if (media.isLoaded && media.data === null) {
-    return <p>An error occurred</p>;
-  }
+const MediaRequestReceived = () => {
+  const { media, request } = useContext(RequestReceivedContext);
 
   return (
     <RequestReceivedContainer
-      art_url={media.data.art_url}
-      media_type={media.data.media_type}
+      art_url={media.art_url}
+      media_type={media.media_type}
     >
       <div className="media-image-container">
-        <img src={media.data.thumbUrl} alt="Movie" />
+        <img src={media.thumbUrl} alt="Movie" />
       </div>
       <div className="media-request-container">
         <div className="media-title">
-          <a href={media.data.link} target="_blank">
-            {media.data.title}
+          <a href={media.link} target="_blank">
+            {media.title}
           </a>
-          {isSeries && <p>{request.children.length} Requests</p>}
+          {media.media_type === MEDIA_TYPES.SERIES && (
+            <p>{request.children.length} Requests</p>
+          )}
         </div>
-        <RequestReceived
-          request={childRequestSelected.data}
-          media_id={request.tmdb_id || request.tvdb_id}
-          media_type={media_type}
-          providers={providers}
-        />
-        {isSeries && request.children.length > 1 && (
-          <RequestsPagination
-            currentIndex={childRequestSelected.index}
-            requestsCount={childrenCount}
-            handlePrevRequest={onPrevRequest}
-            handleNextRequest={onNextRequest}
-          />
-        )}
+        <RequestReceived />
       </div>
     </RequestReceivedContainer>
   );

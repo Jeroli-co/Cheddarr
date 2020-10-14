@@ -79,7 +79,7 @@ const useRequestService = () => {
     switch (res.status) {
       case 200:
         pushSuccess("Request deleted");
-        return res.hasOwnProperty("data") ? res.data : null;
+        return res;
       default:
         pushDanger("An error occurred");
         return null;

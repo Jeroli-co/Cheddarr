@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretLeft, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
+import { RequestReceivedContext } from "../../../contexts/RequestReceivedContext";
 
 const RequestsPaginationContainer = styled.div`
   display: flex;
@@ -16,26 +17,28 @@ const RequestsPaginationContainer = styled.div`
 `;
 
 const RequestsPagination = ({
-  currentIndex,
-  requestsCount,
-  handlePrevRequest,
-  handleNextRequest,
+  onPrevRequest,
+  onNextRequest,
+  currentRequest,
 }) => {
-  const onPrevRequest = (e) => {
-    handlePrevRequest();
+  const { request } = useContext(RequestReceivedContext);
+
+  const handleClickPrev = (e) => {
+    onPrevRequest();
     e.preventDefault();
   };
-  const onNextRequest = (e) => {
-    handleNextRequest();
+  const handleClickNext = (e) => {
+    onNextRequest();
     e.preventDefault();
   };
+
   return (
     <RequestsPaginationContainer>
-      <div className="pagination-buttons prev-button" onClick={onPrevRequest}>
+      <div className="pagination-buttons prev-button" onClick={handleClickPrev}>
         <FontAwesomeIcon icon={faCaretLeft} size="2x" />
       </div>
-      Request {currentIndex + 1} / {requestsCount}
-      <div className="pagination-buttons next-button" onClick={onNextRequest}>
+      Request {currentRequest.index + 1} / {request.children.length}
+      <div className="pagination-buttons next-button" onClick={handleClickNext}>
         <FontAwesomeIcon icon={faCaretRight} size="2x" />
       </div>
     </RequestsPaginationContainer>

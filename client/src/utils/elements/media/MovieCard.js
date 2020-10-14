@@ -11,7 +11,6 @@ import { PlexButton } from "../PlexButton";
 import { MediaRating } from "./MediaRating";
 import { MediaBackground } from "./MediaBackground";
 import { useWindowSize } from "../../hooks/useWindowSize";
-import { STATIC_STYLE } from "../../enums/StaticStyles";
 import { Spinner } from "../Spinner";
 import { SCREEN_SIZE } from "../../enums/ScreenSizes";
 

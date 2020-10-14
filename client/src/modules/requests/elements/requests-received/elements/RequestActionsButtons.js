@@ -6,18 +6,17 @@ import styled from "styled-components";
 import { useRequestUtils } from "../../../hooks/useRequestUtils";
 import { SCREEN_SIZE } from "../../../../../utils/enums/ScreenSizes";
 import { DeleteRequestButton } from "./DeleteRequestButton";
+import { RequestsReceivedContext } from "../../../contexts/RequestsReceivedContext";
+import { RequestReceivedContext } from "../../../contexts/RequestReceivedContext";
+import { MEDIA_TYPES } from "../../../../media/enums/MediaTypes";
 
 const RequestActionsContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   border-top: 1px solid ${(props) => props.theme.dark};
   padding-top: 10px;
-
-  @media (min-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
+  padding-bottom: 10px;
 
   & .request-providers-container {
     display: flex;
@@ -26,25 +25,13 @@ const RequestActionsContainer = styled.div`
     & .request-providers-label {
       margin-right: 10px;
     }
-
-    @media (max-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {
-      padding-bottom: 10px;
-    }
   }
 
   & .request-actions-container {
     display: flex;
 
-    @media (max-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {
-      & button {
-        width: 50%;
-      }
-    }
-
-    @media (min-width: ${SCREEN_SIZE.MOBILE_LARGE}px) {
-      & button {
-        width: 100px;
-      }
+    & button {
+      flex-grow: 1;
     }
 
     & button:nth-child(1) {
@@ -53,42 +40,31 @@ const RequestActionsContainer = styled.div`
   }
 
   & .request-status-text {
-    color: ${(props) => props.requestStateColor};
-    background: white;
-    border-radius: 6px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
+    color: ${(props) => props.theme.dark};
     text-align: center;
     font-size: 1em;
+
+    & .request-status-state {
+      color: ${(props) => props.requestStateColor};
+    }
   }
 
   & .request-deleted-container {
     background-color: ${(props) => props.theme.dangerLight};
     color: ${(props) => props.theme.danger};
-    padding: 20px 0 20px 15px;
     border-radius: 8px;
     width: 100%;
   }
 `;
 
-const RequestActionsButtons = ({
-  media_type,
-  request,
-  providers,
-  updateRequest,
-}) => {
-  const { acceptRequest, refuseRequest, deleteRequest } = useRequestService();
-  const [providerSelected, setProviderSelected] = useState(null);
-  const [isRequestDeleted, setIsRequestDeleted] = useState(false);
+const RequestActionsButtons = ({ currentRequest }) => {
+  const { providers, acceptRequest, refuseRequest } = useContext(
+    RequestsReceivedContext
+  );
+  const { request, media } = useContext(RequestReceivedContext);
+  const [providerSelected, setProviderSelected] = useState(providers[0]);
 
-  useEffect(() => {
-    if (providers && providers.length > 0) {
-      setProviderSelected(providers[0]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [providers]);
+  const isSeries = media.media_type === MEDIA_TYPES.SERIES;
 
   const onProviderChange = (e) => {
     setProviderSelected(e.target.value);
@@ -96,23 +72,21 @@ const RequestActionsButtons = ({
   };
 
   const onAcceptRequest = (e) => {
-    acceptRequest(media_type, request.id, providerSelected.id).then((data) => {
-      if (data) updateRequest(data);
-    });
+    const current_request_id =
+      media.media_type === MEDIA_TYPES.SERIES
+        ? currentRequest.childRequest.id
+        : currentRequest.id;
+    acceptRequest(request.id, current_request_id, providerSelected.id);
     e.preventDefault();
   };
 
   const onRefusedRequest = (e) => {
-    refuseRequest(media_type, request.id).then((data) => {
-      if (data) if (data) updateRequest(data);
-    });
+    const current_request_id =
+      media.media_type === MEDIA_TYPES.SERIES
+        ? currentRequest.childRequest.id
+        : currentRequest.id;
+    refuseRequest(request.id, current_request_id);
     e.preventDefault();
-  };
-
-  const onDeleteRequest = () => {
-    deleteRequest(media_type, request.id).then((data) => {
-      if (data) setIsRequestDeleted(true);
-    });
   };
 
   const {
@@ -121,27 +95,24 @@ const RequestActionsButtons = ({
     isRequestPending,
   } = useRequestUtils();
 
-  if (!isRequestPending(request)) {
-    let requestStateText = getRequestState(request);
-    requestStateText =
-      requestStateText[0].toUpperCase() +
-      requestStateText.substring(1).toLowerCase();
-    const requestStateTextColor = getRequestColor(request);
-
-    if (isRequestDeleted) {
-      return (
-        <RequestActionsContainer requestStateColor={requestStateTextColor}>
-          <div className="request-deleted-container">
-            <p className="request-deleted-text">Request deleted</p>
-          </div>
-        </RequestActionsContainer>
-      );
-    }
-
+  if (
+    !isRequestPending(isSeries ? currentRequest.childRequest : currentRequest)
+  ) {
     return (
-      <RequestActionsContainer requestStateColor={requestStateTextColor}>
-        <p className="request-status-text">{requestStateText}</p>
-        <DeleteRequestButton handleDeleteRequest={onDeleteRequest} />
+      <RequestActionsContainer
+        requestStateColor={getRequestColor(
+          isSeries ? currentRequest.childRequest : currentRequest
+        )}
+      >
+        <p className="request-status-text">
+          Request{" "}
+          <span className="request-status-state">
+            {getRequestState(
+              isSeries ? currentRequest.childRequest : currentRequest
+            )}
+          </span>
+        </p>
+        <DeleteRequestButton currentRequest={currentRequest} />
       </RequestActionsContainer>
     );
   }
