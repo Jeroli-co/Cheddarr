@@ -1,4 +1,3 @@
-import subprocess
 import click
 
 
@@ -22,4 +21,8 @@ def test():
 
 @click.command("run")
 def run():
-    subprocess.run("uvicorn server.main:app --reload")
+    import os
+    import uvicorn
+
+    debug = os.environ.get("ENV") == "development"
+    uvicorn.run("server.main:app", reload=debug, debug=debug)
