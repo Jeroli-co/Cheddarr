@@ -3,10 +3,10 @@ import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
 import { Link, Route, useLocation } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import { routes } from "../../../router/routes";
-import { FORM_DEFAULT_VALIDATOR } from "../../../utils/enums/FormDefaultValidators";
-import logo from "../../../assets/plex.png";
+import { AuthContext } from "../../contexts/AuthContext";
+import { routes } from "../../../../router/routes";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../utils/enums/FormDefaultValidators";
+import logo from "../../../../assets/plex.png";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);

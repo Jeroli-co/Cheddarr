@@ -1,18 +1,27 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SignInButton } from "../elements/SignInButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const WaitingEmailConfirmation = ({ email }) => {
   const { resendConfirmation } = useContext(AuthContext);
-  const [httpResponse, setHttpResponse] = useState(null);
+  const [requestDetail, setRequestDetail] = useState({
+    error: null,
+    loading: false,
+  });
 
   const _onResendEmail = () => {
-    resendConfirmation(email).then((res) => {
-      if (res) setHttpResponse(res);
-    });
+    setRequestDetail({ ...requestDetail, loading: true });
   };
+
+  useEffect(() => {
+    if (requestDetail.loading) {
+      resendConfirmation(email).then((detail) => {
+        setRequestDetail({ error: detail, loading: false });
+      });
+    }
+  }, [requestDetail]);
 
   return (
     <section
@@ -44,6 +53,7 @@ const WaitingEmailConfirmation = ({ email }) => {
               className="button is-rounded is-primary"
               type="button"
               onClick={_onResendEmail}
+              disabled={requestDetail.loading}
             >
               <span className="icon">
                 <FontAwesomeIcon icon={faEnvelope} />
@@ -51,7 +61,7 @@ const WaitingEmailConfirmation = ({ email }) => {
               <span>Resend email</span>
             </button>
           </div>
-          {httpResponse && <p>{httpResponse.message}</p>}
+          {requestDetail.error && <p>{requestDetail.error}</p>}
         </div>
       </div>
     </section>

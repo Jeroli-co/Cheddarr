@@ -1,8 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { routes } from "../../../router/routes";
-import { HTTP_METHODS } from "../../api/enums/HttpMethods";
-import { HttpService } from "../../api/services/HttpService";
 import { AuthService } from "../services/AuthService";
 import { useLocation } from "react-router";
 import { DecodedTokenModel } from "../models/DecodedTokenModel";
@@ -114,34 +112,11 @@ const AuthContextProvider = (props) => {
   };
 
   const confirmEmail = async (token) => {
-    const res = await HttpService.executeRequest(
-      HTTP_METHODS.GET,
-      "/sign-up/" + token
-    );
-    switch (res.status) {
-      case 200:
-        return res;
-      case 403:
-      case 410:
-        return res;
-      default:
-        return null;
-    }
+    return await AuthService.confirmEmail(token);
   };
 
   const resendConfirmation = async (email) => {
-    const res = await HttpService.executeRequest(
-      HTTP_METHODS.PATCH,
-      "/sign-up",
-      email
-    );
-    switch (res.status) {
-      case 200:
-      case 400:
-        return res;
-      default:
-        return null;
-    }
+    return await AuthService.resendConfirmation(email);
   };
 
   const invalidSession = () => {

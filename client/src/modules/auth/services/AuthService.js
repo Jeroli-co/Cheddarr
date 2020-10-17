@@ -16,18 +16,17 @@ class AuthService {
       sign_up
     ).then(
       (response) => {
-        switch (response.status) {
-          case 201:
-            return new UserModel(
-              response.data.username,
-              response.data.email,
-              response.data.avatar,
-              response.data.friends,
-              response.data.confirmed,
-              response.data.admin
-            );
-          default:
-            return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
+        if (response.status === 201) {
+          return new UserModel(
+            response.data.username,
+            response.data.email,
+            response.data.avatar,
+            response.data.friends,
+            response.data.confirmed,
+            response.data.admin
+          );
+        } else {
+          return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
         }
       },
       (error) => {
@@ -48,11 +47,10 @@ class AuthService {
     fd.append("password", sign_in.password);
     return HttpService.executeRequest(HTTP_METHODS.POST, "/sign-in", fd).then(
       (response) => {
-        switch (response.status) {
-          case 200:
-            return this.saveToken(response.data);
-          default:
-            return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
+        if (response.status === 200) {
+          return this.saveToken(response.data);
+        } else {
+          return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
         }
       },
       (error) => {
@@ -70,15 +68,14 @@ class AuthService {
   static signInWithPlex = async (redirect_uri) => {
     return HttpService.executeRequest(HTTP_METHODS.GET, "/sign-in/plex").then(
       (response) => {
-        switch (response.status) {
-          case 200:
-            return this.getPlexAuthInfos(response.data, redirect_uri);
-          default:
-            return null;
+        if (response.status === 200) {
+          return this.getPlexAuthInfos(response.data, redirect_uri);
+        } else {
+          return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
         }
       },
-      () => {
-        return null;
+      (error) => {
+        return ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status);
       }
     );
   };
@@ -90,17 +87,16 @@ class AuthService {
       })
       .then(
         (response) => {
-          switch (response.status) {
-            case 201:
-              const key = response.data["id"];
-              const code = response.data["code"];
-              return this.authorizePlex(key, code, redirectURI);
-            default:
-              return null;
+          if (response.status === 201) {
+            const key = response.data["id"];
+            const code = response.data["code"];
+            return this.authorizePlex(key, code, redirectURI);
+          } else {
+            return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
           }
         },
-        () => {
-          return null;
+        (error) => {
+          return ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status);
         }
       );
   };
@@ -113,16 +109,13 @@ class AuthService {
       body
     ).then(
       (response) => {
-        switch (response.status) {
-          case 200:
-            window.location.href = response.headers.location;
-            return null;
-          default:
-            return null;
+        if (response.status === 200) {
+          window.location.href = response.headers.location;
         }
-      },
-      () => {
         return null;
+      },
+      (error) => {
+        return ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status);
       }
     );
   };
@@ -133,11 +126,10 @@ class AuthService {
       "/sign-in/plex/confirm" + uri
     ).then(
       (response) => {
-        switch (response.status) {
-          case 200:
-            return response;
-          default:
-            return null;
+        if (response.status === 200) {
+          return response;
+        } else {
+          return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
         }
       },
       () => {
@@ -147,34 +139,45 @@ class AuthService {
   };
 
   static confirmEmail = async (token) => {
-    const res = await HttpService.executeRequest(
+    return HttpService.executeRequest(
       HTTP_METHODS.GET,
       "/sign-up/" + token
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return null;
+        } else {
+          return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
+        }
+      },
+      (error) => {
+        switch (error.response.status) {
+          case 403:
+            return ERRORS_MESSAGE.USER_ALREADY_CONFIRMED;
+          case 410:
+            return ERRORS_MESSAGE.STATUS_410_GONE;
+          default:
+            return ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status);
+        }
+      }
     );
-    switch (res.status) {
-      case 200:
-        return res;
-      case 403:
-      case 410:
-        return res;
-      default:
-        return null;
-    }
   };
 
   static resendConfirmation = async (email) => {
-    const res = await HttpService.executeRequest(
-      HTTP_METHODS.PATCH,
-      "/sign-up",
-      email
+    return HttpService.executeRequest(HTTP_METHODS.PATCH, "/sign-up", {
+      email: email,
+    }).then(
+      (response) => {
+        if (response.status === 200) {
+          return null;
+        } else {
+          return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
+        }
+      },
+      (error) => {
+        return ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status);
+      }
     );
-    switch (res.status) {
-      case 200:
-      case 400:
-        return res;
-      default:
-        return null;
-    }
   };
 
   static getToken = () => {

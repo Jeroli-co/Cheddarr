@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
-import { SignInButton } from "../../auth/elements/SignInButton";
-import { SignUpButton } from "../../auth/elements/SignUpButton";
+import { SignInButton } from "../../auth/components/elements/SignInButton";
+import { SignUpButton } from "../../auth/components/elements/SignUpButton";
 import { RowLayout } from "../../../utils/elements/layouts";
 import { GitHubButton } from "../elements/GithubButton";
 import { UserDropdownImage } from "../elements/UserDropdownImage";

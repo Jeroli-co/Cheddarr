@@ -30,7 +30,8 @@ class Settings(BaseSettings):
     ##########################################################################
     API_VERSION = "0.1"
     API_PREFIX: str = "/api"
-    DOMAIN: str = None
+    DOMAIN: str = "localhost:8000"
+    SERVER_HOST: str = f"http://{DOMAIN}"
 
     ##########################################################################
     # folders                                                                #
@@ -71,6 +72,10 @@ class Settings(BaseSettings):
     MAIL_SMTP_HOST: Optional[str]
     MAIL_SMTP_USER: Optional[str]
     MAIL_SMTP_PASSWORD: Optional[str]
+    MAIL_DEFAULT_SENDER: Tuple[str, str] = (
+      f"noreply@{DOMAIN}",
+      "Cheddarr",
+    )
 
 
 class ProdSettings(Settings):
@@ -93,19 +98,9 @@ class ProdSettings(Settings):
     # mail                                                                   #
     ##########################################################################
     MAIL_ENABLED: bool = True
-    MAIL_DEFAULT_SENDER: Tuple[str, str] = (
-        f"noreply@{DOMAIN}",
-        "Cheddarr",
-    )
 
 
 class DevSettings(Settings):
-    ##########################################################################
-    # server                                                                 #
-    ##########################################################################
-    DOMAIN: str = "localhost:8000"
-    SERVER_HOST: str = f"http://{DOMAIN}"
-
     ##########################################################################
     # database                                                               #
     ##########################################################################
