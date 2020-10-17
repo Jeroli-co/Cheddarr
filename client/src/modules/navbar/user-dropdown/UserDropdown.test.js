@@ -17,7 +17,7 @@ test("UserDropdown always shows static elment", () => {
           isAuthenticated: true,
           avatar: null,
           username: "",
-          signOut: () => {},
+          invalidSession: () => {},
         }}
       >
         <Navbar />
@@ -39,7 +39,7 @@ test("UserDropdown shows user picture if it's set", () => {
           isAuthenticated: true,
           avatar: logo,
           username: "",
-          signOut: () => {},
+          invalidSession: () => {},
         }}
       >
         <Navbar />
@@ -60,7 +60,7 @@ test("UserDropdown shows username if avatar is not set", () => {
           isAuthenticated: true,
           avatar: null,
           username: username,
-          signOut: () => {},
+          invalidSession: () => {},
         }}
       >
         <Navbar />

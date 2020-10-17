@@ -1,244 +1,171 @@
-import axios from "axios";
-import Cookies from "js-cookie";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { withRouter } from "react-router-dom";
-import { useApi } from "../../api/hooks/useApi";
+import React, { createContext, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { routes } from "../../../router/routes";
-import { NotificationContext } from "../../notifications/contexts/NotificationContext";
+import { HTTP_METHODS } from "../../api/enums/HttpMethods";
+import { HttpService } from "../../api/services/HttpService";
+import { AuthService } from "../services/AuthService";
+import { useLocation } from "react-router";
+import { DecodedTokenModel } from "../models/DecodedTokenModel";
+import { UserModel } from "../../user/models/UserModel";
 
 const AuthContext = createContext();
 
 const initialSessionState = {
   isAuthenticated: false,
+  id: null,
   username: null,
   avatar: null,
+  admin: false,
   isLoading: true,
 };
 
 const AuthContextProvider = (props) => {
   const [session, setSession] = useState(initialSessionState);
-  const { executeRequest, methods } = useApi();
-  const { pushDanger } = useContext(NotificationContext);
+
+  const location = useLocation();
+  const history = useHistory();
 
   useEffect(() => {
-    if (props.location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
-      confirmSignInWithPlex(props.location.search).then((res) => {
-        if (res) {
-          let redirectURI = res.headers["redirect-uri"];
-          redirectURI =
-            redirectURI && redirectURI.length > 0
-              ? redirectURI
-              : routes.HOME.url;
-          props.history.push(redirectURI);
-        }
-      });
-      return;
+    if (location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
+      AuthService.confirmSignInWithPlex(location.search).then(
+        (response) => {
+          if (response) {
+            const decodedToken = AuthService.saveToken(response.data);
+            if (decodedToken instanceof DecodedTokenModel) {
+              initSession(
+                decodedToken.username,
+                decodedToken.avatar,
+                decodedToken.admin
+              );
+              let redirectURI = response.headers["redirect-uri"];
+              redirectURI =
+                redirectURI && redirectURI.length > 0
+                  ? redirectURI
+                  : routes.HOME.url;
+              history.push(redirectURI);
+            } else {
+              throw new Error();
+            }
+          } else {
+            throw new Error();
+          }
+        },
+        () => invalidSession()
+      );
     }
-
-    if (session.isLoading) {
-      const authenticated = Cookies.get("authenticated");
-      const username = Cookies.get("username");
-      const avatar = Cookies.get("avatar");
-      if (authenticated === "yes") {
-        initSession(username, avatar);
-      } else {
-        setSession({ ...initialSessionState, isLoading: false });
-      }
-    }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const initSession = (username, avatar) => {
-    Cookies.set("authenticated", "yes", { expires: 365 });
-    Cookies.set("username", username, { expires: 365 });
-    Cookies.set("avatar", avatar, { expires: 365 });
+  useEffect(() => {
+    if (session.isLoading) {
+      const current_session = AuthService.getCurrentSession();
+      if (current_session) {
+        initSession(
+          current_session.username,
+          current_session.avatar,
+          current_session.admin
+        );
+      } else {
+        clearSession();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
+
+  const initSession = (username, avatar, admin) => {
     setSession({
-      ...session,
       isAuthenticated: true,
       username: username,
       avatar: avatar,
+      admin: admin,
       isLoading: false,
     });
   };
 
   const clearSession = () => {
-    Cookies.remove("authenticated");
-    Cookies.remove("username");
-    Cookies.remove("avatar");
     setSession({ ...initialSessionState, isLoading: false });
   };
 
-  const signIn = async (data, redirectURI) => {
-    const username = data["usernameOrEmail"] || data["username"];
-    const fd = new FormData();
-    fd.append("username", username);
-    fd.append("password", data["password"]);
-    const remember = data["remember"];
-    if (typeof remember !== "undefined" && remember !== null) {
-      fd.append("remember", remember);
-    }
-    const res = await executeRequest(methods.POST, "/sign-in", fd);
-
-    switch (res.status) {
-      case 200:
-        initSession(res.data.username, res.data["avatar"]);
-        props.history.push(redirectURI);
-        return res;
-      case 400:
-      case 401:
-        pushDanger(res.message);
-        return res;
-      default:
-        handleError(res);
+  const signUp = async (data) => {
+    const user = await AuthService.signUp(data);
+    if (user instanceof UserModel) {
+      if (user.confirmed) {
+        history.push(routes.SIGN_IN.url);
         return null;
+      } else {
+        return "";
+      }
     }
+    return user;
+  };
+
+  const signIn = async (data, redirectURI) => {
+    const res = await AuthService.signIn(data);
+    if (res instanceof DecodedTokenModel) {
+      initSession(res.username, res.avatar, res.admin);
+      history.push(redirectURI);
+      return null;
+    }
+    return res;
   };
 
   const signInWithPlex = async (redirectURI) => {
-    const res = await executeRequest(methods.GET, "/sign-in/plex");
-    switch (res.status) {
-      case 200:
-        const plexRes = await axios.post(res.data, {
-          headers: { Accept: "application/json" },
-        });
-        switch (plexRes.status) {
-          case 201:
-            const key = plexRes.data["id"];
-            const code = plexRes.data["code"];
-            const authRes = await authorizePlex(key, code, redirectURI);
-            if (authRes && authRes.status === 200) {
-              window.location.href = authRes.headers.location;
-            }
-            return plexRes;
-          default:
-            handleError(res);
-            return null;
-        }
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const authorizePlex = async (key, code, redirectURI) => {
-    const body = { key: key, code: code, redirectUri: redirectURI };
-    const res = await executeRequest(
-      methods.POST,
-      "/sign-in/plex/authorize",
-      body
-    );
-    switch (res.status) {
-      case 200:
-        return res;
-      default:
-        handleError(res);
-        return null;
-    }
-  };
-
-  const confirmSignInWithPlex = async (search) => {
-    const res = await executeRequest(
-      methods.GET,
-      "/sign-in/plex/confirm" + search
-    );
-    switch (res.status) {
-      case 200:
-        initSession(res.data.username, res.data["avatar"]);
-        return res;
-      default:
-        clearSession();
-        handleError(res);
-        return null;
-    }
-  };
-
-  const signOut = async () => {
-    await executeRequest(methods.GET, "/sign-out");
-    clearSession();
-    props.history.push(routes.SIGN_IN.url);
-  };
-
-  const signUp = async (data) => {
-    const res = await executeRequest(methods.POST, "/sign-up", data);
-    switch (res.status) {
-      case 200:
-        return res;
-      case 409:
-        pushDanger(res.message);
-        return res;
-      default:
-        return null;
-    }
+    AuthService.signInWithPlex(redirectURI).then(() => null);
   };
 
   const confirmEmail = async (token) => {
-    const res = await executeRequest(methods.GET, "/sign-up/" + token);
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      "/sign-up/" + token
+    );
     switch (res.status) {
       case 200:
-        clearSession();
         return res;
       case 403:
       case 410:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const resendConfirmation = async (email) => {
-    const res = await executeRequest(methods.PATCH, "/sign-up", email);
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PATCH,
+      "/sign-up",
+      email
+    );
     switch (res.status) {
       case 200:
       case 400:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
-  const setUsername = (username) => {
-    Cookies.set("username", username);
+  const invalidSession = () => {
+    AuthService.deleteToken();
+    clearSession();
+    history.push(routes.SIGN_IN.url);
+  };
+
+  const updateUsername = (username) => {
+    AuthService.changeUsername(username);
     setSession({ ...session, username: username });
-  };
-
-  const setAvatar = (avatar) => {
-    Cookies.set("avatar", avatar);
-    setSession({ ...session, avatar: avatar });
-  };
-
-  const handleError = (error) => {
-    switch (error.status) {
-      case 401:
-        clearSession();
-        const redirectUri = props.location.pathname;
-        props.history.push(routes.SIGN_IN.url + "?redirectURI=" + redirectUri);
-        break;
-      case 404:
-        props.history.push(routes.NOT_FOUND.url);
-        break;
-      default:
-        pushDanger("An error occurred ...");
-        return;
-    }
   };
 
   return (
     <AuthContext.Provider
       value={{
         ...session,
-        clearSession,
         signIn,
         signInWithPlex,
-        signOut,
         signUp,
         confirmEmail,
         resendConfirmation,
-        setUsername,
-        setAvatar,
-        handleError,
+        invalidSession,
+        updateUsername,
       }}
     >
       {props.children}
@@ -246,6 +173,4 @@ const AuthContextProvider = (props) => {
   );
 };
 
-const AuthContextWithRouterProvider = withRouter(AuthContextProvider);
-
-export { AuthContext, AuthContextWithRouterProvider };
+export { AuthContext, AuthContextProvider };

@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useApi } from "../../../api/hooks/useApi";
 import { AuthContext } from "../../../auth/contexts/AuthContext";
 import { NotificationContext } from "../../../notifications/contexts/NotificationContext";
 import { isEmptyObject } from "../../../../utils/objects";
+import { HttpService } from "../../../api/services/HttpService";
+import { HTTP_METHODS } from "../../../api/enums/HttpMethods";
 
 const PlexConfigContext = createContext();
 
@@ -11,7 +12,6 @@ const PlexConfigContextProvider = (props) => {
 
   const providerUrl = "/media-servers/plex/";
 
-  const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
   const { pushSuccess, pushInfo } = useContext(NotificationContext);
 
@@ -23,7 +23,10 @@ const PlexConfigContextProvider = (props) => {
   }, []);
 
   const getPlexConfig = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "config/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      providerUrl + "config/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -34,7 +37,10 @@ const PlexConfigContextProvider = (props) => {
   };
 
   const getPlexServers = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "servers/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      providerUrl + "servers/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -45,7 +51,10 @@ const PlexConfigContextProvider = (props) => {
   };
 
   const unlinkPlexAccount = async () => {
-    const res = await executeRequest(methods.DELETE, providerUrl + "config/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.DELETE,
+      providerUrl + "config/"
+    );
     switch (res.status) {
       case 200:
         pushInfo(res.message);
@@ -58,8 +67,8 @@ const PlexConfigContextProvider = (props) => {
   };
 
   const updateConfig = async (newConfig) => {
-    const res = await executeRequest(
-      methods.PATCH,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PATCH,
       providerUrl + "config/",
       newConfig
     );
@@ -75,8 +84,8 @@ const PlexConfigContextProvider = (props) => {
   };
 
   const addPlexServer = async (server) => {
-    const res = await executeRequest(
-      methods.POST,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.POST,
       providerUrl + "config/servers/",
       server
     );
@@ -92,8 +101,8 @@ const PlexConfigContextProvider = (props) => {
   };
 
   const removePlexServer = async (machine_id) => {
-    const res = await executeRequest(
-      methods.DELETE,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.DELETE,
       providerUrl + "config/servers/" + machine_id + "/"
     );
     switch (res.status) {

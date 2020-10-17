@@ -1,16 +1,19 @@
-import { useApi } from "../../../api/hooks/useApi";
 import { useContext } from "react";
 import { AuthContext } from "../../../auth/contexts/AuthContext";
 import { NotificationContext } from "../../../notifications/contexts/NotificationContext";
+import { HttpService } from "../../../api/services/HttpService";
+import { HTTP_METHODS } from "../../../api/enums/HttpMethods";
 
 const useRadarr = () => {
   const providerUrl = "/providers/radarr/";
-  const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
   const { pushSuccess, pushDanger } = useContext(NotificationContext);
 
   const getRadarrStatus = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "status/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      providerUrl + "status/"
+    );
     switch (res.status) {
       case 200:
         return !!res.data.status;
@@ -20,8 +23,8 @@ const useRadarr = () => {
   };
 
   const testRadarrConfig = async (config) => {
-    const res = await executeRequest(
-      methods.PATCH,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PATCH,
       providerUrl + "config/",
       config
     );
@@ -36,7 +39,10 @@ const useRadarr = () => {
   };
 
   const getRadarrConfig = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "config/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      providerUrl + "config/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -47,8 +53,8 @@ const useRadarr = () => {
   };
 
   const updateRadarrConfig = async (newConfig) => {
-    const res = await executeRequest(
-      methods.PUT,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PUT,
       providerUrl + "config/",
       newConfig
     );

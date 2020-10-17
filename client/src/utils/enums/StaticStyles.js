@@ -1,7 +1,7 @@
-const STATIC_STYLE = {
+const STATIC_STYLES = {
   NAVBAR_HEIGHT: 75,
   TABLET_MAX_WIDTH: 834,
   MOBILE_MAX_WIDTH: 416,
 };
 
-export { STATIC_STYLE };
+export { STATIC_STYLES };

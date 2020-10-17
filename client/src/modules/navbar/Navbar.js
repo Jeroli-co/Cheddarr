@@ -14,7 +14,7 @@ import { useOutsideAlerter } from "../../utils/hooks/useOutsideAlerter";
 import { RowLayout } from "../../utils/elements/layouts";
 import { SearchBar } from "./search-bar/SearchBar";
 import { routes } from "../../router/routes";
-import { STATIC_STYLE } from "../../STATIC_STYLE";
+import { STATIC_STYLES } from "../../utils/enums/StaticStyles";
 
 const NavbarLogoKeyframes = () => {
   return keyframes`
@@ -30,7 +30,7 @@ const NavbarLogoKeyframes = () => {
 const NavbarStyle = styled.div`
   position: relative;
   padding: 10px;
-  height: ${STATIC_STYLE.NAVBAR_HEIGHT}px;
+  height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   background-color: ${(props) => props.theme.primary};
 `;
 

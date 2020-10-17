@@ -1,4 +1,3 @@
-import os
 import secrets
 from enum import Enum
 from typing import List, Optional, Tuple, Union
@@ -104,7 +103,7 @@ class DevSettings(Settings):
     ##########################################################################
     # server                                                                 #
     ##########################################################################
-    DOMAIN: str = "localhost"
+    DOMAIN: str = "localhost:8000"
     SERVER_HOST: str = f"http://{DOMAIN}"
 
     ##########################################################################

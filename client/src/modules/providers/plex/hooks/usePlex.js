@@ -1,6 +1,7 @@
-import { useApi } from "../../../api/hooks/useApi";
 import { useContext } from "react";
 import { AuthContext } from "../../../auth/contexts/AuthContext";
+import { HTTP_METHODS } from "../../../api/enums/HttpMethods";
+import { HttpService } from "../../../api/services/HttpService";
 
 const usePlex = () => {
   const providerUrl = "/media-servers/plex/";
@@ -9,11 +10,13 @@ const usePlex = () => {
   const seasonUrl = providerUrl + "seasons/";
   const episodeUrl = providerUrl + "episodes/";
 
-  const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
 
   const getPlexStatus = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "status/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      providerUrl + "status/"
+    );
     switch (res.status) {
       case 200:
         return !!res.data.status;
@@ -23,7 +26,10 @@ const usePlex = () => {
   };
 
   const getMoviesRecentlyAdded = async () => {
-    const res = await executeRequest(methods.GET, moviesUrl + "recent/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      moviesUrl + "recent/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -34,7 +40,10 @@ const usePlex = () => {
   };
 
   const getSeriesRecentlyAdded = async () => {
-    const res = await executeRequest(methods.GET, seriesUrl + "recent/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      seriesUrl + "recent/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -45,7 +54,10 @@ const usePlex = () => {
   };
 
   const getOnDeck = async () => {
-    const res = await executeRequest(methods.GET, providerUrl + "on-deck/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      providerUrl + "on-deck/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -56,7 +68,10 @@ const usePlex = () => {
   };
 
   const getMovie = async (id) => {
-    const res = await executeRequest(methods.GET, moviesUrl + id + "/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      moviesUrl + id + "/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -67,7 +82,10 @@ const usePlex = () => {
   };
 
   const getSeries = async (id) => {
-    const res = await executeRequest(methods.GET, seriesUrl + id + "/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      seriesUrl + id + "/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -78,7 +96,10 @@ const usePlex = () => {
   };
 
   const getSeason = async (seasonId) => {
-    const res = await executeRequest(methods.GET, seasonUrl + seasonId + "/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      seasonUrl + seasonId + "/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -89,7 +110,10 @@ const usePlex = () => {
   };
 
   const getEpisode = async (episodeId) => {
-    const res = await executeRequest(methods.GET, episodeUrl + episodeId + "/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      episodeUrl + episodeId + "/"
+    );
     switch (res.status) {
       case 200:
         return res.data;

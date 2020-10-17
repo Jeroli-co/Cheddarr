@@ -56,7 +56,7 @@ const DropdownMenuMobileItem = styled.div`
 `;
 
 const UserDropdownMobile = ({ dropdownRef, isVisible, isAuthenticated }) => {
-  const { avatar, username, signOut } = useContext(AuthContext);
+  const { avatar, username, invalidSession } = useContext(AuthContext);
   return (
     <UserDropdownMobileStyle ref={dropdownRef} isVisible={isVisible}>
       <RowLayout
@@ -109,7 +109,7 @@ const UserDropdownMobile = ({ dropdownRef, isVisible, isAuthenticated }) => {
           </Link>
 
           <DropdownMenuMobileItem
-            onClick={signOut}
+            onClick={() => invalidSession()}
             data-testid="SignOutButtonMobile"
           >
             <RowLayout childMarginRight="2%" justifyContent="space-between">

@@ -12,17 +12,19 @@ import { WaitingEmailConfirmation } from "./WaitingEmailConfirmation";
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm();
   const { signUp, signInWithPlex } = useContext(AuthContext);
-  const [signUpRes, setSignUpRes] = useState(null);
+  const [errorDetail, setErrorDetail] = useState(null);
   const email = watch("email");
 
   const onSubmit = (data) => {
-    signUp(data).then((res) => {
-      setSignUpRes(res);
+    signUp(data).then((detail) => {
+      if (detail !== null) {
+        console.log(detail);
+        setErrorDetail(detail);
+      }
     });
   };
 
-  if (signUpRes && signUpRes.status === 200)
-    return <WaitingEmailConfirmation email={email} />;
+  if (errorDetail === "") return <WaitingEmailConfirmation email={email} />;
 
   return (
     <div className="SignUpForm" data-testid="SignUpForm">
@@ -197,7 +199,13 @@ const SignUpForm = () => {
                 )}
             </div>
 
-            {signUpRes && <p className="help is-danger">{signUpRes.message}</p>}
+            {errorDetail && (
+              <div className="field">
+                <div className="control">
+                  <p className="help is-danger">{errorDetail}</p>
+                </div>
+              </div>
+            )}
 
             {/* SUBMIT BUTTON */}
             <div className="field">

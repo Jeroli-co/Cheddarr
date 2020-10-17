@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { STATIC_STYLE } from "../../STATIC_STYLE";
+import { STATIC_STYLES } from "../enums/StaticStyles";
 
 const getWindowSize = () => {
   const { innerWidth: width, innerHeight: height } = window;
@@ -23,7 +23,7 @@ const useWindowSize = () => {
   }, []);
 
   const getHeightMinusNavbar = () =>
-    windowSize.height - STATIC_STYLE.NAVBAR_HEIGHT;
+    windowSize.height - STATIC_STYLES.NAVBAR_HEIGHT;
 
   return {
     ...windowSize,

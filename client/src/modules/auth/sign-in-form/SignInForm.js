@@ -12,29 +12,23 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-const SignInForm = (props) => {
+const SignInForm = () => {
   const { signIn, signInWithPlex } = useContext(AuthContext);
   const { register, handleSubmit, errors } = useForm();
-  const [rememberMe, setRememberMe] = useState(false);
-  const [httpError, setHttpError] = useState(null);
   const query = useQuery();
   const [redirectURI, setRedirectURI] = useState(null);
+  const [errorDetail, setErrorDetail] = useState(null);
 
   useEffect(() => {
-    let redirectURI = query.get("redirectURI");
-    redirectURI = redirectURI ? redirectURI : routes.HOME.url;
-    setRedirectURI(redirectURI);
+    let redirectURIQuery = query.get("redirectURI");
+    redirectURIQuery = redirectURIQuery ? redirectURIQuery : routes.HOME.url;
+    setRedirectURI(redirectURIQuery);
   }, [query]);
 
   const onSubmit = (data) => {
-    signIn(data, redirectURI).then((res) => {
-      if (res) {
-        switch (res.status) {
-          case 200:
-            return;
-          default:
-            setHttpError(res);
-        }
+    signIn(data, redirectURI).then((detail) => {
+      if (detail) {
+        setErrorDetail(detail);
       }
     });
   };
@@ -63,10 +57,9 @@ const SignInForm = (props) => {
               <label className="label">Username or email</label>
               <div className="control has-icons-left">
                 <input
-                  name="usernameOrEmail"
+                  name="username"
                   className={
-                    "input is-medium " +
-                    (errors["usernameOrEmail"] ? "is-danger" : "")
+                    "input is-medium " + (errors["username"] ? "is-danger" : "")
                   }
                   type="text"
                   placeholder="Username or email"
@@ -79,20 +72,20 @@ const SignInForm = (props) => {
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faUser} />
                 </span>
-                {errors["usernameOrEmail"] &&
-                  errors["usernameOrEmail"].type === "required" && (
+                {errors["username"] &&
+                  errors["username"].type === "required" && (
                     <p className="help is-danger">
                       {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
                     </p>
                   )}
-                {errors["usernameOrEmail"] &&
-                  errors["usernameOrEmail"].type === "minLength" && (
+                {errors["username"] &&
+                  errors["username"].type === "minLength" && (
                     <p className="help is-danger">
                       {FORM_DEFAULT_VALIDATOR.MIN_LENGTH.message}
                     </p>
                   )}
-                {errors["usernameOrEmail"] &&
-                  errors["usernameOrEmail"].type === "maxLength" && (
+                {errors["username"] &&
+                  errors["username"].type === "maxLength" && (
                     <p className="help is-danger">
                       {FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}
                     </p>
@@ -125,39 +118,13 @@ const SignInForm = (props) => {
               )}
             </div>
 
-            {httpError &&
-              ((httpError.status === 401 && (
-                <p className="help is-danger">{httpError.message}</p>
-              )) ||
-                (httpError.status === 400 && (
-                  <p className="help is-danger">
-                    {httpError.message}{" "}
-                    <span
-                      className="has-link-style"
-                      onClick={() =>
-                        props.history.push(routes.RESEND_EMAIL_CONFIRMATION.url)
-                      }
-                    >
-                      Click here
-                    </span>{" "}
-                    to resend the email
-                  </p>
-                )))}
-
-            <div className="field">
-              <div className="control">
-                <input
-                  id="remember"
-                  type="checkbox"
-                  name="remember"
-                  className="switch is-rounded is-small"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                  ref={register}
-                />
-                <label htmlFor="remember">Remember me</label>
+            {errorDetail && (
+              <div className="field">
+                <div className="control">
+                  <p className="help is-danger">{errorDetail}</p>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="field">
               <div className="control">

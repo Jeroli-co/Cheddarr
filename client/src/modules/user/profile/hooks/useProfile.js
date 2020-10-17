@@ -3,50 +3,59 @@ import { useHistory } from "react-router";
 import { AuthContext } from "../../../auth/contexts/AuthContext";
 import { NotificationContext } from "../../../notifications/contexts/NotificationContext";
 import { routes } from "../../../../router/routes";
-import { useApi } from "../../../api/hooks/useApi";
+import { HttpService } from "../../../api/services/HttpService";
+import { HTTP_METHODS } from "../../../api/enums/HttpMethods";
 
 const useProfile = () => {
-  const profileURI = "/me/";
+  const profileURI = "/user";
 
-  const { executeRequest, methods } = useApi();
-  const { handleError, clearSession, setUsername } = useContext(AuthContext);
+  const { invalidSession, updateUsername } = useContext(AuthContext);
   const { pushSuccess, pushInfo } = useContext(NotificationContext);
   const history = useHistory();
 
   const getUser = async (username) => {
-    let res = null;
+    let res;
     if (username === null) {
-      res = await executeRequest(methods.GET, profileURI);
+      res = await HttpService.executeRequest(HTTP_METHODS.GET, profileURI);
     } else {
-      res = await executeRequest(methods.GET, "/users/" + username);
+      res = await HttpService.executeRequest(
+        HTTP_METHODS.GET,
+        "/users/" + username
+      );
     }
     switch (res.status) {
       case 200:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const changeUsername = async (data) => {
-    const res = await executeRequest(methods.PUT, profileURI, data);
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PUT,
+      profileURI,
+      data
+    );
     switch (res.status) {
       case 200:
         const username = res.data.username;
-        setUsername(username);
+        updateUsername(username);
         pushSuccess("Username has changed");
         return res;
       case 409:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const changeEmail = async (data) => {
-    const res = await executeRequest(methods.PUT, profileURI, data);
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PUT,
+      profileURI,
+      data
+    );
     switch (res.status) {
       case 200:
         pushInfo("Please check your email to confirm it.");
@@ -54,46 +63,51 @@ const useProfile = () => {
       case 409:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const changePassword = async (data) => {
-    const res = await executeRequest(methods.PUT, profileURI + "password/", {
-      oldPassword: data["oldPassword"],
-      newPassword: data["newPassword"],
-    });
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PUT,
+      profileURI + "password",
+      {
+        oldPassword: data["oldPassword"],
+        newPassword: data["newPassword"],
+      }
+    );
     switch (res.status) {
       case 200:
         pushInfo("Password changed. Please sign in again.");
-        clearSession();
+        invalidSession();
         return res;
       case 400:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const initResetPassword = async (data) => {
-    const res = await executeRequest(methods.PUT, profileURI + "password", {
-      email: data["email"],
-    });
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PUT,
+      profileURI + "password",
+      {
+        email: data["email"],
+      }
+    );
     switch (res.status) {
       case 200:
       case 400:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const checkResetPasswordToken = async (token) => {
-    const res = await executeRequest(
-      methods.GET,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
       profileURI + "password/" + token
     );
     switch (res.status) {
@@ -102,14 +116,13 @@ const useProfile = () => {
       case 410:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const resetPassword = async (token, data) => {
-    const res = await executeRequest(
-      methods.POST,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.POST,
       profileURI + "password/" + token,
       { password: data["password"] }
     );
@@ -119,33 +132,36 @@ const useProfile = () => {
         history.push(routes.SIGN_IN.url);
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const deleteAccount = async (data) => {
-    const res = await executeRequest(methods.DELETE, profileURI);
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.DELETE,
+      profileURI
+    );
     switch (res.status) {
       case 200:
         pushInfo("Your account has been deleted");
-        clearSession();
+        invalidSession();
         return res;
       case 400:
         return res;
       default:
-        handleError(res);
         return null;
     }
   };
 
   const getUsersProviders = async (type) => {
-    const res = await executeRequest(methods.GET, "/users/?provides=" + type);
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      "/users/?provides=" + type
+    );
     switch (res.status) {
       case 200:
         return res.data;
       default:
-        handleError(res);
         return null;
     }
   };

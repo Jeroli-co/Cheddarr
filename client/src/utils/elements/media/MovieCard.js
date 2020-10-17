@@ -11,7 +11,7 @@ import { PlexButton } from "../PlexButton";
 import { MediaRating } from "./MediaRating";
 import { MediaBackground } from "./MediaBackground";
 import { useWindowSize } from "../../hooks/useWindowSize";
-import { STATIC_STYLE } from "../../../STATIC_STYLE";
+import { STATIC_STYLES } from "../../enums/StaticStyles";
 import Spinner from "../Spinner";
 
 const MovieCard = ({ movie }) => {
@@ -93,7 +93,7 @@ const MovieCard = ({ movie }) => {
               />
             </RowLayout>
 
-            {width > STATIC_STYLE.TABLET_MAX_WIDTH && (
+            {width > STATIC_STYLES.TABLET_MAX_WIDTH && (
               <div>
                 {movieInfo.summary && (
                   <RowLayout marginTop="1em">
@@ -149,7 +149,7 @@ const MovieCard = ({ movie }) => {
           </Container>
         </RowLayout>
 
-        {width <= STATIC_STYLE.TABLET_MAX_WIDTH && (
+        {width <= STATIC_STYLES.TABLET_MAX_WIDTH && (
           <div>
             {movieInfo.summary && (
               <RowLayout marginTop="1em">

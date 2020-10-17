@@ -1,15 +1,15 @@
 import { useContext } from "react";
 import { AuthContext } from "../../../auth/contexts/AuthContext";
-import { useApi } from "../../../api/hooks/useApi";
+import { HttpService } from "../../../api/services/HttpService";
+import { HTTP_METHODS } from "../../../api/enums/HttpMethods";
 
 const useFriends = () => {
   const friendsURI = "/user/friends/";
 
-  const { executeRequest, methods } = useApi();
   const { handleError } = useContext(AuthContext);
 
   const getFriends = async () => {
-    const res = await executeRequest(methods.GET, friendsURI);
+    const res = await HttpService.executeRequest(HTTP_METHODS.GET, friendsURI);
     switch (res.status) {
       case 200:
         return res.data;
@@ -20,7 +20,10 @@ const useFriends = () => {
   };
 
   const getReceived = async () => {
-    const res = await executeRequest(methods.GET, friendsURI + "received/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      friendsURI + "received/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -31,7 +34,10 @@ const useFriends = () => {
   };
 
   const getRequested = async () => {
-    const res = await executeRequest(methods.GET, friendsURI + "requested/");
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
+      friendsURI + "requested/"
+    );
     switch (res.status) {
       case 200:
         return res.data;
@@ -44,7 +50,11 @@ const useFriends = () => {
   const addFriend = async (username) => {
     const fd = new FormData();
     fd.append("usernameOrEmail", username);
-    const res = await executeRequest(methods.POST, friendsURI, fd);
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.POST,
+      friendsURI,
+      fd
+    );
     switch (res.status) {
       case 200:
       case 400:
@@ -57,8 +67,8 @@ const useFriends = () => {
   };
 
   const acceptRequest = async (username) => {
-    const res = await executeRequest(
-      methods.PATCH,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.PATCH,
       friendsURI + username + "/"
     );
     switch (res.status) {
@@ -71,8 +81,8 @@ const useFriends = () => {
   };
 
   const deleteFriend = async (username) => {
-    const res = await executeRequest(
-      methods.DELETE,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.DELETE,
       friendsURI + username + "/"
     );
     switch (res.status) {
@@ -85,8 +95,8 @@ const useFriends = () => {
   };
 
   const refuseFriend = async (username) => {
-    const res = await executeRequest(
-      methods.DELETE,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.DELETE,
       friendsURI + username + "/"
     );
     switch (res.status) {
@@ -99,8 +109,8 @@ const useFriends = () => {
   };
 
   const cancelFriend = async (username) => {
-    const res = await executeRequest(
-      methods.DELETE,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.DELETE,
       friendsURI + username + "/"
     );
     switch (res.status) {
@@ -113,8 +123,8 @@ const useFriends = () => {
   };
 
   const getMediaStatus = async (provider, media_id) => {
-    const res = await executeRequest(
-      methods.GET,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
       friendsURI +
         "/media/status/?provider=" +
         provider.username +

@@ -1,16 +1,16 @@
-import { useApi } from "../../api/hooks/useApi";
 import { useContext } from "react";
 import { NotificationContext } from "../../notifications/contexts/NotificationContext";
 import { REQUEST_STATES } from "../enums/RequestStates";
+import { HttpService } from "../../api/services/HttpService";
+import { HTTP_METHODS } from "../../api/enums/HttpMethods";
 
 const useRequestService = () => {
   const requestUrl = "/requests/";
-  const { executeRequest, methods } = useApi();
   const { pushSuccess } = useContext(NotificationContext);
 
   const request = async (requested_username, media_type, request) => {
-    const res = await executeRequest(
-      methods.POST,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.POST,
       requestUrl + media_type + "/",
       {
         requested_username: requested_username,
@@ -27,8 +27,8 @@ const useRequestService = () => {
   };
 
   const getRequests = async (media_type, request_type) => {
-    const res = await executeRequest(
-      methods.GET,
+    const res = await HttpService.executeRequest(
+      HTTP_METHODS.GET,
       requestUrl + media_type + "/" + request_type + "/"
     );
     switch (res.status) {

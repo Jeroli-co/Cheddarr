@@ -1,10 +1,9 @@
-import { useApi } from "../../api/hooks/useApi";
 import { MEDIA_TYPES } from "../enums/MediaTypes";
+import { HttpService } from "../../api/services/HttpService";
+import { HTTP_METHODS } from "../../api/enums/HttpMethods";
 
 const useMediaService = () => {
   const searchUrl = "/search/";
-
-  const { executeRequest, methods } = useApi();
 
   const getMediaById = async (
     media_type,
@@ -19,7 +18,7 @@ const useMediaService = () => {
     if (episode_number !== null) {
       url += MEDIA_TYPES.EPISODES + "/" + episode_number + "/";
     }
-    const res = await executeRequest(methods.GET, url);
+    const res = await HttpService.executeRequest(HTTP_METHODS.GET, url);
     switch (res.status) {
       case 200:
         return res;

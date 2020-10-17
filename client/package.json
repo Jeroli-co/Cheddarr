@@ -20,6 +20,7 @@
     "bulma-tooltip": "^3.0.2",
     "cross-env": "^7.0.2",
     "js-cookie": "^2.2.1",
+    "jwt-decode": "^3.0.0",
     "mutationobserver-shim": "^0.3.3",
     "node-sass": "^4.14.1",
     "react": "^16.12.0",

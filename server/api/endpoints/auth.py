@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/sign-up", response_model=schemas.User, status_code=status.HTTP_201_CREATED
+    "/sign-up", response_model=schemas.User, status_code=status.HTTP_201_CREATED, responses={status.HTTP_409_CONFLICT:{"message": str}}
 )
 async def signup(
     user_in: schemas.UserCreate,

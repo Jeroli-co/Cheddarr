@@ -60,7 +60,7 @@ const DropdownMenuItemIcon = styled.div`
 `;
 
 const UserDropdown = ({ dropdownRef, isVisible, toggle }) => {
-  const { avatar, username, signOut } = useContext(AuthContext);
+  const { avatar, username, invalidSession } = useContext(AuthContext);
 
   return (
     <UserDropdownStyle ref={dropdownRef} data-testid="UserDropdown">
@@ -90,7 +90,10 @@ const UserDropdown = ({ dropdownRef, isVisible, toggle }) => {
           </DropdownMenuItem>
         </Link>
 
-        <DropdownMenuItem onClick={signOut} data-testid="SignOutButton">
+        <DropdownMenuItem
+          onClick={() => invalidSession()}
+          data-testid="SignOutButton"
+        >
           <DropdownMenuItemIcon>
             <FontAwesomeIcon icon={faSignOutAlt} />
           </DropdownMenuItemIcon>
