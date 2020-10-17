@@ -21,6 +21,7 @@ const WaitingEmailConfirmation = ({ email }) => {
         setRequestDetail({ error: detail, loading: false });
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestDetail]);
 
   return (

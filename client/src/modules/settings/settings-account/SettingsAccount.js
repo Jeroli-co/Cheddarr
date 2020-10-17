@@ -1,21 +1,11 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../router/routes";
-import { NotificationContext } from "../../notifications/contexts/NotificationContext";
 
 const SettingsAccountBody = () => {
-  const { pushSuccess } = useContext(NotificationContext);
   const history = useHistory();
-
-  const _onCopyToClipboard = () => {
-    const copyText = document.getElementById("apiKeyInput");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-    document.execCommand("copy");
-    pushSuccess("API Key copied");
-  };
 
   return (
     <div className="container">

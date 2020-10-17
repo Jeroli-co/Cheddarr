@@ -5,16 +5,13 @@ import {
   RowLayout,
   RowLayout2,
 } from "../../../utils/elements/layouts";
-import { Container } from "../../../utils/elements/Container";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import styled from "styled-components";
 import { MEDIA_TYPES } from "../../media/enums/MediaTypes";
 import { useMedia } from "../../media/hooks/useMedia";
 import { H2 } from "../../../utils/elements/titles";
 import { Image } from "../../../utils/elements/Image";
 import RequestsSpinner from "./RequestsSpinner";
 
+/*
 const SeriesRequestReceivedStyle = styled.div`
   border: 2px solid ${(props) => props.theme.dark};
   border-radius: 12px;
@@ -23,6 +20,7 @@ const SeriesRequestReceivedStyle = styled.div`
   align-items: center;
   margin: 1%;
 `;
+ */
 
 const SeriesRequestReceived = ({ request }) => {
   const { getRequestState } = useRequestService();
