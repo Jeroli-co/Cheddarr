@@ -6,7 +6,7 @@ import { OnlineMovieCard } from "./elements/OnlineMovieCard";
 import { OnlineSeriesCard } from "./elements/OnlineSeriesCard";
 import { Container } from "../../../utils/elements/Container";
 import Spinner from "../../../utils/elements/Spinner";
-import { useProfile } from "../../user/profile/hooks/useProfile";
+import { useProfile } from "../../user/hooks/useProfile";
 
 const initialState = {
   results: [],

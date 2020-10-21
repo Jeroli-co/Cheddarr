@@ -3,23 +3,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../utils/enums/FormDefaultValidators";
-import { useProfile } from "../../../user/profile/hooks/useProfile";
+import { useUserService } from "../../../user/hooks/useUserService";
 
 const ChangeUsernameModal = (props) => {
   const { register, handleSubmit, errors } = useForm();
-  const { changeUsername } = useProfile();
-  const [httpError, setHttpError] = useState(null);
+  const { changeUsername } = useUserService();
+  const [error, setError] = useState(null);
 
   const onSubmit = async (data) => {
-    const res = await changeUsername(data);
-    if (res) {
-      switch (res.status) {
-        case 200:
-          closeModal();
-          return;
-        default:
-          setHttpError(res);
-      }
+    const response = await changeUsername(data);
+    if (response.error === null) {
+      closeModal();
+    } else {
+      setError(response.error);
     }
   };
 
@@ -90,9 +86,7 @@ const ChangeUsernameModal = (props) => {
               )}
             </div>
 
-            {httpError && httpError.status === 409 && (
-              <p className="help is-danger">{httpError.message}</p>
-            )}
+            {error && <p className="help is-danger">{error}</p>}
           </section>
 
           <footer className="modal-card-foot">

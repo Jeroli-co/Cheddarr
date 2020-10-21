@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { ResetPasswordForm } from "./reset-password-form/ResetPasswordForm";
-import { useProfile } from "../../../user/profile/hooks/useProfile";
+import { useProfile } from "../../../user/hooks/useProfile";
 
 const ResetPassword = () => {
   const { token } = useParams();

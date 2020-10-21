@@ -4,7 +4,7 @@ import { routes } from "../../../router/routes";
 import { AuthService } from "../services/AuthService";
 import { useLocation } from "react-router";
 import { DecodedTokenModel } from "../models/DecodedTokenModel";
-import { UserModel } from "../../user/models/UserModel";
+import { PlexSignInConfirmationModel } from "../models/PlexSignInConfirmationModel";
 
 const AuthContext = createContext();
 
@@ -26,26 +26,16 @@ const AuthContextProvider = (props) => {
   useEffect(() => {
     if (location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
       AuthService.confirmSignInWithPlex(location.search).then(
-        (response) => {
-          if (response) {
-            const decodedToken = AuthService.saveToken(response.data);
-            if (decodedToken instanceof DecodedTokenModel) {
-              initSession(
-                decodedToken.username,
-                decodedToken.avatar,
-                decodedToken.admin
-              );
-              let redirectURI = response.headers["redirect-uri"];
-              redirectURI =
-                redirectURI && redirectURI.length > 0
-                  ? redirectURI
-                  : routes.HOME.url;
-              history.push(redirectURI);
-            } else {
-              throw new Error();
-            }
-          } else {
-            throw new Error();
+        (plexSignInConfirmationModel) => {
+          if (
+            plexSignInConfirmationModel instanceof PlexSignInConfirmationModel
+          ) {
+            initSession(
+              plexSignInConfirmationModel.decodedToken.username,
+              plexSignInConfirmationModel.decodedToken.avatar,
+              plexSignInConfirmationModel.decodedToken.admin
+            );
+            history.push(plexSignInConfirmationModel.redirectURI);
           }
         },
         () => invalidSession()
@@ -85,26 +75,28 @@ const AuthContextProvider = (props) => {
   };
 
   const signUp = async (data) => {
-    const user = await AuthService.signUp(data);
-    if (user instanceof UserModel) {
+    const httpServiceResponseModel = await AuthService.signUp(data);
+    const user = httpServiceResponseModel.data;
+    if (user) {
       if (user.confirmed) {
         history.push(routes.SIGN_IN.url);
-        return null;
-      } else {
-        return "";
       }
     }
-    return user;
+    return httpServiceResponseModel;
   };
 
   const signIn = async (data, redirectURI) => {
-    const res = await AuthService.signIn(data);
-    if (res instanceof DecodedTokenModel) {
-      initSession(res.username, res.avatar, res.admin);
+    const decodedToken = await AuthService.signIn(data);
+    if (decodedToken instanceof DecodedTokenModel) {
+      initSession(
+        decodedToken.username,
+        decodedToken.avatar,
+        decodedToken.admin
+      );
       history.push(redirectURI);
       return null;
     }
-    return res;
+    return decodedToken;
   };
 
   const signInWithPlex = async (redirectURI) => {

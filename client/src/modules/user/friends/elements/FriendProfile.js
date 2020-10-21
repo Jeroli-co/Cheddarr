@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams } from "react-router";
-import { useProfile } from "../../profile/hooks/useProfile";
+import Spinner from "../../../../utils/elements/Spinner";
+import { usePublicUser } from "../../hooks/usePublicUser";
 
 const FriendProfile = () => {
   const { id } = useParams();
-  const { getUser } = useProfile();
-  const [user, setUser] = useState(null);
+  const friend = usePublicUser(id);
 
-  useEffect(() => {
-    getUser(id).then((res) => {
-      if (res) setUser(res.data);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  if (friend === null) return <Spinner />;
 
   return (
     <div
@@ -20,21 +15,18 @@ const FriendProfile = () => {
       data-testid="FriendProfile"
     >
       <div className="is-divider" data-content="Profile" />
-
-      {user && (
-        <div className="container">
-          <img
-            src={user["avatar"]}
-            alt="User"
-            width={260}
-            height={260}
-            data-testid="UserPublicProfileImage"
-          />
-          <p className="is-size-5" data-testid="UserPublicProfileUsername">
-            <i>{"@" + user.username}</i>
-          </p>
-        </div>
-      )}
+      <div className="container">
+        <img
+          src={friend.avatar}
+          alt="User"
+          width={260}
+          height={260}
+          data-testid="UserPublicProfileImage"
+        />
+        <p className="is-size-5" data-testid="UserPublicProfileUsername">
+          <i>{"@" + friend.username}</i>
+        </p>
+      </div>
     </div>
   );
 };

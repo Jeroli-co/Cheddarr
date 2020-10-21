@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../utils/enums/FormDefaultValidators";
 import { NotificationContext } from "../../../../notifications/contexts/NotificationContext";
-import { useProfile } from "../../../../user/profile/hooks/useProfile";
+import { useProfile } from "../../../../user/hooks/useProfile";
 
 const InitResetPasswordModal = (props) => {
   const { register, handleSubmit, errors } = useForm();

@@ -12,18 +12,21 @@ import { WaitingEmailConfirmation } from "./WaitingEmailConfirmation";
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm();
   const { signUp, signInWithPlex } = useContext(AuthContext);
-  const [errorDetail, setErrorDetail] = useState(null);
+  const [httpServiceResponseModel, setHttpServiceResponseModel] = useState(
+    null
+  );
   const email = watch("email");
 
   const onSubmit = (data) => {
-    signUp(data).then((detail) => {
-      if (detail !== null) {
-        setErrorDetail(detail);
-      }
-    });
+    signUp(data).then((res) => setHttpServiceResponseModel(res));
   };
 
-  if (errorDetail === "") return <WaitingEmailConfirmation email={email} />;
+  if (
+    httpServiceResponseModel !== null &&
+    httpServiceResponseModel.error === null
+  ) {
+    return <WaitingEmailConfirmation email={email} />;
+  }
 
   return (
     <div className="SignUpForm" data-testid="SignUpForm">
@@ -198,10 +201,12 @@ const SignUpForm = () => {
                 )}
             </div>
 
-            {errorDetail && (
+            {httpServiceResponseModel && httpServiceResponseModel.error && (
               <div className="field">
                 <div className="control">
-                  <p className="help is-danger">{errorDetail}</p>
+                  <p className="help is-danger">
+                    {httpServiceResponseModel.error}
+                  </p>
                 </div>
               </div>
             )}

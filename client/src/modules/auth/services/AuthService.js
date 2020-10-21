@@ -7,6 +7,9 @@ import { HttpService } from "../../api/services/HttpService";
 import { HTTP_METHODS } from "../../api/enums/HttpMethods";
 import { ERRORS_MESSAGE } from "../../../utils/enums/ErrorsMessage";
 import { UserModel } from "../../user/models/UserModel";
+import { routes } from "../../../router/routes";
+import { HttpServiceResponseModel } from "../../api/models/HttpServiceResponseModel";
+import { PlexSignInConfirmationModel } from "../models/PlexSignInConfirmationModel";
 
 class AuthService {
   static signUp = async (sign_up) => {
@@ -17,25 +20,36 @@ class AuthService {
     ).then(
       (response) => {
         if (response.status === 201) {
-          return new UserModel(
+          const user = new UserModel(
             response.data.username,
             response.data.email,
             response.data.avatar,
-            response.data.friends,
             response.data.confirmed,
             response.data.admin
           );
+          return new HttpServiceResponseModel(user, response.status, null);
         } else {
-          return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
+          return new HttpServiceResponseModel(
+            null,
+            response.status,
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
         }
       },
       (error) => {
         switch (error.response.status) {
           case 409:
-          case 422:
-            return error.response.data.detail;
+            return new HttpServiceResponseModel(
+              null,
+              error.response.status,
+              ERRORS_MESSAGE.STATUS_409_CONFLICT
+            );
           default:
-            return ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status);
+            return new HttpServiceResponseModel(
+              null,
+              error.response.status,
+              ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+            );
         }
       }
     );
@@ -127,13 +141,19 @@ class AuthService {
     ).then(
       (response) => {
         if (response.status === 200) {
-          return response;
+          const decodedToken = AuthService.saveToken(response.data);
+          let redirectURI = response.headers["redirect-uri"];
+          redirectURI =
+            redirectURI && redirectURI.length > 0
+              ? redirectURI
+              : routes.HOME.url;
+          return new PlexSignInConfirmationModel(decodedToken, redirectURI);
         } else {
           return ERRORS_MESSAGE.UNHANDLED_STATUS(response.status);
         }
       },
-      () => {
-        return null;
+      (error) => {
+        return ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status);
       }
     );
   };

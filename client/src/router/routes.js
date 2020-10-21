@@ -9,7 +9,6 @@ import { SignInForm } from "../modules/auth/components/sign-in-form/SignInForm";
 import { SignUpForm } from "../modules/auth/components/sign-up-form/SignUpForm";
 import { FriendProfile } from "../modules/user/friends/elements/FriendProfile";
 import { Friends } from "../modules/user/friends/Friends";
-import { Profile } from "../modules/user/profile/Profile";
 import { Settings } from "../modules/settings/Settings";
 import { ChangeEmailModal } from "../modules/settings/settings-account/element/ChangeEmailModal";
 import { ChangePasswordModal } from "../modules/settings/settings-account/element/ChangePasswordModal";
@@ -26,6 +25,7 @@ import { SeriesPage } from "../utils/elements/media/SeriesPage";
 import { Requests } from "../modules/requests/Requests";
 import { RequestsSent } from "../modules/requests/elements/RequestsSent";
 import { RequestsReceived } from "../modules/requests/elements/RequestsReceived";
+import { User } from "../modules/user/User";
 
 const routes = {
   HOME: { url: "/", component: Home },
@@ -49,8 +49,8 @@ const routes = {
     component: ResendEmailConfirmationModal,
   },
   NOT_FOUND: { url: "/404", component: NotFound },
-  USER_PROFILE: { url: "/me", component: Profile },
-  USER_FRIENDS: { url: "/me/friends", component: Friends },
+  USER_PROFILE: { url: "/user", component: User },
+  USER_FRIENDS: { url: "/user/friends", component: Friends },
   USER_FRIEND_PROFILE: {
     url: (username) => "/users/" + username,
     component: FriendProfile,

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../utils/enums/FormDefaultValidators";
-import { useProfile } from "../../../user/profile/hooks/useProfile";
+import { useProfile } from "../../../user/hooks/useProfile";
 
 const DeleteAccountModal = (props) => {
   const { register, handleSubmit, errors } = useForm();

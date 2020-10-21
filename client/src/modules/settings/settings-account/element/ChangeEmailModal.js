@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../utils/enums/FormDefaultValidators";
-import { useProfile } from "../../../user/profile/hooks/useProfile";
+import { useProfile } from "../../../user/hooks/useProfile";
 
 const ChangeEmailModal = (props) => {
   const { register, handleSubmit, errors } = useForm();

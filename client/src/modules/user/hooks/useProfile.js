@@ -1,54 +1,17 @@
 import { useContext } from "react";
 import { useHistory } from "react-router";
-import { AuthContext } from "../../../auth/contexts/AuthContext";
-import { NotificationContext } from "../../../notifications/contexts/NotificationContext";
-import { routes } from "../../../../router/routes";
-import { HttpService } from "../../../api/services/HttpService";
-import { HTTP_METHODS } from "../../../api/enums/HttpMethods";
+import { AuthContext } from "../../auth/contexts/AuthContext";
+import { NotificationContext } from "../../notifications/contexts/NotificationContext";
+import { routes } from "../../../router/routes";
+import { HttpService } from "../../api/services/HttpService";
+import { HTTP_METHODS } from "../../api/enums/HttpMethods";
 
 const useProfile = () => {
   const profileURI = "/user";
 
-  const { invalidSession, updateUsername } = useContext(AuthContext);
-  const { pushSuccess, pushInfo } = useContext(NotificationContext);
+  const { invalidSession } = useContext(AuthContext);
+  const { pushInfo } = useContext(NotificationContext);
   const history = useHistory();
-
-  const getUser = async (username) => {
-    let res;
-    if (username === null) {
-      res = await HttpService.executeRequest(HTTP_METHODS.GET, profileURI);
-    } else {
-      res = await HttpService.executeRequest(
-        HTTP_METHODS.GET,
-        "/users/" + username
-      );
-    }
-    switch (res.status) {
-      case 200:
-        return res;
-      default:
-        return null;
-    }
-  };
-
-  const changeUsername = async (data) => {
-    const res = await HttpService.executeRequest(
-      HTTP_METHODS.PUT,
-      profileURI,
-      data
-    );
-    switch (res.status) {
-      case 200:
-        const username = res.data.username;
-        updateUsername(username);
-        pushSuccess("Username has changed");
-        return res;
-      case 409:
-        return res;
-      default:
-        return null;
-    }
-  };
 
   const changeEmail = async (data) => {
     const res = await HttpService.executeRequest(
@@ -167,8 +130,6 @@ const useProfile = () => {
   };
 
   return {
-    getUser,
-    changeUsername,
     changeEmail,
     changePassword,
     initResetPassword,
