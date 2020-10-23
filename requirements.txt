@@ -5,18 +5,15 @@ email-validator
 fastapi
 itsdangerous
 jinja2
-passlib
+passlib[bcrypt]
 PlexAPI
 pydantic
-pyhumps
 pytest
 python-dotenv
 python-jose[cryptography]
 python-multipart
 sqlalchemy
-sqlalchemy-utils
 requests
-starlette
 tmdbsimple
 uvicorn
 

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import AnyHttpUrl, BaseModel, EmailStr
 from .base import APIModel
 
 
@@ -12,7 +12,7 @@ class Token(BaseModel):
 class TokenPayload(BaseModel):
     sub: str
     username: str
-    avatar: Optional[str]
+    avatar: str
     admin: bool = False
 
 

@@ -1,1 +1,1 @@
-from .model import Model  # noqa
+from .base import Base, Model, ModelType, Timestamp  # noqa

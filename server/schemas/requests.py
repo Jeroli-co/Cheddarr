@@ -1,20 +1,19 @@
-from __future__ import annotations
+from abc import ABC
+from typing import List, Optional
 
-from typing import List
-from uuid import UUID
-
-from server.models.requests import SeriesType
-from server.schemas import APIModel, UserPublic
+from server.models import RequestStatus, SeriesType
+from server.schemas import APIModel, Movie, Series, UserPublic
 
 
-class MovieRequest(APIModel):
+class Request(APIModel, ABC):
     id: int
-    tmdb_id: int
-    approved: bool
-    refused: bool
-    available: bool
-
+    request_status: RequestStatus
     requested_user: UserPublic
+    requesting_user: UserPublic
+
+
+class MovieRequest(Request):
+    media: Movie
 
 
 class MovieRequestCreate(APIModel):
@@ -22,37 +21,22 @@ class MovieRequestCreate(APIModel):
     requested_username: str
 
 
-class SeriesRequest(APIModel):
-    id: int
-    tvdb_id: int
-    series_type: SeriesType
-    children: List[SeriesChildRequest]
-    requested_user: UserPublic
-
-
-class SeriesChildRequest(APIModel):
-    id: int
-    approved: bool
-    refused: bool
-    series_id: int
-    selected_provider_id: UUID
-    requesting_user: UserPublic
-    parent: SeriesRequest
-    seasons: List[SeasonRequest]
-
-
-class SeriesChildRequestCreate(APIModel):
-    requested_username: str
-    tvdb_id: int
-    series_type: SeriesType
-    seasons: List[SeasonRequest]
+class EpisodeRequest(APIModel):
+    episode_number: int
 
 
 class SeasonRequest(APIModel):
     season_number: int
-    episodes: List[EpisodeRequest]
+    episodes: Optional[List[EpisodeRequest]]
 
 
-class EpisodeRequest(APIModel):
-    episode_number: int
-    available: bool
+class SeriesRequest(Request):
+    tvdb_id: int
+    series_type: SeriesType
+    media: Series
+
+
+class SeriesRequestCreate(APIModel):
+    tvdb_id: int
+    requested_username: str
+    seasons: Optional[List[SeasonRequest]]

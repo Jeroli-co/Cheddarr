@@ -17,7 +17,7 @@ python manage.py [--env=production|development] COMMAND [OPTIONS] [ARGS]
     "--env",
     type=click.Choice(["development", "production"]),
     default="development",
-    help="Whether to use DevSettings or ProdSettings (development by default).",
+    help="Whether to use DevConfig or ProdConfig (development by default).",
 )
 def cli(env):
 

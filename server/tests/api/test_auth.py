@@ -1,20 +1,14 @@
-import json
-
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from server.models.users import User
-from server.tests.conftest import (
-    user1_email,
-    user1_password,
-    user1_username,
-    user2_email,
-    user2_password,
-)
+from server.core.security import generate_timed_token
+from server.repositories import UserRepository
+from server.tests.conftest import datasets
 
 
 def test_signup_ok(app: FastAPI, db: Session, client: TestClient):
+    user_repo = UserRepository(db)
     assert (
         client.post(
             app.url_path_for("signup"),
@@ -26,60 +20,108 @@ def test_signup_ok(app: FastAPI, db: Session, client: TestClient):
         ).status_code
         == 201
     )
-    assert db.query(User).filter_by(email="test@test.com").first()
+    assert user_repo.find_by_email(email="test@test.com")
 
 
-def test_signup_user_already_exist(app: FastAPI, db: Session, client: TestClient):
+def test_signup_user_already_exist(app: FastAPI, client: TestClient):
     assert (
         client.post(
             app.url_path_for("signup"),
             json={
-                "username": user1_username,
-                "password": user1_password,
-                "email": user1_email,
+                "username": datasets["user1"]["username"],
+                "password": datasets["user1"]["password"],
+                "email": datasets["user1"]["email"],
             },
         ).status_code
         == 409
     )
 
 
-def test_signin_with_email(app: FastAPI, db: Session, client: TestClient):
+def test_confirm_email_invalid_link(app: FastAPI, client: TestClient):
+    assert (
+        client.get(
+            app.url_path_for("confirm_email", token="invalid"),
+        ).status_code
+        == 410
+    )
+
+
+def test_confirm_email_not_existing(app: FastAPI, client: TestClient):
+    token = generate_timed_token({"email": "not_existing_email@fake.com"})
+    assert (
+        client.get(
+            app.url_path_for("confirm_email", token=token),
+        ).status_code
+        == 404
+    )
+
+
+def test_confirm_email_already_confirmed(app: FastAPI, client: TestClient):
+    token = generate_timed_token({"email": datasets["user1"]["email"]})
+    r = client.get(
+        app.url_path_for("confirm_email", token=token),
+    )
+    assert r.status_code == 403
+
+
+def test_confirm_email(app: FastAPI, db: Session, client: TestClient):
+    user_repo = UserRepository(db)
+    token = generate_timed_token({"email": datasets["user4"]["email"]})
+    r = client.get(
+        app.url_path_for("confirm_email", token=token),
+    )
+    assert r.status_code == 200
+    assert user_repo.find_by_id(datasets["user4"]["id"]).confirmed
+
+
+def test_signin_with_email(app: FastAPI, client: TestClient):
     assert (
         client.post(
             app.url_path_for("signin"),
-            data={"username": user1_email, "password": user1_password},
+            data={
+                "username": datasets["user1"]["email"],
+                "password": datasets["user1"]["password"],
+            },
         ).status_code
         == 200
     )
 
 
-def test_signin_with_username(app: FastAPI, db: Session, client: TestClient):
+def test_signin_with_username(app: FastAPI, client: TestClient):
     assert (
         client.post(
             app.url_path_for("signin"),
-            data={"username": user1_username, "password": user1_password},
+            data={
+                "username": datasets["user1"]["username"],
+                "password": datasets["user1"]["password"],
+            },
         ).status_code
         == 200
     )
 
 
-def test_signin_wrong_username_password(app: FastAPI, db: Session, client: TestClient):
+def test_signin_wrong_username_password(app: FastAPI, client: TestClient):
     assert (
         client.post(
             app.url_path_for("signin"),
-            data={"username": user2_email, "password": "wrong_password"},
+            data={"username": datasets["user2"]["email"], "password": "wrong_password"},
         ).status_code
         == 401
     )
 
 
 def test_signin_unconfimed_user(app: FastAPI, db: Session, client: TestClient):
-    user = db.query(User).filter_by(email=user2_email).first()
-    user.update(db, dict(confirmed=False))
+    user_repo = UserRepository(db)
+    user = user_repo.find_by_id(datasets["user2"]["id"])
+    user.confirmed = False
+    user_repo.save(user)
     assert (
         client.post(
             app.url_path_for("signin"),
-            data={"username": user2_email, "password": user2_password},
+            data={
+                "username": datasets["user2"]["email"],
+                "password": datasets["user2"]["password"],
+            },
         ).status_code
         == 400
     )

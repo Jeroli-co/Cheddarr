@@ -1,146 +1,73 @@
-from __future__ import annotations
+from abc import ABC
+from datetime import date
+from typing import Generic, List, Optional, TypeVar, Union
 
-from enum import Enum
-from typing import List, Optional
+from pydantic import Field, validator
+from pydantic.generics import GenericModel
+from server.schemas import Media, Movie, Series, Season, Episode
 
-from pydantic import AnyHttpUrl, BaseModel, Field
+MovieResultType = TypeVar("MovieResultType")
+SeriesResultType = TypeVar("SeriesResultType")
 
-from server.models.requests import SeriesType
-from server.schemas import APIModel, UserPublic
 
-TMDB_URL = "https://www.themoviedb.org/"
-TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"
+class SearchResult(GenericModel, Generic[MovieResultType, SeriesResultType]):
+    page: int = 1
+    total_pages: int
+    total_results: int
+    results: List[Union[SeriesResultType, MovieResultType]]
+
+
+###########################################
+# TMDB                                    #
+###########################################
+
+TMDB_URL = "https://www.themoviedb.org"
+TMDB_IMAGES_URL = "https://image.tmdb.org/t/p"
 TMDB_POSTER_SIZE = "w500"
 TMDB_ART_SIZE = "w1280"
 
 
-class QuickSearchType(str, Enum):
-    movies = "movies"
-    series = "series"
-    friends = "friends"
-
-
-class QuickSearch(APIModel):
-    value: str
-    type: Optional[QuickSearchType]
-    page: int = 1
-
-
-"""
-class MediaSearchResultSchema(APIModel):
-    ratingKey = ma.String(data_key="id")
-    title = ma.String()
-    year = ma.Integer()
-    thumbUrl = ma.String()
-    type = ma.String()
-
-    @post_dump
-    def media_type(self, media, **kwargs):
-        media["type"] = media.get("type").replace("show", "series")
-        return media
-"""
-
-
-class FriendSearchResult(UserPublic):
-    type: QuickSearchType = Field(default=QuickSearchType.friends, const=True)
-
-
-class TmdbMedia(APIModel):
+class TmdbMedia(Media, ABC):
     tmdb_id: int = Field(alias="id")
-    summary: str = Field(alias="overview")
-    rating: float = Field(alias="vote_average")
-    thumbUrl: str = Field(alias="poster_path")
-    art_url: str = Field(alias="backdrop_path")
-    media_type: str
-    status: str
-    link: AnyHttpUrl = Field(
-        default=lambda media: f"{TMDB_URL}{media['media_type']}/{media['id']}",
-        const=True,
-    )
-    """
-
-    @post_dump
-    def get_thumbUrl(self, media, **kwargs):
-        if media.get("thumbUrl") is None:
-            return media
-        else:
-            media[
-                "thumbUrl"
-            ] = f"{TMDB_IMAGES_URL}{TMDB_POSTER_SIZE}{media['thumbUrl']}"
-        return media
-
-    @post_dump
-    def get_art_url(self, media, **kwargs):
-        if media.get("art_url") is None:
-            return media
-        else:
-            media["art_url"] = f"{TMDB_IMAGES_URL}{TMDB_POSTER_SIZE}{media['art_url']}"
-        return media
-
-    @post_dump
-    def media_type(self, media, **kwargs):
-        media["media_type"] = media.get("media_type").replace("tv", "series")
-        return media
-"""
-
-
-class TmdbMovie(TmdbMedia):
-    title: str
-    release_date: str
-    media_type = Field(default="movie", const=True)
-    link: AnyHttpUrl = Field(
-        default=lambda media: f"{TMDB_URL}movie/{media['id']}", const=True
-    )
-
-
-class TmdbSeries(TmdbMedia):
-    tvdb_id: int
     title: str = Field(alias="name")
-    releaseDate: str = Field(alias="first_air_date")
-    media_type = Field(default="series", const=True)
-    seasons: List[TmdbSeason]
-    series_type: SeriesType
-    link: AnyHttpUrl = Field(
-        default=lambda media: f"{TMDB_URL}tv/{media['id']}", const=True
-    )
+    summary: str = Field(alias="overview")
+    release_date: str = Field(alias="release_date")
+    status: Optional[str] = Field(alias="status")
+    rating: float = Field(alias="vote_average")
+    poster_url: str = Field(alias="poster_path")
+    art_url: Optional[str] = Field(alias="backdrop_path")
+
+    @validator("poster_url")
+    def get_poster(cls, poster):
+        return f"{TMDB_IMAGES_URL}/{TMDB_POSTER_SIZE}/{poster}"
+
+    @validator("art_url")
+    def get_art(cls, art):
+        return f"{TMDB_IMAGES_URL}/{TMDB_ART_SIZE}/{art}"
 
 
-class TmdbSeason(APIModel):
-    season_number: int
-    name: str
-    release_date = Field(alias="air_date")
-    episodes: List[TmdbEpisode]
+class TmdbMovie(TmdbMedia, Movie):
+    release_date: str = Field(alias="release_date")
 
 
-class TmdbEpisode(APIModel):
-    episode_number: int
-    name: str
-    release_date = Field(alias="air_date")
+class TmdbEpisode(Episode):
+    episode_number: int = Field(alias="episode_number")
+    title: str = Field(alias="name")
+    release_date: date = Field(alias="air_date")
 
 
-class TmdbMediaSearchResult(APIModel):
-    page: int = 1
-    total_pages: int
-    total_results: int
-    """
-    results = ma.Method("get_results")
-
-    def get_results(self, search_results):
-        res = []
-        for media in search_results["results"]:
-            if media["media_type"] == "movie":
-                res.append(tmdb_movie_serializer.dump(media))
-            elif media["media_type"] == "tv":
-                res.append(tmdb_series_serializer.dump(media))
-            else:
-                continue
-        return res
-"""
+class TmdbSeason(Season):
+    season_number: int = Field(alias="season_number")
+    title: str = Field(alias="name")
+    release_date: date = Field(alias="air_date")
+    episodes: Optional[List[TmdbEpisode]] = Field(alias="episodes")
 
 
-class TmdbMovieSearchResult(TmdbMediaSearchResult):
-    results: List[TmdbMovie]
+class TmdbSeries(TmdbMedia, Series):
+    release_date: str = Field(alias="first_air_date")
+    number_of_seasons: Optional[int] = Field(alias="number_of_seasons")
+    seasons: Optional[List[TmdbSeason]] = Field(alias="seasons")
 
 
-class TmdbSeriesSearchResultSchema(TmdbMediaSearchResult):
-    results: List[TmdbSeries]
+class TmdbSearchResult(SearchResult[TmdbSeries, TmdbMovie]):
+    pass

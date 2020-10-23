@@ -3,13 +3,15 @@ from enum import Enum
 from typing import List, Optional, Tuple, Union
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import (
     AnyHttpUrl,
     AnyUrl,
     BaseSettings,
+    DirectoryPath,
 )
 
-PROJECT_ROOT = Path(__file__).parents[2].resolve()
+PROJECT_ROOT: DirectoryPath = Path(__file__).parents[2].resolve()
 
 
 class Environment(str, Enum):
@@ -17,18 +19,15 @@ class Environment(str, Enum):
     PRODUCTION = "production"
 
 
-class Settings(BaseSettings):
-    class Config:
-        env_file = PROJECT_ROOT / ".env"
-        case_sensitive = True
+class BaseConfig(BaseSettings):
 
-    APP_NAME = "Cheddarr"
+    APP_NAME: str = "Cheddarr"
     ENV: Environment = Environment.DEVELOPMENT
 
     ##########################################################################
-    # server                                                                    #
+    # server                                                                 #
     ##########################################################################
-    API_VERSION = "0.1"
+    API_VERSION: str = "0.1"
     API_PREFIX: str = "/api"
     DOMAIN: str = "localhost:8000"
     SERVER_HOST: str = f"http://{DOMAIN}"
@@ -36,26 +35,25 @@ class Settings(BaseSettings):
     ##########################################################################
     # folders                                                                #
     ##########################################################################
-    REACT_BUILD_FOLDER = PROJECT_ROOT / "client" / "build"
-    REACT_STATIC_FOLDER = PROJECT_ROOT / "client" / "build" / "static"
-    MAIL_TEMPLATES_FOLDER = PROJECT_ROOT / "server" / "templates"
-    IMAGES_FOLDER = PROJECT_ROOT / "server" / "static" / "images"
+    REACT_BUILD_FOLDER: DirectoryPath = PROJECT_ROOT / "client" / "build"
+    REACT_STATIC_FOLDER: DirectoryPath = PROJECT_ROOT / "client" / "build" / "static"
+    MAIL_TEMPLATES_FOLDER: DirectoryPath = PROJECT_ROOT / "server" / "templates"
+    IMAGES_FOLDER: DirectoryPath = PROJECT_ROOT / "server" / "static" / "images"
 
     ##########################################################################
-    # external services                                                          #
+    # external services                                                      #
     ##########################################################################
     PLEX_CLIENT_IDENTIFIER: str = APP_NAME
     PLEX_TOKEN_URL: AnyHttpUrl = "https://plex.tv/api/v2/pins/"
     PLEX_AUTHORIZE_URL: AnyHttpUrl = "https://app.plex.tv/auth#/"
     PLEX_USER_RESOURCE_URL: AnyHttpUrl = "https://plex.tv/api/v2/user/"
-    PLEXAPI_ENABLE_FAST_CONNECT = True
-    TMDB_API_KEY: str
+    TMDB_API_KEY: str = None
 
     ##########################################################################
     # security                                                               #
     ##########################################################################
     SECRET_KEY: str = secrets.token_urlsafe(32)
-    SIGNING_ALGORITHM = "HS256"
+    SIGNING_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 3
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
@@ -73,14 +71,14 @@ class Settings(BaseSettings):
     MAIL_SMTP_USER: Optional[str]
     MAIL_SMTP_PASSWORD: Optional[str]
     MAIL_DEFAULT_SENDER: Tuple[str, str] = (
-      f"noreply@{DOMAIN}",
-      "Cheddarr",
+        f"noreply@{DOMAIN}",
+        "Cheddarr",
     )
 
 
-class ProdSettings(Settings):
+class ProdConfig(BaseConfig):
     ##########################################################################
-    # server                                                                    #
+    # server                                                                 #
     ##########################################################################
     DOMAIN: Optional[str] = None
     HEROKU_APP_NAME: Optional[str] = None
@@ -100,7 +98,11 @@ class ProdSettings(Settings):
     MAIL_ENABLED: bool = True
 
 
-class DevSettings(Settings):
+class DevConfig(BaseConfig):
+    class Config:
+        env_file = PROJECT_ROOT / ".env"
+        case_sensitive = True
+
     ##########################################################################
     # database                                                               #
     ##########################################################################
@@ -113,7 +115,7 @@ class DevSettings(Settings):
     MAIL_ENABLED: bool = False
 
 
-class FactorySettings:
+class FactoryConfig:
     """Returns a Settings instance dependending on the ENV variable."""
 
     def __init__(self, env: Environment):
@@ -121,9 +123,10 @@ class FactorySettings:
 
     def __call__(self):
         if self.env == Environment.PRODUCTION:
-            return ProdSettings()
+            return ProdConfig()
         elif self.env == Environment.DEVELOPMENT:
-            return DevSettings()
+            load_dotenv(PROJECT_ROOT / ".env")
+            return DevConfig()
 
 
-settings: Union[ProdSettings, DevSettings] = FactorySettings(Settings().ENV)()
+settings: Union[ProdConfig, DevConfig] = FactoryConfig(BaseConfig().ENV)()

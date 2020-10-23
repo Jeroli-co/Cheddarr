@@ -1,3 +1,6 @@
+from random import randrange
+
+import requests
 from fastapi import (
     APIRouter,
     Depends,
@@ -9,39 +12,41 @@ from fastapi import (
 )
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from passlib import pwd
-from requests import get
-from sqlalchemy.orm import Session
 
-from server import models, schemas
+from server import schemas
 from server.api import dependencies as deps
-from server.core import utils
-from server.core.config import settings
+from server.core import utils, settings, security
+from server.models import PlexAccount, User
+from server.repositories import PlexAccountRepository, UserRepository
 
 router = APIRouter()
 
 
 @router.post(
-    "/sign-up", response_model=schemas.User, status_code=status.HTTP_201_CREATED, responses={status.HTTP_409_CONFLICT:{"message": str}}
+    "/sign-up",
+    response_model=schemas.User,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_409_CONFLICT: {"description": "Email or username not available"}
+    },
 )
-async def signup(
+def signup(
     user_in: schemas.UserCreate,
     request: Request,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(deps.db),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
-    existing_email = models.User.get_by_email(db, user_in.email)
+    existing_email = user_repo.find_by_email(user_in.email)
     if existing_email:
         raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
 
-    existing_username = models.User.get_by_username(db, user_in.username)
+    existing_username = user_repo.find_by_username(user_in.username)
     if existing_username:
-        raise HTTPException(status.HTTP_409_CONFLICT, "This username is not available.")
-
-    user = models.User.create(db, obj_in=user_in, commit=False)
+        raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
+    user = user_in.to_orm(User)
     if settings.MAIL_ENABLED:
         email_data = schemas.EmailConfirm(email=user.email).dict()
-        token = utils.generate_timed_token(email_data)
+        token = security.generate_timed_token(email_data)
         background_tasks.add_task(
             utils.send_email,
             to_email=user.email,
@@ -54,31 +59,38 @@ async def signup(
         )
     else:
         user.confirmed = True
-    user.save(db)
+    user_repo.save(user)
     return user
 
 
-@router.get("/sign-up/{token}")
-async def confirm_email(
+@router.get(
+    "/sign-up/{token}",
+    responses={
+        status.HTTP_403_FORBIDDEN: {"description": "Email already confirmed"},
+        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
+    },
+)
+def confirm_email(
     token: str,
-    db: Session = Depends(deps.db),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     try:
-        email_data = schemas.EmailConfirm(**utils.confirm_timed_token(token))
+        email_data = schemas.EmailConfirm.parse_obj(security.confirm_timed_token(token))
     except Exception:
         raise HTTPException(
             status.HTTP_410_GONE, "The confirmation link is invalid or has expired."
         )
     if email_data.old_email is not None:
-        user = models.User.get_by_email(db, email_data.old_email)
-        if not user:
+        user = user_repo.find_by_email(email_data.old_email)
+        if user is None:
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND, "No user with this email was found."
             )
-        user.update(db, obj_in=dict(email=email_data.email))
+        user.email = email_data.email
     else:
-        user = models.User.get_by_email(db, email_data.email)
-        if not user:
+        user = user_repo.find_by_email(email_data.email)
+        if user is None:
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND, "No user with this email was found."
             )
@@ -87,29 +99,36 @@ async def confirm_email(
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN, "This email is already confirmed."
             )
-        user.update(db, obj_in=dict(confirmed=True))
-    return {"message": "This email is now confirmed."}
+        user.confirmed = True
+    user_repo.save(user)
+    return {"detail": "This email is now confirmed."}
 
 
-@router.patch("/sign-up")
-async def resend_confirmation(
+@router.patch(
+    "/sign-up",
+    responses={
+        status.HTTP_403_FORBIDDEN: {"description": "Email already confirmed"},
+        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+    },
+)
+def resend_confirmation(
     body: schemas.EmailConfirm,
     request: Request,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(deps.db),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     email = body.email
-    existing_user = models.User.get_by_email(db, email)
-    if not existing_user:
+    existing_user = user_repo.find_by_email(email)
+    if existing_user is None:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "No user with this email exists."
         )
     if existing_user.confirmed:
         raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "This email is already confirmed."
+            status.HTTP_403_FORBIDDEN, "This email is already confirmed."
         )
     email_data = schemas.EmailConfirm(email=email).dict()
-    token = utils.generate_timed_token(email_data)
+    token = security.generate_timed_token(email_data)
     background_tasks.add_task(
         utils.send_email,
         to_email=email,
@@ -118,16 +137,23 @@ async def resend_confirmation(
         environment=dict(confirm_url=request.url_for("confirm_email", token=token)),
     )
 
-    return {"message": "Confirmation email sent."}
+    return {"detail": "Confirmation email sent."}
 
 
-@router.post("/sign-in", response_model=schemas.Token)
-async def signin(
+@router.post(
+    "/sign-in",
+    response_model=schemas.Token,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "Email needs to be confirmed"},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Wrong credentials"},
+    },
+)
+def signin(
     form: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(deps.db),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
-    user = models.User.get_by_username_or_email(db, username_or_email=form.username)
-    if not user or user.password != form.password:
+    user = user_repo.find_by_username_or_email(form.username)
+    if user is None or not security.verify_password(form.password, user.password):
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Wrong username/email or password.",
@@ -141,11 +167,11 @@ async def signin(
             headers={"WWW-Authenticate": "Bearer"},
         )
     payload = schemas.TokenPayload(
-        sub=user.id,
+        sub=str(user.id),
         username=user.username,
         avatar=user.avatar,
     )
-    access_token = utils.create_jwt_access_token(payload)
+    access_token = security.create_jwt_access_token(payload)
     token = schemas.Token(
         access_token=access_token,
         token_type="bearer",
@@ -154,7 +180,7 @@ async def signin(
 
 
 @router.get("/sign-in/plex")
-async def start_signin_plex():
+def start_signin_plex():
     request_pin_url = utils.make_url(
         settings.PLEX_TOKEN_URL,
         queries_dict={
@@ -167,14 +193,11 @@ async def start_signin_plex():
 
 
 @router.post("/sign-in/plex/authorize")
-async def authorize_signin_plex(
-    request: Request, auth_data: schemas.PlexAuthorizeSignin
-):
-
+def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSignin):
     forward_url = request.url_for("confirm_signin_plex").replace(
         settings.API_PREFIX, ""
     )
-    token = utils.generate_token(
+    token = security.generate_token(
         {
             "id": auth_data.key,
             "code": auth_data.code,
@@ -197,11 +220,24 @@ async def authorize_signin_plex(
     return RedirectResponse(url=authorize_url, status_code=200)
 
 
-@router.get("/sign-in/plex/confirm", response_model=schemas.Token)
-async def confirm_signin_plex(
-    token: str, response: Response, db: Session = Depends(deps.db)
+@router.get(
+    "/sign-in/plex/confirm",
+    response_model=schemas.Token,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "description": "Plex authorization error"
+        },
+    },
+)
+def confirm_signin_plex(
+    token: str,
+    response: Response,
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    plex_account_repo: PlexAccountRepository = Depends(
+        deps.get_repository(PlexAccountRepository)
+    ),
 ):
-    token = utils.confirm_token(token)
+    token = security.confirm_token(token)
     state = token.get("id")
     code = token.get("code")
     redirect_uri = token.get("redirectUri", "")
@@ -212,49 +248,50 @@ async def confirm_signin_plex(
             "X-Plex-Client-Identifier": settings.PLEX_CLIENT_IDENTIFIER,
         },
     )
-    r = get(access_url, headers={"Accept": "application/json"})
+    r = requests.get(access_url, headers={"Accept": "application/json"})
     auth_token = r.json().get("authToken")
-    if not auth_token:
+    if auth_token is None:
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR, "Error while authorizing Plex."
         )
 
-    r = get(
+    r = requests.get(
         settings.PLEX_USER_RESOURCE_URL,
         headers={"X-Plex-Token": auth_token, "Accept": "application/json"},
     )
     info = r.json()
     plex_user_id = info["id"]
-    email = info["email"]
+    plex_email = info["email"]
+    plex_username = info["username"]
+    plex_avatar = info["thumb"]
 
-    # Find this user in the database, or create it
-    user = models.User.get_by_email(db, email)
-    if not user:
-        user_in = schemas.UserCreate(
-            username=info["username"],
-            email=email,
-            password=pwd.genword(),
-        )
-        print(user_in.password)
-        user = models.User.create(db, obj_in=user_in)
-        user.update(db, obj_in=dict(confirmed=True, avatar=info["thumb"]))
-
-    # Find the user's plex config in the database, or create it
-    plex_config = models.PlexConfig.find_by(db, plex_user_id=plex_user_id)
-    if not plex_config:
-        plex_config_in = schemas.PlexConfigCreate(
+    # Find this plex account in the database, or create it with the corresponding user
+    plex_account = plex_account_repo.find_by_plex_user_id(plex_user_id)
+    if plex_account is None:
+        user = user_repo.find_by_email(plex_email)
+        if user is None:
+            if user_repo.find_by_username(plex_username) is not None:
+                plex_username = "{}{}".format(plex_username, randrange(1, 999))
+            user = User(
+                username=plex_username,
+                email=plex_email,
+                password=security.get_random_password(),
+                avatar=plex_avatar,
+                confirmed=True,
+            )
+            user_repo.save(user)
+        plex_account = PlexAccount(
             plex_user_id=plex_user_id, user_id=user.id, api_key=auth_token
         )
-        plex_config = models.PlexConfig.create(db, obj_in=plex_config_in)
-    # Associate the API key (possibly new at each login)
-    plex_config.update(db, obj_in=dict(api_key=auth_token))
-
+    # Update the Plex account with the API key (possibly different at each login)
+    plex_account.api_key = auth_token
+    plex_account_repo.save(plex_account)
     payload = schemas.TokenPayload(
-        sub=plex_config.user.id,
-        username=plex_config.user.username,
-        avatar=plex_config.user.avatar,
+        sub=str(plex_account.user.id),
+        username=plex_account.user.username,
+        avatar=plex_account.user.avatar,
     )
-    access_token = utils.create_jwt_access_token(payload)
+    access_token = security.create_jwt_access_token(payload)
     token = schemas.Token(
         access_token=access_token,
         token_type="bearer",

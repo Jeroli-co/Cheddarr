@@ -1,120 +1,99 @@
-import tmdbsimple as tmdb
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 
+from server import schemas
+from server.helpers import search
 
 router = APIRouter()
 
-"""
-@search_bp.route("/")
-@login_required
-@query(SearchSchema)
-def search_all(value, type=None, **kwargs):
-    if type == "friends":
-        return FriendSearchResultSchema().jsonify(search_friends(value), many=True)
 
-    if type == "movies" or type == "series":
-        return MediaSearchResultSchema().jsonify(search_media(value, type), many=True)
-
-    return jsonify(
-        FriendSearchResultSchema().dump(search_friends(value), many=True)
-        + MediaSearchResultSchema().dump(
-            search_media(value, type, filters=kwargs), many=True
-        )
-    )
-
-
-@search_bp.route("/all/")
-@login_required
-@query(SearchSchema)
-@jsonify_with(TmdbMediaSearchResultSchema)
-@cache.memoize(timeout=3600)
-def search_tmdb_media(value, page=1):
-    results = tmdb.Search().multi(query=value, page=page)
-    set_tmdb_series_info(series=results["results"])
-    return results
-
-
-@search_bp.route("/movies/")
-@login_required
-@query(SearchSchema)
-@jsonify_with(TmdbMovieSearchResultSchema)
-@cache.memoize(timeout=3600)
-def search_tmdb_movies(value, page=1):
-    results = tmdb.Search().movie(query=value, page=page)
-    return results
-
-
-@search_bp.route("/series/")
-@login_required
-@query(SearchSchema)
-@jsonify_with(TmdbSeriesSearchResultSchema)
-@cache.memoize(timeout=3600)
-def search_tmdb_series(value, page=1):
-    results = tmdb.Search().tv(query=value, page=page)
-    set_tmdb_series_info(series=results["results"])
-    return results
-
-
-@search_bp.route("/movies/<int:tmdb_id>/")
-@login_required
-@jsonify_with(TmdbMovieSchema)
-@cache.memoize(timeout=3600)
-def get_tmdb_movie(tmdb_id):
-    try:
-        movie = tmdb.Movies(tmdb_id).info()
-        return movie
-    except HTTPError as e:
-        abort(e.response.status_code)
-
-
-@search_bp.route("/series/<int:tvdb_id>/")
-@login_required
-@cache.memoize(timeout=3600)
-@jsonify_with(TmdbSeriesSchema)
-def get_tmdb_series_by_tvdb_id(tvdb_id):
-
-    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
-    if not tmdb_result:
-        raise NotFound("No series found.")
-    tmdb_id = tmdb_result[0]["id"]
-    try:
-        series = tmdb.TV(tmdb_id).info()
-        set_tmdb_series_info(series=series)
-        return series
-    except HTTPError as e:
-        abort(e.response.status_code)
-
-
-@search_bp.route("/series/<int:tvdb_id>/seasons/<int:season_number>/")
-@login_required
-@jsonify_with(TmdbSeasonSchema)
-@cache.memoize(timeout=3600)
-def get_tmdb_season_by_tvdb_id(tvdb_id, season_number):
-    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
-    if not tmdb_result:
-        raise NotFound("No series found.")
-    tmdb_id = tmdb_result[0]["id"]
-    try:
-        season = tmdb.TV_Seasons(tmdb_id, season_number).info()
-        return season
-    except HTTPError as e:
-        abort(e.response.status_code)
-
-
-@search_bp.route(
-    "/series/<int:tvdb_id>/seasons/<int:season_number>/episodes/<int:episode_number>"
+@router.get(
+    "/all/",
+    response_model=schemas.SearchResult,
+    response_model_exclude_none=True,
 )
-@login_required
-@jsonify_with(TmdbEpisodeSchema)
-@cache.memoize(timeout=3600)
-def get_tmdb_episode_by_tvdb_id(tvdb_id, season_number, episode_number):
-    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
-    if not tmdb_result:
-        raise NotFound("No series found.")
-    tmdb_id = tmdb_result[0]["id"]
-    try:
-        episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info()
-        return episode
-    except HTTPError as e:
-        abort(e.response.status_code)
-""" ""
+def search_media(term, page=1):
+    return search.search_tmdb_media(term, page)
+
+
+@router.get(
+    "/movies/",
+    response_model=schemas.SearchResult,
+    response_model_exclude_none=True,
+)
+def search_movies(term, page=1):
+    return search.search_tmdb_movies(term, page)
+
+
+@router.get(
+    "/series/",
+    response_model=schemas.SearchResult,
+    response_model_exclude_none=True,
+)
+def search_series(term, page=1):
+    return search.search_tmdb_series(term, page)
+
+
+@router.get(
+    "/movies/{provider_id}/",
+    response_model=schemas.Movie,
+    response_model_exclude_none=True,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No movie found"},
+    },
+)
+def find_movie(provider_id: int):
+    """ Find a movie with  an external search provider id (TMDB) """
+    movie = search.find_tmdb_movie(provider_id)
+    if movie is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Movie not found.")
+    return movie
+
+
+@router.get(
+    "/series/{provider_id}/",
+    response_model=schemas.Series,
+    response_model_exclude_none=True,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No series found"},
+    },
+)
+def find_series(provider_id: int):
+    """ Find a TV series with an external search provider id (TVDB) """
+    series = search.find_tmdb_series_by_tvdb_id(provider_id)
+    if series is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Series not found.")
+    return series
+
+
+@router.get(
+    "/series/{provider_id}/seasons/{season_number}/",
+    response_model=schemas.Season,
+    response_model_exclude_none=True,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No season found"},
+    },
+)
+def find_season(provider_id: int, season_number: int):
+    """ Find a TV season with  an external search provider id (TVDB) and a season number """
+    season = search.find_tmdb_season_by_tvdb_id(provider_id, season_number)
+    if season is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Season not found.")
+    return season
+
+
+@router.get(
+    "/series/{provider_id}/seasons/{season_number}/episodes/{episode_number}",
+    response_model=schemas.Episode,
+    response_model_exclude_none=True,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No episode found"},
+    },
+)
+def find_episode(provider_id: int, season_number: int, episode_number: int):
+    """ Find a TV episode with an external search provider id (TVDB), a season number and an episode number """
+    episode = search.find_tmdb_episode_by_tvdb_id(
+        provider_id, season_number, episode_number
+    )
+    if episode is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Episode not found.")
+    return episode

@@ -1,33 +1,37 @@
-from typing import List, Optional, Type
+from typing import List, Optional
+from urllib.parse import urlparse
 
 from plexapi.exceptions import PlexApiException
 from plexapi.library import LibrarySection, MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
-from plexapi.server import PlexServer
-from sqlalchemy.orm import Session
+from plexapi.server import PlexServer as PlexAPIServer
 
-from server.models import PlexConfig
+from server.schemas import PlexConfigCreateUpdate, PlexServerInfo
 
 
-def connect_servers(db: Session, user_id: int) -> Optional[PlexServer]:
-    plex_config = PlexConfig.find_by(db, user_id=user_id)
-    assert plex_config
-    plex_servers = plex_config.servers
-    assert plex_servers
-    api_key = plex_config.api_key
-    server_name = plex_servers[0].name  # only one server for the moment
+def get_servers(plex_api_key) -> List[PlexServerInfo]:
+    plex_account = MyPlexAccount(plex_api_key)
+    return [
+        PlexServerInfo(
+            server_id=resource.clientIdentifier,
+            server_name=resource.name,
+        )
+        for resource in plex_account.resources()
+        if resource.provides == "server"
+    ]
+
+
+def get_server(api_key: str, name: str) -> Optional[PlexAPIServer]:
     try:
-        return MyPlexAccount(api_key).resource(server_name).connect()
+        server = MyPlexAccount(api_key).resource(name).connect()
     except PlexApiException:
         return None
+    return server
 
 
 def library_sections(
-    plex_server: PlexServer, section_id=None, section_type=None
-) -> List[Type[LibrarySection]]:
-    if section_id is not None:
-        # TODO get section by id
-        pass
+    plex_server: PlexAPIServer, section_type: str = None
+) -> List[LibrarySection]:
     if section_type == "movies":
         libtype = MovieSection
     elif section_type == "series":
@@ -43,7 +47,11 @@ def library_sections(
 
 
 def search(
-    plex_server: PlexServer, section_type: str, title: str, filters: dict, max_results=3
+    plex_server: PlexAPIServer,
+    section_type: str,
+    title: str,
+    filters: dict,
+    max_results=3,
 ):
     if section_type == "movies":
         sections = library_sections(plex_server, section_type="movies")

@@ -2,31 +2,49 @@ from typing import Union, List
 
 from requests import get, post
 
-from server.models import SonarrConfig, SeriesChildRequest, SeriesType
-from server.models.providers.sonarr import SonarrSeries, SonarrAddOptions, SonarrEpisode
-from server.schemas.providers.sonarr import SonarrSeriesSchema, SonarrEpisodeSchema
-from server import utils
+from server.models import (
+    SonarrConfig,
+)
+
+from server.core import utils
 
 
-def make_url(config: SonarrConfig, resource_path: str, queries: dict = None) -> str:
+def make_url(
+    *,
+    api_key: str,
+    host: str,
+    port: int,
+    ssl: bool,
+    version: int = None,
+    resource_path: str,
+    queries: dict = None,
+) -> str:
     queries = queries or {}
-    port = config.port
-    version = config.version
+    port = port
+    version = version
     return utils.make_url(
         "%s://%s%s/api%s%s"
         % (
-            "https" if config.ssl else "http",
-            config.host,
+            "https" if ssl else "http",
+            host,
             f":{port}" if port else "",
             f"/v{version}" if version else "",
             resource_path,
         ),
-        queries_dict={**queries, "apikey": config.api_key},
+        queries_dict={**queries, "apikey": api_key},
     )
 
 
-def check_status(config: SonarrConfig) -> Union[bool, dict]:
-    url = make_url(config, "/system/status")
+def check_instance_status(
+    api_key: str, host: str, port: int, ssl: bool
+) -> Union[bool, dict]:
+    url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        resource_path="/system/status",
+    )
     try:
         r = get(url)
     except Exception:
@@ -39,16 +57,20 @@ def check_status(config: SonarrConfig) -> Union[bool, dict]:
 def lookup(
     config: SonarrConfig,
     tvdb_id: int,
-) -> SonarrSeries:
+):
     url = make_url(
-        config,
-        "/series/lookup",
+        api_key=config.api_key,
+        host=config.host,
+        port=config.port,
+        ssl=config.ssl,
+        resource_path="/series/lookup",
         queries={"term": f"tvdb:{tvdb_id}"},
     )
     lookup_result = get(url).json()[0]
-    return SonarrSeriesSchema().load(lookup_result)
+    # return SonarrSeriesSchema().load(lookup_result)
 
 
+"""
 def add_series(config: SonarrConfig, series: SonarrSeries) -> SonarrSeries:
     url = make_url(config, "/series")
     res = post(url, data=SonarrSeriesSchema().dumps(series))
@@ -101,3 +123,4 @@ def send_request(request: SeriesChildRequest):
             ]
         for episode in season.episodes:
             print(episodes)
+"""

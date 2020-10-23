@@ -1,32 +1,28 @@
-from __future__ import annotations
-
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import AnyHttpUrl, EmailStr
-
 from . import APIModel
 
 
 class UserBase(APIModel):
-    username: Optional[str]
-    email: Optional[EmailStr]
+    username: str
+    email: EmailStr
 
 
 class User(UserBase):
     avatar: Optional[AnyHttpUrl]
-    friends: List[UserPublic]
     confirmed: bool
     admin: bool
 
 
 class UserCreate(UserBase):
-    username: str
-    email: EmailStr
     password: str
 
 
 class UserUpdate(UserBase):
-    old_password: Optional[str] = None
+    username: Optional[str]
+    email: Optional[EmailStr]
+    old_password: Optional[str]
     password: Optional[str]
 
 
@@ -44,6 +40,3 @@ class PasswordResetCreate(APIModel):
 
 class PasswordResetConfirm(APIModel):
     password: str
-
-
-User.update_forward_refs()

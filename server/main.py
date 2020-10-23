@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from server.api.router import api_router
+from server.api import api
 from server.core.config import settings
 from server.site import site
 
@@ -15,7 +15,7 @@ def setup_app() -> FastAPI:
         docs_url=settings.API_PREFIX + "/docs",
         redoc_url=settings.API_PREFIX + "/redoc",
     )
-    application.include_router(api_router, prefix=settings.API_PREFIX)
+    application.include_router(api.router, prefix=settings.API_PREFIX)
     application.mount("/", site)
     application.add_middleware(
         CORSMiddleware,

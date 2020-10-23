@@ -1,64 +1,103 @@
 import re
-from typing import List, Union
+from typing import Optional
 
 import tmdbsimple as tmdb
 
-from server.helpers.providers.plex import connect_plex_servers, plex_search
-from server.models import User
+from server import schemas
+from server.core import settings
+from server.models import SeriesType
+
+tmdb.API_KEY = settings.TMDB_API_KEY
 
 
-def search_friends(name, limit=3):
-    result = []
-    search = User.search("username", name)
-    current_friends = current_user.friends
-    for user in search:
-        if user in current_friends:
-            result.append(user)
-    return result
+def search_tmdb_movies(term: str, page: int) -> dict:
+    search = tmdb.Search().movie(query=term, page=page)
+    for movie in search["results"]:
+        set_tmdb_movie_info(movie, from_search=True)
+    return schemas.TmdbSearchResult.parse_obj(search).dict()
 
 
-def search_media(title, section=None, filters=None):
-    filters = filters or {}
+def search_tmdb_media(term: str, page: int) -> dict:
+    search = tmdb.Search().multi(query=term, page=page)
+    for media in search["results"]:
+        if media["media_type"] == "tv":
+            set_tmdb_series_info(media, from_search=True)
+        else:
+            set_tmdb_movie_info(media, from_search=True)
+        del media["media_type"]
+    return schemas.TmdbSearchResult.parse_obj(search).dict()
+
+
+def search_tmdb_series(term: str, page: int) -> dict:
+    search = tmdb.Search().tv(query=term, page=page)
+    for series in search["results"]:
+        set_tmdb_series_info(series, from_search=True)
+    return schemas.TmdbSearchResult.parse_obj(search).dict()
+
+
+def find_tmdb_movie(tmdb_id: int) -> Optional[dict]:
     try:
-        plex_server = connect_plex_servers(current_user)
-    except BadRequest:
-        return []
-    result = plex_search(
-        plex_server, section_type=section, title=title, filters=filters
-    )
-    return result
+        movie = tmdb.Movies(tmdb_id).info()
+    except Exception:
+        return None
+    set_tmdb_movie_info(movie)
+    return schemas.TmdbMovie.parse_obj(movie).dict()
 
 
-@cache.cached(timeout=40000)
-def tmdb_series_genres():
-    return tmdb.Genres().tv_list().get("genres")
+def find_tmdb_series_by_tvdb_id(tvdb_id: int) -> Optional[dict]:
+    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
+    if not tmdb_result:
+        return None
+    tmdb_id = tmdb_result[0]["id"]
+    series = tmdb.TV(tmdb_id).info()
+    set_tmdb_series_info(series)
+    return schemas.TmdbSeries.parse_obj(series).dict()
 
 
-@cache.cached(timeout=40000)
-def tmdb_movie_genres():
-    return tmdb.Genres().movie_list().get("genres")
+def find_tmdb_season_by_tvdb_id(tvdb_id: int, season_number: int) -> Optional[dict]:
+    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
+    if not tmdb_result:
+        return None
+    tmdb_id = tmdb_result[0]["id"]
+    season = tmdb.TV_Seasons(tmdb_id, season_number).info()
+    return schemas.TmdbSeason.parse_obj(season).dict()
 
 
-def set_tmdb_series_info(series: Union[List[dict], dict]):
-    anime_pattern = re.compile("^(?i)anim(e|ation)$")
+def find_tmdb_episode_by_tvdb_id(
+    tvdb_id: int, season_number: int, episode_number: int
+) -> Optional[dict]:
+    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
+    if not tmdb_result:
+        return None
+    tmdb_id = tmdb_result[0]["id"]
+    episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info()
+    return schemas.TmdbEpisode.parse_obj(episode).dict()
 
-    if isinstance(series, list):
-        genres = tmdb_series_genres()
-        anime_genre_ids = [
-            genre["id"] for genre in genres if anime_pattern.match(genre["name"])
+
+def set_tmdb_movie_info(movie: dict, from_search: bool = False):
+    if from_search:
+        tmdb_genres = tmdb.Genres().movie_list().get("genres")
+        genres = [
+            genre["name"] for genre in tmdb_genres if genre["id"] in movie["genre_ids"]
         ]
-        for s in series:
-            if s.get("media_type") == "tv":
-                s["tvdb_id"] = tmdb.TV(s["id"]).external_ids().get("tvdb_id")
-                s["series_type"] = (
-                    "anime"
-                    if not set(s["genre_ids"]).isdisjoint(anime_genre_ids)
-                    else "standard"
-                )
     else:
-        series["tvdb_id"] = tmdb.TV(series["id"]).external_ids().get("tvdb_id")
-        for genre in series["genres"]:
-            if anime_pattern.match(genre["name"]):
-                series["series_type"] = SeriesType.anime.value
-                return
-        series["series_type"] = SeriesType.standard.value
+        genres = [genre["name"] for genre in movie["genres"]]
+    movie["genres"] = genres
+
+
+def set_tmdb_series_info(series: dict, from_search: bool = False):
+    anime_pattern = re.compile("^(?i)anim(e|ation)$")
+    series["tvdb_id"] = tmdb.TV(series["id"]).external_ids().get("tvdb_id")
+    if from_search:
+        tmdb_genres = tmdb.Genres().tv_list().get("genres")
+        genres = [
+            genre["name"] for genre in tmdb_genres if genre["id"] in series["genre_ids"]
+        ]
+    else:
+        genres = [genre["name"] for genre in series["genres"]]
+    for genre in genres:
+        if anime_pattern.match(genre):
+            series["series_type"] = SeriesType.anime
+            break
+    series["series_type"] = SeriesType.standard
+    series["genres"] = genres

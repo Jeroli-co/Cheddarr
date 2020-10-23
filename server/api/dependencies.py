@@ -1,18 +1,22 @@
-from typing import Generator
+from typing import Callable, Generator, List, Type
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
+from sqlalchemy.orm import Session
 
-from server import models, schemas
 from server.core.config import settings
 from server.database.session import SessionLocal
+from server.models import User
+from server.repositories import UserRepository, PlexConfigRepository
+from server.repositories.base import BaseRepository
+from server.schemas import TokenPayload
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_PREFIX}/sign-in")
 
 
-def db() -> Generator:
+def _db() -> Generator:
     session = SessionLocal()
     try:
         yield session
@@ -23,9 +27,21 @@ def db() -> Generator:
         session.close()
 
 
-def current_user(
-    token: str = Depends(oauth2_scheme), database=Depends(db)
-) -> models.User:
+def get_repository(
+    repo_type: Type[BaseRepository],
+) -> Callable[[Session], BaseRepository]:
+    def _get_repo(
+        session: Session = Depends(_db),
+    ) -> BaseRepository:
+        return repo_type(session)
+
+    return _get_repo
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    user_repository: UserRepository = Depends(get_repository(UserRepository)),
+) -> User:
     credentials_exception = HTTPException(
         status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials.",
@@ -35,10 +51,26 @@ def current_user(
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=settings.SIGNING_ALGORITHM
         )
-        token_data = schemas.TokenPayload(**payload)
+        token_data = TokenPayload.parse_obj(payload)
     except (jwt.JWTError, ValidationError):
         raise credentials_exception
-    user = models.User.get(database, id=token_data.sub)
+    user = user_repository.find_by_id(int(token_data.sub))
     if not user:
         raise credentials_exception
     return user
+
+
+def get_current_user_plex_configs(
+    cur_user: User = Depends(get_current_user),
+    plex_config_repository: PlexConfigRepository = Depends(
+        get_repository(PlexConfigRepository)
+    ),
+):
+    configs = plex_config_repository.find_all_by_user_id(
+        user_id=cur_user.id, enabled=True
+    )
+    if configs is None:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, "No Plex configuration found for the user."
+        )
+    return configs
