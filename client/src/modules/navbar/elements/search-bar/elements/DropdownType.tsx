@@ -7,8 +7,8 @@ import {
   faTag,
   faTags,
 } from "@fortawesome/free-solid-svg-icons";
-import { useOutsideAlerter } from "../../../../utils/hooks/useOutsideAlerter";
-import { SearchRequestTypes } from "../../../search/enums/SearchRequestTypes";
+import { useOutsideAlerter } from "../../../../../utils/hooks/useOutsideAlerter";
+import { SearchRequestTypes } from "../../../../search/enums/SearchRequestTypes";
 
 const DropdownTypeStyle = styled.div<{ isActive: boolean }>`
   position: relative;

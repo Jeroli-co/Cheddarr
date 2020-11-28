@@ -3,14 +3,14 @@ import { render } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
-import { routes } from "../../../router/routes";
+import { routes } from "../../../../router/routes";
 import {
   AuthContext,
   AuthContextDefaultImpl,
-} from "../../auth/contexts/AuthContext";
-import { Navbar } from "../Navbar";
+} from "../../../auth/contexts/AuthContext";
+import { Navbar } from "../../Navbar";
 
-const logo = require("../../../assets/cheddarr-small.png");
+const logo = require("../../../../assets/cheddarr-small.png");
 
 test("UserDropdown always shows static elment", () => {
   const history = createMemoryHistory({ initialEntries: [routes.HOME.url] });

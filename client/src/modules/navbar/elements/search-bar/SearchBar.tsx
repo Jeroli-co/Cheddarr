@@ -6,13 +6,13 @@ import React, {
   useState,
 } from "react";
 import styled, { css } from "styled-components";
-import { isEmpty } from "../../../utils/strings";
+import { isEmpty } from "../../../../utils/strings";
 import { DropdownType } from "./elements/DropdownType";
 import { ResultsList } from "./elements/ResultsList";
 import { useHistory } from "react-router";
-import { routes } from "../../../router/routes";
-import { SearchRequestTypes } from "../../search/enums/SearchRequestTypes";
-import { SearchService } from "../../search/services/SearchService";
+import { routes } from "../../../../router/routes";
+import { SearchRequestTypes } from "../../../search/enums/SearchRequestTypes";
+import { SearchService } from "../../../search/services/SearchService";
 
 const SearchBarStyle = styled.div<{ isInputFocus: boolean }>`
   position: relative;

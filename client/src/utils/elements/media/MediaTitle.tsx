@@ -1,5 +1,6 @@
 import React from "react";
-import { Text, TITLE_SIZES } from "../../strings";
+import { TITLE_SIZES } from "../../strings";
+import { Text } from "../Text";
 import { routes } from "../../../router/routes";
 import { Link } from "react-router-dom";
 import {

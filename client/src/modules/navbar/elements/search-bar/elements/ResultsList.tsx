@@ -1,19 +1,19 @@
 import React from "react";
 import styled from "styled-components";
-import { ColumnLayout, RowLayout } from "../../../../utils/elements/layouts";
-import { Text } from "../../../../utils/strings";
+import { ColumnLayout, RowLayout } from "../../../../../utils/elements/layouts";
 import { useHistory } from "react-router";
-import { routes } from "../../../../router/routes";
-import Spinner from "../../../../utils/elements/Spinner";
+import { routes } from "../../../../../router/routes";
+import Spinner from "../../../../../utils/elements/Spinner";
 import {
   IMediaServerMedia,
   IMediaServerSeries,
   isMediaServerMedia,
   isMediaServerMovie,
   isMediaServerSeries,
-} from "../../../media-servers/models/IMediaServerMedia";
-import { IPublicUser, isPublicUser } from "../../../user/models/IPublicUser";
-import { SearchRequestTypes } from "../../../search/enums/SearchRequestTypes";
+} from "../../../../media-servers/models/IMediaServerMedia";
+import { IPublicUser, isPublicUser } from "../../../../user/models/IPublicUser";
+import { SearchRequestTypes } from "../../../../search/enums/SearchRequestTypes";
+import { Text } from "../../../../../utils/elements/Text";
 
 const ResultsListStyle = styled.div<{ isVisible: boolean }>`
   position: absolute;

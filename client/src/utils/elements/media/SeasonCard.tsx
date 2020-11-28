@@ -8,7 +8,7 @@ import { MediaTitle } from "./MediaTitle";
 import { Tag, TagColor } from "../Tag";
 import { MediaRating } from "./MediaRating";
 import { PlexButton } from "../PlexButton";
-import { Text, TITLE_SIZES } from "../../strings";
+import { Text } from "../Text";
 import { EpisodeCard } from "./EpisodeCard";
 import smoothscroll from "smoothscroll-polyfill";
 import styled from "styled-components";
@@ -18,6 +18,7 @@ import {
   IMediaServerSeason,
 } from "../../../modules/media-servers/models/IMediaServerMedia";
 import { PlexService } from "../../../modules/media-servers/plex/services/PlexService";
+import { TITLE_SIZES } from "../../strings";
 
 const EpisodeSelectedLayout = styled.div`
   border-top: 3px solid ${(props) => props.theme.primary};

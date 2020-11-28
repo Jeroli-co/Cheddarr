@@ -11,29 +11,20 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../auth/contexts/AuthContext";
 import { SignUpButton } from "../auth/components/elements/SignUpButton";
 import { SignInButton } from "../auth/components/elements/SignInButton";
-import { UserDropdown } from "./user-dropdown/UserDropdown";
-import styled, { keyframes } from "styled-components";
+import { UserDropdown } from "./elements/user-dropdown/UserDropdown";
+import styled from "styled-components";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { GitHubButton } from "./elements/GithubButton";
-import { UserDropdownMobile } from "./user-dropdown/UserDropdownMobile";
+import { UserDropdownMobile } from "./elements/user-dropdown/UserDropdownMobile";
 import { useOutsideAlerter } from "../../utils/hooks/useOutsideAlerter";
 import { RowLayout } from "../../utils/elements/layouts";
-import { SearchBar } from "./search-bar/SearchBar";
+import { SearchBar } from "./elements/search-bar/SearchBar";
 import { routes } from "../../router/routes";
 import { STATIC_STYLES } from "../../utils/enums/StaticStyles";
+import { Spin } from "../animations/Animations";
+import { ThemesPicker } from "./elements/themes-picker/ThemesDropdown";
 
 const logo = require("../../assets/cheddarr-small.png");
-
-const NavbarLogoKeyframes = () => {
-  return keyframes`
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  `;
-};
 
 const NavbarStyle = styled.div`
   position: relative;
@@ -47,7 +38,7 @@ const NavbarAppLogo = styled.div`
   justify-content: center;
   align-items: center;
   &:hover {
-    animation-name: ${NavbarLogoKeyframes};
+    animation-name: ${Spin};
     animation-duration: 1s;
     animation-iteration-count: 1;
     animation-timing-function: ease-in-out;
@@ -102,6 +93,7 @@ const Navbar = () => {
   const burgerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownMobileRef = useRef<HTMLDivElement>(null);
+
   useOutsideAlerter([dropdownRef, dropdownMobileRef, burgerRef], () =>
     setIsDropdownOpen(false)
   );
@@ -132,6 +124,7 @@ const Navbar = () => {
             alignItems="center"
             childMarginLeft="30px"
           >
+            <ThemesPicker />
             <GitHubButton />
             {!isLoading && isAuthenticated && (
               <Link to={routes.REQUESTS_SENT.url}>

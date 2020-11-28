@@ -1,5 +1,16 @@
 import { keyframes } from "styled-components";
 
+export const Spin = () => {
+  return keyframes`
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  `;
+};
+
 const FadeInUp = (height: number) => {
   return keyframes`
     from {

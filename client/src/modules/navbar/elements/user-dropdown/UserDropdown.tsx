@@ -1,16 +1,16 @@
 import * as React from "react";
 import { RefObject, useContext } from "react";
 import { Link } from "react-router-dom";
-import { routes } from "../../../router/routes";
+import { routes } from "../../../../router/routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCog,
   faSignOutAlt,
   faUserCircle,
 } from "@fortawesome/free-solid-svg-icons";
-import { AuthContext } from "../../auth/contexts/AuthContext";
+import { AuthContext } from "../../../auth/contexts/AuthContext";
 import styled from "styled-components";
-import { UserDropdownImage } from "../elements/UserDropdownImage";
+import { UserDropdownImage } from "./UserDropdownImage";
 
 const UserDropdownStyle = styled.div`
   position: relative;
