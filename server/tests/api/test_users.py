@@ -77,7 +77,7 @@ def test_delete_current_user(
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
-    assert user_repo.find_by_id(datasets["user1"]["id"]) is None
+    assert user_repo.find_by(id=datasets["user1"]["id"]) is None
 
 
 def test_update_username(
@@ -118,7 +118,7 @@ def test_update_password(
     )
     assert r.status_code == 200
     assert verify_password(
-        "new_password", user_repo.find_by_id(datasets["user1"]["id"]).password
+        "new_password", user_repo.find_by(id=datasets["user1"]["id"]).password
     )
 
 
@@ -196,16 +196,16 @@ def test_add_friend(
     friendship_repo = FriendshipRepository(db)
     assert (
         len(
-            friendship_repo.find_all_requested_by_user_id(
-                datasets["user1"]["id"], pending=True
+            friendship_repo.find_all_by(
+                requesting_user_id=datasets["user1"]["id"], pending=True
             )
         )
         == 1
     )
     assert (
         len(
-            friendship_repo.find_all_received_by_user_id(
-                datasets["user3"]["id"], pending=True
+            friendship_repo.find_all_by(
+                requested_user_id=datasets["user3"]["id"], pending=True
             )
         )
         == 0
@@ -218,16 +218,16 @@ def test_add_friend(
     assert r.status_code == 201
     assert (
         len(
-            friendship_repo.find_all_requested_by_user_id(
-                datasets["user1"]["id"], pending=True
+            friendship_repo.find_all_by(
+                requesting_user_id=datasets["user1"]["id"], pending=True
             )
         )
         == 2
     )
     assert (
         len(
-            friendship_repo.find_all_received_by_user_id(
-                datasets["user3"]["id"], pending=True
+            friendship_repo.find_all_by(
+                requested_user_id=datasets["user3"]["id"], pending=True
             )
         )
         == 1

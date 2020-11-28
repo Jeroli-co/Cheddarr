@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import (
     APIRouter,
@@ -16,7 +16,6 @@ from server.models import Friendship, ProviderType, User
 from server.repositories import (
     UserRepository,
     FriendshipRepository,
-    ProviderConfigRepository,
 )
 
 users_router = APIRouter()
@@ -35,7 +34,7 @@ def get_user_by_id(
     id: int,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
-    user = user_repo.find_by_id(id)
+    user = user_repo.find_by(id=id)
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this id exists.")
     return user
@@ -72,15 +71,15 @@ async def get_current_user(current_user: User = Depends(deps.get_current_user)):
 def get_user_providers(
     type: Optional[ProviderType] = None,
     current_user: User = Depends(deps.get_current_user),
-    provider_repo: ProviderConfigRepository = Depends(
-        deps.get_repository(ProviderConfigRepository)
-    ),
 ):
+    user_providers = current_user.providers
     if type is not None:
-        return provider_repo.find_all_by_user_id_and_type(
-            user_id=current_user.id, provider_type=type, enabled=True
-        )
-    return provider_repo.find_all_by_user_id(user_id=current_user.id, enabled=True)
+        return [
+            provider
+            for provider in user_providers
+            if provider.provider_type == type and provider.enabled
+        ]
+    return user_providers
 
 
 @current_user_router.delete("")
@@ -263,7 +262,7 @@ def confirm_reset_password(
 
 
 @current_user_router.get(
-    "/friends", response_model=List[schemas.UserPublic], tags=["friends"]
+    "/friends", response_model=list[schemas.UserPublic], tags=["friends"]
 )
 def get_friends(
     providers_type: Optional[ProviderType] = None,
@@ -276,7 +275,7 @@ def get_friends(
     friends = [
         friendship.requesting_user
         if friendship.requesting_user != current_user
-        else friendship.receiving_user
+        else friendship.requested_user
         for friendship in friendships
     ]
     if providers_type is not None:
@@ -302,39 +301,39 @@ def get_friends(
 
 
 @current_user_router.get(
-    "/friends/received", response_model=List[schemas.UserPublic], tags=["friends"]
+    "/friends/incoming", response_model=list[schemas.UserPublic], tags=["friends"]
 )
-def get_pending_received_friends(
+def get_pending_incoming_friends(
     current_user: User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(
         deps.get_repository(FriendshipRepository)
     ),
 ):
-    friendships = friendship_repo.find_all_received_by_user_id(
-        current_user.id, pending=True
+    friendships = friendship_repo.find_all_by(
+        requested_user_id=current_user.id, pending=True
     )
     return [friendship.requesting_user for friendship in friendships]
 
 
 @current_user_router.get(
-    "/friends/requested", response_model=List[schemas.UserPublic], tags=["friends"]
+    "/friends/outgoing", response_model=list[schemas.UserPublic], tags=["friends"]
 )
-def get_pending_requested_friends(
+def get_pending_outgoing_friends(
     current_user: User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(
         deps.get_repository(FriendshipRepository)
     ),
 ):
-    friendships = friendship_repo.find_all_requested_by_user_id(
-        current_user.id, pending=True
+    friendships = friendship_repo.find_all_by(
+        requesting_user_id=current_user.id, pending=True
     )
-    return [friendship.receiving_user for friendship in friendships]
+    return [friendship.requested_user for friendship in friendships]
 
 
 @current_user_router.post(
     "/friends",
-    response_model=schemas.UserPublic,
     status_code=status.HTTP_201_CREATED,
+    response_model=schemas.UserPublic,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
         status.HTTP_409_CONFLICT: {"description": "Already friends"},
@@ -357,10 +356,10 @@ def add_friend(
         raise HTTPException(status.HTTP_409_CONFLICT, "This user is already a friend.")
 
     friendship = Friendship(
-        requesting_user_id=current_user.id, receiving_user_id=friend.id
+        requesting_user_id=current_user.id, requested_user_id=friend.id
     )
     friendship_repo.save(friendship)
-    return friendship.receiving_user
+    return friendship.requested_user
 
 
 @current_user_router.patch(

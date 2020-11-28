@@ -20,7 +20,6 @@ class User(Model):
     providers = relationship(
         "ProviderConfig",
         back_populates="user",
-        lazy="dynamic",
         cascade="all,delete,delete-orphan",
     )
 
@@ -46,16 +45,18 @@ class PlexAccount(Model):
 
 
 class Friendship(Model):
-    __repr_props__ = ("requesting_user", "receiving_user", "pending")
+    __repr_props__ = ("requesting_user", "requested_user", "pending")
 
     requesting_user_id = Column(ForeignKey(User.id), primary_key=True)
-    receiving_user_id = Column(ForeignKey(User.id), primary_key=True)
+    requested_user_id = Column(ForeignKey(User.id), primary_key=True)
+
     requesting_user = relationship(
         "User",
         foreign_keys=[requesting_user_id],
     )
-    receiving_user = relationship(
+    requested_user = relationship(
         "User",
-        foreign_keys=[receiving_user_id],
+        foreign_keys=[requested_user_id],
     )
+
     pending = Column(Boolean, default=True)

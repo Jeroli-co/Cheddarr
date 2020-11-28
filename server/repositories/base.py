@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Generic, TypeVar
+from typing import Generic, get_args, Optional
 
 from sqlalchemy.orm import Session
 
@@ -14,6 +14,13 @@ class BaseRepository(Generic[ModelType], ABC):
         :param session: A SQLAlchemy Session
         """
         self.session = session
+        self.model = get_args(self.__orig_bases__[0])[0]
+
+    def find_by(self, **filters) -> Optional[ModelType]:
+        return self.session.query(self.model).filter_by(**filters).one_or_none()
+
+    def find_all_by(self, limit: int = 100, **filters) -> list[ModelType]:
+        return self.session.query(self.model).filter_by(**filters).limit(limit).all()
 
     def save(self, db_obj: ModelType) -> ModelType:
         """

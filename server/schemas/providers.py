@@ -1,5 +1,5 @@
 from datetime import date
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import AnyHttpUrl, Field, validator
 
@@ -37,8 +37,8 @@ class PlexConfigCreateUpdate(ProviderConfigBase, PlexServerInfo):
 # Radarr                            #
 #####################################
 class RadarrInstanceInfo(APIModel):
-    root_folders: List[str]
-    quality_profiles: List[dict]
+    root_folders: list[str]
+    quality_profiles: list[dict]
     version: int
 
 
@@ -59,13 +59,30 @@ class RadarrConfigCreateUpdate(ProviderConfigBase, RadarrConfigData):
     enabled: Optional[bool] = True
 
 
+class RadarrAddOptions(APIModel):
+    search_for_movie: bool = Field(alias="searchForMovie")
+
+
+class RadarrMovie(APIModel):
+    id: Optional[int]
+    tmdb_id: int = Field(alias="tmdbId")
+    title: str = Field(alias="title")
+    title_slug: str = Field(alias="titleSlug")
+    year: int = Field(alias="year")
+    quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
+    root_folder_path: Optional[str] = Field(alias="rootFolderPath")
+    monitored: bool = Field(alias="monitored")
+    images: list[dict] = Field(alias="images")
+    add_options: Optional[RadarrAddOptions] = Field(alias="addOptions")
+
+
 #####################################
 # Sonarr                            #
 #####################################
 class SonarrInstanceInfo(APIModel):
-    root_folders: List[str]
-    quality_profiles: List[dict]
-    language_profiles: List[dict]
+    root_folders: list[str]
+    quality_profiles: list[dict]
+    language_profiles: list[dict]
     version: int
 
 
@@ -90,6 +107,38 @@ class SonarrConfig(ProviderConfigBase, SonarrConfigData):
 
 class SonarrConfigCreateUpdate(ProviderConfigBase, SonarrConfigData):
     enabled: Optional[bool] = True
+
+
+class SonarrAddOptions(APIModel):
+    ignore_episodes_with_files: bool = Field(alias="ignoreEpisodesWithFiles")
+    ignore_episodes_without_files: bool = Field(alias="ignoreEpisodesWithoutFiles")
+    search_for_missing_episodes: bool = Field(alias="searchForMissingEpisodes")
+
+
+class SonarrEpisode(APIModel):
+    id: int
+    episode_number: int = Field(alias="episodeNumber")
+    season_number: int = Field(alias="seasonNumber")
+    monitored: bool = Field(alias="monitored")
+
+
+class SonarrSeason(APIModel):
+    season_number: int = Field(alias="seasonNumber")
+    monitored: bool = Field(alias="monitored")
+
+
+class SonarrSeries(APIModel):
+    id: Optional[int]
+    title: str = Field(alias="title")
+    tvdb_id: int = Field(alias="tvdbId")
+    title_slug: str = Field(alias="titleSlug")
+    quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
+    language_profile_id: Optional[int] = Field(alias="languageProfileId")
+    root_folder_path: Optional[str] = Field(alias="rootFolderPath")
+    images: list[dict] = Field(alias="images")
+    add_options: Optional[SonarrAddOptions] = Field(alias="addOptions")
+    series_type: str
+    seasons: list[SonarrSeason]
 
 
 #####################################
@@ -140,10 +189,10 @@ class PlexVideo(APIModel):
 class PlexMovie(PlexVideo):
     duration: int
     release_date: date = Field(alias="originallyAvailableAt")
-    actors: List[PlexMediaTag]
-    directors: List[PlexMediaTag]
+    actors: list[PlexMediaTag]
+    directors: list[PlexMediaTag]
     studio: str
-    genres: List[PlexMediaTag]
+    genres: list[PlexMediaTag]
 
 
 class PlexEpisode(PlexVideo):
@@ -164,7 +213,7 @@ class PlexSeason(PlexVideo):
     series_id: int = Field(alias="parentRatingKey")
     series_title: str = Field(alias="parentTitle")
     season_number: int = Field(alias="seasonNumber")
-    episodes: List[PlexEpisode]
+    episodes: list[PlexEpisode]
 
     @validator("episodes", pre=True)
     def get_episodes(cls, episodes, **kwargs):
@@ -172,10 +221,10 @@ class PlexSeason(PlexVideo):
 
 
 class PlexSeries(PlexVideo):
-    seasons: List[PlexSeason]
-    actors: List[PlexMediaTag]
+    seasons: list[PlexSeason]
+    actors: list[PlexMediaTag]
     studio: str
-    genres: List[PlexMediaTag]
+    genres: list[PlexMediaTag]
     release_date: date = Field(alias="originallyAvailableAt")
 
     @validator("seasons", pre=True)

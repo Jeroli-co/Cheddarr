@@ -29,13 +29,22 @@ from .providers import (
     RadarrConfig,
     RadarrConfigCreateUpdate,
     RadarrConfigData,
+    RadarrMovie,
     RadarrInstanceInfo,
+    RadarrAddOptions,
     SonarrInstanceInfo,
     SonarrConfig,
     SonarrConfigData,
     SonarrConfigCreateUpdate,
+    SonarrAddOptions,
 )
-from .requests import MovieRequest, MovieRequestCreate, SeriesRequest
+from .requests import (
+    MovieRequest,
+    MovieRequestCreate,
+    SeriesRequest,
+    SeriesRequestCreate,
+    RequestUpdate,
+)
 from .search import (
     SearchResult,
     TmdbMovie,

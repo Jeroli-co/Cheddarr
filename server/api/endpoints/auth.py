@@ -24,8 +24,8 @@ router = APIRouter()
 
 @router.post(
     "/sign-up",
-    response_model=schemas.User,
     status_code=status.HTTP_201_CREATED,
+    response_model=schemas.User,
     responses={
         status.HTTP_409_CONFLICT: {"description": "Email or username not available"}
     },
@@ -36,7 +36,7 @@ def signup(
     background_tasks: BackgroundTasks,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
-    existing_email = user_repo.find_by_email(user_in.email)
+    existing_email = user_repo.find_by(email=user_in.email)
     if existing_email:
         raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
 
@@ -266,7 +266,7 @@ def confirm_signin_plex(
     plex_avatar = info["thumb"]
 
     # Find this plex account in the database, or create it with the corresponding user
-    plex_account = plex_account_repo.find_by_plex_user_id(plex_user_id)
+    plex_account = plex_account_repo.find_by(plex_user_id=plex_user_id)
     if plex_account is None:
         user = user_repo.find_by_email(plex_email)
         if user is None:

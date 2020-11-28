@@ -98,8 +98,8 @@ def setup():
     user3 = User(**datasets["user3"])
     user4 = User(**datasets["user4"])
     session.add_all((user1, user2, user3))
-    friendship1 = Friendship(requesting_user=user1, receiving_user=user2, pending=False)
-    friendship2 = Friendship(requesting_user=user1, receiving_user=user4, pending=True)
+    friendship1 = Friendship(requesting_user=user1, requested_user=user2, pending=False)
+    friendship2 = Friendship(requesting_user=user1, requested_user=user4, pending=True)
     session.add_all((friendship1, friendship2))
     session.commit()
 

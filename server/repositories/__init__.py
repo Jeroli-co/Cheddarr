@@ -1,6 +1,5 @@
 from .users import UserRepository, FriendshipRepository, PlexAccountRepository
 from .providers import (
-    ProviderConfigRepository,
     PlexConfigRepository,
     RadarrConfigRepository,
     SonarrConfigRepository,

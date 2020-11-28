@@ -35,7 +35,7 @@ class Movie(Model, Media):
 class Series(Model, Media):
     tvdb_id = Column(Integer, nullable=False)
     number_of_seasons = Column(Integer)
-    requests = relationship("SeriesRequest")
+    requests = relationship("SeriesRequest", back_populates="series")
 
 
 class RequestStatus(str, Enum):
@@ -52,12 +52,28 @@ class Request(object):
     )
 
     @declared_attr
-    def requested_user_id(cls):
-        return Column(ForeignKey("user.id"), nullable=False)
+    def selected_provider_id(cls):
+        return Column(ForeignKey("providerconfig.id"))
 
     @declared_attr
     def requesting_user_id(cls):
         return Column(ForeignKey("user.id"), nullable=False)
+
+    @declared_attr
+    def requested_user_id(cls):
+        return Column(ForeignKey("user.id"), nullable=False)
+
+    @declared_attr
+    def selected_provider(cls):
+        return relationship("ProviderConfig")
+
+    @declared_attr
+    def requesting_user(cls):
+        return relationship("User", foreign_keys=cls.requesting_user_id)
+
+    @declared_attr
+    def requested_user(cls):
+        return relationship("User", foreign_keys=cls.requested_user_id)
 
 
 class MovieRequest(Model, Timestamp, Request):
@@ -65,24 +81,16 @@ class MovieRequest(Model, Timestamp, Request):
 
     movie_id = Column(ForeignKey("movie.id"), nullable=False)
     movie = relationship("Movie")
-    requested_user = relationship("User", foreign_keys="MovieRequest.requested_user_id")
-    requesting_user = relationship(
-        "User", foreign_keys="MovieRequest.requesting_user_id"
-    )
 
 
-class SeriesRequest(Model, Request):
+class SeriesRequest(Model, Timestamp, Request):
     __repr_props__ = ("series", "requested_user", "requesting_user")
 
     series_id = Column(ForeignKey("series.id"), nullable=False)
-    series = relationship("Series")
+    series = relationship("Series", back_populates="requests")
     series_type = Column(DBEnum(SeriesType), nullable=False)
-    selected_provider_id = Column(ForeignKey("providerconfig.id"), nullable=False)
-    requested_user = relationship(
-        "User", foreign_keys="SeriesRequest.requested_user_id"
-    )
-    requesting_user = relationship(
-        "User", foreign_keys="SeriesRequest.requesting_user_id"
+    seasons = relationship(
+        "SeasonRequest", cascade="all,delete,delete-orphan", backref="request"
     )
 
 

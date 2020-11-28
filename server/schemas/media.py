@@ -1,6 +1,5 @@
 from abc import ABC
 from datetime import date
-from typing import List
 
 from pydantic import Field
 
@@ -11,13 +10,10 @@ from server.schemas import APIModel
 class Media(APIModel, ABC):
     tmdb_id: int
     title: str
-    summary: str
     release_date: date
     status: str
-    rating: float
     poster_url: str
     art_url: str
-    genres: List[str]
 
 
 class Movie(Media):
@@ -34,11 +30,11 @@ class Season(APIModel):
     season_number: int
     title: str
     release_date: date
-    episodes: List[Episode]
+    episodes: list[Episode]
 
 
 class Series(Media):
     tvdb_id: int
     number_of_seasons: int
-    seasons: List[Season]
+    seasons: list[Season]
     media_type: MediaType = Field(default=MediaType.series, const=True)

@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import date
-from typing import Generic, List, Optional, TypeVar, Union
+from typing import Generic, Optional, TypeVar, Union
 
 from pydantic import Field, validator
 from pydantic.generics import GenericModel
@@ -10,11 +10,17 @@ MovieResultType = TypeVar("MovieResultType")
 SeriesResultType = TypeVar("SeriesResultType")
 
 
+class SearchedMedia(Media):
+    summary: Optional[str]
+    rating: Optional[float]
+    genres: Optional[list[str]]
+
+
 class SearchResult(GenericModel, Generic[MovieResultType, SeriesResultType]):
     page: int = 1
     total_pages: int
     total_results: int
-    results: List[Union[SeriesResultType, MovieResultType]]
+    results: list[Union[SeriesResultType, MovieResultType]]
 
 
 ###########################################
@@ -27,7 +33,7 @@ TMDB_POSTER_SIZE = "w500"
 TMDB_ART_SIZE = "w1280"
 
 
-class TmdbMedia(Media, ABC):
+class TmdbMedia(SearchedMedia, ABC):
     tmdb_id: int = Field(alias="id")
     title: str = Field(alias="name")
     summary: str = Field(alias="overview")
@@ -60,13 +66,13 @@ class TmdbSeason(Season):
     season_number: int = Field(alias="season_number")
     title: str = Field(alias="name")
     release_date: date = Field(alias="air_date")
-    episodes: Optional[List[TmdbEpisode]] = Field(alias="episodes")
+    episodes: Optional[list[TmdbEpisode]] = Field(alias="episodes")
 
 
 class TmdbSeries(TmdbMedia, Series):
     release_date: str = Field(alias="first_air_date")
     number_of_seasons: Optional[int] = Field(alias="number_of_seasons")
-    seasons: Optional[List[TmdbSeason]] = Field(alias="seasons")
+    seasons: Optional[list[TmdbSeason]] = Field(alias="seasons")
 
 
 class TmdbSearchResult(SearchResult[TmdbSeries, TmdbMovie]):

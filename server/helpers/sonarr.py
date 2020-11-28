@@ -1,6 +1,6 @@
-from typing import Union, List
+from typing import Union
 
-from requests import get, post
+import requests
 
 from server.models import (
     SonarrConfig,
@@ -46,7 +46,7 @@ def check_instance_status(
         resource_path="/system/status",
     )
     try:
-        r = get(url)
+        r = requests.get(url)
     except Exception:
         return False
     if r.status_code != 200:
@@ -66,7 +66,7 @@ def lookup(
         resource_path="/series/lookup",
         queries={"term": f"tvdb:{tvdb_id}"},
     )
-    lookup_result = get(url).json()[0]
+    lookup_result = requests.get(url).json()[0]
     # return SonarrSeriesSchema().load(lookup_result)
 
 
@@ -77,7 +77,7 @@ def add_series(config: SonarrConfig, series: SonarrSeries) -> SonarrSeries:
     return SonarrSeriesSchema().load(res.json())
 
 
-def get_episodes(config: SonarrConfig, series_id: int) -> List[SonarrEpisode]:
+def get_episodes(config: SonarrConfig, series_id: int) -> list[SonarrEpisode]:
     url = make_url(config, "/episode", queries={"seriesId": series_id})
     res = get(url)
     return SonarrEpisodeSchema(many=True).load(res.json())

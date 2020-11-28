@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import AnyHttpUrl, BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr
 from .base import APIModel
 
 

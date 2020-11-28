@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get(
     "/servers",
-    response_model=List[schemas.PlexServerInfo],
+    response_model=list[schemas.PlexServerInfo],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex account linked"},
     },
@@ -25,7 +25,7 @@ def get_plex_account_servers_info(
         deps.get_repository(PlexAccountRepository)
     ),
 ):
-    plex_account = plex_account_repo.find_by_user_id(current_user.id)
+    plex_account = plex_account_repo.find_by(user_id=current_user.id)
     if plex_account is None:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "No Plex account linked to the user."
@@ -50,7 +50,7 @@ def get_plex_account_server(
         deps.get_repository(PlexAccountRepository)
     ),
 ):
-    plex_account = plex_account_repo.find_by_user_id(current_user.id)
+    plex_account = plex_account_repo.find_by(user_id=current_user.id)
     if plex_account is None:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "No Plex account linked to the user."
@@ -72,7 +72,7 @@ def get_plex_account_server(
 
 @router.get(
     "/movies/recent",
-    response_model=List[schemas.PlexMovie],
+    response_model=list[schemas.PlexMovie],
     response_model_by_alias=False,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
@@ -82,7 +82,7 @@ def get_plex_account_server(
     },
 )
 def get_plex_recent_movies(
-    plex_configs: List[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
     if plex_server is None:
@@ -111,7 +111,7 @@ def get_plex_recent_movies(
 )
 def get_plex_movie(
     movie_id: int,
-    plex_configs: List[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
     if plex_server is None:
@@ -125,7 +125,7 @@ def get_plex_movie(
 
 @router.get(
     "/series/recent",
-    response_model=List[schemas.PlexEpisode],
+    response_model=list[schemas.PlexEpisode],
     response_model_by_alias=False,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
@@ -135,7 +135,7 @@ def get_plex_movie(
     },
 )
 def get_plex_recent_series(
-    plex_configs: List[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
     if plex_server is None:
@@ -164,7 +164,7 @@ def get_plex_recent_series(
 )
 def get_plex_series(
     series_id: int,
-    plex_configs: List[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
     if plex_server is None:
@@ -189,7 +189,7 @@ def get_plex_series(
 )
 def get_plex_season(
     season_id: int,
-    plex_configs: List[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
     if plex_server is None:
@@ -211,7 +211,7 @@ def get_plex_season(
 )
 def get_plex_episode(
     episode_id: int,
-    plex_configs: List[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
     if plex_server is None:
@@ -225,14 +225,14 @@ def get_plex_episode(
 
 @router.get(
     "/on-deck",
-    response_model=List[Union[schemas.PlexMovie, schemas.PlexEpisode]],
+    response_model=list[Union[schemas.PlexMovie, schemas.PlexEpisode]],
     response_model_by_alias=False,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
     },
 )
 def get_plex_on_deck(
-    plex_configs: List[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
     if plex_server is None:

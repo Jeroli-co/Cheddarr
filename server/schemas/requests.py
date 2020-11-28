@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Optional
+from typing import Optional
 
 from server.models import RequestStatus, SeriesType
 from server.schemas import APIModel, Movie, Series, UserPublic
@@ -7,13 +7,18 @@ from server.schemas import APIModel, Movie, Series, UserPublic
 
 class Request(APIModel, ABC):
     id: int
-    request_status: RequestStatus
+    status: RequestStatus
     requested_user: UserPublic
     requesting_user: UserPublic
 
 
+class RequestUpdate(APIModel):
+    status: RequestStatus
+    provider_id: Optional[str]
+
+
 class MovieRequest(Request):
-    media: Movie
+    movie: Movie
 
 
 class MovieRequestCreate(APIModel):
@@ -27,16 +32,16 @@ class EpisodeRequest(APIModel):
 
 class SeasonRequest(APIModel):
     season_number: int
-    episodes: Optional[List[EpisodeRequest]]
+    episodes: Optional[list[EpisodeRequest]]
 
 
 class SeriesRequest(Request):
     tvdb_id: int
     series_type: SeriesType
-    media: Series
+    series: Series
 
 
 class SeriesRequestCreate(APIModel):
     tvdb_id: int
     requested_username: str
-    seasons: Optional[List[SeasonRequest]]
+    seasons: Optional[list[SeasonRequest]]

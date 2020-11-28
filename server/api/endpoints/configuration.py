@@ -1,5 +1,3 @@
-from typing import List
-
 import requests
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -20,21 +18,21 @@ router = APIRouter()
 ##########################################
 
 
-@router.get("/plex", response_model=List[schemas.PlexConfig])
+@router.get("/plex", response_model=list[schemas.PlexConfig])
 def get_plex_configs(
     current_user: User = Depends(deps.get_current_user),
     plex_config_repo: PlexConfigRepository = Depends(
         deps.get_repository(PlexConfigRepository)
     ),
 ):
-    configs = plex_config_repo.find_all_by_user_id(user_id=current_user.id)
+    configs = plex_config_repo.find_all_by(user_id=current_user.id)
     return configs
 
 
 @router.post(
     "/plex",
-    response_model=schemas.PlexConfig,
     status_code=status.HTTP_201_CREATED,
+    response_model=schemas.PlexConfig,
     responses={
         status.HTTP_409_CONFLICT: {"description": "Server already added"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Server connection fail"},
@@ -52,7 +50,7 @@ def add_plex_config(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             "Failed to connect to  the Plex server.",
         )
-    config = plex_config_repo.find_by_user_id_and_server_id(
+    config = plex_config_repo.find_by(
         user_id=current_user.id, server_id=config_in.server_id
     )
     if config is not None:
@@ -79,7 +77,7 @@ def update_plex_config(
         deps.get_repository(PlexConfigRepository)
     ),
 ):
-    config = plex_config_repo.find_by_id(config_id)
+    config = plex_config_repo.find_by(id=config_id)
     if config is None or config.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex config not found.")
     if plex.get_server(config_in.api_key, config_in.server_name) is None:
@@ -105,7 +103,7 @@ def delete_plex_config(
         deps.get_repository(PlexConfigRepository)
     ),
 ):
-    config = plex_config_repo.find_by_id(config_id)
+    config = plex_config_repo.find_by(id=config_id)
     if config is None or config.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex config not found.")
     plex_config_repo.remove(config)
@@ -140,36 +138,42 @@ def get_radarr_instance_info(
         )
     version = int(test["version"][0])
 
-    root_folders = [
-        folder["path"]
-        for folder in requests.get(
-            radarr.make_url(**base_url, resource_path="/rootFolder")
-        ).json()
-    ]
+    if version == 3:
+        root_folders_url = radarr.make_url(
+            **base_url, version=3, resource_path="/rootFolder"
+        )
+        quality_profiles_url = radarr.make_url(
+            **base_url, version=3, resource_path="/qualityprofile"
+        )
+    else:
+        root_folders_url = radarr.make_url(**base_url, resource_path="/rootFolder")
+        quality_profiles_url = radarr.make_url(**base_url, resource_path="/profile")
+
+    root_folders = [folder["path"] for folder in requests.get(root_folders_url).json()]
     quality_profiles = [
         {"id": profile["id"], "name": profile["name"]}
-        for profile in requests.get(
-            radarr.make_url(**base_url, resource_path="/profile")
-        ).json()
+        for profile in requests.get(quality_profiles_url).json()
     ]
+
     return schemas.RadarrInstanceInfo(
         version=version, root_folders=root_folders, quality_profiles=quality_profiles
     )
 
 
-@router.get("/radarr", response_model=schemas.RadarrConfig)
+@router.get("/radarr", response_model=list[schemas.RadarrConfig])
 def get_radarr_configs(
     current_user: User = Depends(deps.get_current_user),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
 ):
-    config = radarr_config_repo.find_all_by_user_id(current_user.id)
-    return config
+    configs = radarr_config_repo.find_all_by(user_id=current_user.id)
+    return configs
 
 
 @router.post(
     "/radarr",
+    status_code=status.HTTP_201_CREATED,
     response_model=schemas.RadarrConfig,
     responses={
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}
@@ -215,7 +219,7 @@ def update_radarr_config(
         deps.get_repository(RadarrConfigRepository)
     ),
 ):
-    config = radarr_config_repo.find_by_id(config_id)
+    config = radarr_config_repo.find_by(id=config_id)
     if config is None or config.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No existing Radarr config.")
 
@@ -244,7 +248,7 @@ def delete_radarr_config(
         deps.get_repository(RadarrConfigRepository)
     ),
 ):
-    config = radarr_config_repo.find_by_id(config_id)
+    config = radarr_config_repo.find_by(id=config_id)
     if config is None or config.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Radarr config not found.")
     radarr_config_repo.remove(config)
@@ -277,33 +281,30 @@ def get_sonarr_instance_info(config_in: schemas.ProviderConfigBase):
         )
 
     version = int(test["version"][0])
-    root_folders = [
-        folder["path"]
-        for folder in requests.get(
-            sonarr.make_url(**base_url, resource_path="/rootFolder")
-        ).json()
-    ]
     if version == 3:
-        quality_profiles = [
-            {"id": profile["id"], "name": profile["name"]}
-            for profile in requests.get(
-                sonarr.make_url(**base_url, version=3, resource_path="/qualityprofile")
-            ).json()
-        ]
+        root_folder_url = sonarr.make_url(
+            **base_url, version=3, resource_path="/rootFolder"
+        )
+        quality_profile_url = sonarr.make_url(
+            **base_url, version=3, resource_path="/qualityprofile"
+        )
+        language_profile_url = sonarr.make_url(
+            **base_url, version=3, resource_path="/languageprofile"
+        )
         language_profiles = [
             {"id": profile["id"], "name": profile["name"]}
-            for profile in requests.get(
-                sonarr.make_url(**base_url, version=3, resource_path="/languageprofile")
-            ).json()
+            for profile in requests.get(language_profile_url).json()
         ]
     else:
-        quality_profiles = [
-            {"id": profile["id"], "name": profile["name"]}
-            for profile in requests.get(
-                sonarr.make_url(**base_url, resource_path="/profile")
-            ).json()
-        ]
+        root_folder_url = sonarr.make_url(**base_url, resource_path="/rootFolder")
+        quality_profile_url = sonarr.make_url(**base_url, resource_path="/profile")
         language_profiles = None
+
+    root_folders = [folder["path"] for folder in requests.get(root_folder_url).json()]
+    quality_profiles = [
+        {"id": profile["id"], "name": profile["name"]}
+        for profile in requests.get(quality_profile_url).json()
+    ]
 
     return schemas.SonarrInstanceInfo(
         version=version,
@@ -313,19 +314,20 @@ def get_sonarr_instance_info(config_in: schemas.ProviderConfigBase):
     )
 
 
-@router.get("/sonarr", response_model=List[schemas.SonarrConfig])
+@router.get("/sonarr", response_model=list[schemas.SonarrConfig])
 def get_sonarr_configs(
     current_user: User = Depends(deps.get_current_user),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),
 ):
-    config = sonarr_config_repo.find_all_by_user_id(current_user.id)
-    return config
+    configs = sonarr_config_repo.find_all_by(user_id=current_user.id)
+    return configs
 
 
 @router.post(
     "/sonarr",
+    status_code=status.HTTP_201_CREATED,
     response_model=schemas.SonarrConfig,
     responses={
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}
@@ -371,7 +373,7 @@ def update_sonarr_config(
         deps.get_repository(SonarrConfigRepository)
     ),
 ):
-    config = sonarr_config_repo.find_by_id(config_id)
+    config = sonarr_config_repo.find_by(id=config_id)
     if config is None or config.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No existing Sonarr config.")
 
@@ -401,7 +403,7 @@ def delete_sonarr_config(
         deps.get_repository(SonarrConfigRepository)
     ),
 ):
-    config = sonarr_config_repo.find_by_id(config_id)
+    config = sonarr_config_repo.find_by(id=config_id)
     if config is None or config.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Sonarr config not found.")
     sonarr_config_repo.remove(config)

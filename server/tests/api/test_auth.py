@@ -71,7 +71,7 @@ def test_confirm_email(app: FastAPI, db: Session, client: TestClient):
         app.url_path_for("confirm_email", token=token),
     )
     assert r.status_code == 200
-    assert user_repo.find_by_id(datasets["user4"]["id"]).confirmed
+    assert user_repo.find_by(id=datasets["user4"]["id"]).confirmed
 
 
 def test_signin_with_email(app: FastAPI, client: TestClient):
@@ -112,7 +112,7 @@ def test_signin_wrong_username_password(app: FastAPI, client: TestClient):
 
 def test_signin_unconfimed_user(app: FastAPI, db: Session, client: TestClient):
     user_repo = UserRepository(db)
-    user = user_repo.find_by_id(datasets["user2"]["id"])
+    user = user_repo.find_by(id=datasets["user2"]["id"])
     user.confirmed = False
     user_repo.save(user)
     assert (

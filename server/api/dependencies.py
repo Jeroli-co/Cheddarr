@@ -1,4 +1,4 @@
-from typing import Callable, Generator, List, Type
+from typing import Callable, Generator, Type
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -54,7 +54,7 @@ def get_current_user(
         token_data = TokenPayload.parse_obj(payload)
     except (jwt.JWTError, ValidationError):
         raise credentials_exception
-    user = user_repository.find_by_id(int(token_data.sub))
+    user = user_repository.find_by(id=int(token_data.sub))
     if not user:
         raise credentials_exception
     return user
@@ -66,9 +66,7 @@ def get_current_user_plex_configs(
         get_repository(PlexConfigRepository)
     ),
 ):
-    configs = plex_config_repository.find_all_by_user_id(
-        user_id=cur_user.id, enabled=True
-    )
+    configs = plex_config_repository.find_all_by(user_id=cur_user.id, enabled=True)
     if configs is None:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "No Plex configuration found for the user."

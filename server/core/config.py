@@ -1,6 +1,6 @@
 import secrets
 from enum import Enum
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -55,7 +55,7 @@ class BaseConfig(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     SIGNING_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 3
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
 
     ##########################################################################
     # database                                                               #
@@ -85,7 +85,7 @@ class ProdConfig(BaseConfig):
     SERVER_HOST: AnyHttpUrl = "https://%s" % (
         DOMAIN or f"{HEROKU_APP_NAME}.herokuapp.com"
     )
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [SERVER_HOST]
+    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = [SERVER_HOST]
 
     ##########################################################################
     # database                                                               #
