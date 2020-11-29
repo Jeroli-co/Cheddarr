@@ -10,7 +10,6 @@ import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { MESSAGES } from "../enums/Messages";
 import { MediasTypes } from "../enums/MediasTypes";
 import { IResetPasswordFormData } from "../components/auth/components/reset-password/reset-password-form/ResetPasswordForm";
-import { IChangePasswordModel } from "../components/settings/settings-account/element/ChangePasswordModal";
 
 class UserService {
   static CURRENT_USER_BASE_URL = "/user";

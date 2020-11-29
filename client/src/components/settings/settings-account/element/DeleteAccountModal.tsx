@@ -1,10 +1,6 @@
-import * as React from "react";
+import React from "react";
 import { useContext, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../../router/routes";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../enums/FormDefaultValidators";
 import { useHistory } from "react-router";
 import { UserService } from "../../../../services/UserService";
 import { NotificationContext } from "../../../../contexts/notifications/NotificationContext";
@@ -47,6 +43,9 @@ const DeleteAccountModal = () => {
             onClick={closeModal}
           />
         </header>
+        <section className="modal-card-body">
+          {error.length > 0 && <p className="help is-danger">{error}</p>}
+        </section>
         <footer className="modal-card-foot">
           <button
             className="button is-danger"

@@ -7,7 +7,6 @@ import { AuthContext, SessionDefaultImpl } from "./AuthContext";
 import { ISignUpFormData } from "../../models/ISignUpFormData";
 import { ISignInFormData } from "../../models/ISignInFormData";
 import { UserService } from "../../services/UserService";
-import { NotificationContext } from "../notifications/NotificationContext";
 
 export const AuthContextProvider = (props: any) => {
   const [session, setSession] = useState({

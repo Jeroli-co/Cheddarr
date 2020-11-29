@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useState } from "react";
@@ -6,10 +6,6 @@ import { useForm } from "react-hook-form";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../enums/FormDefaultValidators";
 import { useHistory } from "react-router";
 import { AuthContext } from "../../../../contexts/auth/AuthContext";
-import {
-  AsyncResponseError,
-  IAsyncResponse,
-} from "../../../../models/IAsyncResponse";
 import { NotificationContext } from "../../../../contexts/notifications/NotificationContext";
 
 type ChangeUsernameData = {
