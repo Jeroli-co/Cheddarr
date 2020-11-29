@@ -1,20 +1,20 @@
 import React from "react";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { NotificationContextProvider } from "./modules/notifications/NotificationContext";
-import { Navbar } from "./modules/navbar/Navbar";
+import { NotificationContextProvider } from "./contexts/notifications/NotificationContext";
+import { Navbar } from "./components/navbar/Navbar";
 import { RouterSwitch } from "./router/RouterSwitch";
-import { AuthContextProvider } from "./modules/auth/contexts/AuthContextProvider";
+import { AuthContextProvider } from "./contexts/auth/AuthContextProvider";
 import { BrowserRouter } from "react-router-dom";
-import { ThemeDynamicContextProvider } from "./modules/themes/ThemeDynamicContextProvider";
-import { Theme } from "./modules/themes/Theme";
+import { ThemeDynamicContextProvider } from "./contexts/themes/ThemeDynamicContextProvider";
+import { ThemeContextProvider } from "./contexts/themes/ThemeContextProvider";
 
 const App = () => {
   config.autoAddCss = false;
 
   return (
     <ThemeDynamicContextProvider>
-      <Theme>
+      <ThemeContextProvider>
         <NotificationContextProvider>
           <BrowserRouter>
             <AuthContextProvider>
@@ -23,7 +23,7 @@ const App = () => {
             </AuthContextProvider>
           </BrowserRouter>
         </NotificationContextProvider>
-      </Theme>
+      </ThemeContextProvider>
     </ThemeDynamicContextProvider>
   );
 };

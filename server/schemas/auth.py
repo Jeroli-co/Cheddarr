@@ -4,12 +4,12 @@ from pydantic import BaseModel, EmailStr
 from .base import APIModel
 
 
-class Token(BaseModel):
+class Token(APIModel):
     access_token: str
     token_type: str
 
 
-class TokenPayload(BaseModel):
+class TokenPayload(APIModel):
     sub: str
     username: str
     avatar: str

@@ -8,6 +8,7 @@ jinja2
 passlib[bcrypt]
 PlexAPI
 pydantic
+pyhumps
 pytest
 python-dotenv
 python-jose[cryptography]
@@ -16,7 +17,3 @@ sqlalchemy
 requests
 tmdbsimple
 uvicorn
-
-
-
-
