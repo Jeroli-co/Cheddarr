@@ -259,12 +259,12 @@ class AuthService {
   };
 
   static getTokenType = (): string | null => {
-    const tokenType = Cookies.get("tokenType");
+    const tokenType = Cookies.get("token_type");
     return tokenType !== undefined ? tokenType : null;
   };
 
   static getAccessToken = (): string | null => {
-    const accessToken = Cookies.get("accessToken");
+    const accessToken = Cookies.get("access_token");
     return accessToken !== undefined ? accessToken : null;
   };
 
@@ -278,16 +278,16 @@ class AuthService {
   };
 
   static saveToken = (encodedToken: IEncodedToken) => {
-    Cookies.set("accessToken", encodedToken.accessToken);
-    Cookies.set("tokenType", encodedToken.tokenType);
+    Cookies.set("access_token", encodedToken.accessToken);
+    Cookies.set("token_type", encodedToken.tokenType);
     const decodedToken = AuthService.decodeToken(encodedToken.accessToken);
     localStorage.setItem("currentSession", JSON.stringify(decodedToken));
     return decodedToken;
   };
 
   static deleteToken = (): void => {
-    Cookies.remove("tokenType");
-    Cookies.remove("accessToken");
+    Cookies.remove("token_type");
+    Cookies.remove("access_token");
     localStorage.removeItem("currentSession");
   };
 
