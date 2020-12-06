@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from server.core.security import hash_password
 from server.core.utils import get_random_avatar
@@ -41,7 +41,11 @@ class PlexAccount(Model):
     plex_user_id = Column(Integer, primary_key=True)
     user_id = Column(ForeignKey("user.id"), primary_key=True)
     api_key = Column(String, unique=True, nullable=False)
-    user = relationship("User", uselist=False)
+    user = relationship(
+        "User",
+        uselist=False,
+        backref=backref("plex_account", cascade="all,delete,delete-orphan"),
+    )
 
 
 class Friendship(Model):
@@ -53,10 +57,12 @@ class Friendship(Model):
     requesting_user = relationship(
         "User",
         foreign_keys=[requesting_user_id],
+        backref=backref("outgoing_friendships", cascade="all,delete,delete-orphan"),
     )
     requested_user = relationship(
         "User",
         foreign_keys=[requested_user_id],
+        backref=backref("incoming_friendships", cascade="all,delete,delete-orphan"),
     )
 
     pending = Column(Boolean, default=True)

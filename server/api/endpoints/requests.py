@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from server import models, schemas
 from server.api import dependencies as deps
@@ -185,47 +185,114 @@ def add_series_request(
 
     series = series_repo.find_by(tvdb_id=request.tvdb_id)
     if series is None:
-        searched_series = schemas.Series.parse_obj(
-            search.find_tmdb_series_by_tvdb_id(request.tvdb_id)
-        )
+        searched_series = search.find_tmdb_series_by_tvdb_id(request.tvdb_id)
         if searched_series is None:
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND, "The requested series was not found"
             )
-        series = searched_series.to_orm(Series)
+        series = schemas.Series.parse_obj(searched_series).to_orm(Series)
 
-    series_request = series_request_repo.find_by_user_ids_and_tvdb_id(
+    series_requests = series_request_repo.find_all_by_user_ids_and_tvdb_id(
         tvdb_id=request.tvdb_id,
         requesting_user_id=current_user.id,
         requested_user_id=requested_user.id,
     )
-    if series_request is None:
+
+    series_request = None
+
+    for r in series_requests:
+        if r.status == models.RequestStatus.pending:
+            series_request = r
+
+    if not series_request:
         series_request = SeriesRequest(
             requested_user=requested_user,
             requesting_user=current_user,
             series=series,
         )
-    for requested_season in request.seasons:
-        existing_season = next(
+        update_existing_series_request(series_request, request)
+        series_request_repo.save(series_request)
+        return series_request
+
+    if request.seasons:
+        if not series_request.seasons:
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                "This series has already been requested entirely.",
+            )
+        for db_season in series_request.seasons:
+            duplicate_season = next(
+                (
+                    season
+                    for season in request.seasons
+                    if season.season_number == db_season.season_number
+                ),
+                None,
+            )
+            if duplicate_season is not None:
+                if not duplicate_season.episodes and db_season.episodes:
+                    continue
+
+                if not db_season.episodes:
+                    request.seasons.remove(duplicate_season)
+                    continue
+
+                for db_episode in db_season.episodes:
+                    duplicate_episode = next(
+                        (
+                            episode
+                            for episode in duplicate_season.episodes
+                            if episode.episode_number == db_episode.episode_number
+                        ),
+                        None,
+                    )
+                    if duplicate_episode is not None:
+                        duplicate_season.episodes.remove(duplicate_episode)
+                if not duplicate_season.episodes:
+                    request.seasons.remove(duplicate_season)
+        if not request.seasons:
+            raise HTTPException(
+                status.HTTP_409_CONFLICT, "This content has already been requested."
+            )
+
+        update_existing_series_request(series_request, request)
+    else:
+        series_request.seasons = []
+
+    series_request_repo.save(series_request)
+    return series_request
+
+
+def update_existing_series_request(
+    series_request: models.SeriesRequest, request_in: schemas.SeriesRequestCreate
+):
+    if request_in.seasons is None:
+        request_in.seasons = []
+    for season in request_in.seasons:
+        if season.episodes is None:
+            season.episodes = []
+        else:
+            episodes = []
+            for episode in season.episodes:
+                episodes.append(episode.to_orm(models.EpisodeRequest))
+            season.episodes = episodes
+
+        already_added_season = next(
             (
-                season
-                for season in series_request.seasons
-                if season.season_number == requested_season.season_number
+                s
+                for s in series_request.seasons
+                if s.season_number == season.season_number
             ),
             None,
         )
-        if existing_season is not None:
-            for requested_episode in requested_season.episodes:
-                existing_episode = next(
-                    (
-                        episode
-                        for episode in existing_season.episodes
-                        if episode.episode_number == requested_episode.episode_number
-                    ),
-                    None,
-                )
-                if existing_episode is not None:
-                    existing_season.episodes.remove(existing_episode)
+
+        if not already_added_season:
+            series_request.seasons.append(season.to_orm(models.SeasonRequest))
+        else:
+            if season.episodes:
+                already_added_season.episodes.extend(season.episodes)
+            else:
+                already_added_season.episodes = season.episodes
 
 
 @router.patch("/series/{request_id}")

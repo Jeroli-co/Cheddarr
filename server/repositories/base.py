@@ -22,6 +22,14 @@ class BaseRepository(Generic[ModelType], ABC):
     def find_all_by(self, limit: int = 100, **filters) -> list[ModelType]:
         return self.session.query(self.model).filter_by(**filters).limit(limit).all()
 
+    def search_by(self, field: str, value: str, limit: int = 3):
+        return (
+            self.session.query(self.model)
+            .filter(getattr(self.model, field).contains(value))
+            .limit(limit)
+            .all()
+        )
+
     def save(self, db_obj: ModelType) -> ModelType:
         """
         Persist an object to the database

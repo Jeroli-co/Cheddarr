@@ -10,6 +10,7 @@ PlexAPI
 pydantic
 pyhumps
 pytest
+pytest-mock
 python-dotenv
 python-jose[cryptography]
 python-multipart

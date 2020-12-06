@@ -232,16 +232,9 @@ class PlexSeries(PlexVideo):
         return seasons()
 
 
-"""
 class MediaSearchResultSchema(APIModel):
-    ratingKey = ma.String(data_key="id")
-    title = ma.String()
-    year = ma.Integer()
-    thumbUrl = ma.String()
-    type = ma.String()
-
-    @post_dump
-    def media_type(self, media, **kwargs):
-        media["type"] = media.get("type").replace("show", "series")
-        return media
-"""
+    id: int = Field(alias="ratingKey")
+    type: str = Field(alias="type")
+    title: str = Field(alias="title")
+    year: int = Field(alias="year")
+    poster_url: Optional[AnyHttpUrl] = Field(alias="thumbUrl")

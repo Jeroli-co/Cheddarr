@@ -49,7 +49,6 @@ def search(
     plex_server: PlexAPIServer,
     section_type: str,
     title: str,
-    filters: dict,
     max_results=3,
 ):
     if section_type == "movies":
@@ -61,6 +60,6 @@ def search(
     result = [
         media
         for section in sections
-        for media in section.search(maxresults=max_results, title=title, **filters)
+        for media in section.search(maxresults=max_results, title=title)
     ]
     return result

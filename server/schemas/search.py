@@ -59,7 +59,11 @@ class TmdbMovie(TmdbMedia, Movie):
 class TmdbEpisode(Episode):
     episode_number: int = Field(alias="episode_number")
     title: str = Field(alias="name")
-    release_date: date = Field(alias="air_date")
+    release_date: Optional[date] = Field(alias="air_date")
+
+    @validator("release_date", pre=True)
+    def empty_date(cls, v) -> Optional[date]:
+        return None if not v else v
 
 
 class TmdbSeason(Season):

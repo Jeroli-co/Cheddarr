@@ -17,7 +17,6 @@ from server.models.types import SeriesType
 
 
 class Media(object):
-    __repr_props__ = ("title",)
 
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
@@ -28,13 +27,18 @@ class Media(object):
 
 
 class Movie(Model, Media):
+    __repr_props__ = ("title", "tmdb_id")
+
     tmdb_id = Column(Integer, unique=True, index=True)
     requests = relationship("MovieRequest")
 
 
 class Series(Model, Media):
+    __repr_props__ = ("title", "tvdb_id", "series_type")
+
     tvdb_id = Column(Integer, nullable=False)
     number_of_seasons = Column(Integer)
+    series_type = Column(DBEnum(SeriesType), nullable=False)
     requests = relationship("SeriesRequest", back_populates="series")
 
 
@@ -88,7 +92,6 @@ class SeriesRequest(Model, Timestamp, Request):
 
     series_id = Column(ForeignKey("series.id"), nullable=False)
     series = relationship("Series", back_populates="requests")
-    series_type = Column(DBEnum(SeriesType), nullable=False)
     seasons = relationship(
         "SeasonRequest", cascade="all,delete,delete-orphan", backref="request"
     )
@@ -110,5 +113,4 @@ class EpisodeRequest(Model):
 
     id = Column(Integer, primary_key=True)
     episode_number = Column(Integer, nullable=False)
-    release_date = Column(Date)
     season_request_id = Column(ForeignKey("seasonrequest.id"), nullable=False)

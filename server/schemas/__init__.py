@@ -37,12 +37,14 @@ from .providers import (
     SonarrConfigData,
     SonarrConfigCreateUpdate,
     SonarrAddOptions,
+    MediaSearchResultSchema,
 )
 from .requests import (
     MovieRequest,
     MovieRequestCreate,
     SeriesRequest,
     SeriesRequestCreate,
+    SeasonRequest,
     RequestUpdate,
 )
 from .search import (

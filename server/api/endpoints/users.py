@@ -421,3 +421,22 @@ def remove_friend(
 
     friendship_repo.remove(friendship)
     return {"detail": "Friend removed."}
+
+
+@current_user_router.get(
+    "/friends/search", response_model=list[schemas.UserPublic], tags=["friends"]
+)
+def search_friends(
+    value: str,
+    current_user: User = Depends(deps.get_current_user),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+):
+    search = user_repo.search_by("username", value)
+    friendships = current_user.incoming_friendships + current_user.outgoing_friendships
+    friends = [
+        friendship.requesting_user
+        if friendship.requesting_user != current_user
+        else friendship.requested_user
+        for friendship in friendships
+    ]
+    return [user for user in search if user in friends]

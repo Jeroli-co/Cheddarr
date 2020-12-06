@@ -29,9 +29,9 @@ class MovieRequestRepository(BaseRepository[MovieRequest]):
 
 
 class SeriesRequestRepository(BaseRepository[SeriesRequest]):
-    def find_by_user_ids_and_tvdb_id(
+    def find_all_by_user_ids_and_tvdb_id(
         self, tvdb_id: int, requesting_user_id: int, requested_user_id: int
-    ) -> Optional[SeriesRequest]:
+    ) -> list[SeriesRequest]:
         return (
             self.session.query(SeriesRequest)
             .join(SeriesRequest.series)
@@ -40,5 +40,5 @@ class SeriesRequestRepository(BaseRepository[SeriesRequest]):
                 SeriesRequest.requesting_user_id == requesting_user_id,
                 SeriesRequest.requested_user_id == requested_user_id,
             )
-            .one_or_none()
+            .all()
         )

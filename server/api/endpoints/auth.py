@@ -174,7 +174,7 @@ def signin(
     access_token = security.create_jwt_access_token(payload)
     token = schemas.Token(
         access_token=access_token,
-        token_type="bearer",
+        token_type="Bearer",
     )
     return token
 

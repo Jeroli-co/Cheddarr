@@ -88,6 +88,8 @@ def set_tmdb_movie_info(movie: dict, from_search: bool = False):
 def set_tmdb_series_info(series: dict, from_search: bool = False):
     anime_pattern = re.compile("^(?i)anim(e|ation)$")
     series["tvdb_id"] = tmdb.TV(series["id"]).external_ids().get("tvdb_id")
+    series["series_type"] = SeriesType.standard
+
     if from_search:
         tmdb_genres = tmdb.Genres().tv_list().get("genres")
         genres = [
@@ -99,5 +101,4 @@ def set_tmdb_series_info(series: dict, from_search: bool = False):
         if anime_pattern.match(genre):
             series["series_type"] = SeriesType.anime
             break
-    series["series_type"] = SeriesType.standard
     series["genres"] = genres

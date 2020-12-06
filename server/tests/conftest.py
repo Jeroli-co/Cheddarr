@@ -45,6 +45,18 @@ datasets = {
         "avatar": "http://avatar.fake",
         "confirmed": False,
     },
+    "series": {
+        "title": "Star Wars: The Clone Wars",
+        "releaseDate": "2008-10-03",
+        "status": "Ended",
+        "posterUrl": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
+        "artUrl": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+        "tvdbId": 83268,
+        "numberOfSeasons": 7,
+        "seasons": None,
+        "mediaType": "series",
+        "seriesType": "anime",
+    },
 }
 
 
@@ -110,4 +122,12 @@ def normal_user_token_headers(client: TestClient) -> Dict[str, str]:
         client=client,
         email=datasets["user1"]["email"],
         password=datasets["user1"]["password"],
+    )
+
+
+@pytest.fixture(scope="function")
+def mock_tmdb(mocker):
+    mocker.patch(
+        "server.helpers.search.find_tmdb_series_by_tvdb_id",
+        return_value=datasets["series"],
     )

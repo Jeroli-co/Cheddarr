@@ -1,4 +1,5 @@
 from abc import ABC
+from datetime import date
 from typing import Optional
 
 from server.models import RequestStatus, SeriesType
@@ -10,6 +11,8 @@ class Request(APIModel, ABC):
     status: RequestStatus
     requested_user: UserPublic
     requesting_user: UserPublic
+    created_at: date
+    updated_at: date
 
 
 class RequestUpdate(APIModel):
@@ -36,9 +39,8 @@ class SeasonRequest(APIModel):
 
 
 class SeriesRequest(Request):
-    tvdb_id: int
-    series_type: SeriesType
     series: Series
+    seasons: Optional[list[SeasonRequest]]
 
 
 class SeriesRequestCreate(APIModel):

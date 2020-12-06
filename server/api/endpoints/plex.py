@@ -241,3 +241,22 @@ def get_plex_on_deck(
         )
     on_deck = plex_server.library.onDeck()
     return on_deck
+
+
+@router.get(
+    "/search",
+    response_model=list[schemas.MediaSearchResultSchema],
+    response_model_by_alias=False,
+)
+def search_plex_media(
+    title: str,
+    section: models.MediaType = None,
+    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+):
+    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    if plex_server is None:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
+        )
+    result = plex.search(plex_server, section_type=section, title=title)
+    return result
