@@ -1,4 +1,4 @@
 export interface IEncodedToken {
-  readonly tokenType: string;
-  readonly accessToken: string;
+  readonly token_type: string;
+  readonly access_token: string;
 }

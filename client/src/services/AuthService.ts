@@ -254,7 +254,7 @@ class AuthService {
     const tokenType = AuthService.getTokenType();
     const accessToken = AuthService.getAccessToken();
     return tokenType && accessToken
-      ? { tokenType: tokenType, accessToken: accessToken }
+      ? { token_type: tokenType, access_token: accessToken }
       : null;
   };
 
@@ -278,9 +278,9 @@ class AuthService {
   };
 
   static saveToken = (encodedToken: IEncodedToken) => {
-    Cookies.set("access_token", encodedToken.accessToken);
-    Cookies.set("token_type", encodedToken.tokenType);
-    const decodedToken = AuthService.decodeToken(encodedToken.accessToken);
+    Cookies.set("access_token", encodedToken.access_token);
+    Cookies.set("token_type", encodedToken.token_type);
+    const decodedToken = AuthService.decodeToken(encodedToken.access_token);
     localStorage.setItem("currentSession", JSON.stringify(decodedToken));
     return decodedToken;
   };

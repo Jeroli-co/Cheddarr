@@ -19,7 +19,7 @@ instance.interceptors.request.use(
     const token = AuthService.getToken();
     if (token) {
       config.headers.common["Authorization"] =
-        token.tokenType + " " + token.accessToken;
+        token.token_type + " " + token.access_token;
     }
     if (config.url === "/sign-in") {
       config.headers.post["Content-Type"] = FORM_URL_ENCODED_TYPE;
