@@ -1,10 +1,12 @@
-export interface IRadarrConfig {
+import { IProviderConfigBase } from "./IProviderConfigBase";
+import { ProviderTypes } from "../enums/ProviderTypes";
+
+export interface IRadarrConfig extends IProviderConfigBase {
+  readonly id: string;
+  readonly name: string;
   readonly enabled: boolean;
-  readonly apiKey: string;
-  readonly host: string;
-  readonly port: number;
-  readonly ssl: boolean;
-  readonly version: string;
+  readonly providerType: ProviderTypes;
   readonly rootFolder: string;
   readonly qualityProfileId: number;
+  readonly version: number;
 }

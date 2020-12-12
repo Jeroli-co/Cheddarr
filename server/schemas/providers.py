@@ -9,7 +9,7 @@ from server.models import ProviderType
 
 class ProviderConfigBase(APIModel):
     host: str
-    port: int
+    port: Optional[int]
     ssl: bool
     api_key: str
 

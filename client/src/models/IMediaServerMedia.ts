@@ -65,6 +65,12 @@ export const isMediaServerMovie = (arg: any): arg is IMediaServerMovie => {
   );
 };
 
+export const isMediaServerMovieArray = (
+  arg: any
+): arg is IMediaServerMovie[] => {
+  return arg && Array.isArray(arg) && arg.every((e) => isMediaServerMovie(e));
+};
+
 export interface IMediaServerSeries extends IMediaServerMedia {
   readonly seasons: IMediaServerSeason[];
   readonly actors: IActor[];
@@ -82,6 +88,12 @@ export const isMediaServerSeries = (arg: any): arg is IMediaServerSeries => {
     arg.genres &&
     isArrayOfStrings(arg.genres)
   );
+};
+
+export const isMediaServerSeriesArray = (
+  arg: any
+): arg is IMediaServerSeries[] => {
+  return arg && Array.isArray(arg) && arg.every((e) => isMediaServerSeries(e));
 };
 
 export interface IMediaServerSeason extends IMediaServerMedia {

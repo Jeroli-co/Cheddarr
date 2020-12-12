@@ -17,7 +17,7 @@ import {
 export class SearchService {
   static SEARCH_MEDIA_URL = "/search";
 
-  static getMediasByTitle = async (type: SearchRequestTypes, value: string) => {
+  static GetMediasByTitle = async (type: SearchRequestTypes, value: string) => {
     const url =
       SearchService.SEARCH_MEDIA_URL +
       "?" +
@@ -43,7 +43,7 @@ export class SearchService {
     );
   };
 
-  static getMediaById = async (mediaType: MediasTypes, tmdbId: number) => {
+  static GetMediaById = async (mediaType: MediasTypes, tmdbId: number) => {
     let url = SearchService.SEARCH_MEDIA_URL + mediaType + "/" + tmdbId;
     return HttpService.executeRequest<ISearchedMedias>(
       HTTP_METHODS.GET,
@@ -66,7 +66,7 @@ export class SearchService {
     );
   };
 
-  static getSeasonByNumber = async (tmdbId: number, seasonNumber: number) => {
+  static GetSeasonByNumber = async (tmdbId: number, seasonNumber: number) => {
     let url =
       SearchService.SEARCH_MEDIA_URL +
       "/" +
@@ -95,7 +95,7 @@ export class SearchService {
     );
   };
 
-  static getEpisodeByNumber = async (
+  static GetEpisodeByNumber = async (
     tmdbId: number,
     seasonNumber: number,
     episodeNumber: number

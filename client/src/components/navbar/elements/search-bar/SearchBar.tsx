@@ -12,7 +12,16 @@ import { ResultsList } from "./elements/ResultsList";
 import { useHistory } from "react-router";
 import { routes } from "../../../../router/routes";
 import { SearchRequestTypes } from "../../../../enums/SearchRequestTypes";
-import { SearchService } from "../../../../services/SearchService";
+import { PlexService } from "../../../../services/PlexService";
+import {
+  IMediaServerMovie,
+  IMediaServerSeries,
+  isMediaServerMovieArray,
+  isMediaServerSeriesArray,
+} from "../../../../models/IMediaServerMedia";
+import { IPublicUser } from "../../../../models/IPublicUser";
+import { MediasTypes } from "../../../../enums/MediasTypes";
+import { FriendService } from "../../../../services/FriendService";
 
 const SearchBarStyle = styled.div<{ isInputFocus: boolean }>`
   position: relative;
@@ -70,11 +79,19 @@ const SearchBar = () => {
   const [isInputFocus, setIsInputFocus] = useState(false);
   const [value, setValue] = useState("");
 
-  const initialResult = { data: null, loading: false };
-  const [results, setResults] = useState<{
-    data: any | null;
-    loading: boolean;
-  }>(initialResult);
+  const initialSearchState = { data: null, isLoading: false };
+  const [moviesResults, setMoviesResults] = useState<{
+    data: IMediaServerMovie[] | null;
+    isLoading: boolean;
+  }>(initialSearchState);
+  const [seriesResults, setSeriesResults] = useState<{
+    data: IMediaServerSeries[] | null;
+    isLoading: boolean;
+  }>(initialSearchState);
+  const [friendsResults, setFriendsResults] = useState<{
+    data: IPublicUser[] | null;
+    isLoading: boolean;
+  }>(initialSearchState);
 
   const history = useHistory();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -84,6 +101,13 @@ const SearchBar = () => {
     e.preventDefault();
   };
 
+  const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && value.length > 0) {
+      history.push(routes.SEARCH.url(searchType, value));
+      setValue("");
+    }
+  };
+
   const onSearchTypeChange = (type: SearchRequestTypes) => {
     if (inputRef && inputRef.current) {
       setSearchType(type);
@@ -91,19 +115,30 @@ const SearchBar = () => {
     }
   };
 
-  const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && value.length > 0) {
-      history.push(routes.SEARCH.url(searchType, value));
-      setValue("");
-    }
-    e.preventDefault();
-  };
-
   const _search = () => {
     if (!isEmpty(value) && value.length > 1) {
-      setResults({ ...results, loading: true });
+      switch (searchType) {
+        case SearchRequestTypes.MOVIES:
+          setMoviesResults({ ...moviesResults, isLoading: true });
+          break;
+        case SearchRequestTypes.SERIES:
+          setSeriesResults({ ...seriesResults, isLoading: true });
+          break;
+        case SearchRequestTypes.FRIENDS:
+          setFriendsResults({ ...friendsResults, isLoading: true });
+          break;
+        case SearchRequestTypes.ALL:
+          setMoviesResults({ ...moviesResults, isLoading: true });
+          setSeriesResults({ ...seriesResults, isLoading: true });
+          setFriendsResults({ ...friendsResults, isLoading: true });
+          break;
+        default:
+          throw new Error("No search type matched");
+      }
     } else {
-      setResults(initialResult);
+      setMoviesResults(initialSearchState);
+      setSeriesResults(initialSearchState);
+      setFriendsResults(initialSearchState);
     }
   };
 
@@ -114,15 +149,32 @@ const SearchBar = () => {
   }, [value]);
 
   useEffect(() => {
-    if (results.loading) {
-      SearchService.getMediasByTitle(searchType, value).then((data) => {
-        if (data) {
-          setResults({ data: data, loading: false });
-        }
+    if (moviesResults.isLoading) {
+      PlexService.SearchPlexMedias(MediasTypes.MOVIE, value).then((res) => {
+        if (res.error === null && isMediaServerMovieArray(res.data))
+          setMoviesResults({ data: res.data, isLoading: false });
+      });
+    }
+
+    if (seriesResults.isLoading) {
+      PlexService.SearchPlexMedias(MediasTypes.SERIES, value).then((res) => {
+        if (res.error === null && isMediaServerSeriesArray(res.data))
+          setSeriesResults({ data: res.data, isLoading: false });
+      });
+    }
+
+    if (friendsResults.isLoading) {
+      FriendService.SearchFriends(value).then((res) => {
+        if (res.error === null)
+          setFriendsResults({ data: res.data, isLoading: false });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [results.loading]);
+  }, [
+    moviesResults.isLoading,
+    seriesResults.isLoading,
+    friendsResults.isLoading,
+  ]);
 
   useEffect(() => {
     _search();
@@ -145,9 +197,11 @@ const SearchBar = () => {
       />
       <ResultsList
         searchValue={value}
-        isVisible={isInputFocus}
+        isInputFocus={isInputFocus}
         searchType={searchType}
-        results={results}
+        moviesResults={moviesResults}
+        seriesResults={seriesResults}
+        friendsResults={friendsResults}
       />
     </SearchBarStyle>
   );

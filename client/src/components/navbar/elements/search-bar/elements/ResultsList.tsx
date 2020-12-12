@@ -3,17 +3,17 @@ import styled from "styled-components";
 import { ColumnLayout, RowLayout } from "../../../../elements/layouts";
 import { useHistory } from "react-router";
 import { routes } from "../../../../../router/routes";
-import Spinner from "../../../../elements/Spinner";
 import {
   IMediaServerMedia,
+  IMediaServerMovie,
   IMediaServerSeries,
-  isMediaServerMedia,
   isMediaServerMovie,
   isMediaServerSeries,
 } from "../../../../../models/IMediaServerMedia";
-import { IPublicUser, isPublicUser } from "../../../../../models/IPublicUser";
+import { IPublicUser } from "../../../../../models/IPublicUser";
 import { SearchRequestTypes } from "../../../../../enums/SearchRequestTypes";
 import { Text } from "../../../../elements/Text";
+import Spinner from "../../../../elements/Spinner";
 
 const ResultsListStyle = styled.div<{ isVisible: boolean }>`
   position: absolute;
@@ -103,24 +103,6 @@ interface IAllSortedResults {
   series: IMediaServerSeries[];
 }
 
-const sortSearchResult = (results: Array<IPublicUser | IMediaServerMedia>) => {
-  const sortedResults: IAllSortedResults = {
-    friends: [],
-    movies: [],
-    series: [],
-  };
-  results.forEach((result) => {
-    if (isPublicUser(result)) {
-      sortedResults.friends.push(result);
-    } else if (isMediaServerSeries(result)) {
-      sortedResults.series.push(result);
-    } else if (isMediaServerMovie(result)) {
-      sortedResults.movies.push(result);
-    }
-  });
-  return sortedResults;
-};
-
 const SearchOnlineButtonStyle = styled.div`
   display: flex;
   justify-content: center;
@@ -151,99 +133,144 @@ const SearchOnlineButton = ({ type, searchValue }: SearchOnlineButtonProps) => {
 type SearchResultItemsProps = {
   type: SearchRequestTypes;
   searchValue: string;
-  results: any;
+  moviesResults: { data: IMediaServerMovie[] | null; isLoading: boolean };
+  seriesResults: { data: IMediaServerSeries[] | null; isLoading: boolean };
+  friendsResults: { data: IPublicUser[] | null; isLoading: boolean };
 };
 
 const SearchResultsItems = ({
   type,
   searchValue,
-  results,
+  moviesResults,
+  seriesResults,
+  friendsResults,
 }: SearchResultItemsProps) => {
-  if (!results) {
-    return <div />;
+  switch (type) {
+    case SearchRequestTypes.ALL:
+      return (
+        <div>
+          <SearchOnlineButton type={type} searchValue={searchValue} />
+          <ResultsSectionTitle>Movies</ResultsSectionTitle>
+          {moviesResults.isLoading && <Spinner />}
+          {!moviesResults.isLoading &&
+            moviesResults.data !== null &&
+            moviesResults.data.length > 0 && (
+              <div>
+                {moviesResults.data.map((movie, index) => (
+                  <MediaResult key={index} media={movie} />
+                ))}
+              </div>
+            )}
+          <ResultsSectionTitle>Series</ResultsSectionTitle>
+          {seriesResults.isLoading && <Spinner />}
+          {!seriesResults.isLoading &&
+            seriesResults.data !== null &&
+            seriesResults.data.length > 0 && (
+              <div>
+                {seriesResults.data.map((series, index) => (
+                  <MediaResult key={index} media={series} />
+                ))}
+              </div>
+            )}
+          <ResultsSectionTitle>Friends</ResultsSectionTitle>
+          {friendsResults.isLoading && <Spinner />}
+          {!friendsResults.isLoading &&
+            friendsResults.data !== null &&
+            friendsResults.data.length > 0 && (
+              <div>
+                {friendsResults.data.map((friend, index) => (
+                  <FriendResult key={index} user={friend} />
+                ))}
+              </div>
+            )}
+        </div>
+      );
+    case SearchRequestTypes.MOVIES:
+      return (
+        <div>
+          {moviesResults.isLoading && <Spinner />}
+          {!moviesResults.isLoading &&
+            moviesResults.data !== null &&
+            moviesResults.data.length > 0 && (
+              <div>
+                {moviesResults.data.map((movie, index) => (
+                  <MediaResult key={index} media={movie} />
+                ))}
+              </div>
+            )}
+        </div>
+      );
+    case SearchRequestTypes.SERIES:
+      return (
+        <div>
+          {seriesResults.isLoading && <Spinner />}
+          {!seriesResults.isLoading &&
+            seriesResults.data !== null &&
+            seriesResults.data.length > 0 && (
+              <div>
+                {seriesResults.data.map((series, index) => (
+                  <MediaResult key={index} media={series} />
+                ))}
+              </div>
+            )}
+        </div>
+      );
+    case SearchRequestTypes.FRIENDS:
+      return (
+        <div>
+          {friendsResults.isLoading && <Spinner />}
+          {!friendsResults.isLoading &&
+            friendsResults.data !== null &&
+            friendsResults.data.length > 0 && (
+              <div>
+                {friendsResults.data.map((friend, index) => (
+                  <FriendResult key={index} user={friend} />
+                ))}
+              </div>
+            )}
+        </div>
+      );
+    default:
+      throw new Error("No search type matched");
   }
-
-  if (results.length === 0) {
-    return (
-      <div>
-        <SearchOnlineButton type={type} searchValue={searchValue} />
-        <p>No results found</p>
-      </div>
-    );
-  }
-
-  if (type === SearchRequestTypes.ALL) {
-    const sortedResult = sortSearchResult(results);
-
-    return (
-      <div>
-        <SearchOnlineButton type={type} searchValue={searchValue} />
-        {sortedResult.friends.length > 0 && (
-          <div>
-            <ResultsSectionTitle>Friends</ResultsSectionTitle>
-            {sortedResult.friends.map((friend, index) => (
-              <FriendResult key={index} user={friend} />
-            ))}
-          </div>
-        )}
-        {sortedResult.movies.length > 0 && (
-          <div>
-            <ResultsSectionTitle>Movies</ResultsSectionTitle>
-            {sortedResult.movies.map((movie, index) => (
-              <MediaResult key={index} media={movie} />
-            ))}
-          </div>
-        )}
-        {sortedResult.series.length > 0 && (
-          <div>
-            <ResultsSectionTitle>Series</ResultsSectionTitle>
-            {sortedResult.series.map((series, index) => (
-              <MediaResult key={index} media={series} />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return results.map(
-    (result: IMediaServerMedia | IPublicUser, index: number) => {
-      if (isMediaServerMedia(result)) {
-        return <MediaResult key={index} media={result} />;
-      } else if (isPublicUser(result)) {
-        return <FriendResult key={index} user={result} />;
-      } else {
-        return <div />;
-      }
-    }
-  );
 };
 
 type ResultsListProps = {
   searchValue: string;
-  isVisible: boolean;
+  isInputFocus: boolean;
   searchType: SearchRequestTypes;
-  results: { data: IPublicUser[] | IMediaServerMedia[]; loading: boolean };
+  moviesResults: { data: IMediaServerMovie[] | null; isLoading: boolean };
+  seriesResults: { data: IMediaServerSeries[] | null; isLoading: boolean };
+  friendsResults: { data: IPublicUser[] | null; isLoading: boolean };
 };
 
 const ResultsList = ({
   searchValue,
-  isVisible,
+  isInputFocus,
   searchType,
-  results,
+  moviesResults,
+  seriesResults,
+  friendsResults,
 }: ResultsListProps) => {
   return (
     <ResultsListStyle
-      isVisible={isVisible && (results.data !== undefined || results.loading)}
+      isVisible={
+        isInputFocus &&
+        (moviesResults.data !== null ||
+          seriesResults.data !== null ||
+          friendsResults.data !== null ||
+          moviesResults.isLoading ||
+          seriesResults.isLoading ||
+          friendsResults.isLoading)
+      }
     >
-      {!results.loading && (
-        <SearchResultsItems
-          searchValue={searchValue}
-          type={searchType}
-          results={results.data}
-        />
-      )}
-      {results.loading && <Spinner color="primary" size="lg" />}
+      <SearchResultsItems
+        searchValue={searchValue}
+        type={searchType}
+        moviesResults={moviesResults}
+        seriesResults={seriesResults}
+        friendsResults={friendsResults}
+      />
     </ResultsListStyle>
   );
 };

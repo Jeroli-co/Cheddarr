@@ -9,7 +9,7 @@ export const useEpisode = (
 ) => {
   const [episode, setEpisode] = useState<ISearchedEpisode | null>(null);
   useEffect(() => {
-    SearchService.getEpisodeByNumber(tmdbId, seasonNumber, episodeNumber).then(
+    SearchService.GetEpisodeByNumber(tmdbId, seasonNumber, episodeNumber).then(
       (res) => {
         if (res.error === null) setEpisode(res.data);
       }

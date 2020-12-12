@@ -15,8 +15,9 @@ export enum FriendsRequestType {
 
 export class FriendService {
   static FRIEND_BASE_URL = UserService.CURRENT_USER_BASE_URL + "/friends";
+  static FRIEND_SEARCH_BASE_URL = FriendService.FRIEND_BASE_URL + "/search";
 
-  static GetFriends = async (type?: FriendsRequestType) => {
+  static GetFriends = (type?: FriendsRequestType) => {
     const urlSuffix = type ? "/" + type : "";
     return HttpService.executeRequest<IPublicUser[]>(
       HTTP_METHODS.GET,
@@ -110,6 +111,28 @@ export class FriendService {
       (response) => {
         if (response.status === 200) {
           return new AsyncResponseSuccess<IPublicUser>("Friend deleted");
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
+
+  static SearchFriends = (value: string) => {
+    return HttpService.executeRequest<IPublicUser[]>(
+      HTTP_METHODS.GET,
+      FriendService.FRIEND_SEARCH_BASE_URL + "?value=" + value
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess<IPublicUser[]>("", response.data);
         } else {
           return new AsyncResponseError(
             ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)

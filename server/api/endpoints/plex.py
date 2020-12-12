@@ -249,7 +249,7 @@ def get_plex_on_deck(
     response_model_by_alias=False,
 )
 def search_plex_media(
-    title: str,
+    value: str,
     section: models.MediaType = None,
     plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
@@ -258,5 +258,5 @@ def search_plex_media(
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
         )
-    result = plex.search(plex_server, section_type=section, title=title)
+    result = plex.search(plex_server, section_type=section, title=value)
     return result

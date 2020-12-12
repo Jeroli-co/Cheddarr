@@ -6,7 +6,10 @@ import { Container } from "../elements/Container";
 import Spinner from "../elements/Spinner";
 import { SearchService } from "../../services/SearchService";
 import { SearchRequestTypes } from "../../enums/SearchRequestTypes";
-import { ISearchedMedias, isSearchedSeries } from "../../models/ISearchedMedias";
+import {
+  ISearchedMedias,
+  isSearchedSeries,
+} from "../../models/ISearchedMedias";
 import { MediasTypes } from "../../enums/MediasTypes";
 import { UserService } from "../../services/UserService";
 import { IPublicUser } from "../../models/IPublicUser";
@@ -35,7 +38,7 @@ const Search = () => {
   >([]);
 
   useEffect(() => {
-    SearchService.getMediasByTitle(type, title).then((res) => {
+    SearchService.GetMediasByTitle(type, title).then((res) => {
       if (res.error === null) {
         setData({ results: res.data, isLoading: false });
         UserService.GetProviders(MediasTypes.MOVIE).then((res) => {
@@ -86,12 +89,10 @@ const Search = () => {
                   friendsProviders={friendsSeriesProviders}
                 />
               );
-            } else {
-              return <div />;
             }
+            break;
           default:
-            console.log("No type matched");
-            return <div />;
+            throw new Error("No type matched");
         }
       });
     }

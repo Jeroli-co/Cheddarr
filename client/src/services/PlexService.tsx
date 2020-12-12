@@ -15,9 +15,11 @@ import {
 import { MediaRecentlyAddedType } from "../components/media-servers/components/media-recently-added/enums/MediaRecentlyAddedType";
 import { IPlexConfig } from "../models/IPlexConfig";
 import { IPlexServer } from "../models/IPlexServer";
+import { MediasTypes } from "../enums/MediasTypes";
 
 export class PlexService {
-  static PLEX_SERVER_BASE_URL = "/media-servers/plex";
+  static PLEX_SERVER_BASE_URL = "/plex";
+  static PLEX_SEARCH_BASE_URL = PlexService.PLEX_SERVER_BASE_URL + "/search";
 
   static GetMediaRecentlyAdded = (type: MediaRecentlyAddedType) => {
     return HttpService.executeRequest<IMediaServerMedia[]>(
@@ -280,6 +282,35 @@ export class PlexService {
       (response) => {
         if (response.status === 200) {
           return new AsyncResponseSuccess<IMediaServerEpisode>(
+            "",
+            response.data
+          );
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
+
+  static SearchPlexMedias = (mediaType: MediasTypes, value: string) => {
+    return HttpService.executeRequest<IMediaServerMedia[]>(
+      HTTP_METHODS.GET,
+      PlexService.PLEX_SEARCH_BASE_URL +
+        "?section=" +
+        mediaType +
+        "&value=" +
+        value
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess<IMediaServerMedia[]>(
             "",
             response.data
           );
