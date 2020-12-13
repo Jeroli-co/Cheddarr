@@ -53,7 +53,7 @@ datasets = {
         "artUrl": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
         "tvdbId": 83268,
         "numberOfSeasons": 7,
-        "seasons": None,
+        "seasons": [],
         "mediaType": "series",
         "seriesType": "anime",
     },

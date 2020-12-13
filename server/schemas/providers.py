@@ -1,10 +1,10 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from pydantic import AnyHttpUrl, Field, validator
 
-from server.schemas import APIModel
 from server.models import ProviderType
+from server.schemas import APIModel
 
 
 class ProviderConfigBase(APIModel):
@@ -128,17 +128,24 @@ class SonarrSeason(APIModel):
 
 
 class SonarrSeries(APIModel):
-    id: Optional[int]
-    title: str = Field(alias="title")
+    id: Optional[int] = Field(alias="id")
     tvdb_id: int = Field(alias="tvdbId")
-    title_slug: str = Field(alias="titleSlug")
+    title: str = Field(alias="title")
+    images: list[dict] = Field(alias="images")
+    seasons: list[SonarrSeason] = Field(alias="seasons")
+    year: int = Field(alias="year")
+    path: Optional[str] = Field(alias="path")
+    profile_id: Optional[int] = Field(alias="profileId")
+    root_folder_path: Optional[str] = Field(alias="rootFolderPath")
     quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
     language_profile_id: Optional[int] = Field(alias="languageProfileId")
-    root_folder_path: Optional[str] = Field(alias="rootFolderPath")
-    images: list[dict] = Field(alias="images")
+    monitored: bool = Field(alias="monitored")
+    series_type: str = Field(alias="seriesType")
+    title_slug: str = Field(alias="titleSlug")
+    genres: list[str] = Field(alias="genres")
+    tags: list[str] = Field(alias="tags")
+    added: datetime = Field(alias="added")
     add_options: Optional[SonarrAddOptions] = Field(alias="addOptions")
-    series_type: str
-    seasons: list[SonarrSeason]
 
 
 #####################################

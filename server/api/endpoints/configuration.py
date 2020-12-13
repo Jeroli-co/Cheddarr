@@ -1,10 +1,9 @@
 import requests
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from server import models, schemas
 from server.api import dependencies as deps
-from server import schemas
 from server.helpers import plex, radarr, sonarr
-from server.models import PlexConfig, RadarrConfig, SonarrConfig, User
 from server.repositories import (
     PlexConfigRepository,
     RadarrConfigRepository,
@@ -20,7 +19,7 @@ router = APIRouter()
 
 @router.get("/plex", response_model=list[schemas.PlexConfig])
 def get_plex_configs(
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     plex_config_repo: PlexConfigRepository = Depends(
         deps.get_repository(PlexConfigRepository)
     ),
@@ -40,12 +39,20 @@ def get_plex_configs(
 )
 def add_plex_config(
     config_in: schemas.PlexConfigCreateUpdate,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     plex_config_repo: PlexConfigRepository = Depends(
         deps.get_repository(PlexConfigRepository)
     ),
 ):
-    if plex.get_server(config_in.api_key, name=config_in.server_name) is None:
+    if (
+        plex.get_server(
+            base_url=config_in.host,
+            port=config_in.port,
+            ssl=config_in.ssl,
+            api_key=config_in.api_key,
+        )
+        is None
+    ):
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             "Failed to connect to  the Plex server.",
@@ -55,7 +62,7 @@ def add_plex_config(
     )
     if config is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This server is already added.")
-    config = config_in.to_orm(PlexConfig)
+    config = config_in.to_orm(models.PlexConfig)
     config.user_id = current_user.id
     config = plex_config_repo.save(config)
     return config
@@ -72,7 +79,7 @@ def add_plex_config(
 def update_plex_config(
     config_id: str,
     config_in: schemas.PlexConfigCreateUpdate,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     plex_config_repo: PlexConfigRepository = Depends(
         deps.get_repository(PlexConfigRepository)
     ),
@@ -80,7 +87,15 @@ def update_plex_config(
     config = plex_config_repo.find_by(id=config_id)
     if config is None or config.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex config not found.")
-    if plex.get_server(config_in.api_key, config_in.server_name) is None:
+    if (
+        plex.get_server(
+            base_url=config_in.host,
+            port=config_in.port,
+            ssl=config_in.ssl,
+            api_key=config_in.api_key,
+        )
+        is None
+    ):
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             "Failed to connect to  the Plex server.",
@@ -98,7 +113,7 @@ def update_plex_config(
 )
 def delete_plex_config(
     config_id: str,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     plex_config_repo: PlexConfigRepository = Depends(
         deps.get_repository(PlexConfigRepository)
     ),
@@ -162,7 +177,7 @@ def get_radarr_instance_info(
 
 @router.get("/radarr", response_model=list[schemas.RadarrConfig])
 def get_radarr_configs(
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
@@ -181,7 +196,7 @@ def get_radarr_configs(
 )
 def add_radarr_config(
     config_in: schemas.RadarrConfigCreateUpdate,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
@@ -195,7 +210,7 @@ def add_radarr_config(
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr."
         )
-    config = config_in.to_orm(RadarrConfig)
+    config = config_in.to_orm(models.RadarrConfig)
     config.user_id = current_user.id
     config = radarr_config_repo.save(config)
     return config
@@ -214,7 +229,7 @@ def add_radarr_config(
 def update_radarr_config(
     config_id: str,
     config_in: schemas.RadarrConfigCreateUpdate,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
@@ -243,7 +258,7 @@ def update_radarr_config(
 )
 def delete_radarr_config(
     config_id: str,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
@@ -316,7 +331,7 @@ def get_sonarr_instance_info(config_in: schemas.ProviderConfigBase):
 
 @router.get("/sonarr", response_model=list[schemas.SonarrConfig])
 def get_sonarr_configs(
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),
@@ -335,7 +350,7 @@ def get_sonarr_configs(
 )
 def add_sonarr_config(
     config_in: schemas.SonarrConfigCreateUpdate,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),
@@ -349,7 +364,7 @@ def add_sonarr_config(
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr."
         )
-    config = config_in.to_orm(SonarrConfig)
+    config = config_in.to_orm(models.SonarrConfig)
     config.user_id = current_user.id
     sonarr_config_repo.save(config)
     return config
@@ -368,7 +383,7 @@ def add_sonarr_config(
 def update_sonarr_config(
     config_id: str,
     config_in: schemas.SonarrConfigCreateUpdate,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),
@@ -398,7 +413,7 @@ def update_sonarr_config(
 )
 def delete_sonarr_config(
     config_id: str,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),

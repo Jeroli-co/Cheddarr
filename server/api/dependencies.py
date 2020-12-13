@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from server.core.config import settings
 from server.database.session import SessionLocal
 from server.models import User
-from server.repositories import UserRepository, PlexConfigRepository
+from server.repositories import PlexConfigRepository, UserRepository
 from server.repositories.base import BaseRepository
 from server.schemas import TokenPayload
 

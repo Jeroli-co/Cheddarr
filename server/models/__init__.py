@@ -1,12 +1,16 @@
-from .users import User, Friendship, PlexAccount
-from .providers import ProviderConfig, PlexConfig, RadarrConfig, SonarrConfig
-from .types import SeriesType, ProviderType, MediaType
-from .requests import (
-    Movie,
-    MovieRequest,
-    Series,
-    SeriesRequest,
-    SeasonRequest,
-    EpisodeRequest,
-    RequestStatus,
+from .media import Media, MediaType, Movie, Series, SeriesType
+from .providers import (
+    PlexConfig,
+    ProviderConfig,
+    ProviderType,
+    RadarrConfig,
+    SonarrConfig,
 )
+from .requests import (
+    EpisodeRequest,
+    MovieRequest,
+    RequestStatus,
+    SeasonRequest,
+    SeriesRequest,
+)
+from .users import Friendship, PlexAccount, User

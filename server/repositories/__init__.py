@@ -1,4 +1,3 @@
-from .users import UserRepository, FriendshipRepository, PlexAccountRepository
 from .providers import (
     PlexConfigRepository,
     RadarrConfigRepository,
@@ -9,3 +8,4 @@ from .requests import (
     MovieRequestRepository,
     SeriesRequestRepository,
 )
+from .users import FriendshipRepository, PlexAccountRepository, UserRepository

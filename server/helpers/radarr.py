@@ -3,8 +3,8 @@ from typing import Union
 import requests
 
 from server import schemas
-from server.models import MovieRequest, RadarrConfig, RequestStatus
 from server.core import utils
+from server.models import MovieRequest, RadarrConfig, RequestStatus
 
 
 def make_url(

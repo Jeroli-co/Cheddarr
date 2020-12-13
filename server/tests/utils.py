@@ -1,5 +1,3 @@
-import random
-import string
 from typing import Dict
 
 from fastapi.testclient import TestClient

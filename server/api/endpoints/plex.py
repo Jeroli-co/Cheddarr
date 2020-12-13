@@ -3,10 +3,9 @@ from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from server.api import dependencies as deps
 from server import models, schemas
+from server.api import dependencies as deps
 from server.helpers import plex
-from server.models import PlexConfig
 from server.repositories import PlexAccountRepository
 
 router = APIRouter()
@@ -19,7 +18,7 @@ router = APIRouter()
         status.HTTP_404_NOT_FOUND: {"description": "No Plex account linked"},
     },
 )
-def get_plex_account_servers_info(
+def get_plex_account_servers(
     current_user: models.User = Depends(deps.get_current_user),
     plex_account_repo: PlexAccountRepository = Depends(
         deps.get_repository(PlexAccountRepository)
@@ -30,7 +29,7 @@ def get_plex_account_servers_info(
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "No Plex account linked to the user."
         )
-    servers = plex.get_servers(plex_account.api_key)
+    servers = plex.get_plex_account_servers(plex_account.api_key)
     return servers
 
 
@@ -55,7 +54,7 @@ def get_plex_account_server(
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "No Plex account linked to the user."
         )
-    server = plex.get_server(plex_account.api_key, server_name)
+    server = plex.get_plex_account_server(plex_account.api_key, server_name)
     if server is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex server not found.")
     server_in = schemas.PlexServerIn.from_orm(server)
@@ -71,7 +70,7 @@ def get_plex_account_server(
 
 
 @router.get(
-    "/movies/recent",
+    "{config_id}/movies/recent",
     response_model=list[schemas.PlexMovie],
     response_model_by_alias=False,
     responses={
@@ -82,9 +81,15 @@ def get_plex_account_server(
     },
 )
 def get_plex_recent_movies(
-    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    config_id: str,
+    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
-    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    config = next((config for config in plex_configs if config.id == config_id), None)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    plex_server = plex.get_server(
+        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+    )
     if plex_server is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
@@ -99,7 +104,7 @@ def get_plex_recent_movies(
 
 
 @router.get(
-    "/movies/{movie_id}",
+    "{config_id}/movies/{movie_id}",
     response_model=schemas.PlexMovie,
     response_model_by_alias=False,
     responses={
@@ -110,10 +115,16 @@ def get_plex_recent_movies(
     },
 )
 def get_plex_movie(
+    config_id: str,
     movie_id: int,
-    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
-    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    config = next((config for config in plex_configs if config.id == config_id), None)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    plex_server = plex.get_server(
+        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+    )
     if plex_server is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
@@ -124,7 +135,7 @@ def get_plex_movie(
 
 
 @router.get(
-    "/series/recent",
+    "{config_id}/series/recent",
     response_model=list[schemas.PlexEpisode],
     response_model_by_alias=False,
     responses={
@@ -135,9 +146,15 @@ def get_plex_movie(
     },
 )
 def get_plex_recent_series(
-    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    config_id: str,
+    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
-    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    config = next((config for config in plex_configs if config.id == config_id), None)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    plex_server = plex.get_server(
+        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+    )
     if plex_server is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
@@ -152,7 +169,7 @@ def get_plex_recent_series(
 
 
 @router.get(
-    "/series/{series_id}",
+    "{config_id}/series/{series_id}",
     response_model=schemas.PlexSeries,
     response_model_by_alias=False,
     responses={
@@ -163,10 +180,16 @@ def get_plex_recent_series(
     },
 )
 def get_plex_series(
+    config_id: str,
     series_id: int,
-    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
-    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    config = next((config for config in plex_configs if config.id == config_id), None)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    plex_server = plex.get_server(
+        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+    )
     if plex_server is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
@@ -177,7 +200,7 @@ def get_plex_series(
 
 
 @router.get(
-    "/seasons/{season_id}",
+    "{config_id}/seasons/{season_id}",
     response_model=schemas.PlexSeason,
     response_model_by_alias=False,
     responses={
@@ -188,10 +211,16 @@ def get_plex_series(
     },
 )
 def get_plex_season(
+    config_id: str,
     season_id: int,
-    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
-    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    config = next((config for config in plex_configs if config.id == config_id), None)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    plex_server = plex.get_server(
+        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+    )
     if plex_server is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
@@ -202,7 +231,7 @@ def get_plex_season(
 
 
 @router.get(
-    "/episodes/{episode_id}",
+    "{config_id}/episodes/{episode_id}",
     response_model=schemas.PlexEpisode,
     response_model_by_alias=False,
     responses={
@@ -210,10 +239,16 @@ def get_plex_season(
     },
 )
 def get_plex_episode(
+    config_id: str,
     episode_id: int,
-    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
-    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    config = next((config for config in plex_configs if config.id == config_id), None)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    plex_server = plex.get_server(
+        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+    )
     if plex_server is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
@@ -224,7 +259,7 @@ def get_plex_episode(
 
 
 @router.get(
-    "/on-deck",
+    "{config_id}/on-deck",
     response_model=list[Union[schemas.PlexMovie, schemas.PlexEpisode]],
     response_model_by_alias=False,
     responses={
@@ -232,9 +267,15 @@ def get_plex_episode(
     },
 )
 def get_plex_on_deck(
-    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    config_id: str,
+    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
-    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    config = next((config for config in plex_configs if config.id == config_id), None)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    plex_server = plex.get_server(
+        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+    )
     if plex_server is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
@@ -244,16 +285,22 @@ def get_plex_on_deck(
 
 
 @router.get(
-    "/search",
+    "{config_id}/search",
     response_model=list[schemas.MediaSearchResultSchema],
     response_model_by_alias=False,
 )
 def search_plex_media(
+    config_id: str,
     value: str,
     section: models.MediaType = None,
-    plex_configs: list[PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
-    plex_server = plex.get_server(plex_configs[0].api_key, plex_configs[0].server_name)
+    config = next((config for config in plex_configs if config.id == config_id), None)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    plex_server = plex.get_server(
+        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+    )
     if plex_server is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."

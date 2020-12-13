@@ -2,8 +2,8 @@ from typing import Optional
 
 from sqlalchemy import func
 
+from server.models import Friendship, PlexAccount, User
 from .base import BaseRepository
-from server.models import User, PlexAccount, Friendship
 
 
 class UserRepository(BaseRepository[User]):

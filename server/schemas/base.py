@@ -1,7 +1,9 @@
 from typing import Type
-from pydantic import BaseModel
-from server.repositories.base import ModelType
+
 from humps import camelize
+from pydantic import BaseModel
+
+from server.repositories.base import ModelType
 
 
 class APIModel(BaseModel):

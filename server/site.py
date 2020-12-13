@@ -1,10 +1,10 @@
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.responses import FileResponse
 from fastapi.routing import Mount
 from fastapi.staticfiles import StaticFiles
-from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import FileResponse
-from server.core.config import settings
 
+from server.core.config import settings
 
 site_routes = [
     Mount("/images", StaticFiles(directory=str(settings.IMAGES_FOLDER)), name="images"),

@@ -3,20 +3,19 @@ from random import randrange
 import requests
 from fastapi import (
     APIRouter,
+    BackgroundTasks,
     Depends,
     HTTPException,
     Request,
     Response,
     status,
-    BackgroundTasks,
 )
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from server import schemas
+from server import models, schemas
 from server.api import dependencies as deps
-from server.core import utils, settings, security
-from server.models import PlexAccount, User
+from server.core import security, settings, utils
 from server.repositories import PlexAccountRepository, UserRepository
 
 router = APIRouter()
@@ -43,7 +42,7 @@ def signup(
     existing_username = user_repo.find_by_username(user_in.username)
     if existing_username:
         raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
-    user = user_in.to_orm(User)
+    user = user_in.to_orm(models.User)
     if settings.MAIL_ENABLED:
         email_data = schemas.EmailConfirm(email=user.email).dict()
         token = security.generate_timed_token(email_data)
@@ -272,7 +271,7 @@ def confirm_signin_plex(
         if user is None:
             if user_repo.find_by_username(plex_username) is not None:
                 plex_username = "{}{}".format(plex_username, randrange(1, 999))
-            user = User(
+            user = models.User(
                 username=plex_username,
                 email=plex_email,
                 password=security.get_random_password(),
@@ -280,7 +279,7 @@ def confirm_signin_plex(
                 confirmed=True,
             )
             user_repo.save(user)
-        plex_account = PlexAccount(
+        plex_account = models.PlexAccount(
             plex_user_id=plex_user_id, user_id=user.id, api_key=auth_token
         )
     # Update the Plex account with the API key (possibly different at each login)

@@ -1,7 +1,7 @@
 import secrets
 from enum import Enum
-from typing import Optional, Tuple, Union
 from pathlib import Path
+from typing import Optional, Tuple, Union
 
 from dotenv import load_dotenv
 from pydantic import (

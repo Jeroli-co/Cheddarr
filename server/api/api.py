@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .endpoints import auth, users, configuration, search, requests, plex
+from .endpoints import auth, configuration, plex, requests, search, users
 
 router = APIRouter()
 router.include_router(auth.router, tags=["auth"])

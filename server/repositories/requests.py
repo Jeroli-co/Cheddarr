@@ -1,6 +1,6 @@
 from typing import Optional
 
-from server.models import Movie, MovieRequest, SeriesRequest, Series
+from server.models import Movie, MovieRequest, Series, SeriesRequest
 from server.repositories.base import BaseRepository
 
 

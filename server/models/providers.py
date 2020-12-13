@@ -1,11 +1,17 @@
+from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
 from server.database import Model
-from server.models.types import ProviderType
+
+
+class ProviderType(str, Enum):
+    movie_provider = "movie_provider"
+    series_provider = "series_provider"
+    media_server = "media_server"
 
 
 class ProviderConfig(Model):
@@ -15,7 +21,7 @@ class ProviderConfig(Model):
     port = Column(Integer)
     ssl = Column(Boolean, default=False)
     enabled = Column(Boolean, default=True)
-    provider_type = Column(Enum(ProviderType), nullable=False)
+    provider_type = Column(DBEnum(ProviderType), nullable=False)
     name = Column(String)
     user_id = Column(ForeignKey("user.id"), nullable=False)
     user = relationship("User", back_populates="providers")

@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
 from server.tests.conftest import datasets
 
 

@@ -1,14 +1,12 @@
 import os
+from os import listdir
 from pathlib import Path
-from jinja2 import Environment, FileSystemLoader
-import emails
+from random import choice
 from urllib.parse import urlencode
 
-from os import listdir
-from random import choice
-
+import emails
 from emails.template import JinjaTemplate
-
+from jinja2 import Environment, FileSystemLoader
 from pydantic import EmailStr
 
 from server.core.config import settings

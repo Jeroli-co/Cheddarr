@@ -3,14 +3,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from server import models, schemas
 from server.api import dependencies as deps
 from server.helpers import radarr, search, sonarr
-from server.models import (
-    Movie,
-    MovieRequest,
-    RequestStatus,
-    Series,
-    SeriesRequest,
-    SonarrConfig,
-)
 from server.repositories import (
     MovieRepository,
     MovieRequestRepository,
@@ -88,9 +80,9 @@ def add_movie_request(
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND, "The requested movie was not found"
             )
-        movie = searched_movie.to_orm(Movie)
+        movie = searched_movie.to_orm(models.Movie)
 
-    movie_request = MovieRequest(
+    movie_request = models.MovieRequest(
         requested_user=requested_user,
         requesting_user=current_user,
         movie=movie,
@@ -119,20 +111,29 @@ def update_movie_request(
     request = movies_request_repo.find_by(id=request_id)
     if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
-    if request.status != RequestStatus.pending:
+    if request.status != models.RequestStatus.pending:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, "Cannot update a non pending request."
         )
-    if update.status == RequestStatus.approved:
+    if update.status == models.RequestStatus.approved:
         if update.provider_id is None:
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
                 "provider_id must be set to accept a request.",
             )
-        request.selected_provider_id = update.provider_id
-        radarr.send_request(request)
-    elif update.status == RequestStatus.refused:
-        request.status = RequestStatus.refused
+        selected_provider = current_user.providers.filter_by(
+            id=update.provider_id
+        ).one_or_none()
+        if selected_provider is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
+        request.selected_provider = selected_provider
+        request.status = models.RequestStatus.approved
+        if isinstance(request.selected_provider, models.RadarrConfig):
+            radarr.send_request(request)
+
+    elif update.status == models.RequestStatus.refused:
+        request.status = models.RequestStatus.refused
+
     movies_request_repo.save(request)
     return request
 
@@ -169,7 +170,7 @@ def get_sent_series_requests(
     },
 )
 def add_series_request(
-    request: schemas.SeriesRequestCreate,
+    request_in: schemas.SeriesRequestCreate,
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     series_repo: SeriesRepository = Depends(deps.get_repository(SeriesRepository)),
@@ -177,23 +178,24 @@ def add_series_request(
         deps.get_repository(SeriesRequestRepository)
     ),
 ):
-    requested_user = user_repo.find_by_username(request.requested_username)
+    requested_user = user_repo.find_by_username(request_in.requested_username)
     if requested_user is None:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "The requested user does not exist."
         )
 
-    series = series_repo.find_by(tvdb_id=request.tvdb_id)
+    series = series_repo.find_by(tvdb_id=request_in.tvdb_id)
     if series is None:
-        searched_series = search.find_tmdb_series_by_tvdb_id(request.tvdb_id)
+        searched_series = search.find_tmdb_series_by_tvdb_id(request_in.tvdb_id)
         if searched_series is None:
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND, "The requested series was not found"
             )
-        series = schemas.Series.parse_obj(searched_series).to_orm(Series)
+
+        series = schemas.Series.parse_obj(searched_series).to_orm(models.Series)
 
     series_requests = series_request_repo.find_all_by_user_ids_and_tvdb_id(
-        tvdb_id=request.tvdb_id,
+        tvdb_id=request_in.tvdb_id,
         requesting_user_id=current_user.id,
         requested_user_id=requested_user.id,
     )
@@ -205,57 +207,57 @@ def add_series_request(
             series_request = r
 
     if not series_request:
-        series_request = SeriesRequest(
+        series_request = models.SeriesRequest(
             requested_user=requested_user,
             requesting_user=current_user,
             series=series,
         )
-        update_existing_series_request(series_request, request)
+        update_existing_series_request(series_request, request_in)
         series_request_repo.save(series_request)
         return series_request
 
-    if request.seasons:
+    if request_in.seasons:
         if not series_request.seasons:
             raise HTTPException(
                 status.HTTP_409_CONFLICT,
                 "This series has already been requested entirely.",
             )
-        for db_season in series_request.seasons:
+        for db_season_req in series_request.seasons:
             duplicate_season = next(
                 (
                     season
-                    for season in request.seasons
-                    if season.season_number == db_season.season_number
+                    for season in request_in.seasons
+                    if season.season_number == db_season_req.season_number
                 ),
                 None,
             )
             if duplicate_season is not None:
-                if not duplicate_season.episodes and db_season.episodes:
+                if not duplicate_season.episodes and db_season_req.episodes:
                     continue
 
-                if not db_season.episodes:
-                    request.seasons.remove(duplicate_season)
+                if not db_season_req.episodes:
+                    request_in.seasons.remove(duplicate_season)
                     continue
 
-                for db_episode in db_season.episodes:
+                for db_episode_req in db_season_req.episodes:
                     duplicate_episode = next(
                         (
                             episode
                             for episode in duplicate_season.episodes
-                            if episode.episode_number == db_episode.episode_number
+                            if episode.episode_number == db_episode_req.episode_number
                         ),
                         None,
                     )
                     if duplicate_episode is not None:
                         duplicate_season.episodes.remove(duplicate_episode)
                 if not duplicate_season.episodes:
-                    request.seasons.remove(duplicate_season)
-        if not request.seasons:
+                    request_in.seasons.remove(duplicate_season)
+        if not request_in.seasons:
             raise HTTPException(
                 status.HTTP_409_CONFLICT, "This content has already been requested."
             )
 
-        update_existing_series_request(series_request, request)
+        update_existing_series_request(series_request, request_in)
     else:
         series_request.seasons = []
 
@@ -298,21 +300,52 @@ def update_existing_series_request(
 @router.patch("/series/{request_id}")
 def update_series_request(
     request_id: int,
+    update: schemas.RequestUpdate,
     current_user: models.User = Depends(deps.get_current_user),
+    series_request_repo: SeriesRequestRepository = Depends(
+        deps.get_repository(SeriesRequestRepository)
+    ),
 ):
-    request = crud.series_child_request.get(db, id=id)
-    if request is None or request.parent.requested_user != current_user:
+    if (
+        update.status != models.RequestStatus.approved
+        and update.status != models.RequestStatus.refused
+    ):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "Request status can only be updated to approved or refused.",
+        )
+    request = series_request_repo.find_by(id=request_id)
+    if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
-    if args.get("approved"):
-        selected_provider_id = args.get("selected_provider_id")
-        selected_provider = current_user.providers.filter_by(
-            id=selected_provider_id
-        ).one_or_none()
+    if request.status != models.RequestStatus.pending:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "Cannot update a non pending request."
+        )
+    if update.status == models.RequestStatus.approved:
+        if update.provider_id is None:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                "provider_id must be set to accept a request.",
+            )
+        selected_provider = next(
+            (
+                provider
+                for provider in current_user.providers
+                if provider.id == update.provider_id
+            ),
+            None,
+        )
         if selected_provider is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
-    request.update(args)
-    if isinstance(request.selected_provider, SonarrConfig):
-        sonarr.send_request(request)
+        request.selected_provider = selected_provider
+        request.status = models.RequestStatus.approved
+        if isinstance(request.selected_provider, models.SonarrConfig):
+            sonarr.send_request(request)
+
+    elif update.status == models.RequestStatus.refused:
+        request.status = models.RequestStatus.refused
+
+    series_request_repo.save(request)
     return request
 
 
@@ -320,16 +353,16 @@ def update_series_request(
 def delete_series_request(
     request_id: int,
     current_user: models.User = Depends(deps.get_current_user),
+    series_request_repo: SeriesRequestRepository = Depends(
+        deps.get_repository(SeriesRequestRepository)
+    ),
 ):
-    request = crud.series_child_request.get(db, id=id)
+    request = series_request_repo.find_by(id=request_id)
     if (
         request is None
-        or request.requesting_user != current_user
-        or request.parent.requested_user != current_user
+        or request.requesting_user_id != current_user.id
+        or request.requested_user_id != current_user.id
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
-
-    request.delete()
-    if not request.parent.children:
-        request.parent.delete()
+    series_request_repo.remove(request)
     return {"detail": "Request deleted."}

@@ -1,22 +1,11 @@
 from typing import Optional
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status,
-    BackgroundTasks,
-    Request,
-)
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 
-from server import schemas
+from server import models, schemas
 from server.api import dependencies as deps
-from server.core import utils, settings, security
-from server.models import Friendship, ProviderType, User
-from server.repositories import (
-    UserRepository,
-    FriendshipRepository,
-)
+from server.core import security, settings, utils
+from server.repositories import FriendshipRepository, UserRepository
 
 users_router = APIRouter()
 current_user_router = APIRouter()
@@ -63,14 +52,14 @@ def get_user_by_username(
 
 
 @current_user_router.get("", response_model=schemas.User)
-async def get_current_user(current_user: User = Depends(deps.get_current_user)):
+async def get_current_user(current_user: models.User = Depends(deps.get_current_user)):
     return current_user
 
 
 @current_user_router.get("/providers")
 def get_user_providers(
-    type: Optional[ProviderType] = None,
-    current_user: User = Depends(deps.get_current_user),
+    type: Optional[models.ProviderType] = None,
+    current_user: models.User = Depends(deps.get_current_user),
 ):
     user_providers = current_user.providers
     if type is not None:
@@ -84,7 +73,7 @@ def get_user_providers(
 
 @current_user_router.delete("")
 def delete_user(
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     user_repo.remove(current_user)
@@ -103,7 +92,7 @@ def update_user(
     user_in: schemas.UserUpdate,
     request: Request,
     background_tasks: BackgroundTasks,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     if user_in.username is not None:
@@ -265,8 +254,8 @@ def confirm_reset_password(
     "/friends", response_model=list[schemas.UserPublic], tags=["friends"]
 )
 def get_friends(
-    providers_type: Optional[ProviderType] = None,
-    current_user: User = Depends(deps.get_current_user),
+    providers_type: Optional[models.ProviderType] = None,
+    current_user: models.User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(
         deps.get_repository(FriendshipRepository)
     ),
@@ -280,21 +269,21 @@ def get_friends(
     ]
     if providers_type is not None:
         friends.append(current_user)
-        if providers_type == ProviderType.movie_provider:
+        if providers_type == models.ProviderType.movie_provider:
             return [
                 friend
                 for friend in friends
                 if friend.providers.filter_by(
-                    provider_type=ProviderType.movie_provider, enabled=True
+                    provider_type=models.ProviderType.movie_provider, enabled=True
                 ).first()
             ]
 
-        if providers_type == ProviderType.series_provider:
+        if providers_type == models.ProviderType.series_provider:
             return [
                 friend
                 for friend in friends
                 if friend.providers.filter_by(
-                    provider_type=ProviderType.series_provider, enabled=True
+                    provider_type=models.ProviderType.series_provider, enabled=True
                 ).first()
             ]
     return friends
@@ -304,7 +293,7 @@ def get_friends(
     "/friends/incoming", response_model=list[schemas.UserPublic], tags=["friends"]
 )
 def get_pending_incoming_friends(
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(
         deps.get_repository(FriendshipRepository)
     ),
@@ -319,7 +308,7 @@ def get_pending_incoming_friends(
     "/friends/outgoing", response_model=list[schemas.UserPublic], tags=["friends"]
 )
 def get_pending_outgoing_friends(
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(
         deps.get_repository(FriendshipRepository)
     ),
@@ -342,7 +331,7 @@ def get_pending_outgoing_friends(
 )
 def add_friend(
     friend: schemas.FriendshipCreate,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     friendship_repo: FriendshipRepository = Depends(
         deps.get_repository(FriendshipRepository)
@@ -355,7 +344,7 @@ def add_friend(
     if friendship_repo.find_by_user_ids(current_user.id, friend.id) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This user is already a friend.")
 
-    friendship = Friendship(
+    friendship = models.Friendship(
         requesting_user_id=current_user.id, requested_user_id=friend.id
     )
     friendship_repo.save(friendship)
@@ -373,7 +362,7 @@ def add_friend(
 )
 def accept_friend(
     username,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     friendship_repo: FriendshipRepository = Depends(
         deps.get_repository(FriendshipRepository)
@@ -403,7 +392,7 @@ def accept_friend(
 )
 def remove_friend(
     username: str,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     friendship_repo: FriendshipRepository = Depends(
         deps.get_repository(FriendshipRepository)
@@ -428,7 +417,7 @@ def remove_friend(
 )
 def search_friends(
     value: str,
-    current_user: User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     search = user_repo.search_by("username", value)

@@ -4,7 +4,8 @@ from typing import Generic, Optional, TypeVar, Union
 
 from pydantic import Field, validator
 from pydantic.generics import GenericModel
-from server.schemas import Media, Movie, Series, Season, Episode
+
+from server.schemas import Episode, Media, Movie, Season, Series
 
 MovieResultType = TypeVar("MovieResultType")
 SeriesResultType = TypeVar("SeriesResultType")

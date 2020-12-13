@@ -3,13 +3,13 @@ from typing import Optional
 from plexapi.exceptions import PlexApiException
 from plexapi.library import LibrarySection, MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
-from plexapi.server import PlexServer as PlexAPIServer
+from plexapi.server import PlexServer
 
 from server.schemas import PlexServerInfo
 
 
-def get_servers(plex_api_key) -> list[PlexServerInfo]:
-    plex_account = MyPlexAccount(plex_api_key)
+def get_plex_account_servers(api_key: str) -> list[PlexServerInfo]:
+    plex_account = MyPlexAccount(api_key)
     return [
         PlexServerInfo(
             server_id=resource.clientIdentifier,
@@ -20,7 +20,7 @@ def get_servers(plex_api_key) -> list[PlexServerInfo]:
     ]
 
 
-def get_server(api_key: str, name: str) -> Optional[PlexAPIServer]:
+def get_plex_account_server(api_key: str, name: str) -> Optional[PlexServer]:
     try:
         server = MyPlexAccount(api_key).resource(name).connect()
     except PlexApiException:
@@ -28,8 +28,19 @@ def get_server(api_key: str, name: str) -> Optional[PlexAPIServer]:
     return server
 
 
+def get_server(
+    base_url: str, port: int, ssl: bool, api_key: str
+) -> Optional[PlexServer]:
+    url = f"{'https' if ssl else 'http'}://{base_url}{':' + str(port) if port else ''}"
+    try:
+        server = PlexServer(url, api_key)
+    except PlexApiException:
+        return None
+    return server
+
+
 def library_sections(
-    plex_server: PlexAPIServer, section_type: str = None
+    plex_server: PlexServer, section_type: str = None
 ) -> list[LibrarySection]:
     if section_type == "movies":
         libtype = MovieSection
@@ -46,7 +57,7 @@ def library_sections(
 
 
 def search(
-    plex_server: PlexAPIServer,
+    plex_server: PlexServer,
     section_type: str,
     title: str,
     max_results=3,

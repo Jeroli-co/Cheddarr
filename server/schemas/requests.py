@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import date
 from typing import Optional
 
-from server.models import RequestStatus, SeriesType
+from server.models import RequestStatus
 from server.schemas import APIModel, Movie, Series, UserPublic
 
 
