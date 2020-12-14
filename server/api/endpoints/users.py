@@ -8,6 +8,7 @@ from server.core import security, settings, utils
 from server.repositories import (
     FriendshipRepository,
     PlexAccountRepository,
+    PlexConfigRepository,
     UserRepository,
 )
 
@@ -90,7 +91,13 @@ def unlink_plex_account(
     plex_account_repo: PlexAccountRepository = Depends(
         deps.get_repository(PlexAccountRepository)
     ),
+    plex_config_repo: PlexConfigRepository = Depends(
+        deps.get_repository(PlexConfigRepository)
+    ),
 ):
+    configs = plex_config_repo.find_all_by(user_id=current_user.id)
+    for config in configs:
+        plex_config_repo.remove(config)
     plex_account_repo.remove(current_user.plex_account)
     return {"detail": "Plex account unlinked."}
 
