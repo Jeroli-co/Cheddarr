@@ -25,11 +25,14 @@ interface AuthContextInterface {
     username: string
   ) => Promise<IAsyncResponse<IUser | null>>;
 
+  readonly unlinkPlexAccount: () => Promise<IAsyncResponse>;
+
   readonly invalidSession: () => void;
 }
 
 export const SessionDefaultImpl: ISession = {
   isAuthenticated: false,
+  plex: false,
   username: "",
   avatar: "",
   admin: false,
@@ -46,6 +49,9 @@ export const AuthContextDefaultImpl: AuthContextInterface = {
     return Promise.resolve(new AsyncResponseSuccess(""));
   },
   updateUsername(): Promise<IAsyncResponse<IUser>> {
+    return Promise.resolve(new AsyncResponseSuccess(""));
+  },
+  unlinkPlexAccount(): Promise<IAsyncResponse> {
     return Promise.resolve(new AsyncResponseSuccess(""));
   },
 };

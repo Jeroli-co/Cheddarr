@@ -1,8 +1,6 @@
 import React from "react";
 import { routes } from "../../router/routes";
 import { Link, Redirect, Route, Switch, useLocation } from "react-router-dom";
-import { PlexConfigContextProvider } from "../../contexts/plex-config/PlexConfigContextProvider";
-import { SidebarMenu } from "../elements/SidebarMenu";
 import styled from "styled-components";
 
 const tabsName = ["Account", "Plex", "Radarr", "Sonarr"];
@@ -45,30 +43,28 @@ const Settings = () => {
             ))}
           </ul>
         </div>
-        <PlexConfigContextProvider>
-          <Switch>
-            <Route
-              path={routes.USER_SETTINGS_ACCOUNT.url}
-              component={routes.USER_SETTINGS_ACCOUNT.component}
-            />
-            <Route
-              exact
-              path={routes.USER_SETTINGS_PLEX.url}
-              component={routes.USER_SETTINGS_PLEX.component}
-            />
-            <Route
-              exact
-              path={routes.USER_SETTINGS_RADARR.url}
-              component={routes.USER_SETTINGS_RADARR.component}
-            />
-            <Route
-              exact
-              path={routes.USER_SETTINGS_SONARR.url}
-              component={routes.USER_SETTINGS_SONARR.component}
-            />
-            <Route render={() => <Redirect to={routes.NOT_FOUND.url} />} />
-          </Switch>
-        </PlexConfigContextProvider>
+        <Switch>
+          <Route
+            path={routes.USER_SETTINGS_ACCOUNT.url}
+            component={routes.USER_SETTINGS_ACCOUNT.component}
+          />
+          <Route
+            exact
+            path={routes.USER_SETTINGS_PLEX.url}
+            component={routes.USER_SETTINGS_PLEX.component}
+          />
+          <Route
+            exact
+            path={routes.USER_SETTINGS_RADARR.url}
+            component={routes.USER_SETTINGS_RADARR.component}
+          />
+          <Route
+            exact
+            path={routes.USER_SETTINGS_SONARR.url}
+            component={routes.USER_SETTINGS_SONARR.component}
+          />
+          <Route render={() => <Redirect to={routes.NOT_FOUND.url} />} />
+        </Switch>
       </div>
     </SettingsStyle>
   );

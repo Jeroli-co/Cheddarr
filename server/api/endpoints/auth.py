@@ -170,7 +170,7 @@ def signin(
         username=user.username,
         avatar=user.avatar,
         admin=user.admin,
-        plex_account_linked=user.plex_account is not None,
+        plex=user.plex_account is not None,
     )
     access_token = security.create_jwt_access_token(payload)
     token = schemas.Token(
@@ -291,6 +291,8 @@ def confirm_signin_plex(
         sub=str(plex_account.user.id),
         username=plex_account.user.username,
         avatar=plex_account.user.avatar,
+        plex=True,
+        admin=plex_account.user.admin
     )
     access_token = security.create_jwt_access_token(payload)
     token = schemas.Token(

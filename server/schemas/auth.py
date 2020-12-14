@@ -15,7 +15,7 @@ class TokenPayload(BaseModel):
     username: str
     avatar: str
     admin: bool
-    plex_account_linked: bool
+    plex: bool
 
 
 class EmailConfirm(APIModel):

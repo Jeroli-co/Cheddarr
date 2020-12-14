@@ -1,24 +1,30 @@
 import { createContext } from "react";
 import { IPlexConfig } from "../../models/IPlexConfig";
+import {
+  AsyncResponseSuccess,
+  IAsyncResponse,
+} from "../../models/IAsyncResponse";
 
 interface PlexConfigContextInterface {
-  config: IPlexConfig | null;
+  configs: IPlexConfig[];
+  currentConfig: IPlexConfig | null;
   isLoading: boolean;
-  readonly updateConfig: (config: IPlexConfig) => void;
+  readonly updateConfig: (_: IPlexConfig) => void;
+  readonly deleteConfig: (_: string) => Promise<IAsyncResponse<any | null>>;
+  readonly addConfig: (_: IPlexConfig) => void;
   readonly isPlexAccountLinked: () => boolean;
-  readonly isPlexServerLinked: () => boolean;
 }
 
 export const PlexConfigContextDefaultImpl: PlexConfigContextInterface = {
-  config: null,
+  configs: [],
+  currentConfig: null,
   isLoading: false,
-  updateConfig(config: IPlexConfig): void {
-    this.config = config;
+  updateConfig(_: IPlexConfig): void {},
+  deleteConfig(_: string): Promise<IAsyncResponse<any | null>> {
+    return Promise.resolve(new AsyncResponseSuccess(""));
   },
+  addConfig(_: IPlexConfig): void {},
   isPlexAccountLinked(): boolean {
-    return false;
-  },
-  isPlexServerLinked(): boolean {
     return false;
   },
 };

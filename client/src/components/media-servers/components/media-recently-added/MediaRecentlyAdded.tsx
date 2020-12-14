@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, MouseEvent } from "react";
+import React, {
+  MouseEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { Carousel } from "../../../elements/Carousel";
@@ -8,6 +14,11 @@ import Spinner from "../../../elements/Spinner";
 import { MediaRecentlyAddedType } from "./enums/MediaRecentlyAddedType";
 import { PlexService } from "../../../../services/PlexService";
 import { IMediaServerMedia } from "../../../../models/IMediaServerMedia";
+import {
+  AsyncResponseError,
+  AsyncResponseSuccess,
+} from "../../../../models/IAsyncResponse";
+import { PlexConfigContext } from "../../../../contexts/plex-config/PlexConfigContext";
 
 type MediaRecentlyAddedProps = {
   type: MediaRecentlyAddedType;
@@ -18,15 +29,32 @@ const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
   const [isShow, setIsShow] = useState(true);
   const [mediaSelectedIndex, setMediaSelectedIndex] = useState(-1);
   const sectionTitleRef = useRef<HTMLDivElement>(null);
+  const { currentConfig } = useContext(PlexConfigContext);
 
   useEffect(() => {
-    PlexService.GetMediaRecentlyAdded(type).then((res) => {
+    const handleRes = (
+      res: AsyncResponseSuccess<IMediaServerMedia[]> | AsyncResponseError
+    ) => {
       if (res.error === null) {
         setMedia(res.data);
       }
-    });
+    };
+
+    if (currentConfig) {
+      if (type === MediaRecentlyAddedType.ON_DECK) {
+        PlexService.GetMediaOnDeck().then((res) => {
+          handleRes(res);
+        });
+      } else {
+        PlexService.GetMediaRecentlyAdded(currentConfig.id, type).then(
+          (res) => {
+            handleRes(res);
+          }
+        );
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentConfig?.id]);
 
   const onPreviewClick = (index: number) => {
     if (sectionTitleRef && sectionTitleRef.current) {

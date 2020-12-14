@@ -44,21 +44,11 @@ export interface INotification {
 }
 
 const NotificationContextDefaultImpl: INotificationContext = {
-  pushDanger(message: string): void {
-    console.log(message);
-  },
-  pushInfo(message: string): void {
-    console.log(message);
-  },
-  pushSuccess(message: string): void {
-    console.log(message);
-  },
-  pushWarning(message: string): void {
-    console.log(message);
-  },
-  removeNotification(): void {
-    console.log("remove notification");
-  },
+  pushDanger(_: string): void {},
+  pushInfo(_: string): void {},
+  pushSuccess(_: string): void {},
+  pushWarning(_: string): void {},
+  removeNotification(): void {},
 };
 
 const NotificationContext = createContext<INotificationContext>(

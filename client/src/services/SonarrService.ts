@@ -10,31 +10,8 @@ import { ISonarrInstanceInfo } from "../models/ISonarrInstanceInfo";
 import { IProviderConfigBase } from "../models/IProviderConfigBase";
 
 export class SonarrService {
-  static SONARR_BASE_URL = "/sonarr";
   static SONARR_CONFIG_BASE_URL = "/configuration/sonarr";
   static SONARR_TEST_CONFIG_BASE_URL = "/configuration/sonarr/instance-info";
-
-  static GetSonarrStatus = () => {
-    return HttpService.executeRequest<boolean>(
-      HTTP_METHODS.GET,
-      SonarrService.SONARR_BASE_URL + "/status"
-    ).then(
-      (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<boolean>("", response.data);
-        } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
-        }
-      },
-      (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
-      }
-    );
-  };
 
   static GetSonarrInstanceInfo = (config: IProviderConfigBase) => {
     return HttpService.executeRequest<ISonarrInstanceInfo>(

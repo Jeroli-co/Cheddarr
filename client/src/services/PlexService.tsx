@@ -14,17 +14,94 @@ import {
 } from "../models/IMediaServerMedia";
 import { MediaRecentlyAddedType } from "../components/media-servers/components/media-recently-added/enums/MediaRecentlyAddedType";
 import { IPlexConfig } from "../models/IPlexConfig";
-import { IPlexServer } from "../models/IPlexServer";
+import { IPlexServerInfo } from "../models/IPlexServerInfo";
 import { MediasTypes } from "../enums/MediasTypes";
+import { IPlexServerDetails } from "../models/IPlexServerDetails";
 
 export class PlexService {
-  static PLEX_SERVER_BASE_URL = "/plex";
-  static PLEX_SEARCH_BASE_URL = PlexService.PLEX_SERVER_BASE_URL + "/search";
+  static PLEX_BASE_URL = "/plex";
+  static PLEX_CONFIG_BASE_URL = "/configuration/plex";
+  static PLEX_SEARCH_BASE_URL = PlexService.PLEX_BASE_URL + "/search";
 
-  static GetMediaRecentlyAdded = (type: MediaRecentlyAddedType) => {
+  static GetPlexServers = () => {
+    return HttpService.executeRequest<IPlexServerInfo[]>(
+      HTTP_METHODS.GET,
+      PlexService.PLEX_BASE_URL + "/servers"
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess<IPlexServerInfo[]>("", response.data);
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
+
+  static GetPlexServer = (serverName: string) => {
+    return HttpService.executeRequest<IPlexServerDetails>(
+      HTTP_METHODS.GET,
+      PlexService.PLEX_BASE_URL + "/servers/" + serverName
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess<IPlexServerDetails>(
+            "",
+            response.data
+          );
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
+
+  static GetMediaRecentlyAdded = (
+    configId: string,
+    type: MediaRecentlyAddedType
+  ) => {
     return HttpService.executeRequest<IMediaServerMedia[]>(
       HTTP_METHODS.GET,
-      PlexService.PLEX_SERVER_BASE_URL + "/" + type + "/recent"
+      PlexService.PLEX_BASE_URL + "/" + configId + "/" + type + "/recent"
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess<IMediaServerMedia[]>(
+            "",
+            response.data
+          );
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
+
+  static GetMediaOnDeck = () => {
+    return HttpService.executeRequest<IMediaServerMedia[]>(
+      HTTP_METHODS.GET,
+      PlexService.PLEX_BASE_URL + "/on-deck"
     ).then(
       (response) => {
         if (response.status === 200) {
@@ -47,58 +124,39 @@ export class PlexService {
   };
 
   static GetPlexConfig = () => {
+    return HttpService.executeRequest<IPlexConfig[]>(
+      HTTP_METHODS.GET,
+      PlexService.PLEX_CONFIG_BASE_URL
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess<IPlexConfig[]>("", response.data);
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
+
+  static AddPlexConfig = (serverDetails: IPlexServerDetails) => {
     return HttpService.executeRequest<IPlexConfig>(
-      HTTP_METHODS.GET,
-      PlexService.PLEX_SERVER_BASE_URL + "/config"
-    ).then(
-      (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexConfig>("", response.data);
-        } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
-        }
-      },
-      (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
-      }
-    );
-  };
-
-  static GetPlexServers = () => {
-    return HttpService.executeRequest<IPlexServer[]>(
-      HTTP_METHODS.GET,
-      PlexService.PLEX_SERVER_BASE_URL + "/servers"
-    ).then(
-      (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexServer[]>("", response.data);
-        } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
-        }
-      },
-      (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
-      }
-    );
-  };
-
-  static AddPlexServer = (server: IPlexServer) => {
-    return HttpService.executeRequest<IPlexServer>(
       HTTP_METHODS.POST,
-      PlexService.PLEX_SERVER_BASE_URL + "/config/servers",
-      server
+      PlexService.PLEX_CONFIG_BASE_URL,
+      serverDetails
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexServer>("", response.data);
+        if (response.status === 201) {
+          return new AsyncResponseSuccess<IPlexConfig>(
+            "Config created",
+            response.data
+          );
         } else {
           return new AsyncResponseError(
             ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
@@ -113,37 +171,18 @@ export class PlexService {
     );
   };
 
-  static RemovePlexServer = (machineId: number) => {
-    return HttpService.executeRequest(
-      HTTP_METHODS.DELETE,
-      PlexService.PLEX_SERVER_BASE_URL + "/config/servers" + machineId
-    ).then(
-      (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexServer>("", response.data);
-        } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
-        }
-      },
-      (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
-      }
-    );
-  };
-
-  static UpdateConfig = (newConfig: IPlexConfig) => {
+  static UpdatePlexConfig = (id: string, newConfig: IPlexConfig) => {
     return HttpService.executeRequest<IPlexConfig>(
-      HTTP_METHODS.PATCH,
-      PlexService.PLEX_SERVER_BASE_URL + "/config",
+      HTTP_METHODS.PUT,
+      PlexService.PLEX_CONFIG_BASE_URL + "/" + id,
       newConfig
     ).then(
       (response) => {
         if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexConfig>("", response.data);
+          return new AsyncResponseSuccess<IPlexConfig>(
+            "Config updated",
+            response.data
+          );
         } else {
           return new AsyncResponseError(
             ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
@@ -158,36 +197,14 @@ export class PlexService {
     );
   };
 
-  static UnlinkPlexAccount = () => {
+  static DeletePlexConfig = (id: string) => {
     return HttpService.executeRequest(
       HTTP_METHODS.DELETE,
-      PlexService.PLEX_SERVER_BASE_URL + "/config"
+      PlexService.PLEX_CONFIG_BASE_URL + "/" + id
     ).then(
       (response) => {
         if (response.status === 200) {
-          return new AsyncResponseSuccess("");
-        } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
-        }
-      },
-      (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
-      }
-    );
-  };
-
-  static GetPlexStatus = () => {
-    return HttpService.executeRequest(
-      HTTP_METHODS.GET,
-      PlexService.PLEX_SERVER_BASE_URL + "/status"
-    ).then(
-      (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess("", response.data);
+          return new AsyncResponseSuccess("Config updated");
         } else {
           return new AsyncResponseError(
             ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
@@ -205,7 +222,7 @@ export class PlexService {
   static GetPlexMovie = (id: number) => {
     return HttpService.executeRequest<IMediaServerMovie>(
       HTTP_METHODS.GET,
-      PlexService.PLEX_SERVER_BASE_URL + "/movies/" + id
+      PlexService.PLEX_BASE_URL + "/movies/" + id
     ).then(
       (response) => {
         if (response.status === 200) {
@@ -227,7 +244,7 @@ export class PlexService {
   static GetSeries = (id: number) => {
     return HttpService.executeRequest<IMediaServerSeries>(
       HTTP_METHODS.GET,
-      PlexService.PLEX_SERVER_BASE_URL + "/series/" + id
+      PlexService.PLEX_BASE_URL + "/series/" + id
     ).then(
       (response) => {
         if (response.status === 200) {
@@ -252,7 +269,7 @@ export class PlexService {
   static GetSeason = (seasonId: number) => {
     return HttpService.executeRequest<IMediaServerSeason>(
       HTTP_METHODS.GET,
-      PlexService.PLEX_SERVER_BASE_URL + "/seasons/" + seasonId
+      PlexService.PLEX_BASE_URL + "/seasons/" + seasonId
     ).then(
       (response) => {
         if (response.status === 200) {
@@ -277,7 +294,7 @@ export class PlexService {
   static GetEpisode = (episodeId: number) => {
     return HttpService.executeRequest<IMediaServerEpisode>(
       HTTP_METHODS.GET,
-      PlexService.PLEX_SERVER_BASE_URL + "/episodes/" + episodeId
+      PlexService.PLEX_BASE_URL + "/episodes/" + episodeId
     ).then(
       (response) => {
         if (response.status === 200) {

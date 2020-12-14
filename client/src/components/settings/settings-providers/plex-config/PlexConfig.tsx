@@ -12,9 +12,9 @@ import { LinkPlexAccount } from "./elements/LinkPlexAccount";
 import { ServersModal } from "./elements/ServersModal";
 import { UnlinkAccountModal } from "./elements/UnlinkAccountModal";
 import { UnlinkServerModal } from "./elements/UnlinkServerModal";
-import Spinner from "../../../elements/Spinner";
-import { PlexService } from "../../../../services/PlexService";
 import { PlexConfigContext } from "../../../../contexts/plex-config/PlexConfigContext";
+import { IPlexConfig } from "../../../../models/IPlexConfig";
+import { AuthContext } from "../../../../contexts/auth/AuthContext";
 
 const PlexConfig = () => {
   const [isServersModalActive, setIsServersModalActive] = useState(false);
@@ -25,39 +25,31 @@ const PlexConfig = () => {
     false
   );
 
-  const { handleSubmit, formState, reset } = useForm();
+  const { handleSubmit, formState } = useForm<IPlexConfig>();
   const {
-    config,
-    isLoading,
-    isPlexServerLinked,
+    currentConfig,
+    updateConfig,
+    deleteConfig,
     isPlexAccountLinked,
   } = useContext(PlexConfigContext);
 
-  const _onUnlinkPlexServer = (machineId: number) => {
-    PlexService.RemovePlexServer(machineId).then((res) => {
+  const { unlinkPlexAccount } = useContext(AuthContext);
+
+  const _onUnlinkPlexConfig = (id: string) => {
+    deleteConfig(id).then((res) => {
       if (res.error === null) setIsUnlinkServerModalActive(false);
     });
   };
 
   const _onUnlinkPlexAccount = () => {
-    PlexService.UnlinkPlexAccount().then((res) => {
+    unlinkPlexAccount().then((res) => {
       if (res.error === null) setIsUnlinkAccountModalActive(false);
     });
   };
 
-  const _onSubmit = (data: any) => {
-    let newConfig: any = {};
-    formState.dirtyFields.forEach((key) => {
-      newConfig[key] = data[key];
-    });
-    PlexService.UpdateConfig(newConfig).then((res) => {
-      if (res.error === null) reset();
-    });
+  const _onSubmit = (data: IPlexConfig) => {
+    updateConfig(data);
   };
-
-  if (isLoading) return <Spinner color="primary" size="3x" />;
-
-  if (config === null) return <div />;
 
   return (
     <div className="PlexConfig" data-testid="PlexConfig">
@@ -69,70 +61,75 @@ const PlexConfig = () => {
         <LinkPlexAccount />
       </RowLayout>
 
-      {isPlexAccountLinked() && (
-        <div>
-          <form onSubmit={handleSubmit(_onSubmit)}>
-            <br />
+      <div>
+        <form onSubmit={handleSubmit(_onSubmit)}>
+          <br />
+          {isPlexAccountLinked() && (
             <p className="subtitle is-3">Plex server</p>
-            {isPlexServerLinked() && (
-              <RowLayout justifyContent="space-between" marginTop="2%">
-                <p className="is-size-5 has-text-weight-light">
-                  {config.servers[0]["name"]}
-                </p>
-                <button
-                  type="button"
-                  className="button is-small is-rounded is-info"
-                  onClick={() => setIsServersModalActive(true)}
-                  data-tooltip="Change server"
-                >
-                  <FontAwesomeIcon icon={faEdit} />
-                </button>
-                <button
-                  type="button"
-                  className="button is-small is-rounded is-danger"
-                  onClick={() => setIsUnlinkServerModalActive(true)}
-                  data-tooltip="Unlink server"
-                >
-                  <FontAwesomeIcon icon={faTrash} />
-                </button>
-              </RowLayout>
-            )}
-            {!isPlexServerLinked() && (
-              <button
-                className="button is-primary"
-                type="button"
-                onClick={() => setIsServersModalActive(true)}
-              >
-                Link Plex server
-              </button>
-            )}
-            <SubmitConfig isFormDirty={formState.dirty} />
-          </form>
-          <hr />
-          <p className="subtitle is-3">Danger zone</p>
-          <div className="content">
-            <p className="is-size-7">
-              <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
-              that option
-            </p>
+          )}
+          {!currentConfig && isPlexAccountLinked() && (
             <button
-              className="button is-danger"
+              className="button is-primary"
               type="button"
-              onClick={() => setIsUnlinkAccountModalActive(true)}
+              onClick={() => setIsServersModalActive(true)}
             >
-              Unlink Plex Account
+              Link Plex server
             </button>
+          )}
+          {currentConfig && isPlexAccountLinked() && (
+            <RowLayout justifyContent="space-between" marginTop="2%">
+              <p className="is-size-5 has-text-weight-light">
+                {currentConfig.serverName}
+              </p>
+              <button
+                type="button"
+                className="button is-small is-rounded is-info"
+                onClick={() => setIsServersModalActive(true)}
+                data-tooltip="Change server"
+              >
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+              <button
+                type="button"
+                className="button is-small is-rounded is-danger"
+                onClick={() => setIsUnlinkServerModalActive(true)}
+                data-tooltip="Unlink server"
+              >
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+            </RowLayout>
+          )}
+          <SubmitConfig isFormDirty={formState.dirty} />
+        </form>
+        <hr />
+        {isPlexAccountLinked() && (
+          <div>
+            <p className="subtitle is-3">Danger zone</p>
+            <div className="content">
+              <p className="is-size-7">
+                <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
+                that option
+              </p>
+              <button
+                className="button is-danger"
+                type="button"
+                onClick={() => setIsUnlinkAccountModalActive(true)}
+              >
+                Unlink Plex Account
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {isServersModalActive && (
         <ServersModal onClose={() => setIsServersModalActive(false)} />
       )}
-      {isUnlinkServerModalActive && config["servers"].length > 0 && (
+
+      {isUnlinkServerModalActive && currentConfig && (
         <UnlinkServerModal
-          machineName={config.servers[0]["name"]}
-          onUnlink={() => _onUnlinkPlexServer(config.servers[0].machineId)}
+          serverName={currentConfig.serverName}
+          onUnlink={() => _onUnlinkPlexConfig(currentConfig?.id)}
           onClose={() => setIsUnlinkServerModalActive(false)}
         />
       )}

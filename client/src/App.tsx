@@ -8,6 +8,7 @@ import { AuthContextProvider } from "./contexts/auth/AuthContextProvider";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeDynamicContextProvider } from "./contexts/themes/ThemeDynamicContextProvider";
 import { ThemeContextProvider } from "./contexts/themes/ThemeContextProvider";
+import { PlexConfigContextProvider } from "./contexts/plex-config/PlexConfigContextProvider";
 
 const App = () => {
   config.autoAddCss = false;
@@ -18,8 +19,10 @@ const App = () => {
         <NotificationContextProvider>
           <BrowserRouter>
             <AuthContextProvider>
-              <Navbar />
-              <RouterSwitch />
+              <PlexConfigContextProvider>
+                <Navbar />
+                <RouterSwitch />
+              </PlexConfigContextProvider>
             </AuthContextProvider>
           </BrowserRouter>
         </NotificationContextProvider>

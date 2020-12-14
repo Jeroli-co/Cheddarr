@@ -39,6 +39,7 @@ const SonarrConfig = () => {
       reset(sonarrConfig);
       setUsePort(sonarrConfig.port !== null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sonarrConfig]);
 
   const getInstanceInfo = (data: IProviderConfigBase) => {

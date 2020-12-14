@@ -302,6 +302,14 @@ class AuthService {
       localStorage.setItem("currentSession", JSON.stringify(currentSession));
     }
   };
+
+  static unlinkPlexAccount = (): void => {
+    const currentSession = AuthService.getCurrentSession();
+    if (currentSession) {
+      currentSession.plex = false;
+      localStorage.setItem("currentSession", JSON.stringify(currentSession));
+    }
+  };
 }
 
 export { AuthService };

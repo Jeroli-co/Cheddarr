@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Spinner from "../../../../elements/Spinner";
 import { PlexService } from "../../../../../services/PlexService";
-import { IPlexServer } from "../../../../../models/IPlexServer";
+import { IPlexServerInfo } from "../../../../../models/IPlexServerInfo";
+import { PlexConfigContext } from "../../../../../contexts/plex-config/PlexConfigContext";
 
 type PlexServerComponentProps = {
-  server: IPlexServer;
+  server: IPlexServerInfo;
 };
 
 type ServersModalProps = {
@@ -12,10 +13,12 @@ type ServersModalProps = {
 };
 
 const ServersModal = ({ onClose }: ServersModalProps) => {
-  const [serverSelected, setServerSelected] = useState<IPlexServer | null>(
+  const [serverSelected, setServerSelected] = useState<IPlexServerInfo | null>(
     null
   );
-  const [servers, setServers] = useState<IPlexServer[] | null>(null);
+  const [servers, setServers] = useState<IPlexServerInfo[] | null>(null);
+
+  const { addConfig } = useContext(PlexConfigContext);
 
   useEffect(() => {
     PlexService.GetPlexServers().then((res) => {
@@ -26,15 +29,14 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
 
   const linkServer = () => {
     if (serverSelected) {
-      PlexService.AddPlexServer({
-        name: serverSelected.name,
-        machineId: serverSelected.machineId,
-      }).then((res) => {
+      PlexService.GetPlexServer(serverSelected.serverName).then((res) => {
         if (res.error === null) {
-          if (servers) {
-            servers.push(res.data);
-          }
-          onClose();
+          PlexService.AddPlexConfig(res.data).then((res2) => {
+            if (res2.error === null) {
+              addConfig(res2.data);
+              onClose();
+            }
+          });
         }
       });
     }
@@ -51,15 +53,18 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
           <div className="level-item">
             <input
               type="radio"
-              name={server.name}
+              name={server.serverName}
               checked={
-                serverSelected !== null && server.name === serverSelected.name
+                serverSelected !== null &&
+                server.serverName === serverSelected.serverName
               }
               onChange={_onChange}
               className="is-pointed"
             />
           </div>
-          <div className="level-item has-text-grey-dark">{server.name}</div>
+          <div className="level-item has-text-grey-dark">
+            {server.serverName}
+          </div>
         </div>
       </div>
     );
@@ -83,7 +88,7 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
           {!servers && <Spinner color="primary" size="2x" />}
           {servers &&
             servers.map((server) => {
-              return <Server key={server.name} server={server} />;
+              return <Server key={server.serverName} server={server} />;
             })}
         </section>
         <footer className="modal-card-foot">

@@ -256,6 +256,28 @@ class UserService {
       }
     );
   };
+
+  static UnlinkPlexAccount = () => {
+    return HttpService.executeRequest(
+      HTTP_METHODS.DELETE,
+      UserService.CURRENT_USER_BASE_URL + "/plex-account"
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess("");
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
 }
 
 export { UserService };

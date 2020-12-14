@@ -1,47 +1,74 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IPlexConfig } from "../../models/IPlexConfig";
 import { PlexConfigContext } from "./PlexConfigContext";
 import { PlexService } from "../../services/PlexService";
+import { AuthContext } from "../auth/AuthContext";
 
 export const PlexConfigContextProvider = (props: any) => {
-  const [config, setConfig] = useState<{
-    data: IPlexConfig | null;
+  const [configs, setConfigs] = useState<{
+    data: IPlexConfig[];
     loading: boolean;
-  }>({ data: null, loading: true });
+  }>({ data: [], loading: true });
+
+  const {
+    session: { plex },
+  } = useContext(AuthContext);
 
   useEffect(() => {
     PlexService.GetPlexConfig().then((res) => {
       if (res.error === null) {
-        setConfig({ data: res.data, loading: false });
+        setConfigs({ data: res.data, loading: false });
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateConfig = (config: IPlexConfig) => {
-    PlexService.UpdateConfig(config).then((res) => {
+  const addConfig = (newConfig: IPlexConfig) => {
+    let configurations = configs.data;
+    configurations.push(newConfig);
+    setConfigs({ ...configs, data: configurations });
+  };
+
+  const updateConfig = (newConfig: IPlexConfig) => {
+    PlexService.UpdatePlexConfig(configs.data[0].id, newConfig).then((res) => {
       if (res.error === null) {
-        setConfig({ data: res.data, loading: false });
+        /*
+        let conf = configs.data.find(c => c.id === res.data.id);
+        if (conf) {
+          conf = res.data;
+          setConfig({ data: res.data[0], loading: false });
+        }
+        */
       }
     });
   };
 
-  const isPlexAccountLinked = () => {
-    return config !== null;
+  const deleteConfig = (id: string) => {
+    return PlexService.DeletePlexConfig(id).then((res) => {
+      if (res.error === null) {
+        let conf = configs.data.filter((c) => c.id !== id);
+        if (conf) {
+          setConfigs({ data: conf, loading: false });
+        }
+      }
+      return res;
+    });
   };
 
-  const isPlexServerLinked = () => {
-    return config.data!.servers.length > 0;
+  const isPlexAccountLinked = () => {
+    return plex;
   };
 
   return (
     <PlexConfigContext.Provider
       value={{
-        config: config.data,
-        isLoading: config.loading,
+        configs: configs.data,
+        isLoading: configs.loading,
+        currentConfig: configs.data.length > 0 ? configs.data[0] : null,
         updateConfig,
+        deleteConfig,
+        addConfig,
         isPlexAccountLinked,
-        isPlexServerLinked,
       }}
     >
       {props.children}

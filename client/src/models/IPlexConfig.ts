@@ -1,11 +1,10 @@
 import { ProviderTypes } from "../enums/ProviderTypes";
-import { IPlexServer } from "./IPlexServer";
+import { IPlexServerInfo } from "./IPlexServerInfo";
+import { IProviderConfigBase } from "./IProviderConfigBase";
 
-export interface IPlexConfig {
-  id: string;
-  apiKey: string;
-  name: string;
-  enabled: boolean;
-  providerType: ProviderTypes;
-  servers: IPlexServer[];
+export interface IPlexConfig extends IProviderConfigBase, IPlexServerInfo {
+  readonly id: string;
+  readonly name: string;
+  readonly enabled: boolean;
+  readonly providerType: ProviderTypes;
 }

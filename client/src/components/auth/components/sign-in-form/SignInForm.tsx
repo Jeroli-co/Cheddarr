@@ -61,7 +61,13 @@ const SignInForm = () => {
 
       <div className="columns is-mobile is-centered">
         <div className="column is-one-quarter-desktop is-half-tablet is-three-quarters-mobile">
-          <form id="sign-in-form" onSubmit={onSubmit}>
+          <form
+            id="sign-in-form"
+            onSubmit={onSubmit}
+            autoCorrect="off"
+            autoCapitalize="off"
+            autoComplete="off"
+          >
             <div className="field">
               <label className="label">Username or email</label>
               <div className="control has-icons-left">

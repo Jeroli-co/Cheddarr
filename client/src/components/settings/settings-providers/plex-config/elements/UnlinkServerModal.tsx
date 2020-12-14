@@ -3,13 +3,13 @@ import React from "react";
 type UnlinkServerModalProps = {
   onUnlink: () => void;
   onClose: () => void;
-  machineName: string;
+  serverName: string;
 };
 
 const UnlinkServerModal = ({
   onUnlink,
   onClose,
-  machineName,
+  serverName,
 }: UnlinkServerModalProps) => {
   return (
     <div
@@ -32,7 +32,7 @@ const UnlinkServerModal = ({
         <section className="modal-card-body">
           <div className="content">
             <p>
-              You are about to unlink <b>{machineName}</b> from Cheddarr.
+              You are about to unlink <b>{serverName}</b> from Cheddarr.
             </p>
             <p>
               You will no longer see the content of this server on your hub.

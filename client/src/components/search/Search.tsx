@@ -94,6 +94,7 @@ const Search = () => {
           default:
             throw new Error("No type matched");
         }
+        return <div />;
       });
     }
   }

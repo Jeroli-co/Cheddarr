@@ -10,31 +10,8 @@ import { IProviderConfigBase } from "../models/IProviderConfigBase";
 import { IRadarrInstanceInfo } from "../models/IRadarrInstanceInfo";
 
 export class RadarrService {
-  static RADARR_BASE_URL = "/radarr";
   static RADARR_CONFIG_BASE_URL = "/configuration/radarr";
   static RADARR_TEST_CONFIG_BASE_URL = "/configuration/radarr/instance-info";
-
-  static GetRadarrStatus = () => {
-    return HttpService.executeRequest<boolean>(
-      HTTP_METHODS.GET,
-      RadarrService.RADARR_BASE_URL + "/status"
-    ).then(
-      (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<boolean>("", response.data);
-        } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
-        }
-      },
-      (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
-      }
-    );
-  };
 
   static GetRadarrInstanceInfo = (config: IProviderConfigBase) => {
     return HttpService.executeRequest<IRadarrInstanceInfo>(

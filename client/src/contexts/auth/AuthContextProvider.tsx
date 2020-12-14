@@ -26,7 +26,8 @@ export const AuthContextProvider = (props: any) => {
             initSession(
               plexSignInData.decodedToken.username,
               plexSignInData.decodedToken.avatar,
-              plexSignInData.decodedToken.admin
+              plexSignInData.decodedToken.admin,
+              plexSignInData.decodedToken.plex
             );
             history.push(plexSignInData.redirectURI);
           }
@@ -41,8 +42,8 @@ export const AuthContextProvider = (props: any) => {
     if (session.isLoading) {
       const currentSession = AuthService.getCurrentSession();
       if (currentSession) {
-        const { admin, avatar, username } = currentSession;
-        initSession(username, avatar, admin);
+        const { admin, avatar, username, plex } = currentSession;
+        initSession(username, avatar, admin, plex);
       } else {
         clearSession();
       }
@@ -50,12 +51,18 @@ export const AuthContextProvider = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   });
 
-  const initSession = (username: string, avatar: string, admin: boolean) => {
+  const initSession = (
+    username: string,
+    avatar: string,
+    admin: boolean,
+    plex: boolean
+  ) => {
     setSession({
       isAuthenticated: true,
       username: username,
       avatar: avatar,
       admin: admin,
+      plex: plex,
       isLoading: false,
     });
   };
@@ -86,7 +93,8 @@ export const AuthContextProvider = (props: any) => {
       initSession(
         decodedToken.username,
         decodedToken.avatar,
-        decodedToken.admin
+        decodedToken.admin,
+        decodedToken.plex
       );
       history.push(redirectURI);
     }
@@ -95,10 +103,22 @@ export const AuthContextProvider = (props: any) => {
 
   const updateUsername = (username: string) => {
     return UserService.ChangeUsername(username).then((response) => {
-      const user = response.data;
-      if (user) {
-        AuthService.changeUsername(user.username);
-        setSession({ ...session, username: user.username });
+      if (response.error === null) {
+        const user = response.data;
+        if (user) {
+          AuthService.changeUsername(user.username);
+          setSession({ ...session, username: user.username });
+        }
+      }
+      return response;
+    });
+  };
+
+  const unlinkPlexAccount = () => {
+    return UserService.UnlinkPlexAccount().then((response) => {
+      if (response.error === null) {
+        AuthService.unlinkPlexAccount();
+        setSession({ ...session, plex: false });
       }
       return response;
     });
@@ -112,6 +132,7 @@ export const AuthContextProvider = (props: any) => {
         signUp: signUp,
         invalidSession: invalidSession,
         updateUsername: updateUsername,
+        unlinkPlexAccount,
       }}
     >
       {props.children}

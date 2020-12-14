@@ -6,15 +6,22 @@ import { AuthService } from "../../../../../services/AuthService";
 import { useLocation } from "react-router";
 
 const LinkPlexAccount = () => {
-  const { isPlexAccountLinked } = useContext(PlexConfigContext);
   const location = useLocation();
+  const { isPlexAccountLinked } = useContext(PlexConfigContext);
 
   const onSignInWithPlex = (e: MouseEvent) => {
     AuthService.signInWithPlex(location.pathname);
     e.preventDefault();
   };
 
-  if (!isPlexAccountLinked()) {
+  if (isPlexAccountLinked()) {
+    return (
+      <p className="is-size-5 is-size-7-mobile has-text-weight-light">
+        <FontAwesomeIcon className="has-text-success" icon={faCheck} /> Plex
+        account linked
+      </p>
+    );
+  } else {
     return (
       <button
         className="button is-primary"
@@ -25,13 +32,6 @@ const LinkPlexAccount = () => {
       </button>
     );
   }
-
-  return (
-    <p className="is-size-5 is-size-7-mobile has-text-weight-light">
-      <FontAwesomeIcon className="has-text-success" icon={faCheck} /> Plex
-      account linked
-    </p>
-  );
 };
 
 export { LinkPlexAccount };

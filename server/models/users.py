@@ -22,6 +22,12 @@ class User(Model):
         back_populates="user",
         cascade="all,delete,delete-orphan",
     )
+    plex_account=relationship(
+      "PlexAccount",
+      back_populates="user",
+      cascade="all,delete,delete-orphan",
+      uselist=False
+    )
 
     @hybrid_property
     def password(self):
@@ -43,8 +49,7 @@ class PlexAccount(Model):
     api_key = Column(String, unique=True, nullable=False)
     user = relationship(
         "User",
-        uselist=False,
-        backref=backref("plex_account", cascade="all,delete,delete-orphan"),
+        back_populates="plex_account"
     )
 
 
