@@ -5,7 +5,11 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request,
 from server import models, schemas
 from server.api import dependencies as deps
 from server.core import security, settings, utils
-from server.repositories import FriendshipRepository, UserRepository
+from server.repositories import (
+    FriendshipRepository,
+    PlexAccountRepository,
+    UserRepository,
+)
 
 users_router = APIRouter()
 current_user_router = APIRouter()
@@ -78,6 +82,17 @@ def delete_user(
 ):
     user_repo.remove(current_user)
     return {"detail": "User deleted."}
+
+
+@current_user_router.delete("/plex-account")
+def unlink_plex_account(
+    current_user: models.User = Depends(deps.get_current_user),
+    plex_account_repo: PlexAccountRepository = Depends(
+        deps.get_repository(PlexAccountRepository)
+    ),
+):
+    plex_account_repo.remove(current_user.plex_account)
+    return {"detail": "Plex account unlinked."}
 
 
 @current_user_router.patch(
