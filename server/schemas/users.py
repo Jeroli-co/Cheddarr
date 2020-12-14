@@ -10,10 +10,15 @@ class UserBase(APIModel):
     email: EmailStr
 
 
+class PlexAccount(APIModel):
+    plex_user_id: int
+
+
 class User(UserBase):
     avatar: Optional[AnyHttpUrl]
     confirmed: bool
     admin: bool
+    plex_account: PlexAccount
 
 
 class UserCreate(UserBase):
