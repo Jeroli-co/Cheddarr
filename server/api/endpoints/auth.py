@@ -169,6 +169,8 @@ def signin(
         sub=str(user.id),
         username=user.username,
         avatar=user.avatar,
+        admin=user.admin,
+        plex_account_linked=user.plex_account is not None,
     )
     access_token = security.create_jwt_access_token(payload)
     token = schemas.Token(
