@@ -101,7 +101,6 @@ const SearchBar = () => {
 
   const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && value.length > 0) {
-      console.log("HEHE");
       history.push(routes.SEARCH.url(searchType, value));
       setValue("");
     }
