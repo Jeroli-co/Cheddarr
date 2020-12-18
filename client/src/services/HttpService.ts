@@ -2,7 +2,6 @@ import axios from "axios";
 import { AuthService } from "./AuthService";
 import { HTTP_METHODS } from "../enums/HttpMethods";
 import humps from "humps";
-import { type } from "os";
 const JSON_TYPE = "application/json";
 const FORM_URL_ENCODED_TYPE = "application/x-www-form-urlencoded";
 

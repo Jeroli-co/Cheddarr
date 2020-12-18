@@ -3,10 +3,6 @@ import styled from "styled-components";
 import { ColumnLayout, RowLayout } from "../../../../elements/layouts";
 import { useHistory } from "react-router";
 import { routes } from "../../../../../router/routes";
-import {
-  IMediaServerMedia,
-  IMediaServerSeries,
-} from "../../../../../models/IMediaServerMedia";
 import { IPublicUser } from "../../../../../models/IPublicUser";
 import { SearchRequestTypes } from "../../../../../enums/SearchRequestTypes";
 import { Text } from "../../../../elements/Text";
