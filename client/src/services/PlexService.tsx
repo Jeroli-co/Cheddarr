@@ -17,11 +17,11 @@ import { IPlexConfig } from "../models/IPlexConfig";
 import { IPlexServerInfo } from "../models/IPlexServerInfo";
 import { MediasTypes } from "../enums/MediasTypes";
 import { IPlexServerDetails } from "../models/IPlexServerDetails";
+import { IMediaSearchResult } from "../models/IMediaSearchResult";
 
 export class PlexService {
   static PLEX_BASE_URL = "/plex";
   static PLEX_CONFIG_BASE_URL = "/configuration/plex";
-  static PLEX_SEARCH_BASE_URL = PlexService.PLEX_BASE_URL + "/search";
 
   static GetPlexServers = () => {
     return HttpService.executeRequest<IPlexServerInfo[]>(
@@ -98,10 +98,10 @@ export class PlexService {
     );
   };
 
-  static GetMediaOnDeck = () => {
+  static GetMediaOnDeck = (configId: string) => {
     return HttpService.executeRequest<IMediaServerMedia[]>(
       HTTP_METHODS.GET,
-      PlexService.PLEX_BASE_URL + "/on-deck"
+      PlexService.PLEX_BASE_URL + "/" + configId + "/on-deck"
     ).then(
       (response) => {
         if (response.status === 200) {
@@ -316,10 +316,17 @@ export class PlexService {
     );
   };
 
-  static SearchPlexMedias = (mediaType: MediasTypes, value: string) => {
-    return HttpService.executeRequest<IMediaServerMedia[]>(
+  static SearchPlexMedias = (
+    configId: string,
+    mediaType: MediasTypes,
+    value: string
+  ) => {
+    return HttpService.executeRequest<IMediaSearchResult[]>(
       HTTP_METHODS.GET,
-      PlexService.PLEX_SEARCH_BASE_URL +
+      PlexService.PLEX_BASE_URL +
+        "/" +
+        configId +
+        "/search" +
         "?section=" +
         mediaType +
         "&value=" +
@@ -327,7 +334,7 @@ export class PlexService {
     ).then(
       (response) => {
         if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaServerMedia[]>(
+          return new AsyncResponseSuccess<IMediaSearchResult[]>(
             "",
             response.data
           );

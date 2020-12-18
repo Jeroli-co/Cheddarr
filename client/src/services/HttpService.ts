@@ -1,7 +1,8 @@
 import axios from "axios";
 import { AuthService } from "./AuthService";
 import { HTTP_METHODS } from "../enums/HttpMethods";
-
+import humps from "humps";
+import { type } from "os";
 const JSON_TYPE = "application/json";
 const FORM_URL_ENCODED_TYPE = "application/x-www-form-urlencoded";
 
@@ -15,16 +16,22 @@ instance.defaults.headers.put["Content-Type"] = JSON_TYPE;
 instance.defaults.headers.patch["Content-Type"] = JSON_TYPE;
 
 instance.interceptors.request.use(
-  (config) => {
+  (request) => {
     const token = AuthService.getToken();
     if (token) {
-      config.headers.common["Authorization"] =
+      request.headers.common["Authorization"] =
         token.token_type + " " + token.access_token;
     }
-    if (config.url === "/sign-in") {
-      config.headers.post["Content-Type"] = FORM_URL_ENCODED_TYPE;
+
+    if (request.url === "/sign-in") {
+      request.headers.post["Content-Type"] = FORM_URL_ENCODED_TYPE;
     }
-    return config;
+
+    if (request.data) {
+      request.data = JSON.parse(humps.decamelize(JSON.stringify(request.data)));
+    }
+
+    return request;
   },
   (error) => {
     return Promise.reject(error);
@@ -33,12 +40,17 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
+    if (response.data) {
+      response.data = JSON.parse(humps.camelize(JSON.stringify(response.data)));
+    }
+
     return response;
   },
   function (error) {
     if (error.response.status === 401) {
       AuthService.deleteToken();
     }
+
     return Promise.reject(error);
   }
 );

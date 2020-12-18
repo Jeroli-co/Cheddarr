@@ -70,7 +70,7 @@ def get_plex_account_server(
 
 
 @router.get(
-    "{config_id}/movies/recent",
+    "/{config_id}/movies/recent",
     response_model=list[schemas.PlexMovie],
     response_model_by_alias=False,
     responses={
@@ -104,7 +104,7 @@ def get_plex_recent_movies(
 
 
 @router.get(
-    "{config_id}/movies/{movie_id}",
+    "/{config_id}/movies/{movie_id}",
     response_model=schemas.PlexMovie,
     response_model_by_alias=False,
     responses={
@@ -135,7 +135,7 @@ def get_plex_movie(
 
 
 @router.get(
-    "{config_id}/series/recent",
+    "/{config_id}/series/recent",
     response_model=list[schemas.PlexEpisode],
     response_model_by_alias=False,
     responses={
@@ -169,7 +169,7 @@ def get_plex_recent_series(
 
 
 @router.get(
-    "{config_id}/series/{series_id}",
+    "/{config_id}/series/{series_id}",
     response_model=schemas.PlexSeries,
     response_model_by_alias=False,
     responses={
@@ -200,7 +200,7 @@ def get_plex_series(
 
 
 @router.get(
-    "{config_id}/seasons/{season_id}",
+    "/{config_id}/seasons/{season_id}",
     response_model=schemas.PlexSeason,
     response_model_by_alias=False,
     responses={
@@ -231,7 +231,7 @@ def get_plex_season(
 
 
 @router.get(
-    "{config_id}/episodes/{episode_id}",
+    "/{config_id}/episodes/{episode_id}",
     response_model=schemas.PlexEpisode,
     response_model_by_alias=False,
     responses={
@@ -259,7 +259,7 @@ def get_plex_episode(
 
 
 @router.get(
-    "{config_id}/on-deck",
+    "/{config_id}/on-deck",
     response_model=list[Union[schemas.PlexMovie, schemas.PlexEpisode]],
     response_model_by_alias=False,
     responses={
@@ -285,7 +285,7 @@ def get_plex_on_deck(
 
 
 @router.get(
-    "{config_id}/search",
+    "/{config_id}/search",
     response_model=list[schemas.MediaSearchResultSchema],
     response_model_by_alias=False,
 )

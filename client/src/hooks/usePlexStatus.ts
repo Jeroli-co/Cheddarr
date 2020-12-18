@@ -9,10 +9,10 @@ const initialPlexStatus = {
 const usePlexStatus = () => {
   const [plexStatus, setPlexStatus] = useState(initialPlexStatus);
   useEffect(() => {
-    PlexService.GetPlexStatus().then((res) => {
+    PlexService.GetPlexConfig().then((res) => {
       let enabled = false;
       if (res.error === null) {
-        enabled = res.data;
+        enabled = res.data.length > 0 && res.data[0].enabled;
       }
       setPlexStatus({ enabled: enabled, loaded: true });
     });

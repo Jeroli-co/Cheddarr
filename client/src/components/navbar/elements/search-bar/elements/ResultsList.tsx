@@ -5,15 +5,14 @@ import { useHistory } from "react-router";
 import { routes } from "../../../../../router/routes";
 import {
   IMediaServerMedia,
-  IMediaServerMovie,
   IMediaServerSeries,
-  isMediaServerMovie,
-  isMediaServerSeries,
 } from "../../../../../models/IMediaServerMedia";
 import { IPublicUser } from "../../../../../models/IPublicUser";
 import { SearchRequestTypes } from "../../../../../enums/SearchRequestTypes";
 import { Text } from "../../../../elements/Text";
 import Spinner from "../../../../elements/Spinner";
+import { IMediaSearchResult } from "../../../../../models/IMediaSearchResult";
+import { MediasTypes } from "../../../../../enums/MediasTypes";
 
 const ResultsListStyle = styled.div<{ isVisible: boolean }>`
   position: absolute;
@@ -21,15 +20,10 @@ const ResultsListStyle = styled.div<{ isVisible: boolean }>`
   width: 100%;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
-  background: white;
+  background: ${(props) => props.theme.bgColor};
   z-index: 1;
-  border: 1px solid LightGrey;
+  border: 1px solid ${(props) => props.theme.dark};
   visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
-`;
-
-const ResultImage = styled.img`
-  width: 30px;
-  height: 50px;
 `;
 
 const ResultsSectionTitle = styled.div`
@@ -40,22 +34,24 @@ const ResultsSectionTitle = styled.div`
 `;
 
 const ResultStyle = styled.div`
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.color};
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${(props) => props.theme.dark};
   }
 `;
 
 type MediaResultProps = {
-  media: IMediaServerMedia | IMediaServerSeries;
+  media: IMediaSearchResult;
 };
 
 const MediaResult = ({ media }: MediaResultProps) => {
   const history = useHistory();
   const redirectToMediaPage = () => {
     let url = "";
-    if (isMediaServerSeries(media)) {
+    if (media.type === MediasTypes.SERIES) {
       url = routes.SERIES.url(media.id.toString());
-    } else if (isMediaServerMovie(media)) {
+    } else if (media.type === MediasTypes.MOVIE) {
       url = routes.MOVIE.url(media.id.toString());
     }
     history.push(url);
@@ -63,13 +59,15 @@ const MediaResult = ({ media }: MediaResultProps) => {
   return (
     <ResultStyle onMouseDown={() => redirectToMediaPage()}>
       <RowLayout className="is-pointed" padding="1%" childMarginRight="2%">
-        <ResultImage src={media.thumbUrl} alt="Thumb" />
+        {media.posterUrl && (
+          <img src={media.posterUrl} alt={media.title} width="30" height="50" />
+        )}
         <ColumnLayout>
           <Text fontSize="0.9em" lineClamp={1}>
             {media.title}
           </Text>
           <Text fontSize="0.8em" fontWeight="lighter">
-            {media.releaseDate?.getFullYear()}
+            {media.year}
           </Text>
         </ColumnLayout>
       </RowLayout>
@@ -90,18 +88,12 @@ const FriendResult = ({ user }: FriendResultProps) => {
       }
     >
       <RowLayout padding="1%" childMarginRight="2%">
-        <ResultImage src={user["avatar"]} alt="User" />
+        <img src={user.avatar} alt="User" />
         <Text fontSize="0.9em">@{user.username}</Text>
       </RowLayout>
     </ResultStyle>
   );
 };
-
-interface IAllSortedResults {
-  friends: IPublicUser[];
-  movies: IMediaServerMedia[];
-  series: IMediaServerSeries[];
-}
 
 const SearchOnlineButtonStyle = styled.div`
   display: flex;
@@ -133,8 +125,8 @@ const SearchOnlineButton = ({ type, searchValue }: SearchOnlineButtonProps) => {
 type SearchResultItemsProps = {
   type: SearchRequestTypes;
   searchValue: string;
-  moviesResults: { data: IMediaServerMovie[] | null; isLoading: boolean };
-  seriesResults: { data: IMediaServerSeries[] | null; isLoading: boolean };
+  moviesResults: { data: IMediaSearchResult[] | null; isLoading: boolean };
+  seriesResults: { data: IMediaSearchResult[] | null; isLoading: boolean };
   friendsResults: { data: IPublicUser[] | null; isLoading: boolean };
 };
 
@@ -150,7 +142,11 @@ const SearchResultsItems = ({
       return (
         <div>
           <SearchOnlineButton type={type} searchValue={searchValue} />
-          <ResultsSectionTitle>Movies</ResultsSectionTitle>
+          {!moviesResults.isLoading &&
+            moviesResults.data &&
+            moviesResults.data.length > 0 && (
+              <ResultsSectionTitle>Movies</ResultsSectionTitle>
+            )}
           {moviesResults.isLoading && <Spinner />}
           {!moviesResults.isLoading &&
             moviesResults.data !== null &&
@@ -161,7 +157,11 @@ const SearchResultsItems = ({
                 ))}
               </div>
             )}
-          <ResultsSectionTitle>Series</ResultsSectionTitle>
+          {!seriesResults.isLoading &&
+            seriesResults.data &&
+            seriesResults.data.length > 0 && (
+              <ResultsSectionTitle>Series</ResultsSectionTitle>
+            )}
           {seriesResults.isLoading && <Spinner />}
           {!seriesResults.isLoading &&
             seriesResults.data !== null &&
@@ -172,7 +172,11 @@ const SearchResultsItems = ({
                 ))}
               </div>
             )}
-          <ResultsSectionTitle>Friends</ResultsSectionTitle>
+          {!friendsResults.isLoading &&
+            friendsResults.data &&
+            friendsResults.data.length > 0 && (
+              <ResultsSectionTitle>Friends</ResultsSectionTitle>
+            )}
           {friendsResults.isLoading && <Spinner />}
           {!friendsResults.isLoading &&
             friendsResults.data !== null &&
@@ -239,8 +243,8 @@ type ResultsListProps = {
   searchValue: string;
   isInputFocus: boolean;
   searchType: SearchRequestTypes;
-  moviesResults: { data: IMediaServerMovie[] | null; isLoading: boolean };
-  seriesResults: { data: IMediaServerSeries[] | null; isLoading: boolean };
+  moviesResults: { data: IMediaSearchResult[] | null; isLoading: boolean };
+  seriesResults: { data: IMediaSearchResult[] | null; isLoading: boolean };
   friendsResults: { data: IPublicUser[] | null; isLoading: boolean };
 };
 

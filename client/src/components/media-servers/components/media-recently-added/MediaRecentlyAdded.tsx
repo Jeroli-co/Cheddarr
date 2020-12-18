@@ -42,7 +42,7 @@ const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
 
     if (currentConfig) {
       if (type === MediaRecentlyAddedType.ON_DECK) {
-        PlexService.GetMediaOnDeck().then((res) => {
+        PlexService.GetMediaOnDeck(currentConfig.id).then((res) => {
           handleRes(res);
         });
       } else {

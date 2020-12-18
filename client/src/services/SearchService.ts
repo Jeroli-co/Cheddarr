@@ -18,12 +18,12 @@ export class SearchService {
   static SEARCH_MEDIA_URL = "/search";
 
   static GetMediasByTitle = async (type: SearchRequestTypes, value: string) => {
-    const url =
-      SearchService.SEARCH_MEDIA_URL +
-      "?" +
-      (type !== SearchRequestTypes.ALL ? "type=" + type + "&" : "") +
-      "value=" +
-      value;
+    let url = SearchService.SEARCH_MEDIA_URL;
+    if (type !== SearchRequestTypes.ALL) {
+      url = url + "/" + type;
+    }
+    url = url + "?value=" + value;
+    console.log(url);
 
     return HttpService.executeRequest(HTTP_METHODS.GET, url).then(
       (response) => {

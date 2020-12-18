@@ -7,12 +7,12 @@ router = APIRouter()
 
 
 @router.get(
-    "/all/",
+    "",
     response_model=schemas.SearchResult,
     response_model_exclude_none=True,
 )
-def search_media(term, page=1):
-    return search.search_tmdb_media(term, page)
+def search_media(value, page=1):
+    return search.search_tmdb_media(value, page)
 
 
 @router.get(
@@ -20,8 +20,8 @@ def search_media(term, page=1):
     response_model=schemas.SearchResult,
     response_model_exclude_none=True,
 )
-def search_movies(term, page=1):
-    return search.search_tmdb_movies(term, page)
+def search_movies(value, page=1):
+    return search.search_tmdb_movies(value, page)
 
 
 @router.get(
@@ -29,8 +29,8 @@ def search_movies(term, page=1):
     response_model=schemas.SearchResult,
     response_model_exclude_none=True,
 )
-def search_series(term, page=1):
-    return search.search_tmdb_series(term, page)
+def search_series(value, page=1):
+    return search.search_tmdb_series(value, page)
 
 
 @router.get(
