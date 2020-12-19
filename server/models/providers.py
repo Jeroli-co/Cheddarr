@@ -9,8 +9,8 @@ from server.database import Model
 
 
 class ProviderType(str, Enum):
-    movie_provider = "movie_provider"
-    series_provider = "series_provider"
+    movie_provider = "movies"
+    series_provider = "series"
     media_server = "media_server"
 
 

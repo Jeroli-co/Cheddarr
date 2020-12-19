@@ -7,6 +7,7 @@ import {
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { UserService } from "./UserService";
 import { IPublicUser } from "../models/IPublicUser";
+import { MediasTypes } from "../enums/MediasTypes";
 
 export enum FriendsRequestType {
   INCOMING = "incoming",
@@ -22,6 +23,28 @@ export class FriendService {
     return HttpService.executeRequest<IPublicUser[]>(
       HTTP_METHODS.GET,
       FriendService.FRIEND_BASE_URL + urlSuffix
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess<IPublicUser[]>("", response.data);
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
+
+  static GetFriendsProviders = (type: MediasTypes) => {
+    return HttpService.executeRequest<IPublicUser[]>(
+      HTTP_METHODS.GET,
+      FriendService.FRIEND_BASE_URL + "?providers_type=" + type
     ).then(
       (response) => {
         if (response.status === 200) {

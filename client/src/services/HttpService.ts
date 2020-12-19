@@ -27,7 +27,7 @@ instance.interceptors.request.use(
     }
 
     if (request.data) {
-      request.data = JSON.parse(humps.decamelize(JSON.stringify(request.data)));
+      request.data = humps.decamelizeKeys(request.data);
     }
 
     return request;
@@ -40,7 +40,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => {
     if (response.data) {
-      response.data = JSON.parse(humps.camelize(JSON.stringify(response.data)));
+      response.data = humps.camelizeKeys(response.data);
     }
 
     return response;
@@ -62,7 +62,6 @@ class HttpService {
     headers?: Object
   ) => {
     const reqHeaders = headers ? { headers: headers } : {};
-
     switch (method) {
       case HTTP_METHODS.GET:
         return await instance.get<T>(url, reqHeaders);

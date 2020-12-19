@@ -26,25 +26,33 @@ class AuthService {
       signUpFormData
     ).then(
       (response) => {
-        if (response.status === 201) {
-          return new AsyncResponseSuccess<IUser>(
-            MESSAGES.SIGN_UP_SUCCESS,
-            response.data
-          );
+        if (response.status) {
+          if (response.status === 201) {
+            return new AsyncResponseSuccess<IUser>(
+              MESSAGES.SIGN_UP_SUCCESS,
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       },
       (error) => {
-        switch (error.response.status) {
-          case 409:
-            return new AsyncResponseError(ERRORS_MESSAGE.STATUS_409_CONFLICT);
-          default:
-            return new AsyncResponseError(
-              ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-            );
+        if (error.response) {
+          switch (error.response.status) {
+            case 409:
+              return new AsyncResponseError(ERRORS_MESSAGE.STATUS_409_CONFLICT);
+            default:
+              return new AsyncResponseError(
+                ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+              );
+          }
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       }
     );
@@ -60,31 +68,39 @@ class AuthService {
       fd
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IDecodedToken>(
-            "",
-            AuthService.saveToken(response.data)
-          );
+        if (response.status) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IDecodedToken>(
+              "",
+              AuthService.saveToken(response.data)
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       },
       (error) => {
-        switch (error.response.status) {
-          case 401:
-            return new AsyncResponseError(
-              ERRORS_MESSAGE.STATUS_401_UNAUTHORIZED
-            );
-          case 422:
-            return new AsyncResponseError(
-              ERRORS_MESSAGE.STATUS_422_UNPROCESSABLE
-            );
-          default:
-            return new AsyncResponseError(
-              ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-            );
+        if (error.response) {
+          switch (error.response.status) {
+            case 401:
+              return new AsyncResponseError(
+                ERRORS_MESSAGE.STATUS_401_UNAUTHORIZED
+              );
+            case 422:
+              return new AsyncResponseError(
+                ERRORS_MESSAGE.STATUS_422_UNPROCESSABLE
+              );
+            default:
+              return new AsyncResponseError(
+                ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+              );
+          }
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       }
     );
@@ -96,19 +112,27 @@ class AuthService {
       "/sign-in/plex"
     ).then(
       (response) => {
-        if (response.status === 200) {
-          AuthService.getPlexAuthInfos(response.data, redirectURI);
-          return new AsyncResponseSuccess("");
+        if (response.status) {
+          if (response.status === 200) {
+            AuthService.getPlexAuthInfos(response.data, redirectURI);
+            return new AsyncResponseSuccess("");
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
+        }
       }
     );
   };
@@ -120,20 +144,28 @@ class AuthService {
       })
       .then(
         (response) => {
-          if (response.status === 201) {
-            const id = response.data.id;
-            const code = response.data.code;
-            return AuthService.authorizePlex(id, code, redirectURI);
+          if (response.status) {
+            if (response.status === 201) {
+              const id = response.data.id;
+              const code = response.data.code;
+              return AuthService.authorizePlex(id, code, redirectURI);
+            } else {
+              return new AsyncResponseError(
+                ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+              );
+            }
           } else {
-            return new AsyncResponseError(
-              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-            );
+            return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
           }
         },
         (error) => {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-          );
+          if (error.response) {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+            );
+          } else {
+            return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
+          }
         }
       );
   };
@@ -150,19 +182,27 @@ class AuthService {
       body
     ).then(
       (response) => {
-        if (response.status === 200) {
-          window.location.href = response.headers.location;
-          return new AsyncResponseSuccess("Succeed");
+        if (response.status) {
+          if (response.status === 200) {
+            window.location.href = response.headers.location;
+            return new AsyncResponseSuccess("Succeed");
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
+        }
       }
     );
   };
@@ -173,27 +213,38 @@ class AuthService {
       "/sign-in/plex/confirm" + uri
     ).then(
       (response) => {
-        if (response.status === 200) {
-          const decodedToken = AuthService.saveToken(response.data);
-          const redirectURI: string = response.headers["redirect-uri"];
-          const plexSignInConfirmation: IPlexSignInConfirmation = {
-            decodedToken: decodedToken,
-            redirectURI:
-              redirectURI && redirectURI.length > 0
-                ? redirectURI
-                : routes.HOME.url,
-          };
-          return new AsyncResponseSuccess("Signed id", plexSignInConfirmation);
+        if (response.status) {
+          if (response.status === 200) {
+            const decodedToken = AuthService.saveToken(response.data);
+            const redirectURI: string = response.headers["redirect-uri"];
+            const plexSignInConfirmation: IPlexSignInConfirmation = {
+              decodedToken: decodedToken,
+              redirectURI:
+                redirectURI && redirectURI.length > 0
+                  ? redirectURI
+                  : routes.HOME.url,
+            };
+            return new AsyncResponseSuccess(
+              "Signed id",
+              plexSignInConfirmation
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
+        }
       }
     );
   };
@@ -204,26 +255,34 @@ class AuthService {
       "/sign-up/" + token
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess(MESSAGES.EMAIL_CONFIRMED);
+        if (response.status) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess(MESSAGES.EMAIL_CONFIRMED);
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       },
       (error) => {
-        switch (error.response.status) {
-          case 403:
-            return new AsyncResponseError(
-              ERRORS_MESSAGE.USER_ALREADY_CONFIRMED
-            );
-          case 410:
-            return new AsyncResponseError(ERRORS_MESSAGE.STATUS_410_GONE);
-          default:
-            return new AsyncResponseError(
-              ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-            );
+        if (error.response) {
+          switch (error.response.status) {
+            case 403:
+              return new AsyncResponseError(
+                ERRORS_MESSAGE.USER_ALREADY_CONFIRMED
+              );
+            case 410:
+              return new AsyncResponseError(ERRORS_MESSAGE.STATUS_410_GONE);
+            default:
+              return new AsyncResponseError(
+                ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+              );
+          }
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       }
     );
@@ -234,18 +293,26 @@ class AuthService {
       email: email,
     }).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess(MESSAGES.EMAIL_CONFIRMATION_RESENT);
+        if (response.status) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess(MESSAGES.EMAIL_CONFIRMATION_RESENT);
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.UNHANDLED_STATUS(500));
+        }
       }
     );
   };

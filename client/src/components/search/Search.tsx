@@ -11,11 +11,11 @@ import {
   isSearchedSeries,
 } from "../../models/ISearchedMedias";
 import { MediasTypes } from "../../enums/MediasTypes";
-import { UserService } from "../../services/UserService";
 import { IPublicUser } from "../../models/IPublicUser";
+import { FriendService } from "../../services/FriendService";
 
 type SearchResultState = {
-  results: Array<ISearchedMedias>;
+  results: ISearchedMedias[] | null;
   isLoading: boolean;
 };
 
@@ -27,7 +27,7 @@ type SearchParams = {
 const Search = () => {
   const { type, title } = useParams<SearchParams>();
   const [data, setData] = useState<SearchResultState>({
-    results: [],
+    results: null,
     isLoading: true,
   });
   const [friendsMoviesProviders, setFriendsMoviesProviders] = useState<
@@ -38,27 +38,30 @@ const Search = () => {
   >([]);
 
   useEffect(() => {
-    SearchService.GetMediasByTitle(type, title).then((res) => {
+    FriendService.GetFriendsProviders(MediasTypes.MOVIE).then((res) => {
       if (res.error === null) {
-        setData({ results: res.data, isLoading: false });
-        UserService.GetProviders(MediasTypes.MOVIE).then((res) => {
-          if (res.error === null) {
-            setFriendsMoviesProviders(res.data);
-          }
-        });
-        UserService.GetProviders(MediasTypes.SERIES).then((res) => {
-          if (res.error === null) {
-            setFriendsSeriesProviders(res.data);
-          }
-        });
+        setFriendsMoviesProviders(res.data);
       }
     });
+
+    FriendService.GetFriendsProviders(MediasTypes.SERIES).then((res) => {
+      if (res.error === null) {
+        setFriendsSeriesProviders(res.data);
+      }
+    });
+
+    SearchService.GetMediasByTitle(type, title).then((res) => {
+      if (res.error === null) {
+        setData({ results: res.data.results, isLoading: false });
+      }
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, title]);
 
   let content;
 
-  if (data.isLoading) {
+  if (data.isLoading || data.results === null) {
     content = <Spinner color="primary" size="2x" />;
   } else {
     if (data.results.length === 0) {
@@ -71,7 +74,7 @@ const Search = () => {
       );
     } else {
       content = data.results.map((media, index) => {
-        switch (media.type) {
+        switch (media.mediaType) {
           case MediasTypes.MOVIE:
             return (
               <SearchedMovieCard
@@ -94,7 +97,7 @@ const Search = () => {
           default:
             throw new Error("No type matched");
         }
-        return <div />;
+        return <div key={index} />;
       });
     }
   }

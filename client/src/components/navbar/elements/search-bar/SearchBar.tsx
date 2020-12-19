@@ -151,7 +151,6 @@ const SearchBar = () => {
           value
         ).then((res) => {
           if (res.error === null) {
-            console.log("HEHE");
             setMoviesResults({ data: res.data, isLoading: false });
           }
         });

@@ -29,18 +29,29 @@ export class PlexService {
       PlexService.PLEX_BASE_URL + "/servers"
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexServerInfo[]>("", response.data);
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IPlexServerInfo[]>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -51,21 +62,29 @@ export class PlexService {
       PlexService.PLEX_BASE_URL + "/servers/" + serverName
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexServerDetails>(
-            "",
-            response.data
-          );
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IPlexServerDetails>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -79,21 +98,29 @@ export class PlexService {
       PlexService.PLEX_BASE_URL + "/" + configId + "/" + type + "/recent"
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaServerMedia[]>(
-            "",
-            response.data
-          );
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IMediaServerMedia[]>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -104,21 +131,29 @@ export class PlexService {
       PlexService.PLEX_BASE_URL + "/" + configId + "/on-deck"
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaServerMedia[]>(
-            "",
-            response.data
-          );
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IMediaServerMedia[]>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -129,18 +164,26 @@ export class PlexService {
       PlexService.PLEX_CONFIG_BASE_URL
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexConfig[]>("", response.data);
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IPlexConfig[]>("", response.data);
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -152,21 +195,29 @@ export class PlexService {
       serverDetails
     ).then(
       (response) => {
-        if (response.status === 201) {
-          return new AsyncResponseSuccess<IPlexConfig>(
-            "Config created",
-            response.data
-          );
+        if (response) {
+          if (response.status === 201) {
+            return new AsyncResponseSuccess<IPlexConfig>(
+              "Config created",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -178,21 +229,29 @@ export class PlexService {
       newConfig
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPlexConfig>(
-            "Config updated",
-            response.data
-          );
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IPlexConfig>(
+              "Config updated",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -203,18 +262,26 @@ export class PlexService {
       PlexService.PLEX_CONFIG_BASE_URL + "/" + id
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess("Config updated");
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess("Config updated");
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -225,18 +292,29 @@ export class PlexService {
       PlexService.PLEX_BASE_URL + "/movies/" + id
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaServerMovie>("", response.data);
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IMediaServerMovie>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -247,21 +325,29 @@ export class PlexService {
       PlexService.PLEX_BASE_URL + "/series/" + id
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaServerSeries>(
-            "",
-            response.data
-          );
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IMediaServerSeries>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -272,21 +358,29 @@ export class PlexService {
       PlexService.PLEX_BASE_URL + "/seasons/" + seasonId
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaServerSeason>(
-            "",
-            response.data
-          );
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IMediaServerSeason>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -297,21 +391,29 @@ export class PlexService {
       PlexService.PLEX_BASE_URL + "/episodes/" + episodeId
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaServerEpisode>(
-            "",
-            response.data
-          );
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IMediaServerEpisode>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };
@@ -333,21 +435,29 @@ export class PlexService {
         value
     ).then(
       (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaSearchResult[]>(
-            "",
-            response.data
-          );
+        if (response) {
+          if (response.status === 200) {
+            return new AsyncResponseSuccess<IMediaSearchResult[]>(
+              "",
+              response.data
+            );
+          } else {
+            return new AsyncResponseError(
+              ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+            );
+          }
         } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
         }
       },
       (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
+        if (error.response) {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        } else {
+          return new AsyncResponseError(ERRORS_MESSAGE.INTERNAL_SERVER_ERROR);
+        }
       }
     );
   };

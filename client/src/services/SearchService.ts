@@ -13,6 +13,7 @@ import {
   ISearchedMedias,
   ISearchedSeason,
 } from "../models/ISearchedMedias";
+import { ISearchResult } from "../models/ISearchResult";
 
 export class SearchService {
   static SEARCH_MEDIA_URL = "/search";
@@ -23,12 +24,14 @@ export class SearchService {
       url = url + "/" + type;
     }
     url = url + "?value=" + value;
-    console.log(url);
 
-    return HttpService.executeRequest(HTTP_METHODS.GET, url).then(
+    return HttpService.executeRequest<ISearchResult>(
+      HTTP_METHODS.GET,
+      url
+    ).then(
       (response) => {
         if (response.status === 200) {
-          return new AsyncResponseSuccess<ISearchedMedias[]>("", response.data);
+          return new AsyncResponseSuccess<ISearchResult>("", response.data);
         } else {
           return new AsyncResponseError(
             ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)

@@ -11,7 +11,7 @@ export interface ISearchedMedias {
   readonly rating: number;
   readonly contentRating: string;
   readonly genres: string[];
-  readonly type: MediasTypes;
+  readonly mediaType: MediasTypes;
 }
 
 export interface ISearchedMovie extends ISearchedMedias {}
