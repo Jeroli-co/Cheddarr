@@ -13,6 +13,7 @@ import {
 import { MediasTypes } from "../../enums/MediasTypes";
 import { IPublicUser } from "../../models/IPublicUser";
 import { FriendService } from "../../services/FriendService";
+import { ProviderTypes } from "../../enums/ProviderTypes";
 
 type SearchResultState = {
   results: ISearchedMedias[] | null;
@@ -38,13 +39,13 @@ const Search = () => {
   >([]);
 
   useEffect(() => {
-    FriendService.GetFriendsProviders(MediasTypes.MOVIE).then((res) => {
+    FriendService.GetFriendsProviders(ProviderTypes.MOVIES).then((res) => {
       if (res.error === null) {
         setFriendsMoviesProviders(res.data);
       }
     });
 
-    FriendService.GetFriendsProviders(MediasTypes.SERIES).then((res) => {
+    FriendService.GetFriendsProviders(ProviderTypes.SERIES).then((res) => {
       if (res.error === null) {
         setFriendsSeriesProviders(res.data);
       }

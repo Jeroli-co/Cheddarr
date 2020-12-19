@@ -7,7 +7,7 @@ import {
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { UserService } from "./UserService";
 import { IPublicUser } from "../models/IPublicUser";
-import { MediasTypes } from "../enums/MediasTypes";
+import { ProviderTypes } from "../enums/ProviderTypes";
 
 export enum FriendsRequestType {
   INCOMING = "incoming",
@@ -41,7 +41,7 @@ export class FriendService {
     );
   };
 
-  static GetFriendsProviders = (type: MediasTypes) => {
+  static GetFriendsProviders = (type: ProviderTypes) => {
     return HttpService.executeRequest<IPublicUser[]>(
       HTTP_METHODS.GET,
       FriendService.FRIEND_BASE_URL + "?providers_type=" + type

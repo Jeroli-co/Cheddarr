@@ -1,5 +1,5 @@
 export enum ProviderTypes {
-  MOVIE = "movie",
-  SERIES = "series",
-  SERVER = "server",
+  MOVIES = "movies_provider",
+  SERIES = "series_provider",
+  SERVER = "medias_server",
 }

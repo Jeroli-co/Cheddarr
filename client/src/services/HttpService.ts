@@ -2,6 +2,7 @@ import axios from "axios";
 import { AuthService } from "./AuthService";
 import { HTTP_METHODS } from "../enums/HttpMethods";
 import humps from "humps";
+import { routes } from "../router/routes";
 const JSON_TYPE = "application/json";
 const FORM_URL_ENCODED_TYPE = "application/x-www-form-urlencoded";
 
@@ -22,9 +23,9 @@ instance.interceptors.request.use(
         token.token_type + " " + token.access_token;
     }
 
-    if (request.url === "/sign-in") {
+    if (request.url?.startsWith(routes.SIGN_IN.url)) {
       request.headers.post["Content-Type"] = FORM_URL_ENCODED_TYPE;
-    } else {
+    } else if (!request.url?.startsWith(routes.CONFIRM_PLEX_SIGNIN.url)) {
       if (request.data) {
         request.data = humps.decamelizeKeys(request.data);
       }
@@ -39,7 +40,11 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    if (response.config.url !== "/sign-in" && response.data) {
+    if (
+      !response.config.url?.startsWith(routes.SIGN_IN.url) &&
+      !response.config.url?.startsWith(routes.CONFIRM_PLEX_SIGNIN.url) &&
+      response.data
+    ) {
       response.data = humps.camelizeKeys(response.data);
     }
 

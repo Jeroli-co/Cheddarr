@@ -177,7 +177,26 @@ class UserService {
   static GetProviders = (type: MediasTypes) => {
     return HttpService.executeRequest<IPublicUser[]>(
       HTTP_METHODS.GET,
-      UserService.USERS_BASE_URL + "/providers" + "?type=" + type
+      UserService.USERS_BASE_URL + "/?provides=" + type
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess<IPublicUser[]>("", response.data);
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        if (error.status === 400) {
+          return new AsyncResponseError(ERRORS_MESSAGE.STATUS_400_BAD_REQUEST);
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+          );
+        }
+      }
     );
   };
 
