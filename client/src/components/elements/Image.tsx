@@ -12,7 +12,7 @@ type ImageProps = {
 
 const Image = styled.img<ImageProps>`
   width: ${(props) => (props.width ? props.width : "100%")};
-  height: ${(props) => (props.height ? props.height : "100%")};
+  height: ${(props) => (props.height ? props.height : "auto")};
   border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
   border: ${(props) => (props.border ? props.border : "none")};
   opacity: ${(props) => (props.opacity ? props.opacity : "1")};

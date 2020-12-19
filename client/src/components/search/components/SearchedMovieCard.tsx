@@ -42,7 +42,7 @@ const SearchedMovieCard = ({
     >
       <RowLayout alignItems="flex-start">
         <Image
-          src={movie["thumbUrl"]}
+          src={movie.posterUrl}
           alt={movie.title}
           width="12%"
           borderRadius="12px"

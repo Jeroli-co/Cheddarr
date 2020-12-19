@@ -4,8 +4,8 @@ import { SeriesType } from "../enums/SeriesType";
 export interface ISearchedMedias {
   readonly tmdbId: number;
   readonly title: string;
-  readonly thumbUrl: string;
-  readonly artUrl: string;
+  readonly posterUrl: string | null;
+  readonly artUrl: string | null;
   readonly summary: string;
   readonly releaseDate: Date;
   readonly rating: number;

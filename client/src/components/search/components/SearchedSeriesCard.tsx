@@ -75,7 +75,7 @@ const SearchedSeriesCard = ({
     >
       <RowLayout alignItems="flex-start">
         <Image
-          src={series.thumbUrl}
+          src={series.posterUrl}
           alt={series.title}
           width="12%"
           borderRadius="12px"

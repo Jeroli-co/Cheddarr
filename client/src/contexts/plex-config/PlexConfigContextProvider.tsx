@@ -11,17 +11,19 @@ export const PlexConfigContextProvider = (props: any) => {
   }>({ data: [], loading: true });
 
   const {
-    session: { plex },
+    session: { plex, isLoading },
   } = useContext(AuthContext);
 
   useEffect(() => {
-    PlexService.GetPlexConfig().then((res) => {
-      if (res.error === null) {
-        setConfigs({ data: res.data, loading: false });
-      }
-    });
+    if (!isLoading && plex) {
+      PlexService.GetPlexConfig().then((res) => {
+        if (res.error === null) {
+          setConfigs({ data: res.data, loading: false });
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoading]);
 
   const addConfig = (newConfig: IPlexConfig) => {
     let configurations = configs.data;

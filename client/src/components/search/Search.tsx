@@ -39,6 +39,11 @@ const Search = () => {
   >([]);
 
   useEffect(() => {
+    console.log(title);
+  }, [title]);
+
+  useEffect(() => {
+
     FriendService.GetFriendsProviders(ProviderTypes.MOVIES).then((res) => {
       if (res.error === null) {
         setFriendsMoviesProviders(res.data);

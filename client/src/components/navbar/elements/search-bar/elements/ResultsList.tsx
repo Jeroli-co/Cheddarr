@@ -9,6 +9,7 @@ import { Text } from "../../../../elements/Text";
 import Spinner from "../../../../elements/Spinner";
 import { IMediaSearchResult } from "../../../../../models/IMediaSearchResult";
 import { MediasTypes } from "../../../../../enums/MediasTypes";
+import { Image } from "../../../../elements/Image";
 
 const ResultsListStyle = styled.div<{ isVisible: boolean }>`
   position: absolute;
@@ -56,7 +57,12 @@ const MediaResult = ({ media }: MediaResultProps) => {
     <ResultStyle onMouseDown={() => redirectToMediaPage()}>
       <RowLayout className="is-pointed" padding="1%" childMarginRight="2%">
         {media.posterUrl && (
-          <img src={media.posterUrl} alt={media.title} width="30" height="50" />
+          <Image
+            src={media.posterUrl}
+            alt={media.title}
+            width="35px"
+            height="50px"
+          />
         )}
         <ColumnLayout>
           <Text fontSize="0.9em" lineClamp={1}>
