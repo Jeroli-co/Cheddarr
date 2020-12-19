@@ -14,7 +14,7 @@ from server.repositories.requests import SeriesRepository
 router = APIRouter()
 
 
-@router.get("/movies/incoming/", response_model=list[schemas.MovieRequest])
+@router.get("/movies/incoming", response_model=list[schemas.MovieRequest])
 def get_received_movie_requests(
     current_user: models.User = Depends(deps.get_current_user),
     movie_request_repo: MovieRequestRepository = Depends(
@@ -25,7 +25,7 @@ def get_received_movie_requests(
     return requests
 
 
-@router.get("/movies/outgoing/", response_model=list[schemas.MovieRequest])
+@router.get("/movies/outgoing", response_model=list[schemas.MovieRequest])
 def get_sent_movie_requests(
     current_user: models.User = Depends(deps.get_current_user),
     movie_request_repo: MovieRequestRepository = Depends(
@@ -37,7 +37,7 @@ def get_sent_movie_requests(
 
 
 @router.post(
-    "/movies/",
+    "/movies",
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.MovieRequest,
     responses={
@@ -138,7 +138,7 @@ def update_movie_request(
     return request
 
 
-@router.get("/series/incoming/", response_model=list[schemas.SeriesRequest])
+@router.get("/series/incoming", response_model=list[schemas.SeriesRequest])
 def get_received_series_requests(
     current_user: models.User = Depends(deps.get_current_user),
     series_request_repo: SeriesRequestRepository = Depends(
@@ -149,7 +149,7 @@ def get_received_series_requests(
     return requests
 
 
-@router.get("/series/outgoing/", response_model=list[schemas.SeriesRequest])
+@router.get("/series/outgoing", response_model=list[schemas.SeriesRequest])
 def get_sent_series_requests(
     current_user: models.User = Depends(deps.get_current_user),
     series_request_repo: SeriesRequestRepository = Depends(
@@ -161,7 +161,7 @@ def get_sent_series_requests(
 
 
 @router.post(
-    "/series/",
+    "/series",
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.SeriesRequest,
     responses={

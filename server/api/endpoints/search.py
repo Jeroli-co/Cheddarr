@@ -16,7 +16,7 @@ def search_media(value, page=1):
 
 
 @router.get(
-    "/movies/",
+    "/movies",
     response_model=schemas.SearchResult,
     response_model_exclude_none=True,
 )
@@ -25,7 +25,7 @@ def search_movies(value, page=1):
 
 
 @router.get(
-    "/series/",
+    "/series",
     response_model=schemas.SearchResult,
     response_model_exclude_none=True,
 )
@@ -34,7 +34,7 @@ def search_series(value, page=1):
 
 
 @router.get(
-    "/movies/{provider_id}/",
+    "/movies/{provider_id}",
     response_model=schemas.Movie,
     response_model_exclude_none=True,
     responses={
@@ -50,7 +50,7 @@ def find_movie(provider_id: int):
 
 
 @router.get(
-    "/series/{provider_id}/",
+    "/series/{provider_id}",
     response_model=schemas.Series,
     response_model_exclude_none=True,
     responses={
@@ -66,7 +66,7 @@ def find_series(provider_id: int):
 
 
 @router.get(
-    "/series/{provider_id}/seasons/{season_number}/",
+    "/series/{provider_id}/seasons/{season_number}",
     response_model=schemas.Season,
     response_model_exclude_none=True,
     responses={
