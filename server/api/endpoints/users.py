@@ -61,21 +61,6 @@ async def get_current_user(current_user: models.User = Depends(deps.get_current_
     return current_user
 
 
-@current_user_router.get("/providers")
-def get_user_providers(
-    type: Optional[models.ProviderType] = None,
-    current_user: models.User = Depends(deps.get_current_user),
-):
-    user_providers = current_user.providers
-    if type is not None:
-        return [
-            provider
-            for provider in user_providers
-            if provider.provider_type == type and provider.enabled
-        ]
-    return user_providers
-
-
 @current_user_router.delete("")
 def delete_user(
     current_user: models.User = Depends(deps.get_current_user),
@@ -291,23 +276,20 @@ def get_friends(
     ]
     if providers_type is not None:
         friends.append(current_user)
-        if providers_type == models.ProviderType.movie_provider:
-            return [
-                friend
-                for friend in friends
-                if friend.providers.filter_by(
-                    provider_type=models.ProviderType.movie_provider, enabled=True
-                ).first()
-            ]
+        return [
+            friend
+            for friend in friends
+            if next(
+                (
+                    provider
+                    for provider in friend.providers
+                    if provider.provider_type == providers_type
+                    and provider.enabled is True
+                ),
+                None,
+            )
+        ]
 
-        if providers_type == models.ProviderType.series_provider:
-            return [
-                friend
-                for friend in friends
-                if friend.providers.filter_by(
-                    provider_type=models.ProviderType.series_provider, enabled=True
-                ).first()
-            ]
     return friends
 
 

@@ -1,6 +1,5 @@
 from typing import Type
 
-from humps import camelize
 from pydantic import BaseModel
 
 from server.repositories.base import ModelType

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import requests
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -11,6 +13,26 @@ from server.repositories import (
 )
 
 router = APIRouter()
+
+
+##########################################
+# All configurations                     #
+##########################################
+
+@router.get("/providers")
+def get_user_providers(
+        type: Optional[models.ProviderType] = None,
+        current_user: models.User = Depends(deps.get_current_user),
+):
+    user_providers = current_user.providers
+    if type is not None:
+        return [
+            provider
+            for provider in user_providers
+            if provider.provider_type == type and provider.enabled
+        ]
+    return user_providers
+
 
 ##########################################
 # Plex                                   #
