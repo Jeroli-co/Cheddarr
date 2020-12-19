@@ -24,10 +24,10 @@ instance.interceptors.request.use(
 
     if (request.url === "/sign-in") {
       request.headers.post["Content-Type"] = FORM_URL_ENCODED_TYPE;
-    }
-
-    if (request.data) {
-      request.data = humps.decamelizeKeys(request.data);
+    } else {
+      if (request.data) {
+        request.data = humps.decamelizeKeys(request.data);
+      }
     }
 
     return request;
@@ -39,7 +39,7 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    if (response.data) {
+    if (response.config.url !== "/sign-in" && response.data) {
       response.data = humps.camelizeKeys(response.data);
     }
 
