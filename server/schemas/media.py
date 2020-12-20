@@ -10,10 +10,10 @@ from server.schemas import APIModel
 
 class Media(APIModel, ABC):
     title: str
-    release_date: date
-    status: str
-    poster_url: str
-    art_url: str
+    release_date: Optional[date]
+    status: Optional[str]
+    poster_url: Optional[str]
+    art_url: Optional[str]
 
 
 class Movie(Media):
@@ -30,7 +30,7 @@ class Episode(APIModel):
 class Season(APIModel):
     season_number: int
     title: str
-    release_date: date
+    release_date: Optional[date]
     episodes: Optional[list[Episode]]
 
 

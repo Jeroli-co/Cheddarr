@@ -10,28 +10,46 @@ from server.models import SeriesType
 tmdb.API_KEY = settings.TMDB_API_KEY
 
 
-def search_tmdb_movies(term: str, page: int) -> dict:
-    search = tmdb.Search().movie(query=term, page=page)
-    for movie in search["results"]:
-        set_tmdb_movie_info(movie, from_search=True)
+def search_tmdb_media(term: str, page: int) -> dict:
+    search = tmdb.Search().multi(query=term, page=page)
+    results = []
+    for media in search["results"]:
+        if media["media_type"] == "tv":
+            del media["media_type"]
+            set_tmdb_series_info(media, from_search=True)
+            if not media["tvdb_id"]:
+                continue
+            parsed_media = schemas.TmdbSeries.parse_obj(media)
+        elif media["media_type"] == "movie":
+            del media["media_type"]
+            set_tmdb_movie_info(media, from_search=True)
+            parsed_media = schemas.TmdbMovie.parse_obj(media)
+        results.append(parsed_media)
+    search["results"] = results
     return schemas.TmdbSearchResult.parse_obj(search).dict()
 
 
-def search_tmdb_media(term: str, page: int) -> dict:
-    search = tmdb.Search().multi(query=term, page=page)
-    for media in search["results"]:
-        if media["media_type"] == "tv":
-            set_tmdb_series_info(media, from_search=True)
-        else:
-            set_tmdb_movie_info(media, from_search=True)
-        del media["media_type"]
+def search_tmdb_movies(term: str, page: int) -> dict:
+    search = tmdb.Search().movie(query=term, page=page)
+    results = []
+    for movie in search["results"]:
+        set_tmdb_movie_info(movie, from_search=True)
+        parsed_movie = schemas.TmdbMovie.parse_obj(movie)
+        results.append(parsed_movie)
+    search["results"] = results
     return schemas.TmdbSearchResult.parse_obj(search).dict()
 
 
 def search_tmdb_series(term: str, page: int) -> dict:
     search = tmdb.Search().tv(query=term, page=page)
+    results = []
     for series in search["results"]:
         set_tmdb_series_info(series, from_search=True)
+        if not series["tvdb_id"]:
+            continue
+        parsed_media = schemas.TmdbSeries.parse_obj(series)
+        results.append(parsed_media)
+    search["results"] = results
     return schemas.TmdbSearchResult.parse_obj(search).dict()
 
 

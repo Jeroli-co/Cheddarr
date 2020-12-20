@@ -37,11 +37,11 @@ TMDB_ART_SIZE = "w1280"
 class TmdbMedia(SearchedMedia, ABC):
     tmdb_id: int = Field(alias="id")
     title: str = Field(alias="name")
-    summary: str = Field(alias="overview")
-    release_date: str = Field(alias="release_date")
+    summary: Optional[str] = Field(alias="overview")
+    release_date: Optional[date] = Field(alias="release_date")
     status: Optional[str] = Field(alias="status")
-    rating: float = Field(alias="vote_average")
-    poster_url: str = Field(alias="poster_path")
+    rating: Optional[float] = Field(alias="vote_average")
+    poster_url: Optional[str] = Field(alias="poster_path")
     art_url: Optional[str] = Field(alias="backdrop_path")
 
     @validator("poster_url")
@@ -51,6 +51,10 @@ class TmdbMedia(SearchedMedia, ABC):
     @validator("art_url")
     def get_art(cls, art):
         return f"{TMDB_IMAGES_URL}/{TMDB_ART_SIZE}/{art}"
+
+    @validator("release_date", pre=True)
+    def empty_date(cls, v) -> Optional[date]:
+        return None if not v else v
 
 
 class TmdbMovie(TmdbMedia, Movie):
@@ -70,12 +74,12 @@ class TmdbEpisode(Episode):
 class TmdbSeason(Season):
     season_number: int = Field(alias="season_number")
     title: str = Field(alias="name")
-    release_date: date = Field(alias="air_date")
+    release_date: Optional[date] = Field(alias="air_date")
     episodes: Optional[list[TmdbEpisode]] = Field(alias="episodes")
 
 
 class TmdbSeries(TmdbMedia, Series):
-    release_date: str = Field(alias="first_air_date")
+    release_date: Optional[date] = Field(alias="first_air_date", default=None)
     number_of_seasons: Optional[int] = Field(alias="number_of_seasons")
     seasons: Optional[list[TmdbSeason]] = Field(alias="seasons")
 
