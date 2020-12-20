@@ -297,7 +297,7 @@ def update_existing_series_request(
                 already_added_season.episodes = season.episodes
 
 
-@router.patch("/series/{request_id}")
+@router.patch("/series/{request_id}", response_model=schemas.SeriesRequest)
 def update_series_request(
     request_id: int,
     update: schemas.RequestUpdate,

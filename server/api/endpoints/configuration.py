@@ -19,10 +19,11 @@ router = APIRouter()
 # All configurations                     #
 ##########################################
 
-@router.get("/providers")
+
+@router.get("")
 def get_user_providers(
-        type: Optional[models.ProviderType] = None,
-        current_user: models.User = Depends(deps.get_current_user),
+    type: Optional[models.ProviderType] = None,
+    current_user: models.User = Depends(deps.get_current_user),
 ):
     user_providers = current_user.providers
     if type is not None:
