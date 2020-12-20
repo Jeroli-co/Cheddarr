@@ -151,6 +151,25 @@ def update_movie_request(
     return request
 
 
+@router.delete("/movies/{request_id}")
+def delete_movie_request(
+    request_id: int,
+    current_user: models.User = Depends(deps.get_current_user),
+    movies_request_repo: MovieRequestRepository = Depends(
+        deps.get_repository(MovieRequestRepository)
+    ),
+):
+    request = movies_request_repo.find_by(id=request_id)
+    if (
+        request is None
+        or request.requesting_user_id != current_user.id
+        or request.requested_user_id != current_user.id
+    ):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
+    movies_request_repo.remove(request)
+    return {"detail": "Request deleted."}
+
+
 @router.get("/series/incoming", response_model=list[schemas.SeriesRequest])
 def get_received_series_requests(
     current_user: models.User = Depends(deps.get_current_user),
