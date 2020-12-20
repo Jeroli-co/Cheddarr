@@ -15,7 +15,6 @@ export const ErrorHandler = ({ status }: ErrorProps) => {
     case 401:
       invalidSession();
       return <Redirect to={routes.SIGN_IN.url} />;
-      break;
     default:
       return <InternalServerError />;
   }

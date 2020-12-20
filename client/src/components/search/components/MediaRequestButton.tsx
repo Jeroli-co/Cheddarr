@@ -1,4 +1,4 @@
-import React, { ChangeEvent, MouseEvent } from "react";
+import React, { ChangeEvent, MouseEvent, useContext } from "react";
 import { MediasTypes } from "../../../enums/MediasTypes";
 import { RequestSeriesOptions } from "../../../enums/RequestSeriesOptions";
 import { RequestService } from "../../../services/RequestService";
@@ -6,6 +6,7 @@ import {
   IMovieRequestCreate,
   ISeriesRequestCreate,
 } from "../../../models/IRequestCreate";
+import { NotificationContext } from "../../../contexts/notifications/NotificationContext";
 
 type MediaRequestButtonProps = {
   mediasType: MediasTypes;
@@ -18,8 +19,17 @@ const MediaRequestButton = ({
   requestCreate,
   onSeriesScopeChanges,
 }: MediaRequestButtonProps) => {
+  const { pushSuccess, pushDanger } = useContext(NotificationContext);
+
   const handleRequest = (e: MouseEvent) => {
-    RequestService.RequestMedias(mediasType, requestCreate);
+    RequestService.RequestMedias(mediasType, requestCreate).then(
+      (res) => {
+        pushSuccess("Request sent.");
+      },
+      (error) => {
+        pushDanger("Error sending request, please try again later.");
+      }
+    );
     e.preventDefault();
   };
 

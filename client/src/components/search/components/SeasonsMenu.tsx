@@ -6,7 +6,6 @@ import styled from "styled-components";
 import { SeasonEpisodes } from "./SeasonEpisodes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useSeries } from "../../../hooks/useSeries";
 import { ISearchedSeries } from "../../../models/ISearchedMedias";
 
 const SeasonsMenuStyle = styled.ul`

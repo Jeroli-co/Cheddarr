@@ -27,7 +27,7 @@ const useRequestSeriesOptions = (series: ISearchedSeries | null) => {
             (s) => s.seasonNumber === season.seasonNumber
           ) !== undefined;
         if (isRequestContainSeason) {
-          optionsTemp.seasons.map((s) => {
+          optionsTemp.seasons.forEach((s) => {
             if (s.seasonNumber === season.seasonNumber) {
               s.episodes = [];
             }

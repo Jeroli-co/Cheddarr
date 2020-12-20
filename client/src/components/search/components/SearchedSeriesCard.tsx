@@ -12,7 +12,6 @@ import { ISearchedSeries } from "../../../models/ISearchedMedias";
 import { IPublicUser } from "../../../models/IPublicUser";
 import { MediasTypes } from "../../../enums/MediasTypes";
 import { useSeries } from "../../../hooks/useSeries";
-import Spinner from "../../elements/Spinner";
 
 type SearchedSeriesCardProps = {
   series: ISearchedSeries;

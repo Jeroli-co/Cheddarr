@@ -1,4 +1,4 @@
 export enum RequestTypes {
-  SENT = "sent",
-  RECEIVED = "received",
+  INCOMING = "incoming",
+  OUTGOING = "outgoing",
 }

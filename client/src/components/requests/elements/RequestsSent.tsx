@@ -6,11 +6,21 @@ import { MovieRequestSent } from "./MovieRequestSent";
 import { SeriesRequestSent } from "./SeriesRequestSent";
 import { MediasTypes } from "../../../enums/MediasTypes";
 import Spinner from "../../elements/Spinner";
-import { isArrayOfSeriesRequest } from "../../../models/IRequest";
+import {
+  IMovieRequest,
+  isArrayOfSeriesRequest,
+  ISeriesRequest,
+} from "../../../models/IRequest";
 
 const RequestsSent = () => {
-  const moviesRequestsSent = useRequests(MediasTypes.MOVIE, RequestTypes.SENT);
-  const seriesRequestsSent = useRequests(MediasTypes.SERIES, RequestTypes.SENT);
+  const moviesRequestsSent = useRequests(
+    MediasTypes.MOVIE,
+    RequestTypes.OUTGOING
+  );
+  const seriesRequestsSent = useRequests(
+    MediasTypes.SERIES,
+    RequestTypes.OUTGOING
+  );
 
   return (
     <Container>
@@ -18,7 +28,7 @@ const RequestsSent = () => {
       {!moviesRequestsSent && <Spinner />}
       {moviesRequestsSent &&
         moviesRequestsSent.map((rs, index) => (
-          <MovieRequestSent key={index} request={rs} />
+          <MovieRequestSent key={index} request={rs as IMovieRequest} />
         ))}
       <div className="is-divider" />
       <h3 className="title is-3">Series requested</h3>
@@ -26,7 +36,7 @@ const RequestsSent = () => {
       {seriesRequestsSent &&
         isArrayOfSeriesRequest(seriesRequestsSent) &&
         seriesRequestsSent.map((rs, index) => (
-          <SeriesRequestSent key={index} request={rs} />
+          <SeriesRequestSent key={index} request={rs as ISeriesRequest} />
         ))}
       <div className="is-divider" />
     </Container>

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { IAsyncResponse } from "../../models/IAsyncResponse";
-import { IPublicUser } from "../../models/IPublicUser";
 
 type AddFriendsInputProp = {
   sendFriendRequest: (username: string) => void;

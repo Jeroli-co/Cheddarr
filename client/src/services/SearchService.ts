@@ -4,7 +4,6 @@ import {
   AsyncResponseError,
   AsyncResponseSuccess,
 } from "../models/IAsyncResponse";
-import { IMediaServerMedia } from "../models/IMediaServerMedia";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { MediasTypes } from "../enums/MediasTypes";
 import { SearchRequestTypes } from "../enums/SearchRequestTypes";

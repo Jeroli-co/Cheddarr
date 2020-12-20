@@ -1,28 +1,85 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { RowElement, RowLayout, RowLayout2 } from "../../elements/layouts";
 import { H2 } from "../../elements/titles";
 import { Image } from "../../elements/Image";
 import { ISeriesRequest } from "../../../models/IRequest";
+import { RequestStatus } from "../../../enums/RequestStatus";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
+import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
+import { RequestService } from "../../../services/RequestService";
+import { ISonarrConfig } from "../../../models/ISonarrConfig";
+import { SonarrService } from "../../../services/SonarrService";
+import { NotificationContext } from "../../../contexts/notifications/NotificationContext";
+import { MediasTypes } from "../../../enums/MediasTypes";
 
 type SeriesRequestReceivedProps = {
   request: ISeriesRequest;
 };
 
 const SeriesRequestReceived = ({ request }: SeriesRequestReceivedProps) => {
+  const [sonarrConfigs, setSonarrConfigs] = useState<ISonarrConfig | null>(
+    null
+  );
+  const { pushSuccess, pushDanger } = useContext(NotificationContext);
+
+  useEffect(() => {
+    SonarrService.GetSonarrConfig().then((res) => {
+      if (res.error === null && res.data.length > 0)
+        setSonarrConfigs(res.data[0]);
+    });
+  }, []);
+
+  const onAcceptRequest = () => {
+    if (sonarrConfigs !== null) {
+      RequestService.UpdateMediasRequest(MediasTypes.SERIES, request.id, {
+        status: RequestStatus.APPROVED,
+        providerId: sonarrConfigs.id,
+      }).then(
+        (res) => {
+          if (res.error === null) {
+            pushSuccess("Request accepted");
+          }
+        },
+        (_) => {
+          pushDanger("Cannot accept request, try again later...");
+        }
+      );
+    }
+  };
+
+  const onRefuseRequest = () => {
+    if (sonarrConfigs !== null) {
+      RequestService.UpdateMediasRequest(MediasTypes.SERIES, request.id, {
+        status: RequestStatus.REFUSED,
+        providerId: null,
+      }).then(
+        (res) => {
+          if (res.error === null) {
+            pushSuccess("Request refused");
+          }
+        },
+        (_) => {
+          pushDanger("Cannot refuse request, try again later...");
+        }
+      );
+    }
+  };
+
   return (
     <RowLayout2 wrap="wrap" border="2px solid black">
       {/* Media */}
       <RowElement flexGrow="0" flexShrink="0" flexBasis="310px">
-        {request.medias.posterUrl && (
-          <Image src={request.medias.posterUrl} alt="Series" />
+        {request.series.posterUrl && (
+          <Image src={request.series.posterUrl} alt="Series" />
         )}
       </RowElement>
       <RowLayout2 border="1px solid red">
         <RowElement flexGrow="3" border="1px solid green">
-          <H2>{request.medias.title}</H2>
+          <H2>{request.series.title}</H2>
           <div>
-            {request.medias.seasons.map((season) => {
-              return <div>Season {season.seasonNumber}</div>;
+            {request.seasons.map((season, index) => {
+              return <div key={index}>Season {season.seasonNumber}</div>;
             })}
           </div>
         </RowElement>
@@ -61,6 +118,24 @@ const SeriesRequestReceived = ({ request }: SeriesRequestReceivedProps) => {
           </div>
         </RowElement>
       </RowLayout2>
+      {request.status === RequestStatus.PENDING && (
+        <div>
+          <button
+            type="button"
+            className="button is-success"
+            onClick={() => onAcceptRequest()}
+          >
+            <FontAwesomeIcon icon={faCheck} />
+          </button>
+          <button
+            type="button"
+            className="button is-danger"
+            onClick={() => onRefuseRequest()}
+          >
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
+        </div>
+      )}
     </RowLayout2>
   );
 };

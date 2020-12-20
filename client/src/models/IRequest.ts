@@ -12,19 +12,22 @@ export interface IRequest {
   readonly status: RequestStatus;
   readonly requestedUser: IPublicUser;
   readonly requestingUser: IPublicUser;
-  readonly medias: ISearchedMedias;
   readonly createdAt: Date;
   readonly updatedAt?: Date;
 }
 
 export interface IMovieRequest extends IRequest {
-  readonly medias: ISearchedMovie;
+  readonly movie: ISearchedMovie;
 }
 
 export interface ISeriesRequest extends IRequest {
   readonly tvdbId: number;
   readonly seriesType: SeriesType;
-  readonly medias: ISearchedSeries;
+  readonly series: ISearchedSeries;
+  readonly seasons: {
+    seasonNumber: number;
+    episodes: { episodeNumber: number }[];
+  }[];
 }
 
 export const isSeriesRequest = (arg: any): arg is ISeriesRequest => {

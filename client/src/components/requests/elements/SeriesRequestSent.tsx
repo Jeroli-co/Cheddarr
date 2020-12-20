@@ -26,6 +26,7 @@ const SeriesRequestSent = ({ request }: SeriesRequestSentProps) => {
         {/* Requested user */}
         <div>
           <h5 className="title is-5">Requested user</h5>
+
           <RowLayout
             width="auto"
             justifyContent="space-between"
@@ -62,9 +63,10 @@ const SeriesRequestSent = ({ request }: SeriesRequestSentProps) => {
         {/* Media */}
         <div>
           <h5 className="title is-5">Media</h5>
-          <div>{request.medias.title}</div>
+          <div>{request.series.title}</div>
         </div>
       </RowLayout>
+
       {/* See more */}
       <Container padding="1%">
         <button className="button is-info">

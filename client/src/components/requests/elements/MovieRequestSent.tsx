@@ -62,7 +62,7 @@ const MovieRequestSent = ({ request }: MovieRequestSentProps) => {
         {/* Media */}
         <div>
           <h5 className="title is-5">Movie</h5>
-          <div>{request.medias.title}</div>
+          <div>{request.movie.title}</div>
         </div>
       </RowLayout>
       {/* See more */}
