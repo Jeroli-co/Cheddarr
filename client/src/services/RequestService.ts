@@ -51,7 +51,7 @@ export abstract class RequestService {
       }
     ).then(
       (response) => {
-        if (response.status === 200) {
+        if (response.status === 201) {
           return new AsyncResponseSuccess<IRequest>("", response.data);
         } else {
           return new AsyncResponseError(

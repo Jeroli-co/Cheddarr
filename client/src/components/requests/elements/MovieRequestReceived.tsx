@@ -79,7 +79,12 @@ const MovieRequestReceived = ({ request }: MovieRequestReceivedProps) => {
         {/* Requested user */}
         <div>
           {request.movie.posterUrl && (
-            <Image src={request.movie.posterUrl} alt="Movie" />
+            <Image
+              src={request.movie.posterUrl}
+              alt="Movie"
+              width="310px"
+              height="auto"
+            />
           )}
           <h5 className="title is-5">Requested user</h5>
           <RowLayout

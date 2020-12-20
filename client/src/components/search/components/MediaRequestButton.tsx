@@ -24,9 +24,13 @@ const MediaRequestButton = ({
   const handleRequest = (e: MouseEvent) => {
     RequestService.RequestMedias(mediasType, requestCreate).then(
       (res) => {
-        pushSuccess("Request sent.");
+        if (res.error === null) {
+          pushSuccess("Request sent.");
+        } else {
+          pushDanger("Error sending request, please try again later.");
+        }
       },
-      (error) => {
+      (_) => {
         pushDanger("Error sending request, please try again later.");
       }
     );
