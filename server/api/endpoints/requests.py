@@ -108,6 +108,14 @@ def update_movie_request(
         deps.get_repository(MovieRequestRepository)
     ),
 ):
+    if (
+        update.status != models.RequestStatus.approved
+        and update.status != models.RequestStatus.refused
+    ):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "Request status can only be updated to approved or refused.",
+        )
     request = movies_request_repo.find_by(id=request_id)
     if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
@@ -121,9 +129,14 @@ def update_movie_request(
                 status.HTTP_400_BAD_REQUEST,
                 "provider_id must be set to accept a request.",
             )
-        selected_provider = current_user.providers.filter_by(
-            id=update.provider_id
-        ).one_or_none()
+        selected_provider = next(
+            (
+                provider
+                for provider in current_user.providers
+                if provider.id == update.provider_id
+            ),
+            None,
+        )
         if selected_provider is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
         request.selected_provider = selected_provider
@@ -316,7 +329,7 @@ def update_series_request(
         )
     request = series_request_repo.find_by(id=request_id)
     if request is None or request.requested_user_id != current_user.id:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != models.RequestStatus.pending:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, "Cannot update a non pending request."
