@@ -19,26 +19,9 @@ export class FriendService {
   static FRIEND_SEARCH_BASE_URL = FriendService.FRIEND_BASE_URL + "/search";
 
   static GetFriends = (type?: FriendsRequestType) => {
-    const urlSuffix = type ? "/" + type : "";
-    return HttpService.executeRequest<IPublicUser[]>(
-      HTTP_METHODS.GET,
-      FriendService.FRIEND_BASE_URL + urlSuffix
-    ).then(
-      (response) => {
-        if (response.status === 200) {
-          return new AsyncResponseSuccess<IPublicUser[]>("", response.data);
-        } else {
-          return new AsyncResponseError(
-            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
-          );
-        }
-      },
-      (error) => {
-        return new AsyncResponseError(
-          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-        );
-      }
-    );
+    let url = FriendService.FRIEND_BASE_URL;
+    if (type) url += "/" + type;
+    return HttpService.executeRequest<IPublicUser[]>(HTTP_METHODS.GET, url);
   };
 
   static GetFriendsProviders = (type: ProviderTypes) => {
@@ -126,7 +109,7 @@ export class FriendService {
     );
   };
 
-  static DeleteFriend = async (username: string) => {
+  static DeleteFriend = (username: string) => {
     return HttpService.executeRequest<void>(
       HTTP_METHODS.DELETE,
       FriendService.FRIEND_BASE_URL + "/" + username

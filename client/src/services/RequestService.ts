@@ -44,7 +44,7 @@ export abstract class RequestService {
   ) => {
     return HttpService.executeRequest(
       HTTP_METHODS.POST,
-      RequestService.REQUEST_BASE_URL + mediasType + "/",
+      RequestService.REQUEST_BASE_URL + "/" + mediasType,
       {
         ...request,
       }

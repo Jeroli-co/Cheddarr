@@ -13,7 +13,9 @@ const SeriesRequestReceived = ({ request }: SeriesRequestReceivedProps) => {
     <RowLayout2 wrap="wrap" border="2px solid black">
       {/* Media */}
       <RowElement flexGrow="0" flexShrink="0" flexBasis="310px">
-        <Image src={request.medias.posterUrl} alt="Series" />
+        {request.medias.posterUrl && (
+          <Image src={request.medias.posterUrl} alt="Series" />
+        )}
       </RowElement>
       <RowLayout2 border="1px solid red">
         <RowElement flexGrow="3" border="1px solid green">

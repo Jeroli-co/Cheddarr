@@ -7,8 +7,8 @@ import { ResetPassword } from "../components/auth/components/reset-password/Rese
 import { InitResetPasswordModal } from "../components/auth/components/sign-in-form/init-reset-password-modal/InitResetPasswordModal";
 import { SignInForm } from "../components/auth/components/sign-in-form/SignInForm";
 import { SignUpForm } from "../components/auth/components/sign-up-form/SignUpForm";
-import { FriendProfile } from "../components/user/friends/elements/FriendProfile";
-import { Friends } from "../components/user/friends/Friends";
+import { FriendProfile } from "../components/user/FriendProfile";
+import { Friends } from "../components/user/Friends";
 import { Settings } from "../components/settings/Settings";
 import { ChangeEmailModal } from "../components/settings/settings-account/element/ChangeEmailModal";
 import { ChangePasswordModal } from "../components/settings/settings-account/element/ChangePasswordModal";

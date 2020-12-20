@@ -11,6 +11,8 @@ import { useRequestSeriesOptions } from "../../../hooks/useRequestSeriesOptions"
 import { ISearchedSeries } from "../../../models/ISearchedMedias";
 import { IPublicUser } from "../../../models/IPublicUser";
 import { MediasTypes } from "../../../enums/MediasTypes";
+import { useSeries } from "../../../hooks/useSeries";
+import Spinner from "../../elements/Spinner";
 
 type SearchedSeriesCardProps = {
   series: ISearchedSeries;
@@ -24,6 +26,9 @@ const SearchedSeriesCard = ({
   const [providerSelected, setProviderSelected] = useState<IPublicUser | null>(
     null
   );
+
+  const seriesWithSeason = useSeries(series.tvdbId);
+
   const {
     options,
     addSeasons,
@@ -32,7 +37,8 @@ const SearchedSeriesCard = ({
     removeEpisode,
     isSeasonSelected,
     isEpisodeSelected,
-  } = useRequestSeriesOptions(series);
+  } = useRequestSeriesOptions(seriesWithSeason);
+
   const [showSeasons, setShowSeasons] = useState(false);
 
   useEffect(() => {
@@ -74,12 +80,14 @@ const SearchedSeriesCard = ({
       borderRadius="12px"
     >
       <RowLayout alignItems="flex-start">
-        <Image
-          src={series.posterUrl}
-          alt={series.title}
-          width="12%"
-          borderRadius="12px"
-        />
+        {series.posterUrl && (
+          <Image
+            src={series.posterUrl}
+            alt={series.title}
+            width="12%"
+            borderRadius="12px"
+          />
+        )}
         <Container width="100%" padding="1%">
           <RowLayout justifyContent="space-between" alignItems="center">
             <h1 className="title is-3">{series.title}</h1>
@@ -125,7 +133,7 @@ const SearchedSeriesCard = ({
         <div>
           <div className="is-divider" />
           <SeasonsMenu
-            series={series}
+            series={seriesWithSeason}
             handleAddSeason={handleAddSeason}
             handleAddEpisode={handleAddEpisode}
             handleRemoveSeason={handleRemoveSeason}

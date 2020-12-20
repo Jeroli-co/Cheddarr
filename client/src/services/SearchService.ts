@@ -47,14 +47,14 @@ export class SearchService {
   };
 
   static GetMediaById = async (mediaType: MediasTypes, tmdbId: number) => {
-    let url = SearchService.SEARCH_MEDIA_URL + mediaType + "/" + tmdbId;
+    let url = SearchService.SEARCH_MEDIA_URL + "/" + mediaType + "/" + tmdbId;
     return HttpService.executeRequest<ISearchedMedias>(
       HTTP_METHODS.GET,
       url
     ).then(
       (response) => {
         if (response.status === 200) {
-          return new AsyncResponseSuccess<IMediaServerMedia>("", response.data);
+          return new AsyncResponseSuccess<ISearchedMedias>("", response.data);
         } else {
           return new AsyncResponseError(
             ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
@@ -69,13 +69,13 @@ export class SearchService {
     );
   };
 
-  static GetSeasonByNumber = async (tmdbId: number, seasonNumber: number) => {
+  static GetSeasonByNumber = async (tvdbId: number, seasonNumber: number) => {
     let url =
       SearchService.SEARCH_MEDIA_URL +
       "/" +
       MediasTypes.SERIES +
       "/" +
-      tmdbId +
+      tvdbId +
       "/" +
       MediasTypes.SEASON +
       "/" +

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ISearchedSeries } from "../models/ISearchedMedias";
 import { IRequestSeriesOptions } from "../models/IRequestSeriesOptions";
 
-const useRequestSeriesOptions = (series: ISearchedSeries) => {
+const useRequestSeriesOptions = (series: ISearchedSeries | null) => {
   const [options, setOptions] = useState<IRequestSeriesOptions | null>(null);
 
   useEffect(() => {
@@ -10,25 +10,37 @@ const useRequestSeriesOptions = (series: ISearchedSeries) => {
   }, [series]);
 
   const addSeasons = (seasonNumber: number) => {
-    if (!options) return null;
+    if (options === null || series === null) return null;
+
     const season = series.seasons.find(
       (season) => season.seasonNumber === seasonNumber
     );
+
+    let optionsTemp = options;
+
     if (season) {
-      if (options.seasons.length === 0) {
-        options.seasons.push({ seasonNumber: seasonNumber, episodes: [] });
+      if (optionsTemp.seasons.length === 0) {
+        optionsTemp.seasons.push({ seasonNumber: seasonNumber, episodes: [] });
       } else {
         const isRequestContainSeason =
-          options.seasons.find(
+          optionsTemp.seasons.find(
             (s) => s.seasonNumber === season.seasonNumber
           ) !== undefined;
         if (isRequestContainSeason) {
-          season.episodes = [];
+          optionsTemp.seasons.map((s) => {
+            if (s.seasonNumber === season.seasonNumber) {
+              s.episodes = [];
+            }
+          });
         } else {
-          options.seasons.push({ seasonNumber: seasonNumber, episodes: [] });
+          optionsTemp.seasons.push({
+            seasonNumber: seasonNumber,
+            episodes: [],
+          });
         }
       }
-      setOptions(options);
+
+      setOptions({ ...optionsTemp });
     }
   };
 
@@ -41,7 +53,7 @@ const useRequestSeriesOptions = (series: ISearchedSeries) => {
   };
 
   const addEpisode = (seasonNumber: number, episodeNumber: number) => {
-    if (!options) return null;
+    if (options === null || series === null) return null;
     const seasons = options.seasons;
     const season = seasons.find((s) => s.seasonNumber === seasonNumber);
     if (season) {
@@ -76,7 +88,7 @@ const useRequestSeriesOptions = (series: ISearchedSeries) => {
   };
 
   const isSeasonSelected = (seasonNumber: number) => {
-    if (!options) return false;
+    if (options === null) return false;
     const season = options.seasons.find(
       (season) =>
         season.seasonNumber === seasonNumber && season.episodes.length === 0
@@ -85,7 +97,7 @@ const useRequestSeriesOptions = (series: ISearchedSeries) => {
   };
 
   const isEpisodeSelected = (seasonNumber: number, episodeNumber: number) => {
-    if (!options) return false;
+    if (options === null) return false;
     const season = options.seasons.find(
       (season) => season.seasonNumber === seasonNumber
     );

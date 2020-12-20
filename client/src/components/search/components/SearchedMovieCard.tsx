@@ -41,12 +41,14 @@ const SearchedMovieCard = ({
       borderRadius="12px"
     >
       <RowLayout alignItems="flex-start">
-        <Image
-          src={movie.posterUrl}
-          alt={movie.title}
-          width="12%"
-          borderRadius="12px"
-        />
+        {movie.posterUrl && (
+          <Image
+            src={movie.posterUrl}
+            alt={movie.title}
+            width="12%"
+            borderRadius="12px"
+          />
+        )}
         <Container width="100%" padding="1%">
           <RowLayout justifyContent="space-between" alignItems="center">
             <H3>{movie.title}</H3>

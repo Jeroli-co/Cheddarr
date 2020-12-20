@@ -6,11 +6,13 @@ import {
   faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FriendItemContainer } from "./FriendItemContainer";
-import { IPublicUser } from "../../../../models/IPublicUser";
+import { IPublicUser } from "../../models/IPublicUser";
+import { IAsyncCall } from "../../models/IAsyncCall";
+import Spinner from "../elements/Spinner";
 
 type FriendsRequestedListProps = {
-  requested: IPublicUser[];
-  cancelRequest: (username: string) => void;
+  requested: IAsyncCall<IPublicUser[]>;
+  cancelRequest: (friend: IPublicUser) => void;
 };
 
 const RequestedList = ({
@@ -19,12 +21,12 @@ const RequestedList = ({
 }: FriendsRequestedListProps) => {
   const [showRequestedList, setShowRequestedList] = useState(false);
 
-  const Actions = ({ username }: IPublicUser) => {
+  const Actions = (friend: IPublicUser) => {
     return (
       <button
         className="button is-danger is-small"
         type="button"
-        onClick={() => cancelRequest(username)}
+        onClick={() => cancelRequest(friend)}
       >
         <span className="icon">
           <FontAwesomeIcon icon={faMinus} />
@@ -41,7 +43,9 @@ const RequestedList = ({
       >
         <div className="level-left">
           <div className="level-item">
-            <h5 className="subtitle is-5">Requested ({requested.length})</h5>
+            <h5 className="subtitle is-5">
+              Requested ({requested.data ? requested.data.length : 0})
+            </h5>
           </div>
         </div>
         <div className="level-right">
@@ -53,14 +57,17 @@ const RequestedList = ({
         </div>
       </div>
 
-      {requested.map((user) => (
-        <FriendItemContainer
-          key={user.username}
-          user={user}
-          actions={<Actions {...user} />}
-          isShow={showRequestedList}
-        />
-      ))}
+      {showRequestedList && requested.isLoading && <Spinner />}
+      {!requested.isLoading &&
+        requested.data &&
+        requested.data.map((user) => (
+          <FriendItemContainer
+            key={user.username}
+            user={user}
+            actions={<Actions {...user} />}
+            isShow={showRequestedList}
+          />
+        ))}
     </div>
   );
 };

@@ -1,29 +1,20 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { IAsyncResponse } from "../../../../models/IAsyncResponse";
-import { IPublicUser } from "../../../../models/IPublicUser";
+import { IAsyncResponse } from "../../models/IAsyncResponse";
+import { IPublicUser } from "../../models/IPublicUser";
 
 type AddFriendsInputProp = {
-  sendFriendRequest: (
-    username: string
-  ) => Promise<IAsyncResponse<IPublicUser | null>>;
+  sendFriendRequest: (username: string) => void;
 };
 
 const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
   const [searchFriends, setSearchFriends] = useState("");
-  const [
-    response,
-    setResponse,
-  ] = useState<IAsyncResponse<IPublicUser | null> | null>(null);
 
   const _onAddFriend = async () => {
     if (searchFriends.replace(/\s/g, "").length > 0) {
-      const res = await sendFriendRequest(searchFriends);
-      if (res.error === null) {
-        setSearchFriends("");
-      }
-      setResponse(res);
+      sendFriendRequest(searchFriends);
+      setSearchFriends("");
     }
   };
 
@@ -61,16 +52,6 @@ const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
             </div>
           </div>
         </div>
-        {response && (
-          <div className="level-item">
-            {(response.error && (
-              <p className="help is-danger">{response.error}</p>
-            )) ||
-              (response.message && (
-                <p className="help is-success">{response.message}</p>
-              ))}
-          </div>
-        )}
       </div>
     </div>
   );

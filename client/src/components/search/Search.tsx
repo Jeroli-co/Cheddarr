@@ -27,6 +27,7 @@ type SearchParams = {
 
 const Search = () => {
   const { type, title } = useParams<SearchParams>();
+
   const [data, setData] = useState<SearchResultState>({
     results: null,
     isLoading: true,
@@ -39,11 +40,6 @@ const Search = () => {
   >([]);
 
   useEffect(() => {
-    console.log(title);
-  }, [title]);
-
-  useEffect(() => {
-
     FriendService.GetFriendsProviders(ProviderTypes.MOVIES).then((res) => {
       if (res.error === null) {
         setFriendsMoviesProviders(res.data);

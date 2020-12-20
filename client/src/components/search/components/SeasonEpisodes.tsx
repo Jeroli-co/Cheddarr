@@ -7,7 +7,7 @@ import { RowLayout } from "../../elements/layouts";
 import { useSeason } from "../../../hooks/useSeason";
 
 type SeasonEpisodesProps = {
-  seriesId: number;
+  tvdbId: number;
   seasonNumber: number;
   handleAddEpisode: (seasonNumber: number, episodeNumber: number) => void;
   handleRemoveEpisode: (seasonNumber: number, episodeNumber: number) => void;
@@ -15,13 +15,13 @@ type SeasonEpisodesProps = {
 };
 
 const SeasonEpisodes = ({
-  seriesId,
+  tvdbId,
   seasonNumber,
   handleAddEpisode,
   handleRemoveEpisode,
   isEpisodeSelected,
 }: SeasonEpisodesProps) => {
-  const season = useSeason(seriesId, seasonNumber);
+  const season = useSeason(tvdbId, seasonNumber);
 
   if (season === null) {
     return <Spinner />;

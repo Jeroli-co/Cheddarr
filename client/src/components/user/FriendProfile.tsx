@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useParams } from "react-router";
-import Spinner from "../../../elements/Spinner";
-import { usePublicUser } from "../../../../hooks/usePublicUser";
+import Spinner from "../elements/Spinner";
+import { usePublicUser } from "../../hooks/usePublicUser";
 
 type FriendProfileRouteParams = {
   id: string;

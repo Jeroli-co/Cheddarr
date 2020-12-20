@@ -7,12 +7,14 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FriendItemContainer } from "./FriendItemContainer";
-import { IPublicUser } from "../../../../models/IPublicUser";
+import { IPublicUser } from "../../models/IPublicUser";
+import { IAsyncCall } from "../../models/IAsyncCall";
+import Spinner from "../elements/Spinner";
 
 type FriendsReceivedListProps = {
-  received: IPublicUser[];
-  acceptRequest: (username: string) => void;
-  refuseRequest: (username: string) => void;
+  received: IAsyncCall<IPublicUser[]>;
+  acceptRequest: (friend: IPublicUser) => void;
+  refuseRequest: (friend: IPublicUser) => void;
 };
 
 const ReceivedList = ({
@@ -22,13 +24,13 @@ const ReceivedList = ({
 }: FriendsReceivedListProps) => {
   const [showReceivedList, setShowReceivedList] = useState(false);
 
-  const Actions = ({ username }: IPublicUser) => {
+  const Actions = (friend: IPublicUser) => {
     return (
       <div className="buttons">
         <button
           className="button is-success is-small"
           type="button"
-          onClick={() => acceptRequest(username)}
+          onClick={() => acceptRequest(friend)}
         >
           <span className="icon">
             <FontAwesomeIcon icon={faCheck} />
@@ -37,7 +39,7 @@ const ReceivedList = ({
         <button
           className="button is-danger is-small"
           type="button"
-          onClick={() => refuseRequest(username)}
+          onClick={() => refuseRequest(friend)}
         >
           <span className="icon">
             <FontAwesomeIcon icon={faTimes} />
@@ -55,7 +57,9 @@ const ReceivedList = ({
       >
         <div className="level-left">
           <div className="level-item">
-            <h5 className="subtitle is-5">Received ({received.length})</h5>
+            <h5 className="subtitle is-5">
+              Received ({received.data ? received.data.length : 0})
+            </h5>
           </div>
         </div>
         <div className="level-right">
@@ -67,14 +71,17 @@ const ReceivedList = ({
         </div>
       </div>
 
-      {received.map((user) => (
-        <FriendItemContainer
-          key={user.username}
-          user={user}
-          actions={<Actions {...user} />}
-          isShow={showReceivedList}
-        />
-      ))}
+      {showReceivedList && received.isLoading && <Spinner />}
+      {!received.isLoading &&
+        received.data &&
+        received.data.map((user) => (
+          <FriendItemContainer
+            key={user.username}
+            user={user}
+            actions={<Actions {...user} />}
+            isShow={showReceivedList}
+          />
+        ))}
     </div>
   );
 };

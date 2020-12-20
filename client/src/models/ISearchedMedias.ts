@@ -24,13 +24,7 @@ export interface ISearchedSeries extends ISearchedMedias {
 }
 
 export const isSearchedSeries = (arg: any): arg is ISearchedSeries => {
-  return (
-    arg &&
-    arg.tvdbId &&
-    typeof arg.tvdbId == "string" &&
-    arg.numberOfSeasons &&
-    typeof arg.numberOfSeasons == "number"
-  );
+  return arg && arg.tvdbId && typeof arg.tvdbId == "number";
 };
 
 export interface ISearchedSeason {

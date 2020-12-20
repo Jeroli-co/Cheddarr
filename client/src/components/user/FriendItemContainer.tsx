@@ -1,10 +1,10 @@
-import * as React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { routes } from "../../../../router/routes";
+import { routes } from "../../router/routes";
 import styled from "styled-components";
-import { FadeInUp, FadeOutDown } from "../../../animations/Animations";
-import { Animate } from "../../../animations/Animate";
-import { IPublicUser } from "../../../../models/IPublicUser";
+import { FadeInUp, FadeOutDown } from "../animations/Animations";
+import { Animate } from "../animations/Animate";
+import { IPublicUser } from "../../models/IPublicUser";
 
 const FriendItemContainerStyle = styled.div`
   border-bottom: 1px solid #e8e8e8;

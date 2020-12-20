@@ -1,4 +1,4 @@
-import React, { useEffect, useState, MouseEvent } from "react";
+import React, { MouseEvent, useEffect, useState } from "react";
 import { RowLayout } from "../../elements/layouts";
 import { Container } from "../../elements/Container";
 import Spinner from "../../elements/Spinner";
@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { SeasonEpisodes } from "./SeasonEpisodes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useSeries } from "../../../hooks/useSeries";
 import { ISearchedSeries } from "../../../models/ISearchedMedias";
 
 const SeasonsMenuStyle = styled.ul`
@@ -33,7 +34,7 @@ const SeasonsMenuItemStyle = styled.li<SeasonsMenuItemStyleProps>`
 `;
 
 type SeasonsMenuProps = {
-  series: ISearchedSeries;
+  series: ISearchedSeries | null;
   handleAddSeason: (seasonNumber: number) => void;
   handleAddEpisode: (seasonNumber: number, episodeNumber: number) => void;
   handleRemoveSeason: (seasonNumber: number) => void;
@@ -61,7 +62,7 @@ const SeasonsMenu = ({
     }
   }, [series]);
 
-  if (!series) {
+  if (series === null) {
     return (
       <Container padding="1%">
         <Spinner color="primary" size="2x" />
@@ -70,7 +71,7 @@ const SeasonsMenu = ({
   }
 
   const onAddSeason = (e: MouseEvent) => {
-    if (seasonNumberSelected) {
+    if (seasonNumberSelected !== null) {
       handleAddSeason(seasonNumberSelected);
     }
     e.preventDefault();
@@ -139,7 +140,7 @@ const SeasonsMenu = ({
           </div>
           <div className="is-divider" />
           <SeasonEpisodes
-            seriesId={series.tvdbId}
+            tvdbId={series.tvdbId}
             seasonNumber={seasonNumberSelected}
             handleAddEpisode={onAddEpisode}
             handleRemoveEpisode={onRemoveEpisode}
