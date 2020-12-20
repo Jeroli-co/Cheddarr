@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { routes } from "../../../router/routes";
+import { routes } from "../../router/routes";
 
 const RequestsTabs = () => {
   const location = useLocation();

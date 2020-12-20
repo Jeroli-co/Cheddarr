@@ -9,7 +9,7 @@ import { SeriesType } from "../enums/SeriesType";
 
 export interface IRequest {
   readonly id: number;
-  readonly status: RequestStatus;
+  status: RequestStatus;
   readonly requestedUser: IPublicUser;
   readonly requestingUser: IPublicUser;
   readonly createdAt: Date;

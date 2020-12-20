@@ -1,14 +1,12 @@
 import React, { useContext } from "react";
-import { RowLayout } from "../../elements/layouts";
+import { RowLayout } from "../elements/layouts";
 import styled from "styled-components";
-import { IMovieRequest } from "../../../models/IRequest";
-import { Image } from "../../elements/Image";
-import { RequestService } from "../../../services/RequestService";
-import { MediasTypes } from "../../../enums/MediasTypes";
-import { NotificationContext } from "../../../contexts/notifications/NotificationContext";
-import { RequestStatus } from "../../../enums/RequestStatus";
+import { IMovieRequest } from "../../models/IRequest";
+import { Image } from "../elements/Image";
+import { RequestStatus } from "../../enums/RequestStatus";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
+import { RequestsSentContext } from "../../contexts/requests/requests-sent/RequestsSentContext";
 
 const MovieRequestSentStyle = styled.div`
   border: 2px solid ${(props) => props.theme.dark};
@@ -32,17 +30,7 @@ type MovieRequestSentProps = {
 };
 
 const MovieRequestSent = ({ request }: MovieRequestSentProps) => {
-  const { pushSuccess, pushDanger } = useContext(NotificationContext);
-
-  const onDeleteRequest = () => {
-    RequestService.DeleteRequest(MediasTypes.MOVIE, request.id).then((res) => {
-      if (res.error === null) {
-        pushSuccess("Request deleted");
-      } else {
-        pushDanger("Error deleting request");
-      }
-    });
-  };
+  const { deleteMovieRequestSent } = useContext(RequestsSentContext);
 
   return (
     <MovieRequestSentStyle>
@@ -100,7 +88,7 @@ const MovieRequestSent = ({ request }: MovieRequestSentProps) => {
       </RowLayout>
 
       {request.status === RequestStatus.PENDING && (
-        <DeleteRequestButton onClick={() => onDeleteRequest()}>
+        <DeleteRequestButton onClick={() => deleteMovieRequestSent(request.id)}>
           <FontAwesomeIcon icon={faTimes} />
         </DeleteRequestButton>
       )}

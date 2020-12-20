@@ -1,18 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
-import { RowElement, RowLayout, RowLayout2 } from "../../elements/layouts";
-import { H2 } from "../../elements/titles";
-import { Image } from "../../elements/Image";
-import { ISeriesRequest } from "../../../models/IRequest";
-import { RequestStatus } from "../../../enums/RequestStatus";
+import React, { useContext } from "react";
+import { RowElement, RowLayout, RowLayout2 } from "../elements/layouts";
+import { H2 } from "../elements/titles";
+import { Image } from "../elements/Image";
+import { ISeriesRequest } from "../../models/IRequest";
+import { RequestStatus } from "../../enums/RequestStatus";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
-import { RequestService } from "../../../services/RequestService";
-import { ISonarrConfig } from "../../../models/ISonarrConfig";
-import { SonarrService } from "../../../services/SonarrService";
-import { NotificationContext } from "../../../contexts/notifications/NotificationContext";
-import { MediasTypes } from "../../../enums/MediasTypes";
 import styled from "styled-components";
+import { RequestsReceivedContext } from "../../contexts/requests/requests-received/RequestsReceivedContext";
 
 const SeriesRequestReceivedStyle = styled.div`
   position: relative;
@@ -30,63 +26,11 @@ type SeriesRequestReceivedProps = {
 };
 
 const SeriesRequestReceived = ({ request }: SeriesRequestReceivedProps) => {
-  const [sonarrConfigs, setSonarrConfigs] = useState<ISonarrConfig | null>(
-    null
-  );
-  const { pushSuccess, pushDanger } = useContext(NotificationContext);
-
-  useEffect(() => {
-    SonarrService.GetSonarrConfig().then((res) => {
-      if (res.error === null && res.data.length > 0)
-        setSonarrConfigs(res.data[0]);
-    });
-  }, []);
-
-  const onAcceptRequest = () => {
-    if (sonarrConfigs !== null) {
-      RequestService.UpdateMediasRequest(MediasTypes.SERIES, request.id, {
-        status: RequestStatus.APPROVED,
-        providerId: sonarrConfigs.id,
-      }).then(
-        (res) => {
-          if (res.error === null) {
-            pushSuccess("Request accepted");
-          }
-        },
-        (_) => {
-          pushDanger("Cannot accept request, try again later...");
-        }
-      );
-    }
-  };
-
-  const onRefuseRequest = () => {
-    if (sonarrConfigs !== null) {
-      RequestService.UpdateMediasRequest(MediasTypes.SERIES, request.id, {
-        status: RequestStatus.REFUSED,
-        providerId: null,
-      }).then(
-        (res) => {
-          if (res.error === null) {
-            pushSuccess("Request refused");
-          }
-        },
-        (_) => {
-          pushDanger("Cannot refuse request, try again later...");
-        }
-      );
-    }
-  };
-
-  const onDeleteRequest = () => {
-    RequestService.DeleteRequest(MediasTypes.SERIES, request.id).then((res) => {
-      if (res.error === null) {
-        pushSuccess("Request deleted");
-      } else {
-        pushDanger("Error deleting request");
-      }
-    });
-  };
+  const {
+    acceptSeriesRequest,
+    refuseSeriesRequest,
+    deleteSeriesRequestReceived,
+  } = useContext(RequestsReceivedContext);
 
   return (
     <SeriesRequestReceivedStyle>
@@ -149,14 +93,14 @@ const SeriesRequestReceived = ({ request }: SeriesRequestReceivedProps) => {
             <button
               type="button"
               className="button is-success"
-              onClick={() => onAcceptRequest()}
+              onClick={() => acceptSeriesRequest(request.id)}
             >
               <FontAwesomeIcon icon={faCheck} />
             </button>
             <button
               type="button"
               className="button is-danger"
-              onClick={() => onRefuseRequest()}
+              onClick={() => refuseSeriesRequest(request.id)}
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
@@ -165,7 +109,9 @@ const SeriesRequestReceived = ({ request }: SeriesRequestReceivedProps) => {
       </RowLayout2>
 
       {request.status !== RequestStatus.PENDING && (
-        <DeleteRequestButton onClick={() => onDeleteRequest()}>
+        <DeleteRequestButton
+          onClick={() => deleteSeriesRequestReceived(request.id)}
+        >
           <FontAwesomeIcon icon={faTimes} />
         </DeleteRequestButton>
       )}

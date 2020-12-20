@@ -1,16 +1,15 @@
 import React, { useContext } from "react";
-import { RowLayout } from "../../elements/layouts";
-import styled from "styled-components";
-import { ISeriesRequest } from "../../../models/IRequest";
-import { Image } from "../../elements/Image";
-import { RequestStatus } from "../../../enums/RequestStatus";
+import { RowLayout } from "../elements/layouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import styled from "styled-components";
+import { IMovieRequest } from "../../models/IRequest";
+import { RequestStatus } from "../../enums/RequestStatus";
+import { Image } from "../elements/Image";
+import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
-import { RequestService } from "../../../services/RequestService";
-import { MediasTypes } from "../../../enums/MediasTypes";
-import { NotificationContext } from "../../../contexts/notifications/NotificationContext";
+import { RequestsReceivedContext } from "../../contexts/requests/requests-received/RequestsReceivedContext";
 
-const SeriesRequestSentStyle = styled.div`
+const MovieRequestReceivedStyle = styled.div`
   border: 2px solid ${(props) => props.theme.dark};
   border-radius: 12px;
   display: flex;
@@ -27,39 +26,31 @@ const DeleteRequestButton = styled.div`
   cursor: pointer;
 `;
 
-type SeriesRequestSentProps = {
-  request: ISeriesRequest;
+type MovieRequestReceivedProps = {
+  request: IMovieRequest;
 };
 
-const SeriesRequestSent = ({ request }: SeriesRequestSentProps) => {
-  const { pushSuccess, pushDanger } = useContext(NotificationContext);
-
-  const onDeleteRequest = () => {
-    RequestService.DeleteRequest(MediasTypes.SERIES, request.id).then((res) => {
-      if (res.error === null) {
-        pushSuccess("Request deleted");
-      } else {
-        pushDanger("Error deleting request");
-      }
-    });
-  };
+const MovieRequestReceived = ({ request }: MovieRequestReceivedProps) => {
+  const {
+    acceptMovieRequest,
+    refuseMovieRequest,
+    deleteMovieRequestReceived,
+  } = useContext(RequestsReceivedContext);
 
   return (
-    <SeriesRequestSentStyle>
+    <MovieRequestReceivedStyle>
       <RowLayout justifyContent="space-between" padding="1%">
-        {request.series.posterUrl && (
-          <Image
-            src={request.series.posterUrl}
-            alt="Series"
-            width="250px"
-            height="350px"
-          />
-        )}
-
         {/* Requested user */}
         <div>
+          {request.movie.posterUrl && (
+            <Image
+              src={request.movie.posterUrl}
+              alt="Movie"
+              width="250px"
+              height="350px"
+            />
+          )}
           <h5 className="title is-5">Requested user</h5>
-
           <RowLayout
             width="auto"
             justifyContent="space-between"
@@ -72,13 +63,11 @@ const SeriesRequestSent = ({ request }: SeriesRequestSentProps) => {
             <div>{request.requestedUser.username}</div>
           </RowLayout>
         </div>
-
         {/* Requested at */}
         <div>
           <h5 className="title is-5">Requested at</h5>
           <div>{request.createdAt}</div>
         </div>
-
         {/* Response date */}
         {request.updatedAt && (
           <div>
@@ -86,27 +75,46 @@ const SeriesRequestSent = ({ request }: SeriesRequestSentProps) => {
             <div>{request.updatedAt}</div>
           </div>
         )}
-
         {/* State */}
         <div>
           <h5 className="title is-5">Status</h5>
           <div>{request.status}</div>
         </div>
-
         {/* Media */}
         <div>
           <h5 className="title is-5">Media</h5>
-          <div>{request.series.title}</div>
+          <div>{request.movie.title}</div>
         </div>
       </RowLayout>
 
       {request.status === RequestStatus.PENDING && (
-        <DeleteRequestButton onClick={() => onDeleteRequest()}>
+        <div>
+          <button
+            type="button"
+            className="button is-success"
+            onClick={() => acceptMovieRequest(request.id)}
+          >
+            <FontAwesomeIcon icon={faCheck} />
+          </button>
+          <button
+            type="button"
+            className="button is-danger"
+            onClick={() => refuseMovieRequest(request.id)}
+          >
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
+        </div>
+      )}
+
+      {request.status !== RequestStatus.PENDING && (
+        <DeleteRequestButton
+          onClick={() => deleteMovieRequestReceived(request.id)}
+        >
           <FontAwesomeIcon icon={faTimes} />
         </DeleteRequestButton>
       )}
-    </SeriesRequestSentStyle>
+    </MovieRequestReceivedStyle>
   );
 };
 
-export { SeriesRequestSent };
+export { MovieRequestReceived };

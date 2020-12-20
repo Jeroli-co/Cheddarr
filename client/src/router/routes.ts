@@ -23,9 +23,9 @@ import { Search } from "../components/search/Search";
 import { SeasonPage } from "../components/elements/media/SeasonPage";
 import { SeriesPage } from "../components/elements/media/SeriesPage";
 import { Requests } from "../components/requests/Requests";
-import { RequestsSent } from "../components/requests/elements/RequestsSent";
-import { RequestsReceived } from "../components/requests/elements/RequestsReceived";
 import { User } from "../components/user/User";
+import { RequestsSentDashboard } from "../components/requests/RequestsSentDashboard";
+import { RequestsReceivedDashboard } from "../components/requests/RequestsReceivedDashboard";
 
 const routes = {
   HOME: { url: "/", component: Home },
@@ -102,11 +102,11 @@ const routes = {
   },
   REQUESTS_SENT: {
     url: "/requests/sent",
-    component: RequestsSent,
+    component: RequestsSentDashboard,
   },
   REQUESTS_RECEIVED: {
     url: "/requests/received",
-    component: RequestsReceived,
+    component: RequestsReceivedDashboard,
   },
 };
 
