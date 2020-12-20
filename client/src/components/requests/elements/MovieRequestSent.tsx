@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { RowLayout } from "../../elements/layouts";
-import { Container } from "../../elements/Container";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { IMovieRequest } from "../../../models/IRequest";
+import { Image } from "../../elements/Image";
+import { RequestService } from "../../../services/RequestService";
+import { MediasTypes } from "../../../enums/MediasTypes";
+import { NotificationContext } from "../../../contexts/notifications/NotificationContext";
+import { RequestStatus } from "../../../enums/RequestStatus";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
 
 const MovieRequestSentStyle = styled.div`
   border: 2px solid ${(props) => props.theme.dark};
@@ -13,6 +17,14 @@ const MovieRequestSentStyle = styled.div`
   justify-content: space-between;
   align-items: center;
   margin: 1%;
+  position: relative;
+`;
+
+const DeleteRequestButton = styled.div`
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  cursor: pointer;
 `;
 
 type MovieRequestSentProps = {
@@ -20,9 +32,30 @@ type MovieRequestSentProps = {
 };
 
 const MovieRequestSent = ({ request }: MovieRequestSentProps) => {
+  const { pushSuccess, pushDanger } = useContext(NotificationContext);
+
+  const onDeleteRequest = () => {
+    RequestService.DeleteRequest(MediasTypes.MOVIE, request.id).then((res) => {
+      if (res.error === null) {
+        pushSuccess("Request deleted");
+      } else {
+        pushDanger("Error deleting request");
+      }
+    });
+  };
+
   return (
     <MovieRequestSentStyle>
       <RowLayout justifyContent="space-between" padding="1%">
+        {request.movie.posterUrl && (
+          <Image
+            src={request.movie.posterUrl}
+            alt="Series"
+            width="250px"
+            height="350px"
+          />
+        )}
+
         {/* Requested user */}
         <div>
           <h5 className="title is-5">Requested user</h5>
@@ -65,15 +98,12 @@ const MovieRequestSent = ({ request }: MovieRequestSentProps) => {
           <div>{request.movie.title}</div>
         </div>
       </RowLayout>
-      {/* See more */}
-      <Container padding="1%">
-        <button className="button is-info">
-          <span>See more</span>
-          <span className="icon is-small">
-            <FontAwesomeIcon icon={faCaretDown} />
-          </span>
-        </button>
-      </Container>
+
+      {request.status === RequestStatus.PENDING && (
+        <DeleteRequestButton onClick={() => onDeleteRequest()}>
+          <FontAwesomeIcon icon={faTimes} />
+        </DeleteRequestButton>
+      )}
     </MovieRequestSentStyle>
   );
 };

@@ -20,6 +20,14 @@ const MovieRequestReceivedStyle = styled.div`
   justify-content: space-between;
   align-items: center;
   margin: 1%;
+  position: relative;
+`;
+
+const DeleteRequestButton = styled.div`
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  cursor: pointer;
 `;
 
 type MovieRequestReceivedProps = {
@@ -73,6 +81,16 @@ const MovieRequestReceived = ({ request }: MovieRequestReceivedProps) => {
     }
   };
 
+  const onDeleteRequest = () => {
+    RequestService.DeleteRequest(MediasTypes.MOVIE, request.id).then((res) => {
+      if (res.error === null) {
+        pushSuccess("Request deleted");
+      } else {
+        pushDanger("Error deleting request");
+      }
+    });
+  };
+
   return (
     <MovieRequestReceivedStyle>
       <RowLayout justifyContent="space-between" padding="1%">
@@ -82,8 +100,8 @@ const MovieRequestReceived = ({ request }: MovieRequestReceivedProps) => {
             <Image
               src={request.movie.posterUrl}
               alt="Movie"
-              width="310px"
-              height="auto"
+              width="250px"
+              height="350px"
             />
           )}
           <h5 className="title is-5">Requested user</h5>
@@ -140,6 +158,12 @@ const MovieRequestReceived = ({ request }: MovieRequestReceivedProps) => {
             <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>
+      )}
+
+      {request.status !== RequestStatus.PENDING && (
+        <DeleteRequestButton onClick={() => onDeleteRequest()}>
+          <FontAwesomeIcon icon={faTimes} />
+        </DeleteRequestButton>
       )}
     </MovieRequestReceivedStyle>
   );

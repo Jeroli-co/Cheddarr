@@ -93,4 +93,26 @@ export abstract class RequestService {
       }
     );
   };
+
+  static DeleteRequest = (mediasType: MediasTypes, requestId: number) => {
+    return HttpService.executeRequest(
+      HTTP_METHODS.DELETE,
+      RequestService.REQUEST_BASE_URL + "/" + mediasType + "/" + requestId
+    ).then(
+      (response) => {
+        if (response.status === 200) {
+          return new AsyncResponseSuccess("");
+        } else {
+          return new AsyncResponseError(
+            ERRORS_MESSAGE.UNHANDLED_STATUS(response.status)
+          );
+        }
+      },
+      (error) => {
+        return new AsyncResponseError(
+          ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+        );
+      }
+    );
+  };
 }

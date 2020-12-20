@@ -22,18 +22,13 @@ const MediaRequestButton = ({
   const { pushSuccess, pushDanger } = useContext(NotificationContext);
 
   const handleRequest = (e: MouseEvent) => {
-    RequestService.RequestMedias(mediasType, requestCreate).then(
-      (res) => {
-        if (res.error === null) {
-          pushSuccess("Request sent.");
-        } else {
-          pushDanger("Error sending request, please try again later.");
-        }
-      },
-      (_) => {
+    RequestService.RequestMedias(mediasType, requestCreate).then((res) => {
+      if (res.error === null) {
+        pushSuccess("Request sent.");
+      } else {
         pushDanger("Error sending request, please try again later.");
       }
-    );
+    });
     e.preventDefault();
   };
 
