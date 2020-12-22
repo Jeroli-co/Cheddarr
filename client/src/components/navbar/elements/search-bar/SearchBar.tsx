@@ -148,7 +148,7 @@ const SearchBar = () => {
       if (moviesResults.isLoading) {
         PlexService.SearchPlexMedias(
           currentConfig.id,
-          MediasTypes.MOVIE,
+          MediasTypes.MOVIES,
           value
         ).then((res) => {
           if (res.error === null) {

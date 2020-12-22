@@ -104,17 +104,7 @@ export interface IMediaServerSeason extends IMediaServerMedia {
 }
 
 export const isMediaServerSeason = (arg: any): arg is IMediaServerSeason => {
-  return (
-    arg &&
-    arg.seriesId &&
-    typeof arg.seriesId == "number" &&
-    arg.seriesTitle &&
-    typeof arg.seriesTitle == "string" &&
-    arg.seasonNumber &&
-    typeof arg.seasonNumber == "number" &&
-    arg.episodes &&
-    Array.isArray(arg.episodes)
-  );
+  return arg && arg.type && arg.type === MediasTypes.SEASON;
 };
 
 export interface IMediaServerEpisode extends IMediaServerMedia {
@@ -127,7 +117,7 @@ export interface IMediaServerEpisode extends IMediaServerMedia {
 }
 
 export const isMediaServerEpisode = (arg: any): arg is IMediaServerEpisode => {
-  return arg && isMediaServerMedia(arg) && arg.type === MediasTypes.EPISODE;
+  return arg && arg.type && arg.type === MediasTypes.EPISODE;
 };
 
 export interface IActor {

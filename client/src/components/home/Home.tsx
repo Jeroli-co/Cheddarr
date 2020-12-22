@@ -2,8 +2,8 @@ import React, { useContext } from "react";
 import { AuthContext } from "../../contexts/auth/AuthContext";
 import { Link } from "react-router-dom";
 import { routes } from "../../router/routes";
-import { MediaRecentlyAddedType } from "../media-servers/components/media-recently-added/enums/MediaRecentlyAddedType";
-import { MediaRecentlyAdded } from "../media-servers/components/media-recently-added/MediaRecentlyAdded";
+import { MediaRecentlyAddedType } from "../../enums/MediaRecentlyAddedType";
+import { MediaRecentlyAdded } from "../media-servers/MediaRecentlyAdded";
 import styled from "styled-components";
 import { Spin } from "../animations/Animations";
 import Spinner from "../elements/Spinner";
@@ -65,11 +65,11 @@ const Home = () => {
     if (plex) {
       content = (
         <div className="home-content noselect">
+          <MediaRecentlyAdded type={MediaRecentlyAddedType.ON_DECK} />
+          <br />
           <MediaRecentlyAdded type={MediaRecentlyAddedType.MOVIES} />
           <br />
           <MediaRecentlyAdded type={MediaRecentlyAddedType.SERIES} />
-          <br />
-          <MediaRecentlyAdded type={MediaRecentlyAddedType.ON_DECK} />
         </div>
       );
     } else {

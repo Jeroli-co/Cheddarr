@@ -24,13 +24,22 @@ export const ThemeDynamicContextProvider = ({ children }: any) => {
     setTheme(theme);
   };
 
-  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const toggleDarkMode = () => {
+    const darkModeToggled = !darkMode;
+    localStorage.setItem("darkModeEnabled", darkModeToggled.toString());
+    setDarkMode(darkModeToggled);
+  };
 
   useEffect(() => {
-    setDarkMode(
-      window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-    );
+    const localDarkMode = localStorage.getItem("darkModeEnabled");
+    if (localDarkMode) {
+      setDarkMode(localDarkMode === "true");
+    } else {
+      setDarkMode(
+        window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    }
 
     const localTheme = localStorage.getItem("currentTheme");
     if (localTheme) {

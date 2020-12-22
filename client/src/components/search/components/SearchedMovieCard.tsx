@@ -58,7 +58,7 @@ const SearchedMovieCard = ({
             />
             {providerSelected && (
               <MediaRequestButton
-                mediasType={MediasTypes.MOVIE}
+                mediasType={MediasTypes.MOVIES}
                 requestCreate={{
                   tmdbId: movie.tmdbId,
                   requestedUsername: providerSelected.username,

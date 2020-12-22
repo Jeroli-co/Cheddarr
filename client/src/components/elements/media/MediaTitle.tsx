@@ -26,13 +26,13 @@ type MediaTitleProps = {
 const MediaTitle = ({ media }: MediaTitleProps) => {
   switch (media.type) {
     case MediasTypes.SERIES:
-    case MediasTypes.MOVIE:
+    case MediasTypes.MOVIES:
       return (
         <Text fontSize={TITLE_SIZES.one} fontWeight="500">
           {media.title}
         </Text>
       );
-    case MediasTypes.SEASON:
+    case MediasTypes.SEASONS:
       if (isMediaServerSeason(media)) {
         return (
           <Text fontSize={TITLE_SIZES.one} fontWeight="500">
@@ -44,7 +44,7 @@ const MediaTitle = ({ media }: MediaTitleProps) => {
         );
       }
       break;
-    case MediasTypes.EPISODE:
+    case MediasTypes.EPISODES:
       if (isMediaServerEpisode(media)) {
         return (
           <div>

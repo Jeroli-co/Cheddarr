@@ -12,7 +12,7 @@ import {
   IMediaServerSeason,
   IMediaServerSeries,
 } from "../models/IMediaServerMedia";
-import { MediaRecentlyAddedType } from "../components/media-servers/components/media-recently-added/enums/MediaRecentlyAddedType";
+import { MediaRecentlyAddedType } from "../enums/MediaRecentlyAddedType";
 import { IPlexConfig } from "../models/IPlexConfig";
 import { IPlexServerInfo } from "../models/IPlexServerInfo";
 import { MediasTypes } from "../enums/MediasTypes";

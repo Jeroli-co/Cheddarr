@@ -50,7 +50,7 @@ const MediaResult = ({ media }: MediaResultProps) => {
     let url = "";
     if (media.type === MediasTypes.SERIES) {
       url = routes.SERIES.url(media.id.toString());
-    } else if (media.type === MediasTypes.MOVIE) {
+    } else if (media.type === MediasTypes.MOVIES) {
       url = routes.MOVIE.url(media.id.toString());
     }
     history.push(url);

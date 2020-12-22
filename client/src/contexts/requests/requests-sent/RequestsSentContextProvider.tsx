@@ -10,7 +10,7 @@ export const RequestsSentContextProvider = (props: any) => {
   const {
     requests: moviesRequestsSent,
     deleteRequest: deleteOutgoingMovie,
-  } = useRequests(MediasTypes.MOVIE, RequestTypes.OUTGOING);
+  } = useRequests(MediasTypes.MOVIES, RequestTypes.OUTGOING);
 
   const {
     requests: seriesRequestsSent,
@@ -20,7 +20,7 @@ export const RequestsSentContextProvider = (props: any) => {
   const { pushSuccess, pushDanger } = useContext(NotificationContext);
 
   const deleteMovieRequestSent = (requestId: number) => {
-    RequestService.DeleteRequest(MediasTypes.MOVIE, requestId).then((res) => {
+    RequestService.DeleteRequest(MediasTypes.MOVIES, requestId).then((res) => {
       if (res.error === null) {
         deleteOutgoingMovie(requestId);
         pushSuccess("Request deleted");

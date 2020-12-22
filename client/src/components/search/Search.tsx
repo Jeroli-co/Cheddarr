@@ -77,7 +77,7 @@ const Search = () => {
     } else {
       content = data.results.map((media, index) => {
         switch (media.mediaType) {
-          case MediasTypes.MOVIE:
+          case MediasTypes.MOVIES:
             return (
               <SearchedMovieCard
                 key={index}

@@ -76,7 +76,7 @@ export class SearchService {
       "/" +
       tvdbId +
       "/" +
-      MediasTypes.SEASON +
+      MediasTypes.SEASONS +
       "/" +
       seasonNumber;
     return HttpService.executeRequest(HTTP_METHODS.GET, url).then(
@@ -109,7 +109,7 @@ export class SearchService {
       "/" +
       tmdbId +
       "/" +
-      MediasTypes.SEASON +
+      MediasTypes.SEASONS +
       "/" +
       seasonNumber +
       "/" +

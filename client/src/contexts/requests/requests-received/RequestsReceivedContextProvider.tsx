@@ -18,7 +18,7 @@ export const RequestsReceivedContextProvider = (props: any) => {
     requests: moviesRequestsReceived,
     updateRequest: updateReceivedMovieRequest,
     deleteRequest: deleteIncomingMovie,
-  } = useRequests(MediasTypes.MOVIE, RequestTypes.INCOMING);
+  } = useRequests(MediasTypes.MOVIES, RequestTypes.INCOMING);
 
   const {
     requests: seriesRequestsReceived,
@@ -30,7 +30,7 @@ export const RequestsReceivedContextProvider = (props: any) => {
 
   const acceptMovieRequest = (requestId: number) => {
     if (radarrConfig.data) {
-      RequestService.UpdateMediasRequest(MediasTypes.MOVIE, requestId, {
+      RequestService.UpdateMediasRequest(MediasTypes.MOVIES, requestId, {
         status: RequestStatus.APPROVED,
         providerId: radarrConfig.data.id,
       }).then((res) => {
@@ -61,7 +61,7 @@ export const RequestsReceivedContextProvider = (props: any) => {
   };
 
   const refuseMovieRequest = (requestId: number) => {
-    RequestService.UpdateMediasRequest(MediasTypes.MOVIE, requestId, {
+    RequestService.UpdateMediasRequest(MediasTypes.MOVIES, requestId, {
       status: RequestStatus.REFUSED,
       providerId: null,
     }).then((res) => {
@@ -89,7 +89,7 @@ export const RequestsReceivedContextProvider = (props: any) => {
   };
 
   const deleteMovieRequestReceived = (requestId: number) => {
-    RequestService.DeleteRequest(MediasTypes.MOVIE, requestId).then((res) => {
+    RequestService.DeleteRequest(MediasTypes.MOVIES, requestId).then((res) => {
       if (res.error === null) {
         deleteIncomingMovie(requestId);
         pushSuccess("Request deleted");

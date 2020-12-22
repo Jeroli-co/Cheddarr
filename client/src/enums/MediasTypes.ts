@@ -1,6 +1,9 @@
 export enum MediasTypes {
-  MOVIE = "movies",
+  MOVIES = "movies",
+  MOVIE = "movie",
   SERIES = "series",
-  SEASON = "seasons",
-  EPISODE = "episodes",
+  SEASONS = "seasons",
+  SEASON = "season",
+  EPISODES = "episodes",
+  EPISODE = "episode",
 }
