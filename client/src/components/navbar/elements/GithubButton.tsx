@@ -4,9 +4,9 @@ import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import * as React from "react";
 
 const GitHubButtonStyle = styled.a`
-  color: ${(props) => props.theme.dark};
-  opacity: 0.7;
-  transition: 0.3 ease;
+  color: ${(props) => props.theme.darker};
+  opacity: 0.8;
+  transition: opacity 0.5 ease;
   &:hover {
     opacity: 1;
   }

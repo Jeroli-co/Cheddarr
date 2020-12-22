@@ -15,11 +15,13 @@ const ResultsListStyle = styled.div<{ isVisible: boolean }>`
   position: absolute;
   top: 100%;
   width: 100%;
+  border-bottom: 1px solid ${(props) => props.theme.gray};
+  border-right: 1px solid ${(props) => props.theme.gray};
+  border-left: 1px solid ${(props) => props.theme.gray};
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   background: ${(props) => props.theme.bgColor};
-  z-index: 1;
-  border: 1px solid ${(props) => props.theme.dark};
+  z-index: 10;
   visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
 `;
 

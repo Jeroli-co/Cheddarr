@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { ThemeDynamicContext } from "./ThemeDynamicContextProvider";
 import { ThemeProvider } from "styled-components";
-import { GlobalStyle } from "../../Themes";
+import { GlobalStyle } from "../../GlobalStyles";
 
 export const ThemeContextProvider = ({ children }: any) => {
   const { theme, darkMode } = useContext(ThemeDynamicContext);

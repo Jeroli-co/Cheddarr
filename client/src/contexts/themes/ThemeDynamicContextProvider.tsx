@@ -17,9 +17,12 @@ export const ThemeDynamicContext = React.createContext<IThemeContext>({
 
 export const ThemeDynamicContextProvider = ({ children }: any) => {
   const [darkMode, setDarkMode] = useState<boolean | null>(null);
-  const [theme, setTheme] = useState<ITheme>(themes.orange);
+  const [theme, setTheme] = useState<ITheme | null>(null);
 
-  const switchTheme = (theme: ITheme) => setTheme(theme);
+  const switchTheme = (theme: ITheme) => {
+    localStorage.setItem("currentTheme", JSON.stringify(theme));
+    setTheme(theme);
+  };
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
@@ -28,9 +31,16 @@ export const ThemeDynamicContextProvider = ({ children }: any) => {
       window.matchMedia &&
         window.matchMedia("(prefers-color-scheme: dark)").matches
     );
+
+    const localTheme = localStorage.getItem("currentTheme");
+    if (localTheme) {
+      setTheme(JSON.parse(localTheme));
+    } else {
+      setTheme(themes.orange);
+    }
   }, []);
 
-  if (darkMode === null) return <div />;
+  if (darkMode === null || theme === null) return <div />;
 
   return (
     <ThemeDynamicContext.Provider

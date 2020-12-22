@@ -45,7 +45,7 @@ const EpisodeCard = ({ episode }: EpisodeCardProps) => {
       <Container padding="1%">
         <RowLayout>
           <Image
-            src={episodeInfo.thumbUrl}
+            src={episodeInfo.posterUrl}
             alt={episodeInfo.title}
             width="30%"
             borderRadius="12px"

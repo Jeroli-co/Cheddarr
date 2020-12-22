@@ -46,7 +46,7 @@ const SeriesCard = ({ series }: SeriesCardProps) => {
       <Container padding="1%">
         <RowLayout alignItems="flex-start">
           <Image
-            src={seriesInfo.thumbUrl}
+            src={seriesInfo.posterUrl}
             alt={seriesInfo.title}
             width="16%"
             borderRadius="12px"
@@ -139,7 +139,7 @@ const SeriesCard = ({ series }: SeriesCardProps) => {
             >
               <ColumnLayout alignItems="center">
                 <Image
-                  src={season.thumbUrl}
+                  src={season.posterUrl}
                   alt={season.title}
                   width="125px"
                   borderRadius="12px"

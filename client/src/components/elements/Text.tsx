@@ -7,11 +7,20 @@ type TextProps = {
   lineClamp?: number;
   color?: string;
   whiteSpace?: string;
+  isPrimary?: boolean;
+  isSecondary?: boolean;
+  margin?: string;
 };
 
 export const Text = styled(OptionalMarginAndPaddingP)<TextProps>`
   font-weight: ${(props) => (props.fontWeight ? props.fontWeight : "normal")};
-  color: ${(props) => (props.color ? props.color : props.theme.color)};
+  color: ${(props) => {
+    if (props.isPrimary) {
+      return props.theme.primary;
+    } else {
+      return props.theme.color;
+    }
+  }};
   ${(props) =>
     props.fontSize !== undefined &&
     css`

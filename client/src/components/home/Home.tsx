@@ -2,23 +2,21 @@ import React, { useContext } from "react";
 import { AuthContext } from "../../contexts/auth/AuthContext";
 import { Link } from "react-router-dom";
 import { routes } from "../../router/routes";
-import { usePlexStatus } from "../../hooks/usePlexStatus";
 import { MediaRecentlyAddedType } from "../media-servers/components/media-recently-added/enums/MediaRecentlyAddedType";
 import { MediaRecentlyAdded } from "../media-servers/components/media-recently-added/MediaRecentlyAdded";
 import styled from "styled-components";
 import { Spin } from "../animations/Animations";
+import Spinner from "../elements/Spinner";
 
 const logo = require("../../assets/cheddarr.png");
 
 const HomeStyle = styled.div`
   text-align: center;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vm);
-  background-color: ${(props) => props.theme.bgColor};
+  padding: 10px;
 
   .home-content {
     display: flex;
@@ -40,12 +38,14 @@ const HomeStyle = styled.div`
 
 const Home = () => {
   const {
-    session: { isAuthenticated },
+    session: { isAuthenticated, plex, isLoading },
   } = useContext(AuthContext);
 
-  const plexStatus = usePlexStatus();
-
   let content;
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   if (!isAuthenticated) {
     content = (
@@ -62,15 +62,17 @@ const Home = () => {
       </div>
     );
   } else {
-    if (plexStatus.enabled) {
+    if (plex) {
       content = (
         <div className="home-content noselect">
           <MediaRecentlyAdded type={MediaRecentlyAddedType.MOVIES} />
+          <br />
           <MediaRecentlyAdded type={MediaRecentlyAddedType.SERIES} />
+          <br />
           <MediaRecentlyAdded type={MediaRecentlyAddedType.ON_DECK} />
         </div>
       );
-    } else if (plexStatus.loaded) {
+    } else {
       content = (
         <div className="home-content">
           <img src={logo} className="home-logo" alt="logo" />
@@ -80,8 +82,6 @@ const Home = () => {
           </Link>
         </div>
       );
-    } else {
-      content = <div />;
     }
   }
 

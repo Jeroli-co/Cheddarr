@@ -5,7 +5,7 @@ export interface IMediaServerMedia {
   readonly id: number;
   readonly type: MediasTypes;
   readonly title: string;
-  readonly thumbUrl: string;
+  readonly posterUrl: string;
   readonly artUrl: string;
   readonly summary: string;
   readonly releaseDate: Date;
@@ -127,21 +127,7 @@ export interface IMediaServerEpisode extends IMediaServerMedia {
 }
 
 export const isMediaServerEpisode = (arg: any): arg is IMediaServerEpisode => {
-  return (
-    arg &&
-    arg.seriesId &&
-    typeof arg.seriesId == "number" &&
-    arg.seriesTitle &&
-    typeof arg.seriesTitle == "string" &&
-    arg.seasonNumber &&
-    typeof arg.seasonNumber == "number" &&
-    arg.episodeNumber &&
-    typeof arg.episodeNumber == "number" &&
-    arg.seasonThumbUrl &&
-    typeof arg.seasonThumbUrl == "string" &&
-    arg.duration &&
-    typeof arg.duration == "number"
-  );
+  return arg && isMediaServerMedia(arg) && arg.type === MediasTypes.EPISODE;
 };
 
 export interface IActor {

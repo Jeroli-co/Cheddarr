@@ -71,12 +71,12 @@ const SeasonCard = ({ season }: SeasonCardProps) => {
   return (
     <Container>
       <MediaBackground
-        image={seasonInfo.artUrl ? seasonInfo.artUrl : seasonInfo.thumbUrl}
+        image={seasonInfo.artUrl ? seasonInfo.artUrl : seasonInfo.posterUrl}
       >
         <Container padding="1%">
           <RowLayout>
             <Image
-              src={seasonInfo.thumbUrl}
+              src={seasonInfo.posterUrl}
               alt={seasonInfo.title}
               width="20%"
               borderRadius="12px"
@@ -142,7 +142,7 @@ const SeasonCard = ({ season }: SeasonCardProps) => {
                 >
                   <Image
                     key={episode.id}
-                    src={episode.thumbUrl}
+                    src={episode.posterUrl}
                     alt="Episode thumb"
                     borderRadius="12px"
                   />

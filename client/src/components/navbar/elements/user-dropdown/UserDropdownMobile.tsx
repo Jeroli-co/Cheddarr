@@ -20,6 +20,7 @@ const UserDropdownMobileStyle = styled.div<{ isVisible: boolean }>`
   top: 75px;
   left: 0;
   display: ${(props) => (props.isVisible ? "block" : "none")};
+  background-color: ${(props) => props.theme.bgColor};
   border-radius: 12px;
   margin-top: 2%;
   width: 100%;
@@ -51,7 +52,7 @@ const DropdownMenuMobileItem = styled.div`
   padding: 10px;
 
   &:hover {
-    color: ${(props) => props.theme.dark};
+    color: ${(props) => props.theme.gray};
   }
 `;
 

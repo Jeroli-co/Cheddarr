@@ -28,7 +28,7 @@ const SearchBarStyle = styled.div<{ isInputFocus: boolean }>`
   transition: 0.3s ease;
 
   @media only screen and (min-width: 1024px) {
-    width: 33%;
+    width: 40%;
   }
 
   .search-input {
@@ -46,7 +46,7 @@ const SearchBarStyle = styled.div<{ isInputFocus: boolean }>`
     outline: none;
 
     ::placeholder {
-      color: ${(props) => props.theme.dark};
+      color: ${(props) => props.theme.darker};
     }
   }
 
@@ -54,7 +54,7 @@ const SearchBarStyle = styled.div<{ isInputFocus: boolean }>`
     isInputFocus &&
     css`
       @media only screen and (min-width: 1024px) {
-        width: 40%;
+        width: 60%;
       }
 
       .search-input {
@@ -89,6 +89,7 @@ const SearchBar = () => {
     data: IPublicUser[] | null;
     isLoading: boolean;
   }>(initialSearchState);
+
   const { currentConfig } = useContext(PlexConfigContext);
 
   const history = useHistory();

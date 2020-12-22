@@ -28,12 +28,11 @@ const DropdownMenuStyle = styled.div<{ isVisible: boolean }>`
   justify-content: center;
   align-items: center;
   min-width: 10vw;
-  border: 1px solid transparent;
-  box-shadow: 1px 1px 8px 1px;
+  border: 1px solid ${(props) => props.theme.gray};
   border-radius: 6px;
-  background: white;
   z-index: 10;
   padding: 2%;
+  background-color: ${(props) => props.theme.bgColor};
 
   > *:not(:last-child) {
     border-bottom: 1px solid LightGrey;

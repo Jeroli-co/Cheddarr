@@ -17,7 +17,7 @@ type ThemePreviewStyleProps = {
 const ThemePreviewStyle = styled.div<ThemePreviewStyleProps>`
   width: 25px;
   height: 25px;
-  border: 1px solid ${(props) => props.theme.color};
+  border: 1px solid ${(props) => props.theme.dark};
   border-radius: 6px;
   background: ${(props) =>
     props.themeOverride ? props.themeOverride.primary : props.theme.primary};
@@ -58,12 +58,11 @@ const ThemesDropdownStyle = styled.div<{ isVisible: boolean }>`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 1px solid ${(props) => props.theme.dark};
-  box-shadow: 1px 1px 8px 1px ${(props) => props.theme.dark};
+  border: 1px solid ${(props) => props.theme.gray};
   border-radius: 6px;
-  background: ${(props) => props.theme.bgColor};
   z-index: 10;
   padding: 2%;
+  background-color: ${(props) => props.theme.bgColor};
 
   > *:not(:last-child) {
     border-bottom: 1px solid LightGrey;
@@ -118,14 +117,21 @@ const ThemesDropdown = ({ show }: ThemesDropdownProps) => {
         <ThemePreviewStyle
           themeOverride={darkMode ? themes.orange.dark : themes.orange.light}
         />
-        <ThemeDropdownOptionText>Orange/Yellow</ThemeDropdownOptionText>
+        <ThemeDropdownOptionText>Orange</ThemeDropdownOptionText>
       </ThemeDropdownOptionStyle>
 
       <ThemeDropdownOptionStyle onClick={() => switchTheme(themes.blue)}>
         <ThemePreviewStyle
           themeOverride={darkMode ? themes.blue.dark : themes.blue.light}
         />
-        <ThemeDropdownOptionText>Blue/Purple</ThemeDropdownOptionText>
+        <ThemeDropdownOptionText>Blue</ThemeDropdownOptionText>
+      </ThemeDropdownOptionStyle>
+
+      <ThemeDropdownOptionStyle onClick={() => switchTheme(themes.green)}>
+        <ThemePreviewStyle
+          themeOverride={darkMode ? themes.green.dark : themes.green.light}
+        />
+        <ThemeDropdownOptionText>Green</ThemeDropdownOptionText>
       </ThemeDropdownOptionStyle>
     </ThemesDropdownStyle>
   );

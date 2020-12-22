@@ -1,4 +1,4 @@
-import React, { MouseEvent } from "react";
+import React, { MouseEvent, useEffect } from "react";
 import styled, { css } from "styled-components";
 import {
   IMediaServerEpisode,
@@ -15,6 +15,7 @@ const MediaPreviewCardStyle = styled.div<MediaPreviewCardStyleProps>`
   position: relative;
   min-width: 10vw;
   max-width: 10vw;
+  min-height: 200px;
   height: 100%;
   cursor: pointer;
   transition: 0.5s ease;
@@ -111,7 +112,7 @@ export const MediaPreviewCard = ({
       oneIsActive={oneIsActive}
       onClick={onClick}
     >
-      <img className="media-image" src={media.thumbUrl} alt={media.title} />
+      <img className="media-image" src={media.posterUrl} alt="" />
       <div className="media-title is-size-5-tablet is-size-7-mobile">
         <p>{media.title}</p>
         {isMediaServerEpisode(media) && (

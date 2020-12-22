@@ -47,7 +47,7 @@ const MovieCard = ({ movie }: MovieCardProps) => {
       <Container padding="1%">
         <RowLayout alignItems="flex-start">
           <Image
-            src={movieInfo.thumbUrl}
+            src={movieInfo.posterUrl}
             alt={movieInfo.title}
             width="16%"
             borderRadius="12px"

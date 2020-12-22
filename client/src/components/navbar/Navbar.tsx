@@ -30,7 +30,8 @@ const NavbarStyle = styled.div`
   position: relative;
   padding: 10px;
   height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
-  background-color: ${(props) => props.theme.primary};
+  background: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.darker};
 `;
 
 const NavbarAppLogo = styled.div`
@@ -56,6 +57,10 @@ const NavbarEnd = styled.div`
       display: none;
     }
   }
+`;
+
+const NavbarTextStyled = styled.p`
+  color: ${(props) => props.theme.darker};
 `;
 
 const NavbarBurgerStyle = styled.div`
@@ -128,9 +133,7 @@ const Navbar = () => {
             <GitHubButton />
             {!isLoading && isAuthenticated && (
               <Link to={routes.REQUESTS_SENT.url}>
-                <p className="has-text-dark has-text-weight-semibold">
-                  Requests
-                </p>
+                <NavbarTextStyled>Requests</NavbarTextStyled>
               </Link>
             )}
             {!isLoading && isAuthenticated && (
