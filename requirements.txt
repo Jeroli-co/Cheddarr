@@ -1,4 +1,5 @@
 aiofiles
+celery[redis]
 click
 emails
 email-validator

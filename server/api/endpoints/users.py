@@ -1,8 +1,8 @@
 from typing import Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from server import models, schemas
+from server import models, schemas, tasks
 from server.api import dependencies as deps
 from server.core import security, settings, utils
 from server.repositories import (
@@ -98,7 +98,6 @@ def unlink_plex_account(
 def update_user(
     user_in: schemas.UserUpdate,
     request: Request,
-    background_tasks: BackgroundTasks,
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
@@ -122,8 +121,7 @@ def update_user(
             )
         current_user.password = user_in.password
         if settings.MAIL_ENABLED:
-            background_tasks.add_task(
-                utils.send_email,
+            tasks.send_email_task.delay(
                 to_email=current_user.email,
                 subject="Your password has been changed",
                 html_template_name="email/change_password_notice.html",
@@ -139,8 +137,7 @@ def update_user(
                 email=user_in.email, old_email=current_user.email
             ).dict()
             token = security.generate_timed_token(email_data)
-            background_tasks.add_task(
-                utils.send_email,
+            tasks.send_email_task.delay(
                 to_email=user_in.email,
                 subject="Please confirm your new email",
                 html_template_name="email/email_confirmation.html",
@@ -166,7 +163,6 @@ def update_user(
 def reset_password(
     email_data: schemas.PasswordResetCreate,
     request: Request,
-    background_tasks: BackgroundTasks,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     email = email_data.email
@@ -176,8 +172,7 @@ def reset_password(
             status.HTTP_404_NOT_FOUND, "No user registered with this email."
         )
     token = security.generate_timed_token(user.email)
-    background_tasks.add_task(
-        utils.send_email,
+    tasks.send_email_task.delay(
         to_email=email,
         subject="Reset your password",
         html_template_name="email/reset_password_instructions.html",
@@ -230,7 +225,6 @@ def check_reset_password(
 def confirm_reset_password(
     token: str,
     password: schemas.PasswordResetConfirm,
-    background_tasks: BackgroundTasks,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     try:
@@ -248,13 +242,40 @@ def confirm_reset_password(
 
     user.password = password
     user_repo.save(user)
-    background_tasks.add_task(
-        utils.send_email,
+    tasks.send_email_task.delay(
         to_email=user.email,
         subject="Your password has been reset",
         html_template_name="email/reset_password_notice.html",
     )
     return {"detail": "Password reset."}
+
+
+@current_user_router.get("/notifications")
+def get_notifications(current_user: models.User = Depends(deps.get_current_user)):
+    return current_user.notifications
+
+
+@current_user_router.delete("/notifications/{id}")
+def delete_notification(
+    id: int,
+    current_user: models.User = Depends(deps.get_current_user),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+):
+    current_user.notifications = [n for n in current_user.notifications if n.id != id]
+    user_repo.save(current_user)
+
+    return {"detail": "Notification deleted"}
+
+
+@current_user_router.delete("/notifications")
+def delete_all_notifications(
+    current_user: models.User = Depends(deps.get_current_user),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+):
+    current_user.notifications = []
+    user_repo.save(current_user)
+
+    return {"detail": "Notifications deleted"}
 
 
 @current_user_router.get(

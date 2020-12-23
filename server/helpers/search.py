@@ -5,7 +5,7 @@ import tmdbsimple as tmdb
 
 from server import schemas
 from server.core import settings
-from server.models import SeriesType
+from server.models import MediaType, SeriesType
 
 tmdb.API_KEY = settings.TMDB_API_KEY
 
@@ -15,15 +15,15 @@ def search_tmdb_media(term: str, page: int) -> dict:
     results = []
     for media in search["results"]:
         if media["media_type"] == "tv":
-            del media["media_type"]
             set_tmdb_series_info(media, from_search=True)
             if not media["tvdb_id"]:
                 continue
             parsed_media = schemas.TmdbSeries.parse_obj(media)
         elif media["media_type"] == "movie":
-            del media["media_type"]
             set_tmdb_movie_info(media, from_search=True)
             parsed_media = schemas.TmdbMovie.parse_obj(media)
+        else:
+            continue
         results.append(parsed_media)
     search["results"] = results
     return schemas.TmdbSearchResult.parse_obj(search).dict()
@@ -93,6 +93,7 @@ def find_tmdb_episode_by_tvdb_id(
 
 
 def set_tmdb_movie_info(movie: dict, from_search: bool = False):
+    movie["media_type"] = MediaType.movies
     if from_search:
         tmdb_genres = tmdb.Genres().movie_list().get("genres")
         genres = [
@@ -104,10 +105,10 @@ def set_tmdb_movie_info(movie: dict, from_search: bool = False):
 
 
 def set_tmdb_series_info(series: dict, from_search: bool = False):
-    anime_pattern = re.compile("^(?i)anim(e|ation)$")
+    series["media_type"] = MediaType.series
     series["tvdb_id"] = tmdb.TV(series["id"]).external_ids().get("tvdb_id")
     series["series_type"] = SeriesType.standard
-
+    anime_pattern = re.compile("^(?i)anim(e|ation)$")
     if from_search:
         tmdb_genres = tmdb.Genres().tv_list().get("genres")
         genres = [

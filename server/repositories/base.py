@@ -30,6 +30,9 @@ class BaseRepository(Generic[ModelType], ABC):
             .all()
         )
 
+    def count(self):
+        return self.session.query(self.model).count()
+
     def save(self, db_obj: ModelType) -> ModelType:
         """
         Persist an object to the database

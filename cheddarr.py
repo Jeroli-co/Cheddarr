@@ -2,7 +2,7 @@
 import os
 import click
 
-from server.core.commands import init_db, run, test
+from server.core.commands import beat, init_db, run, test, worker
 
 
 """USAGE:
@@ -30,6 +30,8 @@ def cli(env):
 cli.add_command(run)
 cli.add_command(init_db)
 cli.add_command(test)
+cli.add_command(worker)
+cli.add_command(beat)
 
 if __name__ == "__main__":
     cli()

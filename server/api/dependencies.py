@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from server.core.config import settings
 from server.database.session import SessionLocal
-from server.models import User
+from server.models import User, UserRole
 from server.repositories import PlexConfigRepository, UserRepository
 from server.repositories.base import BaseRepository
 from server.schemas import TokenPayload
@@ -16,7 +16,7 @@ from server.schemas import TokenPayload
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_PREFIX}/sign-in")
 
 
-def _db() -> Generator:
+def get_db() -> Generator:
     session = SessionLocal()
     try:
         yield session
@@ -31,7 +31,7 @@ def get_repository(
     repo_type: Type[BaseRepository],
 ) -> Callable[[Session], BaseRepository]:
     def _get_repo(
-        session: Session = Depends(_db),
+        session: Session = Depends(get_db),
     ) -> BaseRepository:
         return repo_type(session)
 
@@ -58,6 +58,25 @@ def get_current_user(
     if not user:
         raise credentials_exception
     return user
+
+
+def get_current_superuser(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if current_user.role != UserRole.superuser:
+        raise HTTPException(status_code=403, detail="Not enough privileges.")
+    return current_user
+
+
+def get_current_poweruser(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if (
+        current_user.role != UserRole.superuser
+        and current_user.role != UserRole.poweruser
+    ):
+        raise HTTPException(status_code=403, detail="Not enough privileges.")
+    return current_user
 
 
 def get_current_user_plex_configs(

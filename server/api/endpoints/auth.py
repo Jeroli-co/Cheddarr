@@ -3,7 +3,6 @@ from random import randrange
 import requests
 from fastapi import (
     APIRouter,
-    BackgroundTasks,
     Depends,
     HTTPException,
     Request,
@@ -13,7 +12,7 @@ from fastapi import (
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from server import models, schemas
+from server import models, schemas, tasks
 from server.api import dependencies as deps
 from server.core import security, settings, utils
 from server.repositories import PlexAccountRepository, UserRepository
@@ -32,7 +31,6 @@ router = APIRouter()
 def signup(
     user_in: schemas.UserCreate,
     request: Request,
-    background_tasks: BackgroundTasks,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     existing_email = user_repo.find_by(email=user_in.email)
@@ -43,11 +41,15 @@ def signup(
     if existing_username:
         raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
     user = user_in.to_orm(models.User)
+
+    # First signed-up user
+    if user_repo.count() == 0:
+        user.role = models.UserRole.superuser
+
     if settings.MAIL_ENABLED:
         email_data = schemas.EmailConfirm(email=user.email).dict()
         token = security.generate_timed_token(email_data)
-        background_tasks.add_task(
-            utils.send_email,
+        tasks.send_email_task.delay(
             to_email=user.email,
             subject="Welcome!",
             html_template_name="email/welcome.html",
@@ -113,7 +115,6 @@ def confirm_email(
 def resend_confirmation(
     body: schemas.EmailConfirm,
     request: Request,
-    background_tasks: BackgroundTasks,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     email = body.email
@@ -128,8 +129,7 @@ def resend_confirmation(
         )
     email_data = schemas.EmailConfirm(email=email).dict()
     token = security.generate_timed_token(email_data)
-    background_tasks.add_task(
-        utils.send_email,
+    tasks.send_email_task.delay(
         to_email=email,
         subject="Please confirm your email",
         html_template_name="email/email_confirmation.html",
@@ -169,7 +169,7 @@ def signin(
         sub=str(user.id),
         username=user.username,
         avatar=user.avatar,
-        admin=user.admin,
+        role=user.role,
         plex=user.plex_account is not None,
     )
     access_token = security.create_jwt_access_token(payload)
@@ -280,6 +280,10 @@ def confirm_signin_plex(
                 avatar=plex_avatar,
                 confirmed=True,
             )
+            # First signed-up user
+            if user_repo.count() == 0:
+                user.role = models.UserRole.superuser
+
             user_repo.save(user)
         plex_account = models.PlexAccount(
             plex_user_id=plex_user_id, user_id=user.id, api_key=auth_token
@@ -292,7 +296,7 @@ def confirm_signin_plex(
         username=plex_account.user.username,
         avatar=plex_account.user.avatar,
         plex=True,
-        admin=plex_account.user.admin
+        role=plex_account.user.role,
     )
     access_token = security.create_jwt_access_token(payload)
     token = schemas.Token(

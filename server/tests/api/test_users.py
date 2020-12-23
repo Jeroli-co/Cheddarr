@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from server import models
 from server.core.security import verify_password
 from server.repositories import FriendshipRepository, UserRepository
 from server.tests.conftest import datasets
@@ -17,7 +18,7 @@ def test_get_current_user(app: FastAPI, client: TestClient, normal_user_token_he
     assert current_user["username"] == datasets["user1"]["username"]
     assert current_user["avatar"] == datasets["user1"]["avatar"]
     assert current_user["confirmed"] is True
-    assert current_user["admin"] is False
+    assert current_user["role"] == models.UserRole.user
 
 
 def test_get_user_by_id(app: FastAPI, client: TestClient, normal_user_token_headers):

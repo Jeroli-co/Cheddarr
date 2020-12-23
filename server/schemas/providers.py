@@ -73,6 +73,7 @@ class RadarrMovie(APIModel):
     root_folder_path: Optional[str] = Field(alias="rootFolderPath")
     monitored: bool = Field(alias="monitored")
     images: list[dict] = Field(alias="images")
+    has_file: bool = Field(alias="hasFile")
     add_options: Optional[RadarrAddOptions] = Field(alias="addOptions")
 
 
@@ -120,11 +121,14 @@ class SonarrEpisode(APIModel):
     episode_number: int = Field(alias="episodeNumber")
     season_number: int = Field(alias="seasonNumber")
     monitored: bool = Field(alias="monitored")
+    has_file: bool = Field(alias="hasFile")
 
 
 class SonarrSeason(APIModel):
     season_number: int = Field(alias="seasonNumber")
     monitored: bool = Field(alias="monitored")
+    episode_file_count: Optional[int] = Field(alias="episodeFileCount")
+    total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")
 
 
 class SonarrSeries(APIModel):
@@ -145,6 +149,8 @@ class SonarrSeries(APIModel):
     genres: list[str] = Field(alias="genres")
     tags: list[str] = Field(alias="tags")
     added: datetime = Field(alias="added")
+    episode_file_count: Optional[int] = Field(alias="episodeFileCount")
+    total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")
     add_options: Optional[SonarrAddOptions] = Field(alias="addOptions")
 
 

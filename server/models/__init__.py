@@ -13,4 +13,5 @@ from .requests import (
     SeasonRequest,
     SeriesRequest,
 )
-from .users import Friendship, PlexAccount, User
+from .users import Friendship, PlexAccount, User, UserRole
+from .notifications import Notification

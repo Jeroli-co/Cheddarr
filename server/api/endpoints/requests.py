@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from server import models, schemas
+from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.helpers import radarr, search, sonarr
+from server.helpers import search
 from server.repositories import (
     MovieRepository,
     MovieRequestRepository,
@@ -88,6 +88,12 @@ def add_movie_request(
         movie=movie,
     )
     movie_request_repo.save(movie_request)
+    requested_user.notifications.append(
+        models.Notification(
+            message=f"You have a new movie request by {current_user.username} for {movie.title}"
+        )
+    )
+    user_repo.save(requested_user)
     return movie_request
 
 
@@ -142,7 +148,7 @@ def update_movie_request(
         request.selected_provider = selected_provider
         request.status = models.RequestStatus.approved
         if isinstance(request.selected_provider, models.RadarrConfig):
-            radarr.send_request(request)
+            tasks.send_radarr_request_task.delay(request.id)
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
@@ -166,6 +172,13 @@ def delete_movie_request(
         or request.requested_user_id != current_user.id
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
+    if (
+        request.status != models.RequestStatus.pending
+        and request.requested_user_id != current_user.id
+    ):
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request."
+        )
     movies_request_repo.remove(request)
     return {"detail": "Request deleted."}
 
@@ -371,8 +384,12 @@ def update_series_request(
             raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
         request.selected_provider = selected_provider
         request.status = models.RequestStatus.approved
+        for season in request.seasons:
+            season.status = models.RequestStatus.approved
+            for episode in season.episodes:
+                episode.status = models.RequestStatus.approved
         if isinstance(request.selected_provider, models.SonarrConfig):
-            sonarr.send_request(request)
+            tasks.send_sonarr_request_task.delay(request.id)
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
@@ -396,5 +413,12 @@ def delete_series_request(
         or request.requested_user_id != current_user.id
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
+    if (
+        request.status != models.RequestStatus.pending
+        and request.requested_user_id != current_user.id
+    ):
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request."
+        )
     series_request_repo.remove(request)
     return {"detail": "Request deleted."}

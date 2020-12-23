@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from server.api.dependencies import _db
+from server.api.dependencies import get_db
 from server.database.base import Base
 from server.models.users import Friendship, User
 from server.tests.utils import user_authentication_headers
@@ -83,7 +83,7 @@ def app() -> FastAPI:
     from server.main import setup_app  # local import for testing purpose
 
     app_ = setup_app()
-    app_.dependency_overrides[_db] = get_test_db
+    app_.dependency_overrides[get_db] = get_test_db
     return app_
 
 

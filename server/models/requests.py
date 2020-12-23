@@ -5,6 +5,7 @@ from sqlalchemy import (
     Enum as DBEnum,
     ForeignKey,
     Integer,
+    Text,
 )
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
@@ -24,6 +25,7 @@ class Request(object):
     status = Column(
         DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
     )
+    comment = Column(Text)
 
     @declared_attr
     def selected_provider_id(cls):
@@ -73,6 +75,10 @@ class SeasonRequest(Model):
     id = Column(Integer, primary_key=True)
     season_number = Column(Integer, nullable=False)
     series_request_id = Column(ForeignKey("seriesrequest.id"), nullable=False)
+    status = Column(
+        DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
+    )
+
     episodes = relationship(
         "EpisodeRequest", cascade="all,delete,delete-orphan", backref="season"
     )
@@ -84,3 +90,6 @@ class EpisodeRequest(Model):
     id = Column(Integer, primary_key=True)
     episode_number = Column(Integer, nullable=False)
     season_request_id = Column(ForeignKey("seasonrequest.id"), nullable=False)
+    status = Column(
+        DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
+    )

@@ -132,7 +132,7 @@ def get_episodes(config: SonarrConfig, series_id: int) -> list[schemas.SonarrEpi
 
 
 def update_episode(
-    config: schemas.SonarrConfig, series_id: int, episode: schemas.SonarrEpisode
+    config: schemas.SonarrConfig, episode: schemas.SonarrEpisode
 ) -> schemas.SonarrEpisode:
     url = make_url(
         api_key=config.api_key,
@@ -143,7 +143,6 @@ def update_episode(
         resource_path=f"/episode/{episode.id}",
     )
     res = requests.put(url, data=episode.json(by_alias=True, exclude_none=True))
-    print(res.json())
     return schemas.SonarrEpisode.parse_obj(res.json())
 
 
@@ -189,6 +188,7 @@ def send_request(request: SeriesRequest):
                 season.monitored = True
                 continue
             for req_episode in req_season.episodes:
+                print(episodes)
                 episode = next(
                     e
                     for e in episodes
@@ -196,6 +196,6 @@ def send_request(request: SeriesRequest):
                     and e.episode_number == req_episode.episode_number
                 )
                 episode.monitored = True
-                update_episode(config, series.id, episode)
+                update_episode(config, episode)
         print(series)
         update_series(config, series)

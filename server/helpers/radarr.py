@@ -83,7 +83,6 @@ def send_request(request: MovieRequest):
     config = request.selected_provider
     movie = lookup(config, tmdb_id=request.movie.tmdb_id, title=request.movie.title)
     if movie.id is not None:
-        request.status = RequestStatus.available
         return
     movie.root_folder_path = config.root_folder
     movie.quality_profile_id = config.quality_profile_id

@@ -162,6 +162,7 @@ def delete_plex_config(
 )
 def get_radarr_instance_info(
     config_in: schemas.ProviderConfigBase,
+    current_user=Depends(deps.get_current_poweruser),
 ):
     base_url = dict(
         api_key=config_in.api_key,
@@ -200,7 +201,7 @@ def get_radarr_instance_info(
 
 @router.get("/radarr", response_model=list[schemas.RadarrConfig])
 def get_radarr_configs(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_poweruser),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
@@ -219,7 +220,7 @@ def get_radarr_configs(
 )
 def add_radarr_config(
     config_in: schemas.RadarrConfigCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_poweruser),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
@@ -252,7 +253,7 @@ def add_radarr_config(
 def update_radarr_config(
     config_id: str,
     config_in: schemas.RadarrConfigCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_poweruser),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
@@ -281,7 +282,7 @@ def update_radarr_config(
 )
 def delete_radarr_config(
     config_id: str,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_poweruser),
     radarr_config_repo: RadarrConfigRepository = Depends(
         deps.get_repository(RadarrConfigRepository)
     ),
@@ -305,7 +306,10 @@ def delete_radarr_config(
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}
     },
 )
-def get_sonarr_instance_info(config_in: schemas.ProviderConfigBase):
+def get_sonarr_instance_info(
+    config_in: schemas.ProviderConfigBase,
+    current_user=Depends(deps.get_current_poweruser),
+):
     base_url = dict(
         api_key=config_in.api_key,
         host=config_in.host,
@@ -354,7 +358,7 @@ def get_sonarr_instance_info(config_in: schemas.ProviderConfigBase):
 
 @router.get("/sonarr", response_model=list[schemas.SonarrConfig])
 def get_sonarr_configs(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_poweruser),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),
@@ -373,7 +377,7 @@ def get_sonarr_configs(
 )
 def add_sonarr_config(
     config_in: schemas.SonarrConfigCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_poweruser),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),
@@ -406,7 +410,7 @@ def add_sonarr_config(
 def update_sonarr_config(
     config_id: str,
     config_in: schemas.SonarrConfigCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_poweruser),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),
@@ -436,7 +440,7 @@ def update_sonarr_config(
 )
 def delete_sonarr_config(
     config_id: str,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: models.User = Depends(deps.get_current_poweruser),
     sonarr_config_repo: SonarrConfigRepository = Depends(
         deps.get_repository(SonarrConfigRepository)
     ),

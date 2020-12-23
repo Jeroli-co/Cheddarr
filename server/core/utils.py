@@ -13,7 +13,7 @@ from server.core.config import settings
 
 
 def send_email(
-    to_email: EmailStr,
+    to_email: str,
     subject: str,
     html_template_name: str,
     environment: dict = None,
