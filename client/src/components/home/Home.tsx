@@ -7,6 +7,7 @@ import { MediaRecentlyAdded } from "../media-servers/MediaRecentlyAdded";
 import styled from "styled-components";
 import { Spin } from "../animations/Animations";
 import Spinner from "../elements/Spinner";
+import { PlexConfigContext } from "../../contexts/plex-config/PlexConfigContext";
 
 const logo = require("../../assets/cheddarr.png");
 
@@ -25,6 +26,7 @@ const HomeStyle = styled.div`
     .home-logo {
       height: 40vmin;
       pointer-events: none;
+      align-self: center;
       @media (prefers-reduced-motion: no-preference) {
         animation: ${Spin} infinite 20s linear;
       }
@@ -38,16 +40,20 @@ const HomeStyle = styled.div`
 
 const Home = () => {
   const {
-    session: { isAuthenticated, plex, isLoading },
+    session: { isAuthenticated, isLoading },
   } = useContext(AuthContext);
+
+  const { currentConfig, isLoading: isPlexConfigLoading } = useContext(
+    PlexConfigContext
+  );
 
   let content;
 
-  if (isLoading) {
+  if (isLoading || isPlexConfigLoading) {
     return <Spinner />;
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isLoading) {
     content = (
       <div className="home-content">
         <img src={logo} className="home-logo" alt="logo" />
@@ -62,7 +68,7 @@ const Home = () => {
       </div>
     );
   } else {
-    if (plex) {
+    if (currentConfig && !isPlexConfigLoading) {
       content = (
         <div className="home-content noselect">
           <MediaRecentlyAdded type={MediaRecentlyAddedType.ON_DECK} />
@@ -72,7 +78,7 @@ const Home = () => {
           <MediaRecentlyAdded type={MediaRecentlyAddedType.SERIES} />
         </div>
       );
-    } else {
+    } else if (!currentConfig) {
       content = (
         <div className="home-content">
           <img src={logo} className="home-logo" alt="logo" />
