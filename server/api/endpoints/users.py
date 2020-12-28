@@ -16,6 +16,11 @@ users_router = APIRouter()
 current_user_router = APIRouter()
 
 
+##########################################
+# Users                                  #
+##########################################
+
+
 @users_router.get(
     "/{id:int}",
     dependencies=([Depends(deps.get_current_user)]),
@@ -54,6 +59,11 @@ def get_user_by_username(
             status.HTTP_404_NOT_FOUND, "No user with this username exists."
         )
     return user
+
+
+##########################################
+# Current User                           #
+##########################################
 
 
 @current_user_router.get("", response_model=schemas.User)
@@ -250,12 +260,17 @@ def confirm_reset_password(
     return {"detail": "Password reset."}
 
 
-@current_user_router.get("/notifications")
+##########################################
+# Notifications                          #
+##########################################
+
+
+@current_user_router.get("/notifications", tags=["notifications"])
 def get_notifications(current_user: models.User = Depends(deps.get_current_user)):
     return current_user.notifications
 
 
-@current_user_router.delete("/notifications/{id}")
+@current_user_router.delete("/notifications/{id}", tags=["notifications"])
 def delete_notification(
     id: int,
     current_user: models.User = Depends(deps.get_current_user),
@@ -267,7 +282,7 @@ def delete_notification(
     return {"detail": "Notification deleted"}
 
 
-@current_user_router.delete("/notifications")
+@current_user_router.delete("/notifications", tags=["notifications"])
 def delete_all_notifications(
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
@@ -276,6 +291,11 @@ def delete_all_notifications(
     user_repo.save(current_user)
 
     return {"detail": "Notifications deleted"}
+
+
+##########################################
+# Friends                                #
+##########################################
 
 
 @current_user_router.get(

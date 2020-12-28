@@ -164,39 +164,36 @@ def get_radarr_instance_info(
     config_in: schemas.ProviderConfigBase,
     current_user=Depends(deps.get_current_poweruser),
 ):
-    base_url = dict(
-        api_key=config_in.api_key,
-        host=config_in.host,
-        port=config_in.port,
-        ssl=config_in.ssl,
+    instance_info = radarr.get_instance_info(
+        config_in.api_key, config_in.host, config_in.port, config_in.ssl
     )
-    test = radarr.check_instance_status(**base_url)
-    if not test:
+    if instance_info is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr."
         )
-    version = int(test["version"][0])
+    return instance_info
 
-    if version == 3:
-        root_folders_url = radarr.make_url(
-            **base_url, version=3, resource_path="/rootFolder"
-        )
-        quality_profiles_url = radarr.make_url(
-            **base_url, version=3, resource_path="/qualityprofile"
-        )
-    else:
-        root_folders_url = radarr.make_url(**base_url, resource_path="/rootFolder")
-        quality_profiles_url = radarr.make_url(**base_url, resource_path="/profile")
 
-    root_folders = [folder["path"] for folder in requests.get(root_folders_url).json()]
-    quality_profiles = [
-        {"id": profile["id"], "name": profile["name"]}
-        for profile in requests.get(quality_profiles_url).json()
-    ]
+@router.get("/radarr/{config_id}/instance-info")
+def get_radarr_config_instance_info(
+    config_id: str,
+    current_user=Depends(deps.get_current_poweruser),
+    radarr_config_repo: RadarrConfigRepository = Depends(
+        deps.get_repository(RadarrConfigRepository)
+    ),
+):
+    config = radarr_config_repo.find_by(id=config_id)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Radarr config not found.")
 
-    return schemas.RadarrInstanceInfo(
-        version=version, root_folders=root_folders, quality_profiles=quality_profiles
+    instance_info = radarr.get_instance_info(
+        config.api_key, config.host, config.port, config.ssl
     )
+    if instance_info is None:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr."
+        )
+    return instance_info
 
 
 @router.get("/radarr", response_model=list[schemas.RadarrConfig])
@@ -310,50 +307,35 @@ def get_sonarr_instance_info(
     config_in: schemas.ProviderConfigBase,
     current_user=Depends(deps.get_current_poweruser),
 ):
-    base_url = dict(
-        api_key=config_in.api_key,
-        host=config_in.host,
-        port=config_in.port,
-        ssl=config_in.ssl,
+    instance_info = sonarr.get_instance_info(
+        config_in.api_key, config_in.host, config_in.port, config_in.ssl
     )
-    test = sonarr.check_instance_status(**base_url)
-    if not test:
+    if instance_info is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr."
         )
+    return instance_info
 
-    version = int(test["version"][0])
-    if version == 3:
-        root_folder_url = sonarr.make_url(
-            **base_url, version=3, resource_path="/rootFolder"
-        )
-        quality_profile_url = sonarr.make_url(
-            **base_url, version=3, resource_path="/qualityprofile"
-        )
-        language_profile_url = sonarr.make_url(
-            **base_url, version=3, resource_path="/languageprofile"
-        )
-        language_profiles = [
-            {"id": profile["id"], "name": profile["name"]}
-            for profile in requests.get(language_profile_url).json()
-        ]
-    else:
-        root_folder_url = sonarr.make_url(**base_url, resource_path="/rootFolder")
-        quality_profile_url = sonarr.make_url(**base_url, resource_path="/profile")
-        language_profiles = None
 
-    root_folders = [folder["path"] for folder in requests.get(root_folder_url).json()]
-    quality_profiles = [
-        {"id": profile["id"], "name": profile["name"]}
-        for profile in requests.get(quality_profile_url).json()
-    ]
-
-    return schemas.SonarrInstanceInfo(
-        version=version,
-        root_folders=root_folders,
-        quality_profiles=quality_profiles,
-        language_profiles=language_profiles,
+@router.get("/sonarr/{config_id}/instance-info")
+def get_sonarr_config_instance_info(
+    config_id: str,
+    current_user=Depends(deps.get_current_poweruser),
+    sonarr_config_repo: SonarrConfigRepository = Depends(
+        deps.get_repository(SonarrConfigRepository)
+    ),
+):
+    config = sonarr_config_repo.find_by(id=config_id)
+    if config is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Config not found.")
+    instance_info = sonarr.get_instance_info(
+        config.api_key, config.host, config.port, config.ssl
     )
+    if instance_info is None:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr."
+        )
+    return instance_info
 
 
 @router.get("/sonarr", response_model=list[schemas.SonarrConfig])

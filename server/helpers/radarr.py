@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 import requests
 
@@ -50,6 +50,58 @@ def check_instance_status(
     if r.status_code != 200:
         return False
     return r.json()
+
+
+def get_instance_info(
+    api_key: str,
+    host: str,
+    port: int,
+    ssl: bool,
+) -> Optional[schemas.RadarrInstanceInfo]:
+
+    test = check_instance_status(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+    )
+    if not test:
+        return None
+    version = int(test["version"][0])
+
+    if version == 3:
+        root_folders_url = make_url(
+            api_key=api_key,
+            host=host,
+            port=port,
+            ssl=ssl,
+            version=3,
+            resource_path="/rootFolder",
+        )
+        quality_profiles_url = make_url(
+            api_key=api_key,
+            host=host,
+            port=port,
+            ssl=ssl,
+            version=3,
+            resource_path="/qualityprofile",
+        )
+    else:
+        root_folders_url = make_url(
+            api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/rootFolder"
+        )
+        quality_profiles_url = make_url(
+            api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/profile"
+        )
+
+    root_folders = [folder["path"] for folder in requests.get(root_folders_url).json()]
+    quality_profiles = [
+        {"id": profile["id"], "name": profile["name"]}
+        for profile in requests.get(quality_profiles_url).json()
+    ]
+    return schemas.RadarrInstanceInfo(
+        version=version, root_folders=root_folders, quality_profiles=quality_profiles
+    )
 
 
 def lookup(config: RadarrConfig, tmdb_id: int, title: str) -> schemas.RadarrMovie:

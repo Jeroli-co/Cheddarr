@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -55,6 +55,70 @@ def check_instance_status(
     if r.status_code != 200:
         return False
     return r.json()
+
+
+def get_instance_info(
+    api_key: str, host: str, port: int, ssl: bool
+) -> Optional[schemas.SonarrInstanceInfo]:
+    test = check_instance_status(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+    )
+    if not test:
+        return None
+
+    version = int(test["version"][0])
+    if version == 3:
+        root_folder_url = make_url(
+            api_key=api_key,
+            host=host,
+            port=port,
+            ssl=ssl,
+            version=3,
+            resource_path="/rootFolder",
+        )
+        quality_profile_url = make_url(
+            api_key=api_key,
+            host=host,
+            port=port,
+            ssl=ssl,
+            version=3,
+            resource_path="/qualityprofile",
+        )
+        language_profile_url = make_url(
+            api_key=api_key,
+            host=host,
+            port=port,
+            ssl=ssl,
+            version=3,
+            resource_path="/languageprofile",
+        )
+        language_profiles = [
+            {"id": profile["id"], "name": profile["name"]}
+            for profile in requests.get(language_profile_url).json()
+        ]
+    else:
+        root_folder_url = make_url(
+            api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/rootFolder"
+        )
+        quality_profile_url = make_url(
+            api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/profile"
+        )
+        language_profiles = None
+
+    root_folders = [folder["path"] for folder in requests.get(root_folder_url).json()]
+    quality_profiles = [
+        {"id": profile["id"], "name": profile["name"]}
+        for profile in requests.get(quality_profile_url).json()
+    ]
+    return schemas.SonarrInstanceInfo(
+        version=version,
+        quality_profiles=quality_profiles,
+        language_profiles=language_profiles,
+        root_folders=root_folders,
+    )
 
 
 def lookup(

@@ -236,6 +236,9 @@ def get_plex_season(
     response_model_by_alias=False,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex config or server"},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "description": "Plex server connection error"
+        },
     },
 )
 def get_plex_episode(
@@ -264,6 +267,9 @@ def get_plex_episode(
     response_model_by_alias=False,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "description": "Plex server connection error"
+        },
     },
 )
 def get_plex_on_deck(
@@ -281,6 +287,7 @@ def get_plex_on_deck(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
         )
     on_deck = plex_server.library.onDeck()
+    print(on_deck[0].url(on_deck[0].__dict__))
     return on_deck
 
 
@@ -288,6 +295,12 @@ def get_plex_on_deck(
     "/{config_id}/search",
     response_model=list[schemas.MediaSearchResultSchema],
     response_model_by_alias=False,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "description": "Plex server connection error"
+        },
+    },
 )
 def search_plex_media(
     config_id: str,

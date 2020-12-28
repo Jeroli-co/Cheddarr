@@ -15,25 +15,6 @@ class ProviderConfigBase(APIModel):
 
 
 #####################################
-# Plex                              #
-#####################################
-class PlexServerInfo(APIModel):
-    server_id: str
-    server_name: str
-
-
-class PlexConfig(ProviderConfigBase, PlexServerInfo):
-    id: str
-    name: str
-    enabled: bool = True
-    provider_type: ProviderType = Field(default=ProviderType.media_server, const=True)
-
-
-class PlexConfigCreateUpdate(ProviderConfigBase, PlexServerInfo):
-    enabled: Optional[bool] = True
-
-
-#####################################
 # Radarr                            #
 #####################################
 class RadarrInstanceInfo(APIModel):
@@ -155,6 +136,25 @@ class SonarrSeries(APIModel):
 
 
 #####################################
+# Plex                              #
+#####################################
+class PlexServerInfo(APIModel):
+    server_id: str
+    server_name: str
+
+
+class PlexConfig(ProviderConfigBase, PlexServerInfo):
+    id: str
+    name: str
+    enabled: bool = True
+    provider_type: ProviderType = Field(default=ProviderType.media_server, const=True)
+
+
+class PlexConfigCreateUpdate(ProviderConfigBase, PlexServerInfo):
+    enabled: Optional[bool] = True
+
+
+#####################################
 # PlexAPI                           #
 #####################################
 class PlexServerIn(APIModel):
@@ -188,15 +188,17 @@ class PlexVideo(APIModel):
     art_url: Optional[AnyHttpUrl] = Field(alias="artUrl")
     rating: Optional[float] = Field(alias="audienceRating")
     is_watched: Optional[bool] = Field(alias="isWatched")
-    web_url: Optional[AnyHttpUrl] = Field(
-        default_factory=lambda media: "%s/web/index.html#!/server/%s/details?key=%s"
-        % (
+    web_url: Optional[AnyHttpUrl] = Field(alias="url")
+
+    @validator("web_url", pre=True)
+    def get_web_url(cls, web_url, values):
+        print(values)
+        return "a"
+        return "%s/web/index.html#!/server/%s/details?key=%s" % (
             media._server._baseurl,
             media._server.machineIdentifier,
             media.key,
-        ),
-        const=True,
-    )
+        )
 
 
 class PlexMovie(PlexVideo):
