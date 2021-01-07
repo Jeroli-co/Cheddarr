@@ -188,16 +188,15 @@ class PlexVideo(APIModel):
     art_url: Optional[AnyHttpUrl] = Field(alias="artUrl")
     rating: Optional[float] = Field(alias="audienceRating")
     is_watched: Optional[bool] = Field(alias="isWatched")
+    server: PlexServerIn = Field(alias="_server")
     web_url: Optional[AnyHttpUrl] = Field(alias="url")
 
     @validator("web_url", pre=True)
     def get_web_url(cls, web_url, values):
-        print(values)
-        return "a"
         return "%s/web/index.html#!/server/%s/details?key=%s" % (
-            media._server._baseurl,
-            media._server.machineIdentifier,
-            media.key,
+            values["server"].base_url,
+            values["server"].server_id,
+            values["id"],
         )
 
 

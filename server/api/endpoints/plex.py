@@ -73,6 +73,7 @@ def get_plex_account_server(
     "/{config_id}/movies/recent",
     response_model=list[schemas.PlexMovie],
     response_model_by_alias=False,
+    response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
@@ -107,6 +108,7 @@ def get_plex_recent_movies(
     "/{config_id}/movies/{movie_id}",
     response_model=schemas.PlexMovie,
     response_model_by_alias=False,
+    response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
@@ -138,6 +140,7 @@ def get_plex_movie(
     "/{config_id}/series/recent",
     response_model=list[schemas.PlexEpisode],
     response_model_by_alias=False,
+    response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
@@ -172,6 +175,7 @@ def get_plex_recent_series(
     "/{config_id}/series/{series_id}",
     response_model=schemas.PlexSeries,
     response_model_by_alias=False,
+    response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
@@ -203,6 +207,7 @@ def get_plex_series(
     "/{config_id}/seasons/{season_id}",
     response_model=schemas.PlexSeason,
     response_model_by_alias=False,
+    response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
@@ -234,6 +239,7 @@ def get_plex_season(
     "/{config_id}/episodes/{episode_id}",
     response_model=schemas.PlexEpisode,
     response_model_by_alias=False,
+    response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex config or server"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
@@ -265,6 +271,7 @@ def get_plex_episode(
     "/{config_id}/on-deck",
     response_model=list[Union[schemas.PlexMovie, schemas.PlexEpisode]],
     response_model_by_alias=False,
+    response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
@@ -287,7 +294,6 @@ def get_plex_on_deck(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Could not connect to the Plex server."
         )
     on_deck = plex_server.library.onDeck()
-    print(on_deck[0].url(on_deck[0].__dict__))
     return on_deck
 
 
@@ -295,6 +301,7 @@ def get_plex_on_deck(
     "/{config_id}/search",
     response_model=list[schemas.MediaSearchResultSchema],
     response_model_by_alias=False,
+    response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
