@@ -130,22 +130,26 @@ export const AuthenticationContextProvider = (props: any) => {
                 .post("/sign-in/plex/authorize", {
                   key: res2.data.id,
                   code: res2.data.code,
-                  redirectUri: redirectURI,
+                  redirect_uri: redirectURI,
                 })
                 .then(
                   (res3) => {
                     window.location.href = res3.headers.location;
                   },
                   (error) => {
-                    if (error.status) {
-                      pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(error.status));
+                    if (error.response && error.response.status) {
+                      pushDanger(
+                        ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+                      );
                     }
                   }
                 );
             },
             (error) => {
-              if (error.status) {
-                pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(error.status));
+              if (error.response && error.response.status) {
+                pushDanger(
+                  ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+                );
               }
             }
           );
