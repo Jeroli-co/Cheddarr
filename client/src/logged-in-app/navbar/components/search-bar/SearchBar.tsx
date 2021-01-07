@@ -67,7 +67,7 @@ const SearchBarStyle = styled.div<{ isInputFocus: boolean }>`
     `}
 `;
 
-let timer: number = 0;
+let timer: any;
 
 const SearchBar = () => {
   const [searchType, setSearchType] = useState<SearchRequestTypes>(

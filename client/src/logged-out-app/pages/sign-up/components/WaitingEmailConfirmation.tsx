@@ -3,7 +3,7 @@ import { SignInButton } from "../../../components/SignInButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { IUser } from "../../../../logged-in-app/pages/user-profile/models/IUser";
-import { useAuthentication } from "../../../../shared/contexts/AuthenticationContext";
+import { useAuthentication } from "../../../contexts/AuthenticationContext";
 
 type WaitingEmailConfirmationProps = {
   user: IUser;

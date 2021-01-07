@@ -1,54 +1,50 @@
 import React, { useContext, useRef, useState } from "react";
 import styled from "styled-components";
 import { ThemeDynamicContext } from "../../contexts/themes/ThemeDynamicContextProvider";
-import { IPalette, themes } from "../../contexts/themes/Themes";
 import { Text } from "../Text";
 import { useOutsideAlerter } from "../../hooks/useOutsideAlerter";
 import { ToggleSwitch } from "../ToggleSwitch";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
+import {
+  BLUE_PALETTE,
+  GREEN_PALETTE,
+  IPalette,
+  ORANGE_PALETTE,
+} from "../../contexts/themes/Palettes";
 
 const ThemesPickerStyle = styled.div`
   position: relative;
 `;
 
 type ThemePreviewStyleProps = {
-  themeOverride?: IPalette;
+  palette?: IPalette;
 };
 
 const ThemePreviewStyle = styled.div<ThemePreviewStyleProps>`
   width: 25px;
   height: 25px;
-  border: 1px solid ${(props) => props.theme.color};
+  border: 1px solid ${STATIC_STYLES.COLORS.DARK};
   border-radius: 6px;
   background: ${(props) =>
-    props.themeOverride ? props.themeOverride.primary : props.theme.primary};
+    props.palette ? props.palette.primary : props.theme.primary};
   background: -moz-linear-gradient(135deg, ${(props) =>
-    props.themeOverride
-      ? props.themeOverride.primary
-      : props.theme.primary} 50%, ${(props) =>
-  props.themeOverride
-    ? props.themeOverride.secondary
-    : props.theme.secondary} 50%);
+    props.palette ? props.palette.primary : props.theme.primary} 50%, ${(
+  props
+) => (props.palette ? props.palette.secondary : props.theme.secondary)} 50%);
   background: -webkit-linear-gradient(135deg, ${(props) =>
-    props.themeOverride
-      ? props.themeOverride.primary
-      : props.theme.primary} 50%, ${(props) =>
-  props.themeOverride
-    ? props.themeOverride.secondary
-    : props.theme.secondary} 50%);
+    props.palette ? props.palette.primary : props.theme.primary} 50%, ${(
+  props
+) => (props.palette ? props.palette.secondary : props.theme.secondary)} 50%);
   background: linear-gradient(135deg, ${(props) =>
-    props.themeOverride
-      ? props.themeOverride.primary
-      : props.theme.primary} 50%, ${(props) =>
-  props.themeOverride
-    ? props.themeOverride.secondary
-    : props.theme.secondary} 50%);
+    props.palette ? props.palette.primary : props.theme.primary} 50%, ${(
+  props
+) => (props.palette ? props.palette.secondary : props.theme.secondary)} 50%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="${(props) =>
-    props.themeOverride
-      ? props.themeOverride.primary
+    props.palette
+      ? props.palette.primary
       : props.theme.primary}",endColorstr="${(props) =>
-  props.themeOverride
-    ? props.themeOverride.secondary
+  props.palette
+    ? props.palette.secondary
     : props.theme.secondary}",GradientType=1);
 `;
 
@@ -98,7 +94,7 @@ type ThemesDropdownProps = {
 };
 
 const ThemesDropdown = ({ show }: ThemesDropdownProps) => {
-  const { darkMode, toggleDarkMode, switchTheme } = useContext(
+  const { darkMode, toggleDarkMode, switchPalette } = useContext(
     ThemeDynamicContext
   );
 
@@ -114,24 +110,18 @@ const ThemesDropdown = ({ show }: ThemesDropdownProps) => {
         <Text paddingLeft="10px">Dark</Text>
       </ThemeLightDarkContainer>
 
-      <ThemeDropdownOptionStyle onClick={() => switchTheme(themes.orange)}>
-        <ThemePreviewStyle
-          themeOverride={darkMode ? themes.orange.dark : themes.orange.light}
-        />
+      <ThemeDropdownOptionStyle onClick={() => switchPalette(ORANGE_PALETTE)}>
+        <ThemePreviewStyle palette={ORANGE_PALETTE} />
         <ThemeDropdownOptionText>Orange</ThemeDropdownOptionText>
       </ThemeDropdownOptionStyle>
 
-      <ThemeDropdownOptionStyle onClick={() => switchTheme(themes.blue)}>
-        <ThemePreviewStyle
-          themeOverride={darkMode ? themes.blue.dark : themes.blue.light}
-        />
+      <ThemeDropdownOptionStyle onClick={() => switchPalette(BLUE_PALETTE)}>
+        <ThemePreviewStyle palette={BLUE_PALETTE} />
         <ThemeDropdownOptionText>Blue</ThemeDropdownOptionText>
       </ThemeDropdownOptionStyle>
 
-      <ThemeDropdownOptionStyle onClick={() => switchTheme(themes.green)}>
-        <ThemePreviewStyle
-          themeOverride={darkMode ? themes.green.dark : themes.green.light}
-        />
+      <ThemeDropdownOptionStyle onClick={() => switchPalette(GREEN_PALETTE)}>
+        <ThemePreviewStyle palette={GREEN_PALETTE} />
         <ThemeDropdownOptionText>Green</ThemeDropdownOptionText>
       </ThemeDropdownOptionStyle>
     </ThemesDropdownStyle>

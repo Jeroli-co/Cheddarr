@@ -4,14 +4,26 @@ import {
   createErrorAsyncCall,
   createSuccessAsyncCall,
 } from "../models/IAsyncCall";
+import { useSession } from "../contexts/SessionContext";
+import { useLocation } from "react-router-dom";
 
 export const useAPI = () => {
+  const { invalidSession } = useSession();
+  const location = useLocation();
+
+  const handleError = (error: AxiosError) => {
+    if (error.response && error.response.status === 401) {
+      invalidSession(location.pathname);
+    }
+  };
+
   function get<T>(url: string, headers: Object = {}) {
     return instance.get<T>(url, headers).then(
       (response: AxiosResponse<T>) => {
         return createSuccessAsyncCall<T>(response);
       },
       (error: AxiosError) => {
+        handleError(error);
         return createErrorAsyncCall(error);
       }
     );
@@ -23,6 +35,7 @@ export const useAPI = () => {
         return createSuccessAsyncCall<T>(response);
       },
       (error: AxiosError) => {
+        handleError(error);
         return createErrorAsyncCall(error);
       }
     );
@@ -34,6 +47,7 @@ export const useAPI = () => {
         return createSuccessAsyncCall<T>(response);
       },
       (error: AxiosError) => {
+        handleError(error);
         return createErrorAsyncCall(error);
       }
     );
@@ -49,6 +63,7 @@ export const useAPI = () => {
         return createSuccessAsyncCall<T>(response);
       },
       (error: AxiosError) => {
+        handleError(error);
         return createErrorAsyncCall(error);
       }
     );
@@ -60,6 +75,7 @@ export const useAPI = () => {
         return createSuccessAsyncCall<T>(response);
       },
       (error: AxiosError) => {
+        handleError(error);
         return createErrorAsyncCall(error);
       }
     );

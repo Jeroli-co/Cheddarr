@@ -1,10 +1,11 @@
+import React from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import * as React from "react";
+import { STATIC_STYLES } from "../enums/StaticStyles";
 
 const GitHubButtonStyle = styled.a`
-  color: ${(props) => props.theme.color};
+  color: ${STATIC_STYLES.COLORS.DARK};
   opacity: 0.8;
   transition: opacity 0.5 ease;
   &:hover {

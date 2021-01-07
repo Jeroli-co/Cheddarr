@@ -6,7 +6,7 @@ import { Link, Route, useLocation } from "react-router-dom";
 import { routes } from "../../../routes";
 import { FORM_DEFAULT_VALIDATOR } from "../../../shared/enums/FormDefaultValidators";
 import { ISignInFormData } from "../../models/ISignInFormData";
-import { useAuthentication } from "../../../shared/contexts/AuthenticationContext";
+import { useAuthentication } from "../../contexts/AuthenticationContext";
 
 const logo = require("../../../assets/plex.png");
 

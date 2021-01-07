@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router";
-import { useAuthentication } from "../../shared/contexts/AuthenticationContext";
+import { useAuthentication } from "../contexts/AuthenticationContext";
 
 const ConfirmEmail = () => {
   const { token } = useParams<{ token: string }>();

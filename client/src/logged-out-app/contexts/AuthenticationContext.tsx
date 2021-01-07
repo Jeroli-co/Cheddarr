@@ -1,19 +1,19 @@
 import React, { createContext, useContext, useEffect } from "react";
-import { ISignInFormData } from "../../logged-out-app/models/ISignInFormData";
-import { ISignUpFormData } from "../../logged-out-app/models/ISignUpFormData";
+import { ISignInFormData } from "../models/ISignInFormData";
+import { ISignUpFormData } from "../models/ISignUpFormData";
 import { useLocation } from "react-router-dom";
 import { useHistory } from "react-router";
 import { routes } from "../../routes";
-import { useAPI } from "../hooks/useAPI";
-import { useSession } from "./SessionContext";
-import { IEncodedToken } from "../models/IEncodedToken";
-import { useAlert } from "./AlertContext";
+import { useAPI } from "../../shared/hooks/useAPI";
+import { useSession } from "../../shared/contexts/SessionContext";
+import { IEncodedToken } from "../../shared/models/IEncodedToken";
+import { useAlert } from "../../shared/contexts/AlertContext";
 import { IUser } from "../../logged-in-app/pages/user-profile/models/IUser";
 import axios from "axios";
-import { MESSAGES } from "../enums/Messages";
-import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
+import { MESSAGES } from "../../shared/enums/Messages";
+import { ERRORS_MESSAGE } from "../../shared/enums/ErrorsMessage";
 import { instance } from "../../axiosInstance";
-import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
+import { DefaultAsyncCall, IAsyncCall } from "../../shared/models/IAsyncCall";
 
 interface IAuthenticationContextInterface {
   readonly signUp: (
@@ -111,6 +111,8 @@ export const AuthenticationContextProvider = (props: any) => {
         history.push(redirectURI ? redirectURI : routes.HOME.url);
       } else if (res.status === 401) {
         pushDanger("Wrong credentials");
+      } else {
+        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }
     });
   };

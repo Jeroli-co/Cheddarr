@@ -9,7 +9,7 @@ import logo from "../../../assets/plex.png";
 import { WaitingEmailConfirmation } from "./components/WaitingEmailConfirmation";
 import { ISignUpFormData } from "../../models/ISignUpFormData";
 import { IUser } from "../../../logged-in-app/pages/user-profile/models/IUser";
-import { useAuthentication } from "../../../shared/contexts/AuthenticationContext";
+import { useAuthentication } from "../../contexts/AuthenticationContext";
 import { Redirect } from "react-router";
 
 const SignUpForm = () => {

@@ -1,11 +1,6 @@
 import { createGlobalStyle } from "styled-components";
-import { IPalette } from "./Themes";
 
-type GlobalStylesProps = {
-  theme: IPalette;
-};
-
-export const GlobalStyle = createGlobalStyle<GlobalStylesProps>`
+export const GlobalStyle = createGlobalStyle<any>`
   body {
     min-height: 100vh;
     max-width: 100vw;

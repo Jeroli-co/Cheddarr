@@ -53,7 +53,9 @@ export const PlexConfigContextProvider = (props: any) => {
   useEffect(() => {
     if (plex) {
       get<IPlexConfig[]>(APIRoutes.GET_PLEX_CONFIGS).then((res) => {
-        setConfigs(res);
+        if (res) {
+          setConfigs(res);
+        }
       });
     } else {
       setConfigs({ ...DefaultAsyncCall, isLoading: false });

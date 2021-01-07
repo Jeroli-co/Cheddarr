@@ -57,7 +57,7 @@ export const AlertContext = createContext<INotificationContext>(
 
 type NotificationState = {
   notification: INotification | null;
-  timer: number;
+  timer: any;
 };
 
 export const NotificationContextProvider = (props: any) => {

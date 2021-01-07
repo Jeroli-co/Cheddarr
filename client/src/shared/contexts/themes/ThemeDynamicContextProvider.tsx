@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { ITheme, themes } from "./Themes";
+import React, { useContext, useEffect, useState } from "react";
+import { IPalette, ORANGE_PALETTE } from "./Palettes";
 
 interface IThemeContext {
   darkMode: boolean;
   toggleDarkMode: () => void;
-  theme: ITheme;
-  switchTheme: (theme: ITheme) => void;
+  palette: IPalette;
+  switchPalette: (palette: IPalette) => void;
 }
 
 export const ThemeDynamicContext = React.createContext<IThemeContext>({
   darkMode: false,
   toggleDarkMode: () => {},
-  theme: themes.orange,
-  switchTheme: (_: ITheme) => {},
+  palette: ORANGE_PALETTE,
+  switchPalette(_: IPalette): void {},
 });
 
 export const ThemeDynamicContextProvider = ({ children }: any) => {
   const [darkMode, setDarkMode] = useState<boolean | null>(null);
-  const [theme, setTheme] = useState<ITheme | null>(null);
+  const [palette, setPalette] = useState<IPalette | null>(null);
 
-  const switchTheme = (theme: ITheme) => {
-    localStorage.setItem("currentTheme", JSON.stringify(theme));
-    setTheme(theme);
+  const switchPalette = (palette: IPalette) => {
+    localStorage.setItem("currentPalette", JSON.stringify(palette));
+    setPalette(palette);
   };
 
   const toggleDarkMode = () => {
@@ -41,21 +41,23 @@ export const ThemeDynamicContextProvider = ({ children }: any) => {
       );
     }
 
-    const localTheme = localStorage.getItem("currentTheme");
-    if (localTheme) {
-      setTheme(JSON.parse(localTheme));
+    const localPalette = localStorage.getItem("currentPalette");
+    if (localPalette) {
+      setPalette(JSON.parse(localPalette));
     } else {
-      setTheme(themes.orange);
+      setPalette(ORANGE_PALETTE);
     }
   }, []);
 
-  if (darkMode === null || theme === null) return <div />;
+  if (darkMode === null || palette === null) return <div />;
 
   return (
     <ThemeDynamicContext.Provider
-      value={{ darkMode, toggleDarkMode, theme, switchTheme }}
+      value={{ darkMode, toggleDarkMode, palette, switchPalette }}
     >
       {children}
     </ThemeDynamicContext.Provider>
   );
 };
+
+export const useDynamicContext = () => useContext(ThemeDynamicContext);
