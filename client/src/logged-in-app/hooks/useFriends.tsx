@@ -23,7 +23,7 @@ export const useFriends = () => {
   const { pushSuccess, pushInfo, pushDanger } = useContext(AlertContext);
 
   useEffect(() => {
-    async function testMotherFucker() {
+    async function getAllFriendsRequests() {
       const [
         friendsRequests,
         incomingFriendsRequests,
@@ -39,7 +39,8 @@ export const useFriends = () => {
       setFriendsRequestSent(outgoingFriendsRequests);
     }
 
-    testMotherFucker().then();
+    getAllFriendsRequests().then();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addFriend = (friend: IPublicUser) => {

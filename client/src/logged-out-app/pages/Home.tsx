@@ -34,7 +34,7 @@ const HomeStyle = styled.div`
   }
 `;
 
-const Home = () => {
+export default function Home() {
   return (
     <HomeStyle>
       <div className="home-content">
@@ -50,6 +50,4 @@ const Home = () => {
       </div>
     </HomeStyle>
   );
-};
-
-export { Home };
+}

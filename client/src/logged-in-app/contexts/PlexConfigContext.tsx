@@ -36,7 +36,7 @@ export const PlexConfigContext = createContext<PlexConfigContextInterface>(
 
 export const usePlexConfig = () => useContext(PlexConfigContext);
 
-export const PlexConfigContextProvider = (props: any) => {
+export default function PlexConfigContextProvider(props: any) {
   const {
     session: { plex },
   } = useSession();
@@ -124,4 +124,4 @@ export const PlexConfigContextProvider = (props: any) => {
       {props.children}
     </PlexConfigContext.Provider>
   );
-};
+}

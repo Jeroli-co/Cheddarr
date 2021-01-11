@@ -1,7 +1,7 @@
 import React from "react";
 import { TITLE_SIZES } from "../../../../utils/strings";
 import { Text } from "../../../../shared/components/Text";
-import { routes } from "../../../../routes";
+import { routes } from "../../../../router/routes";
 import { Link } from "react-router-dom";
 import {
   IMediaServerEpisode,

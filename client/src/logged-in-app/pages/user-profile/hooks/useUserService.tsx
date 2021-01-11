@@ -5,8 +5,7 @@ import { MESSAGES } from "../../../../shared/enums/Messages";
 import { useSession } from "../../../../shared/contexts/SessionContext";
 import { IUser } from "../models/IUser";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
-import { useLocation } from "react-router-dom";
-import { routes } from "../../../../routes";
+import { routes } from "../../../../router/routes";
 import { useHistory } from "react-router";
 
 export interface IChangePasswordModel {
@@ -55,6 +54,7 @@ export const useUserService = () => {
       if (res.status === 200) {
         pushSuccess("Password changed");
         invalidSession();
+        history.push(routes.SIGN_IN.url(routes.SETTINGS_ACCOUNT.url));
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }
@@ -67,6 +67,7 @@ export const useUserService = () => {
       if (res.status === 200) {
         pushSuccess("Account deleted");
         invalidSession();
+        history.push(routes.SIGN_IN.url());
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }

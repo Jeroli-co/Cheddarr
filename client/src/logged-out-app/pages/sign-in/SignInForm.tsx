@@ -3,7 +3,7 @@ import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
 import { Link, Route, useLocation } from "react-router-dom";
-import { routes } from "../../../routes";
+import { routes } from "../../../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../../../shared/enums/FormDefaultValidators";
 import { ISignInFormData } from "../../models/ISignInFormData";
 import { useAuthentication } from "../../contexts/AuthenticationContext";
@@ -23,6 +23,10 @@ const SignInForm = () => {
   const onSubmit = handleSubmit((data) => {
     redirectURI ? signIn(data, redirectURI) : signIn(data);
   });
+
+  function initSignInWithPlex() {
+    redirectURI ? signInWithPlex(redirectURI) : signInWithPlex();
+  }
 
   return (
     <div className="SignInForm" data-testid="SignInForm">
@@ -130,7 +134,7 @@ const SignInForm = () => {
             <button
               className="button has-background-dark-plex"
               type="button"
-              onClick={() => signInWithPlex()}
+              onClick={() => initSignInWithPlex()}
             >
               <span className="icon">
                 <img

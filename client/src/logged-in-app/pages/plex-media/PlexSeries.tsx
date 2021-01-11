@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import { ColumnLayout, RowLayout } from "../../../shared/components/Layouts";
 import { Tag, TagColor } from "./components/Tag";
 import { Link } from "react-router-dom";
-import { routes } from "../../../routes";
+import { routes } from "../../../router/routes";
 import { Actors } from "./components/Actors";
 import { Image } from "../../../shared/components/Image";
 import { MediaTitle } from "./components/MediaTitle";

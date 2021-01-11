@@ -10,7 +10,7 @@ import { isEmpty } from "../../../../utils/strings";
 import { DropdownType } from "./components/DropdownType";
 import { ResultsList } from "./components/ResultsList";
 import { useHistory } from "react-router";
-import { routes } from "../../../../routes";
+import { routes } from "../../../../router/routes";
 import { SearchRequestTypes } from "../../../enums/SearchRequestTypes";
 import { IPublicUser } from "../../../models/IPublicUser";
 import { usePlexConfig } from "../../../contexts/PlexConfigContext";

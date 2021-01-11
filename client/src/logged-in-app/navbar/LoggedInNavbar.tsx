@@ -9,7 +9,7 @@ import { UserDropdownMobile } from "./components/user-dropdown/UserDropdownMobil
 import { useOutsideAlerter } from "../../shared/hooks/useOutsideAlerter";
 import { RowLayout } from "../../shared/components/Layouts";
 import { SearchBar } from "./components/search-bar/SearchBar";
-import { routes } from "../../routes";
+import { routes } from "../../router/routes";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Spin } from "../../shared/components/animations/Animations";
 import { ThemesPicker } from "../../shared/components/themes-picker/ThemesDropdown";
@@ -81,7 +81,7 @@ const NavbarBurger = ({ toggle, burgerRef }: NavbarBurgerProps) => {
   );
 };
 
-export const Navbar = () => {
+export default function LoggedInNavbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const burgerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -140,4 +140,4 @@ export const Navbar = () => {
       />
     </NavbarStyle>
   );
-};
+}

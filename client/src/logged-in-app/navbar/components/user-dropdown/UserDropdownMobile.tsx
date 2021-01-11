@@ -6,7 +6,7 @@ import { RowLayout } from "../../../../shared/components/Layouts";
 import { GitHubButton } from "../../../../shared/components/GithubButton";
 import { UserDropdownImage } from "./UserDropdownImage";
 import { Link } from "react-router-dom";
-import { routes } from "../../../../routes";
+import { routes } from "../../../../router/routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCog,
@@ -76,6 +76,7 @@ const UserDropdownMobile = ({
 
   function logout() {
     invalidSession();
+    history.push(routes.SIGN_IN.url());
   }
 
   return (

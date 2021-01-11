@@ -1,5 +1,5 @@
 import React from "react";
-import { routes } from "../../../routes";
+import { routes } from "../../../router/routes";
 import { Link, Redirect, Route, Switch, useLocation } from "react-router-dom";
 import styled from "styled-components";
 

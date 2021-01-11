@@ -6,7 +6,7 @@ import {
 } from "../models/IAsyncCall";
 import { useSession } from "../contexts/SessionContext";
 import { useLocation } from "react-router-dom";
-import { routes } from "../../routes";
+import { routes } from "../../router/routes";
 import { useHistory } from "react-router";
 
 export const useAPI = () => {
@@ -17,6 +17,7 @@ export const useAPI = () => {
   const handleError = (error: AxiosError) => {
     if (error.response && error.response.status === 401) {
       invalidSession();
+      history.push(routes.SIGN_IN.url(location.pathname));
     }
   };
 

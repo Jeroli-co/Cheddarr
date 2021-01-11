@@ -4,17 +4,20 @@ import jwt_decode from "jwt-decode";
 import { ISession, SessionDefaultImpl } from "../models/ISession";
 import { IEncodedToken } from "../models/IEncodedToken";
 import { IDecodedToken } from "../models/IDecodedToken";
-import { routes } from "../../routes";
+import { routes } from "../../router/routes";
+import { instance } from "../../axiosInstance";
+import { APIRoutes } from "../enums/APIRoutes";
+import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
+import { useLocation } from "react-router-dom";
+import { useHistory } from "react-router";
+import { useAlert } from "./AlertContext";
 
 interface ISessionContextInterface {
   session: ISession;
   readonly updateUsername: (username: string) => void;
   readonly unlinkPlexAccount: () => void;
-  readonly initSession: (
-    encodedToken: IEncodedToken,
-    redirectURI?: string
-  ) => void;
-  readonly invalidSession: (redirectURI?: string) => void;
+  readonly initSession: (encodedToken: IEncodedToken) => void;
+  readonly invalidSession: () => void;
 }
 
 const SessionContextDefaultImpl: ISessionContextInterface = {
@@ -31,12 +34,36 @@ const SessionContext = createContext<ISessionContextInterface>(
 
 export const SessionContextProvider = (props: any) => {
   const [session, setSession] = useState(SessionDefaultImpl);
+  const location = useLocation();
+  const history = useHistory();
+  const { pushDanger } = useAlert();
 
   useEffect(() => {
     if (session.isLoading) {
-      const encodedSession = getEncodedSession();
-      if (encodedSession) {
-        initSession(encodedSession);
+      if (location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
+        instance
+          .get<IEncodedToken>(APIRoutes.CONFIRM_PLEX_SIGN_IN(location.search))
+          .then(
+            (res) => {
+              initSession(res.data);
+              let redirectURI = res.headers["redirect-uri"];
+              if (redirectURI && redirectURI.length > 0) {
+                history.push(redirectURI);
+              }
+            },
+            (error) => {
+              if (error.status) {
+                pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(error.status));
+              }
+            }
+          );
+      } else {
+        const encodedSession = getEncodedSession();
+        if (encodedSession) {
+          initSession(encodedSession);
+        } else {
+          invalidSession();
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,7 +82,7 @@ export const SessionContextProvider = (props: any) => {
     }
   };
 
-  const initSession = (encodedToken: IEncodedToken, redirectURI?: string) => {
+  const initSession = (encodedToken: IEncodedToken) => {
     Cookies.set("token_type", encodedToken.token_type);
     Cookies.set("access_token", encodedToken.access_token);
     const decodedToken = jwt_decode<IDecodedToken>(encodedToken.access_token);
@@ -69,7 +96,7 @@ export const SessionContextProvider = (props: any) => {
     });
   };
 
-  const invalidSession = (redirectURI?: string) => {
+  const invalidSession = () => {
     Cookies.remove("token_type");
     Cookies.remove("access_token");
     setSession({

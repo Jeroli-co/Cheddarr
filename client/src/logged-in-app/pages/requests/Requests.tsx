@@ -1,6 +1,6 @@
 import React from "react";
 import { Redirect, Route, Switch } from "react-router";
-import { routes } from "../../../routes";
+import { routes } from "../../../router/routes";
 import { RequestsTabs } from "./components/RequestsTabs";
 import { Container } from "../../../shared/components/Container";
 

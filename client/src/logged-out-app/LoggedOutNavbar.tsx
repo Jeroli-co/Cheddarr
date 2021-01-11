@@ -44,7 +44,7 @@ const NavbarEnd = styled.div`
   }
 `;
 
-export const Navbar = () => {
+export default function LoggedOutNavbar() {
   return (
     <NavbarStyle className="noselect">
       <RowLayout data-testid="Navbar" alignItems="center">
@@ -71,4 +71,4 @@ export const Navbar = () => {
       </RowLayout>
     </NavbarStyle>
   );
-};
+}

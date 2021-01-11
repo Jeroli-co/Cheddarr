@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { routes } from "../../../routes";
+import { routes } from "../../../router/routes";
 import { MediaRecentlyAddedType } from "./enums/MediaRecentlyAddedType";
 import styled from "styled-components";
 import { usePlexConfig } from "../../contexts/PlexConfigContext";
@@ -40,7 +40,7 @@ const HomeStyle = styled.div`
   }
 `;
 
-const Home = () => {
+export default function Home() {
   const { configs, currentConfig } = usePlexConfig();
 
   if (configs.isLoading || currentConfig.isLoading) {
@@ -72,6 +72,4 @@ const Home = () => {
       </div>
     </HomeStyle>
   );
-};
-
-export { Home };
+}

@@ -2,7 +2,7 @@ import React from "react";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
-import { routes } from "../../../../../routes";
+import { routes } from "../../../../../router/routes";
 
 const SettingsAccountBody = () => {
   const history = useHistory();

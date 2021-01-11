@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, Route } from "react-router-dom";
 import styled from "styled-components";
-import { routes } from "../../../routes";
+import { routes } from "../../../router/routes";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import Spinner from "../../../shared/components/Spinner";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";

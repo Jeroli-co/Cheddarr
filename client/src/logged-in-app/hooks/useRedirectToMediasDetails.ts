@@ -1,6 +1,6 @@
 import { useHistory } from "react-router-dom";
 import { MediaTypes } from "../enums/MediaTypes";
-import { routes } from "../../routes";
+import { routes } from "../../router/routes";
 import {
   IMediasServerMedias,
   isMediaServerEpisode,

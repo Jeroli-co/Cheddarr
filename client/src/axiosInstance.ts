@@ -1,6 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { routes } from "./routes";
+import { routes } from "./router/routes";
 import humps from "humps";
 
 const JSON_TYPE = "application/json";

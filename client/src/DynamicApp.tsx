@@ -2,8 +2,19 @@ import React, { Suspense } from "react";
 import { useSession } from "./shared/contexts/SessionContext";
 import { PageLoader } from "./shared/components/PageLoader";
 
-const LoggedInApp = React.lazy(() => import("./logged-in-app/LoggedInApp"));
-const LoggedOutApp = React.lazy(() => import("./logged-out-app/LoggedOutApp"));
+const AuthenticationContextProvider = React.lazy(() =>
+  import("./logged-out-app/contexts/AuthenticationContext")
+);
+const LoggedOutNavbar = React.lazy(() =>
+  import("./logged-out-app/LoggedOutNavbar")
+);
+const LoggedInNavbar = React.lazy(() =>
+  import("./logged-in-app/navbar/LoggedInNavbar")
+);
+const PlexConfigContextProvider = React.lazy(() =>
+  import("./logged-in-app/contexts/PlexConfigContext")
+);
+const SwitchRoutes = React.lazy(() => import("./router/SwitchRoutes"));
 
 export const DynamicApp = () => {
   const {
@@ -12,11 +23,17 @@ export const DynamicApp = () => {
 
   return isAuthenticated ? (
     <Suspense fallback={<PageLoader />}>
-      <LoggedInApp />
+      <PlexConfigContextProvider>
+        <LoggedInNavbar />
+        <SwitchRoutes />
+      </PlexConfigContextProvider>
     </Suspense>
   ) : (
     <Suspense fallback={<PageLoader />}>
-      <LoggedOutApp />
+      <AuthenticationContextProvider>
+        <LoggedOutNavbar />
+        <SwitchRoutes />
+      </AuthenticationContextProvider>
     </Suspense>
   );
 };

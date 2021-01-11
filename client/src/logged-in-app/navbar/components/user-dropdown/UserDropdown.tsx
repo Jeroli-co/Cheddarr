@@ -1,7 +1,7 @@
 import React from "react";
 import { RefObject } from "react";
 import { Link } from "react-router-dom";
-import { routes } from "../../../../routes";
+import { routes } from "../../../../router/routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCog,
@@ -81,6 +81,7 @@ const UserDropdown = ({
 
   function logout() {
     invalidSession();
+    history.push(routes.SIGN_IN.url());
   }
 
   return (

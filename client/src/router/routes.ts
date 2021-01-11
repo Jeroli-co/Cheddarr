@@ -1,37 +1,35 @@
-import { NotFound } from "./shared/components/errors/NotFound";
-import { Home as LoggedOutHome } from "./logged-out-app/pages/Home";
-import { Home as LoggedInHome } from "./logged-in-app/pages/home/Home";
-import { PageLoader } from "./shared/components/PageLoader";
-import { ConfirmEmail } from "./logged-out-app/pages/ConfirmEmail";
-import { ResetPassword } from "./logged-out-app/pages/reset-password/ResetPassword";
-import { InitResetPasswordModal } from "./logged-out-app/pages/sign-in/components/InitResetPasswordModal";
-import { SignInForm } from "./logged-out-app/pages/sign-in/SignInForm";
-import { SignUpForm } from "./logged-out-app/pages/sign-up/SignUpForm";
-import { PublicUser } from "./logged-in-app/pages/PublicUser";
-import { Friends } from "./logged-in-app/pages/user-profile/friends/Friends";
-import { Settings } from "./logged-in-app/pages/settings/Settings";
-import { ChangeEmailModal } from "./logged-in-app/pages/settings/components/account/components/ChangeEmailModal";
-import { ChangePasswordModal } from "./logged-in-app/pages/settings/components/account/components/ChangePasswordModal";
-import { ChangeUsernameModal } from "./logged-in-app/pages/settings/components/account/components/ChangeUsernameModal";
-import { DeleteAccountModal } from "./logged-in-app/pages/settings/components/account/components/DeleteAccountModal";
-import { SettingsAccount } from "./logged-in-app/pages/settings/components/account/SettingsAccount";
-import { PlexConfig } from "./logged-in-app/pages/settings/components/plex/PlexConfig";
-import { RadarrConfig } from "./logged-in-app/pages/settings/components/RadarrConfig";
-import { SonarrConfig } from "./logged-in-app/pages/settings/components/SonarrConfig";
-import { Search } from "./logged-in-app/pages/search/Search";
-import { Requests } from "./logged-in-app/pages/requests/Requests";
-import { UserProfile } from "./logged-in-app/pages/user-profile/UserProfile";
-import { RequestsSentDashboard } from "./logged-in-app/pages/requests/components/requests-sent/RequestsSentDashboard";
-import { RequestsReceivedDashboard } from "./logged-in-app/pages/requests/components/requests-received/RequestsReceivedDashboard";
-import { PlexMovie } from "./logged-in-app/pages/plex-media/PlexMovie";
-import { PlexSeries } from "./logged-in-app/pages/plex-media/PlexSeries";
-import { PlexSeason } from "./logged-in-app/pages/plex-media/PlexSeason";
+import { NotFound } from "../shared/components/errors/NotFound";
+import { PageLoader } from "../shared/components/PageLoader";
+import { ConfirmEmail } from "../logged-out-app/pages/ConfirmEmail";
+import { ResetPassword } from "../logged-out-app/pages/reset-password/ResetPassword";
+import { InitResetPasswordModal } from "../logged-out-app/pages/sign-in/components/InitResetPasswordModal";
+import { SignInForm } from "../logged-out-app/pages/sign-in/SignInForm";
+import { SignUpForm } from "../logged-out-app/pages/sign-up/SignUpForm";
+import { PublicUser } from "../logged-in-app/pages/PublicUser";
+import { Friends } from "../logged-in-app/pages/user-profile/friends/Friends";
+import { Settings } from "../logged-in-app/pages/settings/Settings";
+import { ChangeEmailModal } from "../logged-in-app/pages/settings/components/account/components/ChangeEmailModal";
+import { ChangePasswordModal } from "../logged-in-app/pages/settings/components/account/components/ChangePasswordModal";
+import { ChangeUsernameModal } from "../logged-in-app/pages/settings/components/account/components/ChangeUsernameModal";
+import { DeleteAccountModal } from "../logged-in-app/pages/settings/components/account/components/DeleteAccountModal";
+import { SettingsAccount } from "../logged-in-app/pages/settings/components/account/SettingsAccount";
+import { PlexConfig } from "../logged-in-app/pages/settings/components/plex/PlexConfig";
+import { RadarrConfig } from "../logged-in-app/pages/settings/components/RadarrConfig";
+import { SonarrConfig } from "../logged-in-app/pages/settings/components/SonarrConfig";
+import { Search } from "../logged-in-app/pages/search/Search";
+import { Requests } from "../logged-in-app/pages/requests/Requests";
+import { UserProfile } from "../logged-in-app/pages/user-profile/UserProfile";
+import { RequestsSentDashboard } from "../logged-in-app/pages/requests/components/requests-sent/RequestsSentDashboard";
+import { RequestsReceivedDashboard } from "../logged-in-app/pages/requests/components/requests-received/RequestsReceivedDashboard";
+import { PlexMovie } from "../logged-in-app/pages/plex-media/PlexMovie";
+import { PlexSeries } from "../logged-in-app/pages/plex-media/PlexSeries";
+import { PlexSeason } from "../logged-in-app/pages/plex-media/PlexSeason";
+import { Home } from "../shared/Home";
 
 const routes = {
   HOME: {
     url: "/",
-    loggedOutComponent: LoggedOutHome,
-    loggedInComponent: LoggedInHome,
+    component: Home,
   },
 
   /** AUTH **/
