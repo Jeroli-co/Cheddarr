@@ -12,6 +12,7 @@ import styled from "styled-components";
 import { UserDropdownImage } from "./UserDropdownImage";
 import { useSession } from "../../../../shared/contexts/SessionContext";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
+import { useHistory } from "react-router";
 
 const UserDropdownStyle = styled.div`
   position: relative;
@@ -76,6 +77,12 @@ const UserDropdown = ({
     invalidSession,
   } = useSession();
 
+  const history = useHistory();
+
+  function logout() {
+    invalidSession();
+  }
+
   return (
     <UserDropdownStyle ref={dropdownRef} data-testid="UserDropdown">
       <UserDropdownImage className="is-pointed" onClick={() => toggle()}>
@@ -104,10 +111,7 @@ const UserDropdown = ({
           </DropdownMenuItem>
         </Link>
 
-        <DropdownMenuItem
-          onClick={() => invalidSession()}
-          data-testid="SignOutButton"
-        >
+        <DropdownMenuItem onClick={() => logout()}>
           <DropdownMenuItemIcon>
             <FontAwesomeIcon icon={faSignOutAlt} />
           </DropdownMenuItemIcon>

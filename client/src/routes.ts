@@ -37,9 +37,7 @@ const routes = {
   /** AUTH **/
   SIGN_IN: {
     url: (redirectURI?: string) =>
-      redirectURI
-        ? "/sign-in".concat("?redirectURI=", redirectURI)
-        : "/sign-in",
+      redirectURI ? "/sign-in?redirectURI=" + redirectURI : "/sign-in",
     component: SignInForm,
   },
   CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm", component: PageLoader },

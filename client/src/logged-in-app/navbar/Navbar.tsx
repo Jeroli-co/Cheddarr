@@ -13,6 +13,7 @@ import { routes } from "../../routes";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Spin } from "../../shared/components/animations/Animations";
 import { ThemesPicker } from "../../shared/components/themes-picker/ThemesDropdown";
+import { usePlexConfig } from "../contexts/PlexConfigContext";
 
 const logo = require("../../assets/cheddarr-small.png");
 
@@ -85,6 +86,7 @@ export const Navbar = () => {
   const burgerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownMobileRef = useRef<HTMLDivElement>(null);
+  const { currentConfig } = usePlexConfig();
 
   useOutsideAlerter([dropdownRef, dropdownMobileRef, burgerRef], () =>
     setIsDropdownOpen(false)
@@ -96,14 +98,14 @@ export const Navbar = () => {
 
   return (
     <NavbarStyle className="noselect">
-      <RowLayout data-testid="Navbar" alignItems="center">
+      <RowLayout alignItems="center">
         <RowLayout childMarginRight="40px">
           <Link to="/">
             <NavbarAppLogo>
               <img src={logo} alt="Chedarr" width="40px" height="24px" />
             </NavbarAppLogo>
           </Link>
-          <SearchBar />
+          {currentConfig.data && <SearchBar />}
         </RowLayout>
         <NavbarEnd>
           <RowLayout

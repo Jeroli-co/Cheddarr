@@ -10,22 +10,18 @@ import { useAuthentication } from "../../contexts/AuthenticationContext";
 
 const logo = require("../../../assets/plex.png");
 
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
+function useRedirectURI() {
+  const query = new URLSearchParams(useLocation().search);
+  return query.get("redirectURI");
 }
 
 const SignInForm = () => {
   const { signIn, signInWithPlex } = useAuthentication();
   const { register, handleSubmit, errors } = useForm<ISignInFormData>();
-  const query = useQuery();
-
-  const getRedirectURI = () => {
-    const redirectURI = query.get("redirectURI");
-    return redirectURI ? redirectURI : routes.HOME.url;
-  };
+  const redirectURI = useRedirectURI();
 
   const onSubmit = handleSubmit((data) => {
-    signIn(data, getRedirectURI());
+    redirectURI ? signIn(data, redirectURI) : signIn(data);
   });
 
   return (
@@ -134,7 +130,7 @@ const SignInForm = () => {
             <button
               className="button has-background-dark-plex"
               type="button"
-              onClick={() => signInWithPlex(getRedirectURI())}
+              onClick={() => signInWithPlex()}
             >
               <span className="icon">
                 <img

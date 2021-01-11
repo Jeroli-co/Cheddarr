@@ -66,7 +66,7 @@ const PlexConfig = () => {
           {isPlexAccountLinked() && (
             <p className="subtitle is-3">Plex server</p>
           )}
-          {!currentConfig && isPlexAccountLinked() && (
+          {!currentConfig.data && isPlexAccountLinked() && (
             <button
               className="button is-primary"
               type="button"

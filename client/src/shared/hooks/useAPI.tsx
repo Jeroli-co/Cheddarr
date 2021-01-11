@@ -6,14 +6,17 @@ import {
 } from "../models/IAsyncCall";
 import { useSession } from "../contexts/SessionContext";
 import { useLocation } from "react-router-dom";
+import { routes } from "../../routes";
+import { useHistory } from "react-router";
 
 export const useAPI = () => {
   const { invalidSession } = useSession();
   const location = useLocation();
+  const history = useHistory();
 
   const handleError = (error: AxiosError) => {
     if (error.response && error.response.status === 401) {
-      invalidSession(location.pathname);
+      invalidSession();
     }
   };
 

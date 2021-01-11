@@ -6,7 +6,6 @@ import { useAuthentication } from "../../../../../../logged-out-app/contexts/Aut
 import { usePlexConfig } from "../../../../../contexts/PlexConfigContext";
 
 const LinkPlexAccount = () => {
-  const location = useLocation();
   const { isPlexAccountLinked } = usePlexConfig();
   const { signInWithPlex } = useAuthentication();
 
@@ -22,7 +21,7 @@ const LinkPlexAccount = () => {
       <button
         className="button is-primary"
         type="button"
-        onClick={() => signInWithPlex(location.pathname)}
+        onClick={() => signInWithPlex()}
       >
         Link Plex account
       </button>

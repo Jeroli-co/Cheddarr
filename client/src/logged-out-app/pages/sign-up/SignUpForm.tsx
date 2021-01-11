@@ -220,7 +220,7 @@ const SignUpForm = () => {
               <button
                 className="button has-background-dark-plex"
                 type="button"
-                onClick={() => signInWithPlex(routes.HOME.url)}
+                onClick={() => signInWithPlex()}
               >
                 <span className="icon">
                   <img

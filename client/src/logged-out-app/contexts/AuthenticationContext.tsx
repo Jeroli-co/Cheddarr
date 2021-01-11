@@ -9,11 +9,11 @@ import { useSession } from "../../shared/contexts/SessionContext";
 import { IEncodedToken } from "../../shared/models/IEncodedToken";
 import { useAlert } from "../../shared/contexts/AlertContext";
 import { IUser } from "../../logged-in-app/pages/user-profile/models/IUser";
-import axios from "axios";
 import { MESSAGES } from "../../shared/enums/Messages";
 import { ERRORS_MESSAGE } from "../../shared/enums/ErrorsMessage";
 import { instance } from "../../axiosInstance";
 import { DefaultAsyncCall, IAsyncCall } from "../../shared/models/IAsyncCall";
+import { APIRoutes } from "../../shared/enums/APIRoutes";
 
 interface IAuthenticationContextInterface {
   readonly signUp: (
@@ -22,7 +22,7 @@ interface IAuthenticationContextInterface {
   readonly confirmEmail: (token: string) => void;
   readonly resendEmailConfirmation: (email: string) => void;
   readonly signIn: (data: ISignInFormData, redirectURI?: string) => void;
-  readonly signInWithPlex: (redirectURI: string) => void;
+  readonly signInWithPlex: () => void;
 }
 
 const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
@@ -49,16 +49,10 @@ export const AuthenticationContextProvider = (props: any) => {
   useEffect(() => {
     if (location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
       instance
-        .get<IEncodedToken>("/sign-in/plex/confirm/".concat(location.search))
+        .get<IEncodedToken>(APIRoutes.CONFIRM_PLEX_SIGN_IN(location.search))
         .then(
           (res) => {
-            const redirectURI: string | null = res.headers["redirect-uri"];
             initSession(res.data);
-            history.push(
-              redirectURI && redirectURI.length > 0
-                ? redirectURI
-                : routes.HOME.url
-            );
           },
           (error) => {
             if (error.status) {
@@ -71,7 +65,7 @@ export const AuthenticationContextProvider = (props: any) => {
   }, []);
 
   const signUp = async (data: ISignUpFormData) => {
-    return await post<IUser>("/sign-up", data).then((res) => {
+    return await post<IUser>(APIRoutes.SIGN_UP, data).then((res) => {
       if (res.data) {
         pushSuccess("Account created");
       }
@@ -80,7 +74,7 @@ export const AuthenticationContextProvider = (props: any) => {
   };
 
   const confirmEmail = (token: string) => {
-    get("/sign-up/".concat(token)).then((res) => {
+    get(APIRoutes.CONFIRM_EMAIL(token)).then((res) => {
       if (res.status === 200) {
         pushSuccess(MESSAGES.EMAIL_CONFIRMED);
         history.push(routes.SIGN_IN.url());
@@ -92,7 +86,7 @@ export const AuthenticationContextProvider = (props: any) => {
   };
 
   const resendEmailConfirmation = (email: string) => {
-    patch("/sign-up", { email: email }).then((res) => {
+    patch(APIRoutes.SIGN_UP, { email: email }).then((res) => {
       if (res.status === 200) {
         pushSuccess(MESSAGES.EMAIL_CONFIRMATION_RESENT);
       } else {
@@ -105,10 +99,9 @@ export const AuthenticationContextProvider = (props: any) => {
     const fd = new FormData();
     fd.append("username", data.username);
     fd.append("password", data.password);
-    post<IEncodedToken>("/sign-in", fd).then((res) => {
+    post<IEncodedToken>(APIRoutes.SIGN_IN, fd).then((res) => {
       if (res.data && res.status === 200) {
         initSession(res.data);
-        history.push(redirectURI ? redirectURI : routes.HOME.url);
       } else if (res.status === 401) {
         pushDanger("Wrong credentials");
       } else {
@@ -117,20 +110,20 @@ export const AuthenticationContextProvider = (props: any) => {
     });
   };
 
-  const signInWithPlex = async (redirectURI: string) => {
-    get<string>("/sign-in/plex").then((res1) => {
+  const signInWithPlex = () => {
+    get<string>(APIRoutes.INIT_PLEX_SIGN_IN).then((res1) => {
       if (res1.data) {
-        axios
+        instance
           .post<{ id: string; code: string }>(res1.data, {
             headers: { Accept: "application/json" },
           })
           .then(
             (res2) => {
-              axios
-                .post("/sign-in/plex/authorize", {
+              instance
+                .post(APIRoutes.AUTHORIZE_PLEX_SIGN_IN, {
                   key: res2.data.id,
                   code: res2.data.code,
-                  redirect_uri: redirectURI,
+                  redirect_uri: "",
                 })
                 .then(
                   (res3) => {

@@ -6,6 +6,8 @@ import { useSession } from "../../../../shared/contexts/SessionContext";
 import { IUser } from "../models/IUser";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
 import { useLocation } from "react-router-dom";
+import { routes } from "../../../../routes";
+import { useHistory } from "react-router";
 
 export interface IChangePasswordModel {
   readonly oldPassword: string;
@@ -17,7 +19,7 @@ export const useUserService = () => {
   const { patch, remove } = useAPI();
   const { pushDanger, pushSuccess } = useAlert();
   const { updateUsername: updateSession, invalidSession } = useSession();
-  const location = useLocation();
+  const history = useHistory();
 
   const updateUsername = (username: string) => {
     return patch<IUser>(APIRoutes.UPDATE_USER, { username: username }).then(
@@ -52,7 +54,7 @@ export const useUserService = () => {
     patch<IUser>(APIRoutes.UPDATE_USER, password).then((res) => {
       if (res.status === 200) {
         pushSuccess("Password changed");
-        invalidSession(location.pathname);
+        invalidSession();
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }

@@ -5,6 +5,7 @@ export interface ISession {
   readonly admin: boolean;
   plex: boolean;
   isLoading: boolean;
+  redirectURI?: string;
 }
 
 export const SessionDefaultImpl: ISession = {

@@ -23,22 +23,23 @@ export const useFriends = () => {
   const { pushSuccess, pushInfo, pushDanger } = useContext(AlertContext);
 
   useEffect(() => {
-    get<IPublicUser[]>(APIRoutes.GET_FRIENDS).then((res) => setFriends(res));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    async function testMotherFucker() {
+      const [
+        friendsRequests,
+        incomingFriendsRequests,
+        outgoingFriendsRequests,
+      ] = await Promise.all([
+        get<IPublicUser[]>(APIRoutes.GET_FRIENDS),
+        get<IPublicUser[]>(APIRoutes.GET_INCOMING_FRIEND_REQUESTS),
+        get<IPublicUser[]>(APIRoutes.GET_OUTGOING_FRIEND_REQUESTS),
+      ]);
 
-  useEffect(() => {
-    get<IPublicUser[]>(APIRoutes.GET_INCOMING_FRIEND_REQUESTS).then((res) =>
-      setFriendsRequestReceived(res)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      setFriends(friendsRequests);
+      setFriendsRequestReceived(incomingFriendsRequests);
+      setFriendsRequestSent(outgoingFriendsRequests);
+    }
 
-  useEffect(() => {
-    get<IPublicUser[]>(APIRoutes.GET_OUTGOING_FRIEND_REQUESTS).then((res) =>
-      setFriendsRequestSent(res)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    testMotherFucker().then();
   }, []);
 
   const addFriend = (friend: IPublicUser) => {

@@ -1,17 +1,19 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { ISession, SessionDefaultImpl } from "../models/ISession";
-import { routes } from "../../routes";
-import { useHistory } from "react-router-dom";
 import Cookies from "js-cookie";
-import { IEncodedToken } from "../models/IEncodedToken";
 import jwt_decode from "jwt-decode";
+import { ISession, SessionDefaultImpl } from "../models/ISession";
+import { IEncodedToken } from "../models/IEncodedToken";
 import { IDecodedToken } from "../models/IDecodedToken";
+import { routes } from "../../routes";
 
 interface ISessionContextInterface {
   session: ISession;
   readonly updateUsername: (username: string) => void;
   readonly unlinkPlexAccount: () => void;
-  readonly initSession: (encodedToken: IEncodedToken) => void;
+  readonly initSession: (
+    encodedToken: IEncodedToken,
+    redirectURI?: string
+  ) => void;
   readonly invalidSession: (redirectURI?: string) => void;
 }
 
@@ -29,15 +31,12 @@ const SessionContext = createContext<ISessionContextInterface>(
 
 export const SessionContextProvider = (props: any) => {
   const [session, setSession] = useState(SessionDefaultImpl);
-  const history = useHistory();
 
   useEffect(() => {
     if (session.isLoading) {
       const encodedSession = getEncodedSession();
       if (encodedSession) {
         initSession(encodedSession);
-      } else {
-        setSession({ ...SessionDefaultImpl, isLoading: false });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,7 +55,7 @@ export const SessionContextProvider = (props: any) => {
     }
   };
 
-  const initSession = (encodedToken: IEncodedToken) => {
+  const initSession = (encodedToken: IEncodedToken, redirectURI?: string) => {
     Cookies.set("token_type", encodedToken.token_type);
     Cookies.set("access_token", encodedToken.access_token);
     const decodedToken = jwt_decode<IDecodedToken>(encodedToken.access_token);
@@ -73,8 +72,10 @@ export const SessionContextProvider = (props: any) => {
   const invalidSession = (redirectURI?: string) => {
     Cookies.remove("token_type");
     Cookies.remove("access_token");
-    setSession({ ...SessionDefaultImpl, isLoading: false });
-    history.push(routes.SIGN_IN.url(redirectURI));
+    setSession({
+      ...SessionDefaultImpl,
+      isLoading: false,
+    });
   };
 
   const updateUsername = (username: string) => {

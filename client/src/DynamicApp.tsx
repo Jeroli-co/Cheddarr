@@ -1,16 +1,22 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { useSession } from "./shared/contexts/SessionContext";
-import { LoggedInApp } from "./logged-in-app/LoggedInApp";
-import { LoggedOutApp } from "./logged-out-app/LoggedOutApp";
+import { PageLoader } from "./shared/components/PageLoader";
+
+const LoggedInApp = React.lazy(() => import("./logged-in-app/LoggedInApp"));
+const LoggedOutApp = React.lazy(() => import("./logged-out-app/LoggedOutApp"));
 
 export const DynamicApp = () => {
   const {
-    session: { isAuthenticated, isLoading },
+    session: { isAuthenticated },
   } = useSession();
 
-  if (isLoading) {
-    return <div />;
-  }
-
-  return isAuthenticated ? <LoggedInApp /> : <LoggedOutApp />;
+  return isAuthenticated ? (
+    <Suspense fallback={<PageLoader />}>
+      <LoggedInApp />
+    </Suspense>
+  ) : (
+    <Suspense fallback={<PageLoader />}>
+      <LoggedOutApp />
+    </Suspense>
+  );
 };

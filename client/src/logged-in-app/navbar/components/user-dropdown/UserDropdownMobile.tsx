@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useSession } from "../../../../shared/contexts/SessionContext";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
+import { useHistory } from "react-router";
 
 const UserDropdownMobileStyle = styled.div<{ isVisible: boolean }>`
   position: absolute;
@@ -70,6 +71,13 @@ const UserDropdownMobile = ({
     invalidSession,
     session: { isAuthenticated, avatar, username },
   } = useSession();
+
+  const history = useHistory();
+
+  function logout() {
+    invalidSession();
+  }
+
   return (
     <UserDropdownMobileStyle ref={dropdownRef} isVisible={isVisible}>
       <RowLayout
@@ -119,7 +127,7 @@ const UserDropdownMobile = ({
           </Link>
 
           <DropdownMenuMobileItem
-            onClick={() => invalidSession()}
+            onClick={() => logout()}
             data-testid="SignOutButtonMobile"
           >
             <RowLayout childMarginRight="2%" justifyContent="space-between">

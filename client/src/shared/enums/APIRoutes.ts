@@ -2,6 +2,14 @@ import { MediaTypes } from "../../logged-in-app/enums/MediaTypes";
 import { RequestTypes } from "../../logged-in-app/pages/requests/enums/RequestTypes";
 
 export const APIRoutes = {
+  // AUTH
+  CONFIRM_PLEX_SIGN_IN: (query: string) => "/sign-in/plex/confirm" + query,
+  SIGN_UP: "/sign-up",
+  CONFIRM_EMAIL: (token: string) => "/sign-up/" + token,
+  SIGN_IN: "/sign-in",
+  INIT_PLEX_SIGN_IN: "/sign-in/plex",
+  AUTHORIZE_PLEX_SIGN_IN: "/sign-in/plex/authorize",
+
   // USER
   GET_PUBLIC_USER: (username: string) => "/users/" + username,
   GET_CURRENT_USER: "/user",
@@ -37,7 +45,7 @@ export const APIRoutes = {
   DELETE_PLEX_CONFIG: (plexConfigId: string) =>
     "/configuration/plex/" + plexConfigId,
   GET_PLEX_SERVERS: "/plex/servers",
-  GET_PLEX_SERVER: (serverName: string) => "/plex/server/" + serverName,
+  GET_PLEX_SERVER: (serverName: string) => "/plex/servers/" + serverName,
   SEARCH_PLEX_MOVIES: (plexConfigId: string, value: string) =>
     "/plex/" + plexConfigId + "/search?section=movies&value=" + value,
   SEARCH_PLEX_SERIES: (plexConfigId: string, value: string) =>

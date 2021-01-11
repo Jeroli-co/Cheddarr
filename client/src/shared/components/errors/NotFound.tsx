@@ -3,7 +3,7 @@ import React from "react";
 const NotFound = () => {
   return (
     <div
-      className="NotFound hero is-primary is-bold is-fullheight-with-navbar"
+      className="hero is-primary is-bold is-fullheight-with-navbar"
       data-testid="NotFound"
     >
       <div className="hero-body">

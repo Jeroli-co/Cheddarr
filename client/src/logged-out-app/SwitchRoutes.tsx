@@ -1,8 +1,12 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import { routes } from "../routes";
+import { useSession } from "../shared/contexts/SessionContext";
 
 export const SwitchRoutes = (props: any) => {
+  const {
+    session: { isAuthenticated },
+  } = useSession();
   return (
     <Switch>
       <Route
@@ -33,7 +37,7 @@ export const SwitchRoutes = (props: any) => {
         component={routes.RESET_PASSWORD.component}
         {...props}
       />
-      <Route component={routes.NOT_FOUND.component} />
+      {!isAuthenticated && <Route component={routes.NOT_FOUND.component} />}
     </Switch>
   );
 };

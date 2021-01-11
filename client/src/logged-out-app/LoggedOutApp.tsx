@@ -4,11 +4,11 @@ import { AuthenticationContextProvider } from "./contexts/AuthenticationContext"
 import { SwitchRoutes } from "./SwitchRoutes";
 import { Navbar } from "./Navbar";
 
-export const LoggedOutApp = () => {
+export default function LoggedOutApp() {
   return (
     <AuthenticationContextProvider>
       <Navbar />
       <SwitchRoutes />
     </AuthenticationContextProvider>
   );
-};
+}
