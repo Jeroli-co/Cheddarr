@@ -1,9 +1,8 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext } from "react";
 import { ISignInFormData } from "../models/ISignInFormData";
 import { ISignUpFormData } from "../models/ISignUpFormData";
-import { useLocation } from "react-router-dom";
 import { useHistory } from "react-router";
-import { routes } from "../../routes";
+import { routes } from "../../router/routes";
 import { useAPI } from "../../shared/hooks/useAPI";
 import { useSession } from "../../shared/contexts/SessionContext";
 import { IEncodedToken } from "../../shared/models/IEncodedToken";
@@ -22,7 +21,7 @@ interface IAuthenticationContextInterface {
   readonly confirmEmail: (token: string) => void;
   readonly resendEmailConfirmation: (email: string) => void;
   readonly signIn: (data: ISignInFormData, redirectURI?: string) => void;
-  readonly signInWithPlex: () => void;
+  readonly signInWithPlex: (redirectURI?: string) => void;
 }
 
 const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
@@ -39,30 +38,11 @@ const AuthenticationContext = createContext<IAuthenticationContextInterface>(
   AuthenticationContextDefaultImpl
 );
 
-export const AuthenticationContextProvider = (props: any) => {
-  const location = useLocation();
+export default function AuthenticationContextProvider(props: any) {
   const history = useHistory();
   const { get, post, patch } = useAPI();
   const { initSession } = useSession();
   const { pushSuccess, pushDanger } = useAlert();
-
-  useEffect(() => {
-    if (location.pathname === routes.CONFIRM_PLEX_SIGNIN.url) {
-      instance
-        .get<IEncodedToken>(APIRoutes.CONFIRM_PLEX_SIGN_IN(location.search))
-        .then(
-          (res) => {
-            initSession(res.data);
-          },
-          (error) => {
-            if (error.status) {
-              pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(error.status));
-            }
-          }
-        );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const signUp = async (data: ISignUpFormData) => {
     return await post<IUser>(APIRoutes.SIGN_UP, data).then((res) => {
@@ -102,6 +82,9 @@ export const AuthenticationContextProvider = (props: any) => {
     post<IEncodedToken>(APIRoutes.SIGN_IN, fd).then((res) => {
       if (res.data && res.status === 200) {
         initSession(res.data);
+        if (redirectURI) {
+          history.push(redirectURI);
+        }
       } else if (res.status === 401) {
         pushDanger("Wrong credentials");
       } else {
@@ -110,7 +93,7 @@ export const AuthenticationContextProvider = (props: any) => {
     });
   };
 
-  const signInWithPlex = () => {
+  const signInWithPlex = (redirectURI?: string) => {
     get<string>(APIRoutes.INIT_PLEX_SIGN_IN).then((res1) => {
       if (res1.data) {
         instance
@@ -123,7 +106,7 @@ export const AuthenticationContextProvider = (props: any) => {
                 .post(APIRoutes.AUTHORIZE_PLEX_SIGN_IN, {
                   key: res2.data.id,
                   code: res2.data.code,
-                  redirect_uri: "",
+                  redirect_uri: redirectURI ? redirectURI : "",
                 })
                 .then(
                   (res3) => {
@@ -163,6 +146,6 @@ export const AuthenticationContextProvider = (props: any) => {
       {props.children}
     </AuthenticationContext.Provider>
   );
-};
+}
 
 export const useAuthentication = () => useContext(AuthenticationContext);

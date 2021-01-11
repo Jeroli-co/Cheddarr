@@ -15,6 +15,10 @@ import {
 } from "../../../../shared/models/IAsyncCall";
 import { SwitchErrors } from "../../../../shared/components/errors/SwitchErrors";
 
+const MediaRecentlyAddedStyle = styled.div`
+  min-width: 100vw;
+`;
+
 const MediaRecentlyAddedTitleContainer = styled.div`
   display: flex;
   align-items: center;
@@ -50,14 +54,6 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentConfig]);
 
-  if (!currentConfig) {
-    return (
-      <Text isPrimary fontSize="1.5em">
-        Add a config plex to see this section
-      </Text>
-    );
-  }
-
   if (medias.isLoading) {
     return <Spinner color="primary" />;
   }
@@ -67,9 +63,9 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
   }
 
   return (
-    <div data-testid="MediaRecentlyAdded">
+    <MediaRecentlyAddedStyle>
       <MediaRecentlyAddedTitleContainer>
-        <Text isPrimary fontSize="1.5em">
+        <Text paddingLeft="10px" isPrimary fontSize="1.5em">
           {type === MediaRecentlyAddedType.MOVIES && "Movies recently added"}
           {type === MediaRecentlyAddedType.SERIES && "Series recently added"}
           {type === MediaRecentlyAddedType.ON_DECK && "On Deck"}
@@ -91,6 +87,6 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
           ))}
         </Carousel>
       )}
-    </div>
+    </MediaRecentlyAddedStyle>
   );
 };
