@@ -18,9 +18,7 @@ def make_url(
     queries: dict = None,
 ) -> str:
     queries = queries or {}
-    port = port
-    if version == 2:
-        version = None
+    version = version if version == 3 else None
     return utils.make_url(
         "%s://%s%s/api%s%s"
         % (

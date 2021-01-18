@@ -1,5 +1,5 @@
 from typing import Dict
-
+from datetime import datetime
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -9,7 +9,6 @@ from sqlalchemy.pool import StaticPool
 
 from server.api.dependencies import get_db
 from server.database.base import Base
-from server.models.users import Friendship, User
 from server.tests.utils import user_authentication_headers
 
 datasets = {
@@ -47,15 +46,13 @@ datasets = {
     },
     "series": {
         "title": "Star Wars: The Clone Wars",
-        "releaseDate": "2008-10-03",
+        "release_date": datetime.strptime("2008-10-03", "%Y-%m-%d"),
         "status": "Ended",
-        "posterUrl": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
-        "artUrl": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
-        "tvdbId": 83268,
-        "numberOfSeasons": 7,
-        "seasons": [],
-        "mediaType": "series",
-        "seriesType": "anime",
+        "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
+        "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+        "tvdb_id": 83268,
+        "number_of_seasons": 7,
+        "series_type": "anime",
     },
 }
 
@@ -102,6 +99,8 @@ def db():
 
 @pytest.fixture(scope="function", autouse=True)
 def setup():
+    from server.models import Series, SeriesRequest, Friendship, User
+
     Base.metadata.drop_all(_db_conn)
     Base.metadata.create_all(_db_conn)
     session = TestingSessionLocal()
@@ -109,7 +108,21 @@ def setup():
     user2 = User(**datasets["user2"])
     user3 = User(**datasets["user3"])
     user4 = User(**datasets["user4"])
-    session.add_all((user1, user2, user3))
+    series1 = Series(**datasets["series"])
+    series_request1 = SeriesRequest(
+        id=1,
+        requesting_user_id=user3.id,
+        requested_user_id=user1.id,
+        series=series1,
+    )
+    series_request2 = SeriesRequest(
+        id=2,
+        requesting_user_id=user1.id,
+        requested_user_id=user3.id,
+        series=series1,
+        status="approved",
+    )
+    session.add_all((user1, user2, user3, series_request1))
     friendship1 = Friendship(requesting_user=user1, requested_user=user2, pending=False)
     friendship2 = Friendship(requesting_user=user1, requested_user=user4, pending=True)
     session.add_all((friendship1, friendship2))

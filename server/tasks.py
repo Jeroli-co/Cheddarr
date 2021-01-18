@@ -15,14 +15,18 @@ def send_email_task(
     send_email(to_email, subject, html_template_name, environment)
 
 
-@celery_app.task(autoretry_for=(Exception,), retry_backoff=True)
+@celery_app.task(
+    autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 15}
+)
 def send_radarr_request_task(request_id: int):
     movie_request_repo = repositories.MovieRequestRepository(next(get_db()))
     request = movie_request_repo.find_by(id=request_id)
     radarr.send_request(request)
 
 
-@celery_app.task(autoretry_for=(Exception,), retry_backoff=True)
+@celery_app.task(
+    autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 15}
+)
 def send_sonarr_request_task(request_id: int):
     series_request_repo = repositories.SeriesRequestRepository(next(get_db()))
     request = series_request_repo.find_by(id=request_id)

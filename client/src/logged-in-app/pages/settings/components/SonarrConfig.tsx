@@ -184,11 +184,11 @@ const SonarrConfig = () => {
                 type="text"
                 ref={register}
                 value={
-                  currentSonarrConfig.data
-                    ? currentSonarrConfig.data.version
-                    : instanceInfo.data
-                    ? instanceInfo.data.version
-                    : ""
+                  instanceInfo.data
+                    ? instanceInfo.data.version :
+                      currentSonarrConfig.data
+                        ? currentSonarrConfig.data.version
+                        : ""
                 }
                 disabled={true}
               />

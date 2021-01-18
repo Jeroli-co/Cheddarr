@@ -18,13 +18,12 @@ def make_url(
     host: str,
     port: int,
     ssl: bool,
-    version: int = None,
+    version: int = 2,
     resource_path: str,
     queries: dict = None,
 ) -> str:
     queries = queries or {}
-    port = port
-    version = version
+    version = version if version == 3 else None
     return utils.make_url(
         "%s://%s%s/api%s%s"
         % (
@@ -163,6 +162,7 @@ def add_series(
         resource_path="/series",
     )
     res = requests.post(url, data=series.json(by_alias=True, exclude_none=True))
+    print(res.json())
     return schemas.SonarrSeries.parse_obj(res.json())
 
 

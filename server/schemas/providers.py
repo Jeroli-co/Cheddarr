@@ -64,7 +64,7 @@ class RadarrMovie(APIModel):
 class SonarrInstanceInfo(APIModel):
     root_folders: list[str]
     quality_profiles: list[dict]
-    language_profiles: list[dict]
+    language_profiles: Optional[list[dict]]
     version: int
 
 

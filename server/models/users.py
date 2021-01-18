@@ -24,7 +24,7 @@ class User(Model):
     password_hash = Column(String, nullable=False)
     avatar = Column(String)
     confirmed = Column(Boolean, nullable=False, default=False)
-    role = Column(DBEnum(UserRole), nullable=False, default=False)
+    role = Column(DBEnum(UserRole), nullable=False, default="user")
     notifications = relationship(
         "Notification",
         back_populates="user",

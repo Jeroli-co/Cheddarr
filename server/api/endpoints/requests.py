@@ -166,10 +166,9 @@ def delete_movie_request(
     ),
 ):
     request = movies_request_repo.find_by(id=request_id)
-    if (
-        request is None
-        or request.requesting_user_id != current_user.id
-        or request.requested_user_id != current_user.id
+    if request is None or (
+        request.requesting_user_id != current_user.id
+        and request.requested_user_id != current_user.id
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
     if (
@@ -407,10 +406,9 @@ def delete_series_request(
     ),
 ):
     request = series_request_repo.find_by(id=request_id)
-    if (
-        request is None
-        or request.requesting_user_id != current_user.id
-        or request.requested_user_id != current_user.id
+    if request is None or (
+        request.requesting_user_id != current_user.id
+        and request.requested_user_id != current_user.id
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
     if (

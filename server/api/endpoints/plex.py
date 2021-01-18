@@ -168,8 +168,8 @@ def get_plex_recent_series(
         for section in series_section
         for series in section.recentlyAdded(maxresults=20)
     ]
+    recent_series.sort(key=lambda s: s.addedAt, reverse=True)
     return recent_series
-
 
 @router.get(
     "/{config_id}/series/{series_id}",
