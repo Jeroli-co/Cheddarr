@@ -52,6 +52,7 @@ export const RadarrConfig = () => {
     if (!usePort) {
       setValue("port", "");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usePort]);
 
   const onSubmit = (data: IRadarrConfig) => {

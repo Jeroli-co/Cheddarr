@@ -74,6 +74,7 @@ export const SonarrConfig = () => {
     if (!usePort) {
       setValue("port", "");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usePort]);
 
   return (
