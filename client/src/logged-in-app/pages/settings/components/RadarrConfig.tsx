@@ -30,9 +30,14 @@ export const RadarrConfig = () => {
 
   const [usePort, setUsePort] = useState<boolean>(false);
 
-  const { register, handleSubmit, reset, getValues, errors } = useForm<
-    IRadarrConfig
-  >();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    errors,
+    setValue,
+  } = useForm<IRadarrConfig>();
 
   useEffect(() => {
     if (radarrConfig.data && instanceInfo.data === null) {
@@ -42,6 +47,12 @@ export const RadarrConfig = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [radarrConfig]);
+
+  useEffect(() => {
+    if (!usePort) {
+      setValue("port", "");
+    }
+  }, [usePort]);
 
   const onSubmit = (data: IRadarrConfig) => {
     if (data.port === "") {
@@ -95,8 +106,9 @@ export const RadarrConfig = () => {
           {instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
         </RowLayout>
         <br />
-        {radarrConfig.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
-        {!radarrConfig.isLoading && (
+        {radarrConfig.isLoading ||
+          (instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />)}
+        {!radarrConfig.isLoading && !instanceInfo.isLoading && (
           <div>
             <div className="field">
               <label>API Key</label>

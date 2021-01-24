@@ -28,18 +28,14 @@ export const SonarrConfig = () => {
   } = useSonarrConfig();
   const [usePort, setUsePort] = useState<boolean>(false);
 
-  const { register, handleSubmit, getValues, errors, reset } = useForm<
-    ISonarrConfig
-  >();
-
-  useEffect(() => {
-    if (currentSonarrConfig.data) {
-      reset(currentSonarrConfig.data);
-      setUsePort(currentSonarrConfig.data.port !== null);
-      getInstanceInfo(currentSonarrConfig.data, false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSonarrConfig]);
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    errors,
+    reset,
+    setValue,
+  } = useForm<ISonarrConfig>();
 
   const getInstanceInfo = (data: IProviderConfigBase, withAlert: boolean) => {
     if (data.port === "") {
@@ -64,6 +60,21 @@ export const SonarrConfig = () => {
       instanceInfo.data && instanceInfo.data.version.toString().startsWith("3")
     );
   };
+
+  useEffect(() => {
+    if (currentSonarrConfig.data) {
+      reset(currentSonarrConfig.data);
+      setUsePort(currentSonarrConfig.data.port !== null);
+      getInstanceInfo(currentSonarrConfig.data, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSonarrConfig]);
+
+  useEffect(() => {
+    if (!usePort) {
+      setValue("port", "");
+    }
+  }, [usePort]);
 
   return (
     <PageLayout>
@@ -97,10 +108,9 @@ export const SonarrConfig = () => {
           {instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
         </RowLayout>
         <br />
-        {currentSonarrConfig.isLoading && (
-          <SecondarySpinner size={Sizes.LARGE} />
-        )}
-        {!currentSonarrConfig.isLoading && (
+        {currentSonarrConfig.isLoading ||
+          (instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />)}
+        {!currentSonarrConfig.isLoading && !instanceInfo.isLoading && (
           <div>
             <div className="field">
               <label>API Key</label>

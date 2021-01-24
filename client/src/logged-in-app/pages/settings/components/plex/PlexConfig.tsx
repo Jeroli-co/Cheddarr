@@ -30,7 +30,9 @@ const PlexConfig = () => {
     false
   );
 
-  const { handleSubmit, register, errors, reset } = useForm<IPlexConfig>();
+  const { handleSubmit, register, errors, reset, setValue } = useForm<
+    IPlexConfig
+  >();
   const {
     currentConfig,
     createConfig,
@@ -76,6 +78,12 @@ const PlexConfig = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentConfig]);
+
+  useEffect(() => {
+    if (!usePort) {
+      setValue("port", "");
+    }
+  }, [usePort]);
 
   return (
     <PageLayout>
