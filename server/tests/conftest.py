@@ -12,48 +12,96 @@ from server.database.base import Base
 from server.tests.utils import user_authentication_headers
 
 datasets = {
-    "user1": {
-        "id": 1,
-        "username": "user1",
-        "email": "email1@test.com",
-        "password": "password1",
-        "avatar": "http://avatar.fake",
-        "confirmed": True,
-    },
-    "user2": {
-        "id": 2,
-        "username": "user2",
-        "email": "email2@test.com",
-        "password": "password2",
-        "avatar": "http://avatar.fake",
-        "confirmed": True,
-    },
-    "user3": {
-        "id": 3,
-        "username": "user3",
-        "email": "email3@test.com",
-        "password": "password3",
-        "avatar": "http://avatar.fake",
-        "confirmed": True,
-    },
-    "user4": {
-        "id": 4,
-        "username": "user4",
-        "email": "email4@test.com",
-        "password": "password4",
-        "avatar": "http://avatar.fake",
-        "confirmed": False,
-    },
-    "series": {
-        "title": "Star Wars: The Clone Wars",
-        "release_date": datetime.strptime("2008-10-03", "%Y-%m-%d"),
-        "status": "Ended",
-        "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
-        "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
-        "tvdb_id": 83268,
-        "number_of_seasons": 7,
-        "series_type": "anime",
-    },
+    "users": [
+        {
+            "id": 1,
+            "username": "user1",
+            "email": "email1@test.com",
+            "password": "password1",
+            "avatar": "http://avatar.fake",
+            "confirmed": True,
+        },
+        {
+            "id": 2,
+            "username": "user2",
+            "email": "email2@test.com",
+            "password": "password2",
+            "avatar": "http://avatar.fake",
+            "confirmed": True,
+        },
+        {
+            "id": 3,
+            "username": "user3",
+            "email": "email3@test.com",
+            "password": "password3",
+            "avatar": "http://avatar.fake",
+            "confirmed": True,
+        },
+        {
+            "id": 4,
+            "username": "user4",
+            "email": "email4@test.com",
+            "password": "password4",
+            "avatar": "http://avatar.fake",
+            "confirmed": False,
+        },
+    ],
+    "series": [
+        {
+            "id": 1,
+            "title": "Star Wars: The Clone Wars",
+            "release_date": datetime.strptime("2008-10-03", "%Y-%m-%d"),
+            "status": "Ended",
+            "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
+            "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+            "tvdb_id": 83268,
+            "number_of_seasons": 7,
+            "series_type": "anime",
+        }
+    ],
+    "series_requests": [
+        {
+            "id": 1,
+            "requesting_user_id": 3,
+            "requested_user_id": 1,
+            "status": "pending",
+            "series_id": 1,
+        },
+        {
+            "id": 2,
+            "requesting_user_id": 1,
+            "requested_user_id": 3,
+            "status": "approved",
+            "series_id": 1,
+        },
+    ],
+    "movies": [
+        {
+            "id": 1,
+            "title": "Star Wars: The Clone Wars",
+            "release_date": datetime.strptime("1977-10-18", "%Y-%m-%d"),
+            "status": "Ended",
+            "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
+            "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+            "tmdb_id": 11,
+        }
+    ],
+    "movies_requests": [
+        {
+            "id": 1,
+            "requesting_user_id": 3,
+            "requested_user_id": 1,
+            "status": "pending",
+            "movie_id": 1,
+        },
+        {
+            "id": 2,
+            "requesting_user_id": 1,
+            "requested_user_id": 3,
+            "status": "approved",
+            "movie_id": 1,
+        },
+    ],
 }
 
 
@@ -99,33 +147,34 @@ def db():
 
 @pytest.fixture(scope="function", autouse=True)
 def setup():
-    from server.models import Series, SeriesRequest, Friendship, User
+    from server.models import (
+        Movie,
+        Series,
+        MovieRequest,
+        SeriesRequest,
+        Friendship,
+        User,
+    )
 
     Base.metadata.drop_all(_db_conn)
     Base.metadata.create_all(_db_conn)
     session = TestingSessionLocal()
-    user1 = User(**datasets["user1"])
-    user2 = User(**datasets["user2"])
-    user3 = User(**datasets["user3"])
-    user4 = User(**datasets["user4"])
-    series1 = Series(**datasets["series"])
-    series_request1 = SeriesRequest(
-        id=1,
-        requesting_user_id=user3.id,
-        requested_user_id=user1.id,
-        series=series1,
-    )
-    series_request2 = SeriesRequest(
-        id=2,
-        requesting_user_id=user1.id,
-        requested_user_id=user3.id,
-        series=series1,
-        status="approved",
-    )
-    session.add_all((user1, user2, user3, series_request1))
+    user1 = User(**datasets["users"][0])
+    user2 = User(**datasets["users"][1])
+    user3 = User(**datasets["users"][2])
+    user4 = User(**datasets["users"][3])
+    session.add_all((user1, user2, user3))
     friendship1 = Friendship(requesting_user=user1, requested_user=user2, pending=False)
     friendship2 = Friendship(requesting_user=user1, requested_user=user4, pending=True)
     session.add_all((friendship1, friendship2))
+    series1 = Series(**datasets["series"][0])
+    movie1 = Movie(**datasets["movies"][0])
+    session.add_all((movie1, series1))
+    series_request1 = SeriesRequest(**datasets["series_requests"][0])
+    series_request2 = SeriesRequest(**datasets["series_requests"][1])
+    movie_request1 = MovieRequest(**datasets["movies_requests"][0])
+    movie_request2 = MovieRequest(**datasets["movies_requests"][1])
+    session.add_all((series_request1, series_request2, movie_request1, movie_request2))
     session.commit()
 
 
@@ -133,8 +182,8 @@ def setup():
 def normal_user_token_headers(client: TestClient) -> Dict[str, str]:
     return user_authentication_headers(
         client=client,
-        email=datasets["user1"]["email"],
-        password=datasets["user1"]["password"],
+        email=datasets["users"][0]["email"],
+        password=datasets["users"][0]["password"],
     )
 
 

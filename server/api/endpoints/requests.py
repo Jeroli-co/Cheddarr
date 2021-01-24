@@ -88,12 +88,6 @@ def add_movie_request(
         movie=movie,
     )
     movie_request_repo.save(movie_request)
-    requested_user.notifications.append(
-        models.Notification(
-            message=f"You have a new movie request by {current_user.username} for {movie.title}"
-        )
-    )
-    user_repo.save(requested_user)
     return movie_request
 
 
@@ -153,7 +147,11 @@ def update_movie_request(
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
 
-    movies_request_repo.save(request)
+    current_movie_requests = movies_request_repo.find_all_by(movie_id=request.movie_id)
+    for r in current_movie_requests:
+        r.status = request.status
+        movies_request_repo.save(r)
+
     return request
 
 
@@ -256,7 +254,7 @@ def add_series_request(
             requesting_user=current_user,
             series=series,
         )
-        update_existing_series_request(series_request, request_in)
+        unify_series_request(series_request, request_in)
         series_request_repo.save(series_request)
         return series_request
 
@@ -301,7 +299,7 @@ def add_series_request(
                 status.HTTP_409_CONFLICT, "This content has already been requested."
             )
 
-        update_existing_series_request(series_request, request_in)
+        unify_series_request(series_request, request_in)
     else:
         series_request.seasons = []
 
@@ -309,7 +307,7 @@ def add_series_request(
     return series_request
 
 
-def update_existing_series_request(
+def unify_series_request(
     series_request: models.SeriesRequest, request_in: schemas.SeriesRequestCreate
 ):
     if request_in.seasons is None:
