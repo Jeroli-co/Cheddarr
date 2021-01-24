@@ -1,3 +1,4 @@
+import time
 from typing import Optional, Union
 
 import requests
@@ -162,7 +163,6 @@ def add_series(
         resource_path="/series",
     )
     res = requests.post(url, data=series.json(by_alias=True, exclude_none=True))
-    print(res.json())
     return schemas.SonarrSeries.parse_obj(res.json())
 
 
@@ -234,7 +234,10 @@ def send_request(request: SeriesRequest):
             ignore_episodes_without_files=False,
             search_for_missing_episodes=False,
         )
+        for season in series.seasons:
+            season.monitored = False
         series = add_series(config, series)
+        time.sleep(2)
     else:
         series = get_series(config, series.id)
     # request seasons is empty so we are requesting all the series
@@ -252,7 +255,6 @@ def send_request(request: SeriesRequest):
                 season.monitored = True
                 continue
             for req_episode in req_season.episodes:
-                print(episodes)
                 episode = next(
                     e
                     for e in episodes
@@ -261,5 +263,4 @@ def send_request(request: SeriesRequest):
                 )
                 episode.monitored = True
                 update_episode(config, episode)
-        print(series)
         update_series(config, series)
