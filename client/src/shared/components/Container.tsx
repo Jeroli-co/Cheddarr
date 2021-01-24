@@ -23,7 +23,6 @@ type ContainerProps = {
 
 const Container = styled.div<ContainerProps>`
   display: flex;
-  text-align: ${(props) => (props.textAlign ? props.textAlign : "left")};
   flex-direction: column;
   justify-content: ${(props) =>
     props.justifyContent ? props.justifyContent : "flex-start"};
