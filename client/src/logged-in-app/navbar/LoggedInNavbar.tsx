@@ -86,7 +86,6 @@ export default function LoggedInNavbar() {
   const burgerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownMobileRef = useRef<HTMLDivElement>(null);
-  const { currentConfig } = usePlexConfig();
 
   useOutsideAlerter([dropdownRef, dropdownMobileRef, burgerRef], () =>
     setIsDropdownOpen(false)
@@ -105,7 +104,7 @@ export default function LoggedInNavbar() {
               <img src={logo} alt="Chedarr" width="40px" height="24px" />
             </NavbarAppLogo>
           </Link>
-          {currentConfig.data && <SearchBar />}
+          {<SearchBar />}
         </RowLayout>
         <NavbarEnd>
           <RowLayout

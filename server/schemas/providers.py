@@ -157,11 +157,9 @@ class PlexConfigCreateUpdate(ProviderConfigBase, PlexServerInfo):
 #####################################
 # PlexAPI                           #
 #####################################
-class PlexServerIn(APIModel):
+class PlexServerUrl(APIModel):
     base_url: str = Field(alias="_baseurl")
-    api_key: str = Field(alias="_token")
     server_id: str = Field(alias="machineIdentifier")
-    server_name: str = Field(alias="friendlyName")
 
 
 class PlexServerOut(APIModel):
@@ -188,7 +186,7 @@ class PlexVideo(APIModel):
     art_url: Optional[AnyHttpUrl] = Field(alias="artUrl")
     rating: Optional[float] = Field(alias="audienceRating")
     is_watched: Optional[bool] = Field(alias="isWatched")
-    server: PlexServerIn = Field(alias="_server")
+    server: PlexServerUrl = Field(alias="_server")
     web_url: Optional[AnyHttpUrl] = Field(alias="url")
 
     @validator("web_url", pre=True)

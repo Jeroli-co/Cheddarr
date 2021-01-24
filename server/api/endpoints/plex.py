@@ -54,19 +54,10 @@ def get_plex_account_server(
         raise HTTPException(
             status.HTTP_404_NOT_FOUND, "No Plex account linked to the user."
         )
-    server = plex.get_plex_account_server(plex_account.api_key, server_name)
-    if server is None:
+    server_out = plex.get_plex_account_server(plex_account.api_key, server_name)
+    if server_out is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex server not found.")
-    server_in = schemas.PlexServerIn.from_orm(server)
-    url = urlparse(server_in.base_url)
-    return schemas.PlexServerOut(
-        server_name=server_in.server_name,
-        server_id=server_in.server_id,
-        host=url.hostname,
-        port=url.port,
-        ssl=True if url.scheme == "https" else False,
-        api_key=server_in.api_key,
-    )
+    return server_out
 
 
 @router.get(
@@ -170,6 +161,7 @@ def get_plex_recent_series(
     ]
     recent_series.sort(key=lambda s: s.addedAt, reverse=True)
     return recent_series
+
 
 @router.get(
     "/{config_id}/series/{series_id}",

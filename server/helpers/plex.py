@@ -5,7 +5,7 @@ from plexapi.library import LibrarySection, MovieSection, ShowSection
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
 
-from server.schemas import PlexServerInfo
+from server.schemas import PlexServerInfo, PlexServerOut
 
 
 def get_plex_account_servers(api_key: str) -> list[PlexServerInfo]:
@@ -20,12 +20,21 @@ def get_plex_account_servers(api_key: str) -> list[PlexServerInfo]:
     ]
 
 
-def get_plex_account_server(api_key: str, name: str) -> Optional[PlexServer]:
+def get_plex_account_server(api_key: str, name: str) -> Optional[PlexServerOut]:
     try:
-        server = MyPlexAccount(api_key).resource(name).connect()
+        server = MyPlexAccount(api_key).resource(name)
+        server_con = next(s for s in server.connections if s.local)
+        server_out = PlexServerOut(
+            host=server_con.address,
+            port=server_con.port,
+            ssl=True if server_con.protocol == "HTTPS" else False,
+            api_key=server.accessToken,
+            server_id=server.clientIdentifier,
+            server_name=server.name,
+        )
     except PlexApiException:
         return None
-    return server
+    return server_out
 
 
 def get_server(

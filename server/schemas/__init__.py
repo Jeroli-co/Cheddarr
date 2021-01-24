@@ -18,7 +18,6 @@ from .providers import (
     PlexMovie,
     PlexSeason,
     PlexSeries,
-    PlexServerIn,
     PlexServerInfo,
     PlexServerOut,
     ProviderConfigBase,
