@@ -7,10 +7,14 @@ import { createContext, useContext } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../../shared/models/IAsyncCall";
 import { IPlexConfig } from "../pages/settings/components/plex/models/IPlexConfig";
 import { DefaultAsyncData, IAsyncData } from "../../shared/models/IAsyncData";
+import { useAlert } from "../../shared/contexts/AlertContext";
+import { IPlexServerInfo } from "../pages/settings/components/plex/models/IPlexServerInfo";
 
 interface PlexConfigContextInterface {
   configs: IAsyncCall<IPlexConfig[] | null>;
   currentConfig: IAsyncData<IPlexConfig | null>;
+  readonly createConfig: (_: IPlexConfig) => void;
+  readonly createConfigFromServerInfo: (_: IPlexServerInfo) => void;
   readonly updateConfig: (_: IPlexConfig) => void;
   readonly deleteConfig: (_: string) => Promise<IAsyncCall>;
   readonly addConfig: (_: IPlexConfig) => void;
@@ -20,6 +24,8 @@ interface PlexConfigContextInterface {
 export const PlexConfigContextDefaultImpl: PlexConfigContextInterface = {
   configs: DefaultAsyncCall,
   currentConfig: DefaultAsyncData,
+  createConfig(_: IPlexConfig): void {},
+  createConfigFromServerInfo(_: IPlexServerInfo): void {},
   updateConfig(_: IPlexConfig): void {},
   deleteConfig(_: string): Promise<IAsyncCall> {
     return Promise.resolve(DefaultAsyncCall);
@@ -48,7 +54,9 @@ export default function PlexConfigContextProvider(props: any) {
     IAsyncData<IPlexConfig | null>
   >(DefaultAsyncData);
 
-  const { get, put, remove } = useAPI();
+  const { get, put, remove, post } = useAPI();
+
+  const { pushSuccess, pushDanger } = useAlert();
 
   useEffect(() => {
     if (plex) {
@@ -64,9 +72,13 @@ export default function PlexConfigContextProvider(props: any) {
   }, [plex]);
 
   useEffect(() => {
-    if (configs && configs.data && configs.data.length > 0) {
+    if (!configs.isLoading && configs.data && configs.data?.length > 0) {
       setCurrentConfig({ data: configs.data[0], isLoading: false });
-    } else {
+    } else if (
+      !configs.isLoading &&
+      configs.data &&
+      configs.data?.length === 0
+    ) {
       setCurrentConfig({ ...DefaultAsyncData, isLoading: false });
     }
   }, [configs]);
@@ -79,9 +91,36 @@ export default function PlexConfigContextProvider(props: any) {
     }
   };
 
+  const createConfig = (config: IPlexConfig) => {
+    post<IPlexConfig>(APIRoutes.CREATE_PLEX_CONFIG, config).then((res) => {
+      if (res.data && res.status === 201) {
+        addConfig(res.data);
+        pushSuccess("Configuration created");
+      } else {
+        pushDanger("Cannot create config");
+      }
+    });
+  };
+
+  const createConfigFromServerInfo = (serverDetail: IPlexServerInfo) => {
+    post<IPlexConfig>(APIRoutes.CREATE_PLEX_CONFIG, serverDetail).then(
+      (res) => {
+        if (res.data && res.status === 201) {
+          addConfig(res.data);
+          pushSuccess("Configuration created");
+        } else {
+          pushDanger("Cannot create config");
+        }
+      }
+    );
+  };
+
   const updateConfig = (newConfig: IPlexConfig) => {
-    put<IPlexConfig>(APIRoutes.UPDATE_PLEX_CONFIG(newConfig.id)).then((res) => {
-      if (res.data) {
+    put<IPlexConfig>(
+      APIRoutes.UPDATE_PLEX_CONFIG(newConfig.id),
+      newConfig
+    ).then((res) => {
+      if (res.status === 200 && res.data) {
         let configurations = configs.data;
         if (configurations) {
           let indexOf = configurations.findIndex((c) => c.id === newConfig.id);
@@ -90,6 +129,9 @@ export default function PlexConfigContextProvider(props: any) {
             setConfigs({ ...configs, data: configurations });
           }
         }
+        pushSuccess("Configuration updated");
+      } else {
+        pushDanger("Cannot update configuration");
       }
     });
   };
@@ -115,6 +157,8 @@ export default function PlexConfigContextProvider(props: any) {
       value={{
         configs: configs,
         currentConfig: currentConfig,
+        createConfig,
+        createConfigFromServerInfo,
         updateConfig,
         deleteConfig,
         addConfig,

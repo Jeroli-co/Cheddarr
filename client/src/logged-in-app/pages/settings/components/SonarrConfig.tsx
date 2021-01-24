@@ -14,6 +14,7 @@ import { SecondaryButton } from "../../../../experimentals/Button";
 import { SecondaryDivider } from "../../../../experimentals/Divider";
 import { SecondarySpinner } from "../../../../shared/components/Spinner";
 import { Sizes } from "../../../../shared/enums/Sizes";
+import { PageLayout } from "../../../../experimentals/PageLayout";
 
 export const SonarrConfig = () => {
   const [instanceInfo, setInstanceInfo] = useState<
@@ -48,6 +49,9 @@ export const SonarrConfig = () => {
   };
 
   const onSubmit = (data: ISonarrConfig) => {
+    if (data.port === "") {
+      data.port = null;
+    }
     if (currentSonarrConfig.data) {
       updateSonarrConfig(currentSonarrConfig.data.id, data);
     } else {
@@ -62,7 +66,7 @@ export const SonarrConfig = () => {
   };
 
   return (
-    <div>
+    <PageLayout>
       <form
         id="radarr-config-form"
         autoComplete="off"
@@ -99,7 +103,7 @@ export const SonarrConfig = () => {
         {!currentSonarrConfig.isLoading && (
           <div>
             <div className="field">
-              <label className="label">API Key</label>
+              <label>API Key</label>
               <div className="control">
                 <input
                   name="apiKey"
@@ -118,7 +122,7 @@ export const SonarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Hostname or IP Address</label>
+              <label>Hostname or IP Address</label>
               <div className="control">
                 <input
                   name="host"
@@ -137,7 +141,7 @@ export const SonarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">
+              <label>
                 Port{" "}
                 <input
                   type="checkbox"
@@ -145,20 +149,18 @@ export const SonarrConfig = () => {
                   onChange={() => setUsePort(!usePort)}
                 />
               </label>
-              {usePort && (
-                <div className="control">
-                  <input
-                    name="port"
-                    className="input"
-                    type="number"
-                    placeholder="Port"
-                    ref={register({ minLength: 4, maxLength: 5 })}
-                    minLength={1000}
-                    maxLength={99999}
-                  />
-                </div>
-              )}
-              {!usePort && <p>Check the box to set a port value</p>}
+              <div className="control">
+                <input
+                  name="port"
+                  className="input"
+                  type="number"
+                  placeholder="Port"
+                  ref={register({ minLength: 4, maxLength: 5 })}
+                  minLength={1000}
+                  maxLength={99999}
+                  disabled={!usePort}
+                />
+              </div>
             </div>
             <div className="field">
               <div className="control">
@@ -195,7 +197,7 @@ export const SonarrConfig = () => {
               <br />
             </div>
             <div className="field">
-              <label className="label">Version</label>
+              <label>Version</label>
               <div className="control">
                 <input
                   name="version"
@@ -214,7 +216,7 @@ export const SonarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Default Root Folder</label>
+              <label>Default Root Folder</label>
               <div className="control">
                 <div className="select is-fullwidth">
                   <select name="rootFolder" ref={register}>
@@ -229,7 +231,7 @@ export const SonarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Default Root Folder (Anime)</label>
+              <label>Default Root Folder (Anime)</label>
               <div className="control">
                 <div className="select is-fullwidth">
                   <select name="animeRootFolder" ref={register}>
@@ -244,7 +246,7 @@ export const SonarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Default Quality Profile</label>
+              <label>Default Quality Profile</label>
               <div className="control">
                 <div className="select is-fullwidth">
                   <select name="qualityProfileId" ref={register}>
@@ -259,7 +261,7 @@ export const SonarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Default Quality Profile (Anime)</label>
+              <label>Default Quality Profile (Anime)</label>
               <div className="control">
                 <div className="select is-fullwidth">
                   <select name="animeQualityProfileId" ref={register}>
@@ -275,7 +277,7 @@ export const SonarrConfig = () => {
             </div>
             {isVersionThree() && (
               <div className="field">
-                <label className="label">Default Language Profile</label>
+                <label>Default Language Profile</label>
                 <div className="control">
                   <div className="select is-fullwidth">
                     <select name="languageProfileId" ref={register}>
@@ -292,9 +294,7 @@ export const SonarrConfig = () => {
             )}
             {isVersionThree() && (
               <div className="field">
-                <label className="label">
-                  Default Language Profile (Anime)
-                </label>
+                <label>Default Language Profile (Anime)</label>
                 <div className="control">
                   <div className="select is-fullwidth">
                     <select name="animeLanguageProfileId" ref={register}>
@@ -317,6 +317,6 @@ export const SonarrConfig = () => {
           </div>
         )}
       </form>
-    </div>
+    </PageLayout>
   );
 };

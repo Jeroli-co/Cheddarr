@@ -97,7 +97,7 @@ export const useFriends = () => {
     post<IPublicUser>(APIRoutes.SEND_FRIEND_REQUEST, {
       usernameOrEmail: usernameOrEmail,
     }).then((res) => {
-      if (res.status === 200 && res.data && friendsRequestSent.data) {
+      if (res.status === 201 && res.data && friendsRequestSent.data) {
         let data = friendsRequestSent.data;
         data.push(res.data);
         setFriendsRequestSent({ ...friendsRequestSent, data: data });

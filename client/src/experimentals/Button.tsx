@@ -10,7 +10,6 @@ type ButtonStyleProps = {
 };
 
 export const Button = styled.button<ButtonStyleProps>`
-
   margin: 0
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -108,10 +107,46 @@ export const PrimaryRoundedButton = styled(RoundedButton)`
   background-color: ${(props) => props.theme.primary};
 `;
 
+export const PrimaryOutlinedButton = styled(Button)`
+  border: 1px solid ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.primary};
+  &:hover {
+    color: white;
+    background-color: ${(props) => props.theme.primary};
+  }
+`;
+
+export const PrimaryOutlinedRoundedButton = styled(RoundedButton)`
+  border: 1px solid ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.primary};
+  &:hover {
+    color: white;
+    background-color: ${(props) => props.theme.primary};
+  }
+`;
+
 export const SecondaryButton = styled(Button)`
   background-color: ${(props) => props.theme.secondary};
 `;
 
 export const SecondaryRoundedButton = styled(RoundedButton)`
   background-color: ${(props) => props.theme.secondary};
+`;
+
+export const SecondaryOutlinedButton = styled(Button)`
+  border: 1px solid ${(props) => props.theme.secondary};
+  color: ${(props) => props.theme.secondary};
+  &:hover {
+    color: white;
+    background-color: ${(props) => props.theme.primary};
+  }
+`;
+
+export const SecondaryOutlinedRoundedButton = styled(RoundedButton)`
+  border: 1px solid ${(props) => props.theme.secondary};
+  color: ${(props) => props.theme.secondary};
+  &:hover {
+    color: white;
+    background-color: ${(props) => props.theme.primary};
+  }
 `;

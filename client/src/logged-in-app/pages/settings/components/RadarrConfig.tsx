@@ -14,6 +14,7 @@ import { SecondaryButton } from "../../../../experimentals/Button";
 import { SecondarySpinner } from "../../../../shared/components/Spinner";
 import { Sizes } from "../../../../shared/enums/Sizes";
 import { SecondaryDivider } from "../../../../experimentals/Divider";
+import { PageLayout } from "../../../../experimentals/PageLayout";
 
 export const RadarrConfig = () => {
   const [instanceInfo, setInstanceInfo] = useState<
@@ -43,6 +44,9 @@ export const RadarrConfig = () => {
   }, [radarrConfig]);
 
   const onSubmit = (data: IRadarrConfig) => {
+    if (data.port === "") {
+      data.port = null;
+    }
     if (radarrConfig.data) {
       updateRadarrConfig(radarrConfig.data.id, data);
     } else {
@@ -60,7 +64,7 @@ export const RadarrConfig = () => {
   };
 
   return (
-    <div>
+    <PageLayout>
       <form
         id="radarr-config-form"
         autoComplete="off"
@@ -95,7 +99,7 @@ export const RadarrConfig = () => {
         {!radarrConfig.isLoading && (
           <div>
             <div className="field">
-              <label className="label">API Key</label>
+              <label>API Key</label>
               <div className="control">
                 <input
                   name="apiKey"
@@ -114,7 +118,7 @@ export const RadarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Hostname or IP Address</label>
+              <label>Hostname or IP Address</label>
               <div className="control">
                 <input
                   name="host"
@@ -133,7 +137,7 @@ export const RadarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">
+              <label>
                 Port{" "}
                 <input
                   type="checkbox"
@@ -150,6 +154,7 @@ export const RadarrConfig = () => {
                   ref={register({ minLength: 4, maxLength: 5 })}
                   minLength={1000}
                   maxLength={99999}
+                  disabled={!usePort}
                 />
               </div>
             </div>
@@ -188,7 +193,7 @@ export const RadarrConfig = () => {
               <br />
             </div>
             <div className="field">
-              <label className="label">Version</label>
+              <label>Version</label>
               <div className="control">
                 <input
                   name="version"
@@ -201,7 +206,7 @@ export const RadarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Default Root Folder</label>
+              <label>Default Root Folder</label>
               <div className="control">
                 <div className="select is-fullwidth">
                   <select name="rootFolder" ref={register}>
@@ -216,7 +221,7 @@ export const RadarrConfig = () => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Default Quality Profile</label>
+              <label>Default Quality Profile</label>
               <div className="control">
                 <div className="select is-fullwidth">
                   <select name="qualityProfileId" ref={register}>
@@ -237,6 +242,6 @@ export const RadarrConfig = () => {
           </div>
         )}
       </form>
-    </div>
+    </PageLayout>
   );
 };

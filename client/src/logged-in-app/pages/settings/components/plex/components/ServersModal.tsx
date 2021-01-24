@@ -1,12 +1,12 @@
 import React, { useContext, useState } from "react";
-import Spinner from "../../../../../../shared/components/Spinner";
+import { PrimarySpinner } from "../../../../../../shared/components/Spinner";
 import { IPlexServerInfo } from "../models/IPlexServerInfo";
 import { PlexConfigContext } from "../../../../../contexts/PlexConfigContext";
 import { usePlexServers } from "../../../../../hooks/usePlexServers";
 import { useAPI } from "../../../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../../../shared/enums/APIRoutes";
-import { IPlexConfig } from "../models/IPlexConfig";
-import { useAlert } from "../../../../../../shared/contexts/AlertContext";
+import { Sizes } from "../../../../../../shared/enums/Sizes";
+import { PrimaryOutlinedButton } from "../../../../../../experimentals/Button";
 
 type PlexServerComponentProps = {
   server: IPlexServerInfo;
@@ -23,10 +23,13 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
 
   const servers = usePlexServers();
 
-  const { addConfig } = useContext(PlexConfigContext);
+  const {
+    updateConfig,
+    currentConfig,
+    createConfigFromServerInfo,
+  } = useContext(PlexConfigContext);
 
-  const { get, post } = useAPI();
-  const { pushSuccess, pushDanger } = useAlert();
+  const { get } = useAPI();
 
   const linkServer = () => {
     if (serverSelected) {
@@ -34,18 +37,13 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
         APIRoutes.GET_PLEX_SERVER(serverSelected.serverName)
       ).then((serverDetail) => {
         if (serverDetail.data && serverDetail.status === 200) {
-          post<IPlexConfig>(
-            APIRoutes.CREATE_PLEX_CONFIG,
-            serverDetail.data
-          ).then((res) => {
-            if (res.data && res.status === 201) {
-              addConfig(res.data);
-              pushSuccess("Configuration created");
-              onClose();
-            } else {
-              pushDanger("Cannot create config");
-            }
-          });
+          if (currentConfig.data) {
+            let newConfig = { ...currentConfig.data, ...serverDetail.data };
+            updateConfig(newConfig);
+          } else {
+            createConfigFromServerInfo(serverDetail.data);
+          }
+          onClose();
         }
       });
     }
@@ -84,7 +82,7 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
       <div className="modal-background" onClick={(e) => onClose()} />
       <div className="modal-card">
         <header className="modal-card-head">
-          <p className="modal-card-title has-text-primary has-text-weight-semibold">
+          <p className="modal-card-title has-text-weight-semibold">
             Plex servers
           </p>
           <button
@@ -94,23 +92,16 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
           />
         </header>
         <section className="modal-card-body">
-          {!servers && <Spinner color="primary" size="2x" />}
+          {!servers && <PrimarySpinner size={Sizes.LARGE} />}
           {servers.data &&
             servers.data.map((server) => {
               return <Server key={server.serverName} server={server} />;
             })}
         </section>
         <footer className="modal-card-foot">
-          <button
-            type="button"
-            className="button is-primary is-inverted"
-            onClick={() => linkServer()}
-          >
+          <PrimaryOutlinedButton type="button" onClick={() => linkServer()}>
             Save changes
-          </button>
-          <button type="button" className="button" onClick={(e) => onClose()}>
-            Cancel
-          </button>
+          </PrimaryOutlinedButton>
         </footer>
       </div>
     </div>

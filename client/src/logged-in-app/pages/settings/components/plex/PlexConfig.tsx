@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   faEdit,
   faExclamationCircle,
@@ -7,7 +7,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
 import { RowLayout } from "../../../../../shared/components/Layouts";
-import { SubmitConfig } from "../../../../../experimentals/SubmitConfig";
 import { LinkPlexAccount } from "./components/LinkPlexAccount";
 import { ServersModal } from "./components/ServersModal";
 import { UnlinkAccountModal } from "./components/UnlinkAccountModal";
@@ -15,6 +14,12 @@ import { UnlinkServerModal } from "./components/UnlinkServerModal";
 import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
 import { IPlexConfig } from "./models/IPlexConfig";
 import { useSession } from "../../../../../shared/contexts/SessionContext";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
+import { SecondaryButton } from "../../../../../experimentals/Button";
+import { SecondarySpinner } from "../../../../../shared/components/Spinner";
+import { Sizes } from "../../../../../shared/enums/Sizes";
+import { PageLayout } from "../../../../../experimentals/PageLayout";
+import { SecondaryDivider } from "../../../../../experimentals/Divider";
 
 const PlexConfig = () => {
   const [isServersModalActive, setIsServersModalActive] = useState(false);
@@ -25,13 +30,15 @@ const PlexConfig = () => {
     false
   );
 
-  const { handleSubmit, formState } = useForm<IPlexConfig>();
+  const { handleSubmit, register, errors, reset } = useForm<IPlexConfig>();
   const {
     currentConfig,
+    createConfig,
     updateConfig,
     deleteConfig,
     isPlexAccountLinked,
   } = useContext(PlexConfigContext);
+  const [usePort, setUsePort] = useState(false);
 
   const { unlinkPlexAccount } = useSession();
 
@@ -47,36 +54,52 @@ const PlexConfig = () => {
   };
 
   const _onSubmit = (data: IPlexConfig) => {
-    updateConfig(data);
+    if (data.port === "") {
+      data.port = null;
+    }
+    if (currentConfig.data) {
+      let newConfig = { ...currentConfig.data, ...data };
+      updateConfig(newConfig);
+    } else {
+      createConfig(data);
+    }
   };
 
+  useEffect(() => {
+    if (currentConfig.data) {
+      reset(currentConfig.data);
+      setUsePort(currentConfig.data.port !== null);
+    }
+  }, [currentConfig]);
+
   return (
-    <div className="PlexConfig" data-testid="PlexConfig">
+    <PageLayout>
       <RowLayout
         justifyContent="space-between"
+        alignItems="center"
         borderBottom="1px solid LightGrey"
       >
         <h1 className="is-size-1">Plex</h1>
         <LinkPlexAccount />
       </RowLayout>
 
-      <div>
-        <form onSubmit={handleSubmit(_onSubmit)}>
+      {isPlexAccountLinked() && (
+        <div>
           <br />
-          {isPlexAccountLinked() && (
-            <p className="subtitle is-3">Plex server</p>
-          )}
-          {!currentConfig.data && isPlexAccountLinked() && (
-            <button
-              className="button is-primary"
+          <h3 className="is-size-3">Current Plex server</h3>
+          <br />
+          {currentConfig.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
+          {!currentConfig.isLoading && !currentConfig.data && (
+            <SecondaryButton
               type="button"
               onClick={() => setIsServersModalActive(true)}
             >
-              Link Plex server
-            </button>
+              Get account servers
+            </SecondaryButton>
           )}
-          {currentConfig.data && isPlexAccountLinked() && (
-            <RowLayout justifyContent="space-between" marginTop="2%">
+
+          {!currentConfig.isLoading && currentConfig.data && (
+            <RowLayout childMarginRight="20px">
               <p className="is-size-5 has-text-weight-light">
                 {currentConfig.data.serverName}
               </p>
@@ -98,28 +121,157 @@ const PlexConfig = () => {
               </button>
             </RowLayout>
           )}
-          <SubmitConfig isFormDirty={formState.dirty} />
-        </form>
-        <hr />
-        {isPlexAccountLinked() && (
-          <div>
-            <p className="subtitle is-3">Danger zone</p>
-            <div className="content">
-              <p className="is-size-7">
-                <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
-                that option
-              </p>
-              <button
-                className="button is-danger"
-                type="button"
-                onClick={() => setIsUnlinkAccountModalActive(true)}
-              >
-                Unlink Plex Account
-              </button>
+
+          <SecondaryDivider />
+
+          {currentConfig.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
+
+          {!currentConfig.isLoading && (
+            <form onSubmit={handleSubmit(_onSubmit)}>
+              <h3 className="is-size-3">
+                {currentConfig.data ? "Update" : "Add"} plex server
+              </h3>
+              <div className="field">
+                <label>Authentication token</label>
+                <div className="control">
+                  <input
+                    name="apiKey"
+                    className="input"
+                    type="text"
+                    placeholder="API Key"
+                    ref={register({
+                      required: true,
+                    })}
+                  />
+                  {errors.apiKey && errors.apiKey.type === "required" && (
+                    <p className="help is-danger">
+                      {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="field">
+                <label>Hostname or IP Address</label>
+                <div className="control">
+                  <input
+                    name="host"
+                    className="input"
+                    type="text"
+                    placeholder="Hostname or IP"
+                    ref={register({
+                      required: true,
+                    })}
+                  />
+                  {errors.host && errors.host.type === "required" && (
+                    <p className="help is-danger">
+                      {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="field">
+                <label>
+                  Port{" "}
+                  <input
+                    type="checkbox"
+                    checked={usePort}
+                    onChange={() => setUsePort(!usePort)}
+                  />
+                </label>
+                <div className="control">
+                  <input
+                    name="port"
+                    className="input"
+                    type="number"
+                    placeholder="Port"
+                    ref={register({ minLength: 4, maxLength: 5 })}
+                    minLength={1000}
+                    maxLength={99999}
+                    disabled={!usePort}
+                  />
+                </div>
+              </div>
+              <div className="field">
+                <label>Server ID</label>
+                <div className="control">
+                  <input
+                    name="serverId"
+                    className="input"
+                    type="text"
+                    placeholder="Server ID"
+                    ref={register({
+                      required: true,
+                    })}
+                  />
+                  {errors.serverId && errors.serverId.type === "required" && (
+                    <p className="help is-danger">
+                      {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="field">
+                <label>Server name</label>
+                <div className="control">
+                  <input
+                    name="serverName"
+                    className="input"
+                    type="text"
+                    placeholder="Server name"
+                    ref={register({
+                      required: true,
+                    })}
+                  />
+                  {errors.serverName &&
+                    errors.serverName.type === "required" && (
+                      <p className="help is-danger">
+                        {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+                      </p>
+                    )}
+                </div>
+              </div>
+              <div className="field">
+                <div className="control">
+                  <input
+                    id="ssl"
+                    type="checkbox"
+                    name="ssl"
+                    className="switch is-rounded is-small"
+                    ref={register}
+                  />
+                  <label htmlFor="ssl">SSL</label>
+                </div>
+              </div>
+              <div className="field">
+                <div className="control">
+                  <SecondaryButton type="submit">Save</SecondaryButton>
+                </div>
+              </div>
+            </form>
+          )}
+
+          <SecondaryDivider />
+
+          {currentConfig.data && (
+            <div>
+              <h3 className="is-size-3">Danger zone</h3>
+              <div className="content">
+                <p className="is-size-7">
+                  <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
+                  that option
+                </p>
+                <button
+                  className="button is-danger"
+                  type="button"
+                  onClick={() => setIsUnlinkAccountModalActive(true)}
+                >
+                  Unlink Plex Account
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {isServersModalActive && (
         <ServersModal onClose={() => setIsServersModalActive(false)} />
@@ -141,7 +293,7 @@ const PlexConfig = () => {
           onClose={() => setIsUnlinkAccountModalActive(false)}
         />
       )}
-    </div>
+    </PageLayout>
   );
 };
 
