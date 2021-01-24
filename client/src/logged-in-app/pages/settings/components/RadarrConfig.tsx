@@ -13,8 +13,9 @@ import {
 import { SecondaryButton } from "../../../../experimentals/Button";
 import { SecondarySpinner } from "../../../../shared/components/Spinner";
 import { Sizes } from "../../../../shared/enums/Sizes";
+import { SecondaryDivider } from "../../../../experimentals/Divider";
 
-const RadarrConfig = () => {
+export const RadarrConfig = () => {
   const [instanceInfo, setInstanceInfo] = useState<
     IAsyncCall<IRadarrInstanceInfo | null>
   >(DefaultAsyncCall);
@@ -50,6 +51,9 @@ const RadarrConfig = () => {
   };
 
   const getInstanceInfo = (data: IProviderConfigBase, withAlert: boolean) => {
+    if (data.port === "") {
+      data.port = null;
+    }
     getRadarrInstanceInfo(data, withAlert).then((res) => {
       setInstanceInfo(res);
     });
@@ -70,7 +74,7 @@ const RadarrConfig = () => {
           alignItems="center"
         >
           <h1 className="is-size-1">Radarr</h1>
-          {instanceInfo.data && (
+          {!instanceInfo.isLoading && instanceInfo.data && (
             <div className="field">
               <div className="control">
                 <input
@@ -137,20 +141,17 @@ const RadarrConfig = () => {
                   onChange={() => setUsePort(!usePort)}
                 />
               </label>
-              {usePort && (
-                <div className="control">
-                  <input
-                    name="port"
-                    className="input"
-                    type="number"
-                    placeholder="Port"
-                    ref={register({ minLength: 4, maxLength: 5 })}
-                    minLength={1000}
-                    maxLength={99999}
-                  />
-                </div>
-              )}
-              {!usePort && <p>Check the box to set a port value</p>}
+              <div className="control">
+                <input
+                  name="port"
+                  className="input"
+                  type="number"
+                  placeholder="Port"
+                  ref={register({ minLength: 4, maxLength: 5 })}
+                  minLength={1000}
+                  maxLength={99999}
+                />
+              </div>
             </div>
             <div className="field">
               <div className="control">
@@ -176,7 +177,7 @@ const RadarrConfig = () => {
             </div>
           </div>
         )}
-        <div className="is-divider is-primary" />
+        <SecondaryDivider />
         {instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
         {!instanceInfo.isLoading && instanceInfo.data && (
           <div>
@@ -230,12 +231,7 @@ const RadarrConfig = () => {
             </div>
             <div className="field">
               <div className="control">
-                <button
-                  type="submit"
-                  className="button is-primary is-outlined is-fullwidth"
-                >
-                  Save changes
-                </button>
+                <SecondaryButton type="submit">Save changes</SecondaryButton>
               </div>
             </div>
           </div>
@@ -244,5 +240,3 @@ const RadarrConfig = () => {
     </div>
   );
 };
-
-export { RadarrConfig };

@@ -35,13 +35,18 @@ export const useSonarrConfig = () => {
     }
   }, [sonarrConfigs]);
 
-  const getSonarrInstanceInfo = (config: IProviderConfigBase) => {
+  const getSonarrInstanceInfo = (
+    config: IProviderConfigBase,
+    withAlert: boolean
+  ) => {
     return post<ISonarrInstanceInfo>(
       APIRoutes.GET_SONARR_INSTANCE_INFO,
       config
     ).then((res) => {
       if (res.status === 200) {
-        pushSuccess("Successful connection");
+        if (withAlert) {
+          pushSuccess("Successful connection");
+        }
       } else {
         pushDanger("Cannot get instance info");
       }

@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { routes } from "../../../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../../../shared/enums/FormDefaultValidators";
-import logo from "../../../assets/plex.png";
 import { WaitingEmailConfirmation } from "./components/WaitingEmailConfirmation";
 import { ISignUpFormData } from "../../models/ISignUpFormData";
 import { IUser } from "../../../logged-in-app/pages/user-profile/models/IUser";
