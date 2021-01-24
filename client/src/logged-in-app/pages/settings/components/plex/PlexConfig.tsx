@@ -57,6 +57,7 @@ const PlexConfig = () => {
 
   const _onSelectServer = (config: IPlexConfig) => {
     reset(config);
+    setUsePort(config.port !== null);
   };
 
   const _onSubmit = (data: IPlexConfig) => {
