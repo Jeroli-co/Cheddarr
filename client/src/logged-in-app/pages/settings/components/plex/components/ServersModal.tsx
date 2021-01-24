@@ -92,8 +92,9 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
           />
         </header>
         <section className="modal-card-body">
-          {!servers && <PrimarySpinner size={Sizes.LARGE} />}
-          {servers.data &&
+          {servers.isLoading && <PrimarySpinner size={Sizes.LARGE} />}
+          {!servers.isLoading &&
+            servers.data &&
             servers.data.map((server) => {
               return <Server key={server.serverName} server={server} />;
             })}
