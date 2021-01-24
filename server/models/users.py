@@ -1,126 +1,82 @@
-from uuid import uuid4
+from enum import Enum
 
-from flask_login import UserMixin
-from sqlalchemy.orm import validates
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum as DBEnum
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import backref, relationship
 
-from server import utils
-from server.database import (
-    Boolean,
-    Column,
-    ForeignKey,
-    Integer,
-    Model,
-    String,
-    backref,
-    relationship,
-    session,
-    Email,
-    Password,
-    URL,
-)
+from server.core.security import hash_password
+from server.core.utils import get_random_avatar
+from server.database import Model
 
 
-class User(Model, UserMixin):
+class UserRole(str, Enum):
+    user = "user"
+    poweruser = "poweruser"
+    superuser = "superuser"
+
+
+class User(Model):
+    __repr_props__ = ("username", "email", "role", "confirmed")
+
     id = Column(Integer, primary_key=True)
-    username = Column(String(128), unique=True, index=True)
-
-    email = Column(Email, unique=True, index=True)
-    password = Column(
-        Password(schemes=["pbkdf2_sha512", "md5_crypt"], deprecated=["md5_crypt"]),
+    username = Column(String, nullable=False, unique=True, index=True)
+    email = Column(String, nullable=False, unique=True, index=True)
+    password_hash = Column(String, nullable=False)
+    avatar = Column(String)
+    confirmed = Column(Boolean, nullable=False, default=False)
+    role = Column(DBEnum(UserRole), nullable=False, default="user")
+    notifications = relationship(
+        "Notification",
+        back_populates="user",
+        cascade="all,delete,delete-orphan",
     )
-
-    @validates("password")
-    def validate_password(self, key, password):
-        assert 8 <= len(password) <= 128
-        return password
-
-    avatar = Column(URL, nullable=True)
-    session_token = Column(String(256))
-    confirmed = Column(Boolean, default=False)
-    api_key = Column(String(256), unique=True, nullable=True)
     providers = relationship(
-        "ProviderConfig", back_populates="user", cascade="all,delete", lazy="dynamic"
+        "ProviderConfig",
+        back_populates="user",
+        cascade="all,delete,delete-orphan",
     )
-    media_servers = relationship(
-        "MediaServer", back_populates="user", cascade="all,delete", lazy="dynamic"
+    plex_account = relationship(
+        "PlexAccount",
+        back_populates="user",
+        cascade="all,delete,delete-orphan",
+        uselist=False,
     )
-    __repr_props__ = ("username", "email", "confirmed")
 
-    def __init__(
-        self,
-        username,
-        email,
-        password,
-        avatar=None,
-        confirmed=False,
-    ):
-        self.username = username
-        self.email = email
-        self.password = password
-        self.avatar = avatar
-        self.confirmed = confirmed
-        self.api_key = None
-        self.session_token = utils.generate_token(str(uuid4()))
+    @hybrid_property
+    def password(self):
+        return self.password_hash
 
-    def get_id(self):
-        return str(self.session_token)
+    @password.setter
+    def password(self, plain):
+        self.password_hash = hash_password(plain)
 
-    def change_password(self, new_password):
-        self.password = new_password
-        self.session_token = utils.generate_token(str(uuid4()))
-        return session.commit()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if "avatar" not in kwargs:
+            self.avatar = get_random_avatar()
 
-    def change_email(self, new_email):
-        self.email = new_email
-        self.session_token = utils.generate_token(str(uuid4()))
-        return session.commit()
 
-    @property
-    def friends(self):
-        friendships = (
-            self.requested_friends.filter_by(pending=False).union(
-                self.received_friends.filter_by(pending=False)
-            )
-        ).all()
-        return [
-            friendship.receiving_user
-            if friendship.receiving_user is not self
-            else friendship.requesting_user
-            for friendship in friendships
-        ]
-
-    def get_pending_requested_friends(self):
-        friendships = self.requested_friends.filter_by(pending=True).all()
-        return [friendship.receiving_user for friendship in friendships]
-
-    def get_pending_received_friends(self):
-        friendships = self.received_friends.filter_by(pending=True).all()
-        return [friendship.requesting_user for friendship in friendships]
-
-    def is_friend(self, user):
-        return (
-            self.requested_friends.filter_by(receiving_user_id=user.id).count()
-            + self.received_friends.filter_by(requesting_user_id=user.id).count()
-        ) > 0
+class PlexAccount(Model):
+    plex_user_id = Column(Integer, primary_key=True)
+    user_id = Column(ForeignKey("user.id"), primary_key=True)
+    api_key = Column(String, unique=True, nullable=False)
+    user = relationship("User", back_populates="plex_account")
 
 
 class Friendship(Model):
+    __repr_props__ = ("requesting_user", "requested_user", "pending")
+
+    pending = Column(Boolean, default=True)
     requesting_user_id = Column(ForeignKey(User.id), primary_key=True)
-    receiving_user_id = Column(ForeignKey(User.id), primary_key=True)
+    requested_user_id = Column(ForeignKey(User.id), primary_key=True)
+
     requesting_user = relationship(
         "User",
         foreign_keys=[requesting_user_id],
-        backref=backref("requested_friends", cascade="all,delete", lazy="dynamic"),
+        backref=backref("outgoing_friendships", cascade="all,delete,delete-orphan"),
     )
-    receiving_user = relationship(
+    requested_user = relationship(
         "User",
-        foreign_keys=[receiving_user_id],
-        backref=backref("received_friends", cascade="all,delete", lazy="dynamic"),
+        foreign_keys=[requested_user_id],
+        backref=backref("incoming_friendships", cascade="all,delete,delete-orphan"),
     )
-    pending = Column(Boolean, default=True)
-
-    __repr_props__ = ("requesting_user", "receiving_user", "pending")
-
-    def __init__(self, requesting_user: User, receiving_user: User):
-        self.requesting_user = requesting_user
-        self.receiving_user = receiving_user

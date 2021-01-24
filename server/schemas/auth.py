@@ -1,17 +1,30 @@
-from server.extensions import ma
+from typing import Optional
+
+from pydantic import BaseModel, EmailStr
+
+from .base import APIModel
+from ..models import UserRole
 
 
-class SigninSchema(ma.Schema):
-    usernameOrEmail = ma.String(required=True)
-    password = ma.String(required=True)
-    remember = ma.Boolean(required=False, missing=False)
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
-class AuthorizePlexSigninSchema(ma.Schema):
-    key = ma.Int()
-    code = ma.String()
-    redirectURI = ma.String(missing="")
+class TokenPayload(BaseModel):
+    sub: str
+    username: str
+    avatar: str
+    role: UserRole
+    plex: bool
 
 
-class ConfirmPlexSigninSchema(ma.Schema):
-    token = ma.String()
+class EmailConfirm(APIModel):
+    email: EmailStr
+    old_email: Optional[EmailStr]
+
+
+class PlexAuthorizeSignin(APIModel):
+    key: str
+    code: str
+    redirect_uri: str = ""

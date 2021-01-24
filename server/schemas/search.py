@@ -1,130 +1,87 @@
-from marshmallow import post_dump
-from marshmallow.validate import OneOf
+from abc import ABC
+from datetime import date
+from typing import Generic, Optional, TypeVar, Union
 
-from server.extensions import ma
-from server.models import SeriesType
+from pydantic import Field, validator
+from pydantic.generics import GenericModel
 
-TMDB_URL = "https://www.themoviedb.org/"
-TMDB_IMAGES_URL = "https://image.tmdb.org/t/p/"
+from server.schemas import Episode, Media, Movie, Season, Series
+
+MovieResultType = TypeVar("MovieResultType")
+SeriesResultType = TypeVar("SeriesResultType")
+
+
+class SearchedMedia(Media):
+    summary: Optional[str]
+    rating: Optional[float]
+    genres: Optional[list[str]]
+
+
+class SearchResult(GenericModel, Generic[MovieResultType, SeriesResultType]):
+    page: int = 1
+    total_pages: int
+    total_results: int
+    results: list[Union[SeriesResultType, MovieResultType]]
+
+
+###########################################
+# TMDB                                    #
+###########################################
+
+TMDB_URL = "https://www.themoviedb.org"
+TMDB_IMAGES_URL = "https://image.tmdb.org/t/p"
 TMDB_POSTER_SIZE = "w500"
 TMDB_ART_SIZE = "w1280"
 
 
-class SearchSchema(ma.Schema):
-    value = ma.String(required=True)
-    type = ma.String(validate=OneOf(["movies", "series", "friends"]))
-    page = ma.Integer()
+def empty_date(cls, v) -> Optional[date]:
+    return None if not v else v
 
 
-class MediaSearchResultSchema(ma.Schema):
-    ratingKey = ma.String(data_key="id")
-    title = ma.String()
-    year = ma.Integer()
-    thumbUrl = ma.String()
-    type = ma.String()
+class TmdbMedia(SearchedMedia, ABC):
+    tmdb_id: int = Field(alias="id")
+    title: str = Field(alias="name")
+    summary: Optional[str] = Field(alias="overview")
+    status: Optional[str] = Field(alias="status")
+    rating: Optional[float] = Field(alias="vote_average")
+    poster_url: Optional[str] = Field(alias="poster_path")
+    art_url: Optional[str] = Field(alias="backdrop_path")
 
-    @post_dump
-    def media_type(self, media, **kwargs):
-        media["type"] = media.get("type").replace("show", "series")
-        return media
+    @validator("poster_url")
+    def get_poster(cls, poster):
+        return f"{TMDB_IMAGES_URL}/{TMDB_POSTER_SIZE}/{poster}"
 
-
-class FriendSearchResultSchema(ma.Schema):
-    username = ma.String()
-    avatar = ma.URL()
-    email = ma.Email()
-    type = ma.Constant("friend")
+    @validator("art_url")
+    def get_art(cls, art):
+        return f"{TMDB_IMAGES_URL}/{TMDB_ART_SIZE}/{art}"
 
 
-class TmdbMediaSchema(ma.Schema):
-    id = ma.Integer(data_key="tmdb_id")
-    overview = ma.String(data_key="summary")
-    vote_average = ma.Float(data_key="rating")
-    poster_path = ma.String(data_key="thumbUrl")
-    backdrop_path = ma.String(data_key="art_url")
-    media_type = ma.String()
-    status = ma.String()
-    link = ma.Function(lambda media: f"{TMDB_URL}{media['media_type']}/{media['id']}")
-
-    @post_dump
-    def get_thumbUrl(self, media, **kwargs):
-        if media.get("thumbUrl") is None:
-            return media
-        else:
-            media[
-                "thumbUrl"
-            ] = f"{TMDB_IMAGES_URL}{TMDB_POSTER_SIZE}{media['thumbUrl']}"
-        return media
-
-    @post_dump
-    def get_art_url(self, media, **kwargs):
-        if media.get("art_url") is None:
-            return media
-        else:
-            media["art_url"] = f"{TMDB_IMAGES_URL}{TMDB_POSTER_SIZE}{media['art_url']}"
-        return media
-
-    @post_dump
-    def media_type(self, media, **kwargs):
-        media["media_type"] = media.get("media_type").replace("tv", "series")
-        return media
+class TmdbMovie(TmdbMedia, Movie):
+    release_date: Optional[date] = Field(alias="release_date")
+    _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
-class TmdbMovieSchema(TmdbMediaSchema):
-    title = ma.String()
-    release_date = ma.String(data_key="releaseDate")
-    media_type = ma.String(default="movie")
-    link = ma.Function(lambda media: f"{TMDB_URL}movie/{media['id']}")
+class TmdbEpisode(Episode):
+    episode_number: int = Field(alias="episode_number")
+    title: str = Field(alias="name")
+    release_date: Optional[date] = Field(alias="air_date")
+    _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
-class TmdbSeriesSchema(TmdbMediaSchema):
-    tvdb_id = ma.Integer()
-    name = ma.String(data_key="title")
-    first_air_date = ma.String(data_key="releaseDate")
-    media_type = ma.String(default="series")
-    seasons = ma.Nested("TmdbSeasonSchema", many=True)
-    series_type = ma.String(validate=OneOf([SeriesType.STANDARD, SeriesType.ANIME]))
-    link = ma.Function(lambda media: f"{TMDB_URL}tv/{media['id']}")
+class TmdbSeason(Season):
+    season_number: int = Field(alias="season_number")
+    title: str = Field(alias="name")
+    release_date: Optional[date] = Field(alias="air_date")
+    episodes: Optional[list[TmdbEpisode]] = Field(alias="episodes")
+    _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
-class TmdbSeasonSchema(ma.Schema):
-    season_number = ma.Integer()
-    name = ma.String()
-    air_date = ma.String(data_key="release_date")
-    episodes = ma.Nested("TmdbEpisodeSchema", many=True)
+class TmdbSeries(TmdbMedia, Series):
+    release_date: Optional[date] = Field(alias="first_air_date", default=None)
+    number_of_seasons: Optional[int] = Field(alias="number_of_seasons")
+    seasons: Optional[list[TmdbSeason]] = Field(alias="seasons")
+    _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
-class TmdbEpisodeSchema(ma.Schema):
-    episode_number = ma.Integer()
-    name = ma.String()
-    air_date = ma.String(data_key="release_date")
-
-
-class TmdbMediaSearchResultSchema(ma.Schema):
-    page = ma.Integer()
-    total_pages = ma.Integer()
-    total_results = ma.Integer()
-    results = ma.Method("get_results")
-
-    def get_results(self, search_results):
-        res = []
-        for media in search_results["results"]:
-            if media["media_type"] == "movie":
-                res.append(tmdb_movie_serializer.dump(media))
-            elif media["media_type"] == "tv":
-                res.append(tmdb_series_serializer.dump(media))
-            else:
-                continue
-        return res
-
-
-class TmdbMovieSearchResultSchema(TmdbMediaSearchResultSchema):
-    results = ma.List(ma.Nested(TmdbMovieSchema))
-
-
-class TmdbSeriesSearchResultSchema(TmdbMediaSearchResultSchema):
-    results = ma.List(ma.Nested(TmdbSeriesSchema))
-
-
-tmdb_movie_serializer = TmdbMovieSchema()
-tmdb_series_serializer = TmdbSeriesSchema()
+class TmdbSearchResult(SearchResult[TmdbSeries, TmdbMovie]):
+    pass

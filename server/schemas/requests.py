@@ -1,89 +1,49 @@
-from marshmallow import pre_dump, validates_schema, ValidationError, EXCLUDE
-from marshmallow.validate import OneOf
-from marshmallow_sqlalchemy import auto_field
+from abc import ABC
+from datetime import date
+from typing import Optional
 
-from server.extensions import ma
-from server.models import (
-    SeriesRequest,
-    SeriesChildRequest,
-    SeasonRequest,
-    EpisodeRequest,
-    MovieRequest,
-)
-from server.models.requests import SeriesType
+from server.models import RequestStatus
+from server.schemas import APIModel, Movie, Series, UserPublic
 
 
-class MovieRequestSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = MovieRequest
-        dump_only = ("requested_date", "response_date", "requested_user")
-
-    requested_username = ma.String(load_only=True, required=True)
-    requested_user = ma.Nested(
-        "UserSchema",
-        only=["username", "avatar"],
-    )
-    requesting_user = ma.Nested(
-      "UserSchema",
-      only=["username", "avatar"],
-    )
+class Request(APIModel, ABC):
+    id: int
+    status: RequestStatus
+    requested_user: UserPublic
+    requesting_user: UserPublic
+    created_at: date
+    updated_at: date
 
 
-class SeriesRequestSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = SeriesRequest
-
-    children = ma.Nested("SeriesChildRequestSchema", many=True)
+class RequestUpdate(APIModel):
+    status: RequestStatus
+    provider_id: Optional[str]
 
 
-class SeriesChildRequestSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = SeriesChildRequest
-        dump_only = ("requested_date", "response_date", "requested_user")
-
-    seasons = ma.Nested("SeasonRequestSchema", many=True, required=True)
-    tvdb_id = ma.Int(required=True)
-    requested_user = ma.Nested(
-        "UserSchema",
-        only=["username", "avatar"],
-    )
-    requesting_user = ma.Nested(
-      "UserSchema",
-      only=["username", "avatar"],
-    )
-    requested_username = ma.String(load_only=True, required=True)
-    series_type = ma.String(
-        validate=OneOf([SeriesType.STANDARD, SeriesType.ANIME]),
-        load_only=True,
-        required=True,
-    )
-    selected_provider_id = auto_field()
-
-    @pre_dump
-    def get_dump_info(self, request, **kwargs):
-        request.requested_user = request.series.requested_user
-        request.tvdb_id = request.series.tvdb_id
-        return request
-
-    @validates_schema
-    def validate_approve(self, data, **kwargs):
-        if data.get("approved") and not data.get("selected_provider_id"):
-            raise ValidationError(
-                "Must have a value to approve a request.",
-                field_name="selected_provier_id",
-            )
+class MovieRequest(Request):
+    movie: Movie
 
 
-class SeasonRequestSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = SeasonRequest
-        load_instance = True
-        unknown = EXCLUDE
-
-    episodes = ma.Nested("EpisodeRequestSchema", many=True)
+class MovieRequestCreate(APIModel):
+    tmdb_id: int
+    requested_username: str
 
 
-class EpisodeRequestSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = EpisodeRequest
-        load_instance = True
+class EpisodeRequest(APIModel):
+    episode_number: int
+
+
+class SeasonRequest(APIModel):
+    season_number: int
+    episodes: Optional[list[EpisodeRequest]]
+
+
+class SeriesRequest(Request):
+    series: Series
+    seasons: Optional[list[SeasonRequest]]
+
+
+class SeriesRequestCreate(APIModel):
+    tvdb_id: int
+    requested_username: str
+    seasons: Optional[list[SeasonRequest]]

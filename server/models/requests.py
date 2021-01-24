@@ -1,135 +1,95 @@
-from datetime import date
 from enum import Enum
-from typing import TYPE_CHECKING, List
 
-from server.database import (
-    Model,
+from sqlalchemy import (
     Column,
-    Integer,
-    ForeignKey,
-    relationship,
-    backref,
-    Date,
-    Boolean,
-    UniqueConstraint,
     Enum as DBEnum,
+    ForeignKey,
+    Integer,
+    Text,
 )
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
 
-if TYPE_CHECKING:
-    from . import User  # noqa
+from server.database import Model, Timestamp
 
 
-class MovieRequest(Model):
+class RequestStatus(str, Enum):
+    pending = "pending"
+    approved = "approved"
+    refused = "refused"
+    available = "available"
+
+
+class Request(object):
     id = Column(Integer, primary_key=True)
-    tmdb_id = Column(Integer)
-    requested_date = Column(Date)
-    response_date = Column(Date, nullable=True)
-    approved = Column(Boolean, default=False)
-    refused = Column(Boolean, default=False)
-    available = Column(Boolean, default=False)
-    requested_user_id = Column(ForeignKey("user.id"))
-    requesting_user_id = Column(ForeignKey("user.id"))
-    requested_user = relationship(
-        "User",
-        foreign_keys=[requested_user_id],
-        backref=backref("received_movies_requests", cascade="all,delete", lazy=True),
+    status = Column(
+        DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
     )
-    requesting_user = relationship(
-        "User",
-        foreign_keys=[requesting_user_id],
-        backref=backref("sent_movies_requests", cascade="all,delete", lazy=True),
-    )
-    UniqueConstraint(requested_user_id, requesting_user_id, tmdb_id)
+    comment = Column(Text)
 
-    __repr_props__ = ("tmdb_id", "requested_user", "requesting_user_id")
+    @declared_attr
+    def selected_provider_id(cls):
+        return Column(ForeignKey("providerconfig.id"))
 
-    def __init__(self, tmdb_id: int, requested_user: "User", requesting_user: "User"):
-        self.tmdb_id = tmdb_id
-        self.requested_user = requested_user
-        self.requesting_user = requesting_user
-        self.requested_date = date.today()
+    @declared_attr
+    def requesting_user_id(cls):
+        return Column(ForeignKey("user.id"), nullable=False)
 
+    @declared_attr
+    def requested_user_id(cls):
+        return Column(ForeignKey("user.id"), nullable=False)
 
-class SeriesType(str, Enum):
-    ANIME = "anime"
-    STANDARD = "standard"
+    @declared_attr
+    def selected_provider(cls):
+        return relationship("ProviderConfig")
 
+    @declared_attr
+    def requesting_user(cls):
+        return relationship("User", foreign_keys=cls.requesting_user_id)
 
-class SeriesRequest(Model):
-    id = Column(Integer, primary_key=True)
-    tvdb_id = Column(Integer)
-    series_type = Column(DBEnum(SeriesType))
-    requested_user_id = Column(ForeignKey("user.id"))
-    requested_user = relationship(
-        "User",
-        foreign_keys=[requested_user_id],
-        backref=backref("received_series_requests", cascade="all,delete", lazy=True),
-    )
-    children = relationship(
-        "SeriesChildRequest",
-        cascade="all,delete,delete-orphan",
-        back_populates="series",
-    )
-    UniqueConstraint(requested_user_id, tvdb_id)
-
-    __repr_props__ = ("tvdb_id", "requested_user", "children")
-
-    def __init__(self, tvdb_id: int, requested_user: "User", series_type: SeriesType):
-        self.tvdb_id = tvdb_id
-        self.requested_user = requested_user
-        self.series_type = series_type
+    @declared_attr
+    def requested_user(cls):
+        return relationship("User", foreign_keys=cls.requested_user_id)
 
 
-class SeriesChildRequest(Model):
-    id = Column(Integer, primary_key=True)
-    requested_date = Column(Date)
-    response_date = Column(Date, nullable=True)
-    approved = Column(Boolean, default=False)
-    refused = Column(Boolean, default=False)
-    series_id = Column(ForeignKey("seriesrequest.id"))
-    selected_provider_id = Column(ForeignKey("providerconfig.id"), nullable=True)
-    requesting_user_id = Column(ForeignKey("user.id"))
-    requesting_user = relationship(
-        "User",
-        foreign_keys=[requesting_user_id],
-        backref=backref("sent_series_requests", cascade="all,delete", lazy=True),
-    )
-    series = relationship("SeriesRequest", back_populates="children")
+class MovieRequest(Model, Timestamp, Request):
+    __repr_props__ = ("movie", "requested_user", "requesting_user")
+
+    movie_id = Column(ForeignKey("movie.id"), nullable=False)
+    movie = relationship("Movie")
+
+
+class SeriesRequest(Model, Timestamp, Request):
+    __repr_props__ = ("series", "requested_user", "requesting_user")
+
+    series_id = Column(ForeignKey("series.id"), nullable=False)
+    series = relationship("Series", back_populates="requests")
     seasons = relationship(
-        "SeasonRequest", cascade="all,delete,delete-orphan", backref="series_child"
+        "SeasonRequest", cascade="all,delete,delete-orphan", backref="request"
     )
-
-    __repr_props__ = (
-        "requesting_user",
-        "requested_date",
-        "response_date",
-        "approved",
-        "refused",
-        "seasons",
-    )
-
-    def __init__(self, requesting_user: "User", seasons: List["SeasonRequest"]):
-        self.requesting_user = requesting_user
-        self.seasons = seasons
-        self.requested_date = date.today()
 
 
 class SeasonRequest(Model):
-    id = Column(Integer, primary_key=True)
-    season_number = Column(Integer)
-    series_child_id = Column(ForeignKey("serieschildrequest.id"))
-    episodes = relationship("EpisodeRequest", cascade="all,delete", backref="season")
+    __repr_props__ = ("season_number", "episodes")
 
-    __repr_props__ = (
-        "season_number",
-        "episodes",
+    id = Column(Integer, primary_key=True)
+    season_number = Column(Integer, nullable=False)
+    series_request_id = Column(ForeignKey("seriesrequest.id"), nullable=False)
+    status = Column(
+        DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
+    )
+
+    episodes = relationship(
+        "EpisodeRequest", cascade="all,delete,delete-orphan", backref="season"
     )
 
 
 class EpisodeRequest(Model):
-    id = Column(Integer, primary_key=True)
-    episode_number = Column(Integer)
-    available = Column(Boolean, default=False)
-    season_id = Column(ForeignKey("seasonrequest.id"))
-
     __repr_props__ = ("episode_number", "available")
+
+    id = Column(Integer, primary_key=True)
+    episode_number = Column(Integer, nullable=False)
+    season_request_id = Column(ForeignKey("seasonrequest.id"), nullable=False)
+    status = Column(
+        DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
+    )
