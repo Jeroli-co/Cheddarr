@@ -3,88 +3,79 @@ import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../../../router/routes";
+import { H3 } from "../../../../../shared/components/Titles";
+import { SecondaryButton } from "../../../../../experimentals/Button";
 
 const SettingsAccountBody = () => {
   const history = useHistory();
 
   return (
-    <div className="container">
-      <div className="columns has-text-centered-mobile">
-        <div id="action-column" className="column is-half-desktop">
-          {/* CHANGE USERNAME */}
-          <h3 className="subtitle is-3">Change username</h3>
-          <div className="content">
-            <p className="is-size-7">
-              <FontAwesomeIcon icon={faExclamationCircle} /> Your friends mights
-              not recognize you !
-            </p>
-            <button
-              className="button is-primary"
-              type="button"
-              onClick={() => history.push(routes.CHANGE_USERNAME_MODAL.url)}
-            >
-              Change username
-            </button>
-          </div>
-
-          <div className="is-divider" data-content="OR" />
-
-          {/* CHANGE PASSWORD */}
-          <h3 className="subtitle is-3">Change password</h3>
-          <div className="content">
-            <p className="is-size-7">
-              <FontAwesomeIcon icon={faExclamationCircle} /> You will need to
-              sign in again after
-            </p>
-            <button
-              className="button is-primary"
-              type="button"
-              onClick={() => history.push(routes.CHANGE_PASSWORD_MODAL.url)}
-            >
-              Change password
-            </button>
-          </div>
-
-          <div className="is-divider" data-content="OR" />
-
-          {/* CHANGE EMAIL */}
-          <h3 className="subtitle is-3">Change email</h3>
-          <div className="content">
-            <p className="is-size-7">
-              <FontAwesomeIcon icon={faExclamationCircle} /> You will need to
-              confirm your new email
-            </p>
-            <button
-              className="button is-primary"
-              type="button"
-              onClick={() => history.push(routes.CHANGE_EMAIL_MODAL.url)}
-            >
-              Change email
-            </button>
-          </div>
-
-          <div className="is-divider is-danger" data-content="OR" />
-
-          {/* DELETE_ACCOUNT_MODAL ACCOUNT */}
-          <h3 className="subtitle is-3 is-danger">Delete</h3>
-          <div className="content">
-            <p className="is-size-7">
-              <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
-              that option
-            </p>
-            <button
-              className="button is-danger"
-              type="button"
-              onClick={() => history.push(routes.DELETE_ACCOUNT_MODAL.url)}
-            >
-              Delete account
-            </button>
-          </div>
+    <section>
+      <div>
+        {/* CHANGE USERNAME */}
+        <H3>Change username</H3>
+        <div className="content">
+          <p className="is-size-7">
+            <FontAwesomeIcon icon={faExclamationCircle} /> Your friends mights
+            not recognize you !
+          </p>
+          <SecondaryButton
+            type="button"
+            onClick={() => history.push(routes.CHANGE_USERNAME_MODAL.url)}
+          >
+            Change username
+          </SecondaryButton>
         </div>
 
-        <div id="fake-column" className="column" />
+        {/* CHANGE PASSWORD */}
+        <H3>Change password</H3>
+        <div className="content">
+          <p className="is-size-7">
+            <FontAwesomeIcon icon={faExclamationCircle} /> You will need to sign
+            in again after
+          </p>
+          <SecondaryButton
+            type="button"
+            onClick={() => history.push(routes.CHANGE_PASSWORD_MODAL.url)}
+          >
+            Change password
+          </SecondaryButton>
+        </div>
+
+        {/* CHANGE EMAIL */}
+        <H3>Change email</H3>
+        <div className="content">
+          <p className="is-size-7">
+            <FontAwesomeIcon icon={faExclamationCircle} /> You will need to
+            confirm your new email
+          </p>
+          <SecondaryButton
+            type="button"
+            onClick={() => history.push(routes.CHANGE_EMAIL_MODAL.url)}
+          >
+            Change email
+          </SecondaryButton>
+        </div>
+
+        <hr />
+
+        {/* DELETE_ACCOUNT_MODAL ACCOUNT */}
+        <H3>Delete account</H3>
+        <div className="content">
+          <p className="is-size-7">
+            <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with that
+            option
+          </p>
+          <button
+            className="button is-danger"
+            type="button"
+            onClick={() => history.push(routes.DELETE_ACCOUNT_MODAL.url)}
+          >
+            Delete account
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

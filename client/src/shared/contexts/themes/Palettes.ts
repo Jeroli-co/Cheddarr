@@ -32,8 +32,8 @@ export const GREEN_PALETTE: IPalette = {
   primary: "#15ae1e",
   primaryLight: "#28bf30",
   primaryLighter: "#41e74b",
-  secondary: "#87be21",
-  secondaryLight: "#a6dd44",
-  secondaryLighter: "#c3ea7b",
+  secondary: "#bdff02",
+  secondaryLight: "#cdff45",
+  secondaryLighter: "#d9fd7b",
   secondaryDark: "#658822",
 };

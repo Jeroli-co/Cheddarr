@@ -128,7 +128,7 @@ const ThemesDropdown = ({ show }: ThemesDropdownProps) => {
   );
 };
 
-export const ThemesPicker = () => {
+export const ThemesPicker = (props: any) => {
   const [showThemesDropdown, setShowThemeDropdown] = useState(false);
   const toggleThemePicker = () => setShowThemeDropdown(!showThemesDropdown);
   const themesPickerRef = useRef<HTMLDivElement>(null);

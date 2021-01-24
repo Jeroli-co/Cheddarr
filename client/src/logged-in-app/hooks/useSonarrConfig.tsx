@@ -51,7 +51,7 @@ export const useSonarrConfig = () => {
 
   const createSonarrConfig = (config: ISonarrConfig) => {
     post<ISonarrConfig>(APIRoutes.CREATE_SONARR_CONFIG, config).then((res) => {
-      if (res.status === 200 && res.data) {
+      if (res.status === 201 && res.data) {
         let data = sonarrConfigs.data;
         if (data) {
           data.push(res.data);

@@ -11,6 +11,10 @@ import { ISignUpFormData } from "../../models/ISignUpFormData";
 import { IUser } from "../../../logged-in-app/pages/user-profile/models/IUser";
 import { useAuthentication } from "../../contexts/AuthenticationContext";
 import { Redirect } from "react-router";
+import { PrimaryHero } from "../../../experimentals/Hero";
+import { PlexButton } from "../../../shared/components/PlexButton";
+import { RowLayout2 } from "../../../shared/components/Layouts";
+import { SecondaryButton } from "../../../experimentals/Button";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();
@@ -33,19 +37,7 @@ const SignUpForm = () => {
 
   return (
     <div className="SignUpForm" data-testid="SignUpForm">
-      <div className="hero is-primary">
-        <div className="hero-body">
-          <div className="container has-text-centered">
-            <h1 className="title">
-              <p>
-                Create a <span className="has-text-secondary">Cheddarr</span>{" "}
-                account
-              </p>
-            </h1>
-          </div>
-        </div>
-      </div>
-
+      <PrimaryHero>Create a Cheddarr account</PrimaryHero>
       <br />
 
       <div className="columns is-mobile is-centered">
@@ -53,7 +45,7 @@ const SignUpForm = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* USERNAME */}
             <div className="field">
-              <label className="label">Username</label>
+              <label>Username</label>
               <div className="control has-icons-left">
                 <input
                   name="username"
@@ -97,7 +89,7 @@ const SignUpForm = () => {
 
             {/* EMAIL */}
             <div className="field">
-              <label className="label">Email</label>
+              <label>Email</label>
               <div className="control has-icons-left">
                 <input
                   name="email"
@@ -135,7 +127,7 @@ const SignUpForm = () => {
 
             {/* PASSWORD */}
             <div className="field">
-              <label className="label">Password</label>
+              <label>Password</label>
               <div className="control has-icons-left">
                 <input
                   name="password"
@@ -167,7 +159,7 @@ const SignUpForm = () => {
 
             {/* PASSWORD CONFIRMATION */}
             <div className="field">
-              <label className="label">Confirm password</label>
+              <label>Confirm password</label>
               <div className="control has-icons-left">
                 <input
                   name="passwordConfirmation"
@@ -205,35 +197,20 @@ const SignUpForm = () => {
             {/* SUBMIT BUTTON */}
             <div className="field">
               <div className="control">
-                <button
-                  type="submit"
-                  className="button is-fullwidth is-secondary-button"
-                >
+                <SecondaryButton type="submit" width="100%">
                   Sign up
-                </button>
+                </SecondaryButton>
               </div>
             </div>
 
             <div className="is-divider" data-content="OR" />
 
-            <div className="content has-text-centered">
-              <button
-                className="button has-background-dark-plex"
-                type="button"
+            <RowLayout2 justifyContent="center">
+              <PlexButton
+                text="Sign in with Plex"
                 onClick={() => signInWithPlex()}
-              >
-                <span className="icon">
-                  <img
-                    className="icon-left"
-                    src={logo}
-                    alt="Plex logo"
-                    width="30px"
-                    height="30px"
-                  />
-                </span>
-                <span>Sign up with Plex</span>
-              </button>
-            </div>
+              />
+            </RowLayout2>
 
             <br />
 

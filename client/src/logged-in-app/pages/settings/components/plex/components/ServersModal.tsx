@@ -38,7 +38,7 @@ const ServersModal = ({ onClose }: ServersModalProps) => {
             APIRoutes.CREATE_PLEX_CONFIG,
             serverDetail.data
           ).then((res) => {
-            if (res.data && res.status === 200) {
+            if (res.data && res.status === 201) {
               addConfig(res.data);
               pushSuccess("Configuration created");
               onClose();

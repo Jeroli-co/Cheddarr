@@ -37,7 +37,7 @@ const WaitingEmailConfirmation = ({ user }: WaitingEmailConfirmationProps) => {
             below
           </h2>
           <div className="buttons is-centered">
-            <SignInButton dataTestId="waiting-email-confirmation-sign-in-button" />
+            <SignInButton />
             <button
               className="button is-rounded is-primary"
               type="button"

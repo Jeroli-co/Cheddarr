@@ -1,24 +1,18 @@
-import * as React from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
 import { routes } from "../../router/routes";
+import { SecondaryRoundedButton } from "../../experimentals/Button";
+import { useHistory } from "react-router-dom";
 
-type SignUpButtonProps = {
-  dataTestId: string;
-};
-
-export const SignUpButton = ({ dataTestId }: SignUpButtonProps) => {
+export const SignUpButton = () => {
+  const history = useHistory();
   return (
-    <Link
-      className="button is-rounded is-secondary-button"
-      to={routes.SIGN_UP.url}
-      data-testid={dataTestId}
-    >
-      <span className="icon">
+    <SecondaryRoundedButton onClick={() => history.push(routes.SIGN_UP.url)}>
+      <span className="left-icon">
         <FontAwesomeIcon icon={faUserPlus} />
       </span>
       <span>Sign up</span>
-    </Link>
+    </SecondaryRoundedButton>
   );
 };

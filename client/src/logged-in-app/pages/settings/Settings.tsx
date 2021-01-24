@@ -1,18 +1,10 @@
 import React from "react";
 import { routes } from "../../../router/routes";
-import { Link, Redirect, Route, Switch, useLocation } from "react-router-dom";
-import styled from "styled-components";
+import { Redirect, Route, Switch, useLocation } from "react-router-dom";
+import { Tabs } from "../../../experimentals/Tabs";
+import { PageLayout } from "../../../experimentals/PageLayout";
 
-const tabsName = ["Account", "Plex", "Radarr", "Sonarr"];
-
-const SettingsStyle = styled.div`
-  display: flex;
-  padding: 10px;
-
-  .settings-content: {
-    flex-grow: 4;
-  }
-`;
+const tabs = ["Account", "Plex", "Radarr", "Sonarr"];
 
 const Settings = () => {
   const url = routes.SETTINGS.url;
@@ -29,43 +21,36 @@ const Settings = () => {
     );
   };
 
+  const getActiveTab = () => {
+    const activeTab = tabs.find((t) => isActiveTab(t));
+    return activeTab ? activeTab : tabs[0];
+  };
+
   return (
-    <SettingsStyle data-testid="Settings">
-      <div>
-        <div className="settings-content tabs is-centered is-boxed is-medium">
-          <ul>
-            {tabsName.map((name, index) => (
-              <li key={index} className={isActiveTab(name) ? "is-active" : ""}>
-                <Link to={routes.SETTINGS.url + "/" + name.toLowerCase()}>
-                  {name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <Switch>
-          <Route
-            path={routes.SETTINGS_ACCOUNT.url}
-            component={routes.SETTINGS_ACCOUNT.component}
-          />
-          <Route
-            exact
-            path={routes.SETTINGS_PLEX.url}
-            component={routes.SETTINGS_PLEX.component}
-          />
-          <Route
-            exact
-            path={routes.SETTINGS_RADARR.url}
-            component={routes.SETTINGS_RADARR.component}
-          />
-          <Route
-            exact
-            path={routes.SETTINGS_SONARR.url}
-            component={routes.SETTINGS_SONARR.component}
-          />
-        </Switch>
-      </div>
-    </SettingsStyle>
+    <PageLayout>
+      <Tabs tabs={tabs} activeTab={getActiveTab()} />
+      <Switch>
+        <Route
+          path={routes.SETTINGS_ACCOUNT.url}
+          component={routes.SETTINGS_ACCOUNT.component}
+        />
+        <Route
+          exact
+          path={routes.SETTINGS_PLEX.url}
+          component={routes.SETTINGS_PLEX.component}
+        />
+        <Route
+          exact
+          path={routes.SETTINGS_RADARR.url}
+          component={routes.SETTINGS_RADARR.component}
+        />
+        <Route
+          exact
+          path={routes.SETTINGS_SONARR.url}
+          component={routes.SETTINGS_SONARR.component}
+        />
+      </Switch>
+    </PageLayout>
   );
 };
 

@@ -34,6 +34,7 @@ const PlexButtonStyle = styled.button`
 type PlexButtonProps = {
   onClick: () => void;
   text: string;
+  width?: string;
 };
 
 const PlexButton = ({ onClick, text }: PlexButtonProps) => {

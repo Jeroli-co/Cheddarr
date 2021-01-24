@@ -19,8 +19,8 @@ const HomeStyle = styled.div`
   font-size: calc(10px + 2vm);
   align-items: center;
   min-height: calc(100vh - ${STATIC_STYLES.NAVBAR_HEIGHT}px);
-  margin-top: 20px;
-  margin-bottom: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 
   .home-content {
     display: flex;

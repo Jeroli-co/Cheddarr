@@ -41,9 +41,7 @@ const FriendsList = ({ friends, removeFriend }: FriendsListProps) => {
       >
         <div className="level-left">
           <div className="level-item">
-            <h5 className="subtitle is-5">
-              Friends ({friends.data ? friends.data.length : 0})
-            </h5>
+            Friends ({friends.data ? friends.data.length : 0})
           </div>
         </div>
         <div className="level-right">

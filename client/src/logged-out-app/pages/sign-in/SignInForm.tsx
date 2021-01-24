@@ -7,8 +7,10 @@ import { routes } from "../../../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../../../shared/enums/FormDefaultValidators";
 import { ISignInFormData } from "../../models/ISignInFormData";
 import { useAuthentication } from "../../contexts/AuthenticationContext";
-
-const logo = require("../../../assets/plex.png");
+import { PrimaryHero } from "../../../experimentals/Hero";
+import { PlexButton } from "../../../shared/components/PlexButton";
+import { RowLayout2 } from "../../../shared/components/Layouts";
+import { SecondaryButton } from "../../../experimentals/Button";
 
 function useRedirectURI() {
   const query = new URLSearchParams(useLocation().search);
@@ -30,18 +32,7 @@ const SignInForm = () => {
 
   return (
     <div className="SignInForm" data-testid="SignInForm">
-      <div className="hero is-primary">
-        <div className="hero-body">
-          <div className="container has-text-centered">
-            <h1 className="title">
-              <p>
-                Sign into your{" "}
-                <span className="has-text-secondary">Cheddarr</span> account
-              </p>
-            </h1>
-          </div>
-        </div>
-      </div>
+      <PrimaryHero>Sign into your Cheddarr account</PrimaryHero>
 
       <br />
 
@@ -55,7 +46,7 @@ const SignInForm = () => {
             autoComplete="off"
           >
             <div className="field">
-              <label className="label">Username or email</label>
+              <label>Username or email</label>
               <div className="control has-icons-left">
                 <input
                   name="username"
@@ -92,7 +83,7 @@ const SignInForm = () => {
             </div>
 
             <div className="field">
-              <label className="label">Password</label>
+              <label>Password</label>
               <div className="control has-icons-left">
                 <input
                   name="password"
@@ -118,36 +109,21 @@ const SignInForm = () => {
 
             <div className="field">
               <div className="control">
-                <button
-                  type="submit"
-                  className="button is-fullwidth is-secondary-button"
-                >
+                <SecondaryButton type="submit" width="100%">
                   Sign in
-                </button>
+                </SecondaryButton>
               </div>
             </div>
           </form>
 
           <div className="is-divider" data-content="OR" />
 
-          <div className="content has-text-centered">
-            <button
-              className="button has-background-dark-plex"
-              type="button"
+          <RowLayout2 justifyContent="center">
+            <PlexButton
+              text="Sign in with Plex"
               onClick={() => initSignInWithPlex()}
-            >
-              <span className="icon">
-                <img
-                  className="icon-left"
-                  src={logo}
-                  alt="Plex logo"
-                  width="30px"
-                  height="30px"
-                />
-              </span>
-              <span>Sign in with Plex</span>
-            </button>
-          </div>
+            />
+          </RowLayout2>
 
           <br />
 

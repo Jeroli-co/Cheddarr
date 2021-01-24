@@ -174,7 +174,7 @@ const SonarrConfig = () => {
             <br />
           </div>
         )}
-        {instanceInfo && (
+        {instanceInfo.data && (
           <div className="field">
             <label className="label">Version</label>
             <div className="control">
@@ -185,10 +185,10 @@ const SonarrConfig = () => {
                 ref={register}
                 value={
                   instanceInfo.data
-                    ? instanceInfo.data.version :
-                      currentSonarrConfig.data
-                        ? currentSonarrConfig.data.version
-                        : ""
+                    ? instanceInfo.data.version
+                    : currentSonarrConfig.data
+                    ? currentSonarrConfig.data.version
+                    : ""
                 }
                 disabled={true}
               />

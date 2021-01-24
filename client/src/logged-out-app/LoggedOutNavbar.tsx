@@ -1,13 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { STATIC_STYLES } from "../shared/enums/StaticStyles";
 import { Spin } from "../shared/components/animations/Animations";
-import { RowLayout } from "../shared/components/Layouts";
 import { ThemesPicker } from "../shared/components/themes-picker/ThemesDropdown";
 import { GitHubButton } from "../shared/components/GithubButton";
 import { SignInButton } from "./components/SignInButton";
 import { SignUpButton } from "./components/SignUpButton";
+import { useHistory } from "react-router";
+import { routes } from "../router/routes";
 
 const logo = require("../assets/cheddarr-small.png");
 
@@ -17,6 +17,8 @@ const NavbarStyle = styled.div`
   height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   background: ${(props) => props.theme.primary};
   color: ${STATIC_STYLES.COLORS.DARK};
+  display: flex;
+  align-items: center;
 `;
 
 const NavbarAppLogo = styled.div`
@@ -32,6 +34,10 @@ const NavbarAppLogo = styled.div`
 `;
 
 const NavbarEnd = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-end;
   .navbar-end-desktop {
     @media only screen and (max-width: 600px) {
       display: none;
@@ -42,33 +48,35 @@ const NavbarEnd = styled.div`
       display: none;
     }
   }
+
+  .navbar-end-element {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
 `;
 
 export default function LoggedOutNavbar() {
+  const history = useHistory();
+
   return (
     <NavbarStyle className="noselect">
-      <RowLayout data-testid="Navbar" alignItems="center">
-        <RowLayout childMarginRight="40px">
-          <Link to="/">
-            <NavbarAppLogo>
-              <img src={logo} alt="Chedarr" width="40px" height="24px" />
-            </NavbarAppLogo>
-          </Link>
-        </RowLayout>
-        <NavbarEnd>
-          <RowLayout
-            className="navbar-end-desktop"
-            justifyContent="flex-end"
-            alignItems="center"
-            childMarginLeft="30px"
-          >
-            <ThemesPicker />
-            <GitHubButton />
-            <SignInButton dataTestId="SignInButton" />
-            <SignUpButton dataTestId="SignUpButton" />
-          </RowLayout>
-        </NavbarEnd>
-      </RowLayout>
+      <NavbarAppLogo onClick={() => history.push(routes.HOME.url)}>
+        <img src={logo} alt="Chedarr" width="40px" height="24px" />
+      </NavbarAppLogo>
+      <NavbarEnd>
+        <div className="navbar-end-element">
+          <ThemesPicker />
+        </div>
+        <div className="navbar-end-element">
+          <GitHubButton />
+        </div>
+        <div className="navbar-end-element">
+          <SignInButton />
+        </div>
+        <div className="navbar-end-element">
+          <SignUpButton />
+        </div>
+      </NavbarEnd>
     </NavbarStyle>
   );
 }

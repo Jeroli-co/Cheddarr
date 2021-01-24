@@ -57,9 +57,7 @@ const ReceivedList = ({
       >
         <div className="level-left">
           <div className="level-item">
-            <h5 className="subtitle is-5">
-              Received ({received.data ? received.data.length : 0})
-            </h5>
+            Received ({received.data ? received.data.length : 0})
           </div>
         </div>
         <div className="level-right">

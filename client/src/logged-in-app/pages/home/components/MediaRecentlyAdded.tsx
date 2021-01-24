@@ -22,7 +22,6 @@ const MediaRecentlyAddedStyle = styled.div`
 const MediaRecentlyAddedTitleContainer = styled.div`
   display: flex;
   align-items: center;
-  cursor: pointer;
 `;
 
 type MediaRecentlyAddedProps = {

@@ -101,8 +101,8 @@ const UserDropdownMobile = ({
           <p data-testid="UserDropdownUsernameMobile">{username}</p>
         )}
         <GitHubButton />
-        {!isAuthenticated && <SignInButton dataTestId="SignInMobileButton" />}
-        {!isAuthenticated && <SignUpButton dataTestId="SignUpMobileButton" />}
+        {!isAuthenticated && <SignInButton />}
+        {!isAuthenticated && <SignUpButton />}
       </RowLayout>
       {isAuthenticated && (
         <DropdownMenuMobileStyle>
