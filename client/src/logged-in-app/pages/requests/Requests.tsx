@@ -3,12 +3,13 @@ import { Redirect, Route, Switch } from "react-router";
 import { routes } from "../../../router/routes";
 import { RequestsTabs } from "./components/RequestsTabs";
 import { Container } from "../../../shared/components/Container";
+import { PrimaryDivider } from "../../../experimentals/Divider";
 
 const Requests = () => {
   return (
     <Container padding="1%" minHeight="100vh">
       <RequestsTabs />
-      <div className="is-divider" />
+      <PrimaryDivider />
       <Switch>
         <Route
           exact

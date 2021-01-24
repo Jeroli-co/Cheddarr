@@ -4,6 +4,7 @@ import Spinner from "../../shared/components/Spinner";
 import { usePublicUser } from "../hooks/usePublicUser";
 import { SwitchErrors } from "../../shared/components/errors/SwitchErrors";
 import { Image } from "../../shared/components/Image";
+import { PrimaryDivider } from "../../experimentals/Divider";
 
 type RouteParams = {
   username: string;
@@ -19,7 +20,7 @@ const PublicUser = () => {
 
   return (
     <div className="FriendProfile container has-text-centered">
-      <div className="is-divider" data-content="Profile" />
+      <PrimaryDivider />
       <div className="container">
         <Image src={user.data.avatar} alt="User" width="260px" height="260px" />
         <p className="is-size-5">

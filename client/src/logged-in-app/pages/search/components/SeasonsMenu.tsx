@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { ISearchedSeries } from "../models/ISearchedMedias";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
+import { PrimaryDivider } from "../../../../experimentals/Divider";
 
 const SeasonsMenuStyle = styled.ul`
   padding: 1%;
@@ -111,7 +112,6 @@ const SeasonsMenu = ({
           ))}
         </SeasonsMenuStyle>
       </aside>
-      <div className="is-divider-vertical" />
       {seasonNumberSelected !== null && (
         <div>
           <div>
@@ -138,7 +138,7 @@ const SeasonsMenu = ({
               <span>All season</span>
             </button>
           </div>
-          <div className="is-divider" />
+          <PrimaryDivider />
           <SeasonEpisodes
             tvdbId={series.tvdbId}
             seasonNumber={seasonNumberSelected}

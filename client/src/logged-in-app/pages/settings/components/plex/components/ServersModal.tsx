@@ -1,7 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { PrimarySpinner } from "../../../../../../shared/components/Spinner";
 import { IPlexServerInfo } from "../models/IPlexServerInfo";
-import { PlexConfigContext } from "../../../../../contexts/PlexConfigContext";
 import { usePlexServers } from "../../../../../hooks/usePlexServers";
 import { useAPI } from "../../../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../../../shared/enums/APIRoutes";

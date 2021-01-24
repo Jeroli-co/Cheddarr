@@ -14,6 +14,7 @@ import { PrimaryHero } from "../../../experimentals/Hero";
 import { PlexButton } from "../../../shared/components/PlexButton";
 import { RowLayout2 } from "../../../shared/components/Layouts";
 import { SecondaryButton } from "../../../experimentals/Button";
+import { PrimaryDivider } from "../../../experimentals/Divider";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();
@@ -202,7 +203,7 @@ const SignUpForm = () => {
               </div>
             </div>
 
-            <div className="is-divider" data-content="OR" />
+            <PrimaryDivider />
 
             <RowLayout2 justifyContent="center">
               <PlexButton

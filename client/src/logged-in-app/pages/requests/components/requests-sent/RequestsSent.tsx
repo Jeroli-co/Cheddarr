@@ -5,6 +5,7 @@ import { SeriesRequestSent } from "./SeriesRequestSent";
 import Spinner from "../../../../../shared/components/Spinner";
 import { IMovieRequest, ISeriesRequest } from "../../models/IMediaRequest";
 import { RequestsSentContext } from "../../contexts/RequestsSentContext";
+import { PrimaryDivider } from "../../../../../experimentals/Divider";
 
 const RequestsSent = () => {
   const { moviesRequestsSent, seriesRequestsSent } = useContext(
@@ -20,7 +21,7 @@ const RequestsSent = () => {
         moviesRequestsSent.data.map((rs, index) => (
           <MovieRequestSent key={index} request={rs as IMovieRequest} />
         ))}
-      <div className="is-divider" />
+      <PrimaryDivider />
       <h3 className="title is-3">Series requested</h3>
       {seriesRequestsSent.isLoading && <Spinner />}
       {!seriesRequestsSent.isLoading &&
@@ -28,7 +29,7 @@ const RequestsSent = () => {
         seriesRequestsSent.data.map((rs, index) => (
           <SeriesRequestSent key={index} request={rs as ISeriesRequest} />
         ))}
-      <div className="is-divider" />
+      <PrimaryDivider />
     </Container>
   );
 };

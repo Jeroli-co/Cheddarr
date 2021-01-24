@@ -11,6 +11,7 @@ import { PrimaryHero } from "../../../experimentals/Hero";
 import { PlexButton } from "../../../shared/components/PlexButton";
 import { RowLayout2 } from "../../../shared/components/Layouts";
 import { SecondaryButton } from "../../../experimentals/Button";
+import { PrimaryDivider } from "../../../experimentals/Divider";
 
 function useRedirectURI() {
   const query = new URLSearchParams(useLocation().search);
@@ -116,7 +117,7 @@ const SignInForm = () => {
             </div>
           </form>
 
-          <div className="is-divider" data-content="OR" />
+          <PrimaryDivider />
 
           <RowLayout2 justifyContent="center">
             <PlexButton

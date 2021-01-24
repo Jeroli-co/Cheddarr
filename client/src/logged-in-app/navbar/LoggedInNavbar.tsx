@@ -13,7 +13,6 @@ import { routes } from "../../router/routes";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Spin } from "../../shared/components/animations/Animations";
 import { ThemesPicker } from "../../shared/components/themes-picker/ThemesDropdown";
-import { usePlexConfig } from "../contexts/PlexConfigContext";
 
 const logo = require("../../assets/cheddarr-small.png");
 

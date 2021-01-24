@@ -12,6 +12,7 @@ import { ISearchedSeries } from "../models/ISearchedMedias";
 import { IPublicUser } from "../../../models/IPublicUser";
 import { MediaTypes } from "../../../enums/MediaTypes";
 import { useSearchedSeries } from "../../../hooks/useSearchedSeries";
+import { PrimaryDivider } from "../../../../experimentals/Divider";
 
 type SearchedSeriesCardProps = {
   series: ISearchedSeries;
@@ -130,7 +131,7 @@ const SearchedSeriesCard = ({
       </RowLayout>
       {showSeasons && (
         <div>
-          <div className="is-divider" />
+          <PrimaryDivider />
           <SeasonsMenu
             series={seriesWithSeason.data}
             handleAddSeason={handleAddSeason}

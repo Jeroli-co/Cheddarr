@@ -25,7 +25,6 @@
     "@types/styled-components": "^5.1.7",
     "axios": "^0.19.2",
     "bulma": "^0.8.0",
-    "bulma-divider": "^0.2.0",
     "bulma-pageloader": "^0.3.0",
     "bulma-switch": "^2.0.0",
     "bulma-tooltip": "^3.0.2",

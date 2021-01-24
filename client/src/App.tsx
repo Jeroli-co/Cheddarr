@@ -12,17 +12,19 @@ const App = () => {
   config.autoAddCss = false;
 
   return (
-    <ThemeDynamicContextProvider>
-      <ThemeContextProvider>
-        <NotificationContextProvider>
-          <BrowserRouter>
-            <SessionContextProvider>
-              <DynamicApp />
-            </SessionContextProvider>
-          </BrowserRouter>
-        </NotificationContextProvider>
-      </ThemeContextProvider>
-    </ThemeDynamicContextProvider>
+    <div className="App">
+      <ThemeDynamicContextProvider>
+        <ThemeContextProvider>
+          <NotificationContextProvider>
+            <BrowserRouter>
+              <SessionContextProvider>
+                <DynamicApp />
+              </SessionContextProvider>
+            </BrowserRouter>
+          </NotificationContextProvider>
+        </ThemeContextProvider>
+      </ThemeDynamicContextProvider>
+    </div>
   );
 };
 
