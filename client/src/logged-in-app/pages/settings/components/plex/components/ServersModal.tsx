@@ -7,6 +7,7 @@ import { useAPI } from "../../../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../../../shared/enums/APIRoutes";
 import { Sizes } from "../../../../../../shared/enums/Sizes";
 import { PrimaryOutlinedButton } from "../../../../../../experimentals/Button";
+import { IPlexConfig } from "../models/IPlexConfig";
 
 type PlexServerComponentProps = {
   server: IPlexServerInfo;
@@ -14,35 +15,25 @@ type PlexServerComponentProps = {
 
 type ServersModalProps = {
   onClose: () => void;
+  selectServer: (config: IPlexConfig) => void;
 };
 
-const ServersModal = ({ onClose }: ServersModalProps) => {
+const ServersModal = ({ onClose, selectServer }: ServersModalProps) => {
   const [serverSelected, setServerSelected] = useState<IPlexServerInfo | null>(
     null
   );
 
   const servers = usePlexServers();
 
-  const {
-    updateConfig,
-    currentConfig,
-    createConfigFromServerInfo,
-  } = useContext(PlexConfigContext);
-
   const { get } = useAPI();
 
   const linkServer = () => {
     if (serverSelected) {
-      get<IPlexServerInfo>(
+      get<IPlexConfig>(
         APIRoutes.GET_PLEX_SERVER(serverSelected.serverName)
       ).then((serverDetail) => {
         if (serverDetail.data && serverDetail.status === 200) {
-          if (currentConfig.data) {
-            let newConfig = { ...currentConfig.data, ...serverDetail.data };
-            updateConfig(newConfig);
-          } else {
-            createConfigFromServerInfo(serverDetail.data);
-          }
+          selectServer(serverDetail.data);
           onClose();
         }
       });

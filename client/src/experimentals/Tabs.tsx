@@ -62,13 +62,14 @@ export const Tabs = ({ tabs, activeTab }: TabsProps) => {
   return (
     <TabsStyle>
       <TabSide />
-      {tabs.map((tab) => {
+      {tabs.map((tab, index) => {
         return (
           <TabStyle
             isActive={activeTab === tab}
             onClick={() =>
               history.push(routes.SETTINGS.url + "/" + tab.toLowerCase())
             }
+            key={index}
           >
             {tab}
           </TabStyle>

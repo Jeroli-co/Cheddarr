@@ -8,6 +8,7 @@ import { Spin } from "../../../shared/components/animations/Animations";
 import Spinner from "../../../shared/components/Spinner";
 import { MediaRecentlyAdded } from "./components/MediaRecentlyAdded";
 import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
+import { PrimaryDivider } from "../../../experimentals/Divider";
 
 const logo = require("../../../assets/cheddarr.png");
 
@@ -66,7 +67,7 @@ export default function Home() {
     <HomeStyle>
       <div className="home-content">
         <img src={logo} className="home-logo" alt="logo" />
-        <div className="is-divider" />
+        <PrimaryDivider />
         <Link to={routes.SETTINGS_PLEX.url}>
           <p className="is-size-5">Add plex server to start using this hub</p>
         </Link>

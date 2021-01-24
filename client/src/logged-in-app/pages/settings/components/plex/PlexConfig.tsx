@@ -53,6 +53,10 @@ const PlexConfig = () => {
     setIsUnlinkAccountModalActive(false);
   };
 
+  const _onSelectServer = (config: IPlexConfig) => {
+    reset(config);
+  };
+
   const _onSubmit = (data: IPlexConfig) => {
     if (data.port === "") {
       data.port = null;
@@ -70,6 +74,7 @@ const PlexConfig = () => {
       reset(currentConfig.data);
       setUsePort(currentConfig.data.port !== null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentConfig]);
 
   return (
@@ -274,7 +279,10 @@ const PlexConfig = () => {
       )}
 
       {isServersModalActive && (
-        <ServersModal onClose={() => setIsServersModalActive(false)} />
+        <ServersModal
+          selectServer={_onSelectServer}
+          onClose={() => setIsServersModalActive(false)}
+        />
       )}
 
       {isUnlinkServerModalActive && currentConfig.data && (
