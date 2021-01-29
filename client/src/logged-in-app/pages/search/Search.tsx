@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { SearchedMovieCard } from "./components/SearchedMovieCard";
 import { SearchedSeriesCard } from "./components/SearchedSeriesCard";
-import { Container } from "../../../shared/components/Container";
-import Spinner from "../../../shared/components/Spinner";
+import { PrimarySpinner } from "../../../shared/components/Spinner";
 import { SearchRequestTypes } from "../../enums/SearchRequestTypes";
 import { isSearchedSeries } from "./models/ISearchedMedias";
 import { MediaTypes } from "../../enums/MediaTypes";
@@ -16,6 +15,8 @@ import {
 import { useSearchMedia } from "../../hooks/useSearchMedia";
 import { ISearchMediaResult } from "./models/ISearchMediaResult";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
+import { PageLayout } from "../../../experimentals/PageLayout";
+import { Sizes } from "../../../shared/enums/Sizes";
 
 type SearchParams = {
   type: SearchRequestTypes;
@@ -40,14 +41,19 @@ const Search = () => {
 
   let content;
 
-  if (searchMediaResult.isLoading) return <Spinner color="primary" size="2x" />;
+  if (searchMediaResult.isLoading)
+    return (
+      <PageLayout>
+        <PrimarySpinner size={Sizes.LARGE} />
+      </PageLayout>
+    );
   if (searchMediaResult.data === null)
     return <SwitchErrors status={searchMediaResult.status} />;
 
   if (searchMediaResult.data.results.length === 0) {
     content = (
       <div className="content has-text-centered">
-        <h1 className="title is-3 has-text-grey-dark has-text-weight-light">
+        <h1 className="is-size-3 has-text-weight-light">
           Could not find any result for "{title}"
         </h1>
       </div>
@@ -84,7 +90,7 @@ const Search = () => {
     });
   }
 
-  return <Container padding="1%">{content}</Container>;
+  return <PageLayout>{content}</PageLayout>;
 };
 
 export { Search };
