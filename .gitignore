@@ -338,5 +338,10 @@ sketch
 
 ##Databases
 *.db
+db_local/
 
+###Celery
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir
 # End of https://www.gitignore.io/api/node,react,python,jetbrains,visualstudiocode
