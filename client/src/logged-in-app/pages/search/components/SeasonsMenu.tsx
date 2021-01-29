@@ -13,6 +13,7 @@ import { PrimaryDivider } from "../../../../experimentals/Divider";
 const SeasonsMenuStyle = styled.ul`
   padding: 1%;
   min-width: 100px;
+  margin-right: 20px;
 `;
 
 type SeasonsMenuItemStyleProps = {

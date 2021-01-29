@@ -40,10 +40,12 @@ export const RadarrConfig = () => {
   } = useForm<IRadarrConfig>();
 
   useEffect(() => {
-    if (radarrConfig.data && instanceInfo.data === null) {
+    if (radarrConfig.data) {
       reset(radarrConfig.data);
       setUsePort(radarrConfig.data.port !== null);
       getInstanceInfo(radarrConfig.data, false);
+    } else {
+      setInstanceInfo({ ...DefaultAsyncCall, isLoading: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [radarrConfig]);

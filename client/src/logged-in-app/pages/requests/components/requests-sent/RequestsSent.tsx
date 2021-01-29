@@ -14,7 +14,7 @@ const RequestsSent = () => {
 
   return (
     <Container>
-      <h3 className="title is-3">Movies requested</h3>
+      <h3 className="is-size-3">Movies requested</h3>
       {moviesRequestsSent.isLoading && <Spinner />}
       {!moviesRequestsSent.isLoading &&
         moviesRequestsSent.data &&
@@ -22,14 +22,13 @@ const RequestsSent = () => {
           <MovieRequestSent key={index} request={rs as IMovieRequest} />
         ))}
       <PrimaryDivider />
-      <h3 className="title is-3">Series requested</h3>
+      <h3 className="is-size-3">Series requested</h3>
       {seriesRequestsSent.isLoading && <Spinner />}
       {!seriesRequestsSent.isLoading &&
         seriesRequestsSent.data &&
         seriesRequestsSent.data.map((rs, index) => (
           <SeriesRequestSent key={index} request={rs as ISeriesRequest} />
         ))}
-      <PrimaryDivider />
     </Container>
   );
 };

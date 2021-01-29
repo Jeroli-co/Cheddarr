@@ -98,9 +98,136 @@ const PlexConfig = () => {
         <LinkPlexAccount />
       </RowLayout>
 
+      <br />
+      <form onSubmit={handleSubmit(_onSubmit)}>
+        <h3 className="is-size-3">
+          {currentConfig.data ? "Update" : "Add"} plex configuration
+        </h3>
+        <div className="field">
+          <label>Authentication token</label>
+          <div className="control">
+            <input
+              name="apiKey"
+              className="input"
+              type="text"
+              placeholder="API Key"
+              ref={register({
+                required: true,
+              })}
+            />
+            {errors.apiKey && errors.apiKey.type === "required" && (
+              <p className="help is-danger">
+                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="field">
+          <label>Hostname or IP Address</label>
+          <div className="control">
+            <input
+              name="host"
+              className="input"
+              type="text"
+              placeholder="Hostname or IP"
+              ref={register({
+                required: true,
+              })}
+            />
+            {errors.host && errors.host.type === "required" && (
+              <p className="help is-danger">
+                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+              </p>
+            )}
+          </div>
+          <p className="help is-warning">
+            <FontAwesomeIcon icon={faExclamationCircle} /> Change this value
+            with your domain name if you have one
+          </p>
+        </div>
+        <div className="field">
+          <label>
+            Port{" "}
+            <input
+              type="checkbox"
+              checked={usePort}
+              onChange={() => setUsePort(!usePort)}
+            />
+          </label>
+          <div className="control">
+            <input
+              name="port"
+              className="input"
+              type="number"
+              placeholder="Port"
+              ref={register({ minLength: 4, maxLength: 5 })}
+              minLength={1000}
+              maxLength={99999}
+              disabled={!usePort}
+            />
+          </div>
+        </div>
+        <div className="field">
+          <label>Server ID</label>
+          <div className="control">
+            <input
+              name="serverId"
+              className="input"
+              type="text"
+              placeholder="Server ID"
+              ref={register({
+                required: true,
+              })}
+            />
+            {errors.serverId && errors.serverId.type === "required" && (
+              <p className="help is-danger">
+                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="field">
+          <label>Server name</label>
+          <div className="control">
+            <input
+              name="serverName"
+              className="input"
+              type="text"
+              placeholder="Server name"
+              ref={register({
+                required: true,
+              })}
+            />
+            {errors.serverName && errors.serverName.type === "required" && (
+              <p className="help is-danger">
+                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="field">
+          <div className="control">
+            <input
+              id="ssl"
+              type="checkbox"
+              name="ssl"
+              className="switch is-rounded is-small"
+              ref={register}
+            />
+            <label htmlFor="ssl">SSL</label>
+          </div>
+        </div>
+        <div className="field">
+          <div className="control">
+            <SecondaryButton type="submit">Save</SecondaryButton>
+          </div>
+        </div>
+      </form>
+
+      <SecondaryDivider />
+
       {isPlexAccountLinked() && (
         <div>
-          <br />
           <h3 className="is-size-3">Current Plex server</h3>
           <br />
           {currentConfig.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
@@ -137,154 +264,26 @@ const PlexConfig = () => {
             </RowLayout>
           )}
 
-          <SecondaryDivider />
-
           {currentConfig.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
 
-          {!currentConfig.isLoading && (
-            <form onSubmit={handleSubmit(_onSubmit)}>
-              <h3 className="is-size-3">
-                {currentConfig.data ? "Update" : "Add"} plex server
-              </h3>
-              <div className="field">
-                <label>Authentication token</label>
-                <div className="control">
-                  <input
-                    name="apiKey"
-                    className="input"
-                    type="text"
-                    placeholder="API Key"
-                    ref={register({
-                      required: true,
-                    })}
-                  />
-                  {errors.apiKey && errors.apiKey.type === "required" && (
-                    <p className="help is-danger">
-                      {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="field">
-                <label>Hostname or IP Address</label>
-                <div className="control">
-                  <input
-                    name="host"
-                    className="input"
-                    type="text"
-                    placeholder="Hostname or IP"
-                    ref={register({
-                      required: true,
-                    })}
-                  />
-                  {errors.host && errors.host.type === "required" && (
-                    <p className="help is-danger">
-                      {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="field">
-                <label>
-                  Port{" "}
-                  <input
-                    type="checkbox"
-                    checked={usePort}
-                    onChange={() => setUsePort(!usePort)}
-                  />
-                </label>
-                <div className="control">
-                  <input
-                    name="port"
-                    className="input"
-                    type="number"
-                    placeholder="Port"
-                    ref={register({ minLength: 4, maxLength: 5 })}
-                    minLength={1000}
-                    maxLength={99999}
-                    disabled={!usePort}
-                  />
-                </div>
-              </div>
-              <div className="field">
-                <label>Server ID</label>
-                <div className="control">
-                  <input
-                    name="serverId"
-                    className="input"
-                    type="text"
-                    placeholder="Server ID"
-                    ref={register({
-                      required: true,
-                    })}
-                  />
-                  {errors.serverId && errors.serverId.type === "required" && (
-                    <p className="help is-danger">
-                      {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="field">
-                <label>Server name</label>
-                <div className="control">
-                  <input
-                    name="serverName"
-                    className="input"
-                    type="text"
-                    placeholder="Server name"
-                    ref={register({
-                      required: true,
-                    })}
-                  />
-                  {errors.serverName &&
-                    errors.serverName.type === "required" && (
-                      <p className="help is-danger">
-                        {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                      </p>
-                    )}
-                </div>
-              </div>
-              <div className="field">
-                <div className="control">
-                  <input
-                    id="ssl"
-                    type="checkbox"
-                    name="ssl"
-                    className="switch is-rounded is-small"
-                    ref={register}
-                  />
-                  <label htmlFor="ssl">SSL</label>
-                </div>
-              </div>
-              <div className="field">
-                <div className="control">
-                  <SecondaryButton type="submit">Save</SecondaryButton>
-                </div>
-              </div>
-            </form>
-          )}
-
           <SecondaryDivider />
 
-          {currentConfig.data && (
-            <div>
-              <h3 className="is-size-3">Danger zone</h3>
-              <div className="content">
-                <p className="is-size-7">
-                  <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
-                  that option
-                </p>
-                <button
-                  className="button is-danger"
-                  type="button"
-                  onClick={() => setIsUnlinkAccountModalActive(true)}
-                >
-                  Unlink Plex Account
-                </button>
-              </div>
+          <div>
+            <h3 className="is-size-3">Danger zone</h3>
+            <div className="content">
+              <p className="is-size-7">
+                <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
+                that option
+              </p>
+              <button
+                className="button is-danger"
+                type="button"
+                onClick={() => setIsUnlinkAccountModalActive(true)}
+              >
+                Unlink Plex Account
+              </button>
             </div>
-          )}
+          </div>
         </div>
       )}
 

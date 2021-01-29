@@ -74,11 +74,7 @@ export default function PlexConfigContextProvider(props: any) {
   useEffect(() => {
     if (!configs.isLoading && configs.data && configs.data?.length > 0) {
       setCurrentConfig({ data: configs.data[0], isLoading: false });
-    } else if (
-      !configs.isLoading &&
-      configs.data &&
-      configs.data?.length === 0
-    ) {
+    } else {
       setCurrentConfig({ ...DefaultAsyncData, isLoading: false });
     }
   }, [configs]);

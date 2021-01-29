@@ -6,7 +6,9 @@ import { routes } from "../../../../../router/routes";
 import { IPublicUser } from "../../../../models/IPublicUser";
 import { SearchRequestTypes } from "../../../../enums/SearchRequestTypes";
 import { Text } from "../../../../../shared/components/Text";
-import Spinner from "../../../../../shared/components/Spinner";
+import Spinner, {
+  PrimarySpinner,
+} from "../../../../../shared/components/Spinner";
 import { IMediaSearchResult } from "../models/IMediaSearchResult";
 import { Image } from "../../../../../shared/components/Image";
 import { useRedirectToMediasDetails } from "../../../../hooks/useRedirectToMediasDetails";
@@ -144,7 +146,7 @@ const SearchResultsItems = ({
             moviesResults.data.length > 0 && (
               <ResultsSectionTitle>Movies</ResultsSectionTitle>
             )}
-          {moviesResults.isLoading && <Spinner />}
+          {moviesResults.isLoading && <PrimarySpinner />}
           {!moviesResults.isLoading &&
             moviesResults.data !== null &&
             moviesResults.data.length > 0 && (
@@ -159,7 +161,7 @@ const SearchResultsItems = ({
             seriesResults.data.length > 0 && (
               <ResultsSectionTitle>Series</ResultsSectionTitle>
             )}
-          {seriesResults.isLoading && <Spinner />}
+          {seriesResults.isLoading && <PrimarySpinner />}
           {!seriesResults.isLoading &&
             seriesResults.data !== null &&
             seriesResults.data.length > 0 && (
@@ -174,7 +176,7 @@ const SearchResultsItems = ({
             friendsResults.data.length > 0 && (
               <ResultsSectionTitle>Friends</ResultsSectionTitle>
             )}
-          {friendsResults.isLoading && <Spinner />}
+          {friendsResults.isLoading && <PrimarySpinner />}
           {!friendsResults.isLoading &&
             friendsResults.data !== null &&
             friendsResults.data.length > 0 && (

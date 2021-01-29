@@ -149,6 +149,8 @@ const SearchBar = () => {
         ).then((res) => {
           if (res.status === 200 && res.data) {
             setMoviesResults({ data: res.data, isLoading: false });
+          } else {
+            setMoviesResults({ ...moviesResults, isLoading: false });
           }
         });
       }
@@ -159,15 +161,22 @@ const SearchBar = () => {
         ).then((res) => {
           if (res.status === 200 && res.data) {
             setSeriesResults({ data: res.data, isLoading: false });
+          } else {
+            setSeriesResults({ ...seriesResults, isLoading: false });
           }
         });
       }
+    } else {
+      setSeriesResults({ ...seriesResults, isLoading: false });
+      setMoviesResults({ ...moviesResults, isLoading: false });
     }
 
     if (friendsResults.isLoading) {
       get<IPublicUser[]>(APIRoutes.SEARCH_FRIENDS(value)).then((res) => {
         if (res.status === 200 && res.data) {
           setFriendsResults({ data: res.data, isLoading: false });
+        } else {
+          setFriendsResults({ ...friendsResults, isLoading: false });
         }
       });
     }

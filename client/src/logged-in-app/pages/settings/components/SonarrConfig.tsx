@@ -66,6 +66,8 @@ export const SonarrConfig = () => {
       reset(currentSonarrConfig.data);
       setUsePort(currentSonarrConfig.data.port !== null);
       getInstanceInfo(currentSonarrConfig.data, false);
+    } else {
+      setInstanceInfo({ ...DefaultAsyncCall, isLoading: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSonarrConfig]);

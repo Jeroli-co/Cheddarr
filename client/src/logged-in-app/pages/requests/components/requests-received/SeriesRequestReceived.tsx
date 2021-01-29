@@ -38,7 +38,7 @@ const SeriesRequestReceived = ({ request }: SeriesRequestReceivedProps) => {
 
   return (
     <SeriesRequestReceivedStyle>
-      <RowLayout2 wrap="wrap" border="2px solid black">
+      <RowLayout2 wrap="wrap">
         {/* Media */}
         {request.series.posterUrl && (
           <Image
@@ -48,8 +48,8 @@ const SeriesRequestReceived = ({ request }: SeriesRequestReceivedProps) => {
             height="350px"
           />
         )}
-        <RowLayout2 border="1px solid red">
-          <RowElement flexGrow="3" border="1px solid green">
+        <RowLayout2>
+          <RowElement flexGrow="3">
             <H2>{request.series.title}</H2>
             <div>
               {request.seasons.map((season, index) => {
