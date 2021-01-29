@@ -21,12 +21,16 @@ export const DynamicApp = () => {
     session: { isAuthenticated },
   } = useSession();
 
+  // TODO: Move signinwithplex then remove authcontext from authenticated app
+
   return isAuthenticated ? (
     <Suspense fallback={<PageLoader />}>
-      <PlexConfigContextProvider>
-        <LoggedInNavbar />
-        <SwitchRoutes />
-      </PlexConfigContextProvider>
+      <AuthenticationContextProvider>
+        <PlexConfigContextProvider>
+          <LoggedInNavbar />
+          <SwitchRoutes />
+        </PlexConfigContextProvider>
+      </AuthenticationContextProvider>
     </Suspense>
   ) : (
     <Suspense fallback={<PageLoader />}>

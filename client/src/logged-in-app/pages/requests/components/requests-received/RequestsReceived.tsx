@@ -14,7 +14,7 @@ const RequestsReceived = () => {
 
   return (
     <Container>
-      <h3 className="title is-3">Movies requested</h3>
+      <h3 className="is-size-3">Movies requested</h3>
       {moviesRequestsReceived.isLoading && <Spinner />}
       {!moviesRequestsReceived.isLoading &&
         moviesRequestsReceived.data &&
@@ -22,14 +22,13 @@ const RequestsReceived = () => {
           <MovieRequestReceived key={index} request={rs as IMovieRequest} />
         ))}
       <PrimaryDivider />
-      <h3 className="title is-3">Series requested</h3>
+      <h3 className="is-size-3">Series requested</h3>
       {seriesRequestsReceived.isLoading && <Spinner />}
       {!seriesRequestsReceived.isLoading &&
         seriesRequestsReceived.data &&
         seriesRequestsReceived.data.map((rs, index) => (
           <SeriesRequestReceived key={index} request={rs as ISeriesRequest} />
         ))}
-      <PrimaryDivider />
     </Container>
   );
 };

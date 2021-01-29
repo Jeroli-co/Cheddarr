@@ -32,6 +32,8 @@ export const useSonarrConfig = () => {
   useEffect(() => {
     if (sonarrConfigs.data && sonarrConfigs.data.length > 0) {
       setCurrentSonarrConfig({ data: sonarrConfigs.data[0], isLoading: false });
+    } else {
+      setCurrentSonarrConfig({ data: null, isLoading: false });
     }
   }, [sonarrConfigs]);
 

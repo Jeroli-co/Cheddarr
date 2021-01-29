@@ -51,10 +51,6 @@ const DropdownMenuItem = styled.div`
   cursor: pointer;
   color: ${(props) => props.theme.primary};
   padding: 10px;
-
-  &:hover {
-    color: ${STATIC_STYLES.COLORS.DARK};
-  }
 `;
 
 const DropdownMenuItemIcon = styled.div`

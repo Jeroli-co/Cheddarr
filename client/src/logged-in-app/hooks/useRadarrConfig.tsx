@@ -24,6 +24,8 @@ export const useRadarrConfig = () => {
           status: res.status,
           isLoading: false,
         });
+      } else {
+        setRadarrConfig({ data: null, isLoading: false, status: 404 });
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
