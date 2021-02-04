@@ -14,7 +14,7 @@ import {
 } from "../../../../shared/models/IAsyncCall";
 import { SwitchErrors } from "../../../../shared/components/errors/SwitchErrors";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
-import { Icon } from "../../../../experimentals/Icon";
+import { Icon } from "../../../../shared/components/Icon";
 import { H3 } from "../../../../shared/components/Titles";
 import { Sizes } from "../../../../shared/enums/Sizes";
 

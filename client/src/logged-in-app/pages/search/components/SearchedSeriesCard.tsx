@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Container } from "../../../../shared/components/Container";
-import { RowLayout } from "../../../../shared/components/Layouts";
+import { Container } from "../../../../shared/components/layout/Container";
+import { RowLayout } from "../../../../shared/components/layout/Layouts";
 import { Image } from "../../../../shared/components/Image";
 import { MediaRating } from "../../plex-media/components/MediaRating";
 import { ProvidersDropdown } from "./ProvidersDropdown";
@@ -12,7 +12,7 @@ import { ISearchedSeries } from "../models/ISearchedMedias";
 import { IPublicUser } from "../../../models/IPublicUser";
 import { MediaTypes } from "../../../enums/MediaTypes";
 import { useSearchedSeries } from "../../../hooks/useSearchedSeries";
-import { PrimaryDivider } from "../../../../experimentals/Divider";
+import { PrimaryDivider } from "../../../../shared/components/Divider";
 
 type SearchedSeriesCardProps = {
   series: ISearchedSeries;

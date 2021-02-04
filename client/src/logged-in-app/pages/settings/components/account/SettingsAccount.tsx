@@ -3,7 +3,7 @@ import { Route, Switch, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../../../router/routes";
-import { SecondaryButton } from "../../../../../experimentals/Button";
+import { SecondaryButton } from "../../../../../shared/components/Button";
 import { H3 } from "../../../../../shared/components/Titles";
 
 const SettingsAccountBody = () => {

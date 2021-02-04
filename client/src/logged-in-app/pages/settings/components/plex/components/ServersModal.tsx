@@ -5,7 +5,7 @@ import { usePlexServers } from "../../../../../hooks/usePlexServers";
 import { useAPI } from "../../../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../../../shared/enums/APIRoutes";
 import { Sizes } from "../../../../../../shared/enums/Sizes";
-import { PrimaryOutlinedButton } from "../../../../../../experimentals/Button";
+import { PrimaryOutlinedButton } from "../../../../../../shared/components/Button";
 import { IPlexConfig } from "../models/IPlexConfig";
 
 type PlexServerComponentProps = {

@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { Container } from "../../../../shared/components/Container";
-import { ColumnLayout, RowLayout } from "../../../../shared/components/Layouts";
+import { Container } from "../../../../shared/components/layout/Container";
+import {
+  ColumnLayout,
+  RowLayout,
+} from "../../../../shared/components/layout/Layouts";
 import { Image } from "../../../../shared/components/Image";
 import { MediaTitle } from "./MediaTitle";
 import { Tag, TagColor } from "./Tag";

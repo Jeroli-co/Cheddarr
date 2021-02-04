@@ -8,9 +8,8 @@ import {
   ScrollingTable,
 } from "./RequestStyles";
 import { Sizes } from "../../../../shared/enums/Sizes";
-import { CenteredContent } from "../../../../experimentals/CenteredContent";
+import { CenteredContent } from "../../../../shared/components/layout/CenteredContent";
 import { RequestTypes } from "../enums/RequestTypes";
-import { PrimaryDivider } from "../../../../experimentals/Divider";
 
 const RequestsReceived = () => {
   const { requestsReceived } = useRequestsContext();
@@ -27,15 +26,11 @@ const RequestsReceived = () => {
       {!requestsReceived.isLoading &&
         requestsReceived.data &&
         requestsReceived.data.map((r, index) => (
-          <div>
-            <RequestLayout
-              key={index}
-              request={r}
-              requestType={RequestTypes.INCOMING}
-            />
-            {requestsReceived.data &&
-              index !== requestsReceived.data?.length - 1 && <PrimaryDivider />}
-          </div>
+          <RequestLayout
+            key={index}
+            request={r}
+            requestType={RequestTypes.INCOMING}
+          />
         ))}
       <RequestFooter />
     </ScrollingTable>

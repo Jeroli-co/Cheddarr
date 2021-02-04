@@ -11,7 +11,7 @@ import {
 import {
   Button,
   SecondaryButton,
-} from "../../../../../../experimentals/Button";
+} from "../../../../../../shared/components/Button";
 
 const ChangePasswordModal = () => {
   const { register, handleSubmit, errors, watch } = useForm<

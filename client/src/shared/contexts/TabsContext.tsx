@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { createContext, useContext } from "react";
-import { Tabs } from "../../experimentals/Tabs";
+import { Tabs } from "../components/Tabs";
 
 export const TabsContext = createContext({});
 

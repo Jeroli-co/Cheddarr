@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { RowLayout } from "../../../../shared/components/Layouts";
+import { RowLayout } from "../../../../shared/components/layout/Layouts";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultValidators";
 import { IRadarrConfig } from "../models/IRadarrConfig";
 import { IRadarrInstanceInfo } from "../models/IRadarrInstanceInfo";
@@ -10,11 +10,11 @@ import {
   DefaultAsyncCall,
   IAsyncCall,
 } from "../../../../shared/models/IAsyncCall";
-import { SecondaryButton } from "../../../../experimentals/Button";
+import { SecondaryButton } from "../../../../shared/components/Button";
 import { SecondarySpinner } from "../../../../shared/components/Spinner";
 import { Sizes } from "../../../../shared/enums/Sizes";
-import { SecondaryDivider } from "../../../../experimentals/Divider";
-import { PageLayout } from "../../../../experimentals/PageLayout";
+import { SecondaryDivider } from "../../../../shared/components/Divider";
+import { PageLayout } from "../../../../shared/components/layout/PageLayout";
 
 export const RadarrConfig = () => {
   const [instanceInfo, setInstanceInfo] = useState<

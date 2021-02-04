@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import { useHistory } from "react-router";
-import { SecondaryRoundedButton } from "../../experimentals/Button";
+import { SecondaryRoundedButton } from "../../shared/components/Button";
 import { routes } from "../../router/routes";
 
 export const SignInButton = () => {

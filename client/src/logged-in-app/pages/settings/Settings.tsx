@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Switch } from "react-router";
 import { routes } from "../../../router/routes";
-import { PageLayout } from "../../../experimentals/PageLayout";
+import { PageLayout } from "../../../shared/components/layout/PageLayout";
 import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
 
 const Settings = () => {

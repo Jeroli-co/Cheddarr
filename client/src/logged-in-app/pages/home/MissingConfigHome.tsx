@@ -1,4 +1,4 @@
-import { PrimaryDivider } from "../../../experimentals/Divider";
+import { PrimaryDivider } from "../../../shared/components/Divider";
 import { routes } from "../../../router/routes";
 import React from "react";
 import styled from "styled-components";
@@ -48,7 +48,7 @@ export const MissingConfigHome = () => {
       <br />
       <PrimaryDivider />
       <Link onClick={() => history.push(routes.SETTINGS_PLEX.url)}>
-        Add a plex server to start using this hub
+        ADD A PLEX SERVER TO START USING THIS HUB
       </Link>
     </Container>
   );

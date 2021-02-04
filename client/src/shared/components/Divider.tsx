@@ -12,6 +12,10 @@ export const PrimaryDivider = styled(Divider)`
   border-top: 1px solid ${(props) => props.theme.primary};
 `;
 
+export const PrimaryLightDivider = styled(Divider)`
+  border-top: 1px solid ${(props) => props.theme.primaryLight};
+`;
+
 export const SecondaryDivider = styled(Divider)`
   border-top: 1px solid ${(props) => props.theme.secondary};
 `;

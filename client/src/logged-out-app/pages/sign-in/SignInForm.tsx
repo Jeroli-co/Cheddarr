@@ -7,11 +7,11 @@ import { routes } from "../../../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../../../shared/enums/FormDefaultValidators";
 import { ISignInFormData } from "../../models/ISignInFormData";
 import { useAuthentication } from "../../contexts/AuthenticationContext";
-import { PrimaryHero } from "../../../experimentals/Hero";
+import { PrimaryHero } from "../../../shared/components/layout/Hero";
 import { PlexButton } from "../../../shared/components/PlexButton";
-import { RowLayout2 } from "../../../shared/components/Layouts";
-import { SecondaryButton } from "../../../experimentals/Button";
-import { PrimaryDivider } from "../../../experimentals/Divider";
+import { RowLayout2 } from "../../../shared/components/layout/Layouts";
+import { SecondaryButton } from "../../../shared/components/Button";
+import { PrimaryDivider } from "../../../shared/components/Divider";
 
 function useRedirectURI() {
   const query = new URLSearchParams(useLocation().search);

@@ -10,11 +10,11 @@ import { ISignUpFormData } from "../../models/ISignUpFormData";
 import { IUser } from "../../../logged-in-app/pages/user-profile/models/IUser";
 import { useAuthentication } from "../../contexts/AuthenticationContext";
 import { Redirect } from "react-router";
-import { PrimaryHero } from "../../../experimentals/Hero";
+import { PrimaryHero } from "../../../shared/components/layout/Hero";
 import { PlexButton } from "../../../shared/components/PlexButton";
-import { RowLayout2 } from "../../../shared/components/Layouts";
-import { SecondaryButton } from "../../../experimentals/Button";
-import { PrimaryDivider } from "../../../experimentals/Divider";
+import { RowLayout2 } from "../../../shared/components/layout/Layouts";
+import { SecondaryButton } from "../../../shared/components/Button";
+import { PrimaryDivider } from "../../../shared/components/Divider";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();

@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { Sizes } from "../shared/enums/Sizes";
+import { Sizes } from "../enums/Sizes";
 
 type ButtonStyleProps = {
   fontSize?: Sizes;
@@ -14,17 +14,12 @@ export const Button = styled.button<ButtonStyleProps>`
   -moz-appearance: none;
   -webkit-appearance: none;
   align-items: center;
-  border: none;
   border-radius: 4px;
   box-shadow: none;
   display: inline-flex;
   height: 2.5em;
-  justify-content: flex-start;
   line-height: 1.5;
-  padding-bottom: calc(.5em - 1px);
-  padding-left: calc(.75em - 1px);
-  padding-right: calc(.75em - 1px);
-  padding-top: calc(.5em - 1px);
+  padding: calc(.5em - 1px) calc(.75em - 1px);
   position: relative;
   vertical-align: top;
   -webkit-touch-callout: none;
@@ -32,19 +27,15 @@ export const Button = styled.button<ButtonStyleProps>`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  background-color: #fff;
-  border-color: #dbdbdb;
-  border-width: 1px;
+  border: 1px none #8c8c8c;
   color: #363636;
   cursor: pointer;
   justify-content: center;
-  padding-bottom: calc(.5em - 1px);
-  padding-left: 1em;
-  padding-right: 1em;
-  padding-top: calc(.5em - 1px);
   text-align: center;
   white-space: nowrap;
-  
+  background: ${(props) =>
+    props.bgColor ? props.bgColor : props.theme.bgColor};
+
   &:focus {
     outline: none;
   }
@@ -65,29 +56,20 @@ export const Button = styled.button<ButtonStyleProps>`
   }};
 
   ${(props) =>
-    props.bgColor &&
-    css`
-      background-color: ${props.bgColor};
-    `}
-
-  ${(props) =>
     props.color &&
     css`
       color: ${props.color};
     `}
-
   ${(props) =>
     props.borderColor &&
     css`
       border: 1px solid ${props.borderColor};
     `}
-
   ${(props) =>
     props.width &&
     css`
       width: ${props.width};
     `}
-
   .left-icon {
     padding-right: 10px;
   }

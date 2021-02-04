@@ -1,6 +1,6 @@
 import React, { MouseEvent, useEffect, useState } from "react";
-import { RowLayout } from "../../../../shared/components/Layouts";
-import { Container } from "../../../../shared/components/Container";
+import { RowLayout } from "../../../../shared/components/layout/Layouts";
+import { Container } from "../../../../shared/components/layout/Container";
 import Spinner from "../../../../shared/components/Spinner";
 import styled from "styled-components";
 import { SeasonEpisodes } from "./SeasonEpisodes";
@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { ISearchedSeries } from "../models/ISearchedMedias";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
-import { PrimaryDivider } from "../../../../experimentals/Divider";
+import { PrimaryDivider } from "../../../../shared/components/Divider";
 
 const SeasonsMenuStyle = styled.ul`
   padding: 1%;

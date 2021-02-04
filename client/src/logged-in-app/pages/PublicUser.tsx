@@ -4,7 +4,7 @@ import Spinner from "../../shared/components/Spinner";
 import { usePublicUser } from "../hooks/usePublicUser";
 import { SwitchErrors } from "../../shared/components/errors/SwitchErrors";
 import { Image } from "../../shared/components/Image";
-import { PrimaryDivider } from "../../experimentals/Divider";
+import { PrimaryDivider } from "../../shared/components/Divider";
 
 type RouteParams = {
   username: string;

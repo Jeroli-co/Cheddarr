@@ -1,6 +1,8 @@
 import React, { Suspense } from "react";
 import { useSession } from "./shared/contexts/SessionContext";
 import { PageLoader } from "./shared/components/PageLoader";
+import styled from "styled-components";
+import { SidebarMenu } from "./shared/components/layout/SidebarMenu";
 
 const AuthenticationContextProvider = React.lazy(() =>
   import("./logged-out-app/contexts/AuthenticationContext")
@@ -16,6 +18,10 @@ const PlexConfigContextProvider = React.lazy(() =>
 );
 const SwitchRoutes = React.lazy(() => import("./router/SwitchRoutes"));
 
+const LoggedInLayout = styled.section`
+  display: flex;
+`;
+
 export const DynamicApp = () => {
   const {
     session: { isAuthenticated },
@@ -28,7 +34,10 @@ export const DynamicApp = () => {
       <AuthenticationContextProvider>
         <PlexConfigContextProvider>
           <LoggedInNavbar />
-          <SwitchRoutes />
+          <LoggedInLayout>
+            <SidebarMenu />
+            <SwitchRoutes />
+          </LoggedInLayout>
         </PlexConfigContextProvider>
       </AuthenticationContextProvider>
     </Suspense>

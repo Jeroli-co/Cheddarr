@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { ColumnLayout } from "../../../../../shared/components/Layouts";
+import { ColumnLayout } from "../../../../../shared/components/layout/Layouts";
 import { useHistory } from "react-router";
 import { routes } from "../../../../../router/routes";
 import { IPublicUser } from "../../../../models/IPublicUser";

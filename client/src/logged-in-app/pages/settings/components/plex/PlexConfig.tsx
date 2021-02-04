@@ -6,7 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
-import { RowLayout } from "../../../../../shared/components/Layouts";
+import { RowLayout } from "../../../../../shared/components/layout/Layouts";
 import { LinkPlexAccount } from "./components/LinkPlexAccount";
 import { ServersModal } from "./components/ServersModal";
 import { UnlinkAccountModal } from "./components/UnlinkAccountModal";
@@ -15,11 +15,11 @@ import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
 import { IPlexConfig } from "./models/IPlexConfig";
 import { useSession } from "../../../../../shared/contexts/SessionContext";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
-import { SecondaryButton } from "../../../../../experimentals/Button";
+import { SecondaryButton } from "../../../../../shared/components/Button";
 import { SecondarySpinner } from "../../../../../shared/components/Spinner";
 import { Sizes } from "../../../../../shared/enums/Sizes";
-import { PageLayout } from "../../../../../experimentals/PageLayout";
-import { SecondaryDivider } from "../../../../../experimentals/Divider";
+import { PageLayout } from "../../../../../shared/components/layout/PageLayout";
+import { SecondaryDivider } from "../../../../../shared/components/Divider";
 
 const PlexConfig = () => {
   const [isServersModalActive, setIsServersModalActive] = useState(false);

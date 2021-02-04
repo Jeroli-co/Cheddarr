@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../router/routes";
-import { SecondaryRoundedButton } from "../../experimentals/Button";
+import { SecondaryRoundedButton } from "../../shared/components/Button";
 import { useHistory } from "react-router-dom";
 
 export const SignUpButton = () => {

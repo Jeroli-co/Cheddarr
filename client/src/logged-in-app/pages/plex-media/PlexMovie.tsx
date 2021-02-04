@@ -1,11 +1,14 @@
 import React from "react";
 import { useParams } from "react-router";
-import { ColumnLayout, RowLayout } from "../../../shared/components/Layouts";
+import {
+  ColumnLayout,
+  RowLayout,
+} from "../../../shared/components/layout/Layouts";
 import { Tag, TagColor } from "./components/Tag";
 import { Actors } from "./components/Actors";
 import { Image } from "../../../shared/components/Image";
 import { MediaTitle } from "./components/MediaTitle";
-import { Container } from "../../../shared/components/Container";
+import { Container } from "../../../shared/components/layout/Container";
 import { PlexButton } from "../../../shared/components/PlexButton";
 import { MediaRating } from "./components/MediaRating";
 import { MediaBackground } from "./components/MediaBackground";

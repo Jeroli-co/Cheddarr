@@ -23,14 +23,23 @@ import {
   IMediaRequest,
 } from "../models/IMediaRequest";
 import { RequestStatus } from "../enums/RequestStatus";
-import { DangerButton, SuccessButton } from "../../../../experimentals/Button";
-import { Icon } from "../../../../experimentals/Icon";
-import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { UserSmallCard } from "../../../../experimentals/UserSmallCard";
+import {
+  DangerButton,
+  PrimaryOutlinedButton,
+  SuccessButton,
+} from "../../../../shared/components/Button";
+import { Icon } from "../../../../shared/components/Icon";
+import {
+  faArrowLeft,
+  faArrowRight,
+  faCheck,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
+import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
 import { SCREEN_SIZE } from "../../../../utils/enums/ScreenSizes";
 import { useRequestsContext } from "../contexts/RequestsContext";
 import { RequestTypes } from "../enums/RequestTypes";
-import { Tooltiped } from "../../../../experimentals/Tooltiped";
+import { Tooltiped } from "../../../../shared/components/Tooltiped";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;
@@ -320,7 +329,12 @@ const RequestsFooterContainer = styled.header`
 export const RequestFooter = () => {
   return (
     <RequestsFooterContainer>
-      <p>TODO: Add pagination</p>
+      <PrimaryOutlinedButton>
+        <Icon icon={faArrowLeft} />
+      </PrimaryOutlinedButton>
+      <PrimaryOutlinedButton>
+        <Icon icon={faArrowRight} />
+      </PrimaryOutlinedButton>
     </RequestsFooterContainer>
   );
 };
@@ -421,6 +435,7 @@ const RequestContainer = styled.div`
   align-items: center;
   padding: 20px;
   min-width: ${SCREEN_SIZE.DESKTOP_MEDIUM}px;
+  border: 1px solid ${(props) => props.theme.primaryLight};
 `;
 
 type RequestLayoutProps = {
