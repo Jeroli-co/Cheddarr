@@ -69,12 +69,6 @@ const RequestElement = styled.div<{
     justify-content: flex-start;
   }
 
-  &:nth-child(4),
-  &:nth-child(5) {
-    display: flex;
-    justify-content: center;
-  }
-
   &:last-child {
     display: flex;
     justify-content: flex-end;
