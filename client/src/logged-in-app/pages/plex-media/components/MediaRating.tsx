@@ -9,7 +9,7 @@ import {
   IMediaServerMovie,
   IMediaServerSeason,
   IMediaServerSeries,
-} from "../models/IMediasServerMedias";
+} from "../models/IMediaServerMedia";
 import {
   ISearchedMovie,
   ISearchedSeries,

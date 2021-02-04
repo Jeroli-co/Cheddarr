@@ -1,36 +1,50 @@
 import styled from "styled-components";
-import * as React from "react";
+import { STATIC_STYLES } from "../enums/StaticStyles";
 
-const H1Style = styled.p`
-  font-size: 3rem;
+export const H1 = styled.h1`
+  font-size: 3em;
+
+  @media (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    font-size: 2.5em;
+  }
+
+  @media (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
+    font-size: 2em;
+  }
 `;
 
-const H2Style = styled.p`
-  font-size: 2.5rem;
+export const H2 = styled.h2`
+  font-size: 2.5em;
+
+  @media (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    font-size: 2em;
+  }
+
+  @media (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
+    font-size: 1.5em;
+  }
 `;
 
-const H3Style = styled.p`
-  font-size: 2rem;
+export const H3 = styled.h3`
+  font-size: 2em;
+
+  @media (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    font-size: 1.5em;
+  }
+
+  @media (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
+    font-size: 1em;
+  }
 `;
 
-const H4Style = styled.p`
-  font-size: 1.5rem;
+export const H4 = styled.p`
+  font-size: 1.5em;
+
+  @media (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    font-size: 1em;
+  }
+
+  @media (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
+    font-size: 0.5em;
+  }
 `;
-
-const H1 = (props: any) => {
-  return <H1Style>{props.children}</H1Style>;
-};
-
-const H2 = (props: any) => {
-  return <H2Style>{props.children}</H2Style>;
-};
-
-const H3 = (props: any) => {
-  return <H3Style>{props.children}</H3Style>;
-};
-
-const H4 = (props: any) => {
-  return <H4Style>{props.children}</H4Style>;
-};
-
-export { H1, H2, H3, H4 };

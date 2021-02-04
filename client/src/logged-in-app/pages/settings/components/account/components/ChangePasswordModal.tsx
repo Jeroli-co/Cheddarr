@@ -8,6 +8,10 @@ import {
   IChangePasswordModel,
   useUserService,
 } from "../../../../user-profile/hooks/useUserService";
+import {
+  Button,
+  SecondaryButton,
+} from "../../../../../../experimentals/Button";
 
 const ChangePasswordModal = () => {
   const { register, handleSubmit, errors, watch } = useForm<
@@ -147,12 +151,10 @@ const ChangePasswordModal = () => {
             </div>
           </section>
           <footer className="modal-card-foot">
-            <button className="button is-secondary-button">
-              Change password
-            </button>
-            <button className="button" type="button" onClick={closeModal}>
+            <SecondaryButton type="submit">Change password</SecondaryButton>
+            <Button type="button" onClick={closeModal}>
               Cancel
-            </button>
+            </Button>
           </footer>
         </form>
       </div>

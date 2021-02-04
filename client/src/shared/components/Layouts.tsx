@@ -167,8 +167,8 @@ const RowLayout = styled.div<RowLayoutProps>`
   border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
   background-color: ${(props) =>
     props.backgroundColor
-      ? props.theme[props.backgroundColor]
-        ? props.theme[props.backgroundColor]
+      ? props.theme.bgColor
+        ? props.theme.bgColor
         : props.backgroundColor
       : "transparent"};
 
@@ -295,8 +295,8 @@ const RowLayout2 = styled.div<RowLayoutProps>`
   border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
   background-color: ${(props) =>
     props.backgroundColor
-      ? props.theme[props.backgroundColor]
-        ? props.theme[props.backgroundColor]
+      ? props.theme.bgColor
+        ? props.theme.bgColor
         : props.backgroundColor
       : "transparent"};
 

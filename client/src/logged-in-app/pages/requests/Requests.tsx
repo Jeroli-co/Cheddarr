@@ -1,27 +1,32 @@
 import React from "react";
-import { Redirect, Route, Switch } from "react-router";
+import { Route, Switch } from "react-router";
 import { routes } from "../../../router/routes";
-import { RequestsTabs } from "./components/RequestsTabs";
-import { Container } from "../../../shared/components/Container";
+import { PageLayout } from "../../../experimentals/PageLayout";
+import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
+import { RequestsContextProvider } from "./contexts/RequestsContext";
 
 const Requests = () => {
   return (
-    <Container padding="1%" minHeight="100vh">
-      <RequestsTabs />
-      <Switch>
-        <Route
-          exact
-          path={[routes.REQUESTS.url, routes.REQUESTS_SENT.url]}
-          component={routes.REQUESTS_SENT.component}
-        />
-        <Route
-          exact
-          path={routes.REQUESTS_RECEIVED.url}
-          component={routes.REQUESTS_RECEIVED.component}
-        />
-        <Redirect to={routes.NOT_FOUND.url} />
-      </Switch>
-    </Container>
+    <PageLayout>
+      <TabsContextProvider
+        tabs={["Sent", "Received"]}
+        url={routes.REQUESTS.url}
+      >
+        <RequestsContextProvider>
+          <Switch>
+            <Route
+              exact
+              path={routes.REQUESTS_RECEIVED.url}
+              component={routes.REQUESTS_RECEIVED.component}
+            />
+            <Route
+              path={[routes.REQUESTS.url, routes.REQUESTS_SENT.url]}
+              component={routes.REQUESTS_SENT.component}
+            />
+          </Switch>
+        </RequestsContextProvider>
+      </TabsContextProvider>
+    </PageLayout>
   );
 };
 

@@ -19,12 +19,12 @@ import { SonarrConfig } from "../logged-in-app/pages/settings/components/SonarrC
 import { Search } from "../logged-in-app/pages/search/Search";
 import { Requests } from "../logged-in-app/pages/requests/Requests";
 import { UserProfile } from "../logged-in-app/pages/user-profile/UserProfile";
-import { RequestsSentDashboard } from "../logged-in-app/pages/requests/components/requests-sent/RequestsSentDashboard";
-import { RequestsReceivedDashboard } from "../logged-in-app/pages/requests/components/requests-received/RequestsReceivedDashboard";
 import { PlexMovie } from "../logged-in-app/pages/plex-media/PlexMovie";
 import { PlexSeries } from "../logged-in-app/pages/plex-media/PlexSeries";
 import { PlexSeason } from "../logged-in-app/pages/plex-media/PlexSeason";
 import { Home } from "../shared/Home";
+import { RequestsSent } from "../logged-in-app/pages/requests/components/RequestsSent";
+import { RequestsReceived } from "../logged-in-app/pages/requests/components/RequestsReceived";
 
 const routes = {
   HOME: {
@@ -114,11 +114,11 @@ const routes = {
   },
   REQUESTS_SENT: {
     url: "/requests/sent",
-    component: RequestsSentDashboard,
+    component: RequestsSent,
   },
   REQUESTS_RECEIVED: {
     url: "/requests/received",
-    component: RequestsReceivedDashboard,
+    component: RequestsReceived,
   },
 
   /** OTHERS **/

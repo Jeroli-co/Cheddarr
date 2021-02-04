@@ -1,6 +1,7 @@
 export interface ITheme {
   light: IThemeProperties;
   dark: IThemeProperties;
+  constColor: any;
 }
 
 export interface IThemeProperties {
@@ -11,7 +12,7 @@ export interface IThemeProperties {
 
 export const THEMES: ITheme = {
   light: {
-    bgColor: "#ffffff",
+    bgColor: "#FEFEE2",
     color: "#4f4d4d",
     highlight: "#dedede",
   },
@@ -19,5 +20,11 @@ export const THEMES: ITheme = {
     bgColor: "#4e4e4e",
     color: "#ffffff",
     highlight: "#6d6d6d",
+  },
+  constColor: {
+    success: "#32a852",
+    danger: "#ad2333",
+    warning: "#e6c929",
+    info: "#29aae6",
   },
 };

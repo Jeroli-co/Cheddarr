@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Carousel } from "../../plex-media/components/Carousel";
 import { MediaPreviewCard } from "../../plex-media/components/MediaPreviewCard";
-import Spinner from "../../../../shared/components/Spinner";
+import { PrimarySpinner } from "../../../../shared/components/Spinner";
 import { MediaRecentlyAddedType } from "../enums/MediaRecentlyAddedType";
-import { IMediasServerMedias } from "../../plex-media/models/IMediasServerMedias";
+import { IMediaServerMedia } from "../../plex-media/models/IMediaServerMedia";
 import { PlexConfigContext } from "../../../contexts/PlexConfigContext";
-import { Text } from "../../../../shared/components/Text";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import { useRedirectToMediasDetails } from "../../../hooks/useRedirectToMediasDetails";
 import { useAPI } from "../../../../shared/hooks/useAPI";
 import {
@@ -14,14 +13,17 @@ import {
   IAsyncCall,
 } from "../../../../shared/models/IAsyncCall";
 import { SwitchErrors } from "../../../../shared/components/errors/SwitchErrors";
-
-const MediaRecentlyAddedStyle = styled.div`
-  min-width: 100vw;
-`;
+import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { Icon } from "../../../../experimentals/Icon";
+import { H3 } from "../../../../shared/components/Titles";
+import { Sizes } from "../../../../shared/enums/Sizes";
 
 const MediaRecentlyAddedTitleContainer = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+  color: ${(props) => props.theme.primary};
 `;
 
 type MediaRecentlyAddedProps = {
@@ -29,12 +31,14 @@ type MediaRecentlyAddedProps = {
 };
 
 export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
-  const [medias, setMedias] = useState<
-    IAsyncCall<IMediasServerMedias[] | null>
-  >(DefaultAsyncCall);
+  const [media, setMedia] = useState<IAsyncCall<IMediaServerMedia[] | null>>(
+    DefaultAsyncCall
+  );
   const { currentConfig } = useContext(PlexConfigContext);
   const { redirectToMediaPage } = useRedirectToMediasDetails();
   const { get } = useAPI();
+  const [hidden, setHidden] = useState(false);
+  const theme = useTheme();
 
   useEffect(() => {
     if (currentConfig.data) {
@@ -45,47 +49,47 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
         url += "/" + type + "/recent";
       }
 
-      get<IMediasServerMedias[]>(url).then((res) => {
-        setMedias(res);
+      get<IMediaServerMedia[]>(url).then((res) => {
+        setMedia(res);
       });
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentConfig]);
 
-  if (medias.isLoading) {
-    return <Spinner color="primary" />;
+  if (media.isLoading) {
+    return <PrimarySpinner size={Sizes.LARGE} />;
   }
 
-  if (medias.status >= 400) {
-    return <SwitchErrors status={medias.status} />;
+  if (media.status >= 400) {
+    return <SwitchErrors status={media.status} />;
   }
 
   return (
-    <MediaRecentlyAddedStyle>
-      <MediaRecentlyAddedTitleContainer>
-        <Text paddingLeft="10px" isPrimary fontSize="1.5em">
+    <div>
+      <MediaRecentlyAddedTitleContainer onClick={() => setHidden(!hidden)}>
+        <H3>
           {type === MediaRecentlyAddedType.MOVIES && "Movies recently added"}
           {type === MediaRecentlyAddedType.SERIES && "Series recently added"}
           {type === MediaRecentlyAddedType.ON_DECK && "On Deck"}
-        </Text>
+        </H3>
+        {hidden && <Icon icon={faCaretRight} size={"2x"} />}
+        {!hidden && (
+          <Icon icon={faCaretDown} color={theme.primary} size={"2x"} />
+        )}
       </MediaRecentlyAddedTitleContainer>
 
       <br />
 
-      {medias.data && (
+      {media.data && !hidden && (
         <Carousel>
-          {medias.data.map((m, index) => (
-            <div
-              id={m.id.toString()}
-              key={index}
-              onClick={() => redirectToMediaPage(m)}
-            >
-              <MediaPreviewCard medias={m} />
+          {media.data.map((m, index) => (
+            <div key={index} onClick={() => redirectToMediaPage(m)}>
+              <MediaPreviewCard media={m} />
             </div>
           ))}
         </Carousel>
       )}
-    </MediaRecentlyAddedStyle>
+    </div>
   );
 };

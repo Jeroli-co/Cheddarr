@@ -1,10 +1,10 @@
 import React from "react";
-import { Redirect, Route, Switch, useHistory } from "react-router-dom";
+import { Route, Switch, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../../../router/routes";
-import { H3 } from "../../../../../shared/components/Titles";
 import { SecondaryButton } from "../../../../../experimentals/Button";
+import { H3 } from "../../../../../shared/components/Titles";
 
 const SettingsAccountBody = () => {
   const history = useHistory();
@@ -113,7 +113,6 @@ const SettingsAccount = () => {
           path={routes.DELETE_ACCOUNT_MODAL.url}
           component={routes.DELETE_ACCOUNT_MODAL.component}
         />
-        <Route render={() => <Redirect to={routes.NOT_FOUND.url} />} />
       </Switch>
     </div>
   );

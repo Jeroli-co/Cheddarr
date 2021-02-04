@@ -2,16 +2,16 @@ import { useHistory } from "react-router-dom";
 import { MediaTypes } from "../enums/MediaTypes";
 import { routes } from "../../router/routes";
 import {
-  IMediasServerMedias,
+  IMediaServerMedia,
   isMediaServerEpisode,
-} from "../pages/plex-media/models/IMediasServerMedias";
+} from "../pages/plex-media/models/IMediaServerMedia";
 import { IMediaSearchResult } from "../navbar/components/search-bar/models/IMediaSearchResult";
 
 export const useRedirectToMediasDetails = () => {
   const history = useHistory();
 
   const redirectToMediaPage = (
-    medias: IMediasServerMedias | IMediaSearchResult
+    medias: IMediaServerMedia | IMediaSearchResult
   ) => {
     let url = "";
     if (medias.type === MediaTypes.SHOW) {

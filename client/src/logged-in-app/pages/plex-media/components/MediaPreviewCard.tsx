@@ -2,9 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import {
   IMediaServerEpisode,
-  IMediasServerMedias,
+  IMediaServerMedia,
   isMediaServerEpisode,
-} from "../models/IMediasServerMedias";
+} from "../models/IMediaServerMedia";
 
 const MediaPreviewCardStyle = styled.div`
   position: relative;
@@ -59,20 +59,20 @@ const MediaPreviewCardStyle = styled.div`
 `;
 
 type MediaPreviewCardProps = {
-  medias: IMediasServerMedias | IMediaServerEpisode;
+  media: IMediaServerMedia | IMediaServerEpisode;
 };
 
-export const MediaPreviewCard = ({ medias }: MediaPreviewCardProps) => {
+export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
   return (
     <MediaPreviewCardStyle>
-      <img className="media-image" src={medias.posterUrl} alt="" />
+      <img className="media-image" src={media.posterUrl} alt="" />
       <div className="media-title is-size-5-tablet is-size-7-mobile">
         <div>
-          <p>{medias.title}</p>
+          <p>{media.title}</p>
           <br />
-          {isMediaServerEpisode(medias) && (
+          {isMediaServerEpisode(media) && (
             <p>
-              S{medias.seasonNumber} ・ E{medias.episodeNumber}
+              S{media.seasonNumber} ・ E{media.episodeNumber}
             </p>
           )}
         </div>
