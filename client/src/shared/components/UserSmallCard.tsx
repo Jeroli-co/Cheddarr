@@ -1,8 +1,8 @@
 import React from "react";
-import { IPublicUser } from "../logged-in-app/models/IPublicUser";
+import { IPublicUser } from "../../logged-in-app/models/IPublicUser";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import { routes } from "../router/routes";
+import { routes } from "../../router/routes";
 
 const Container = styled.div`
   display: flex;

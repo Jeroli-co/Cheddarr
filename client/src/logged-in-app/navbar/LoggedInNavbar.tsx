@@ -7,7 +7,7 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { GitHubButton } from "../../shared/components/GithubButton";
 import { UserDropdownMobile } from "./components/user-dropdown/UserDropdownMobile";
 import { useOutsideAlerter } from "../../shared/hooks/useOutsideAlerter";
-import { RowLayout } from "../../shared/components/Layouts";
+import { RowLayout } from "../../shared/components/layout/Layouts";
 import { SearchBar } from "./components/search-bar/SearchBar";
 import { routes } from "../../router/routes";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";

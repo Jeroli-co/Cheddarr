@@ -8,7 +8,7 @@ import { useUserService } from "../../../../user-profile/hooks/useUserService";
 import {
   Button,
   SecondaryButton,
-} from "../../../../../../experimentals/Button";
+} from "../../../../../../shared/components/Button";
 
 const ChangeEmailModal = () => {
   const { register, handleSubmit, errors } = useForm<{ email: string }>();

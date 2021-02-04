@@ -3,7 +3,7 @@ import { MediaRecentlyAddedType } from "./enums/MediaRecentlyAddedType";
 import { usePlexConfig } from "../../contexts/PlexConfigContext";
 import { MediaRecentlyAdded } from "./components/MediaRecentlyAdded";
 import { MissingConfigHome } from "./MissingConfigHome";
-import { PrimaryDivider } from "../../../experimentals/Divider";
+import { PrimaryDivider } from "../../../shared/components/Divider";
 
 export default function Home() {
   const { currentConfig } = usePlexConfig();

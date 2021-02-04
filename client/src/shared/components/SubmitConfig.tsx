@@ -1,13 +1,26 @@
 import React from "react";
 import styled from "styled-components";
-import { FadeIn, FadeOut } from "../shared/components/animations/Animations";
-import { Animate } from "../shared/components/animations/Animate";
+import { FadeIn, FadeOut } from "./animations/Animations";
+import { Animate } from "./animations/Animate";
+
+const SubmitContainer = styled.div`
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-top: 1px solid ${(props) => props.theme.primaryLight};
+  background-color: ${(props) => props.theme.bgColor};
+  z-index: 10;
+`;
 
 const SubmitButton = styled.button`
   background: transparent;
   border-radius: 3px;
   border: 2px solid ${(props) => props.theme.primary};
-  background-color: white;
   color: ${(props) => props.theme.primary};
   padding: 0.25em 1em;
   font-size: 1em;
@@ -19,19 +32,6 @@ const SubmitButton = styled.button`
     color: white;
     background-color: ${(props) => props.theme.primary};
   }
-`;
-
-const SubmitContainer = styled.div`
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 70px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  border-top: 1px solid ${(props) => props.theme.primaryLight};
-  background-color: ${(props) => props.theme.primaryLighter};
 `;
 
 type SubmitConfigProps = {

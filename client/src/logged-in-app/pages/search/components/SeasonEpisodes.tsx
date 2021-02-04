@@ -1,9 +1,9 @@
 import React, { MouseEvent } from "react";
 import Spinner from "../../../../shared/components/Spinner";
-import { Container } from "../../../../shared/components/Container";
+import { Container } from "../../../../shared/components/layout/Container";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { RowLayout } from "../../../../shared/components/Layouts";
+import { RowLayout } from "../../../../shared/components/layout/Layouts";
 import { useSeasonByNumber } from "../../../hooks/useSeasonByNumber";
 import { SwitchErrors } from "../../../../shared/components/errors/SwitchErrors";
 

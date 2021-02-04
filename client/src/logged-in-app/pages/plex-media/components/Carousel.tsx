@@ -7,7 +7,6 @@ import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 
 const CarouselStyle = styled.div`
   position: relative;
-  max-width: 100vw;
 
   .pagination-button {
     transition: 0.6s ease;

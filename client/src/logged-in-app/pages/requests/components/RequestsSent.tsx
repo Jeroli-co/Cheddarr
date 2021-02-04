@@ -6,11 +6,10 @@ import {
   RequestLayout,
   ScrollingTable,
 } from "./RequestStyles";
-import { CenteredContent } from "../../../../experimentals/CenteredContent";
+import { CenteredContent } from "../../../../shared/components/layout/CenteredContent";
 import { Sizes } from "../../../../shared/enums/Sizes";
 import { useRequestsContext } from "../contexts/RequestsContext";
 import { RequestTypes } from "../enums/RequestTypes";
-import { PrimaryDivider } from "../../../../experimentals/Divider";
 
 const RequestsSent = () => {
   const { requestsSent } = useRequestsContext();
@@ -27,16 +26,11 @@ const RequestsSent = () => {
       {!requestsSent.isLoading &&
         requestsSent.data &&
         requestsSent.data.map((request, index) => (
-          <div>
-            <RequestLayout
-              key={index}
-              request={request}
-              requestType={RequestTypes.OUTGOING}
-            />
-            {requestsSent.data && index !== requestsSent.data?.length - 1 && (
-              <PrimaryDivider />
-            )}
-          </div>
+          <RequestLayout
+            key={index}
+            request={request}
+            requestType={RequestTypes.OUTGOING}
+          />
         ))}
       <RequestFooter />
     </ScrollingTable>

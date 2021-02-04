@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { MediaBackground } from "./components/MediaBackground";
-import { Container } from "../../../shared/components/Container";
-import { ColumnLayout, RowLayout } from "../../../shared/components/Layouts";
+import { Container } from "../../../shared/components/layout/Container";
+import {
+  ColumnLayout,
+  RowLayout,
+} from "../../../shared/components/layout/Layouts";
 import { Image } from "../../../shared/components/Image";
 import { MediaTitle } from "./components/MediaTitle";
 import { Tag, TagColor } from "./components/Tag";

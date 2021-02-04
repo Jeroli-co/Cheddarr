@@ -2,7 +2,7 @@ import React, { RefObject } from "react";
 import styled from "styled-components";
 import { SignInButton } from "../../../../logged-out-app/components/SignInButton";
 import { SignUpButton } from "../../../../logged-out-app/components/SignUpButton";
-import { RowLayout } from "../../../../shared/components/Layouts";
+import { RowLayout } from "../../../../shared/components/layout/Layouts";
 import { GitHubButton } from "../../../../shared/components/GithubButton";
 import { UserDropdownImage } from "./UserDropdownImage";
 import { Link } from "react-router-dom";

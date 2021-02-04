@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Container } from "../../../../shared/components/Container";
-import { RowLayout } from "../../../../shared/components/Layouts";
+import { Container } from "../../../../shared/components/layout/Container";
+import { RowLayout } from "../../../../shared/components/layout/Layouts";
 import { Image } from "../../../../shared/components/Image";
 import { MediaRating } from "../../plex-media/components/MediaRating";
 import { ProvidersDropdown } from "./ProvidersDropdown";

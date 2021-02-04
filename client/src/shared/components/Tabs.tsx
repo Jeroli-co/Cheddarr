@@ -39,6 +39,9 @@ const TabStyle = styled.div<{ isActive: boolean }>`
   border-top-right-radius: 6px;
 
   padding: 0.75rem 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 
   :hover {
     ${(props) =>

@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { OptionalMarginAndPaddingP } from "../../experimentals/optionalMarginAndPadding/OptionalMarginAndPaddingP";
+import { OptionalMarginAndPaddingP } from "./layout/OptionalMarginAndPaddingP";
 
 type TextProps = {
   fontSize?: string;

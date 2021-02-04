@@ -15,7 +15,7 @@ import {
 import { useSearchMedia } from "../../hooks/useSearchMedia";
 import { ISearchMediaResult } from "./models/ISearchMediaResult";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
-import { PageLayout } from "../../../experimentals/PageLayout";
+import { PageLayout } from "../../../shared/components/layout/PageLayout";
 import { Sizes } from "../../../shared/enums/Sizes";
 
 type SearchParams = {
