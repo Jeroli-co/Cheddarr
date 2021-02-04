@@ -13,4 +13,8 @@ const isArrayOfStrings = (value: any): boolean => {
   );
 };
 
+export const uppercaseFirstLetter = (s: string) => {
+  return s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+};
+
 export { isEmpty, TITLE_SIZES, isArrayOfStrings };

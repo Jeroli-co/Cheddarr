@@ -10,7 +10,7 @@ import { PlexButton } from "../../../../shared/components/PlexButton";
 import { MediaBackground } from "./MediaBackground";
 import { msToHoursMinutes } from "../../../../utils/media-utils";
 import Spinner from "../../../../shared/components/Spinner";
-import { IMediaServerEpisode } from "../models/IMediasServerMedias";
+import { IMediaServerEpisode } from "../models/IMediaServerMedia";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
 import { useAPI } from "../../../../shared/hooks/useAPI";
 import { usePlexConfig } from "../../../contexts/PlexConfigContext";

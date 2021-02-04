@@ -8,15 +8,15 @@ import {
   IMediaServerMovie,
   IMediaServerSeason,
   IMediaServerSeries,
-  IMediasServerMedias,
+  IMediaServerMedia,
   isMediaServerEpisode,
   isMediaServerSeason,
-} from "../models/IMediasServerMedias";
+} from "../models/IMediaServerMedia";
 import { MediaTypes } from "../../../enums/MediaTypes";
 
 type MediaTitleProps = {
   media:
-    | IMediasServerMedias
+    | IMediaServerMedia
     | IMediaServerMovie
     | IMediaServerSeries
     | IMediaServerEpisode

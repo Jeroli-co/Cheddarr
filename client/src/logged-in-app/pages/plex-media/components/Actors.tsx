@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Carousel } from "./Carousel";
 import { getActorInitial } from "../../../../utils/media-utils";
 import * as React from "react";
-import { IActor } from "../models/IMediasServerMedias";
+import { IActor } from "../models/IMediaServerMedia";
 
 const ActorsStyle = styled.div`
   width: 100%;

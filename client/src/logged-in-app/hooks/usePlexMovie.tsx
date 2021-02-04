@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAPI } from "../../shared/hooks/useAPI";
 import { DefaultAsyncCall, IAsyncCall } from "../../shared/models/IAsyncCall";
-import { IMediaServerMovie } from "../pages/plex-media/models/IMediasServerMedias";
+import { IMediaServerMovie } from "../pages/plex-media/models/IMediaServerMedia";
 import { usePlexConfig } from "../contexts/PlexConfigContext";
 import { APIRoutes } from "../../shared/enums/APIRoutes";
 

@@ -5,6 +5,10 @@ import { useForm } from "react-hook-form";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../../shared/enums/FormDefaultValidators";
 import { useHistory } from "react-router";
 import { useUserService } from "../../../../user-profile/hooks/useUserService";
+import {
+  Button,
+  SecondaryButton,
+} from "../../../../../../experimentals/Button";
 
 const ChangeEmailModal = () => {
   const { register, handleSubmit, errors } = useForm<{ email: string }>();
@@ -75,15 +79,10 @@ const ChangeEmailModal = () => {
             </div>
           </section>
           <footer className="modal-card-foot">
-            <button
-              className="button is-secondary-button"
-              data-testid="ChangeEmailSubmitButton"
-            >
-              Change email
-            </button>
-            <button className="button" type="button" onClick={closeModal}>
+            <SecondaryButton type="submit">Change email</SecondaryButton>
+            <Button type="button" onClick={closeModal}>
               Cancel
-            </button>
+            </Button>
           </footer>
         </form>
       </div>

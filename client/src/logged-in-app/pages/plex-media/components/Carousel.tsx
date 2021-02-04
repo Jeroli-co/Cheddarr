@@ -67,6 +67,10 @@ const PaginationButton = styled.button<PaginationButtonProps>`
   border-radius: 50%;
   cursor: pointer;
   z-index: 1;
+  
+  &:focus {
+    outline: none;
+  }
 `;
 
 const Carousel = ({ children }: any) => {

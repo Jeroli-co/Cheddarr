@@ -1,7 +1,7 @@
 import { MediaTypes } from "../../../enums/MediaTypes";
 import { isArrayOfStrings } from "../../../../utils/strings";
 
-export interface IMediasServerMedias {
+export interface IMediaServerMedia {
   readonly id: number;
   readonly type: MediaTypes;
   readonly title: string;
@@ -14,7 +14,7 @@ export interface IMediasServerMedias {
   readonly webUrl: string[];
 }
 
-export const isMediaServerMedia = (arg: any): arg is IMediasServerMedias => {
+export const isMediaServerMedia = (arg: any): arg is IMediaServerMedia => {
   return (
     arg &&
     arg.id &&
@@ -40,30 +40,30 @@ export const isMediaServerMedia = (arg: any): arg is IMediasServerMedias => {
   );
 };
 
-interface IMediasGenres {
+interface IMediaGenres {
   name: string;
   role: string;
   posterUrl: string;
 }
 
-interface IMediasDirector {
+interface IMediaDirector {
   name: string;
   role: string;
   posterUrl: string;
 }
 
-interface IMediasStudio {
+interface IMediaStudio {
   name: string;
   role: string;
   posterUrl: string;
 }
 
-export interface IMediaServerMovie extends IMediasServerMedias {
+export interface IMediaServerMovie extends IMediaServerMedia {
   readonly duration: number;
   readonly actors: IActor[];
-  readonly directors: IMediasDirector[];
+  readonly directors: IMediaDirector[];
   readonly studio: string[];
-  readonly genres: IMediasGenres[];
+  readonly genres: IMediaGenres[];
 }
 
 export const isMediaServerMovie = (arg: any): arg is IMediaServerMovie => {
@@ -86,11 +86,11 @@ export const isMediaServerMovieArray = (
   return arg && Array.isArray(arg) && arg.every((e) => isMediaServerMovie(e));
 };
 
-export interface IMediaServerSeries extends IMediasServerMedias {
+export interface IMediaServerSeries extends IMediaServerMedia {
   readonly seasons: IMediaServerSeason[];
   readonly actors: IActor[];
-  readonly studios: IMediasStudio[];
-  readonly genres: IMediasGenres[];
+  readonly studios: IMediaStudio[];
+  readonly genres: IMediaGenres[];
 }
 
 export const isMediaServerSeries = (arg: any): arg is IMediaServerSeries => {
@@ -111,7 +111,7 @@ export const isMediaServerSeriesArray = (
   return arg && Array.isArray(arg) && arg.every((e) => isMediaServerSeries(e));
 };
 
-export interface IMediaServerSeason extends IMediasServerMedias {
+export interface IMediaServerSeason extends IMediaServerMedia {
   seriesId: number;
   seriesTitle: string;
   seasonNumber: number;
@@ -122,7 +122,7 @@ export const isMediaServerSeason = (arg: any): arg is IMediaServerSeason => {
   return arg && arg.type && arg.type === MediaTypes.SEASON;
 };
 
-export interface IMediaServerEpisode extends IMediasServerMedias {
+export interface IMediaServerEpisode extends IMediaServerMedia {
   seriesId: number;
   seriesTitle: string;
   seasonNumber: number;

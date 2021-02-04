@@ -10,7 +10,7 @@ type ButtonStyleProps = {
 };
 
 export const Button = styled.button<ButtonStyleProps>`
-  margin: 0
+  margin: 0;
   -moz-appearance: none;
   -webkit-appearance: none;
   align-items: center;
@@ -44,6 +44,10 @@ export const Button = styled.button<ButtonStyleProps>`
   padding-top: calc(.5em - 1px);
   text-align: center;
   white-space: nowrap;
+  
+  &:focus {
+    outline: none;
+  }
 
   font-size: ${(props) => {
     switch (props.fontSize) {
@@ -148,5 +152,79 @@ export const SecondaryOutlinedRoundedButton = styled(RoundedButton)`
   &:hover {
     color: white;
     background-color: ${(props) => props.theme.primary};
+  }
+`;
+
+export const SuccessButton = styled(Button)`
+  background-color: ${(props) => props.theme.success};
+  color: white;
+  font-size: 15px;
+  width: 30px;
+  height: 30px;
+`;
+
+export const SuccessRoundedButton = styled(RoundedButton)`
+  background-color: ${(props) => props.theme.success};
+  color: white;
+  min-width: 50px;
+  min-height: 40px;
+`;
+
+export const SuccessOutlinedButton = styled(Button)`
+  border: 1px solid ${(props) => props.theme.success};
+  color: ${(props) => props.theme.success};
+  min-width: 50px;
+  min-height: 40px;
+  &:hover {
+    color: white;
+    background-color: ${(props) => props.theme.success};
+  }
+`;
+
+export const SuccessOutlinedRoundedButton = styled(RoundedButton)`
+  border: 1px solid ${(props) => props.theme.success};
+  color: ${(props) => props.theme.success};
+  min-width: 50px;
+  min-height: 40px;
+  &:hover {
+    color: white;
+    background-color: ${(props) => props.theme.success};
+  }
+`;
+
+export const DangerButton = styled(Button)`
+  background-color: ${(props) => props.theme.danger};
+  color: white;
+  font-size: 15px;
+  width: 30px;
+  height: 30px;
+`;
+
+export const DangerRoundedButton = styled(RoundedButton)`
+  background-color: ${(props) => props.theme.danger};
+  color: white;
+  min-width: 50px;
+  min-height: 40px;
+`;
+
+export const DangerOutlinedButton = styled(Button)`
+  border: 1px solid ${(props) => props.theme.danger};
+  color: ${(props) => props.theme.danger};
+  min-width: 50px;
+  min-height: 40px;
+  &:hover {
+    color: white;
+    background-color: ${(props) => props.theme.danger};
+  }
+`;
+
+export const DangerOutlinedRoundedButton = styled(RoundedButton)`
+  border: 1px solid ${(props) => props.theme.danger};
+  color: ${(props) => props.theme.danger};
+  min-width: 50px;
+  min-height: 40px;
+  &:hover {
+    color: white;
+    background-color: ${(props) => props.theme.danger};
   }
 `;

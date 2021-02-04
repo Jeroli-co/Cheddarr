@@ -12,7 +12,7 @@ import { PlexEpisode } from "./components/PlexEpisode";
 import smoothscroll from "smoothscroll-polyfill";
 import styled from "styled-components";
 import Spinner from "../../../shared/components/Spinner";
-import { IMediaServerEpisode } from "./models/IMediasServerMedias";
+import { IMediaServerEpisode } from "./models/IMediaServerMedia";
 import { TITLE_SIZES } from "../../../utils/strings";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { usePlexSeason } from "../../hooks/usePlexSeason";
