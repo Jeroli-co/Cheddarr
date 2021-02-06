@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { routes } from "../../../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../../../shared/enums/FormDefaultValidators";
@@ -15,10 +14,13 @@ import { PlexButton } from "../../../shared/components/PlexButton";
 import { RowLayout2 } from "../../../shared/components/layout/Layouts";
 import { SecondaryButton } from "../../../shared/components/Button";
 import { PrimaryDivider } from "../../../shared/components/Divider";
+import { usePlexAuth } from "../../../shared/contexts/PlexAuthContext";
+import { SignInButton } from "../../components/SignInButton";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();
-  const { signInWithPlex, signUp } = useAuthentication();
+  const { signUp } = useAuthentication();
+  const { signInWithPlex } = usePlexAuth();
   const [user, setUser] = useState<IUser | null>(null);
 
   const onSubmit = (data: ISignUpFormData) => {
@@ -216,7 +218,8 @@ const SignUpForm = () => {
 
             <div className="content has-text-centered">
               <p className="is-size-7">
-                <Link to={routes.SIGN_IN.url()}>Already have an account ?</Link>
+                <p>Already have an account ?</p>
+                <SignInButton />
               </p>
             </div>
           </form>

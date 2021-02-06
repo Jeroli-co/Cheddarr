@@ -12,6 +12,8 @@ import { PlexButton } from "../../../shared/components/PlexButton";
 import { RowLayout2 } from "../../../shared/components/layout/Layouts";
 import { SecondaryButton } from "../../../shared/components/Button";
 import { PrimaryDivider } from "../../../shared/components/Divider";
+import { usePlexAuth } from "../../../shared/contexts/PlexAuthContext";
+import { SignUpButton } from "../../components/SignUpButton";
 
 function useRedirectURI() {
   const query = new URLSearchParams(useLocation().search);
@@ -19,7 +21,8 @@ function useRedirectURI() {
 }
 
 const SignInForm = () => {
-  const { signIn, signInWithPlex } = useAuthentication();
+  const { signIn } = useAuthentication();
+  const { signInWithPlex } = usePlexAuth();
   const { register, handleSubmit, errors } = useForm<ISignInFormData>();
   const redirectURI = useRedirectURI();
 
@@ -106,6 +109,11 @@ const SignInForm = () => {
                   {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
                 </p>
               )}
+              <p className="help">
+                <Link to={routes.INIT_RESET_PASSWORD.url}>
+                  Forgot your password ?
+                </Link>
+              </p>
             </div>
 
             <div className="field">
@@ -130,12 +138,8 @@ const SignInForm = () => {
 
           <div className="content has-text-centered">
             <p className="is-size-7">
-              <Link to={routes.INIT_RESET_PASSWORD.url}>
-                Forgot your password ?
-              </Link>
-            </p>
-            <p className="is-size-7">
-              <Link to={routes.SIGN_UP.url}>Still not have an account ?</Link>
+              <p>Still not have an account ?</p>
+              <SignUpButton />
             </p>
           </div>
         </div>

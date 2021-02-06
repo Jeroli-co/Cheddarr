@@ -62,6 +62,7 @@ const RequestsHeaderContainer = styled.header`
   border-top-right-radius: 12px;
   color: ${(props) => props.theme.dark};
   min-width: ${SCREEN_SIZE.DESKTOP_MEDIUM}px;
+  user-select: none;
 `;
 
 const RequestElement = styled.div<{
@@ -130,9 +131,8 @@ const RequestsHeaderElement = styled(RequestElement)<{ dir?: FilterDir }>`
 
   &:not(:last-child):before {
     content: "";
-    margin-right: 50px;
     position: absolute;
-    right: 0;
+    left: 90%;
     top: 30%;
     transform: translateY(-50%);
     width: 0;
@@ -147,9 +147,8 @@ const RequestsHeaderElement = styled(RequestElement)<{ dir?: FilterDir }>`
 
   &:not(:last-child):after {
     content: "";
-    margin-right: 50px;
     position: absolute;
-    right: 0;
+    left: 90%;
     top: 70%;
     transform: translateY(-50%);
     width: 0;

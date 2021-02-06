@@ -15,15 +15,16 @@ import {
 import { SwitchErrors } from "../../../../shared/components/errors/SwitchErrors";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { Icon } from "../../../../shared/components/Icon";
-import { H3 } from "../../../../shared/components/Titles";
+import { H1 } from "../../../../shared/components/Titles";
 import { Sizes } from "../../../../shared/enums/Sizes";
 
-const MediaRecentlyAddedTitleContainer = styled.div`
+const MediaRecentlyAddedTitleContainer = styled(H1)`
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   color: ${(props) => props.theme.primary};
+  white-space: nowrap;
 `;
 
 type MediaRecentlyAddedProps = {
@@ -39,6 +40,21 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
   const { get } = useAPI();
   const [hidden, setHidden] = useState(false);
   const theme = useTheme();
+
+  let title;
+  switch (type) {
+    case MediaRecentlyAddedType.MOVIES:
+      title = "Movies recently added";
+      break;
+    case MediaRecentlyAddedType.SERIES:
+      title = "Series recently added";
+      break;
+    case MediaRecentlyAddedType.ON_DECK:
+      title = "On Deck";
+      break;
+    default:
+      title = "Undefined";
+  }
 
   useEffect(() => {
     if (currentConfig.data) {
@@ -68,15 +84,9 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
   return (
     <div>
       <MediaRecentlyAddedTitleContainer onClick={() => setHidden(!hidden)}>
-        <H3>
-          {type === MediaRecentlyAddedType.MOVIES && "Movies recently added"}
-          {type === MediaRecentlyAddedType.SERIES && "Series recently added"}
-          {type === MediaRecentlyAddedType.ON_DECK && "On Deck"}
-        </H3>
-        {hidden && <Icon icon={faCaretRight} size={"2x"} />}
-        {!hidden && (
-          <Icon icon={faCaretDown} color={theme.primary} size={"2x"} />
-        )}
+        <H1>{title}</H1>
+        {hidden && <Icon icon={faCaretRight} />}
+        {!hidden && <Icon icon={faCaretDown} color={theme.primary} />}
       </MediaRecentlyAddedTitleContainer>
 
       <br />

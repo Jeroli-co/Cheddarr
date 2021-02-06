@@ -15,7 +15,6 @@ import {
 import { useSearchMedia } from "../../hooks/useSearchMedia";
 import { ISearchMediaResult } from "./models/ISearchMediaResult";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
-import { PageLayout } from "../../../shared/components/layout/PageLayout";
 import { Sizes } from "../../../shared/enums/Sizes";
 
 type SearchParams = {
@@ -41,12 +40,7 @@ const Search = () => {
 
   let content;
 
-  if (searchMediaResult.isLoading)
-    return (
-      <PageLayout>
-        <PrimarySpinner size={Sizes.LARGE} />
-      </PageLayout>
-    );
+  if (searchMediaResult.isLoading) return <PrimarySpinner size={Sizes.LARGE} />;
   if (searchMediaResult.data === null)
     return <SwitchErrors status={searchMediaResult.status} />;
 
@@ -90,7 +84,7 @@ const Search = () => {
     });
   }
 
-  return <PageLayout>{content}</PageLayout>;
+  return <div>{content}</div>;
 };
 
 export { Search };

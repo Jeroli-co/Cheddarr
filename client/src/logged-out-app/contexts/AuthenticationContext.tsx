@@ -10,7 +10,6 @@ import { useAlert } from "../../shared/contexts/AlertContext";
 import { IUser } from "../../logged-in-app/pages/user-profile/models/IUser";
 import { MESSAGES } from "../../shared/enums/Messages";
 import { ERRORS_MESSAGE } from "../../shared/enums/ErrorsMessage";
-import { instance } from "../../axiosInstance";
 import { DefaultAsyncCall, IAsyncCall } from "../../shared/models/IAsyncCall";
 import { APIRoutes } from "../../shared/enums/APIRoutes";
 
@@ -21,7 +20,6 @@ interface IAuthenticationContextInterface {
   readonly confirmEmail: (token: string) => void;
   readonly resendEmailConfirmation: (email: string) => void;
   readonly signIn: (data: ISignInFormData, redirectURI?: string) => void;
-  readonly signInWithPlex: (redirectURI?: string) => void;
 }
 
 const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
@@ -31,7 +29,6 @@ const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
   confirmEmail(): void {},
   resendEmailConfirmation(): void {},
   signIn(): void {},
-  signInWithPlex(): void {},
 };
 
 const AuthenticationContext = createContext<IAuthenticationContextInterface>(
@@ -93,46 +90,6 @@ export default function AuthenticationContextProvider(props: any) {
     });
   };
 
-  const signInWithPlex = (redirectURI?: string) => {
-    get<string>(APIRoutes.INIT_PLEX_SIGN_IN).then((res1) => {
-      if (res1.data) {
-        instance
-          .post<{ id: string; code: string }>(res1.data, {
-            headers: { Accept: "application/json" },
-          })
-          .then(
-            (res2) => {
-              instance
-                .post(APIRoutes.AUTHORIZE_PLEX_SIGN_IN, {
-                  key: res2.data.id,
-                  code: res2.data.code,
-                  redirect_uri: redirectURI ? redirectURI : "",
-                })
-                .then(
-                  (res3) => {
-                    window.location.href = res3.headers.location;
-                  },
-                  (error) => {
-                    if (error.response && error.response.status) {
-                      pushDanger(
-                        ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-                      );
-                    }
-                  }
-                );
-            },
-            (error) => {
-              if (error.response && error.response.status) {
-                pushDanger(
-                  ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
-                );
-              }
-            }
-          );
-      }
-    });
-  };
-
   return (
     <AuthenticationContext.Provider
       value={{
@@ -140,7 +97,6 @@ export default function AuthenticationContextProvider(props: any) {
         confirmEmail: confirmEmail,
         resendEmailConfirmation: resendEmailConfirmation,
         signIn: signIn,
-        signInWithPlex: signInWithPlex,
       }}
     >
       {props.children}
