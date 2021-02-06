@@ -7,6 +7,7 @@ import { ThemeDynamicContextProvider } from "./shared/contexts/themes/ThemeDynam
 import { ThemeContextProvider } from "./shared/contexts/themes/ThemeContextProvider";
 import { SessionContextProvider } from "./shared/contexts/SessionContext";
 import { DynamicApp } from "./DynamicApp";
+import PlexAuthContextProvider from "./shared/contexts/PlexAuthContext";
 
 const App = () => {
   config.autoAddCss = false;
@@ -18,7 +19,9 @@ const App = () => {
           <NotificationContextProvider>
             <BrowserRouter>
               <SessionContextProvider>
-                <DynamicApp />
+                <PlexAuthContextProvider>
+                  <DynamicApp />
+                </PlexAuthContextProvider>
               </SessionContextProvider>
             </BrowserRouter>
           </NotificationContextProvider>

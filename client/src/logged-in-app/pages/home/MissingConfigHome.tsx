@@ -11,16 +11,13 @@ const logo = require("../../../assets/cheddarr.png");
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 `;
 
 const Logo = styled.img`
-  height: 50vmin;
+  height: 40vmin;
   pointer-events: none;
   align-self: center;
 

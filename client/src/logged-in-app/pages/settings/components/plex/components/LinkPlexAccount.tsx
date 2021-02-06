@@ -1,12 +1,12 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { useAuthentication } from "../../../../../../logged-out-app/contexts/AuthenticationContext";
 import { usePlexConfig } from "../../../../../contexts/PlexConfigContext";
+import { usePlexAuth } from "../../../../../../shared/contexts/PlexAuthContext";
 
 const LinkPlexAccount = () => {
   const { isPlexAccountLinked } = usePlexConfig();
-  const { signInWithPlex } = useAuthentication();
+  const { signInWithPlex } = usePlexAuth();
 
   if (isPlexAccountLinked()) {
     return (

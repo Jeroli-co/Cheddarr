@@ -18,7 +18,6 @@ import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultV
 import { SecondaryButton } from "../../../../../shared/components/Button";
 import { SecondarySpinner } from "../../../../../shared/components/Spinner";
 import { Sizes } from "../../../../../shared/enums/Sizes";
-import { PageLayout } from "../../../../../shared/components/layout/PageLayout";
 import { SecondaryDivider } from "../../../../../shared/components/Divider";
 
 const PlexConfig = () => {
@@ -88,7 +87,7 @@ const PlexConfig = () => {
   }, [usePort]);
 
   return (
-    <PageLayout>
+    <div>
       <RowLayout
         justifyContent="space-between"
         alignItems="center"
@@ -310,7 +309,7 @@ const PlexConfig = () => {
           onClose={() => setIsUnlinkAccountModalActive(false)}
         />
       )}
-    </PageLayout>
+    </div>
   );
 };
 

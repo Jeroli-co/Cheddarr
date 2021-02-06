@@ -17,11 +17,15 @@ import { ThemesPicker } from "../../shared/components/themes-picker/ThemesDropdo
 const logo = require("../../assets/cheddarr-small.png");
 
 const NavbarStyle = styled.div`
-  position: relative;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
   padding: 10px;
   height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   background: ${(props) => props.theme.primary};
   color: ${STATIC_STYLES.COLORS.DARK};
+  z-index: 1;
 `;
 
 const NavbarAppLogo = styled.div`
@@ -80,7 +84,7 @@ const NavbarBurger = ({ toggle, burgerRef }: NavbarBurgerProps) => {
   );
 };
 
-export default function LoggedInNavbar() {
+export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const burgerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
