@@ -14,6 +14,7 @@ import { SecondaryButton } from "../../../shared/components/Button";
 import { PrimaryDivider } from "../../../shared/components/Divider";
 import { usePlexAuth } from "../../../shared/contexts/PlexAuthContext";
 import { SignUpButton } from "../../components/SignUpButton";
+import { Row } from "../../../shared/components/layout/Row";
 
 function useRedirectURI() {
   const query = new URLSearchParams(useLocation().search);
@@ -136,12 +137,10 @@ const SignInForm = () => {
 
           <br />
 
-          <div className="content has-text-centered">
-            <p className="is-size-7">
-              <p>Still not have an account ?</p>
-              <SignUpButton />
-            </p>
-          </div>
+          <Row justifyContent="space-around" alignItems="center">
+            <p>Still not have an account ?</p>
+            <SignUpButton />
+          </Row>
         </div>
       </div>
 

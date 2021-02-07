@@ -14,18 +14,23 @@ import { Image } from "../../../../../shared/components/Image";
 import { useRedirectToMediasDetails } from "../../../../hooks/useRedirectToMediasDetails";
 import { STATIC_STYLES } from "../../../../../shared/enums/StaticStyles";
 
-const ResultsListStyle = styled.div<{ isVisible: boolean }>`
+const Container = styled.div<{ isVisible: boolean }>`
   position: absolute;
   top: 100%;
   width: 100%;
-  border-bottom: 1px solid ${STATIC_STYLES.COLORS.GRAY};
-  border-right: 1px solid ${STATIC_STYLES.COLORS.GRAY};
-  border-left: 1px solid ${STATIC_STYLES.COLORS.GRAY};
+  border-bottom: 1px solid ${(props) => props.theme.grey};
+  border-right: 1px solid ${(props) => props.theme.grey};
+  border-left: 1px solid ${(props) => props.theme.grey};
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   background: ${(props) => props.theme.bgColor};
   z-index: 10;
   visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
+
+  @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
+    margin-left: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
+    width: calc(100vw - ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px);
+  }
 `;
 
 const ResultsSectionTitle = styled.div`
@@ -43,7 +48,7 @@ const ResultStyle = styled.div`
   padding: 1%;
 
   &:hover {
-    background-color: ${(props) => props.theme.highlight};
+    background-color: ${(props) => props.theme.grey};
   }
 `;
 
@@ -256,7 +261,7 @@ const ResultsList = ({
   friendsResults,
 }: ResultsListProps) => {
   return (
-    <ResultsListStyle
+    <Container
       isVisible={
         isInputFocus &&
         (moviesResults.data !== null ||
@@ -274,7 +279,7 @@ const ResultsList = ({
         seriesResults={seriesResults}
         friendsResults={friendsResults}
       />
-    </ResultsListStyle>
+    </Container>
   );
 };
 

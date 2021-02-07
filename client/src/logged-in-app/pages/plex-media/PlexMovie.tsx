@@ -191,7 +191,7 @@ const PlexMovie = () => {
                     {movie.data.id === parseInt(id, 10) &&
                       movie.data.genres.map((genre, index) => (
                         <Tag key={index} type={TagColor.INFO}>
-                          {genre}
+                          {genre.name}
                         </Tag>
                       ))}
                   </RowLayout>

@@ -3,8 +3,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { NotificationContextProvider } from "./shared/contexts/AlertContext";
 import { BrowserRouter } from "react-router-dom";
-import { ThemeDynamicContextProvider } from "./shared/contexts/themes/ThemeDynamicContextProvider";
-import { ThemeContextProvider } from "./shared/contexts/themes/ThemeContextProvider";
+import { ThemeContextProvider } from "./shared/contexts/ThemeContextProvider";
 import { SessionContextProvider } from "./shared/contexts/SessionContext";
 import { DynamicApp } from "./DynamicApp";
 import PlexAuthContextProvider from "./shared/contexts/PlexAuthContext";
@@ -14,19 +13,17 @@ const App = () => {
 
   return (
     <div className="App">
-      <ThemeDynamicContextProvider>
-        <ThemeContextProvider>
-          <NotificationContextProvider>
-            <BrowserRouter>
-              <SessionContextProvider>
-                <PlexAuthContextProvider>
-                  <DynamicApp />
-                </PlexAuthContextProvider>
-              </SessionContextProvider>
-            </BrowserRouter>
-          </NotificationContextProvider>
-        </ThemeContextProvider>
-      </ThemeDynamicContextProvider>
+      <ThemeContextProvider>
+        <NotificationContextProvider>
+          <BrowserRouter>
+            <SessionContextProvider>
+              <PlexAuthContextProvider>
+                <DynamicApp />
+              </PlexAuthContextProvider>
+            </SessionContextProvider>
+          </BrowserRouter>
+        </NotificationContextProvider>
+      </ThemeContextProvider>
     </div>
   );
 };

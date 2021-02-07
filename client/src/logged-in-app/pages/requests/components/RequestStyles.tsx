@@ -36,10 +36,10 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
-import { SCREEN_SIZE } from "../../../../utils/enums/ScreenSizes";
 import { useRequestsContext } from "../contexts/RequestsContext";
 import { RequestTypes } from "../enums/RequestTypes";
 import { Tooltiped } from "../../../../shared/components/Tooltiped";
+import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;
@@ -60,8 +60,8 @@ const RequestsHeaderContainer = styled.header`
   background: ${(props) => props.theme.primaryLight};
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
-  color: ${(props) => props.theme.dark};
-  min-width: ${SCREEN_SIZE.DESKTOP_MEDIUM}px;
+  color: ${(props) => props.theme.primary};
+  min-width: 1500px;
   user-select: none;
 `;
 
@@ -121,6 +121,7 @@ const nextFilterDir = (f: FilterDir | undefined) => {
 
 const RequestsHeaderElement = styled(RequestElement)<{ dir?: FilterDir }>`
   font-weight: bold;
+  white-space: nowrap;
   ${(props) =>
     props.clickable &&
     css`
@@ -139,7 +140,7 @@ const RequestsHeaderElement = styled(RequestElement)<{ dir?: FilterDir }>`
     height: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-bottom: 4px solid ${(props) => props.theme.dark};
+    border-bottom: 4px solid ${(props) => props.theme.primary};
     filter: brightness(
       ${(props) => (props.dir && props.dir === FilterDir.ASC ? "100%" : "200%")}
     );
@@ -155,7 +156,7 @@ const RequestsHeaderElement = styled(RequestElement)<{ dir?: FilterDir }>`
     height: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-top: 4px solid ${(props) => props.theme.dark};
+    border-top: 4px solid ${(props) => props.theme.primary};
     filter: brightness(
       ${(props) =>
         props.dir && props.dir === FilterDir.DESC ? "100%" : "200%"}
@@ -321,8 +322,8 @@ const RequestsFooterContainer = styled.header`
   background: ${(props) => props.theme.primaryLight};
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
-  color: ${(props) => props.theme.dark};
-  min-width: ${SCREEN_SIZE.DESKTOP_MEDIUM}px;
+  color: ${(props) => props.theme.primary};
+  min-width: 1500px;
 `;
 
 export const RequestFooter = () => {
@@ -381,7 +382,7 @@ const MediaType = styled.div<{ type: MediaTypes }>`
   border-radius: 12px;
   font-weight: bold;
   width: min-content;
-  color: ${(props) => props.theme.dark};
+  color: ${(props) => props.theme.primary};
   background: ${(props) => {
     switch (props.type) {
       case MediaTypes.MOVIES:
@@ -407,7 +408,7 @@ const Status = styled.div<{ status: RequestStatus }>`
   border-radius: 12px;
   font-weight: bold;
   width: min-content;
-  color: ${(props) => props.theme.dark};
+  color: ${(props) => props.theme.primary};
   background: ${(props) => {
     switch (props.status) {
       case RequestStatus.APPROVED:
@@ -433,7 +434,7 @@ const RequestContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  min-width: ${SCREEN_SIZE.DESKTOP_MEDIUM}px;
+  min-width: 1500px;
   border: 1px solid ${(props) => props.theme.primaryLight};
 `;
 

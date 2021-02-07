@@ -3,37 +3,30 @@ import styled, { css } from "styled-components";
 import { useHistory } from "react-router-dom";
 
 const TabsStyle = styled.div`
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-overflow-scrolling: touch;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  font-size: 1rem;
   overflow: hidden;
   overflow-x: auto;
+  user-select: none;
+  display: flex;
+  align-items: stretch;
+  font-size: 1rem;
   white-space: nowrap;
   margin-bottom: 10px;
 `;
 
 const TabSide = styled.div`
-  border-bottom: 1px solid ${(props) => props.theme.primary};
+  border-bottom: 1px solid ${(props) => props.theme.primaryLighter};
   width: 100%;
 `;
 
 const TabStyle = styled.div<{ isActive: boolean }>`
   border-top: 1px solid
-    ${(props) => (props.isActive ? props.theme.primary : props.theme.bgColor)};
+    ${(props) => (props.isActive ? props.theme.primaryLighter : "none")};
   border-left: 1px solid
-    ${(props) => (props.isActive ? props.theme.primary : props.theme.bgColor)};
+    ${(props) => (props.isActive ? props.theme.primaryLighter : "none")};
   border-right: 1px solid
-    ${(props) => (props.isActive ? props.theme.primary : props.theme.bgColor)};
+    ${(props) => (props.isActive ? props.theme.primaryLighter : "none")};
   border-bottom: 1px solid
-    ${(props) => (props.isActive ? props.theme.bgColor : props.theme.primary)};
-  color: ${(props) => props.theme.primary};
+    ${(props) => (props.isActive ? "none" : props.theme.primaryLighter)};
 
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
@@ -47,7 +40,7 @@ const TabStyle = styled.div<{ isActive: boolean }>`
     ${(props) =>
       !props.isActive &&
       css`
-        backdrop-filter: brightness(90%);
+        background: ${(props) => props.theme.primaryLight};
       `}
 
     border-top-left-radius: 6px;

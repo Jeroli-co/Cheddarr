@@ -20,30 +20,28 @@ import { useAPI } from "../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 
-const SearchBarStyle = styled.div<{
+const Container = styled.div<{
   isInputFocus: boolean;
-  isSidebarOpen: boolean;
 }>`
-  position: absolute;
-  left: ${STATIC_STYLES.SIDEBAR_OPEN_WIDTH + 10}px;
-  right: ${STATIC_STYLES.SIDEBAR_OPEN_WIDTH + 10}px;
   display: flex;
   align-items: center;
   transition: 0.3s ease;
   height: ${STATIC_STYLES.SEARCH_BAR_HEIGHT}px;
+  width: 100%;
+  background: ${(props) => props.theme.primaryLighter};
 
   .search-input {
-    width: 50%;
+    width: 100%;
     height: 100%;
     border: 1px solid rgba(0, 0, 0, 0);
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
     background-color: ${(props) => props.theme.primaryLight};
-    transition: width 0.5s ease;
-    color: ${(props) => props.theme.white};
+    color: black;
     opacity: 0.5;
+    transition: opacity 0.5s ease;
+
     text-indent: 25px;
     outline: none;
+    border-radius: 0;
 
     ::placeholder {
       color: ${(props) => props.theme.white};
@@ -55,18 +53,13 @@ const SearchBarStyle = styled.div<{
     css`
       .search-input {
         opacity: 1;
-        width: 100%;
       }
     `}
 `;
 
 let timer: any;
 
-type SearchBarProps = {
-  isSidebarOpen: boolean;
-};
-
-const SearchBar = ({ isSidebarOpen }: SearchBarProps) => {
+export const SearchBarMobile = () => {
   const [searchType, setSearchType] = useState<SearchRequestTypes>(
     SearchRequestTypes.ALL
   );
@@ -190,7 +183,7 @@ const SearchBar = ({ isSidebarOpen }: SearchBarProps) => {
   }, [searchType]);
 
   return (
-    <SearchBarStyle isInputFocus={isInputFocus} isSidebarOpen={isSidebarOpen}>
+    <Container isInputFocus={isInputFocus}>
       <SearchDropdownType
         selectedOption={searchType}
         onChange={onSearchTypeChange}
@@ -215,8 +208,6 @@ const SearchBar = ({ isSidebarOpen }: SearchBarProps) => {
         seriesResults={seriesResults}
         friendsResults={friendsResults}
       />
-    </SearchBarStyle>
+    </Container>
   );
 };
-
-export { SearchBar };

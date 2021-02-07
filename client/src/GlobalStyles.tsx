@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 
-export const GlobalStyle = createGlobalStyle<any>`
+export const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -10,10 +10,6 @@ export const GlobalStyle = createGlobalStyle<any>`
     max-width: 100vw;
     background-color: ${(props) => props.theme.bgColor};
     color: ${(props) => props.theme.color};
-    transition: background 1s ease;
-
-    * {
-      transition: background .5s ease;
-    }
+    transition: background .5s ease;
   }
 `;

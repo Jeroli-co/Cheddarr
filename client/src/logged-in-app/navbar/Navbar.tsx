@@ -1,145 +1,80 @@
-import React, { useRef, useState, MouseEvent, RefObject } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import React, { useRef, useState } from "react";
 import { UserDropdown } from "./components/user-dropdown/UserDropdown";
 import styled from "styled-components";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { GitHubButton } from "../../shared/components/GithubButton";
-import { UserDropdownMobile } from "./components/user-dropdown/UserDropdownMobile";
-import { useOutsideAlerter } from "../../shared/hooks/useOutsideAlerter";
-import { RowLayout } from "../../shared/components/layout/Layouts";
 import { SearchBar } from "./components/search-bar/SearchBar";
-import { routes } from "../../router/routes";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Spin } from "../../shared/components/animations/Animations";
-import { ThemesPicker } from "../../shared/components/themes-picker/ThemesDropdown";
+import { useHistory } from "react-router";
+import { useSession } from "../../shared/contexts/SessionContext";
+import { NavbarContainer, navbarLogo, NavbarUserAvatar } from "./NavbarCommon";
 
-const logo = require("../../assets/cheddarr-small.png");
-
-const NavbarStyle = styled.div`
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  padding: 10px;
-  height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
-  background: ${(props) => props.theme.primary};
-  color: ${STATIC_STYLES.COLORS.DARK};
-  z-index: 1;
+const Container = styled(NavbarContainer)`
+  display: flex;
+  align-items: center;
 `;
 
 const NavbarAppLogo = styled.div`
+  width: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH - 10}px;
   display: flex;
   justify-content: center;
   align-items: center;
-  &:hover {
-    animation-name: ${Spin};
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-    animation-timing-function: ease-in-out;
-  }
-`;
-
-const NavbarEnd = styled.div`
-  .navbar-end-desktop {
-    @media only screen and (max-width: 600px) {
-      display: none;
-    }
-  }
-  .navbar-end-mobile {
-    @media only screen and (min-width: 600px) {
-      display: none;
+  img {
+    &:hover {
+      animation-name: ${Spin};
+      animation-duration: 1s;
+      animation-iteration-count: 1;
+      animation-timing-function: ease-in-out;
     }
   }
 `;
 
-const NavbarTextStyled = styled.p`
-  color: ${STATIC_STYLES.COLORS.DARK};
+const UserAvatar = styled(NavbarUserAvatar)`
+  position: absolute;
+  right: 10px;
 `;
 
-const NavbarBurgerStyle = styled.div`
-  cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
-  &:hover {
-    opacity: 1;
-  }
-`;
-
-type NavbarBurgerProps = {
-  toggle: () => void;
-  burgerRef: RefObject<HTMLDivElement>;
+export type NavbarProps = {
+  isSidebarOpen: boolean;
 };
 
-const NavbarBurger = ({ toggle, burgerRef }: NavbarBurgerProps) => {
-  const onBurgerClick = (e: MouseEvent) => {
-    toggle();
-    e.preventDefault();
-  };
-
-  return (
-    <NavbarBurgerStyle ref={burgerRef} onClick={onBurgerClick}>
-      <FontAwesomeIcon icon={faBars} size="lg" />
-    </NavbarBurgerStyle>
-  );
-};
-
-export default function Navbar() {
+export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const burgerRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const dropdownMobileRef = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLImageElement>(null);
 
-  useOutsideAlerter([dropdownRef, dropdownMobileRef, burgerRef], () =>
-    setIsDropdownOpen(false)
-  );
+  const {
+    session: { avatar },
+  } = useSession();
+  const history = useHistory();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
-    <NavbarStyle className="noselect">
-      <RowLayout alignItems="center">
-        <RowLayout childMarginRight="40px">
-          <Link to="/">
-            <NavbarAppLogo>
-              <img src={logo} alt="Chedarr" width="40px" height="24px" />
-            </NavbarAppLogo>
-          </Link>
-          {<SearchBar />}
-        </RowLayout>
-        <NavbarEnd>
-          <RowLayout
-            className="navbar-end-desktop"
-            justifyContent="flex-end"
-            alignItems="center"
-            childMarginLeft="30px"
-          >
-            <ThemesPicker />
-            <GitHubButton />
-            <Link to={routes.REQUESTS.url}>
-              <NavbarTextStyled>Requests</NavbarTextStyled>
-            </Link>
-            <UserDropdown
-              dropdownRef={dropdownRef}
-              isVisible={isDropdownOpen}
-              toggle={() => toggleDropdown()}
-            />
-          </RowLayout>
-          <RowLayout
-            className="navbar-end-mobile"
-            justifyContent="flex-end"
-            childMarginLeft="30px"
-          >
-            <NavbarBurger burgerRef={burgerRef} toggle={toggleDropdown} />
-          </RowLayout>
-        </NavbarEnd>
-      </RowLayout>
-      <UserDropdownMobile
-        dropdownRef={dropdownMobileRef}
-        isVisible={isDropdownOpen}
+    <Container className="noselect">
+      <NavbarAppLogo>
+        <img
+          src={navbarLogo}
+          alt="Chedarr"
+          width={40}
+          height={24}
+          onClick={() => history.push("/")}
+        />
+      </NavbarAppLogo>
+      <SearchBar isSidebarOpen={isSidebarOpen} />
+      <GitHubButton />
+      <UserAvatar
+        src={avatar}
+        alt="User"
+        onClick={() => toggleDropdown()}
+        ref={avatarRef}
       />
-    </NavbarStyle>
+      <UserDropdown
+        isVisible={isDropdownOpen}
+        hideDropdown={() => setIsDropdownOpen(false)}
+        avatarRef={avatarRef}
+      />
+    </Container>
   );
-}
+};
