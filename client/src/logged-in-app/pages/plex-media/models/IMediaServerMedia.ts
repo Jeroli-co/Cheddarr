@@ -62,7 +62,7 @@ export interface IMediaServerMovie extends IMediaServerMedia {
   readonly duration: number;
   readonly actors: IActor[];
   readonly directors: IMediaDirector[];
-  readonly studio: string[];
+  readonly studio: string;
   readonly genres: IMediaGenres[];
 }
 

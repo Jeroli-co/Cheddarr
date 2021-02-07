@@ -23,7 +23,7 @@ const MediaRecentlyAddedTitleContainer = styled(H1)`
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.color};
   white-space: nowrap;
 `;
 
@@ -84,7 +84,7 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
   return (
     <div>
       <MediaRecentlyAddedTitleContainer onClick={() => setHidden(!hidden)}>
-        <H1>{title}</H1>
+        {title}
         {hidden && <Icon icon={faCaretRight} />}
         {!hidden && <Icon icon={faCaretDown} color={theme.primary} />}
       </MediaRecentlyAddedTitleContainer>

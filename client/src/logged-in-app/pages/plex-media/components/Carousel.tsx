@@ -25,6 +25,8 @@ const CarouselStyle = styled.div`
 const CarouselItems = styled.div`
   display: flex;
   overflow-x: scroll;
+  overflow-y: hidden;
+
   scroll-behavior: smooth;
 
   -ms-overflow-style: none; /* IE 11 */
@@ -61,7 +63,7 @@ const PaginationButton = styled.button<PaginationButtonProps>`
   max-width: 60px;
   height: 60px;
   border: 1px solid transparent;
-  background: ${STATIC_STYLES.COLORS.DARK};
+  background: ${(props) => props.theme.grey};
   color: white;
   border-radius: 50%;
   cursor: pointer;

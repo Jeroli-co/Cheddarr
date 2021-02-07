@@ -3,8 +3,9 @@ import { Route, Switch, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../../../router/routes";
-import { SecondaryButton } from "../../../../../shared/components/Button";
+import { PrimaryButton } from "../../../../../shared/components/Button";
 import { H3 } from "../../../../../shared/components/Titles";
+import { Help } from "../../../../../shared/components/Help";
 
 const SettingsAccountBody = () => {
   const history = useHistory();
@@ -15,57 +16,61 @@ const SettingsAccountBody = () => {
         {/* CHANGE USERNAME */}
         <H3>Change username</H3>
         <div className="content">
-          <p className="is-size-7">
+          <Help>
             <FontAwesomeIcon icon={faExclamationCircle} /> Your friends mights
             not recognize you !
-          </p>
-          <SecondaryButton
+          </Help>
+          <PrimaryButton
             type="button"
             onClick={() => history.push(routes.CHANGE_USERNAME_MODAL.url)}
           >
             Change username
-          </SecondaryButton>
+          </PrimaryButton>
         </div>
+
+        <br />
 
         {/* CHANGE PASSWORD */}
         <H3>Change password</H3>
         <div className="content">
-          <p className="is-size-7">
+          <Help>
             <FontAwesomeIcon icon={faExclamationCircle} /> You will need to sign
             in again after
-          </p>
-          <SecondaryButton
+          </Help>
+          <PrimaryButton
             type="button"
             onClick={() => history.push(routes.CHANGE_PASSWORD_MODAL.url)}
           >
             Change password
-          </SecondaryButton>
+          </PrimaryButton>
         </div>
+
+        <br />
 
         {/* CHANGE EMAIL */}
         <H3>Change email</H3>
         <div className="content">
-          <p className="is-size-7">
+          <Help>
             <FontAwesomeIcon icon={faExclamationCircle} /> You will need to
             confirm your new email
-          </p>
-          <SecondaryButton
+          </Help>
+          <PrimaryButton
             type="button"
             onClick={() => history.push(routes.CHANGE_EMAIL_MODAL.url)}
           >
             Change email
-          </SecondaryButton>
+          </PrimaryButton>
         </div>
 
-        <hr />
+        <br />
 
         {/* DELETE_ACCOUNT_MODAL ACCOUNT */}
         <H3>Delete account</H3>
         <div className="content">
-          <p className="is-size-7">
+          <Help>
             <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with that
             option
-          </p>
+          </Help>
           <button
             className="button is-danger"
             type="button"

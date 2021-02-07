@@ -26,8 +26,8 @@ const SeasonsMenuItemStyle = styled.li<SeasonsMenuItemStyleProps>`
   padding: 2%;
   border-radius: 6px;
   background-color: ${(props) =>
-    props.isActive ? props.theme.primary : "white"};
-  color: ${(props) => (props.isActive ? "white" : STATIC_STYLES.COLORS.DARK)};
+    props.isActive ? props.theme.primary : props.theme.black};
+  color: ${(props) => (props.isActive ? props.theme.black : props.theme.black)};
   &:hover {
     ${(props) =>
       !props.isActive && `background-color: ${props.theme.primaryLighter};`}

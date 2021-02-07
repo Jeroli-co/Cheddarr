@@ -1,10 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { STATIC_STYLES } from "../enums/StaticStyles";
 const logo = require("../../assets/plex.png");
 
 const PlexButtonStyle = styled.button`
-  background-color: ${STATIC_STYLES.COLORS.PLEX_COLOR};
+  background-color: ${(props) => props.theme.plex};
   color: LightGrey;
   border: none;
   display: flex;

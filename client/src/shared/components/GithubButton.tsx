@@ -2,12 +2,19 @@ import React from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import { STATIC_STYLES } from "../enums/StaticStyles";
 
 const GitHubButtonStyle = styled.a`
-  color: ${STATIC_STYLES.COLORS.DARK};
+  margin: 0;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  right: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${(props) => props.theme.primaryLighter};
   opacity: 0.8;
-  transition: opacity 0.5 ease;
+  transition: opacity 0.5s ease;
   &:hover {
     opacity: 1;
   }

@@ -3,7 +3,6 @@ import { MediaRecentlyAddedType } from "./enums/MediaRecentlyAddedType";
 import { usePlexConfig } from "../../contexts/PlexConfigContext";
 import { MediaRecentlyAdded } from "./components/MediaRecentlyAdded";
 import { MissingConfigHome } from "./MissingConfigHome";
-import { PrimaryDivider } from "../../../shared/components/Divider";
 
 export default function Home() {
   const { currentConfig } = usePlexConfig();
@@ -12,9 +11,9 @@ export default function Home() {
     return (
       <div className="noselect">
         <MediaRecentlyAdded type={MediaRecentlyAddedType.ON_DECK} />
-        <PrimaryDivider />
+        <br />
         <MediaRecentlyAdded type={MediaRecentlyAddedType.MOVIES} />
-        <PrimaryDivider />
+        <br />
         <MediaRecentlyAdded type={MediaRecentlyAddedType.SERIES} />
       </div>
     );

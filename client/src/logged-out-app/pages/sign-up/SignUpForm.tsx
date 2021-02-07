@@ -16,6 +16,7 @@ import { SecondaryButton } from "../../../shared/components/Button";
 import { PrimaryDivider } from "../../../shared/components/Divider";
 import { usePlexAuth } from "../../../shared/contexts/PlexAuthContext";
 import { SignInButton } from "../../components/SignInButton";
+import { Row } from "../../../shared/components/layout/Row";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();
@@ -216,12 +217,10 @@ const SignUpForm = () => {
 
             <br />
 
-            <div className="content has-text-centered">
-              <p className="is-size-7">
-                <p>Already have an account ?</p>
-                <SignInButton />
-              </p>
-            </div>
+            <Row justifyContent="space-around" alignItems="center">
+              <p>Already have an account ?</p>
+              <SignInButton />
+            </Row>
           </form>
         </div>
       </div>

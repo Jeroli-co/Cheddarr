@@ -8,10 +8,10 @@ import {
 
 const MediaPreviewCardStyle = styled.div`
   position: relative;
-  min-width: 12vw;
-  max-width: 12vw;
-  min-height: calc(12vw + (12vw / 3));
-  max-height: calc(12vw + (12vw / 3));
+  min-width: calc(10vw - 15px);
+  max-width: calc(10vw - 15px);
+  min-height: calc(10vw + (10vw / 3));
+  max-height: calc(10vw + (10vw / 3));
   height: 100%;
   cursor: pointer;
   transition: 0.5s ease;
@@ -49,10 +49,7 @@ const MediaPreviewCardStyle = styled.div`
     color: white;
     padding: 20px;
 
-    border-top: 2px solid ${(props) => props.theme.primary};
-    border-left: 2px solid ${(props) => props.theme.primary};
-    border-right: 2px solid ${(props) => props.theme.primary};
-    border-bottom: 2px solid ${(props) => props.theme.primary};
+    border: 2px solid ${(props) => props.theme.secondary};
 
     background: rgba(0, 0, 0, 0.5);
     border-radius: 12px;

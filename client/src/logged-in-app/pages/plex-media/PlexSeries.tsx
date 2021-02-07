@@ -17,6 +17,7 @@ import { MediaBackground } from "./components/MediaBackground";
 import Spinner from "../../../shared/components/Spinner";
 import { usePlexSeries } from "../../hooks/usePlexSeries";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
+import { PrimaryDivider } from "../../../shared/components/Divider";
 
 type SeriesCardParams = {
   id: string;
@@ -113,7 +114,7 @@ const PlexSeries = () => {
             </RowLayout>
           </Container>
         </RowLayout>
-        <hr />
+        <PrimaryDivider />
         <RowLayout marginBottom="1em">
           <div className="is-size-4">Seasons</div>
         </RowLayout>
@@ -132,7 +133,7 @@ const PlexSeries = () => {
             </Link>
           ))}
         </RowLayout>
-        <hr />
+        <PrimaryDivider />
         <Actors actors={series.data.actors} />
       </Container>
     </MediaBackground>

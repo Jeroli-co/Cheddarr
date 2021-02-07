@@ -16,10 +16,11 @@ export const Button = styled.button<ButtonStyleProps>`
   align-items: center;
   border-radius: 4px;
   box-shadow: none;
-  display: inline-flex;
+  display: flex;
+  justify-content: center;
   height: 2.5em;
   line-height: 1.5;
-  padding: calc(.5em - 1px) calc(.75em - 1px);
+  padding: calc(0.5em - 1px) calc(1.25em - 1px);
   position: relative;
   vertical-align: top;
   -webkit-touch-callout: none;
@@ -28,13 +29,12 @@ export const Button = styled.button<ButtonStyleProps>`
   -ms-user-select: none;
   user-select: none;
   border: 1px none #8c8c8c;
-  color: #363636;
   cursor: pointer;
-  justify-content: center;
   text-align: center;
   white-space: nowrap;
   background: ${(props) =>
     props.bgColor ? props.bgColor : props.theme.bgColor};
+  color: ${(props) => props.theme.white};
 
   &:focus {
     outline: none;
@@ -54,12 +54,6 @@ export const Button = styled.button<ButtonStyleProps>`
         return "1rem";
     }
   }};
-
-  ${(props) =>
-    props.color &&
-    css`
-      color: ${props.color};
-    `}
   ${(props) =>
     props.borderColor &&
     css`
@@ -81,12 +75,10 @@ export const Button = styled.button<ButtonStyleProps>`
 
 export const RoundedButton = styled(Button)`
   border-radius: 290486px;
-  padding-left: calc(1em + 0.25em);
-  padding-right: calc(1em + 0.25em);
 `;
 
 export const PrimaryButton = styled(Button)`
-  background-color: ${(props) => props.theme.primary};
+  background: ${(props) => props.theme.primaryLighter};
 `;
 
 export const PrimaryRoundedButton = styled(RoundedButton)`
