@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Icon } from "../../shared/components/Icon";
 import { faBars, faCog, faRegistered } from "@fortawesome/free-solid-svg-icons";

@@ -1,8 +1,8 @@
-import styled, { css } from "styled-components";
+import React from "react";
+import styled from "styled-components";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Icon } from "../../shared/components/Icon";
 import { faCog, faRegistered } from "@fortawesome/free-solid-svg-icons";
-import React, { RefObject } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { routes } from "../../router/routes";
 import { useWindowSize } from "../../shared/hooks/useWindowSize";

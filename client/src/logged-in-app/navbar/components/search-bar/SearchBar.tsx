@@ -31,6 +31,7 @@ const SearchBarStyle = styled.div<{
   align-items: center;
   transition: 0.3s ease;
   height: ${STATIC_STYLES.SEARCH_BAR_HEIGHT}px;
+  user-select: none;
 
   .search-input {
     width: 50%;

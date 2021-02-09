@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Carousel } from "../../plex-media/components/Carousel";
 import { MediaPreviewCard } from "../../plex-media/components/MediaPreviewCard";
-import { PrimarySpinner } from "../../../../shared/components/Spinner";
+import { Spinner } from "../../../../shared/components/Spinner";
 import { MediaRecentlyAddedType } from "../enums/MediaRecentlyAddedType";
 import { IMediaServerMedia } from "../../plex-media/models/IMediaServerMedia";
 import { PlexConfigContext } from "../../../contexts/PlexConfigContext";
@@ -74,7 +74,7 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
   }, [currentConfig]);
 
   if (media.isLoading) {
-    return <PrimarySpinner size={Sizes.LARGE} />;
+    return <Spinner size={Sizes.LARGE} />;
   }
 
   if (media.status >= 400) {

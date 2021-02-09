@@ -4,7 +4,7 @@ import {
   ColumnLayout,
   RowLayout,
 } from "../../../shared/components/layout/Layouts";
-import { Tag, TagColor } from "./components/Tag";
+import { Tag } from "./components/Tag";
 import { Link } from "react-router-dom";
 import { routes } from "../../../router/routes";
 import { Actors } from "./components/Actors";
@@ -14,10 +14,11 @@ import { Container } from "../../../shared/components/layout/Container";
 import { PlexButton } from "../../../shared/components/PlexButton";
 import { MediaRating } from "./components/MediaRating";
 import { MediaBackground } from "./components/MediaBackground";
-import Spinner from "../../../shared/components/Spinner";
 import { usePlexSeries } from "../../hooks/usePlexSeries";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { PrimaryDivider } from "../../../shared/components/Divider";
+import { Spinner } from "../../../shared/components/Spinner";
+import { Sizes } from "../../../shared/enums/Sizes";
 
 type SeriesCardParams = {
   id: string;
@@ -27,7 +28,7 @@ const PlexSeries = () => {
   const { id } = useParams<SeriesCardParams>();
   const series = usePlexSeries(id);
 
-  if (series.isLoading) return <Spinner color="primary" size="2x" />;
+  if (series.isLoading) return <Spinner size={Sizes.XLARGE} />;
 
   if (!series.data) {
     return <SwitchErrors status={series.status} />;
@@ -58,7 +59,7 @@ const PlexSeries = () => {
             </RowLayout>
             {!series.data.isWatched && (
               <RowLayout marginTop="1em">
-                <Tag type={TagColor.DARK}>Unplayed</Tag>
+                <Tag>Unplayed</Tag>
               </RowLayout>
             )}
             <RowLayout
@@ -104,9 +105,7 @@ const PlexSeries = () => {
                   <div className="is-size-6">Genres</div>
                   <RowLayout childMarginRight="1em">
                     {series.data.genres.map((genre, index) => (
-                      <Tag key={index} type={TagColor.INFO}>
-                        {genre.name}
-                      </Tag>
+                      <Tag key={index}>{genre.name}</Tag>
                     ))}
                   </RowLayout>
                 </ColumnLayout>

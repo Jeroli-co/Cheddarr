@@ -6,13 +6,11 @@ import { routes } from "../../../../../router/routes";
 import { IPublicUser } from "../../../../models/IPublicUser";
 import { SearchRequestTypes } from "../../../../enums/SearchRequestTypes";
 import { Text } from "../../../../../shared/components/Text";
-import Spinner, {
-  PrimarySpinner,
-} from "../../../../../shared/components/Spinner";
 import { IMediaSearchResult } from "../models/IMediaSearchResult";
 import { Image } from "../../../../../shared/components/Image";
 import { useRedirectToMediasDetails } from "../../../../hooks/useRedirectToMediasDetails";
 import { STATIC_STYLES } from "../../../../../shared/enums/StaticStyles";
+import { Spinner } from "../../../../../shared/components/Spinner";
 
 const Container = styled.div<{ isVisible: boolean }>`
   position: absolute;
@@ -151,7 +149,7 @@ const SearchResultsItems = ({
             moviesResults.data.length > 0 && (
               <ResultsSectionTitle>Movies</ResultsSectionTitle>
             )}
-          {moviesResults.isLoading && <PrimarySpinner />}
+          {moviesResults.isLoading && <Spinner />}
           {!moviesResults.isLoading &&
             moviesResults.data !== null &&
             moviesResults.data.length > 0 && (
@@ -166,7 +164,7 @@ const SearchResultsItems = ({
             seriesResults.data.length > 0 && (
               <ResultsSectionTitle>Series</ResultsSectionTitle>
             )}
-          {seriesResults.isLoading && <PrimarySpinner />}
+          {seriesResults.isLoading && <Spinner />}
           {!seriesResults.isLoading &&
             seriesResults.data !== null &&
             seriesResults.data.length > 0 && (
@@ -181,7 +179,7 @@ const SearchResultsItems = ({
             friendsResults.data.length > 0 && (
               <ResultsSectionTitle>Friends</ResultsSectionTitle>
             )}
-          {friendsResults.isLoading && <PrimarySpinner />}
+          {friendsResults.isLoading && <Spinner />}
           {!friendsResults.isLoading &&
             friendsResults.data !== null &&
             friendsResults.data.length > 0 && (

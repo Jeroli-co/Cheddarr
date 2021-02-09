@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { SearchedMovieCard } from "./components/SearchedMovieCard";
 import { SearchedSeriesCard } from "./components/SearchedSeriesCard";
-import { PrimarySpinner } from "../../../shared/components/Spinner";
+import { Spinner } from "../../../shared/components/Spinner";
 import { SearchRequestTypes } from "../../enums/SearchRequestTypes";
 import { isSearchedSeries } from "./models/ISearchedMedias";
 import { MediaTypes } from "../../enums/MediaTypes";
@@ -40,7 +40,7 @@ const Search = () => {
 
   let content;
 
-  if (searchMediaResult.isLoading) return <PrimarySpinner size={Sizes.LARGE} />;
+  if (searchMediaResult.isLoading) return <Spinner size={Sizes.LARGE} />;
   if (searchMediaResult.data === null)
     return <SwitchErrors status={searchMediaResult.status} />;
 

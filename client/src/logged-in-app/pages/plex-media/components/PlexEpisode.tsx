@@ -7,16 +7,17 @@ import {
 } from "../../../../shared/components/layout/Layouts";
 import { Image } from "../../../../shared/components/Image";
 import { MediaTitle } from "./MediaTitle";
-import { Tag, TagColor } from "./Tag";
+import { Tag } from "./Tag";
 import { MediaRating } from "./MediaRating";
 import { PlexButton } from "../../../../shared/components/PlexButton";
 import { MediaBackground } from "./MediaBackground";
 import { msToHoursMinutes } from "../../../../utils/media-utils";
-import Spinner from "../../../../shared/components/Spinner";
 import { IMediaServerEpisode } from "../models/IMediaServerMedia";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
 import { useAPI } from "../../../../shared/hooks/useAPI";
 import { usePlexConfig } from "../../../contexts/PlexConfigContext";
+import { Spinner } from "../../../../shared/components/Spinner";
+import { Sizes } from "../../../../shared/enums/Sizes";
 
 type EpisodeCardProps = {
   episode: IMediaServerEpisode;
@@ -48,7 +49,7 @@ const PlexEpisode = ({ episode }: EpisodeCardProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [episode]);
 
-  if (!episodeInfo) return <Spinner color="primary" size="2x" />;
+  if (!episodeInfo) return <Spinner size={Sizes.XLARGE} />;
 
   return (
     <MediaBackground image={episodeInfo.artUrl}>
@@ -84,7 +85,7 @@ const PlexEpisode = ({ episode }: EpisodeCardProps) => {
               )}
             </RowLayout>
 
-            {episodeInfo.isWatched && <Tag type={TagColor.DARK}>Unplayed</Tag>}
+            {episodeInfo.isWatched && <Tag>Unplayed</Tag>}
 
             <RowLayout alignItems="center" childMarginRight="2%">
               {episodeInfo.rating && <MediaRating media={episodeInfo} />}

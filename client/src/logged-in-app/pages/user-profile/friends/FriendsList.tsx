@@ -9,7 +9,7 @@ import {
 import { FriendItemContainer } from "./FriendItemContainer";
 import { IPublicUser } from "../../../models/IPublicUser";
 import { IAsyncCall } from "../../../../shared/models/IAsyncCall";
-import Spinner from "../../../../shared/components/Spinner";
+import { Spinner } from "../../../../shared/components/Spinner";
 
 type FriendsListProps = {
   friends: IAsyncCall<IPublicUser[] | null>;

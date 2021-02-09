@@ -4,7 +4,7 @@ import {
   ColumnLayout,
   RowLayout,
 } from "../../../shared/components/layout/Layouts";
-import { Tag, TagColor } from "./components/Tag";
+import { Tag } from "./components/Tag";
 import { Actors } from "./components/Actors";
 import { Image } from "../../../shared/components/Image";
 import { MediaTitle } from "./components/MediaTitle";
@@ -14,9 +14,11 @@ import { MediaRating } from "./components/MediaRating";
 import { MediaBackground } from "./components/MediaBackground";
 import { useWindowSize } from "../../../shared/hooks/useWindowSize";
 import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
-import Spinner from "../../../shared/components/Spinner";
 import { usePlexMovie } from "../../hooks/usePlexMovie";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
+import { Spinner } from "../../../shared/components/Spinner";
+import { Sizes } from "../../../shared/enums/Sizes";
+import { msToHoursMinutes } from "../../../utils/media-utils";
 
 type MovieCardParams = {
   id: string;
@@ -34,7 +36,7 @@ const PlexMovie = () => {
   };
 
   if (movie.isLoading) {
-    return <Spinner color="primary" size="2x" />;
+    return <Spinner size={Sizes.XLARGE} />;
   }
 
   if (movie.data === null) {
@@ -71,14 +73,14 @@ const PlexMovie = () => {
                   style={{ cursor: "default" }}
                   data-tooltip="Content rating"
                 >
-                  {movie.data.duration}
+                  {msToHoursMinutes(movie.data.duration)}
                 </p>
               )}
             </RowLayout>
 
             {!movie.data.isWatched && (
               <RowLayout marginTop="1em">
-                <Tag type={TagColor.DARK}>Unplayed</Tag>
+                <Tag>Unplayed</Tag>
               </RowLayout>
             )}
 
@@ -136,7 +138,7 @@ const PlexMovie = () => {
                       <RowLayout childMarginRight="1em">
                         {movie.data.id === parseInt(id, 10) &&
                           movie.data.genres.map((genre, index) => (
-                            <Tag key={index} type={TagColor.INFO}>
+                            <Tag key={index}>
                               {genre.name ? genre.name : ""}
                             </Tag>
                           ))}
@@ -190,9 +192,7 @@ const PlexMovie = () => {
                   <RowLayout childMarginRight="1em">
                     {movie.data.id === parseInt(id, 10) &&
                       movie.data.genres.map((genre, index) => (
-                        <Tag key={index} type={TagColor.INFO}>
-                          {genre.name}
-                        </Tag>
+                        <Tag key={index}>{genre.name}</Tag>
                       ))}
                   </RowLayout>
                 </ColumnLayout>
@@ -201,7 +201,7 @@ const PlexMovie = () => {
           </div>
         )}
 
-        <hr />
+        <br />
 
         <Actors actors={movie.data.actors} />
       </Container>
