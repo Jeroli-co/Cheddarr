@@ -4,6 +4,11 @@ import { useOutsideAlerter } from "../../../../../shared/hooks/useOutsideAlerter
 import { SearchRequestTypes } from "../../../../enums/SearchRequestTypes";
 import { uppercaseFirstLetter } from "../../../../../utils/strings";
 import { STATIC_STYLES } from "../../../../../shared/enums/StaticStyles";
+import {
+  MovieTag,
+  SeriesTag,
+  Tag,
+} from "../../../../pages/plex-media/components/Tag";
 
 const Container = styled.div<{ isActive: boolean }>`
   position: relative;
@@ -49,7 +54,7 @@ const Item = styled.div`
   justify-content: center;
 
   &:hover {
-    background: ${(props) => props.theme.secondary};
+    background: ${(props) => props.theme.primaryLighter};
   }
 
   &:last-child {
@@ -57,7 +62,7 @@ const Item = styled.div`
   }
 `;
 
-type DropdownTypeProps = {
+type SearchDropdownTypeProps = {
   selectedOption: SearchRequestTypes;
   onChange: (type: SearchRequestTypes) => void;
 };
@@ -65,7 +70,7 @@ type DropdownTypeProps = {
 const SearchDropdownType = ({
   selectedOption,
   onChange,
-}: DropdownTypeProps) => {
+}: SearchDropdownTypeProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   useOutsideAlerter([dropdownRef], () => setIsOpen(false));
@@ -83,7 +88,15 @@ const SearchDropdownType = ({
 
   return (
     <Container ref={dropdownRef} isActive={isOpen} onClick={onDropdownClick}>
-      <ActiveItem>{uppercaseFirstLetter(selectedOption)}</ActiveItem>
+      <ActiveItem>
+        {selectedOption === SearchRequestTypes.MOVIES && <MovieTag />}
+        {selectedOption === SearchRequestTypes.SERIES && <SeriesTag />}
+        {selectedOption === SearchRequestTypes.FRIENDS && (
+          <Tag>{uppercaseFirstLetter(selectedOption)}</Tag>
+        )}
+        {selectedOption === SearchRequestTypes.ALL &&
+          uppercaseFirstLetter(selectedOption)}
+      </ActiveItem>
       <Items>
         {isOpen &&
           Object.values(SearchRequestTypes).map(

@@ -8,17 +8,17 @@ import {
 } from "../../../shared/components/layout/Layouts";
 import { Image } from "../../../shared/components/Image";
 import { MediaTitle } from "./components/MediaTitle";
-import { Tag, TagColor } from "./components/Tag";
+import { Tag } from "./components/Tag";
 import { MediaRating } from "./components/MediaRating";
 import { Text } from "../../../shared/components/Text";
 import { PlexEpisode } from "./components/PlexEpisode";
 import smoothscroll from "smoothscroll-polyfill";
 import styled from "styled-components";
-import Spinner from "../../../shared/components/Spinner";
 import { IMediaServerEpisode } from "./models/IMediaServerMedia";
 import { TITLE_SIZES } from "../../../utils/strings";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { usePlexSeason } from "../../hooks/usePlexSeason";
+import { Spinner } from "../../../shared/components/Spinner";
 
 const EpisodeSelectedLayout = styled.div`
   border-top: 3px solid ${(props) => props.theme.primary};
@@ -51,7 +51,7 @@ const PlexSeason = () => {
     }
   }, [episodeSelected]);
 
-  if (season.isLoading) return <Spinner color="primary" size="2x" />;
+  if (season.isLoading) return <Spinner />;
 
   if (season.data === null) {
     return <SwitchErrors status={season.status} />;
@@ -84,9 +84,7 @@ const PlexSeason = () => {
                 )}
               </RowLayout>
 
-              {season.data.isWatched && (
-                <Tag type={TagColor.DARK}>Unplayed</Tag>
-              )}
+              {season.data.isWatched && <Tag>Unplayed</Tag>}
 
               <RowLayout alignItems="center" childMarginRight="2%">
                 {season.data.rating && <MediaRating media={season.data} />}

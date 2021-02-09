@@ -1,5 +1,5 @@
 import React from "react";
-import { PrimarySpinner } from "../../../../shared/components/Spinner";
+import { Spinner } from "../../../../shared/components/Spinner";
 import {
   RequestFooter,
   RequestHeader,
@@ -20,7 +20,7 @@ const RequestsSent = () => {
       <RequestHeader requestType={RequestTypes.OUTGOING} />
       {requestsSent.isLoading && (
         <CenteredContent height="100px">
-          <PrimarySpinner size={Sizes.LARGE} />
+          <Spinner size={Sizes.LARGE} />
         </CenteredContent>
       )}
       {!requestsSent.isLoading &&

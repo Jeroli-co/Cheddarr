@@ -12,7 +12,7 @@ import {
 } from "../../../../shared/models/IAsyncCall";
 import { SecondaryButton } from "../../../../shared/components/Button";
 import { SecondaryDivider } from "../../../../shared/components/Divider";
-import { SecondarySpinner } from "../../../../shared/components/Spinner";
+import { Spinner } from "../../../../shared/components/Spinner";
 import { Sizes } from "../../../../shared/enums/Sizes";
 
 export const SonarrConfig = () => {
@@ -106,11 +106,11 @@ export const SonarrConfig = () => {
             </div>
           </div>
         )}
-        {instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
+        {instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />}
       </RowLayout>
       <br />
       {currentSonarrConfig.isLoading ||
-        (instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />)}
+        (instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />)}
       {!currentSonarrConfig.isLoading && !instanceInfo.isLoading && (
         <div>
           <div className="field">
@@ -198,7 +198,7 @@ export const SonarrConfig = () => {
         </div>
       )}
       <SecondaryDivider />
-      {instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
+      {instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />}
       {!instanceInfo.isLoading && instanceInfo.data && (
         <div>
           <div>

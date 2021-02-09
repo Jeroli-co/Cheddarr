@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PrimarySpinner } from "../../../../../../shared/components/Spinner";
+import { Spinner } from "../../../../../../shared/components/Spinner";
 import { IPlexServerInfo } from "../models/IPlexServerInfo";
 import { usePlexServers } from "../../../../../hooks/usePlexServers";
 import { useAPI } from "../../../../../../shared/hooks/useAPI";
@@ -82,7 +82,7 @@ const ServersModal = ({ onClose, selectServer }: ServersModalProps) => {
           />
         </header>
         <section className="modal-card-body">
-          {servers.isLoading && <PrimarySpinner size={Sizes.LARGE} />}
+          {servers.isLoading && <Spinner size={Sizes.LARGE} />}
           {!servers.isLoading &&
             servers.data &&
             servers.data.map((server) => {

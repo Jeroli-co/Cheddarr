@@ -3,8 +3,8 @@ import { Link, Route } from "react-router-dom";
 import styled from "styled-components";
 import { routes } from "../../../router/routes";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
-import Spinner from "../../../shared/components/Spinner";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
+import { Spinner } from "../../../shared/components/Spinner";
 
 const UserPictureStyle = styled.img`
   object-fit: cover;
@@ -15,7 +15,7 @@ const UserPictureStyle = styled.img`
 const UserProfile = () => {
   const user = useCurrentUser();
 
-  if (user.isLoading) return <Spinner color="primary" />;
+  if (user.isLoading) return <Spinner />;
 
   if (user.data === null) return <SwitchErrors status={user.status} />;
 

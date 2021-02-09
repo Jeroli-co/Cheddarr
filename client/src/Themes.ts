@@ -9,10 +9,11 @@ export const THEMES: DefaultTheme = {
   secondary: "#f45d01ff",
   success: "#32a852",
   danger: "#ad2333",
-  warning: "#e6c929",
-  info: "#29aae6",
+  warning: "#e3ab1f",
   black: "#0D1117",
   white: "#fffff7",
   grey: "#a1978a",
   plex: "#282a2d",
+  movie: "#3e92ea",
+  series: "#a37bc3",
 };

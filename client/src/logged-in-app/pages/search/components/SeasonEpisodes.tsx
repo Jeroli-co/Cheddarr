@@ -1,11 +1,11 @@
 import React, { MouseEvent } from "react";
-import Spinner from "../../../../shared/components/Spinner";
 import { Container } from "../../../../shared/components/layout/Container";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { RowLayout } from "../../../../shared/components/layout/Layouts";
 import { useSeasonByNumber } from "../../../hooks/useSeasonByNumber";
 import { SwitchErrors } from "../../../../shared/components/errors/SwitchErrors";
+import { Spinner } from "../../../../shared/components/Spinner";
 
 type SeasonEpisodesProps = {
   tvdbId: number;
@@ -24,7 +24,7 @@ const SeasonEpisodes = ({
 }: SeasonEpisodesProps) => {
   const season = useSeasonByNumber(tvdbId, seasonNumber);
 
-  if (season.isLoading) return <Spinner color="primary" />;
+  if (season.isLoading) return <Spinner />;
 
   if (season.data === null) return <SwitchErrors status={season.status} />;
 

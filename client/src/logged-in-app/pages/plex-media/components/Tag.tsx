@@ -1,29 +1,38 @@
+import React from "react";
 import styled from "styled-components";
 
-const TagColor = {
-  SUCCESS: { color: "#006500", bgColor: "#bcffb7" },
-  DANGER: { color: "#800000", bgColor: "#ff9290" },
-  WARNING: { color: "#805500", bgColor: "#ffe8a3" },
-  INFO: { color: "#4667ae", bgColor: "#d3e5ff" },
-  DARK: { color: "#525252", bgColor: "#e8e8e8" },
-};
-
-type TagProps = {
-  type: {
-    color: string;
-    bgColor: string;
-  };
-};
-
-const Tag = styled.p<TagProps>`
-  display: table;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 600;
-  color: ${(props) => props.type.color};
-  background-color: ${(props) => props.type.bgColor};
+export const Tag = styled.div`
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 12px;
+  width: min-content;
+  background: ${(props) => props.theme.grey};
 `;
 
-export { Tag, TagColor };
+export const WarningTag = styled(Tag)`
+  background: ${(props) => props.theme.warning};
+`;
+
+export const SuccessTag = styled(Tag)`
+  background: ${(props) => props.theme.success};
+`;
+
+export const DangerTag = styled(Tag)`
+  background: ${(props) => props.theme.danger};
+`;
+
+const MovieTagStyle = styled(Tag)`
+  background: ${(props) => props.theme.movie};
+`;
+
+export const MovieTag = () => {
+  return <MovieTagStyle>Movie</MovieTagStyle>;
+};
+
+const SeriesTagStyle = styled(Tag)`
+  background: ${(props) => props.theme.series};
+`;
+
+export const SeriesTag = () => {
+  return <SeriesTagStyle>Series</SeriesTagStyle>;
+};

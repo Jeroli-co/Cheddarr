@@ -1,14 +1,14 @@
 import React, { MouseEvent, useEffect, useState } from "react";
 import { RowLayout } from "../../../../shared/components/layout/Layouts";
 import { Container } from "../../../../shared/components/layout/Container";
-import Spinner from "../../../../shared/components/Spinner";
 import styled from "styled-components";
 import { SeasonEpisodes } from "./SeasonEpisodes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { ISearchedSeries } from "../models/ISearchedMedias";
-import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 import { PrimaryDivider } from "../../../../shared/components/Divider";
+import { Spinner } from "../../../../shared/components/Spinner";
+import { Sizes } from "../../../../shared/enums/Sizes";
 
 const SeasonsMenuStyle = styled.ul`
   padding: 1%;
@@ -67,7 +67,7 @@ const SeasonsMenu = ({
   if (series === null) {
     return (
       <Container padding="1%">
-        <Spinner color="primary" size="2x" />
+        <Spinner size={Sizes.XLARGE} />
       </Container>
     );
   }

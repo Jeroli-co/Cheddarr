@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { STATIC_STYLES } from "../shared/enums/StaticStyles";
 import { SidebarMenu } from "./sidebarMenu/SidebarMenu";

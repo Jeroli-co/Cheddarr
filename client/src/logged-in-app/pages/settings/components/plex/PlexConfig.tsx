@@ -16,7 +16,7 @@ import { IPlexConfig } from "./models/IPlexConfig";
 import { useSession } from "../../../../../shared/contexts/SessionContext";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
 import { SecondaryButton } from "../../../../../shared/components/Button";
-import { SecondarySpinner } from "../../../../../shared/components/Spinner";
+import { Spinner } from "../../../../../shared/components/Spinner";
 import { Sizes } from "../../../../../shared/enums/Sizes";
 import { SecondaryDivider } from "../../../../../shared/components/Divider";
 
@@ -229,7 +229,7 @@ const PlexConfig = () => {
         <div>
           <h3 className="is-size-3">Current Plex server</h3>
           <br />
-          {currentConfig.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
+          {currentConfig.isLoading && <Spinner size={Sizes.LARGE} />}
           {!currentConfig.isLoading && !currentConfig.data && (
             <SecondaryButton
               type="button"
@@ -263,7 +263,7 @@ const PlexConfig = () => {
             </RowLayout>
           )}
 
-          {currentConfig.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
+          {currentConfig.isLoading && <Spinner size={Sizes.LARGE} />}
 
           <SecondaryDivider />
 

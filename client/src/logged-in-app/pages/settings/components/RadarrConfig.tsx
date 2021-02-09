@@ -11,7 +11,7 @@ import {
   IAsyncCall,
 } from "../../../../shared/models/IAsyncCall";
 import { SecondaryButton } from "../../../../shared/components/Button";
-import { SecondarySpinner } from "../../../../shared/components/Spinner";
+import { Spinner } from "../../../../shared/components/Spinner";
 import { Sizes } from "../../../../shared/enums/Sizes";
 import { SecondaryDivider } from "../../../../shared/components/Divider";
 
@@ -104,11 +104,11 @@ export const RadarrConfig = () => {
             </div>
           </div>
         )}
-        {instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
+        {instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />}
       </RowLayout>
       <br />
       {radarrConfig.isLoading ||
-        (instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />)}
+        (instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />)}
       {!radarrConfig.isLoading && !instanceInfo.isLoading && (
         <div>
           <div className="field">
@@ -196,7 +196,7 @@ export const RadarrConfig = () => {
         </div>
       )}
       <SecondaryDivider />
-      {instanceInfo.isLoading && <SecondarySpinner size={Sizes.LARGE} />}
+      {instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />}
       {!instanceInfo.isLoading && instanceInfo.data && (
         <div>
           <div>

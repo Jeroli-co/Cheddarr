@@ -39,7 +39,13 @@ import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
 import { useRequestsContext } from "../contexts/RequestsContext";
 import { RequestTypes } from "../enums/RequestTypes";
 import { Tooltiped } from "../../../../shared/components/Tooltiped";
-import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
+import {
+  DangerTag,
+  MovieTag,
+  SeriesTag,
+  SuccessTag,
+  WarningTag,
+} from "../../plex-media/components/Tag";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;
@@ -60,7 +66,6 @@ const RequestsHeaderContainer = styled.header`
   background: ${(props) => props.theme.primaryLight};
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
-  color: ${(props) => props.theme.primary};
   min-width: 1500px;
   user-select: none;
 `;
@@ -375,54 +380,9 @@ const RequestImageAndTitle = ({
   );
 };
 
-/* TYPE */
-const MediaType = styled.div<{ type: MediaTypes }>`
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 12px;
-  font-weight: bold;
-  width: min-content;
-  color: ${(props) => props.theme.primary};
-  background: ${(props) => {
-    switch (props.type) {
-      case MediaTypes.MOVIES:
-      case MediaTypes.MOVIE:
-        return "#3E92EA";
-      case MediaTypes.EPISODE:
-      case MediaTypes.EPISODES:
-      case MediaTypes.SEASON:
-      case MediaTypes.SEASONS:
-      case MediaTypes.SHOW:
-      case MediaTypes.SERIES:
-        return "#9267b5";
-      default:
-        return "#888888";
-    }
-  }};
-`;
-
-/* STATUS */
-const Status = styled.div<{ status: RequestStatus }>`
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 12px;
-  font-weight: bold;
-  width: min-content;
-  color: ${(props) => props.theme.primary};
-  background: ${(props) => {
-    switch (props.status) {
-      case RequestStatus.APPROVED:
-        return props.theme.success;
-      case RequestStatus.REFUSED:
-        return props.theme.danger;
-      default:
-        return props.theme.warning;
-    }
-  }};
-`;
-
 /* ACTIONS */
 const Actions = styled.div`
+  display: flex;
   > *:not(:last-child) {
     margin-right: 5px;
   }
@@ -458,7 +418,7 @@ export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
         </RequestElement>
       )}
       <RequestElement>
-        {type && <MediaType type={type}>{type.toUpperCase()}</MediaType>}
+        {type && type === MediaTypes.MOVIES ? <MovieTag /> : <SeriesTag />}
       </RequestElement>
       <RequestElement>
         <UserSmallCard
@@ -472,7 +432,15 @@ export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
       <RequestElement>{request.createdAt}</RequestElement>
       <RequestElement>{request.updatedAt}</RequestElement>
       <RequestElement>
-        <Status status={request.status}>{request.status.toUpperCase()}</Status>
+        {request.status === RequestStatus.PENDING && (
+          <WarningTag>{request.status.toUpperCase()}</WarningTag>
+        )}
+        {request.status === RequestStatus.REFUSED && (
+          <DangerTag>{request.status.toUpperCase()}</DangerTag>
+        )}
+        {request.status === RequestStatus.APPROVED && (
+          <SuccessTag>{request.status.toUpperCase()}</SuccessTag>
+        )}
       </RequestElement>
       <RequestElement>
         {requestType === RequestTypes.INCOMING &&
