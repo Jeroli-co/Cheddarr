@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import date
-from typing import Generic, Optional, TypeVar, Union
+from typing import Generic, Optional, TypeVar, Union,List
 
 from pydantic import Field, validator
 from pydantic.generics import GenericModel
@@ -14,14 +14,14 @@ SeriesResultType = TypeVar("SeriesResultType")
 class SearchedMedia(Media):
     summary: Optional[str]
     rating: Optional[float]
-    genres: Optional[list[str]]
+    genres: Optional[List[str]]
 
 
 class SearchResult(GenericModel, Generic[MovieResultType, SeriesResultType]):
     page: int = 1
     total_pages: int
     total_results: int
-    results: list[Union[SeriesResultType, MovieResultType]]
+    results: List[Union[SeriesResultType, MovieResultType]]
 
 
 ###########################################
@@ -72,14 +72,14 @@ class TmdbSeason(Season):
     season_number: int = Field(alias="season_number")
     title: str = Field(alias="name")
     release_date: Optional[date] = Field(alias="air_date")
-    episodes: Optional[list[TmdbEpisode]] = Field(alias="episodes")
+    episodes: Optional[List[TmdbEpisode]] = Field(alias="episodes")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
 class TmdbSeries(TmdbMedia, Series):
     release_date: Optional[date] = Field(alias="first_air_date", default=None)
     number_of_seasons: Optional[int] = Field(alias="number_of_seasons")
-    seasons: Optional[list[TmdbSeason]] = Field(alias="seasons")
+    seasons: Optional[List[TmdbSeason]] = Field(alias="seasons")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 

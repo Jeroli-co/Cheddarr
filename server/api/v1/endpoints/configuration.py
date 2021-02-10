@@ -1,6 +1,5 @@
-from typing import Optional
+from typing import Optional, List
 
-import requests
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server import models, schemas
@@ -40,7 +39,7 @@ def get_user_providers(
 ##########################################
 
 
-@router.get("/plex", response_model=list[schemas.PlexConfig])
+@router.get("/plex", response_model=List[schemas.PlexConfig])
 def get_plex_configs(
     current_user: models.User = Depends(deps.get_current_user),
     plex_config_repo: PlexConfigRepository = Depends(
@@ -174,7 +173,9 @@ def get_radarr_instance_info(
     return instance_info
 
 
-@router.get("/radarr/{config_id}/instance-info")
+@router.get(
+    "/radarr/{config_id}/instance-info", response_model=schemas.RadarrInstanceInfo
+)
 def get_radarr_config_instance_info(
     config_id: str,
     current_user=Depends(deps.get_current_poweruser),
@@ -196,7 +197,7 @@ def get_radarr_config_instance_info(
     return instance_info
 
 
-@router.get("/radarr", response_model=list[schemas.RadarrConfig])
+@router.get("/radarr", response_model=List[schemas.RadarrConfig])
 def get_radarr_configs(
     current_user: models.User = Depends(deps.get_current_poweruser),
     radarr_config_repo: RadarrConfigRepository = Depends(
@@ -317,7 +318,9 @@ def get_sonarr_instance_info(
     return instance_info
 
 
-@router.get("/sonarr/{config_id}/instance-info")
+@router.get(
+    "/sonarr/{config_id}/instance-info", response_model=schemas.SonarrInstanceInfo
+)
 def get_sonarr_config_instance_info(
     config_id: str,
     current_user=Depends(deps.get_current_poweruser),
@@ -338,7 +341,7 @@ def get_sonarr_config_instance_info(
     return instance_info
 
 
-@router.get("/sonarr", response_model=list[schemas.SonarrConfig])
+@router.get("/sonarr", response_model=List[schemas.SonarrConfig])
 def get_sonarr_configs(
     current_user: models.User = Depends(deps.get_current_poweruser),
     sonarr_config_repo: SonarrConfigRepository = Depends(

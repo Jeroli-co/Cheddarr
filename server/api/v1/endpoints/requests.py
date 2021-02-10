@@ -1,7 +1,10 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
+from server.core.scheduler import scheduler
 from server.helpers import search
 from server.repositories import (
     MovieRepository,
@@ -14,7 +17,7 @@ from server.repositories.requests import SeriesRepository
 router = APIRouter()
 
 
-@router.get("/movies/incoming", response_model=list[schemas.MovieRequest])
+@router.get("/movies/incoming", response_model=List[schemas.MovieRequest])
 def get_received_movie_requests(
     current_user: models.User = Depends(deps.get_current_user),
     movie_request_repo: MovieRequestRepository = Depends(
@@ -25,7 +28,7 @@ def get_received_movie_requests(
     return requests
 
 
-@router.get("/movies/outgoing", response_model=list[schemas.MovieRequest])
+@router.get("/movies/outgoing", response_model=List[schemas.MovieRequest])
 def get_sent_movie_requests(
     current_user: models.User = Depends(deps.get_current_user),
     movie_request_repo: MovieRequestRepository = Depends(
@@ -142,7 +145,7 @@ def update_movie_request(
         request.selected_provider = selected_provider
         request.status = models.RequestStatus.approved
         if isinstance(request.selected_provider, models.RadarrConfig):
-            tasks.send_radarr_request_task.delay(request.id)
+            scheduler.add_job(tasks.send_radarr_request_task, args=request.id)
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
@@ -180,7 +183,7 @@ def delete_movie_request(
     return {"detail": "Request deleted."}
 
 
-@router.get("/series/incoming", response_model=list[schemas.SeriesRequest])
+@router.get("/series/incoming", response_model=List[schemas.SeriesRequest])
 def get_received_series_requests(
     current_user: models.User = Depends(deps.get_current_user),
     series_request_repo: SeriesRequestRepository = Depends(
@@ -191,7 +194,7 @@ def get_received_series_requests(
     return requests
 
 
-@router.get("/series/outgoing", response_model=list[schemas.SeriesRequest])
+@router.get("/series/outgoing", response_model=List[schemas.SeriesRequest])
 def get_sent_series_requests(
     current_user: models.User = Depends(deps.get_current_user),
     series_request_repo: SeriesRequestRepository = Depends(
@@ -386,7 +389,7 @@ def update_series_request(
             for episode in season.episodes:
                 episode.status = models.RequestStatus.approved
         if isinstance(request.selected_provider, models.SonarrConfig):
-            tasks.send_sonarr_request_task.delay(request.id)
+            scheduler.add_job(tasks.send_sonarr_request_task, args=request.id)
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused

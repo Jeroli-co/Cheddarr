@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional,List
 
 from plexapi.exceptions import PlexApiException
 from plexapi.library import LibrarySection, MovieSection, ShowSection
@@ -8,7 +8,7 @@ from plexapi.server import PlexServer
 from server.schemas import PlexServerInfo, PlexServerOut
 
 
-def get_plex_account_servers(api_key: str) -> list[PlexServerInfo]:
+def get_plex_account_servers(api_key: str) -> List[PlexServerInfo]:
     plex_account = MyPlexAccount(api_key)
     return [
         PlexServerInfo(
@@ -50,7 +50,7 @@ def get_server(
 
 def library_sections(
     plex_server: PlexServer, section_type: str = None
-) -> list[LibrarySection]:
+) -> List[LibrarySection]:
     if section_type == "movies":
         libtype = MovieSection
     elif section_type == "series":

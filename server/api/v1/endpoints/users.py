@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.core import security, settings, utils
+from server.core import security, settings
+from server.core.scheduler import scheduler
 from server.repositories import (
     FriendshipRepository,
     PlexAccountRepository,
@@ -131,10 +132,13 @@ def update_user(
             )
         current_user.password = user_in.password
         if settings.MAIL_ENABLED:
-            tasks.send_email_task.delay(
-                to_email=current_user.email,
-                subject="Your password has been changed",
-                html_template_name="email/change_password_notice.html",
+            scheduler.add_job(
+                tasks.send_email_task,
+                kwargs=dict(
+                    to_email=current_user.email,
+                    subject="Your password has been changed",
+                    html_template_name="email/change_password_notice.html",
+                ),
             )
 
     if user_in.email is not None:
@@ -147,12 +151,15 @@ def update_user(
                 email=user_in.email, old_email=current_user.email
             ).dict()
             token = security.generate_timed_token(email_data)
-            tasks.send_email_task.delay(
-                to_email=user_in.email,
-                subject="Please confirm your new email",
-                html_template_name="email/email_confirmation.html",
-                environment=dict(
-                    confirm_url=request.url_for("confirm_email", token=token)
+            scheduler.add_job(
+                tasks.send_email_task,
+                kwargs=dict(
+                    to_email=user_in.email,
+                    subject="Please confirm your new email",
+                    html_template_name="email/email_confirmation.html",
+                    environment=dict(
+                        confirm_url=request.url_for("confirm_email", token=token)
+                    ),
                 ),
             )
         else:
@@ -182,12 +189,15 @@ def reset_password(
             status.HTTP_404_NOT_FOUND, "No user registered with this email."
         )
     token = security.generate_timed_token(user.email)
-    tasks.send_email_task.delay(
-        to_email=email,
-        subject="Reset your password",
-        html_template_name="email/reset_password_instructions.html",
-        environment=dict(
-            reset_url=request.url_for("check_reset_password", token=token)
+    scheduler.add_job(
+        tasks.send_email_task,
+        kwargs=dict(
+            to_email=email,
+            subject="Reset your password",
+            html_template_name="email/reset_password_instructions.html",
+            environment=dict(
+                reset_url=request.url_for("check_reset_password", token=token)
+            ),
         ),
     )
     return {"detail": "Reset instructions sent."}
@@ -252,45 +262,15 @@ def confirm_reset_password(
 
     user.password = password
     user_repo.save(user)
-    tasks.send_email_task.delay(
-        to_email=user.email,
-        subject="Your password has been reset",
-        html_template_name="email/reset_password_notice.html",
+    scheduler.add_job(
+        tasks.send_email_task,
+        kwargs=dict(
+            to_email=user.email,
+            subject="Your password has been reset",
+            html_template_name="email/reset_password_notice.html",
+        ),
     )
     return {"detail": "Password reset."}
-
-
-##########################################
-# Notifications                          #
-##########################################
-
-
-@current_user_router.get("/notifications", tags=["notifications"])
-def get_notifications(current_user: models.User = Depends(deps.get_current_user)):
-    return current_user.notifications
-
-
-@current_user_router.delete("/notifications/{id}", tags=["notifications"])
-def delete_notification(
-    id: int,
-    current_user: models.User = Depends(deps.get_current_user),
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    current_user.notifications = [n for n in current_user.notifications if n.id != id]
-    user_repo.save(current_user)
-
-    return {"detail": "Notification deleted"}
-
-
-@current_user_router.delete("/notifications", tags=["notifications"])
-def delete_all_notifications(
-    current_user: models.User = Depends(deps.get_current_user),
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    current_user.notifications = []
-    user_repo.save(current_user)
-
-    return {"detail": "Notifications deleted"}
 
 
 ##########################################
@@ -299,7 +279,7 @@ def delete_all_notifications(
 
 
 @current_user_router.get(
-    "/friends", response_model=list[schemas.UserPublic], tags=["friends"]
+    "/friends", response_model=List[schemas.UserPublic], tags=["friends"]
 )
 def get_friends(
     providers_type: Optional[models.ProviderType] = None,
@@ -335,7 +315,7 @@ def get_friends(
 
 
 @current_user_router.get(
-    "/friends/incoming", response_model=list[schemas.UserPublic], tags=["friends"]
+    "/friends/incoming", response_model=List[schemas.UserPublic], tags=["friends"]
 )
 def get_pending_incoming_friends(
     current_user: models.User = Depends(deps.get_current_user),
@@ -350,7 +330,7 @@ def get_pending_incoming_friends(
 
 
 @current_user_router.get(
-    "/friends/outgoing", response_model=list[schemas.UserPublic], tags=["friends"]
+    "/friends/outgoing", response_model=List[schemas.UserPublic], tags=["friends"]
 )
 def get_pending_outgoing_friends(
     current_user: models.User = Depends(deps.get_current_user),
@@ -458,7 +438,7 @@ def remove_friend(
 
 
 @current_user_router.get(
-    "/friends/search", response_model=list[schemas.UserPublic], tags=["friends"]
+    "/friends/search", response_model=List[schemas.UserPublic], tags=["friends"]
 )
 def search_friends(
     value: str,

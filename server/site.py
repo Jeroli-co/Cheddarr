@@ -14,7 +14,7 @@ site_routes = [
         name="static",
     ),
 ]
-site = FastAPI(routes=site_routes)
+site = FastAPI(routes=site_routes, docs_url=None, redoc_url=None)
 site_templates = Jinja2Templates(str(settings.REACT_BUILD_FOLDER))
 
 

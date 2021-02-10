@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from server.core.security import generate_timed_token
 from server.repositories import UserRepository
-from server.tests.conftest import datasets
+from server.tests.utils import datasets
 
 
 def test_signup_ok(app: FastAPI, db: Session, client: TestClient):
@@ -20,6 +20,7 @@ def test_signup_ok(app: FastAPI, db: Session, client: TestClient):
         ).status_code
         == 201
     )
+    print(user_repo.find_by_email(email="test@test.com"))
     assert user_repo.find_by_email(email="test@test.com")
 
 

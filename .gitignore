@@ -100,6 +100,15 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+### yarn ###
+# https://yarnpkg.com/advanced/qa#which-files-should-be-gitignored
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
@@ -285,9 +294,6 @@ target/
 #   install all needed dependencies.
 #Pipfile.lock
 
-# celery beat schedule file
-celerybeat-schedule
-
 # SageMath parsed files
 *.sage.py
 
@@ -314,8 +320,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#Flask
-instance/
 ### react ###
 .DS_*
 **/*.backup.*
@@ -340,8 +344,5 @@ sketch
 *.db
 db_local/
 
-###Celery
-celerybeat-schedule.bak
-celerybeat-schedule.dat
-celerybeat-schedule.dir
-# End of https://www.gitignore.io/api/node,react,python,jetbrains,visualstudiocode
+###Config
+config/

@@ -1,4 +1,6 @@
 aiofiles
+alembic
+apscheduler
 celery[redis]
 click
 emails
@@ -11,7 +13,6 @@ PlexAPI
 pydantic
 pytest
 pytest-mock
-python-dotenv
 python-jose[cryptography]
 python-multipart
 sqlalchemy

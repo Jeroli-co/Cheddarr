@@ -1,3 +1,4 @@
+import re
 from random import randrange
 
 import requests
@@ -15,6 +16,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from server import models, schemas, tasks
 from server.api import dependencies as deps
 from server.core import security, settings, utils
+from server.core.scheduler import scheduler
 from server.repositories import PlexAccountRepository, UserRepository
 
 router = APIRouter()
@@ -49,13 +51,17 @@ def signup(
     if settings.MAIL_ENABLED:
         email_data = schemas.EmailConfirm(email=user.email).dict()
         token = security.generate_timed_token(email_data)
-        tasks.send_email_task.delay(
-            to_email=user.email,
-            subject="Welcome!",
-            html_template_name="email/welcome.html",
-            environment=dict(
-                username=user.username,
-                confirm_url=request.url_for("confirm_email", token=token),
+        scheduler.add_job(
+            tasks.send_email_task,
+            "date",
+            kwargs=dict(
+                to_email=user.email,
+                subject="Welcome!",
+                html_template_name="email/welcome.html",
+                environment=dict(
+                    username=user.username,
+                    confirm_url=request.url_for("confirm_email", token=token),
+                ),
             ),
         )
     else:
@@ -129,11 +135,14 @@ def resend_confirmation(
         )
     email_data = schemas.EmailConfirm(email=email).dict()
     token = security.generate_timed_token(email_data)
-    tasks.send_email_task.delay(
-        to_email=email,
-        subject="Please confirm your email",
-        html_template_name="email/email_confirmation.html",
-        environment=dict(confirm_url=request.url_for("confirm_email", token=token)),
+    scheduler.add_job(
+        tasks.send_email_task,
+        kwargs=dict(
+            to_email=email,
+            subject="Please confirm your email",
+            html_template_name="email/email_confirmation.html",
+            environment=dict(confirm_url=request.url_for("confirm_email", token=token)),
+        ),
     )
 
     return {"detail": "Confirmation email sent."}
@@ -186,7 +195,7 @@ def start_signin_plex():
         settings.PLEX_TOKEN_URL,
         queries_dict={
             "strong": "true",
-            "X-Plex-Product": settings.APP_NAME,
+            "X-Plex-Product": "Cheddarr",
             "X-Plex-Client-Identifier": settings.PLEX_CLIENT_IDENTIFIER,
         },
     )
@@ -195,9 +204,10 @@ def start_signin_plex():
 
 @router.post("/sign-in/plex/authorize")
 def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSignin):
-    forward_url = request.url_for("confirm_signin_plex").replace(
-        settings.API_PREFIX, ""
+    forward_url = re.sub(
+        f"{settings.API_PREFIX}/v[0-9]+", "", request.url_for("confirm_signin_plex")
     )
+    print(forward_url)
     token = security.generate_token(
         {
             "id": auth_data.key,
@@ -209,7 +219,7 @@ def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSign
         utils.make_url(
             settings.PLEX_AUTHORIZE_URL,
             queries_dict={
-                "context[device][product]": settings.APP_NAME,
+                "context[device][product]": "Cheddarr",
                 "clientID": settings.PLEX_CLIENT_IDENTIFIER,
                 "code": auth_data.code,
                 "forwardUrl": forward_url,

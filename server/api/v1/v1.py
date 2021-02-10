@@ -1,11 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, FastAPI
+from .endpoints import auth, configuration, plex, requests, search, users, notifications
 
-from .endpoints import auth, configuration, plex, requests, search, users
+version = "v1"
 
 router = APIRouter()
 router.include_router(auth.router, tags=["auth"])
 router.include_router(users.users_router, prefix="/users", tags=["users"])
 router.include_router(users.current_user_router, prefix="/user", tags=["current user"])
+router.include_router(
+    notifications.router, prefix="/notifications", tags=["notifications"]
+)
 router.include_router(
     configuration.router,
     prefix="/configuration",
@@ -14,3 +18,6 @@ router.include_router(
 router.include_router(plex.router, prefix="/plex", tags=["plex"])
 router.include_router(search.router, prefix="/search", tags=["search"])
 router.include_router(requests.router, prefix="/requests", tags=["requests"])
+
+
+application = FastAPI(title="Cheddarr", version=version, routes=router.routes)

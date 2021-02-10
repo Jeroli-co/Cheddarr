@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from server import models
 from server.core.security import verify_password
 from server.repositories import FriendshipRepository, UserRepository
-from server.tests.conftest import datasets
+from server.tests.utils import datasets
 
 
 def test_get_current_user(app: FastAPI, client: TestClient, normal_user_token_headers):

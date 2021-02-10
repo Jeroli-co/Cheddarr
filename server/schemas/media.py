@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import date
-from typing import Optional
+from typing import Optional,List
 
 from pydantic import Field
 
@@ -31,12 +31,12 @@ class Season(APIModel):
     season_number: int
     title: str
     release_date: Optional[date]
-    episodes: Optional[list[Episode]]
+    episodes: Optional[List[Episode]]
 
 
 class Series(Media):
     tvdb_id: int
     number_of_seasons: int
-    seasons: Optional[list[Season]]
+    seasons: Optional[List[Season]]
     media_type: MediaType = Field(default=MediaType.series, const=True)
     series_type: SeriesType

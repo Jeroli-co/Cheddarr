@@ -1,5 +1,4 @@
-from typing import Union
-from urllib.parse import urlparse
+from typing import Union,List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -13,7 +12,7 @@ router = APIRouter()
 
 @router.get(
     "/servers",
-    response_model=list[schemas.PlexServerInfo],
+    response_model=List[schemas.PlexServerInfo],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex account linked"},
     },
@@ -62,7 +61,7 @@ def get_plex_account_server(
 
 @router.get(
     "/{config_id}/movies/recent",
-    response_model=list[schemas.PlexMovie],
+    response_model=List[schemas.PlexMovie],
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
@@ -74,7 +73,7 @@ def get_plex_account_server(
 )
 def get_plex_recent_movies(
     config_id: str,
-    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     config = next((config for config in plex_configs if config.id == config_id), None)
     if config is None:
@@ -110,7 +109,7 @@ def get_plex_recent_movies(
 def get_plex_movie(
     config_id: str,
     movie_id: int,
-    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     config = next((config for config in plex_configs if config.id == config_id), None)
     if config is None:
@@ -129,7 +128,7 @@ def get_plex_movie(
 
 @router.get(
     "/{config_id}/series/recent",
-    response_model=list[schemas.PlexEpisode],
+    response_model=List[schemas.PlexEpisode],
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
@@ -141,7 +140,7 @@ def get_plex_movie(
 )
 def get_plex_recent_series(
     config_id: str,
-    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     config = next((config for config in plex_configs if config.id == config_id), None)
     if config is None:
@@ -178,7 +177,7 @@ def get_plex_recent_series(
 def get_plex_series(
     config_id: str,
     series_id: int,
-    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     config = next((config for config in plex_configs if config.id == config_id), None)
     if config is None:
@@ -210,7 +209,7 @@ def get_plex_series(
 def get_plex_season(
     config_id: str,
     season_id: int,
-    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     config = next((config for config in plex_configs if config.id == config_id), None)
     if config is None:
@@ -242,7 +241,7 @@ def get_plex_season(
 def get_plex_episode(
     config_id: str,
     episode_id: int,
-    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     config = next((config for config in plex_configs if config.id == config_id), None)
     if config is None:
@@ -261,7 +260,7 @@ def get_plex_episode(
 
 @router.get(
     "/{config_id}/on-deck",
-    response_model=list[Union[schemas.PlexMovie, schemas.PlexEpisode]],
+    response_model=List[Union[schemas.PlexMovie, schemas.PlexEpisode]],
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
@@ -273,7 +272,7 @@ def get_plex_episode(
 )
 def get_plex_on_deck(
     config_id: str,
-    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     config = next((config for config in plex_configs if config.id == config_id), None)
     if config is None:
@@ -291,7 +290,7 @@ def get_plex_on_deck(
 
 @router.get(
     "/{config_id}/search",
-    response_model=list[schemas.MediaSearchResultSchema],
+    response_model=List[schemas.MediaSearchResultSchema],
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
@@ -305,7 +304,7 @@ def search_plex_media(
     config_id: str,
     value: str,
     section: models.MediaType = None,
-    plex_configs: list[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
 ):
     config = next((config for config in plex_configs if config.id == config_id), None)
     if config is None:

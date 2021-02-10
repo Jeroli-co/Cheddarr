@@ -52,3 +52,4 @@ from .search import (
     TmdbSeason,
     TmdbSeries,
 )
+from .notifications import Notificaiton, NotificationAgent, EmailAgent

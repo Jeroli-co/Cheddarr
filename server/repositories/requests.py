@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional,List
 
 from server.models import Movie, MovieRequest, Series, SeriesRequest
 from server.repositories.base import BaseRepository
@@ -31,7 +31,7 @@ class MovieRequestRepository(BaseRepository[MovieRequest]):
 class SeriesRequestRepository(BaseRepository[SeriesRequest]):
     def find_all_by_user_ids_and_tvdb_id(
         self, tvdb_id: int, requesting_user_id: int, requested_user_id: int
-    ) -> list[SeriesRequest]:
+    ) -> List[SeriesRequest]:
         return (
             self.session.query(SeriesRequest)
             .join(SeriesRequest.series)

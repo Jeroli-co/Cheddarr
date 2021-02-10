@@ -6,14 +6,14 @@ from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from server.core.config import settings
+from server.core import settings
 from server.database.session import SessionLocal
 from server.models import User, UserRole
 from server.repositories import PlexConfigRepository, UserRepository
 from server.repositories.base import BaseRepository
 from server.schemas import TokenPayload
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_PREFIX}/sign-in")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 
 
 def get_db() -> Generator:

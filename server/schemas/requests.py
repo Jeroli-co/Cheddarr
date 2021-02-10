@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import date
-from typing import Optional
+from typing import Optional,List
 
 from server.models import RequestStatus
 from server.schemas import APIModel, Movie, Series, UserPublic
@@ -35,15 +35,15 @@ class EpisodeRequest(APIModel):
 
 class SeasonRequest(APIModel):
     season_number: int
-    episodes: Optional[list[EpisodeRequest]]
+    episodes: Optional[List[EpisodeRequest]]
 
 
 class SeriesRequest(Request):
     series: Series
-    seasons: Optional[list[SeasonRequest]]
+    seasons: Optional[List[SeasonRequest]]
 
 
 class SeriesRequestCreate(APIModel):
     tvdb_id: int
     requested_username: str
-    seasons: Optional[list[SeasonRequest]]
+    seasons: Optional[List[SeasonRequest]]

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Generic, get_args, Optional
+from typing import Generic, get_args, List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -19,7 +19,7 @@ class BaseRepository(Generic[ModelType], ABC):
     def find_by(self, **filters) -> Optional[ModelType]:
         return self.session.query(self.model).filter_by(**filters).one_or_none()
 
-    def find_all_by(self, limit: int = 100, **filters) -> list[ModelType]:
+    def find_all_by(self, limit: int = 100, **filters) -> List[ModelType]:
         return self.session.query(self.model).filter_by(**filters).limit(limit).all()
 
     def search_by(self, field: str, value: str, limit: int = 3):

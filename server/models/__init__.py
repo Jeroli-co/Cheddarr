@@ -14,4 +14,4 @@ from .requests import (
     SeriesRequest,
 )
 from .users import Friendship, PlexAccount, User, UserRole
-from .notifications import Notification
+from .notifications import Notification, NotificationAgent

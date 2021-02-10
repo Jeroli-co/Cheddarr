@@ -1,39 +1,30 @@
-from celery.schedules import crontab
-
 from server import repositories
 from server.api.dependencies import get_db
-from server.core.celery_app import celery_app
+from server.core.scheduler import scheduler
 from server.core.utils import send_email
 from server.helpers import radarr, sonarr
 from server.models import RequestStatus
 
 
-@celery_app.task
 def send_email_task(
     to_email: str, subject: str, html_template_name: str, environment: dict = None
 ):
     send_email(to_email, subject, html_template_name, environment)
 
 
-@celery_app.task(
-    autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 15}
-)
 def send_radarr_request_task(request_id: int):
     movie_request_repo = repositories.MovieRequestRepository(next(get_db()))
     request = movie_request_repo.find_by(id=request_id)
     radarr.send_request(request)
 
 
-@celery_app.task(
-    autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 15}
-)
 def send_sonarr_request_task(request_id: int):
     series_request_repo = repositories.SeriesRequestRepository(next(get_db()))
     request = series_request_repo.find_by(id=request_id)
     sonarr.send_request(request)
 
 
-@celery_app.task
+@scheduler.scheduled_job("interval", minutes=10)
 def check_movie_requests_availability_task():
     movie_request_repo = repositories.MovieRequestRepository(next(get_db()))
     requests = movie_request_repo.find_all_by(status=RequestStatus.approved)
@@ -47,7 +38,7 @@ def check_movie_requests_availability_task():
             movie_request_repo.save(request)
 
 
-@celery_app.task
+@scheduler.scheduled_job("interval", minutes=10)
 def check_series_requests_availability_task():
     series_request_repo = repositories.SeriesRequestRepository(next(get_db()))
     requests = series_request_repo.find_all_by(status=RequestStatus.approved)
@@ -88,13 +79,3 @@ def check_series_requests_availability_task():
         if req_seasons_available == len(request.seasons):
             request.status = RequestStatus.available
         series_request_repo.save(request)
-
-
-@celery_app.on_after_finalize.connect
-def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(
-        crontab(minute="*/5"), check_movie_requests_availability_task.s()
-    )
-    sender.add_periodic_task(
-        crontab(minute="*/1"), check_series_requests_availability_task.s()
-    )

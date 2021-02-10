@@ -1,5 +1,5 @@
 import time
-from typing import Optional, Union
+from typing import Optional, Union,List
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -181,7 +181,7 @@ def update_series(
     return schemas.SonarrSeries.parse_obj(res.json())
 
 
-def get_episodes(config: SonarrConfig, series_id: int) -> list[schemas.SonarrEpisode]:
+def get_episodes(config: SonarrConfig, series_id: int) -> List[schemas.SonarrEpisode]:
     url = make_url(
         api_key=config.api_key,
         host=config.host,
@@ -192,7 +192,7 @@ def get_episodes(config: SonarrConfig, series_id: int) -> list[schemas.SonarrEpi
         queries={"seriesId": series_id},
     )
     res = requests.get(url)
-    return parse_obj_as(list[schemas.SonarrEpisode], res.json())
+    return parse_obj_as(List[schemas.SonarrEpisode], res.json())
 
 
 def update_episode(

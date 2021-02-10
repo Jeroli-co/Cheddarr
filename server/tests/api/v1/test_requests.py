@@ -3,7 +3,7 @@ from datetime import date
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-from server.tests.conftest import datasets
+from server.tests.utils import datasets
 
 
 def test_add_series_never_requested_without_seasons(

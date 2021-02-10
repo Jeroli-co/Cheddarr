@@ -1,4 +1,5 @@
 import os
+import re
 from os import listdir
 from pathlib import Path
 from random import choice
@@ -7,7 +8,6 @@ from urllib.parse import urlencode
 import emails
 from emails.template import JinjaTemplate
 from jinja2 import Environment, FileSystemLoader
-from pydantic import EmailStr
 
 from server.core.config import settings
 
@@ -21,7 +21,7 @@ def send_email(
     assert settings.MAIL_ENABLED, "Emails are disabled."
     environment = environment or {}
     for k, v in environment.items():
-        environment[k] = v.replace(settings.API_PREFIX, "")
+        environment[k] = re.sub(f"{settings.API_PREFIX}/v[0-9]+", "", v)
     with open(Path(settings.MAIL_TEMPLATES_FOLDER) / html_template_name) as f:
         template_str = f.read()
     message = emails.Message(

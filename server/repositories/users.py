@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional,List
 
 from sqlalchemy import func
 
@@ -55,7 +55,7 @@ class FriendshipRepository(BaseRepository[Friendship]):
 
     def find_all_by_user_id(
         self, user_id: int, pending: bool = None
-    ) -> list[Friendship]:
+    ) -> List[Friendship]:
         query = (
             self.session.query(Friendship)
             .filter_by(requesting_user_id=user_id)

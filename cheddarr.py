@@ -1,37 +1,60 @@
 #!/usr/bin/env python
-import os
 import click
-
-from server.core.commands import beat, init_db, run, test, worker
 
 
 """USAGE:
-python manage.py [--env=production|development] COMMAND [OPTIONS] [ARGS]
+python cheddarr.py [OPTIONS] COMMAND
 """
 
 
 @click.group(
-    help="""A utility script for the Cheddarr application.""",
+    help="""A utility script for the Cheddarr application""",
 )
 @click.option(
-    "--env",
-    type=click.Choice(["development", "production"]),
-    default="development",
-    help="Whether to use DevConfig or ProdConfig (development by default).",
+    "--debug",
+    "-d",
+    default=False,
+    is_flag=True,
 )
-def cli(env):
-
-    if env == "production":
-        os.environ["ENV"] = "production"
-    else:
-        os.environ["ENV"] = "development"
+@click.pass_context
+def cli(ctx, debug):
+    ctx.obj["DEBUG"] = debug
 
 
-cli.add_command(run)
-cli.add_command(init_db)
-cli.add_command(test)
-cli.add_command(worker)
-cli.add_command(beat)
+@cli.command("init-db")
+def init_db():
+    """Initialize the database."""
+    from server.database.base import init_db
+
+    init_db()
+    click.echo("Database initialized.")
+
+
+@cli.command("test")
+def test():
+    """Run the tests."""
+    import pytest
+
+    rv = pytest.main(["./server/tests", "--verbose"])
+    exit(rv)
+
+
+@cli.command("run")
+@click.pass_context
+def run(ctx):
+    import uvicorn
+
+    debug = ctx.obj["DEBUG"]
+    log_level = "debug" if debug else "error"
+    uvicorn.run(
+        "server.main:app",
+        host="0.0.0.0",
+        port=9090,
+        reload=debug,
+        debug=debug,
+        log_level=log_level,
+    )
+
 
 if __name__ == "__main__":
-    cli()
+    cli(obj={})
