@@ -2,12 +2,12 @@ import React, { useRef, useState } from "react";
 import { UserDropdown } from "./components/user-dropdown/UserDropdown";
 import styled from "styled-components";
 import { GitHubButton } from "../../shared/components/GithubButton";
-import { SearchBar } from "./components/search-bar/SearchBar";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Spin } from "../../shared/components/animations/Animations";
 import { useHistory } from "react-router";
 import { useSession } from "../../shared/contexts/SessionContext";
 import { NavbarContainer, navbarLogo, NavbarUserAvatar } from "./NavbarCommon";
+import { SearchBar2 } from "./components/search-bar/SearchBar2";
 
 const Container = styled(NavbarContainer)`
   display: flex;
@@ -62,7 +62,7 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
           onClick={() => history.push("/")}
         />
       </NavbarAppLogo>
-      <SearchBar isSidebarOpen={isSidebarOpen} />
+      <SearchBar2 isSidebarOpen={isSidebarOpen} />
       <GitHubButton />
       <UserAvatar
         src={avatar}

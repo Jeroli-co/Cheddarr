@@ -4,7 +4,7 @@ import { APIRoutes } from "../../shared/enums/APIRoutes";
 import { ISearchedSeries } from "../pages/search/models/ISearchedMedias";
 import { useAlert } from "../../shared/contexts/AlertContext";
 
-export const useSearchMedia = () => {
+export const useSearchMediaService = () => {
   const { get } = useAPI();
   const { pushDanger } = useAlert();
 

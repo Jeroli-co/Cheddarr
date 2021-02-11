@@ -25,6 +25,7 @@ import { PlexSeason } from "../logged-in-app/pages/plex-media/PlexSeason";
 import { Home } from "../shared/Home";
 import { RequestsSent } from "../logged-in-app/pages/requests/components/RequestsSent";
 import { RequestsReceived } from "../logged-in-app/pages/requests/components/RequestsReceived";
+import { Search2 } from "../logged-in-app/pages/search/Search2";
 
 const routes = {
   HOME: {

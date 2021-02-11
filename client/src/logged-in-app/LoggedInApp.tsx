@@ -6,6 +6,7 @@ import { useWindowSize } from "../shared/hooks/useWindowSize";
 import { NavbarMobile } from "./navbar/NavbarMobile";
 import { Navbar } from "./navbar/Navbar";
 import { SidebarMenuMobile } from "./sidebarMenu/SidebarMenuMobile";
+import { SearchContextProvider } from "../shared/contexts/SearchContext";
 const SwitchRoutes = React.lazy(() => import("../router/SwitchRoutes"));
 
 const Layout = styled.div`
@@ -72,13 +73,15 @@ export const LoggedInApp = () => {
   } else {
     return (
       <Layout>
-        <Navbar isSidebarOpen={isOpen} />{" "}
-        <Container>
-          <SidebarMenu isOpen={isOpen} toggle={toggle} />
-          <PageLayout isSidebarOpen={isOpen}>
-            <SwitchRoutes />
-          </PageLayout>
-        </Container>
+        <SearchContextProvider>
+          <Navbar isSidebarOpen={isOpen} />{" "}
+          <Container>
+            <SidebarMenu isOpen={isOpen} toggle={toggle} />
+            <PageLayout isSidebarOpen={isOpen}>
+              <SwitchRoutes />
+            </PageLayout>
+          </Container>
+        </SearchContextProvider>
       </Layout>
     );
   }
