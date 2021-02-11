@@ -19,8 +19,9 @@ import { IAsyncData } from "../../../../shared/models/IAsyncData";
 import { useAPI } from "../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
+import { useSearchContext } from "../../../../shared/contexts/SearchContext";
 
-const SearchBarStyle = styled.div<{
+const Container = styled.div<{
   isInputFocus: boolean;
   isSidebarOpen: boolean;
 }>`
@@ -92,15 +93,7 @@ const SearchBar = ({ isSidebarOpen }: SearchBarProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-    e.preventDefault();
-  };
-
-  const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && value.length > 0) {
-      history.push(routes.SEARCH.url(searchType, value));
-      setValue("");
-    }
+    history.push(routes.SEARCH.url(searchType, e.target.value));
   };
 
   const onSearchTypeChange = (type: SearchRequestTypes) => {
@@ -191,32 +184,21 @@ const SearchBar = ({ isSidebarOpen }: SearchBarProps) => {
   }, [searchType]);
 
   return (
-    <SearchBarStyle isInputFocus={isInputFocus} isSidebarOpen={isSidebarOpen}>
+    <Container isInputFocus={isInputFocus} isSidebarOpen={isSidebarOpen}>
       <SearchDropdownType
         selectedOption={searchType}
         onChange={onSearchTypeChange}
       />
-
       <input
         ref={inputRef}
-        value={value}
         onChange={onInputChange}
         onFocus={() => setIsInputFocus(true)}
         onBlur={() => setIsInputFocus(false)}
-        onKeyPress={onKeyPress}
         className="search-input"
         type="text"
         placeholder="Search..."
       />
-      <ResultsList
-        searchValue={value}
-        isInputFocus={isInputFocus}
-        searchType={searchType}
-        moviesResults={moviesResults}
-        seriesResults={seriesResults}
-        friendsResults={friendsResults}
-      />
-    </SearchBarStyle>
+    </Container>
   );
 };
 

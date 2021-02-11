@@ -12,7 +12,7 @@ import {
   DefaultAsyncCall,
   IAsyncCall,
 } from "../../../shared/models/IAsyncCall";
-import { useSearchMedia } from "../../hooks/useSearchMedia";
+import { useSearchMediaService } from "../../hooks/useSearchMediaService";
 import { ISearchMediaResult } from "./models/ISearchMediaResult";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { Sizes } from "../../../shared/enums/Sizes";
@@ -25,7 +25,7 @@ type SearchParams = {
 const Search = () => {
   const { type, title } = useParams<SearchParams>();
 
-  const { getAllMediaByTitle } = useSearchMedia();
+  const { getAllMediaByTitle } = useSearchMediaService();
   const [searchMediaResult, setSearchMediaResult] = useState<
     IAsyncCall<ISearchMediaResult | null>
   >(DefaultAsyncCall);
