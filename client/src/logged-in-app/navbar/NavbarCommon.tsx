@@ -6,10 +6,12 @@ export const navbarLogo = require("../../assets/cheddarr-small.png");
 export const NavbarContainer = styled.div`
   position: fixed;
   top: 0;
+  right: 0;
   width: 100%;
   height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   background: ${(props) => props.theme.primary};
   z-index: 1;
+  transition: width ${STATIC_STYLES.SIDEBAR_TRANSITION_DURATION} ease;
 `;
 
 export const NavbarUserAvatar = styled.img`

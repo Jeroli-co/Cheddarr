@@ -5,10 +5,10 @@ import styled from "styled-components";
 import { SeasonEpisodes } from "./SeasonEpisodes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { ISearchedSeries } from "../models/ISearchedMedias";
+import { ISearchedSeries } from "../../../../shared/models/ISearchedMedias";
 import { PrimaryDivider } from "../../../../shared/components/Divider";
 import { Spinner } from "../../../../shared/components/Spinner";
-import { Sizes } from "../../../../shared/enums/Sizes";
+import { ComponentSizes } from "../../../../shared/enums/ComponentSizes";
 
 const SeasonsMenuStyle = styled.ul`
   padding: 1%;
@@ -67,7 +67,7 @@ const SeasonsMenu = ({
   if (series === null) {
     return (
       <Container padding="1%">
-        <Spinner size={Sizes.XLARGE} />
+        <Spinner size={ComponentSizes.XLARGE} />
       </Container>
     );
   }

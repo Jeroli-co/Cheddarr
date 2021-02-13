@@ -11,10 +11,10 @@ import { SearchDropdownType } from "./components/SearchDropdownType";
 import { ResultsList } from "./components/ResultsList";
 import { useHistory } from "react-router";
 import { routes } from "../../../../router/routes";
-import { SearchRequestTypes } from "../../../enums/SearchRequestTypes";
-import { IPublicUser } from "../../../models/IPublicUser";
-import { usePlexConfig } from "../../../contexts/PlexConfigContext";
-import { IMediaSearchResult } from "./models/IMediaSearchResult";
+import { SearchFilters } from "../../../../shared/enums/SearchFilters";
+import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { usePlexConfig } from "../../../../shared/contexts/PlexConfigContext";
+import { IMediaSearchResult } from "../../../../shared/models/IMediaSearchResult";
 import { IAsyncData } from "../../../../shared/models/IAsyncData";
 import { useAPI } from "../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
@@ -60,8 +60,8 @@ const Container = styled.div<{
 let timer: any;
 
 export const SearchBarMobile = () => {
-  const [searchType, setSearchType] = useState<SearchRequestTypes>(
-    SearchRequestTypes.ALL
+  const [searchType, setSearchType] = useState<SearchFilters>(
+    SearchFilters.ALL
   );
   const [isInputFocus, setIsInputFocus] = useState(false);
   const [value, setValue] = useState("");
@@ -95,7 +95,7 @@ export const SearchBarMobile = () => {
     }
   };
 
-  const onSearchTypeChange = (type: SearchRequestTypes) => {
+  const onSearchTypeChange = (type: SearchFilters) => {
     if (inputRef && inputRef.current) {
       setSearchType(type);
       inputRef.current.focus();
@@ -105,16 +105,16 @@ export const SearchBarMobile = () => {
   const _search = () => {
     if (!isEmpty(value) && value.length > 1) {
       switch (searchType) {
-        case SearchRequestTypes.MOVIES:
+        case SearchFilters.MOVIES:
           setMoviesResults({ ...moviesResults, isLoading: true });
           break;
-        case SearchRequestTypes.SERIES:
+        case SearchFilters.SERIES:
           setSeriesResults({ ...seriesResults, isLoading: true });
           break;
-        case SearchRequestTypes.FRIENDS:
+        case SearchFilters.FRIENDS:
           setFriendsResults({ ...friendsResults, isLoading: true });
           break;
-        case SearchRequestTypes.ALL:
+        case SearchFilters.ALL:
           setMoviesResults({ ...moviesResults, isLoading: true });
           setSeriesResults({ ...seriesResults, isLoading: true });
           setFriendsResults({ ...friendsResults, isLoading: true });

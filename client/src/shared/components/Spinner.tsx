@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Sizes } from "../enums/Sizes";
+import { ComponentSizes } from "../enums/ComponentSizes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
@@ -9,19 +9,19 @@ const SpinnerStyle = styled.div`
 `;
 
 type SpinnerProps = {
-  size?: Sizes;
+  size?: ComponentSizes;
 };
 
 export const Spinner = (props: SpinnerProps) => {
   const getSize = () => {
     switch (props.size) {
-      case Sizes.SMALL:
+      case ComponentSizes.SMALL:
         return "xs";
-      case Sizes.MEDIUM:
+      case ComponentSizes.MEDIUM:
         return "sm";
-      case Sizes.LARGE:
+      case ComponentSizes.LARGE:
         return "lg";
-      case Sizes.XLARGE:
+      case ComponentSizes.XLARGE:
         return "2x";
       default:
         return "lg";

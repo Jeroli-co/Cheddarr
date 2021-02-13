@@ -3,10 +3,10 @@ import { Carousel } from "../../plex-media/components/Carousel";
 import { MediaPreviewCard } from "../../plex-media/components/MediaPreviewCard";
 import { Spinner } from "../../../../shared/components/Spinner";
 import { MediaRecentlyAddedType } from "../enums/MediaRecentlyAddedType";
-import { IMediaServerMedia } from "../../plex-media/models/IMediaServerMedia";
-import { PlexConfigContext } from "../../../contexts/PlexConfigContext";
+import { IMediaServerMedia } from "../../../../shared/models/IMediaServerMedia";
+import { PlexConfigContext } from "../../../../shared/contexts/PlexConfigContext";
 import styled, { useTheme } from "styled-components";
-import { useRedirectToMediasDetails } from "../../../hooks/useRedirectToMediasDetails";
+import { useRedirectToMediasDetails } from "../../../../shared/hooks/useRedirectToMediasDetails";
 import { useAPI } from "../../../../shared/hooks/useAPI";
 import {
   DefaultAsyncCall,
@@ -15,10 +15,11 @@ import {
 import { SwitchErrors } from "../../../../shared/components/errors/SwitchErrors";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { Icon } from "../../../../shared/components/Icon";
-import { H1 } from "../../../../shared/components/Titles";
-import { Sizes } from "../../../../shared/enums/Sizes";
+import { H2 } from "../../../../shared/components/Titles";
+import { ComponentSizes } from "../../../../shared/enums/ComponentSizes";
+import { CenteredContent } from "../../../../shared/components/layout/CenteredContent";
 
-const MediaRecentlyAddedTitleContainer = styled(H1)`
+const MediaRecentlyAddedTitleContainer = styled(H2)`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -74,7 +75,11 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
   }, [currentConfig]);
 
   if (media.isLoading) {
-    return <Spinner size={Sizes.LARGE} />;
+    return (
+      <CenteredContent height="280px">
+        <Spinner size={ComponentSizes.LARGE} />
+      </CenteredContent>
+    );
   }
 
   if (media.status >= 400) {

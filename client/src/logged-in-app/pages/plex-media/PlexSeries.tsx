@@ -14,11 +14,11 @@ import { Container } from "../../../shared/components/layout/Container";
 import { PlexButton } from "../../../shared/components/PlexButton";
 import { MediaRating } from "./components/MediaRating";
 import { MediaBackground } from "./components/MediaBackground";
-import { usePlexSeries } from "../../hooks/usePlexSeries";
+import { usePlexSeries } from "../../../shared/hooks/usePlexSeries";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { PrimaryDivider } from "../../../shared/components/Divider";
 import { Spinner } from "../../../shared/components/Spinner";
-import { Sizes } from "../../../shared/enums/Sizes";
+import { ComponentSizes } from "../../../shared/enums/ComponentSizes";
 
 type SeriesCardParams = {
   id: string;
@@ -28,7 +28,7 @@ const PlexSeries = () => {
   const { id } = useParams<SeriesCardParams>();
   const series = usePlexSeries(id);
 
-  if (series.isLoading) return <Spinner size={Sizes.XLARGE} />;
+  if (series.isLoading) return <Spinner size={ComponentSizes.XLARGE} />;
 
   if (!series.data) {
     return <SwitchErrors status={series.status} />;

@@ -1,7 +1,7 @@
 import React, { useRef, useState, MouseEvent } from "react";
 import styled from "styled-components";
 import { useOutsideAlerter } from "../../../../../shared/hooks/useOutsideAlerter";
-import { SearchRequestTypes } from "../../../../enums/SearchRequestTypes";
+import { SearchFilters } from "../../../../../shared/enums/SearchFilters";
 import { uppercaseFirstLetter } from "../../../../../utils/strings";
 import { STATIC_STYLES } from "../../../../../shared/enums/StaticStyles";
 import {
@@ -63,8 +63,8 @@ const Item = styled.div`
 `;
 
 type SearchDropdownTypeProps = {
-  selectedOption: SearchRequestTypes;
-  onChange: (type: SearchRequestTypes) => void;
+  selectedOption: SearchFilters;
+  onChange: (type: SearchFilters) => void;
 };
 
 const SearchDropdownType = ({
@@ -80,7 +80,7 @@ const SearchDropdownType = ({
     e.preventDefault();
   };
 
-  const onOptionClick = (e: MouseEvent, value: SearchRequestTypes) => {
+  const onOptionClick = (e: MouseEvent, value: SearchFilters) => {
     setIsOpen(false);
     onChange(value);
     e.preventDefault();
@@ -89,17 +89,17 @@ const SearchDropdownType = ({
   return (
     <Container ref={dropdownRef} isActive={isOpen} onClick={onDropdownClick}>
       <ActiveItem>
-        {selectedOption === SearchRequestTypes.MOVIES && <MovieTag />}
-        {selectedOption === SearchRequestTypes.SERIES && <SeriesTag />}
-        {selectedOption === SearchRequestTypes.FRIENDS && (
+        {selectedOption === SearchFilters.MOVIES && <MovieTag />}
+        {selectedOption === SearchFilters.SERIES && <SeriesTag />}
+        {selectedOption === SearchFilters.FRIENDS && (
           <Tag>{uppercaseFirstLetter(selectedOption)}</Tag>
         )}
-        {selectedOption === SearchRequestTypes.ALL &&
+        {selectedOption === SearchFilters.ALL &&
           uppercaseFirstLetter(selectedOption)}
       </ActiveItem>
       <Items>
         {isOpen &&
-          Object.values(SearchRequestTypes).map(
+          Object.values(SearchFilters).map(
             (st, index) =>
               st !== selectedOption && (
                 <Item key={index} onClick={(e) => onOptionClick(e, st)}>

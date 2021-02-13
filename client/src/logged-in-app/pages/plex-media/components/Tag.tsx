@@ -2,10 +2,10 @@ import React from "react";
 import styled from "styled-components";
 
 export const Tag = styled.div`
+  width: min-content;
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 12px;
-  width: min-content;
   background: ${(props) => props.theme.grey};
 `;
 

@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { RowLayout } from "../../../../shared/components/layout/Layouts";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultValidators";
-import { ISonarrConfig } from "../models/ISonarrConfig";
-import { ISonarrInstanceInfo } from "../models/ISonarrInstanceInfo";
-import { IProviderConfigBase } from "../models/IProviderConfigBase";
-import { useSonarrConfig } from "../../../hooks/useSonarrConfig";
+import { ISonarrConfig } from "../../../../shared/models/ISonarrConfig";
+import { ISonarrInstanceInfo } from "../../../../shared/models/ISonarrInstanceInfo";
+import { IProviderConfigBase } from "../../../../shared/models/IProviderConfigBase";
+import { useSonarrConfig } from "../../../../shared/hooks/useSonarrConfig";
 import {
   DefaultAsyncCall,
   IAsyncCall,
 } from "../../../../shared/models/IAsyncCall";
-import { SecondaryButton } from "../../../../shared/components/Button";
-import { SecondaryDivider } from "../../../../shared/components/Divider";
+import {
+  PrimaryButton,
+  SecondaryButton,
+} from "../../../../shared/components/Button";
+import { PrimaryDivider } from "../../../../shared/components/Divider";
 import { Spinner } from "../../../../shared/components/Spinner";
-import { Sizes } from "../../../../shared/enums/Sizes";
+import { ComponentSizes } from "../../../../shared/enums/ComponentSizes";
+import { Row } from "../../../../shared/components/layout/Row";
+import { H1, H2 } from "../../../../shared/components/Titles";
+import { InputField } from "../../../../shared/components/inputs/InputField";
+import { Checkbox } from "../../../../shared/components/inputs/Checkbox";
 
 export const SonarrConfig = () => {
   const [instanceInfo, setInstanceInfo] = useState<
@@ -86,55 +92,42 @@ export const SonarrConfig = () => {
       autoCapitalize="off"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <RowLayout
-        borderBottom="1px solid LightGrey"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <h1 className="is-size-1">Sonarr</h1>
+      <Row justifyContent="space-between" alignItems="center">
+        <H1>Sonarr</H1>
         {!instanceInfo.isLoading && instanceInfo.data && (
-          <div className="field">
-            <div className="control">
-              <input
-                id="enabled"
-                type="checkbox"
-                name="enabled"
-                className="switch is-primary"
-                ref={register}
-              />
-              <label htmlFor="enabled">Enabled</label>
-            </div>
-          </div>
+          <InputField isInline={true}>
+            <label>Enabled</label>
+            <Checkbox name="enabled" register={register} />
+          </InputField>
         )}
-        {instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />}
-      </RowLayout>
+        {instanceInfo.isLoading && <Spinner size={ComponentSizes.LARGE} />}
+      </Row>
       <br />
       {currentSonarrConfig.isLoading ||
-        (instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />)}
+        (instanceInfo.isLoading && <Spinner size={ComponentSizes.LARGE} />)}
       {!currentSonarrConfig.isLoading && !instanceInfo.isLoading && (
         <div>
-          <div className="field">
+          <InputField>
             <label>API Key</label>
-            <div className="control">
-              <input
-                name="apiKey"
-                className="input"
-                type="text"
-                placeholder="API Key"
-                ref={register({
-                  required: true,
-                })}
-              />
-              {errors.apiKey && errors.apiKey.type === "required" && (
-                <p className="help is-danger">
-                  {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="field">
-            <label>Hostname or IP Address</label>
-            <div className="control">
+            <input
+              name="apiKey"
+              className="input"
+              type="text"
+              placeholder="API Key"
+              ref={register({
+                required: true,
+              })}
+            />
+            {errors.apiKey && errors.apiKey.type === "required" && (
+              <p className="help is-danger">
+                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+              </p>
+            )}
+          </InputField>
+
+          <Row justifyContent="space-between" alignItems="center">
+            <InputField width="49%">
+              <label>Hostname or IP Address</label>
               <input
                 name="host"
                 className="input"
@@ -149,18 +142,17 @@ export const SonarrConfig = () => {
                   {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
                 </p>
               )}
-            </div>
-          </div>
-          <div className="field">
-            <label>
-              Port{" "}
-              <input
-                type="checkbox"
-                checked={usePort}
-                onChange={() => setUsePort(!usePort)}
-              />
-            </label>
-            <div className="control">
+            </InputField>
+
+            <InputField width="49%">
+              <label>
+                Port{" "}
+                <input
+                  type="checkbox"
+                  checked={usePort}
+                  onChange={() => setUsePort(!usePort)}
+                />
+              </label>
               <input
                 name="port"
                 className="input"
@@ -171,160 +163,132 @@ export const SonarrConfig = () => {
                 maxLength={99999}
                 disabled={!usePort}
               />
-            </div>
-          </div>
-          <div className="field">
-            <div className="control">
-              <input
-                id="ssl"
-                type="checkbox"
-                name="ssl"
-                className="switch is-rounded is-small"
-                ref={register}
-              />
-              <label htmlFor="ssl">SSL</label>
-            </div>
-          </div>
-          <div className="field">
-            <div className="control">
-              <SecondaryButton
-                type="button"
-                onClick={() => getInstanceInfo(getValues(), true)}
-              >
-                Get instance info
-              </SecondaryButton>
-            </div>
-          </div>
+            </InputField>
+          </Row>
+
+          <InputField isInline>
+            <label>SSL</label>
+            <Checkbox name="ssl" register={register} round />
+          </InputField>
+
+          <br />
+
+          <PrimaryButton
+            type="button"
+            onClick={() => getInstanceInfo(getValues(), true)}
+          >
+            Get instance info
+          </PrimaryButton>
         </div>
       )}
-      <SecondaryDivider />
-      {instanceInfo.isLoading && <Spinner size={Sizes.LARGE} />}
+
+      <PrimaryDivider />
+
+      {instanceInfo.isLoading && <Spinner size={ComponentSizes.LARGE} />}
       {!instanceInfo.isLoading && instanceInfo.data && (
         <div>
-          <div>
-            <RowLayout borderBottom="1px solid LightGrey">
-              <h3 className="is-size-4">Requests configurations</h3>
-            </RowLayout>
-            <br />
-          </div>
-          <div className="field">
+          <H2>Requests configurations</H2>
+          <br />
+          <InputField>
             <label>Version</label>
-            <div className="control">
-              <input
-                name="version"
-                className="input"
-                type="text"
-                ref={register}
-                value={
-                  instanceInfo.data
-                    ? instanceInfo.data.version
-                    : currentSonarrConfig.data
-                    ? currentSonarrConfig.data.version
-                    : ""
-                }
-                disabled={true}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label>Default Root Folder</label>
-            <div className="control">
-              <div className="select is-fullwidth">
-                <select name="rootFolder" ref={register}>
-                  {instanceInfo.data &&
-                    instanceInfo.data.rootFolders.map((rf, index) => (
-                      <option key={index} value={rf}>
-                        {rf}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="field">
-            <label>Default Root Folder (Anime)</label>
-            <div className="control">
-              <div className="select is-fullwidth">
-                <select name="animeRootFolder" ref={register}>
-                  {instanceInfo.data &&
-                    instanceInfo.data.rootFolders.map((rf, index) => (
-                      <option key={index} value={rf}>
-                        {rf}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="field">
-            <label>Default Quality Profile</label>
-            <div className="control">
-              <div className="select is-fullwidth">
-                <select name="qualityProfileId" ref={register}>
-                  {instanceInfo.data &&
-                    instanceInfo.data.qualityProfiles.map((p, index) => (
-                      <option key={index} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="field">
-            <label>Default Quality Profile (Anime)</label>
-            <div className="control">
-              <div className="select is-fullwidth">
-                <select name="animeQualityProfileId" ref={register}>
-                  {instanceInfo.data &&
-                    instanceInfo.data.qualityProfiles.map((p, index) => (
-                      <option key={index} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-          </div>
+            <input
+              name="version"
+              className="input"
+              type="text"
+              ref={register}
+              value={
+                instanceInfo.data
+                  ? instanceInfo.data.version
+                  : currentSonarrConfig.data
+                  ? currentSonarrConfig.data.version
+                  : ""
+              }
+              disabled={true}
+            />
+          </InputField>
+
+          <Row justifyContent="space-between" alignItems="center">
+            <InputField width="49%">
+              <label>Default Root Folder</label>
+              <select name="rootFolder" ref={register}>
+                {instanceInfo.data &&
+                  instanceInfo.data.rootFolders.map((rf, index) => (
+                    <option key={index} value={rf}>
+                      {rf}
+                    </option>
+                  ))}
+              </select>
+            </InputField>
+
+            <InputField width="49%">
+              <label>Default Root Folder (Anime)</label>
+              <select name="animeRootFolder" ref={register}>
+                {instanceInfo.data &&
+                  instanceInfo.data.rootFolders.map((rf, index) => (
+                    <option key={index} value={rf}>
+                      {rf}
+                    </option>
+                  ))}
+              </select>
+            </InputField>
+          </Row>
+
+          <Row justifyContent="space-between" alignItems="center">
+            <InputField width="49%">
+              <label>Default Quality Profile</label>
+              <select name="qualityProfileId" ref={register}>
+                {instanceInfo.data &&
+                  instanceInfo.data.qualityProfiles.map((p, index) => (
+                    <option key={index} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+              </select>
+            </InputField>
+
+            <InputField width="49%">
+              <label>Default Quality Profile (Anime)</label>
+              <select name="animeQualityProfileId" ref={register}>
+                {instanceInfo.data &&
+                  instanceInfo.data.qualityProfiles.map((p, index) => (
+                    <option key={index} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+              </select>
+            </InputField>
+          </Row>
+
           {isVersionThree() && (
-            <div className="field">
-              <label>Default Language Profile</label>
-              <div className="control">
-                <div className="select is-fullwidth">
-                  <select name="languageProfileId" ref={register}>
-                    {instanceInfo.data &&
-                      instanceInfo.data.languageProfiles.map((l, index) => (
-                        <option key={index} value={l.id}>
-                          {l.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-              </div>
-            </div>
+            <Row justifyContent="space-between" alignItems="center">
+              <InputField width="49%">
+                <label>Default Language Profile</label>
+                <select name="languageProfileId" ref={register}>
+                  {instanceInfo.data &&
+                    instanceInfo.data.languageProfiles.map((l, index) => (
+                      <option key={index} value={l.id}>
+                        {l.name}
+                      </option>
+                    ))}
+                </select>
+              </InputField>
+              <InputField width="49%">
+                <label>Default Language Profile (Anime)</label>
+                <select name="animeLanguageProfileId" ref={register}>
+                  {instanceInfo.data &&
+                    instanceInfo.data.languageProfiles.map((l, index) => (
+                      <option key={index} value={l.id}>
+                        {l.name}
+                      </option>
+                    ))}
+                </select>
+              </InputField>
+            </Row>
           )}
-          {isVersionThree() && (
-            <div className="field">
-              <label>Default Language Profile (Anime)</label>
-              <div className="control">
-                <div className="select is-fullwidth">
-                  <select name="animeLanguageProfileId" ref={register}>
-                    {instanceInfo.data &&
-                      instanceInfo.data.languageProfiles.map((l, index) => (
-                        <option key={index} value={l.id}>
-                          {l.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
-          <div className="field">
-            <div className="control">
-              <SecondaryButton type="submit">Save changes</SecondaryButton>
-            </div>
-          </div>
+
+          <br />
+
+          <SecondaryButton type="submit">Save changes</SecondaryButton>
         </div>
       )}
     </form>

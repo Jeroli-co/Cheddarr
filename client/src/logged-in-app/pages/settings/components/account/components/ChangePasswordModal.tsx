@@ -7,7 +7,7 @@ import { useHistory } from "react-router";
 import {
   IChangePasswordModel,
   useUserService,
-} from "../../../../user-profile/hooks/useUserService";
+} from "../../../../../../shared/hooks/useUserService";
 import {
   Button,
   SecondaryButton,

@@ -1,6 +1,6 @@
 import React from "react";
 import { MediaRecentlyAddedType } from "./enums/MediaRecentlyAddedType";
-import { usePlexConfig } from "../../contexts/PlexConfigContext";
+import { usePlexConfig } from "../../../shared/contexts/PlexConfigContext";
 import { MediaRecentlyAdded } from "./components/MediaRecentlyAdded";
 import { MissingConfigHome } from "./MissingConfigHome";
 

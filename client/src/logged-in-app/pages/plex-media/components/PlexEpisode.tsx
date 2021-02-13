@@ -12,12 +12,12 @@ import { MediaRating } from "./MediaRating";
 import { PlexButton } from "../../../../shared/components/PlexButton";
 import { MediaBackground } from "./MediaBackground";
 import { msToHoursMinutes } from "../../../../utils/media-utils";
-import { IMediaServerEpisode } from "../models/IMediaServerMedia";
+import { IMediaServerEpisode } from "../../../../shared/models/IMediaServerMedia";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
 import { useAPI } from "../../../../shared/hooks/useAPI";
-import { usePlexConfig } from "../../../contexts/PlexConfigContext";
+import { usePlexConfig } from "../../../../shared/contexts/PlexConfigContext";
 import { Spinner } from "../../../../shared/components/Spinner";
-import { Sizes } from "../../../../shared/enums/Sizes";
+import { ComponentSizes } from "../../../../shared/enums/ComponentSizes";
 
 type EpisodeCardProps = {
   episode: IMediaServerEpisode;
@@ -49,7 +49,7 @@ const PlexEpisode = ({ episode }: EpisodeCardProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [episode]);
 
-  if (!episodeInfo) return <Spinner size={Sizes.XLARGE} />;
+  if (!episodeInfo) return <Spinner size={ComponentSizes.XLARGE} />;
 
   return (
     <MediaBackground image={episodeInfo.artUrl}>

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { PrimaryButton } from "../../../../shared/components/Button";
+import { InputField } from "../../../../shared/components/inputs/InputField";
 
 type AddFriendsInputProp = {
   sendFriendRequest: (username: string) => void;
@@ -23,34 +25,29 @@ const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
   };
 
   return (
-    <div className="level">
-      <div className="level-left">
-        <div className="level-item">
-          <div className="field has-addons">
-            <div className="control has-icons-left">
-              <input
-                className="input"
-                type="search"
-                placeholder="Add friends"
-                autoComplete="off"
-                onKeyPress={_onKeyPressed}
-                value={searchFriends}
-                onChange={(e) => setSearchFriends(e.target.value)}
-              />
-              <span className="icon is-small is-left">
-                <FontAwesomeIcon icon={faSearch} />
-              </span>
-            </div>
-            <div className="control">
-              <button className="button is-success" onClick={_onAddFriend}>
-                <span className="icon is-small">
-                  <FontAwesomeIcon icon={faPlus} />
-                </span>
-              </button>
-            </div>
-          </div>
+    <div className="level-item">
+      <InputField withIcon>
+        <div className="with-left-icon">
+          <input
+            className="input"
+            type="search"
+            placeholder="Add friends"
+            autoComplete="off"
+            onKeyPress={_onKeyPressed}
+            value={searchFriends}
+            onChange={(e) => setSearchFriends(e.target.value)}
+          />
+          <span className="icon is-small is-left">
+            <FontAwesomeIcon icon={faSearch} />
+          </span>
         </div>
-      </div>
+      </InputField>
+
+      <PrimaryButton onClick={_onAddFriend}>
+        <span>
+          <FontAwesomeIcon icon={faPlus} />
+        </span>
+      </PrimaryButton>
     </div>
   );
 };

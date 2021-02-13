@@ -1,6 +1,6 @@
 import React from "react";
 import { useContext } from "react";
-import { INotification, AlertContext } from "../contexts/AlertContext";
+import { IAlert, AlertContext } from "../contexts/AlertContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
@@ -9,7 +9,7 @@ type NotificationStyleProps = {
   backgroundColor: string;
 };
 
-const NotificationStyle = styled.div<NotificationStyleProps>`
+const Container = styled.div<NotificationStyleProps>`
   position: fixed;
   bottom: 0;
   left: 50%;
@@ -27,17 +27,17 @@ const NotificationStyle = styled.div<NotificationStyleProps>`
   align-items: center;
 `;
 
-type NotificationProps = {
-  notification: INotification | null;
+type AlertProps = {
+  notification: IAlert | null;
 };
 
-const Alert = ({ notification }: NotificationProps) => {
+const Alert = ({ notification }: AlertProps) => {
   const { removeNotification } = useContext(AlertContext);
 
   if (notification === null) return <div />;
 
   return (
-    <NotificationStyle
+    <Container
       color={notification.level.color}
       backgroundColor={notification.level.bgColor}
     >
@@ -45,7 +45,7 @@ const Alert = ({ notification }: NotificationProps) => {
       <div className="is-pointed" onClick={removeNotification}>
         <FontAwesomeIcon icon={faTimes} />
       </div>
-    </NotificationStyle>
+    </Container>
   );
 };
 

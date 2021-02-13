@@ -6,9 +6,9 @@ import { MediaRating } from "../../plex-media/components/MediaRating";
 import { ProvidersDropdown } from "./ProvidersDropdown";
 import { H3 } from "../../../../shared/components/Titles";
 import { MediaRequestButton } from "./MediaRequestButton";
-import { IPublicUser } from "../../../models/IPublicUser";
-import { ISearchedMovie } from "../models/ISearchedMedias";
-import { MediaTypes } from "../../../enums/MediaTypes";
+import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { ISearchedMovie } from "../../../../shared/models/ISearchedMedias";
+import { MediaTypes } from "../../../../shared/enums/MediaTypes";
 
 type SearchedMoviesCardProps = {
   movie: ISearchedMovie;

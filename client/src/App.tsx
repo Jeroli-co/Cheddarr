@@ -1,7 +1,7 @@
 import React from "react";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { NotificationContextProvider } from "./shared/contexts/AlertContext";
+import { AlertContextProvider } from "./shared/contexts/AlertContext";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeContextProvider } from "./shared/contexts/ThemeContextProvider";
 import { SessionContextProvider } from "./shared/contexts/SessionContext";
@@ -14,7 +14,7 @@ const App = () => {
   return (
     <div className="App">
       <ThemeContextProvider>
-        <NotificationContextProvider>
+        <AlertContextProvider>
           <BrowserRouter>
             <SessionContextProvider>
               <PlexAuthContextProvider>
@@ -22,7 +22,7 @@ const App = () => {
               </PlexAuthContextProvider>
             </SessionContextProvider>
           </BrowserRouter>
-        </NotificationContextProvider>
+        </AlertContextProvider>
       </ThemeContextProvider>
     </div>
   );

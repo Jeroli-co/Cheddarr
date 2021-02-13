@@ -1,10 +1,10 @@
 import { NotFound } from "../shared/components/errors/NotFound";
 import { PageLoader } from "../shared/components/PageLoader";
-import { ConfirmEmail } from "../logged-out-app/pages/ConfirmEmail";
-import { ResetPassword } from "../logged-out-app/pages/reset-password/ResetPassword";
-import { InitResetPasswordModal } from "../logged-out-app/pages/sign-in/components/InitResetPasswordModal";
-import { SignInForm } from "../logged-out-app/pages/sign-in/SignInForm";
-import { SignUpForm } from "../logged-out-app/pages/sign-up/SignUpForm";
+import { ConfirmEmail } from "../logged-out-app/elements/ConfirmEmail";
+import { ResetPassword } from "../logged-out-app/elements/ResetPassword";
+import { InitResetPasswordModal } from "../logged-out-app/elements/InitResetPasswordModal";
+import { SignInForm } from "../logged-out-app/SignInForm";
+import { SignUpForm } from "../logged-out-app/SignUpForm";
 import { PublicUser } from "../logged-in-app/pages/PublicUser";
 import { Friends } from "../logged-in-app/pages/user-profile/friends/Friends";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
@@ -23,9 +23,9 @@ import { PlexMovie } from "../logged-in-app/pages/plex-media/PlexMovie";
 import { PlexSeries } from "../logged-in-app/pages/plex-media/PlexSeries";
 import { PlexSeason } from "../logged-in-app/pages/plex-media/PlexSeason";
 import { Home } from "../shared/Home";
-import { RequestsSent } from "../logged-in-app/pages/requests/components/RequestsSent";
-import { RequestsReceived } from "../logged-in-app/pages/requests/components/RequestsReceived";
-import { Search2 } from "../logged-in-app/pages/search/Search2";
+import { RequestsSent } from "../logged-in-app/pages/requests/elements/RequestsSent";
+import { RequestsReceived } from "../logged-in-app/pages/requests/elements/RequestsReceived";
+import { Profile } from "../logged-in-app/pages/user-profile/Profile";
 
 const routes = {
   HOME: {
@@ -55,7 +55,8 @@ const routes = {
   },
 
   /** USERS **/
-  USER_PROFILE: { url: "/user", component: UserProfile },
+  PROFILE: { url: "/user", component: Profile },
+  USER_PROFILE: { url: "/user/profile", component: UserProfile },
   USER_FRIENDS: { url: "/user/friends", component: Friends },
   PUBLIC_USER: {
     url: (username: string) => "/users/" + username,

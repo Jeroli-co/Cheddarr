@@ -8,3 +8,14 @@ export const Help = styled.p`
     font-size: 12px;
   }
 `;
+
+export const HelpDanger = styled(Help)`
+  color: ${(props) => props.theme.danger};
+`;
+
+export const HelpLink = styled(Help)`
+  cursor: pointer;
+  &:hover {
+    color: ${(props) => props.theme.primaryLighter};
+  }
+`;

@@ -1,16 +1,15 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { routes } from "../../../../router/routes";
 import styled from "styled-components";
 import {
   FadeInUp,
   FadeOutDown,
 } from "../../../../shared/components/animations/Animations";
 import { Animate } from "../../../../shared/components/animations/Animate";
-import { IPublicUser } from "../../../models/IPublicUser";
+import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
+import { Row } from "../../../../shared/components/layout/Row";
 
 const FriendItemContainerStyle = styled.div`
-  border-bottom: 1px solid #e8e8e8;
   padding: 15px;
   height: 100px;
 `;
@@ -35,25 +34,11 @@ const FriendItemContainer = ({
       duration={0.3}
       count={1}
     >
-      <FriendItemContainerStyle className="level is-mobile">
-        <div className="level-left">
-          <div className="level-item">
-            <figure className="image is-64x64">
-              <img src={user["avatar"]} alt="User" />
-            </figure>
-          </div>
-          <div className="level-item">
-            <Link
-              className="is-size-5"
-              to={routes.PUBLIC_USER.url(user.username)}
-            >
-              <i>{"@" + user.username}</i>
-            </Link>
-          </div>
-        </div>
-        <div className="level-right">
-          <div className="level-item">{actions}</div>
-        </div>
+      <FriendItemContainerStyle>
+        <Row justifyContent="space-between" alignItems="center">
+          <UserSmallCard user={user} />
+          <div>{actions}</div>
+        </Row>
       </FriendItemContainerStyle>
     </Animate>
   );

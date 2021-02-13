@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Spinner } from "../../../../../../shared/components/Spinner";
 import { IPlexServerInfo } from "../models/IPlexServerInfo";
-import { usePlexServers } from "../../../../../hooks/usePlexServers";
+import { usePlexServers } from "../../../../../../shared/hooks/usePlexServers";
 import { useAPI } from "../../../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../../../shared/enums/APIRoutes";
-import { Sizes } from "../../../../../../shared/enums/Sizes";
+import { ComponentSizes } from "../../../../../../shared/enums/ComponentSizes";
 import { PrimaryOutlinedButton } from "../../../../../../shared/components/Button";
 import { IPlexConfig } from "../models/IPlexConfig";
 
@@ -82,7 +82,7 @@ const ServersModal = ({ onClose, selectServer }: ServersModalProps) => {
           />
         </header>
         <section className="modal-card-body">
-          {servers.isLoading && <Spinner size={Sizes.LARGE} />}
+          {servers.isLoading && <Spinner size={ComponentSizes.LARGE} />}
           {!servers.isLoading &&
             servers.data &&
             servers.data.map((server) => {

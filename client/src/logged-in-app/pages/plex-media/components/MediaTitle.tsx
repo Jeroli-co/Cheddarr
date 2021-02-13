@@ -11,8 +11,8 @@ import {
   IMediaServerMedia,
   isMediaServerEpisode,
   isMediaServerSeason,
-} from "../models/IMediaServerMedia";
-import { MediaTypes } from "../../../enums/MediaTypes";
+} from "../../../../shared/models/IMediaServerMedia";
+import { MediaTypes } from "../../../../shared/enums/MediaTypes";
 
 type MediaTitleProps = {
   media:

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { IMediaSearchResult } from "../../logged-in-app/navbar/components/search-bar/models/IMediaSearchResult";
+import { IMediaSearchResult } from "../models/IMediaSearchResult";
 import { DefaultAsyncData, IAsyncData } from "../models/IAsyncData";
 import { APIRoutes } from "../enums/APIRoutes";
 import { useAPI } from "./useAPI";
-import { usePlexConfig } from "../../logged-in-app/contexts/PlexConfigContext";
-import { MediaTypes } from "../../logged-in-app/enums/MediaTypes";
+import { usePlexConfig } from "../contexts/PlexConfigContext";
+import { MediaTypes } from "../enums/MediaTypes";
 
 export const useSearchPlexMedia = (mediaType: MediaTypes, title: string) => {
   const [media, setMedia] = useState<IAsyncData<IMediaSearchResult[] | null>>(

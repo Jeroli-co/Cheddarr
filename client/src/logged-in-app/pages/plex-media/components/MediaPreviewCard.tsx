@@ -4,8 +4,8 @@ import {
   IMediaServerEpisode,
   IMediaServerMedia,
   isMediaServerEpisode,
-} from "../models/IMediaServerMedia";
-import { MediaTypes } from "../../../enums/MediaTypes";
+} from "../../../../shared/models/IMediaServerMedia";
+import { MediaTypes } from "../../../../shared/enums/MediaTypes";
 import { MovieTag, SeriesTag } from "./Tag";
 
 const MediaPreviewCardStyle = styled.div`

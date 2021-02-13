@@ -3,7 +3,29 @@ import { AddFriendsInput } from "./AddFriendsInput";
 import { FriendsList } from "./FriendsList";
 import { RequestedList } from "./RequestedList";
 import { ReceivedList } from "./ReceivedList";
-import { useFriends } from "../../../hooks/useFriends";
+import { useFriends } from "../../../../shared/hooks/useFriends";
+import styled from "styled-components";
+import { PrimaryDivider } from "../../../../shared/components/Divider";
+import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
+import { useWindowSize } from "../../../../shared/hooks/useWindowSize";
+
+const Container = styled.div`
+  user-select: none;
+`;
+
+const ListContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`;
+
+const FriendRequestContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    width: 100%;
+  }
+`;
 
 const Friends = () => {
   const {
@@ -17,30 +39,29 @@ const Friends = () => {
     refuseFriendRequest,
   } = useFriends();
 
+  const { width } = useWindowSize();
+
   return (
-    <div className="Friends" data-testid="Friends">
+    <Container>
       <AddFriendsInput sendFriendRequest={sendFriendRequest} />
-
-      <hr />
-
-      <div className="columns">
-        <div className="column is-half">
-          <FriendsList friends={friends} removeFriend={removeFriend} />
-        </div>
-        <div className="column">
+      <PrimaryDivider />
+      <ListContainer>
+        <FriendsList friends={friends} removeFriend={removeFriend} />
+        {width <= STATIC_STYLES.TABLET_MAX_WIDTH && <PrimaryDivider />}
+        <FriendRequestContainer>
           <ReceivedList
             received={friendsRequestReceived}
             acceptRequest={acceptFriendRequest}
             refuseRequest={refuseFriendRequest}
           />
-          <hr />
+          <PrimaryDivider />
           <RequestedList
             requested={friendsRequestSent}
             cancelRequest={cancelFriendRequest}
           />
-        </div>
-      </div>
-    </div>
+        </FriendRequestContainer>
+      </ListContainer>
+    </Container>
   );
 };
 

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../../shared/enums/FormDefaultValidators";
 import { useHistory } from "react-router";
-import { useUserService } from "../../../../user-profile/hooks/useUserService";
+import { useUserService } from "../../../../../../shared/hooks/useUserService";
 
 const ChangeUsernameModal = () => {
   const { register, handleSubmit, errors } = useForm<{ username: string }>();

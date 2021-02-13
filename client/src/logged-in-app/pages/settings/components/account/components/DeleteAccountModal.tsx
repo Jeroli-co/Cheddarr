@@ -1,6 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router";
-import { useUserService } from "../../../../user-profile/hooks/useUserService";
+import { useUserService } from "../../../../../../shared/hooks/useUserService";
 
 const DeleteAccountModal = () => {
   const history = useHistory();

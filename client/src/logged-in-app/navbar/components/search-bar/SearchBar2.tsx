@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 import { SearchDropdownType } from "./components/SearchDropdownType";
 import { useHistory } from "react-router";
 import { routes } from "../../../../router/routes";
-import { SearchRequestTypes } from "../../../enums/SearchRequestTypes";
+import { SearchFilters } from "../../../../shared/enums/SearchFilters";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 import { isEmpty } from "../../../../utils/strings";
 
@@ -48,16 +48,14 @@ const Container = styled.div<{
     `}
 `;
 
-let timer: any;
-
 type SearchBarProps = {
   isSidebarOpen: boolean;
 };
 
 export const SearchBar2 = ({ isSidebarOpen }: SearchBarProps) => {
   const [isInputFocus, setIsInputFocus] = useState(false);
-  const [searchType, setSearchType] = useState<SearchRequestTypes>(
-    SearchRequestTypes.ALL
+  const [searchType, setSearchType] = useState<SearchFilters>(
+    SearchFilters.ALL
   );
   const [searchValue, setSearchValue] = useState("");
   const history = useHistory();
@@ -67,7 +65,7 @@ export const SearchBar2 = ({ isSidebarOpen }: SearchBarProps) => {
     setSearchValue(e.target.value);
   };
 
-  const onSearchTypeChange = (type: SearchRequestTypes) => {
+  const onSearchTypeChange = (type: SearchFilters) => {
     setSearchType(type);
     if (inputRef && inputRef.current) {
       inputRef.current.focus();
@@ -78,6 +76,7 @@ export const SearchBar2 = ({ isSidebarOpen }: SearchBarProps) => {
     if (!isEmpty(searchValue)) {
       history.push(routes.SEARCH.url(searchType, searchValue));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchType, searchValue]);
 
   return (

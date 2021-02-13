@@ -7,14 +7,12 @@ import { NavbarMobile } from "./navbar/NavbarMobile";
 import { Navbar } from "./navbar/Navbar";
 import { SidebarMenuMobile } from "./sidebarMenu/SidebarMenuMobile";
 import { SearchContextProvider } from "../shared/contexts/SearchContext";
+import { Footer } from "../shared/components/Footer";
 const SwitchRoutes = React.lazy(() => import("../router/SwitchRoutes"));
 
 const Layout = styled.div`
   margin: 0;
-`;
-
-const Container = styled.div`
-  display: flex;
+  overflow-x: hidden;
 `;
 
 type PageLayoutProps = {
@@ -24,17 +22,27 @@ type PageLayoutProps = {
 const PageLayoutContainer = styled.div`
   padding: 20px;
   width: 100%;
-  min-height: calc(100vh - ${STATIC_STYLES.NAVBAR_HEIGHT}px);
+  min-height: calc(
+    100vh - ${STATIC_STYLES.NAVBAR_HEIGHT}px - ${STATIC_STYLES.FOOTER_HEIGHT}px
+  );
   overflow-x: hidden;
   transition: ${STATIC_STYLES.SIDEBAR_TRANSITION_DURATION} ease;
 `;
 
 const PageLayout = styled(PageLayoutContainer)<PageLayoutProps>`
   margin-top: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
-  margin-left: ${(props) =>
-    props.isSidebarOpen
-      ? STATIC_STYLES.SIDEBAR_OPEN_WIDTH
-      : STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
+  ${(props) =>
+    props.isSidebarOpen &&
+    css`
+      margin-left: ${STATIC_STYLES.SIDEBAR_OPEN_WIDTH}px;
+      max-width: calc(100% - ${STATIC_STYLES.SIDEBAR_OPEN_WIDTH}px);
+    `}
+  ${(props) =>
+    !props.isSidebarOpen &&
+    css`
+      margin-left: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
+      max-width: calc(100% - ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px);
+    `}
 `;
 
 const PageLayoutMobile = styled(PageLayoutContainer)<PageLayoutProps>`
@@ -61,27 +69,24 @@ export const LoggedInApp = () => {
   if (width <= STATIC_STYLES.MOBILE_MAX_WIDTH) {
     return (
       <Layout>
+        <SidebarMenuMobile isOpen={isOpen} toggle={toggle} />
         <NavbarMobile toggle={toggle} />
-        <Container>
-          <SidebarMenuMobile isOpen={isOpen} toggle={toggle} />
-          <PageLayoutMobile isSidebarOpen={isOpen}>
-            <SwitchRoutes />
-          </PageLayoutMobile>
-        </Container>
+        <PageLayoutMobile isSidebarOpen={isOpen}>
+          <SwitchRoutes />
+        </PageLayoutMobile>
       </Layout>
     );
   } else {
     return (
       <Layout>
         <SearchContextProvider>
+          <SidebarMenu isOpen={isOpen} toggle={toggle} />
           <Navbar isSidebarOpen={isOpen} />{" "}
-          <Container>
-            <SidebarMenu isOpen={isOpen} toggle={toggle} />
-            <PageLayout isSidebarOpen={isOpen}>
-              <SwitchRoutes />
-            </PageLayout>
-          </Container>
+          <PageLayout isSidebarOpen={isOpen}>
+            <SwitchRoutes />
+          </PageLayout>
         </SearchContextProvider>
+        <Footer />
       </Layout>
     );
   }

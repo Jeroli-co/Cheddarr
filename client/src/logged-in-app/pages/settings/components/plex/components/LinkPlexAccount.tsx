@@ -1,8 +1,9 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { usePlexConfig } from "../../../../../contexts/PlexConfigContext";
+import { usePlexConfig } from "../../../../../../shared/contexts/PlexConfigContext";
 import { usePlexAuth } from "../../../../../../shared/contexts/PlexAuthContext";
+import { SecondaryButton } from "../../../../../../shared/components/Button";
 
 const LinkPlexAccount = () => {
   const { isPlexAccountLinked } = usePlexConfig();
@@ -17,13 +18,9 @@ const LinkPlexAccount = () => {
     );
   } else {
     return (
-      <button
-        className="button is-primary"
-        type="button"
-        onClick={() => signInWithPlex()}
-      >
+      <SecondaryButton type="button" onClick={() => signInWithPlex()}>
         Link Plex account
-      </button>
+      </SecondaryButton>
     );
   }
 };

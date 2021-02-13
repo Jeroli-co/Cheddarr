@@ -3,12 +3,12 @@ import styled from "styled-components";
 import { ColumnLayout } from "../../../../../shared/components/layout/Layouts";
 import { useHistory } from "react-router";
 import { routes } from "../../../../../router/routes";
-import { IPublicUser } from "../../../../models/IPublicUser";
-import { SearchRequestTypes } from "../../../../enums/SearchRequestTypes";
+import { IPublicUser } from "../../../../../shared/models/IPublicUser";
+import { SearchFilters } from "../../../../../shared/enums/SearchFilters";
 import { Text } from "../../../../../shared/components/Text";
-import { IMediaSearchResult } from "../models/IMediaSearchResult";
+import { IMediaSearchResult } from "../../../../../shared/models/IMediaSearchResult";
 import { Image } from "../../../../../shared/components/Image";
-import { useRedirectToMediasDetails } from "../../../../hooks/useRedirectToMediasDetails";
+import { useRedirectToMediasDetails } from "../../../../../shared/hooks/useRedirectToMediasDetails";
 import { STATIC_STYLES } from "../../../../../shared/enums/StaticStyles";
 import { Spinner } from "../../../../../shared/components/Spinner";
 
@@ -109,7 +109,7 @@ const SearchOnlineButtonStyle = styled.div`
 `;
 
 type SearchOnlineButtonProps = {
-  type: SearchRequestTypes;
+  type: SearchFilters;
   searchValue: string;
 };
 
@@ -125,7 +125,7 @@ const SearchOnlineButton = ({ type, searchValue }: SearchOnlineButtonProps) => {
 };
 
 type SearchResultItemsProps = {
-  type: SearchRequestTypes;
+  type: SearchFilters;
   searchValue: string;
   moviesResults: { data: IMediaSearchResult[] | null; isLoading: boolean };
   seriesResults: { data: IMediaSearchResult[] | null; isLoading: boolean };
@@ -140,7 +140,7 @@ const SearchResultsItems = ({
   friendsResults,
 }: SearchResultItemsProps) => {
   switch (type) {
-    case SearchRequestTypes.ALL:
+    case SearchFilters.ALL:
       return (
         <div>
           <SearchOnlineButton type={type} searchValue={searchValue} />
@@ -191,7 +191,7 @@ const SearchResultsItems = ({
             )}
         </div>
       );
-    case SearchRequestTypes.MOVIES:
+    case SearchFilters.MOVIES:
       return (
         <div>
           {moviesResults.isLoading && <Spinner />}
@@ -206,7 +206,7 @@ const SearchResultsItems = ({
             )}
         </div>
       );
-    case SearchRequestTypes.SERIES:
+    case SearchFilters.SERIES:
       return (
         <div>
           {seriesResults.isLoading && <Spinner />}
@@ -221,7 +221,7 @@ const SearchResultsItems = ({
             )}
         </div>
       );
-    case SearchRequestTypes.FRIENDS:
+    case SearchFilters.FRIENDS:
       return (
         <div>
           {friendsResults.isLoading && <Spinner />}
@@ -244,7 +244,7 @@ const SearchResultsItems = ({
 type ResultsListProps = {
   searchValue: string;
   isInputFocus: boolean;
-  searchType: SearchRequestTypes;
+  searchType: SearchFilters;
   moviesResults: { data: IMediaSearchResult[] | null; isLoading: boolean };
   seriesResults: { data: IMediaSearchResult[] | null; isLoading: boolean };
   friendsResults: { data: IPublicUser[] | null; isLoading: boolean };

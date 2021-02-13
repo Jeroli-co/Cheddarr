@@ -1,6 +1,6 @@
-import { ProviderTypes } from "../../../enums/ProviderTypes";
+import { ProviderTypes } from "../../../../../../shared/enums/ProviderTypes";
 import { IPlexServerInfo } from "./IPlexServerInfo";
-import { IProviderConfigBase } from "../../../models/IProviderConfigBase";
+import { IProviderConfigBase } from "../../../../../../shared/models/IProviderConfigBase";
 
 export interface IPlexConfig extends IProviderConfigBase, IPlexServerInfo {
   readonly id: string;

@@ -2,26 +2,26 @@ import styled from "styled-components";
 import { STATIC_STYLES } from "../enums/StaticStyles";
 
 export const H1 = styled.h1`
-  font-size: 22px;
+  font-size: 30px;
 
   @media (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    font-size: 20px;
+    font-size: 28px;
   }
 
   @media (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
-    font-size: 18px;
+    font-size: 26px;
   }
 `;
 
 export const H2 = styled.h2`
-  font-size: 20px;
+  font-size: 24px;
 
   @media (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    font-size: 18px;
+    font-size: 22px;
   }
 
   @media (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
-    font-size: 16px;
+    font-size: 20px;
   }
 `;
 
