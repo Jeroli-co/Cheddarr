@@ -31,7 +31,7 @@ jobs:
     - name: Python Poetry Action
       uses: abatilo/actions-poetry@v2.1.0
     - name: Poetry install
-      run: poetry install --no-root
+      run: poetry install
     - name: Test with pytest
       run: |
         pytest
