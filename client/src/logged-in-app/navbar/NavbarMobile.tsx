@@ -38,7 +38,7 @@ export const NavbarMobile = ({ toggle }: NavbarMobileProps) => {
 
   return (
     <NavbarContainer className="noselect">
-      <Row justifyContent="space-between" alignItems="center" width="100%">
+      <Row justifyContent="space-between" alignItems="center">
         <Item onClick={() => toggle()}>
           <Icon icon={faBars} />
         </Item>

@@ -14,10 +14,10 @@ import { Text } from "../../../shared/components/Text";
 import { PlexEpisode } from "./components/PlexEpisode";
 import smoothscroll from "smoothscroll-polyfill";
 import styled from "styled-components";
-import { IMediaServerEpisode } from "./models/IMediaServerMedia";
+import { IMediaServerEpisode } from "../../../shared/models/IMediaServerMedia";
 import { TITLE_SIZES } from "../../../utils/strings";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
-import { usePlexSeason } from "../../hooks/usePlexSeason";
+import { usePlexSeason } from "../../../shared/hooks/usePlexSeason";
 import { Spinner } from "../../../shared/components/Spinner";
 
 const EpisodeSelectedLayout = styled.div`

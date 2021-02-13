@@ -1,13 +1,13 @@
 import React, { ChangeEvent } from "react";
-import { MediaTypes } from "../../../enums/MediaTypes";
-import { RequestSeriesOptions } from "../enums/RequestSeriesOptions";
+import { MediaTypes } from "../../../../shared/enums/MediaTypes";
+import { RequestSeriesOptions } from "../../../../shared/enums/RequestSeriesOptions";
 import {
   IMovieRequestCreate,
   ISeriesRequestCreate,
   isMovieRequestCreate,
   isSeriesRequestCreate,
-} from "../../requests/models/IRequestCreate";
-import { useRequestMedia } from "../../../hooks/useRequestMedia";
+} from "../../../../shared/models/IRequestCreate";
+import { useRequestMedia } from "../../../../shared/hooks/useRequestMedia";
 
 type MediaRequestButtonProps = {
   mediasType: MediaTypes;

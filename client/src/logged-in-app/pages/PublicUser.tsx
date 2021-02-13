@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router";
-import { usePublicUser } from "../hooks/usePublicUser";
+import { usePublicUser } from "../../shared/hooks/usePublicUser";
 import { SwitchErrors } from "../../shared/components/errors/SwitchErrors";
 import { Image } from "../../shared/components/Image";
 import { PrimaryDivider } from "../../shared/components/Divider";

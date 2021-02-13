@@ -6,12 +6,12 @@ import { MediaRating } from "../../plex-media/components/MediaRating";
 import { ProvidersDropdown } from "./ProvidersDropdown";
 import { MediaRequestButton } from "./MediaRequestButton";
 import { SeasonsMenu } from "./SeasonsMenu";
-import { RequestSeriesOptions } from "../enums/RequestSeriesOptions";
-import { useRequestSeriesOptions } from "../../../hooks/useRequestSeriesOptions";
-import { ISearchedSeries } from "../models/ISearchedMedias";
-import { IPublicUser } from "../../../models/IPublicUser";
-import { MediaTypes } from "../../../enums/MediaTypes";
-import { useSearchedSeries } from "../../../hooks/useSearchedSeries";
+import { RequestSeriesOptions } from "../../../../shared/enums/RequestSeriesOptions";
+import { useRequestSeriesOptions } from "../../../../shared/hooks/useRequestSeriesOptions";
+import { ISearchedSeries } from "../../../../shared/models/ISearchedMedias";
+import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { MediaTypes } from "../../../../shared/enums/MediaTypes";
+import { useSearchedSeries } from "../../../../shared/hooks/useSearchedSeries";
 import { PrimaryDivider } from "../../../../shared/components/Divider";
 
 type SearchedSeriesCardProps = {

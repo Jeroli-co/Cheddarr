@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from "react";
-import { IPublicUser } from "../../../models/IPublicUser";
+import { IPublicUser } from "../../../../shared/models/IPublicUser";
 import { Spinner } from "../../../../shared/components/Spinner";
-import { Sizes } from "../../../../shared/enums/Sizes";
+import { ComponentSizes } from "../../../../shared/enums/ComponentSizes";
 
 type ProvidersDropdownProps = {
   providers: IPublicUser[];
@@ -12,7 +12,7 @@ const ProvidersDropdown = ({
   providers,
   handleChanges,
 }: ProvidersDropdownProps) => {
-  if (!providers) return <Spinner size={Sizes.MEDIUM} />;
+  if (!providers) return <Spinner size={ComponentSizes.MEDIUM} />;
   if (providers.length === 0) return <p>No provider found</p>;
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {

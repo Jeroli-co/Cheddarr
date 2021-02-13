@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { routes } from "../../../../../router/routes";
 import { PrimaryButton } from "../../../../../shared/components/Button";
-import { H3 } from "../../../../../shared/components/Titles";
+import { H1, H2 } from "../../../../../shared/components/Titles";
 import { Help } from "../../../../../shared/components/Help";
 
 const SettingsAccountBody = () => {
@@ -12,9 +12,11 @@ const SettingsAccountBody = () => {
 
   return (
     <section>
+      <H1>Account</H1>
+      <br />
       <div>
         {/* CHANGE USERNAME */}
-        <H3>Change username</H3>
+        <H2>Change username</H2>
         <div className="content">
           <Help>
             <FontAwesomeIcon icon={faExclamationCircle} /> Your friends mights
@@ -31,7 +33,7 @@ const SettingsAccountBody = () => {
         <br />
 
         {/* CHANGE PASSWORD */}
-        <H3>Change password</H3>
+        <H2>Change password</H2>
         <div className="content">
           <Help>
             <FontAwesomeIcon icon={faExclamationCircle} /> You will need to sign
@@ -48,7 +50,7 @@ const SettingsAccountBody = () => {
         <br />
 
         {/* CHANGE EMAIL */}
-        <H3>Change email</H3>
+        <H2>Change email</H2>
         <div className="content">
           <Help>
             <FontAwesomeIcon icon={faExclamationCircle} /> You will need to
@@ -65,7 +67,7 @@ const SettingsAccountBody = () => {
         <br />
 
         {/* DELETE_ACCOUNT_MODAL ACCOUNT */}
-        <H3>Delete account</H3>
+        <H2>Delete account</H2>
         <div className="content">
           <Help>
             <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with that
@@ -90,7 +92,7 @@ const DefaultRoute = () => {
 
 const SettingsAccount = () => {
   return (
-    <div className="SettingsAccount" data-testid="SettingsAccount">
+    <div>
       <SettingsAccountBody />
       <Switch>
         <Route

@@ -19,6 +19,7 @@ const Container = styled(SidebarMenuContainer)<{ isOpen: boolean }>`
       ? STATIC_STYLES.SIDEBAR_OPEN_WIDTH
       : STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
   min-width: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
+  max-width: ${STATIC_STYLES.SIDEBAR_OPEN_WIDTH}px;
 `;
 
 export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {

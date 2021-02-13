@@ -14,10 +14,10 @@ import { MediaRating } from "./components/MediaRating";
 import { MediaBackground } from "./components/MediaBackground";
 import { useWindowSize } from "../../../shared/hooks/useWindowSize";
 import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
-import { usePlexMovie } from "../../hooks/usePlexMovie";
+import { usePlexMovie } from "../../../shared/hooks/usePlexMovie";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { Spinner } from "../../../shared/components/Spinner";
-import { Sizes } from "../../../shared/enums/Sizes";
+import { ComponentSizes } from "../../../shared/enums/ComponentSizes";
 import { msToHoursMinutes } from "../../../utils/media-utils";
 
 type MovieCardParams = {
@@ -36,7 +36,7 @@ const PlexMovie = () => {
   };
 
   if (movie.isLoading) {
-    return <Spinner size={Sizes.XLARGE} />;
+    return <Spinner size={ComponentSizes.XLARGE} />;
   }
 
   if (movie.data === null) {

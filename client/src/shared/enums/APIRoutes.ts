@@ -1,5 +1,5 @@
-import { MediaTypes } from "../../logged-in-app/enums/MediaTypes";
-import { RequestTypes } from "../../logged-in-app/pages/requests/enums/RequestTypes";
+import { MediaTypes } from "./MediaTypes";
+import { RequestTypes } from "./RequestTypes";
 
 export const APIRoutes = {
   // AUTH

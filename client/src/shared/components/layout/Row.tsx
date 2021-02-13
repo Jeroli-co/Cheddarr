@@ -23,9 +23,7 @@ export const Row = styled.div<RowProps>`
     css`
       align-items: ${props.alignItems};
     `}
-    ${(props) =>
-      props.width &&
-      css`
-        width: ${props.width};
-      `}
+  
+  width: ${(props) => (props.width ? props.width : "100%")};
+  flex-wrap: wrap;
 `;

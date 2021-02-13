@@ -3,22 +3,22 @@ import { useParams } from "react-router";
 import { SearchedMovieCard } from "./components/SearchedMovieCard";
 import { SearchedSeriesCard } from "./components/SearchedSeriesCard";
 import { Spinner } from "../../../shared/components/Spinner";
-import { SearchRequestTypes } from "../../enums/SearchRequestTypes";
-import { isSearchedSeries } from "./models/ISearchedMedias";
-import { MediaTypes } from "../../enums/MediaTypes";
-import { useFriendsMoviesProviders } from "../../hooks/useFriendsMoviesProviders";
-import { useFriendsSeriesProviders } from "../../hooks/useFriendsSeriesProviders";
+import { SearchFilters } from "../../../shared/enums/SearchFilters";
+import { isSearchedSeries } from "../../../shared/models/ISearchedMedias";
+import { MediaTypes } from "../../../shared/enums/MediaTypes";
+import { useFriendsMoviesProviders } from "../../../shared/hooks/useFriendsMoviesProviders";
+import { useFriendsSeriesProviders } from "../../../shared/hooks/useFriendsSeriesProviders";
 import {
   DefaultAsyncCall,
   IAsyncCall,
 } from "../../../shared/models/IAsyncCall";
-import { useSearchMediaService } from "../../hooks/useSearchMediaService";
-import { ISearchMediaResult } from "./models/ISearchMediaResult";
+import { useSearchMediaService } from "../../../shared/hooks/useSearchMediaService";
+import { ISearchMediaResult } from "../../../shared/models/ISearchMediaResult";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
-import { Sizes } from "../../../shared/enums/Sizes";
+import { ComponentSizes } from "../../../shared/enums/ComponentSizes";
 
 type SearchParams = {
-  type: SearchRequestTypes;
+  type: SearchFilters;
   title: string;
 };
 
@@ -40,7 +40,8 @@ const Search = () => {
 
   let content;
 
-  if (searchMediaResult.isLoading) return <Spinner size={Sizes.LARGE} />;
+  if (searchMediaResult.isLoading)
+    return <Spinner size={ComponentSizes.LARGE} />;
   if (searchMediaResult.data === null)
     return <SwitchErrors status={searchMediaResult.status} />;
 

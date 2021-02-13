@@ -4,21 +4,35 @@ import {
   faExclamationCircle,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
-import { RowLayout } from "../../../../../shared/components/layout/Layouts";
 import { LinkPlexAccount } from "./components/LinkPlexAccount";
 import { ServersModal } from "./components/ServersModal";
 import { UnlinkAccountModal } from "./components/UnlinkAccountModal";
 import { UnlinkServerModal } from "./components/UnlinkServerModal";
-import { PlexConfigContext } from "../../../../contexts/PlexConfigContext";
+import { PlexConfigContext } from "../../../../../shared/contexts/PlexConfigContext";
 import { IPlexConfig } from "./models/IPlexConfig";
 import { useSession } from "../../../../../shared/contexts/SessionContext";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
-import { SecondaryButton } from "../../../../../shared/components/Button";
+import {
+  DangerButton,
+  DangerIconButton,
+  IconButton,
+  PrimaryButton,
+  SecondaryButton,
+} from "../../../../../shared/components/Button";
 import { Spinner } from "../../../../../shared/components/Spinner";
-import { Sizes } from "../../../../../shared/enums/Sizes";
-import { SecondaryDivider } from "../../../../../shared/components/Divider";
+import { ComponentSizes } from "../../../../../shared/enums/ComponentSizes";
+import {
+  PrimaryDivider,
+  SecondaryDivider,
+} from "../../../../../shared/components/Divider";
+import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
+import { InputField } from "../../../../../shared/components/inputs/InputField";
+import { Help } from "../../../../../shared/components/Help";
+import { H1, H2, H3 } from "../../../../../shared/components/Titles";
+import { Row } from "../../../../../shared/components/layout/Row";
+import { Buttons } from "../../../../../shared/components/layout/Buttons";
+import { Icon } from "../../../../../shared/components/Icon";
 
 const PlexConfig = () => {
   const [isServersModalActive, setIsServersModalActive] = useState(false);
@@ -88,42 +102,39 @@ const PlexConfig = () => {
 
   return (
     <div>
-      <RowLayout
-        justifyContent="space-between"
-        alignItems="center"
-        borderBottom="1px solid LightGrey"
-      >
-        <h1 className="is-size-1">Plex</h1>
+      <Row justifyContent="space-between" alignItems="center">
+        <H1>Plex</H1>
         <LinkPlexAccount />
-      </RowLayout>
+      </Row>
 
       <br />
+
       <form onSubmit={handleSubmit(_onSubmit)}>
-        <h3 className="is-size-3">
-          {currentConfig.data ? "Update" : "Add"} plex configuration
-        </h3>
-        <div className="field">
+        <H2>{currentConfig.data ? "Update" : "Add"} plex server</H2>
+
+        {/* Authentication token */}
+        <InputField>
           <label>Authentication token</label>
-          <div className="control">
-            <input
-              name="apiKey"
-              className="input"
-              type="text"
-              placeholder="API Key"
-              ref={register({
-                required: true,
-              })}
-            />
-            {errors.apiKey && errors.apiKey.type === "required" && (
-              <p className="help is-danger">
-                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="field">
-          <label>Hostname or IP Address</label>
-          <div className="control">
+          <input
+            name="apiKey"
+            className="input"
+            type="text"
+            placeholder="API Key"
+            ref={register({
+              required: true,
+            })}
+          />
+          {errors.apiKey && errors.apiKey.type === "required" && (
+            <p className="help is-danger">
+              {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+            </p>
+          )}
+        </InputField>
+
+        <Row justifyContent="space-between">
+          {/* Hostname or IP address */}
+          <InputField width="49%">
+            <label>Hostname or IP Address</label>
             <input
               name="host"
               className="input"
@@ -138,22 +149,22 @@ const PlexConfig = () => {
                 {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
               </p>
             )}
-          </div>
-          <p className="help is-warning">
-            <FontAwesomeIcon icon={faExclamationCircle} /> Change this value
-            with your domain name if you have one
-          </p>
-        </div>
-        <div className="field">
-          <label>
-            Port{" "}
-            <input
-              type="checkbox"
-              checked={usePort}
-              onChange={() => setUsePort(!usePort)}
-            />
-          </label>
-          <div className="control">
+            <Help>
+              <Icon icon={faExclamationCircle} /> Change this value with your
+              domain name if you have one
+            </Help>
+          </InputField>
+
+          {/* PORT */}
+          <InputField width="49%">
+            <label>
+              Port{" "}
+              <input
+                type="checkbox"
+                checked={usePort}
+                onChange={() => setUsePort(!usePort)}
+              />
+            </label>
             <input
               name="port"
               className="input"
@@ -164,11 +175,13 @@ const PlexConfig = () => {
               maxLength={99999}
               disabled={!usePort}
             />
-          </div>
-        </div>
-        <div className="field">
-          <label>Server ID</label>
-          <div className="control">
+          </InputField>
+        </Row>
+
+        <Row justifyContent="space-between">
+          {/* SERVER ID */}
+          <InputField width="49%">
+            <label>Server ID</label>
             <input
               name="serverId"
               className="input"
@@ -183,11 +196,11 @@ const PlexConfig = () => {
                 {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
               </p>
             )}
-          </div>
-        </div>
-        <div className="field">
-          <label>Server name</label>
-          <div className="control">
+          </InputField>
+
+          {/* SERVER NAME */}
+          <InputField width="49%">
+            <label>Server name</label>
             <input
               name="serverName"
               className="input"
@@ -202,85 +215,71 @@ const PlexConfig = () => {
                 {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
               </p>
             )}
-          </div>
-        </div>
-        <div className="field">
-          <div className="control">
-            <input
-              id="ssl"
-              type="checkbox"
-              name="ssl"
-              className="switch is-rounded is-small"
-              ref={register}
-            />
-            <label htmlFor="ssl">SSL</label>
-          </div>
-        </div>
-        <div className="field">
-          <div className="control">
-            <SecondaryButton type="submit">Save</SecondaryButton>
-          </div>
-        </div>
+          </InputField>
+        </Row>
+
+        <InputField>
+          <label>SSL</label>
+          <Checkbox name="ssl" register={register} round />
+        </InputField>
+
+        <br />
+
+        <SecondaryButton type="submit">Save</SecondaryButton>
       </form>
 
-      <SecondaryDivider />
+      <PrimaryDivider />
 
       {isPlexAccountLinked() && (
         <div>
-          <h3 className="is-size-3">Current Plex server</h3>
+          <H2>Current Plex server</H2>
           <br />
-          {currentConfig.isLoading && <Spinner size={Sizes.LARGE} />}
+          {currentConfig.isLoading && <Spinner size={ComponentSizes.LARGE} />}
           {!currentConfig.isLoading && !currentConfig.data && (
-            <SecondaryButton
+            <PrimaryButton
               type="button"
               onClick={() => setIsServersModalActive(true)}
             >
               Get account servers
-            </SecondaryButton>
+            </PrimaryButton>
           )}
 
           {!currentConfig.isLoading && currentConfig.data && (
-            <RowLayout childMarginRight="20px">
-              <p className="is-size-5 has-text-weight-light">
-                {currentConfig.data.serverName}
-              </p>
-              <button
-                type="button"
-                className="button is-small is-rounded is-info"
-                onClick={() => setIsServersModalActive(true)}
-                data-tooltip="Change server"
-              >
-                <FontAwesomeIcon icon={faEdit} />
-              </button>
-              <button
-                type="button"
-                className="button is-small is-rounded is-danger"
-                onClick={() => setIsUnlinkServerModalActive(true)}
-                data-tooltip="Unlink server"
-              >
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-            </RowLayout>
+            <>
+              <H3>{currentConfig.data.serverName}</H3>
+              <Buttons>
+                <IconButton
+                  type="button"
+                  onClick={() => setIsServersModalActive(true)}
+                >
+                  <Icon icon={faEdit} />
+                </IconButton>
+                <DangerIconButton
+                  type="button"
+                  onClick={() => setIsUnlinkServerModalActive(true)}
+                >
+                  <Icon icon={faTrash} />
+                </DangerIconButton>
+              </Buttons>
+            </>
           )}
 
-          {currentConfig.isLoading && <Spinner size={Sizes.LARGE} />}
+          {currentConfig.isLoading && <Spinner size={ComponentSizes.LARGE} />}
 
           <SecondaryDivider />
 
           <div>
-            <h3 className="is-size-3">Danger zone</h3>
+            <H2>Danger zone</H2>
             <div className="content">
-              <p className="is-size-7">
-                <FontAwesomeIcon icon={faExclamationCircle} /> Be careful with
-                that option
-              </p>
-              <button
-                className="button is-danger"
+              <Help>
+                <Icon icon={faExclamationCircle} /> Be careful with that option
+              </Help>
+              <DangerButton
                 type="button"
                 onClick={() => setIsUnlinkAccountModalActive(true)}
               >
                 Unlink Plex Account
-              </button>
+              </DangerButton>
             </div>
           </div>
         </div>

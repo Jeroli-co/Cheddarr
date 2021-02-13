@@ -9,13 +9,13 @@ import {
   IMediaServerMovie,
   IMediaServerSeason,
   IMediaServerSeries,
-} from "../models/IMediaServerMedia";
+} from "../../../../shared/models/IMediaServerMedia";
 import {
   ISearchedMovie,
   ISearchedSeries,
-} from "../../search/models/ISearchedMedias";
+} from "../../../../shared/models/ISearchedMedias";
 
-const RatingStyle = styled.div<{ backgroundColor: string }>`
+const Container = styled.div<{ backgroundColor: string }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,6 +23,16 @@ const RatingStyle = styled.div<{ backgroundColor: string }>`
   width: 60px;
   height: 60px;
   background-color: ${(props) => props.backgroundColor};
+`;
+
+const RatingValue = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  background-color: ${(props) => props.theme.primary};
 `;
 
 type MediaRatingProps = {
@@ -39,13 +49,15 @@ const MediaRating = ({ media }: MediaRatingProps) => {
   if (!media || !media.rating) return <div />;
 
   return (
-    <RatingStyle
+    <Container
       data-tooltip="MediaRating"
       style={{ cursor: "default" }}
       backgroundColor={getColorRating(getRatingPercentage(media.rating))}
     >
-      {getRatingPercentage(media.rating) + "%"}
-    </RatingStyle>
+      <RatingValue className="">
+        {getRatingPercentage(media.rating) + "%"}
+      </RatingValue>
+    </Container>
   );
 };
 

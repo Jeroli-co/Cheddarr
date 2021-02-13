@@ -4,10 +4,10 @@ import { PageLoader } from "./shared/components/PageLoader";
 import { LoggedInApp } from "./logged-in-app/LoggedInApp";
 
 const AuthenticationContextProvider = React.lazy(() =>
-  import("./logged-out-app/contexts/AuthenticationContext")
+  import("./shared/contexts/AuthenticationContext")
 );
 const PlexConfigContextProvider = React.lazy(() =>
-  import("./logged-in-app/contexts/PlexConfigContext")
+  import("./shared/contexts/PlexConfigContext")
 );
 const SwitchRoutes = React.lazy(() => import("./router/SwitchRoutes"));
 

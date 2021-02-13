@@ -9,7 +9,14 @@ import { useSession } from "../../shared/contexts/SessionContext";
 import { NavbarContainer, navbarLogo, NavbarUserAvatar } from "./NavbarCommon";
 import { SearchBar2 } from "./components/search-bar/SearchBar2";
 
-const Container = styled(NavbarContainer)`
+const Container = styled(NavbarContainer)<{ isSidebarOpen: boolean }>`
+  width: calc(
+    100% -
+      ${(props) =>
+        props.isSidebarOpen
+          ? STATIC_STYLES.SIDEBAR_OPEN_WIDTH
+          : STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px
+  );
   display: flex;
   align-items: center;
 `;
@@ -52,7 +59,7 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
   };
 
   return (
-    <Container className="noselect">
+    <Container className="noselect" isSidebarOpen={isSidebarOpen}>
       <NavbarAppLogo>
         <img
           src={navbarLogo}

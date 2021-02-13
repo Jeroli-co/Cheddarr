@@ -6,8 +6,8 @@ export const SidebarMenuContainer = styled.aside<{ isOpen: boolean }>`
   overflow: hidden;
   position: fixed;
   z-index: 1;
-  top: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   left: 0;
+  top: 0;
   height: 100%;
   transition: width ${STATIC_STYLES.SIDEBAR_TRANSITION_DURATION};
 `;
@@ -17,6 +17,7 @@ export const SidebarMenuElement = styled.div<{ isActive?: boolean }>`
   align-items: center;
   cursor: pointer;
   width: 100%;
+  height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   font-size: 20px;
   user-select: none;
   color: ${(props) => props.theme.white};
@@ -44,6 +45,7 @@ export const SidebarMenuElementIcon = styled.span`
   min-width: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
   max-width: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
   height: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
+  font-size: 16px;
 `;
 
 export type SidebarMenuProps = {

@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Switch } from "react-router";
 import { routes } from "../../../router/routes";
 import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
-import { RequestsContextProvider } from "./contexts/RequestsContext";
+import { RequestsContextProvider } from "../../../shared/contexts/RequestsContext";
 
 const Requests = () => {
   return (
