@@ -1,5 +1,5 @@
 import time
-from typing import Optional, Union,List
+from typing import Optional, Union, List
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -38,9 +38,7 @@ def make_url(
     )
 
 
-def check_instance_status(
-    api_key: str, host: str, port: int, ssl: bool
-) -> Union[bool, dict]:
+def check_instance_status(api_key: str, host: str, port: int, ssl: bool) -> Union[bool, dict]:
     url = make_url(
         api_key=api_key,
         host=host,
@@ -151,9 +149,7 @@ def get_series(setting: SonarrSetting, series_id: int) -> schemas.SonarrSeries:
     return schemas.SonarrSeries.parse_obj(res.json())
 
 
-def add_series(
-    setting: SonarrSetting, series: schemas.SonarrSeries
-) -> schemas.SonarrSeries:
+def add_series(setting: SonarrSetting, series: schemas.SonarrSeries) -> schemas.SonarrSeries:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -166,9 +162,7 @@ def add_series(
     return schemas.SonarrSeries.parse_obj(res.json())
 
 
-def update_series(
-    setting: SonarrSetting, series: schemas.SonarrSeries
-) -> schemas.SonarrSeries:
+def update_series(setting: SonarrSetting, series: schemas.SonarrSeries) -> schemas.SonarrSeries:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -219,12 +213,8 @@ def send_request(request: SeriesRequest):
         language_profile_id = setting.language_profile_id
         if series.series_type == SeriesType.anime:
             series.root_folder_path = setting.anime_root_folder or root_folder_path
-            series.quality_profile_id = (
-                setting.anime_quality_profile_id or quality_profile_id
-            )
-            series.language_profile_id = (
-                setting.anime_language_profile_id or language_profile_id
-            )
+            series.quality_profile_id = setting.anime_quality_profile_id or quality_profile_id
+            series.language_profile_id = setting.anime_language_profile_id or language_profile_id
         series.root_folder_path = root_folder_path
         series.quality_profile_id = quality_profile_id
         if setting.version == 3:
@@ -248,9 +238,7 @@ def send_request(request: SeriesRequest):
     else:
         episodes = get_episodes(setting, series.id)
         for req_season in request.seasons:
-            season = next(
-                s for s in series.seasons if s.season_number == req_season.season_number
-            )
+            season = next(s for s in series.seasons if s.season_number == req_season.season_number)
             if not req_season.episodes:
                 season.monitored = True
                 continue

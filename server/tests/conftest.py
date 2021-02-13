@@ -12,13 +12,12 @@ from .utils import datasets, user_authentication_headers
 
 
 url = "sqlite://"
-_db_conn = create_engine(
-    url, connect_args={"check_same_thread": False}, poolclass=StaticPool
-)
+_db_conn = create_engine(url, connect_args={"check_same_thread": False}, poolclass=StaticPool)
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=_db_conn, expire_on_commit=False
 )
 os.environ["TESTING"] = "True"
+
 
 # Override dependency
 def get_test_db():

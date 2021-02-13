@@ -38,9 +38,7 @@ def check_instance_status(
     port: int,
     ssl: bool,
 ) -> Union[bool, dict]:
-    url = make_url(
-        api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/system/status"
-    )
+    url = make_url(api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/system/status")
     try:
         r = requests.get(url)
     except Exception:

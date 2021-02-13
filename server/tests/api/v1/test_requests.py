@@ -19,9 +19,7 @@ def test_add_series_never_requested_without_seasons(
 
     actual = r.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -58,9 +56,7 @@ def test_add_series_never_requested_with_all_seasons(
 
     actual = r.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["id"] == expected.id
@@ -148,9 +144,7 @@ def test_add_season_never_requested(
 
     actual = r.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -160,12 +154,8 @@ def test_add_season_never_requested(
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["series"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
-    assert (
-        actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
-    )
-    assert (
-        actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
-    )
+    assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
+    assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
 
 
 def test_add_season_already_requested_conflict_with_seasons(
@@ -225,9 +215,7 @@ def test_add_season_already_requested_some_season_conflict(
 
     actual = r2.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -237,18 +225,10 @@ def test_add_season_already_requested_some_season_conflict(
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["series"]
     assert len(actual["seasons"]) == len(expected.seasons) == 4
-    assert (
-        actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
-    )
-    assert (
-        actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
-    )
-    assert (
-        actual["seasons"][2]["season_number"] == expected.seasons[2].season_number == 2
-    )
-    assert (
-        actual["seasons"][3]["season_number"] == expected.seasons[3].season_number == 3
-    )
+    assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
+    assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
+    assert actual["seasons"][2]["season_number"] == expected.seasons[2].season_number == 2
+    assert actual["seasons"][3]["season_number"] == expected.seasons[3].season_number == 3
 
 
 def test_add_season_whereas_all_series_requested_without_seasons(
@@ -329,9 +309,7 @@ def test_add_series_with_seasons_already_requested(
 
     actual = r2.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -379,9 +357,7 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
 
     actual = r2.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -391,27 +367,13 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["series"]
     assert len(actual["seasons"]) == len(expected.seasons) == 7
-    assert (
-        actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
-    )
-    assert (
-        actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
-    )
-    assert (
-        actual["seasons"][2]["season_number"] == expected.seasons[2].season_number == 2
-    )
-    assert (
-        actual["seasons"][3]["season_number"] == expected.seasons[3].season_number == 3
-    )
-    assert (
-        actual["seasons"][4]["season_number"] == expected.seasons[4].season_number == 5
-    )
-    assert (
-        actual["seasons"][5]["season_number"] == expected.seasons[5].season_number == 6
-    )
-    assert (
-        actual["seasons"][6]["season_number"] == expected.seasons[6].season_number == 7
-    )
+    assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
+    assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
+    assert actual["seasons"][2]["season_number"] == expected.seasons[2].season_number == 2
+    assert actual["seasons"][3]["season_number"] == expected.seasons[3].season_number == 3
+    assert actual["seasons"][4]["season_number"] == expected.seasons[4].season_number == 5
+    assert actual["seasons"][5]["season_number"] == expected.seasons[5].season_number == 6
+    assert actual["seasons"][6]["season_number"] == expected.seasons[6].season_number == 7
 
 
 def test_add_episode_never_requested(
@@ -442,9 +404,7 @@ def test_add_episode_never_requested(
 
     actual = r.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -454,18 +414,10 @@ def test_add_episode_never_requested(
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["series"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
-    assert (
-        actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
-    )
-    assert (
-        actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 3
-    )
-    assert (
-        len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 1
-    )
-    assert (
-        len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 3
-    )
+    assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
+    assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 3
+    assert len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 1
+    assert len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 3
     assert (
         actual["seasons"][0]["episodes"][0]["episode_number"]
         == expected.seasons[0].episodes[0].episode_number
@@ -585,9 +537,7 @@ def test_add_episode_already_requested_some_episodes_conflict(
 
     actual = r2.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -597,24 +547,12 @@ def test_add_episode_already_requested_some_episodes_conflict(
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["series"]
     assert len(actual["seasons"]) == len(expected.seasons) == 3
-    assert (
-        actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
-    )
-    assert (
-        actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 3
-    )
-    assert (
-        actual["seasons"][2]["season_number"] == expected.seasons[2].season_number == 2
-    )
-    assert (
-        len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 1
-    )
-    assert (
-        len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 5
-    )
-    assert (
-        len(actual["seasons"][2]["episodes"]) == len(expected.seasons[2].episodes) == 2
-    )
+    assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
+    assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 3
+    assert actual["seasons"][2]["season_number"] == expected.seasons[2].season_number == 2
+    assert len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 1
+    assert len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 5
+    assert len(actual["seasons"][2]["episodes"]) == len(expected.seasons[2].episodes) == 2
     assert (
         actual["seasons"][0]["episodes"][0]["episode_number"]
         == expected.seasons[0].episodes[0].episode_number
@@ -747,9 +685,7 @@ def test_add_series_without_seasons_whereas_episodes_requested(
 
     actual = r2.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -799,9 +735,7 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
 
     actual = r2.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -922,9 +856,7 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
 
     actual = r2.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -934,12 +866,8 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["series"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
-    assert (
-        len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 22
-    )
-    assert (
-        len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 2
-    )
+    assert len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 22
+    assert len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 2
 
 
 def test_add_seasons_without_episodes_whereas_episodes_requested(
@@ -983,9 +911,7 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
 
     actual = r2.json()
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -995,12 +921,8 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["series"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
-    assert (
-        len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 0
-    )
-    assert (
-        len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 2
-    )
+    assert len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 0
+    assert len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 2
 
 
 def test_add_episodes_whereas_all_season_requested_with_all_episodes(
@@ -1139,9 +1061,7 @@ def test_add_episodes_whereas_all_season_requested_without_episodes(
     assert r2.status_code == 409
 
 
-def test_get_incoming_series_requests(
-    client: TestClient, db: Session, normal_user_token_headers
-):
+def test_get_incoming_series_requests(client: TestClient, db: Session, normal_user_token_headers):
     r = client.get(
         client.app.url_path_for("get_received_series_requests"),
         headers=normal_user_token_headers,
@@ -1151,9 +1071,7 @@ def test_get_incoming_series_requests(
 
     actual = r.json()[0]
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requested_user_id=datasets["users"][0]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][0]["id"]).first()
     )
 
     assert actual["id"] == expected.id
@@ -1166,9 +1084,7 @@ def test_get_incoming_series_requests(
     assert actual["seasons"] == expected.seasons
 
 
-def test_get_outgoing_series_requests(
-    client: TestClient, db: Session, normal_user_token_headers
-):
+def test_get_outgoing_series_requests(client: TestClient, db: Session, normal_user_token_headers):
     r = client.get(
         client.app.url_path_for("get_sent_series_requests"),
         headers=normal_user_token_headers,
@@ -1178,9 +1094,7 @@ def test_get_outgoing_series_requests(
 
     actual = r.json()[0]
     expected = (
-        db.query(SeriesRequest)
-        .filter_by(requesting_user_id=datasets["users"][0]["id"])
-        .first()
+        db.query(SeriesRequest).filter_by(requesting_user_id=datasets["users"][0]["id"]).first()
     )
 
     assert actual["id"] == expected.id
@@ -1193,9 +1107,7 @@ def test_get_outgoing_series_requests(
     assert actual["seasons"] == expected.seasons
 
 
-def test_update_series_request_wrong_status(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_series_request_wrong_status(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_series_request", request_id="1"),
         headers=normal_user_token_headers,
@@ -1204,9 +1116,7 @@ def test_update_series_request_wrong_status(
     assert r.status_code == 422
 
 
-def test_update_series_request_not_existing(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_series_request_not_existing(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_series_request", request_id="0"),
         headers=normal_user_token_headers,
@@ -1215,9 +1125,7 @@ def test_update_series_request_not_existing(
     assert r.status_code == 404
 
 
-def test_update_series_request_not_requested_user(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_series_request_not_requested_user(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_series_request", request_id="2"),
         headers=normal_user_token_headers,
@@ -1226,9 +1134,7 @@ def test_update_series_request_not_requested_user(
     assert r.status_code == 404
 
 
-def test_update_series_request_approved_no_provider(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_series_request_approved_no_provider(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_series_request", request_id="1"),
         headers=normal_user_token_headers,
@@ -1237,9 +1143,7 @@ def test_update_series_request_approved_no_provider(
     assert r.status_code == 400
 
 
-def test_delete_series_request(
-    client: TestClient, db: Session, normal_user_token_headers
-):
+def test_delete_series_request(client: TestClient, db: Session, normal_user_token_headers):
     from server.repositories import SeriesRequestRepository
 
     series_request_repo = SeriesRequestRepository(db)
@@ -1252,9 +1156,7 @@ def test_delete_series_request(
     assert series_request_repo.find_by(id=1) is None
 
 
-def test_delete_series_request_not_existing(
-    client: TestClient, normal_user_token_headers
-):
+def test_delete_series_request_not_existing(client: TestClient, normal_user_token_headers):
     r = client.delete(
         client.app.url_path_for("delete_series_request", request_id="0"),
         headers=normal_user_token_headers,
@@ -1285,9 +1187,7 @@ def test_add_movie_never_requested(
     from server.models import MovieRequest
 
     expected = (
-        db.query(MovieRequest)
-        .filter_by(requested_user_id=datasets["users"][1]["id"])
-        .first()
+        db.query(MovieRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
     )
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -1319,9 +1219,7 @@ def test_add_movie_already_requested(
     assert r.status_code == 409
 
 
-def test_get_incoming_movies_requests(
-    client: TestClient, db: Session, normal_user_token_headers
-):
+def test_get_incoming_movies_requests(client: TestClient, db: Session, normal_user_token_headers):
     r = client.get(
         client.app.url_path_for("get_received_movie_requests"),
         headers=normal_user_token_headers,
@@ -1331,9 +1229,7 @@ def test_get_incoming_movies_requests(
 
     actual = r.json()[0]
     expected = (
-        db.query(MovieRequest)
-        .filter_by(requested_user_id=datasets["users"][0]["id"])
-        .first()
+        db.query(MovieRequest).filter_by(requested_user_id=datasets["users"][0]["id"]).first()
     )
 
     assert actual["id"] == expected.id
@@ -1345,9 +1241,7 @@ def test_get_incoming_movies_requests(
     assert actual["movie"]
 
 
-def test_get_outgoing_movies_requests(
-    client: TestClient, db: Session, normal_user_token_headers
-):
+def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_user_token_headers):
     r = client.get(
         client.app.url_path_for("get_sent_movie_requests"),
         headers=normal_user_token_headers,
@@ -1357,9 +1251,7 @@ def test_get_outgoing_movies_requests(
 
     actual = r.json()[0]
     expected = (
-        db.query(MovieRequest)
-        .filter_by(requesting_user_id=datasets["users"][0]["id"])
-        .first()
+        db.query(MovieRequest).filter_by(requesting_user_id=datasets["users"][0]["id"]).first()
     )
 
     assert actual["id"] == expected.id
@@ -1371,9 +1263,7 @@ def test_get_outgoing_movies_requests(
     assert actual["movie"]
 
 
-def test_update_movie_request_wrong_status(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_movie_request_wrong_status(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_movie_request", request_id="1"),
         headers=normal_user_token_headers,
@@ -1382,9 +1272,7 @@ def test_update_movie_request_wrong_status(
     assert r.status_code == 422
 
 
-def test_update_movie_request_not_existing(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_movie_request_not_existing(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_movie_request", request_id="0"),
         headers=normal_user_token_headers,
@@ -1393,9 +1281,7 @@ def test_update_movie_request_not_existing(
     assert r.status_code == 404
 
 
-def test_update_movie_request_not_requested_user(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_movie_request_not_requested_user(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_movie_request", request_id="2"),
         headers=normal_user_token_headers,
@@ -1404,9 +1290,7 @@ def test_update_movie_request_not_requested_user(
     assert r.status_code == 404
 
 
-def test_update_movie_request_approved_no_provider(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_movie_request_approved_no_provider(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_movie_request", request_id="1"),
         headers=normal_user_token_headers,
@@ -1415,9 +1299,7 @@ def test_update_movie_request_approved_no_provider(
     assert r.status_code == 400
 
 
-def test_delete_movie_request(
-    client: TestClient, db: Session, normal_user_token_headers
-):
+def test_delete_movie_request(client: TestClient, db: Session, normal_user_token_headers):
     from server.repositories import MovieRequestRepository
 
     movies_request_repo = MovieRequestRepository(db)
@@ -1430,9 +1312,7 @@ def test_delete_movie_request(
     assert movies_request_repo.find_by(id=1) is None
 
 
-def test_delete_movie_request_not_existing(
-    client: TestClient, normal_user_token_headers
-):
+def test_delete_movie_request_not_existing(client: TestClient, normal_user_token_headers):
     r = client.delete(
         client.app.url_path_for("delete_movie_request", request_id="0"),
         headers=normal_user_token_headers,

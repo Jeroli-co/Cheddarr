@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Optional,List
+from typing import Optional, List
 
 from pydantic import AnyHttpUrl, Field, validator
 
@@ -82,9 +82,7 @@ class SonarrSetting(ProviderSettingBase, SonarrSettingData):
     id: str
     name: str
     enabled: bool = True
-    provider_type: ProviderType = Field(
-        default=ProviderType.series_provider, const=True
-    )
+    provider_type: ProviderType = Field(default=ProviderType.series_provider, const=True)
 
 
 class SonarrSettingCreateUpdate(ProviderSettingBase, SonarrSettingData):

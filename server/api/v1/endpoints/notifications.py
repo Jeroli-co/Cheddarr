@@ -1,12 +1,23 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+)
 
 from server import models, schemas
-from server.api import dependencies as deps
+from server.api import (
+    dependencies as deps,
+)
 from server.core import config
-from server.repositories import UserRepository
-from server.repositories.notifications import NotificationAgentRepository
+from server.repositories import (
+    UserRepository,
+)
+from server.repositories.notifications import (
+    NotificationAgentRepository,
+)
 
 router = APIRouter()
 
@@ -15,8 +26,13 @@ router = APIRouter()
 ##########################################
 
 
-@router.get("", response_model=List[schemas.Notification])
-def get_all_notifications(current_user: models.User = Depends(deps.get_current_user)):
+@router.get(
+    "",
+    response_model=List[schemas.Notification],
+)
+def get_all_notifications(
+    current_user: models.User = Depends(deps.get_current_user),
+):
     return current_user.notifications
 
 
@@ -95,7 +111,8 @@ def update_email_agent(
     agent = notif_agent_repo.find_by(id=agent_id)
     if agent is None:
         raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No email agent settings found with this id."
+            status.HTTP_404_NOT_FOUND,
+            "No email agent settings found with this id.",
         )
     agent.update(agent_in)
     notif_agent_repo.save(agent)

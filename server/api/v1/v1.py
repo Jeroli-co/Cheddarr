@@ -7,9 +7,7 @@ router = APIRouter()
 router.include_router(auth.router, tags=["auth"])
 router.include_router(users.users_router, prefix="/users", tags=["users"])
 router.include_router(users.current_user_router, prefix="/user", tags=["current user"])
-router.include_router(
-    notifications.router, prefix="/notifications", tags=["notifications"]
-)
+router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 router.include_router(
     settings.router,
     prefix="/settings",

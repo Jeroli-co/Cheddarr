@@ -60,9 +60,7 @@ def add_movie_request(
 
     requested_user = user_repo.find_by_username(request.requested_username)
     if requested_user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "The requested user does not exist."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
     existing_request = movie_request_repo.find_by_user_ids_and_tmdb_id(
         tmdb_id=request.tmdb_id,
@@ -70,19 +68,13 @@ def add_movie_request(
         requested_user_id=requested_user.id,
     )
     if existing_request is not None:
-        raise HTTPException(
-            status.HTTP_409_CONFLICT, "This movie has already been requested."
-        )
+        raise HTTPException(status.HTTP_409_CONFLICT, "This movie has already been requested.")
 
     movie = movie_repo.find_by(tmdb_id=request.tmdb_id)
     if movie is None:
-        searched_movie = schemas.Movie.parse_obj(
-            search.find_tmdb_movie(request.tmdb_id)
-        )
+        searched_movie = schemas.Movie.parse_obj(search.find_tmdb_movie(request.tmdb_id))
         if searched_movie is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, "The requested movie was not found"
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested movie was not found")
         movie = searched_movie.to_orm(models.Movie)
 
     movie_request = models.MovieRequest(
@@ -123,9 +115,7 @@ def update_movie_request(
     if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != models.RequestStatus.pending:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "Cannot update a non pending request."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
     if update.status == models.RequestStatus.approved:
         if update.provider_id is None:
             raise HTTPException(
@@ -133,11 +123,7 @@ def update_movie_request(
                 "provider_id must be set to accept a request.",
             )
         selected_provider = next(
-            (
-                provider
-                for provider in current_user.providers
-                if provider.id == update.provider_id
-            ),
+            (provider for provider in current_user.providers if provider.id == update.provider_id),
             None,
         )
         if selected_provider is None:
@@ -176,9 +162,7 @@ def delete_movie_request(
         request.status != models.RequestStatus.pending
         and request.requested_user_id != current_user.id
     ):
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
     movies_request_repo.remove(request)
     return {"detail": "Request deleted."}
 
@@ -225,17 +209,13 @@ def add_series_request(
 ):
     requested_user = user_repo.find_by_username(request_in.requested_username)
     if requested_user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "The requested user does not exist."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
     series = series_repo.find_by(tvdb_id=request_in.tvdb_id)
     if series is None:
         searched_series = search.find_tmdb_series_by_tvdb_id(request_in.tvdb_id)
         if searched_series is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, "The requested series was not found"
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested series was not found")
 
         series = schemas.Series.parse_obj(searched_series).to_orm(models.Series)
 
@@ -325,11 +305,7 @@ def unify_series_request(
             season.episodes = episodes
 
         already_added_season = next(
-            (
-                s
-                for s in series_request.seasons
-                if s.season_number == season.season_number
-            ),
+            (s for s in series_request.seasons if s.season_number == season.season_number),
             None,
         )
 
@@ -363,9 +339,7 @@ def update_series_request(
     if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != models.RequestStatus.pending:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "Cannot update a non pending request."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
     if update.status == models.RequestStatus.approved:
         if update.provider_id is None:
             raise HTTPException(
@@ -373,11 +347,7 @@ def update_series_request(
                 "provider_id must be set to accept a request.",
             )
         selected_provider = next(
-            (
-                provider
-                for provider in current_user.providers
-                if provider.id == update.provider_id
-            ),
+            (provider for provider in current_user.providers if provider.id == update.provider_id),
             None,
         )
         if selected_provider is None:
@@ -416,8 +386,6 @@ def delete_series_request(
         request.status != models.RequestStatus.pending
         and request.requested_user_id != current_user.id
     ):
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
     series_request_repo.remove(request)
     return {"detail": "Request deleted."}

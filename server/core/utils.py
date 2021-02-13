@@ -29,9 +29,7 @@ def send_email(
         subject=subject,
         html=JinjaTemplate(
             template_str,
-            environment=Environment(
-                loader=FileSystemLoader(config.MAIL_TEMPLATES_FOLDER)
-            ),
+            environment=Environment(loader=FileSystemLoader(config.MAIL_TEMPLATES_FOLDER)),
         ),
     )
 

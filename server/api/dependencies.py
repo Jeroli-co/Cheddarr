@@ -51,9 +51,7 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(
-            token, config.SECRET_KEY, algorithms=config.SIGNING_ALGORITHM
-        )
+        payload = jwt.decode(token, config.SECRET_KEY, algorithms=config.SIGNING_ALGORITHM)
         token_data = TokenPayload.parse_obj(payload)
     except (jwt.JWTError, ValidationError):
         raise credentials_exception
@@ -74,10 +72,7 @@ def get_current_superuser(
 def get_current_poweruser(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if (
-        current_user.role != UserRole.superuser
-        and current_user.role != UserRole.poweruser
-    ):
+    if current_user.role != UserRole.superuser and current_user.role != UserRole.poweruser:
         raise HTTPException(status_code=403, detail="Not enough privileges.")
     return current_user
 
@@ -90,7 +85,5 @@ def get_current_user_plex_settings(
 ):
     settings = plex_setting_repository.find_all_by(user_id=cur_user.id, enabled=True)
     if settings is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No Plex settings found for the user."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex settings found for the user.")
     return settings

@@ -1,4 +1,4 @@
-from typing import Union,List
+from typing import Union, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -19,15 +19,11 @@ router = APIRouter()
 )
 def get_plex_account_servers(
     current_user: models.User = Depends(deps.get_current_user),
-    plex_account_repo: PlexAccountRepository = Depends(
-        deps.get_repository(PlexAccountRepository)
-    ),
+    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
 ):
     plex_account = plex_account_repo.find_by(user_id=current_user.id)
     if plex_account is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No Plex account linked to the user."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex account linked to the user.")
     servers = plex.get_plex_account_servers(plex_account.api_key)
     return servers
 
@@ -36,23 +32,17 @@ def get_plex_account_servers(
     "/servers/{server_name}",
     response_model=schemas.PlexServerOut,
     responses={
-        status.HTTP_404_NOT_FOUND: {
-            "description": "No Plex account linked or no server found"
-        },
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex account linked or no server found"},
     },
 )
 def get_plex_account_server(
     server_name: str,
     current_user: models.User = Depends(deps.get_current_user),
-    plex_account_repo: PlexAccountRepository = Depends(
-        deps.get_repository(PlexAccountRepository)
-    ),
+    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
 ):
     plex_account = plex_account_repo.find_by(user_id=current_user.id)
     if plex_account is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No Plex account linked to the user."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex account linked to the user.")
     server_out = plex.get_plex_account_server(plex_account.api_key, server_name)
     if server_out is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex server not found.")
@@ -66,9 +56,7 @@ def get_plex_account_server(
     response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Plex server connection error"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Plex server connection error"},
     },
 )
 def get_plex_recent_movies(
@@ -87,9 +75,7 @@ def get_plex_recent_movies(
         )
     movie_sections = plex.library_sections(plex_server, section_type="movies")
     recent_movies = [
-        movie
-        for section in movie_sections
-        for movie in section.recentlyAdded(maxresults=20)
+        movie for section in movie_sections for movie in section.recentlyAdded(maxresults=20)
     ]
     return recent_movies
 
@@ -101,9 +87,7 @@ def get_plex_recent_movies(
     response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Plex server connection error"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Plex server connection error"},
     },
 )
 def get_plex_movie(
@@ -133,9 +117,7 @@ def get_plex_movie(
     response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Plex server connection error"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Plex server connection error"},
     },
 )
 def get_plex_recent_series(
@@ -154,9 +136,7 @@ def get_plex_recent_series(
         )
     series_section = plex.library_sections(plex_server, section_type="series")
     recent_series = [
-        series
-        for section in series_section
-        for series in section.recentlyAdded(maxresults=20)
+        series for section in series_section for series in section.recentlyAdded(maxresults=20)
     ]
     recent_series.sort(key=lambda s: s.addedAt, reverse=True)
     return recent_series
@@ -169,9 +149,7 @@ def get_plex_recent_series(
     response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Plex server connection error"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Plex server connection error"},
     },
 )
 def get_plex_series(
@@ -201,9 +179,7 @@ def get_plex_series(
     response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Plex server connection error"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Plex server connection error"},
     },
 )
 def get_plex_season(
@@ -233,9 +209,7 @@ def get_plex_season(
     response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex setting or server"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Plex server connection error"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Plex server connection error"},
     },
 )
 def get_plex_episode(
@@ -265,9 +239,7 @@ def get_plex_episode(
     response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Plex server connection error"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Plex server connection error"},
     },
 )
 def get_plex_on_deck(
@@ -295,9 +267,7 @@ def get_plex_on_deck(
     response_model_exclude={"server"},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Plex server connection error"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Plex server connection error"},
     },
 )
 def search_plex_media(

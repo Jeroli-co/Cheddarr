@@ -27,9 +27,7 @@ router = APIRouter()
     "/sign-up",
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.User,
-    responses={
-        status.HTTP_409_CONFLICT: {"description": "Email or username not available"}
-    },
+    responses={status.HTTP_409_CONFLICT: {"description": "Email or username not available"}},
 )
 def signup(
     user_in: schemas.UserCreate,
@@ -92,21 +90,15 @@ def confirm_email(
     if email_data.old_email is not None:
         user = user_repo.find_by_email(email_data.old_email)
         if user is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, "No user with this email was found."
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email was found.")
         user.email = email_data.email
     else:
         user = user_repo.find_by_email(email_data.email)
         if user is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, "No user with this email was found."
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email was found.")
 
         if user.confirmed:
-            raise HTTPException(
-                status.HTTP_403_FORBIDDEN, "This email is already confirmed."
-            )
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "This email is already confirmed.")
         user.confirmed = True
     user_repo.save(user)
     return {"detail": "This email is now confirmed."}
@@ -127,13 +119,9 @@ def resend_confirmation(
     email = body.email
     existing_user = user_repo.find_by_email(email)
     if existing_user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No user with this email exists."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email exists.")
     if existing_user.confirmed:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "This email is already confirmed."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "This email is already confirmed.")
     email_data = schemas.EmailConfirm(email=email).dict()
     token = security.generate_timed_token(email_data)
     scheduler.add_job(
@@ -235,18 +223,14 @@ def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSign
     "/sign-in/plex/confirm",
     response_model=schemas.Token,
     responses={
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {
-            "description": "Plex authorization error"
-        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Plex authorization error"},
     },
 )
 def confirm_signin_plex(
     token: str,
     response: Response,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    plex_account_repo: PlexAccountRepository = Depends(
-        deps.get_repository(PlexAccountRepository)
-    ),
+    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
 ):
     token = security.confirm_token(token)
     state = token.get("id")
@@ -262,9 +246,7 @@ def confirm_signin_plex(
     r = requests.get(access_url, headers={"Accept": "application/json"})
     auth_token = r.json().get("authToken")
     if auth_token is None:
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "Error while authorizing Plex."
-        )
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error while authorizing Plex.")
 
     r = requests.get(
         config.PLEX_USER_RESOURCE_URL,

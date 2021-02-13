@@ -91,9 +91,7 @@ def find_season(provider_id: int, season_number: int):
 )
 def find_episode(provider_id: int, season_number: int, episode_number: int):
     """ Find a TV episode with an external search provider id (TVDB), a season number and an episode number """
-    episode = search.find_tmdb_episode_by_tvdb_id(
-        provider_id, season_number, episode_number
-    )
+    episode = search.find_tmdb_episode_by_tvdb_id(provider_id, season_number, episode_number)
     if episode is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Episode not found.")
     return episode

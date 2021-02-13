@@ -44,9 +44,7 @@ def test_get_user_by_id_not_existing(client: TestClient, normal_user_token_heade
 
 def test_get_user_by_username(client: TestClient, normal_user_token_headers):
     r = client.get(
-        client.app.url_path_for(
-            "get_user_by_username", username=datasets["users"][1]["username"]
-        ),
+        client.app.url_path_for("get_user_by_username", username=datasets["users"][1]["username"]),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -56,21 +54,15 @@ def test_get_user_by_username(client: TestClient, normal_user_token_headers):
     assert current_user["avatar"] == datasets["users"][1]["avatar"]
 
 
-def test_get_user_by_username_not_existing(
-    client: TestClient, normal_user_token_headers
-):
+def test_get_user_by_username_not_existing(client: TestClient, normal_user_token_headers):
     r = client.get(
-        client.app.url_path_for(
-            "get_user_by_username", username="not_exsting_username"
-        ),
+        client.app.url_path_for("get_user_by_username", username="not_exsting_username"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 404
 
 
-def test_delete_current_user(
-    client: TestClient, db: Session, normal_user_token_headers
-):
+def test_delete_current_user(client: TestClient, db: Session, normal_user_token_headers):
     user_repo = UserRepository(db)
     r = client.delete(
         client.app.url_path_for("delete_user"),
@@ -116,9 +108,7 @@ def test_update_password(client: TestClient, db: Session, normal_user_token_head
     )
 
 
-def test_update_password_missing_old_password(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_password_missing_old_password(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_user"),
         headers=normal_user_token_headers,
@@ -127,9 +117,7 @@ def test_update_password_missing_old_password(
     assert r.status_code == 422
 
 
-def test_update_password_wrong_old_password(
-    client: TestClient, normal_user_token_headers
-):
+def test_update_password_wrong_old_password(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_user"),
         headers=normal_user_token_headers,
@@ -190,9 +178,7 @@ def test_add_friend(client: TestClient, db: Session, normal_user_token_headers):
     )
     assert (
         len(
-            friendship_repo.find_all_by(
-                requested_user_id=datasets["users"][2]["id"], pending=True
-            )
+            friendship_repo.find_all_by(requested_user_id=datasets["users"][2]["id"], pending=True)
         )
         == 0
     )
@@ -212,9 +198,7 @@ def test_add_friend(client: TestClient, db: Session, normal_user_token_headers):
     )
     assert (
         len(
-            friendship_repo.find_all_by(
-                requested_user_id=datasets["users"][2]["id"], pending=True
-            )
+            friendship_repo.find_all_by(requested_user_id=datasets["users"][2]["id"], pending=True)
         )
         == 1
     )
@@ -245,9 +229,7 @@ def test_accept_friend(client: TestClient, db: Session, normal_user_token_header
         other_user_id=datasets["users"][3]["id"],
     ).pending
     r = client.patch(
-        client.app.url_path_for(
-            "accept_friend", username=datasets["users"][3]["username"]
-        ),
+        client.app.url_path_for("accept_friend", username=datasets["users"][3]["username"]),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -270,9 +252,7 @@ def test_accept_friend_not_existing(client: TestClient, normal_user_token_header
 
 def test_accept_friend_not_friend(client: TestClient, normal_user_token_headers):
     r = client.patch(
-        client.app.url_path_for(
-            "accept_friend", username=datasets["users"][2]["username"]
-        ),
+        client.app.url_path_for("accept_friend", username=datasets["users"][2]["username"]),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 403
@@ -285,9 +265,7 @@ def test_remove_friend(client: TestClient, db: Session, normal_user_token_header
         other_user_id=datasets["users"][1]["id"],
     )
     r = client.delete(
-        client.app.url_path_for(
-            "remove_friend", username=datasets["users"][1]["username"]
-        ),
+        client.app.url_path_for("remove_friend", username=datasets["users"][1]["username"]),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -310,9 +288,7 @@ def test_remove_friend_not_existing(client: TestClient, normal_user_token_header
 
 def test_remove_friend_not_friend(client: TestClient, normal_user_token_headers):
     r = client.delete(
-        client.app.url_path_for(
-            "remove_friend", username=datasets["users"][2]["username"]
-        ),
+        client.app.url_path_for("remove_friend", username=datasets["users"][2]["username"]),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 403

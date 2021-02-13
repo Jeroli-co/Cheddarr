@@ -1,4 +1,4 @@
-from typing import Optional,List
+from typing import Optional, List
 
 from plexapi.exceptions import PlexApiException
 from plexapi.library import LibrarySection, MovieSection, ShowSection
@@ -37,9 +37,7 @@ def get_plex_account_server(api_key: str, name: str) -> Optional[PlexServerOut]:
     return server_out
 
 
-def get_server(
-    base_url: str, port: int, ssl: bool, api_key: str
-) -> Optional[PlexServer]:
+def get_server(base_url: str, port: int, ssl: bool, api_key: str) -> Optional[PlexServer]:
     url = f"{'https' if ssl else 'http'}://{base_url}{':' + str(port) if port else ''}"
     try:
         server = PlexServer(url, api_key)
@@ -48,9 +46,7 @@ def get_server(
     return server
 
 
-def library_sections(
-    plex_server: PlexServer, section_type: str = None
-) -> List[LibrarySection]:
+def library_sections(plex_server: PlexServer, section_type: str = None) -> List[LibrarySection]:
     if section_type == "movies":
         libtype = MovieSection
     elif section_type == "series":
@@ -58,9 +54,7 @@ def library_sections(
     else:
         libtype = LibrarySection
     sections = [
-        section
-        for section in plex_server.library.sections()
-        if isinstance(section, libtype)
+        section for section in plex_server.library.sections() if isinstance(section, libtype)
     ]
     return sections
 

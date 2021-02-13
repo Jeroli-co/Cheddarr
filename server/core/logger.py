@@ -7,9 +7,7 @@ MAX_FILES = 10
 
 
 def log_setup():
-    formatter = logging.Formatter(
-        "%(asctime)s - [%(levelname)s]: %(message)s", "%b %d %H:%M:%S"
-    )
+    formatter = logging.Formatter("%(asctime)s - [%(levelname)s]: %(message)s", "%b %d %H:%M:%S")
 
     file_handler = logging.handlers.TimedRotatingFileHandler(
         config.LOGS_FOLDER / LOG_FILENAME,

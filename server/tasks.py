@@ -30,9 +30,7 @@ def check_movie_requests_availability_task():
     requests = movie_request_repo.find_all_by(status=RequestStatus.approved)
     for request in requests:
         setting = request.selected_provider
-        movie = radarr.lookup(
-            setting, tmdb_id=request.movie.tmdb_id, title=request.movie.title
-        )
+        movie = radarr.lookup(setting, tmdb_id=request.movie.tmdb_id, title=request.movie.title)
         if movie.has_file:
             request.status = RequestStatus.available
             movie_request_repo.save(request)
@@ -50,14 +48,9 @@ def check_series_requests_availability_task():
         for req_season in request.seasons:
             if not req_season.episodes:
                 matched_season = next(
-                    s
-                    for s in series.seasons
-                    if s.season_number == req_season.season_number
+                    s for s in series.seasons if s.season_number == req_season.season_number
                 )
-                if (
-                    matched_season.episode_file_count
-                    == matched_season.total_episode_count
-                ):
+                if matched_season.episode_file_count == matched_season.total_episode_count:
                     req_season.status = RequestStatus.available
                     req_seasons_available += 1
             else:

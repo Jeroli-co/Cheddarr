@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import date
-from typing import Generic, Optional, TypeVar, Union,List
+from typing import Generic, Optional, TypeVar, Union, List
 
 from pydantic import Field, validator
 from pydantic.generics import GenericModel

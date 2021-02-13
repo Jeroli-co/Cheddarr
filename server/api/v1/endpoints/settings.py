@@ -42,9 +42,7 @@ def get_user_providers(
 @router.get("/plex", response_model=List[schemas.PlexSetting])
 def get_plex_settings(
     current_user: models.User = Depends(deps.get_current_user),
-    plex_setting_repo: PlexSettingRepository = Depends(
-        deps.get_repository(PlexSettingRepository)
-    ),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     settings = plex_setting_repo.find_all_by(user_id=current_user.id)
     return settings
@@ -62,9 +60,7 @@ def get_plex_settings(
 def add_plex_setting(
     setting_in: schemas.PlexSettingCreateUpdate,
     current_user: models.User = Depends(deps.get_current_user),
-    plex_setting_repo: PlexSettingRepository = Depends(
-        deps.get_repository(PlexSettingRepository)
-    ),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     if (
         plex.get_server(
@@ -79,9 +75,7 @@ def add_plex_setting(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             "Failed to connect to  the Plex server.",
         )
-    setting = plex_setting_repo.find_by(
-        user_id=current_user.id, server_id=setting_in.server_id
-    )
+    setting = plex_setting_repo.find_by(user_id=current_user.id, server_id=setting_in.server_id)
     if setting is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This server is already added.")
     setting = setting_in.to_orm(models.PlexSetting)
@@ -102,9 +96,7 @@ def update_plex_setting(
     setting_id: str,
     setting_in: schemas.PlexSettingCreateUpdate,
     current_user: models.User = Depends(deps.get_current_user),
-    plex_setting_repo: PlexSettingRepository = Depends(
-        deps.get_repository(PlexSettingRepository)
-    ),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     setting = plex_setting_repo.find_by(id=setting_id)
     if setting is None or setting.user_id != current_user.id:
@@ -136,9 +128,7 @@ def update_plex_setting(
 def delete_plex_setting(
     setting_id: str,
     current_user: models.User = Depends(deps.get_current_user),
-    plex_setting_repo: PlexSettingRepository = Depends(
-        deps.get_repository(PlexSettingRepository)
-    ),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     setting = plex_setting_repo.find_by(id=setting_id)
     if setting is None or setting.user_id != current_user.id:
@@ -155,9 +145,7 @@ def delete_plex_setting(
 @router.post(
     "/radarr/instance-info",
     response_model=schemas.RadarrInstanceInfo,
-    responses={
-        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}
-    },
+    responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
     dependencies=[Depends(deps.get_current_poweruser)],
 )
 def get_radarr_instance_info(
@@ -167,9 +155,7 @@ def get_radarr_instance_info(
         setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
     )
     if instance_info is None:
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr."
-        )
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
     return instance_info
 
 
@@ -192,9 +178,7 @@ def get_radarr_setting_instance_info(
         setting.api_key, setting.host, setting.port, setting.ssl
     )
     if instance_info is None:
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr."
-        )
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
     return instance_info
 
 
@@ -213,9 +197,7 @@ def get_radarr_settings(
     "/radarr",
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.RadarrSetting,
-    responses={
-        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}
-    },
+    responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
 )
 def add_radarr_setting(
     setting_in: schemas.RadarrSettingCreateUpdate,
@@ -230,9 +212,7 @@ def add_radarr_setting(
         port=setting_in.port,
         ssl=setting_in.ssl,
     ):
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr."
-        )
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
     setting = setting_in.to_orm(models.RadarrSetting)
     setting.user_id = current_user.id
     setting = radarr_setting_repo.save(setting)
@@ -244,9 +224,7 @@ def add_radarr_setting(
     response_model=schemas.RadarrSetting,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "Setting not found"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Instance connection fail"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"},
     },
 )
 def update_radarr_setting(
@@ -267,9 +245,7 @@ def update_radarr_setting(
         port=setting_in.port,
         ssl=setting_in.ssl,
     ):
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr."
-        )
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
     setting.update(setting_in)
     radarr_setting_repo.save(setting)
     return setting
@@ -301,9 +277,7 @@ def delete_radarr_setting(
 @router.post(
     "/sonarr/instance-info",
     response_model=schemas.SonarrInstanceInfo,
-    responses={
-        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}
-    },
+    responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
     dependencies=[Depends(deps.get_current_poweruser)],
 )
 def get_sonarr_instance_info(
@@ -313,9 +287,7 @@ def get_sonarr_instance_info(
         setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
     )
     if instance_info is None:
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr."
-        )
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
     return instance_info
 
 
@@ -337,9 +309,7 @@ def get_sonarr_setting_instance_info(
         setting.api_key, setting.host, setting.port, setting.ssl
     )
     if instance_info is None:
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr."
-        )
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
     return instance_info
 
 
@@ -358,9 +328,7 @@ def get_sonarr_settings(
     "/sonarr",
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.SonarrSetting,
-    responses={
-        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}
-    },
+    responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
 )
 def add_sonarr_setting(
     setting_in: schemas.SonarrSettingCreateUpdate,
@@ -375,9 +343,7 @@ def add_sonarr_setting(
         port=setting_in.port,
         ssl=setting_in.ssl,
     ):
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr."
-        )
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
     setting = setting_in.to_orm(models.SonarrSetting)
     setting.user_id = current_user.id
     sonarr_setting_repo.save(setting)
@@ -389,9 +355,7 @@ def add_sonarr_setting(
     response_model=schemas.SonarrSetting,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "Setting not found"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Instance connection fail"
-        },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"},
     },
 )
 def update_sonarr_setting(
@@ -412,9 +376,7 @@ def update_sonarr_setting(
         port=setting_in.port,
         ssl=setting_in.ssl,
     ):
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr."
-        )
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
 
     setting.update(setting_in)
     sonarr_setting_repo.save(setting)
