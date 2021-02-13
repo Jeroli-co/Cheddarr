@@ -33,5 +33,4 @@ jobs:
     - name: Poetry install
       run: poetry install
     - name: Test with pytest
-      run: |
-        pytest
+      run: poetry run python -m pytest -v
