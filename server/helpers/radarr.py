@@ -4,7 +4,7 @@ import requests
 
 from server import schemas
 from server.core import utils
-from server.models import MovieRequest, RadarrConfig, RequestStatus
+from server.models import MovieRequest, RadarrSetting, RequestStatus
 
 
 def make_url(
@@ -102,13 +102,13 @@ def get_instance_info(
     )
 
 
-def lookup(config: RadarrConfig, tmdb_id: int, title: str) -> schemas.RadarrMovie:
+def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> schemas.RadarrMovie:
     url = make_url(
-        api_key=config.api_key,
-        host=config.host,
-        port=config.port,
-        ssl=config.ssl,
-        version=config.version,
+        api_key=setting.api_key,
+        host=setting.host,
+        port=setting.port,
+        ssl=setting.ssl,
+        version=setting.version,
         resource_path="/movie/lookup",
         queries={"term": title},
     )
@@ -117,24 +117,24 @@ def lookup(config: RadarrConfig, tmdb_id: int, title: str) -> schemas.RadarrMovi
     return schemas.RadarrMovie.parse_obj(movie)
 
 
-def add_movie(config: RadarrConfig, movie: schemas.RadarrMovie):
+def add_movie(setting: RadarrSetting, movie: schemas.RadarrMovie):
     url = make_url(
-        api_key=config.api_key,
-        host=config.host,
-        port=config.port,
-        ssl=config.ssl,
-        version=config.version,
+        api_key=setting.api_key,
+        host=setting.host,
+        port=setting.port,
+        ssl=setting.ssl,
+        version=setting.version,
         resource_path="/movie",
     )
     requests.post(url, data=movie.json(by_alias=True, exclude_none=True))
 
 
 def send_request(request: MovieRequest):
-    config = request.selected_provider
-    movie = lookup(config, tmdb_id=request.movie.tmdb_id, title=request.movie.title)
+    setting = request.selected_provider
+    movie = lookup(setting, tmdb_id=request.movie.tmdb_id, title=request.movie.title)
     if movie.id is not None:
         return
-    movie.root_folder_path = config.root_folder
-    movie.quality_profile_id = config.quality_profile_id
+    movie.root_folder_path = setting.root_folder
+    movie.quality_profile_id = setting.quality_profile_id
     movie.add_options = schemas.RadarrAddOptions(search_for_movie=False)
-    add_movie(config, movie)
+    add_movie(setting, movie)

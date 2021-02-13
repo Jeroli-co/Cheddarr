@@ -4,7 +4,7 @@ COPY /client ./client
 RUN cd client && yarn install && yarn cache clean && yarn build --production
 
 
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8-slim
 WORKDIR /app
 COPY --from=FRONT_STAGE /app/client/build ./client/build
 COPY /server ./server

@@ -4,10 +4,10 @@ from typing import Optional
 import tmdbsimple as tmdb
 
 from server import schemas
-from server.core import settings
+from server.core import config
 from server.models import MediaType, SeriesType
 
-tmdb.API_KEY = settings.TMDB_API_KEY
+tmdb.API_KEY = config.TMDB_API_KEY
 
 
 def search_tmdb_media(term: str, page: int) -> dict:

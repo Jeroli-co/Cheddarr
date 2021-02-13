@@ -15,9 +15,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.core import security, settings, utils
+from server.core import security, config, utils
 from server.core.scheduler import scheduler
 from server.repositories import PlexAccountRepository, UserRepository
+
 
 router = APIRouter()
 
@@ -48,7 +49,7 @@ def signup(
     if user_repo.count() == 0:
         user.role = models.UserRole.superuser
 
-    if settings.MAIL_ENABLED:
+    if config.MAIL_ENABLED:
         email_data = schemas.EmailConfirm(email=user.email).dict()
         token = security.generate_timed_token(email_data)
         scheduler.add_job(
@@ -192,11 +193,11 @@ def signin(
 @router.get("/sign-in/plex")
 def start_signin_plex():
     request_pin_url = utils.make_url(
-        settings.PLEX_TOKEN_URL,
+        config.PLEX_TOKEN_URL,
         queries_dict={
             "strong": "true",
             "X-Plex-Product": "Cheddarr",
-            "X-Plex-Client-Identifier": settings.PLEX_CLIENT_IDENTIFIER,
+            "X-Plex-Client-Identifier": config.PLEX_CLIENT_IDENTIFIER,
         },
     )
     return request_pin_url
@@ -205,9 +206,8 @@ def start_signin_plex():
 @router.post("/sign-in/plex/authorize")
 def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSignin):
     forward_url = re.sub(
-        f"{settings.API_PREFIX}/v[0-9]+", "", request.url_for("confirm_signin_plex")
+        f"{config.API_PREFIX}/v[0-9]+", "", request.url_for("confirm_signin_plex")
     )
-    print(forward_url)
     token = security.generate_token(
         {
             "id": auth_data.key,
@@ -217,10 +217,10 @@ def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSign
     )
     authorize_url = (
         utils.make_url(
-            settings.PLEX_AUTHORIZE_URL,
+            config.PLEX_AUTHORIZE_URL,
             queries_dict={
                 "context[device][product]": "Cheddarr",
-                "clientID": settings.PLEX_CLIENT_IDENTIFIER,
+                "clientID": config.PLEX_CLIENT_IDENTIFIER,
                 "code": auth_data.code,
                 "forwardUrl": forward_url,
             },
@@ -253,10 +253,10 @@ def confirm_signin_plex(
     code = token.get("code")
     redirect_uri = token.get("redirectUri", "")
     access_url = utils.make_url(
-        settings.PLEX_TOKEN_URL + state,
+        config.PLEX_TOKEN_URL + state,
         queries_dict={
             "code": code,
-            "X-Plex-Client-Identifier": settings.PLEX_CLIENT_IDENTIFIER,
+            "X-Plex-Client-Identifier": config.PLEX_CLIENT_IDENTIFIER,
         },
     )
     r = requests.get(access_url, headers={"Accept": "application/json"})
@@ -267,7 +267,7 @@ def confirm_signin_plex(
         )
 
     r = requests.get(
-        settings.PLEX_USER_RESOURCE_URL,
+        config.PLEX_USER_RESOURCE_URL,
         headers={"X-Plex-Token": auth_token, "Accept": "application/json"},
     )
     info = r.json()

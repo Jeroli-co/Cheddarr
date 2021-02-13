@@ -19,5 +19,3 @@ class Notification(Model, Timestamp):
     read = Column(Boolean, nullable=False, default=False)
     user_id = Column(ForeignKey("user.id"), nullable=False)
     user = relationship("User", back_populates="notifications")
-
-

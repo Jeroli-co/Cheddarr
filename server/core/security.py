@@ -4,8 +4,7 @@ from itsdangerous import URLSafeSerializer, URLSafeTimedSerializer
 from jose import jwt
 from passlib import pwd
 from passlib.context import CryptContext
-
-from server.core.config import settings
+from server.core.config import config
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -16,11 +15,11 @@ def create_jwt_access_token(payload, expires_delta: timedelta = None) -> str:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+            minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES
         )
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.SIGNING_ALGORITHM
+        to_encode, config.SECRET_KEY, algorithm=config.SIGNING_ALGORITHM
     )
     return encoded_jwt
 
@@ -38,22 +37,22 @@ def get_random_password() -> str:
 
 
 def generate_token(data):
-    serializer = URLSafeSerializer(settings.SECRET_KEY)
+    serializer = URLSafeSerializer(config.SECRET_KEY)
     return serializer.dumps(data)
 
 
 def confirm_token(data):
-    serializer = URLSafeSerializer(settings.SECRET_KEY)
+    serializer = URLSafeSerializer(config.SECRET_KEY)
     return serializer.loads(data)
 
 
 def generate_timed_token(data):
-    serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
+    serializer = URLSafeTimedSerializer(config.SECRET_KEY)
     return serializer.dumps(data)
 
 
 def confirm_timed_token(token: str, expiration_minutes: int = 30):
-    serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
+    serializer = URLSafeTimedSerializer(config.SECRET_KEY)
     try:
         data = serializer.loads(token, max_age=expiration_minutes * 60)
     except Exception:

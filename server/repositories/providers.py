@@ -1,18 +1,18 @@
 from server.models import (
-    PlexConfig,
-    RadarrConfig,
-    SonarrConfig,
+    PlexSetting,
+    RadarrSetting,
+    SonarrSetting,
 )
 from server.repositories.base import BaseRepository
 
 
-class PlexConfigRepository(BaseRepository[PlexConfig]):
+class PlexSettingRepository(BaseRepository[PlexSetting]):
     pass
 
 
-class RadarrConfigRepository(BaseRepository[RadarrConfig]):
+class RadarrSettingRepository(BaseRepository[RadarrSetting]):
     pass
 
 
-class SonarrConfigRepository(BaseRepository[SonarrConfig]):
+class SonarrSettingRepository(BaseRepository[SonarrSetting]):
     pass

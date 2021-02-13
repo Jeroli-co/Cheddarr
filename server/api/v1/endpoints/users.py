@@ -4,12 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.core import security, settings
+from server.core import security, config
 from server.core.scheduler import scheduler
 from server.repositories import (
     FriendshipRepository,
     PlexAccountRepository,
-    PlexConfigRepository,
+    PlexSettingRepository,
     UserRepository,
 )
 
@@ -87,13 +87,13 @@ def unlink_plex_account(
     plex_account_repo: PlexAccountRepository = Depends(
         deps.get_repository(PlexAccountRepository)
     ),
-    plex_config_repo: PlexConfigRepository = Depends(
-        deps.get_repository(PlexConfigRepository)
+    plex_setting_repo: PlexSettingRepository = Depends(
+        deps.get_repository(PlexSettingRepository)
     ),
 ):
-    configs = plex_config_repo.find_all_by(user_id=current_user.id)
-    for config in configs:
-        plex_config_repo.remove(config)
+    settings = plex_setting_repo.find_all_by(user_id=current_user.id)
+    for setting in settings:
+        plex_setting_repo.remove(setting)
     plex_account_repo.remove(current_user.plex_account)
     return {"detail": "Plex account unlinked."}
 
@@ -131,7 +131,7 @@ def update_user(
                 status.HTTP_401_UNAUTHORIZED, "The passwords don't match."
             )
         current_user.password = user_in.password
-        if settings.MAIL_ENABLED:
+        if config.MAIL_ENABLED:
             scheduler.add_job(
                 tasks.send_email_task,
                 kwargs=dict(
@@ -146,7 +146,7 @@ def update_user(
             raise HTTPException(
                 status.HTTP_409_CONFLICT, "This email is already taken."
             )
-        if settings.MAIL_ENABLED:
+        if config.MAIL_ENABLED:
             email_data = schemas.EmailConfirm(
                 email=user_in.email, old_email=current_user.email
             ).dict()

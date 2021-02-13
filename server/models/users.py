@@ -31,7 +31,7 @@ class User(Model):
         cascade="all,delete,delete-orphan",
     )
     providers = relationship(
-        "ProviderConfig",
+        "ProviderSetting",
         back_populates="user",
         cascade="all,delete,delete-orphan",
     )

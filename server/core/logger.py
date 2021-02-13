@@ -1,6 +1,6 @@
 import logging
 import logging.handlers
-from server.core import settings
+from server.core import config
 
 LOG_FILENAME = "cheddarr.log"
 MAX_FILES = 10
@@ -12,7 +12,7 @@ def log_setup():
     )
 
     file_handler = logging.handlers.TimedRotatingFileHandler(
-        settings.LOGS_FOLDER / LOG_FILENAME,
+        config.LOGS_FOLDER / LOG_FILENAME,
         "midnight",
         1,
         utc=True,
@@ -28,7 +28,7 @@ def log_setup():
     log = logging.getLogger()
     log.addHandler(file_handler)
     log.addHandler(stream_handler)
-    log.setLevel(settings.LOG_LEVEL)
+    log.setLevel(config.LOG_LEVEL)
 
     return log
 

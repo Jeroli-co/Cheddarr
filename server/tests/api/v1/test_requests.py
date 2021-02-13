@@ -7,10 +7,10 @@ from server.tests.utils import datasets
 
 
 def test_add_series_never_requested_without_seasons(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
     )
@@ -34,10 +34,10 @@ def test_add_series_never_requested_without_seasons(
 
 
 def test_add_series_never_requested_with_all_seasons(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -74,10 +74,10 @@ def test_add_series_never_requested_with_all_seasons(
 
 
 def test_add_series_already_requested_with_seasons(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -94,7 +94,7 @@ def test_add_series_already_requested_with_seasons(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
     )
@@ -103,15 +103,15 @@ def test_add_series_already_requested_with_seasons(
 
 
 def test_add_series_already_requested_without_seasons(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -132,10 +132,10 @@ def test_add_series_already_requested_without_seasons(
 
 
 def test_add_season_never_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -169,10 +169,10 @@ def test_add_season_never_requested(
 
 
 def test_add_season_already_requested_conflict_with_seasons(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -181,7 +181,7 @@ def test_add_season_already_requested_conflict_with_seasons(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -194,10 +194,10 @@ def test_add_season_already_requested_conflict_with_seasons(
 
 
 def test_add_season_already_requested_some_season_conflict(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -206,7 +206,7 @@ def test_add_season_already_requested_some_season_conflict(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -252,15 +252,15 @@ def test_add_season_already_requested_some_season_conflict(
 
 
 def test_add_season_whereas_all_series_requested_without_seasons(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -273,10 +273,10 @@ def test_add_season_whereas_all_series_requested_without_seasons(
 
 
 def test_add_season_whereas_all_series_requested_with_all_seasons(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -293,7 +293,7 @@ def test_add_season_whereas_all_series_requested_with_all_seasons(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -306,10 +306,10 @@ def test_add_season_whereas_all_series_requested_with_all_seasons(
 
 
 def test_add_series_with_seasons_already_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -318,7 +318,7 @@ def test_add_series_with_seasons_already_requested(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
     )
@@ -344,10 +344,10 @@ def test_add_series_with_seasons_already_requested(
 
 
 def test_add_series_with_seasons_already_requested_with_all_seasons(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -356,7 +356,7 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -415,10 +415,10 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
 
 
 def test_add_episode_never_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -489,10 +489,10 @@ def test_add_episode_never_requested(
 
 
 def test_add_episode_already_requested_conflict(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -511,7 +511,7 @@ def test_add_episode_already_requested_conflict(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -534,10 +534,10 @@ def test_add_episode_already_requested_conflict(
 
 
 def test_add_episode_already_requested_some_episodes_conflict(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -556,7 +556,7 @@ def test_add_episode_already_requested_some_episodes_conflict(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -658,10 +658,10 @@ def test_add_episode_already_requested_some_episodes_conflict(
 
 
 def test_add_episode_whereas_all_series_is_requested_without_seasons(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -669,7 +669,7 @@ def test_add_episode_whereas_all_series_is_requested_without_seasons(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -684,10 +684,10 @@ def test_add_episode_whereas_all_series_is_requested_without_seasons(
 
 
 def test_add_episode_whereas_all_series_is_requested_with_seasons(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -704,7 +704,7 @@ def test_add_episode_whereas_all_series_is_requested_with_seasons(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -719,10 +719,10 @@ def test_add_episode_whereas_all_series_is_requested_with_seasons(
 
 
 def test_add_series_without_seasons_whereas_episodes_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -733,7 +733,7 @@ def test_add_series_without_seasons_whereas_episodes_requested(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -762,10 +762,10 @@ def test_add_series_without_seasons_whereas_episodes_requested(
 
 
 def test_add_series_with_all_seasons_whereas_episodes_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -776,7 +776,7 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -814,10 +814,10 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
 
 
 def test_add_seasons_with_all_episodes_whereas_episodes_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -835,7 +835,7 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -943,10 +943,10 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
 
 
 def test_add_seasons_without_episodes_whereas_episodes_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -964,7 +964,7 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -1004,10 +1004,10 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
 
 
 def test_add_episodes_whereas_all_season_requested_with_all_episodes(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -1088,7 +1088,7 @@ def test_add_episodes_whereas_all_season_requested_with_all_episodes(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -1106,10 +1106,10 @@ def test_add_episodes_whereas_all_season_requested_with_all_episodes(
 
 
 def test_add_episodes_whereas_all_season_requested_without_episodes(
-    app: FastAPI, client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers, mock_tmdb
 ):
     r1 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -1122,7 +1122,7 @@ def test_add_episodes_whereas_all_season_requested_without_episodes(
         },
     )
     r2 = client.post(
-        app.url_path_for("add_series_request"),
+        client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
             "tvdb_id": 83268,
@@ -1140,10 +1140,10 @@ def test_add_episodes_whereas_all_season_requested_without_episodes(
 
 
 def test_get_incoming_series_requests(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r = client.get(
-        app.url_path_for("get_received_series_requests"),
+        client.app.url_path_for("get_received_series_requests"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -1167,10 +1167,10 @@ def test_get_incoming_series_requests(
 
 
 def test_get_outgoing_series_requests(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r = client.get(
-        app.url_path_for("get_sent_series_requests"),
+        client.app.url_path_for("get_sent_series_requests"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -1194,10 +1194,10 @@ def test_get_outgoing_series_requests(
 
 
 def test_update_series_request_wrong_status(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.patch(
-        app.url_path_for("update_series_request", request_id="1"),
+        client.app.url_path_for("update_series_request", request_id="1"),
         headers=normal_user_token_headers,
         json={"status": "available"},
     )
@@ -1205,10 +1205,10 @@ def test_update_series_request_wrong_status(
 
 
 def test_update_series_request_not_existing(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.patch(
-        app.url_path_for("update_series_request", request_id="0"),
+        client.app.url_path_for("update_series_request", request_id="0"),
         headers=normal_user_token_headers,
         json={"status": "approved"},
     )
@@ -1216,10 +1216,10 @@ def test_update_series_request_not_existing(
 
 
 def test_update_series_request_not_requested_user(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.patch(
-        app.url_path_for("update_series_request", request_id="2"),
+        client.app.url_path_for("update_series_request", request_id="2"),
         headers=normal_user_token_headers,
         json={"status": "approved"},
     )
@@ -1227,10 +1227,10 @@ def test_update_series_request_not_requested_user(
 
 
 def test_update_series_request_approved_no_provider(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.patch(
-        app.url_path_for("update_series_request", request_id="1"),
+        client.app.url_path_for("update_series_request", request_id="1"),
         headers=normal_user_token_headers,
         json={"status": "approved"},
     )
@@ -1238,14 +1238,14 @@ def test_update_series_request_approved_no_provider(
 
 
 def test_delete_series_request(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     from server.repositories import SeriesRequestRepository
 
     series_request_repo = SeriesRequestRepository(db)
 
     r = client.delete(
-        app.url_path_for("delete_series_request", request_id="1"),
+        client.app.url_path_for("delete_series_request", request_id="1"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -1253,30 +1253,30 @@ def test_delete_series_request(
 
 
 def test_delete_series_request_not_existing(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.delete(
-        app.url_path_for("delete_series_request", request_id="0"),
+        client.app.url_path_for("delete_series_request", request_id="0"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 404
 
 
 def test_delete_series_request_not_pending_not_requested_user(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.delete(
-        app.url_path_for("delete_series_request", request_id="2"),
+        client.app.url_path_for("delete_series_request", request_id="2"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 403
 
 
 def test_add_movie_never_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r = client.post(
-        app.url_path_for("add_movie_request"),
+        client.app.url_path_for("add_movie_request"),
         headers=normal_user_token_headers,
         json={"tmdb_id": 11, "requested_username": datasets["users"][1]["username"]},
     )
@@ -1298,10 +1298,10 @@ def test_add_movie_never_requested(
 
 
 def test_add_movie_not_existing_user(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r = client.post(
-        app.url_path_for("add_movie_request"),
+        client.app.url_path_for("add_movie_request"),
         headers=normal_user_token_headers,
         json={"tmdb_id": 11, "requested_username": "wrongusername"},
     )
@@ -1309,10 +1309,10 @@ def test_add_movie_not_existing_user(
 
 
 def test_add_movie_already_requested(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
 ):
     r = client.post(
-        app.url_path_for("add_movie_request"),
+        client.app.url_path_for("add_movie_request"),
         headers=normal_user_token_headers,
         json={"tmdb_id": 11, "requested_username": datasets["users"][2]["username"]},
     )
@@ -1320,10 +1320,10 @@ def test_add_movie_already_requested(
 
 
 def test_get_incoming_movies_requests(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r = client.get(
-        app.url_path_for("get_received_movie_requests"),
+        client.app.url_path_for("get_received_movie_requests"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -1346,10 +1346,10 @@ def test_get_incoming_movies_requests(
 
 
 def test_get_outgoing_movies_requests(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r = client.get(
-        app.url_path_for("get_sent_movie_requests"),
+        client.app.url_path_for("get_sent_movie_requests"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -1372,10 +1372,10 @@ def test_get_outgoing_movies_requests(
 
 
 def test_update_movie_request_wrong_status(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.patch(
-        app.url_path_for("update_movie_request", request_id="1"),
+        client.app.url_path_for("update_movie_request", request_id="1"),
         headers=normal_user_token_headers,
         json={"status": "available"},
     )
@@ -1383,10 +1383,10 @@ def test_update_movie_request_wrong_status(
 
 
 def test_update_movie_request_not_existing(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.patch(
-        app.url_path_for("update_movie_request", request_id="0"),
+        client.app.url_path_for("update_movie_request", request_id="0"),
         headers=normal_user_token_headers,
         json={"status": "approved"},
     )
@@ -1394,10 +1394,10 @@ def test_update_movie_request_not_existing(
 
 
 def test_update_movie_request_not_requested_user(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.patch(
-        app.url_path_for("update_movie_request", request_id="2"),
+        client.app.url_path_for("update_movie_request", request_id="2"),
         headers=normal_user_token_headers,
         json={"status": "approved"},
     )
@@ -1405,10 +1405,10 @@ def test_update_movie_request_not_requested_user(
 
 
 def test_update_movie_request_approved_no_provider(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.patch(
-        app.url_path_for("update_movie_request", request_id="1"),
+        client.app.url_path_for("update_movie_request", request_id="1"),
         headers=normal_user_token_headers,
         json={"status": "approved"},
     )
@@ -1416,14 +1416,14 @@ def test_update_movie_request_approved_no_provider(
 
 
 def test_delete_movie_request(
-    app: FastAPI, client: TestClient, db: Session, normal_user_token_headers
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     from server.repositories import MovieRequestRepository
 
     movies_request_repo = MovieRequestRepository(db)
 
     r = client.delete(
-        app.url_path_for("delete_movie_request", request_id="1"),
+        client.app.url_path_for("delete_movie_request", request_id="1"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
@@ -1431,20 +1431,20 @@ def test_delete_movie_request(
 
 
 def test_delete_movie_request_not_existing(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.delete(
-        app.url_path_for("delete_movie_request", request_id="0"),
+        client.app.url_path_for("delete_movie_request", request_id="0"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 404
 
 
 def test_delete_movie_request_not_pending_not_requested_user(
-    app: FastAPI, client: TestClient, normal_user_token_headers
+    client: TestClient, normal_user_token_headers
 ):
     r = client.delete(
-        app.url_path_for("delete_movie_request", request_id="2"),
+        client.app.url_path_for("delete_movie_request", request_id="2"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 403

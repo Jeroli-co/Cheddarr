@@ -60,26 +60,26 @@ def get_plex_account_server(
 
 
 @router.get(
-    "/{config_id}/movies/recent",
+    "/{setting_id}/movies/recent",
     response_model=List[schemas.PlexMovie],
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Plex server connection error"
         },
     },
 )
 def get_plex_recent_movies(
-    config_id: str,
-    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    setting_id: str,
+    plex_settings: List[models.PlexSetting] = Depends(deps.get_current_user_plex_settings),
 ):
-    config = next((config for config in plex_configs if config.id == config_id), None)
-    if config is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    setting = next((setting for setting in plex_settings if setting.id == setting_id), None)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex settings not found.")
     plex_server = plex.get_server(
-        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+        base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
     )
     if plex_server is None:
         raise HTTPException(
@@ -95,27 +95,27 @@ def get_plex_recent_movies(
 
 
 @router.get(
-    "/{config_id}/movies/{movie_id}",
+    "/{setting_id}/movies/{movie_id}",
     response_model=schemas.PlexMovie,
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Plex server connection error"
         },
     },
 )
 def get_plex_movie(
-    config_id: str,
+    setting_id: str,
     movie_id: int,
-    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_settings: List[models.PlexSetting] = Depends(deps.get_current_user_plex_settings),
 ):
-    config = next((config for config in plex_configs if config.id == config_id), None)
-    if config is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    setting = next((setting for setting in plex_settings if setting.id == setting_id), None)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex settings not found.")
     plex_server = plex.get_server(
-        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+        base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
     )
     if plex_server is None:
         raise HTTPException(
@@ -127,26 +127,26 @@ def get_plex_movie(
 
 
 @router.get(
-    "/{config_id}/series/recent",
+    "/{setting_id}/series/recent",
     response_model=List[schemas.PlexEpisode],
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Plex server connection error"
         },
     },
 )
 def get_plex_recent_series(
-    config_id: str,
-    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    setting_id: str,
+    plex_settings: List[models.PlexSetting] = Depends(deps.get_current_user_plex_settings),
 ):
-    config = next((config for config in plex_configs if config.id == config_id), None)
-    if config is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    setting = next((setting for setting in plex_settings if setting.id == setting_id), None)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex settings not found.")
     plex_server = plex.get_server(
-        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+        base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
     )
     if plex_server is None:
         raise HTTPException(
@@ -163,27 +163,27 @@ def get_plex_recent_series(
 
 
 @router.get(
-    "/{config_id}/series/{series_id}",
+    "/{setting_id}/series/{series_id}",
     response_model=schemas.PlexSeries,
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Plex server connection error"
         },
     },
 )
 def get_plex_series(
-    config_id: str,
+    setting_id: str,
     series_id: int,
-    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_settings: List[models.PlexSetting] = Depends(deps.get_current_user_plex_settings),
 ):
-    config = next((config for config in plex_configs if config.id == config_id), None)
-    if config is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    setting = next((setting for setting in plex_settings if setting.id == setting_id), None)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex settings not found.")
     plex_server = plex.get_server(
-        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+        base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
     )
     if plex_server is None:
         raise HTTPException(
@@ -195,27 +195,27 @@ def get_plex_series(
 
 
 @router.get(
-    "/{config_id}/seasons/{season_id}",
+    "/{setting_id}/seasons/{season_id}",
     response_model=schemas.PlexSeason,
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Plex server connection error"
         },
     },
 )
 def get_plex_season(
-    config_id: str,
+    setting_id: str,
     season_id: int,
-    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_settings: List[models.PlexSetting] = Depends(deps.get_current_user_plex_settings),
 ):
-    config = next((config for config in plex_configs if config.id == config_id), None)
-    if config is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    setting = next((setting for setting in plex_settings if setting.id == setting_id), None)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex settings not found.")
     plex_server = plex.get_server(
-        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+        base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
     )
     if plex_server is None:
         raise HTTPException(
@@ -227,27 +227,27 @@ def get_plex_season(
 
 
 @router.get(
-    "/{config_id}/episodes/{episode_id}",
+    "/{setting_id}/episodes/{episode_id}",
     response_model=schemas.PlexEpisode,
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex config or server"},
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex setting or server"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Plex server connection error"
         },
     },
 )
 def get_plex_episode(
-    config_id: str,
+    setting_id: str,
     episode_id: int,
-    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_settings: List[models.PlexSetting] = Depends(deps.get_current_user_plex_settings),
 ):
-    config = next((config for config in plex_configs if config.id == config_id), None)
-    if config is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    setting = next((setting for setting in plex_settings if setting.id == setting_id), None)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex settings not found.")
     plex_server = plex.get_server(
-        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+        base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
     )
     if plex_server is None:
         raise HTTPException(
@@ -259,26 +259,26 @@ def get_plex_episode(
 
 
 @router.get(
-    "/{config_id}/on-deck",
+    "/{setting_id}/on-deck",
     response_model=List[Union[schemas.PlexMovie, schemas.PlexEpisode]],
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Plex server connection error"
         },
     },
 )
 def get_plex_on_deck(
-    config_id: str,
-    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    setting_id: str,
+    plex_settings: List[models.PlexSetting] = Depends(deps.get_current_user_plex_settings),
 ):
-    config = next((config for config in plex_configs if config.id == config_id), None)
-    if config is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    setting = next((setting for setting in plex_settings if setting.id == setting_id), None)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex settings not found.")
     plex_server = plex.get_server(
-        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+        base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
     )
     if plex_server is None:
         raise HTTPException(
@@ -289,28 +289,28 @@ def get_plex_on_deck(
 
 
 @router.get(
-    "/{config_id}/search",
+    "/{setting_id}/search",
     response_model=List[schemas.MediaSearchResultSchema],
     response_model_by_alias=False,
     response_model_exclude={"server"},
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex configuration"},
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex settings"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {
             "description": "Plex server connection error"
         },
     },
 )
 def search_plex_media(
-    config_id: str,
+    setting_id: str,
     value: str,
     section: models.MediaType = None,
-    plex_configs: List[models.PlexConfig] = Depends(deps.get_current_user_plex_configs),
+    plex_settings: List[models.PlexSetting] = Depends(deps.get_current_user_plex_settings),
 ):
-    config = next((config for config in plex_configs if config.id == config_id), None)
-    if config is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex configuration not found.")
+    setting = next((setting for setting in plex_settings if setting.id == setting_id), None)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex settings not found.")
     plex_server = plex.get_server(
-        base_url=config.host, port=config.port, ssl=config.ssl, api_key=config.api_key
+        base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
     )
     if plex_server is None:
         raise HTTPException(

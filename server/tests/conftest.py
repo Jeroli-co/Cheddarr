@@ -1,3 +1,4 @@
+import os
 from typing import Dict
 import pytest
 from fastapi import FastAPI
@@ -7,7 +8,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from server.api.dependencies import get_db
-from server.database.base import Base
 from .utils import datasets, user_authentication_headers
 
 
@@ -18,7 +18,7 @@ _db_conn = create_engine(
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=_db_conn, expire_on_commit=False
 )
-
+os.environ["TESTING"] = "True"
 
 # Override dependency
 def get_test_db():
@@ -29,17 +29,21 @@ def get_test_db():
         session.close()
 
 
-@pytest.fixture(scope="module")
-def app() -> FastAPI:
-    from server.main import app as app_
+def app_v1() -> FastAPI:
+    from server.api.v1.v1 import application as app_
 
     app_.dependency_overrides[get_db] = get_test_db
     return app_
 
 
 @pytest.fixture(scope="module")
-def client(app: FastAPI):
-    with TestClient(app) as c:
+def get_app():
+    return {"v1": app_v1}
+
+
+@pytest.fixture(scope="module", params=["v1"])
+def client(request, get_app):
+    with TestClient(get_app[request.param]()) as c:
         yield c
 
 
@@ -52,6 +56,7 @@ def db():
 
 @pytest.fixture(scope="function", autouse=True)
 def setup():
+    from server.database.base import Base
     from server.models import (
         Movie,
         Series,
@@ -87,7 +92,6 @@ def setup():
 def normal_user_token_headers(client: TestClient) -> Dict[str, str]:
     return user_authentication_headers(
         client=client,
-        api_version=1,
         email=datasets["users"][0]["email"],
         password=datasets["users"][0]["password"],
     )

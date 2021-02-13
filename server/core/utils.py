@@ -9,7 +9,7 @@ import emails
 from emails.template import JinjaTemplate
 from jinja2 import Environment, FileSystemLoader
 
-from server.core.config import settings
+from server.core.config import config
 
 
 def send_email(
@@ -18,28 +18,28 @@ def send_email(
     html_template_name: str,
     environment: dict = None,
 ):
-    assert settings.MAIL_ENABLED, "Emails are disabled."
+    assert config.MAIL_ENABLED, "Emails are disabled."
     environment = environment or {}
     for k, v in environment.items():
-        environment[k] = re.sub(f"{settings.API_PREFIX}/v[0-9]+", "", v)
-    with open(Path(settings.MAIL_TEMPLATES_FOLDER) / html_template_name) as f:
+        environment[k] = re.sub(f"{config.API_PREFIX}/v[0-9]+", "", v)
+    with open(Path(config.MAIL_TEMPLATES_FOLDER) / html_template_name) as f:
         template_str = f.read()
     message = emails.Message(
-        mail_from=settings.MAIL_DEFAULT_SENDER,
+        mail_from=config.MAIL_DEFAULT_SENDER,
         subject=subject,
         html=JinjaTemplate(
             template_str,
             environment=Environment(
-                loader=FileSystemLoader(settings.MAIL_TEMPLATES_FOLDER)
+                loader=FileSystemLoader(config.MAIL_TEMPLATES_FOLDER)
             ),
         ),
     )
 
     smtp_options = {
-        "host": settings.MAIL_SMTP_HOST,
-        "port": settings.MAIL_SMTP_PORT,
-        "user": settings.MAIL_SMTP_USER,
-        "password": settings.MAIL_SMTP_PASSWORD,
+        "host": config.MAIL_SMTP_HOST,
+        "port": config.MAIL_SMTP_PORT,
+        "user": config.MAIL_SMTP_USER,
+        "password": config.MAIL_SMTP_PASSWORD,
     }
     response = message.send(
         to=to_email,
@@ -49,9 +49,9 @@ def send_email(
 
 
 def get_random_avatar():
-    profile_images_path = os.path.join(settings.IMAGES_FOLDER, "users")
+    profile_images_path = os.path.join(config.IMAGES_FOLDER, "users")
     avatar = choice(listdir(profile_images_path))
-    return f"{settings.SERVER_HOST}/images/users/{avatar}"
+    return f"{config.SERVER_HOST}/images/users/{avatar}"
 
 
 def make_url(url: str, queries_dict: dict = None):

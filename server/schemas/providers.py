@@ -7,7 +7,7 @@ from server.models import ProviderType
 from server.schemas import APIModel
 
 
-class ProviderConfigBase(APIModel):
+class ProviderSettingBase(APIModel):
     host: str
     port: Optional[int]
     ssl: bool
@@ -23,20 +23,20 @@ class RadarrInstanceInfo(APIModel):
     version: int
 
 
-class RadarrConfigData(APIModel):
+class RadarrSettingData(APIModel):
     root_folder: str
     quality_profile_id: int
     version: int = Field(ge=2, le=3)
 
 
-class RadarrConfig(ProviderConfigBase, RadarrConfigData):
+class RadarrSetting(ProviderSettingBase, RadarrSettingData):
     id: str
     name: str
     enabled: bool = True
     provider_type: ProviderType = Field(default=ProviderType.movie_provider, const=True)
 
 
-class RadarrConfigCreateUpdate(ProviderConfigBase, RadarrConfigData):
+class RadarrSettingCreateUpdate(ProviderSettingBase, RadarrSettingData):
     enabled: Optional[bool] = True
 
 
@@ -68,7 +68,7 @@ class SonarrInstanceInfo(APIModel):
     version: int
 
 
-class SonarrConfigData(APIModel):
+class SonarrSettingData(APIModel):
     root_folder: str
     anime_root_folder: Optional[str]
     quality_profile_id: int
@@ -78,7 +78,7 @@ class SonarrConfigData(APIModel):
     version: int = Field(ge=2, le=3)
 
 
-class SonarrConfig(ProviderConfigBase, SonarrConfigData):
+class SonarrSetting(ProviderSettingBase, SonarrSettingData):
     id: str
     name: str
     enabled: bool = True
@@ -87,7 +87,7 @@ class SonarrConfig(ProviderConfigBase, SonarrConfigData):
     )
 
 
-class SonarrConfigCreateUpdate(ProviderConfigBase, SonarrConfigData):
+class SonarrSettingCreateUpdate(ProviderSettingBase, SonarrSettingData):
     enabled: Optional[bool] = True
 
 
@@ -143,14 +143,14 @@ class PlexServerInfo(APIModel):
     server_name: str
 
 
-class PlexConfig(ProviderConfigBase, PlexServerInfo):
+class PlexSetting(ProviderSettingBase, PlexServerInfo):
     id: str
     name: str
     enabled: bool = True
     provider_type: ProviderType = Field(default=ProviderType.media_server, const=True)
 
 
-class PlexConfigCreateUpdate(ProviderConfigBase, PlexServerInfo):
+class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
     enabled: Optional[bool] = True
 
 

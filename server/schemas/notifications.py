@@ -1,18 +1,15 @@
+from typing import Any
+
 from server.schemas import APIModel, UserPublic
 
 
-class Notificaiton(APIModel):
+class Notification(APIModel):
     message: str
     read: bool
     user: UserPublic
 
 
-class NotificationAgent(APIModel):
-    name: str
-    enabled: bool
-
-
-class EmailAgent(NotificationAgent):
+class EmailAgentSettings(APIModel):
     smtp_port: int
     smtp_host: str
     smtp_user: str
@@ -20,3 +17,14 @@ class EmailAgent(NotificationAgent):
     sender_address: str
     sender_name: str
     ssl: bool
+
+
+class EmailAgent(APIModel):
+    id: int
+    enabled: bool
+    settings: EmailAgentSettings
+
+
+class EmailAgentCreateUpdate(APIModel):
+    enabled: bool
+    settings: EmailAgentSettings

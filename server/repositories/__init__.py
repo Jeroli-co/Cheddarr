@@ -1,7 +1,7 @@
 from .providers import (
-    PlexConfigRepository,
-    RadarrConfigRepository,
-    SonarrConfigRepository,
+    PlexSettingRepository,
+    RadarrSettingRepository,
+    SonarrSettingRepository,
 )
 from .requests import (
     MovieRepository,

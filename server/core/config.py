@@ -20,9 +20,10 @@ class Config(BaseSettings):
     DOMAIN: str = "localhost:9090"
     SERVER_HOST: str = f"http://{DOMAIN}"
     LOG_LEVEL: str = "INFO"
+    TESTING: bool = False
 
     ##########################################################################
-    # folders                                                                #
+    # folders/files                                                          #
     ##########################################################################
     PROJECT_ROOT: DirectoryPath = Path(__file__).parents[2].resolve()
     REACT_BUILD_FOLDER: DirectoryPath = PROJECT_ROOT / "client" / "build"
@@ -32,6 +33,7 @@ class Config(BaseSettings):
     CONFIG_FOLDER: Path = PROJECT_ROOT / "config"
     LOGS_FOLDER: Path = CONFIG_FOLDER / "logs"
     DB_FOLDER: Path = CONFIG_FOLDER / "db"
+    CONFIG_FILE: Path = CONFIG_FOLDER / "config.json"
 
     ##########################################################################
     # external services                                                      #
@@ -53,8 +55,7 @@ class Config(BaseSettings):
     ##########################################################################
     # database                                                               #
     ##########################################################################
-    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
-    DB_NAME: str = "cheddarr.db"
+    DB_NAME: str = "cheddarr.sqlite"
     DATABASE_URL: str = "sqlite:///" + str(DB_FOLDER / DB_NAME)
     DATABASE_OPTIONS: dict = {"check_same_thread": False}
 
@@ -64,23 +65,39 @@ class Config(BaseSettings):
     MAIL_ENABLED: bool = False
 
     ##########################################################################
-    # Launch actions and config set                                          #
+    # config file                                                            #
     ##########################################################################
     def __init__(self, **values: Any):
         super().__init__(**values)
+
+        if self.TESTING:
+            return
+
         self.CONFIG_FOLDER.mkdir(exist_ok=True)
         self.DB_FOLDER.mkdir(exist_ok=True)
         self.LOGS_FOLDER.mkdir(exist_ok=True)
 
-        file_path = self.CONFIG_FOLDER / "config.json"
         try:
-            config_file = open(file_path, "r")
-            existing_config_file = load(config_file)
-            for k, v in existing_config_file.items():
-                setattr(self, k, v)
-
+            with open(self.CONFIG_FILE, "r") as existing_config_file:
+                existing_config = load(existing_config_file)
+                for k, v in existing_config.items():
+                    setattr(self, k, v)
         except FileNotFoundError:
-            config_file = open(file_path, "w+")
+            pass
+        try:
+            self.write_config_file()
+        except OSError:
+            raise
+
+    def set_config(self, **config_kwargs):
+        print(config_kwargs)
+        for field_k, field_v in config_kwargs.items():
+            if field_k in self.__fields__:
+                setattr(self, field_k, field_v)
+        self.write_config_file()
+
+    def write_config_file(self):
+        with open(self.CONFIG_FILE, "w+") as config_file:
             dump(
                 {
                     item: getattr(self, item)
@@ -90,21 +107,11 @@ class Config(BaseSettings):
                 config_file,
             )
 
-        else:
-            config_file.close()
-
-    _config_file_fields = {"SECRET_KEY", "LOG_LEVEL"}
-
-    def set_config(self, **config_kwargs):
-        print(config_kwargs)
-        for field_k, field_v in config_kwargs:
-            if field_k in self.__fields__:
-                setattr(self, field_k, field_v)
+    _config_file_fields = {
+        "SECRET_KEY",
+        "LOG_LEVEL",
+        "MAIL_ENABLED",
+    }
 
 
-settings = Config()
-
-
-@lru_cache()
-def get_config():
-    return Config()
+config = Config()

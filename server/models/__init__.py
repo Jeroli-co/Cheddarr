@@ -1,10 +1,10 @@
 from .media import Media, MediaType, Movie, Series, SeriesType
 from .providers import (
-    PlexConfig,
-    ProviderConfig,
+    PlexSetting,
+    ProviderSetting,
     ProviderType,
-    RadarrConfig,
-    SonarrConfig,
+    RadarrSetting,
+    SonarrSetting,
 )
 from .requests import (
     EpisodeRequest,

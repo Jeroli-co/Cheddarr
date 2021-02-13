@@ -29,9 +29,9 @@ def check_movie_requests_availability_task():
     movie_request_repo = repositories.MovieRequestRepository(next(get_db()))
     requests = movie_request_repo.find_all_by(status=RequestStatus.approved)
     for request in requests:
-        config = request.selected_provider
+        setting = request.selected_provider
         movie = radarr.lookup(
-            config, tmdb_id=request.movie.tmdb_id, title=request.movie.title
+            setting, tmdb_id=request.movie.tmdb_id, title=request.movie.title
         )
         if movie.has_file:
             request.status = RequestStatus.available
@@ -43,9 +43,9 @@ def check_series_requests_availability_task():
     series_request_repo = repositories.SeriesRequestRepository(next(get_db()))
     requests = series_request_repo.find_all_by(status=RequestStatus.approved)
     for request in requests:
-        config = request.selected_provider
-        series_lookup = sonarr.lookup(config, tvdb_id=request.series.tvdb_id)
-        series = sonarr.get_series(config, series_lookup.id)
+        setting = request.selected_provider
+        series_lookup = sonarr.lookup(setting, tvdb_id=request.series.tvdb_id)
+        series = sonarr.get_series(setting, series_lookup.id)
         req_seasons_available = 0
         for req_season in request.seasons:
             if not req_season.episodes:
@@ -61,7 +61,7 @@ def check_series_requests_availability_task():
                     req_season.status = RequestStatus.available
                     req_seasons_available += 1
             else:
-                episodes = sonarr.get_episodes(config, series.id)
+                episodes = sonarr.get_episodes(setting, series.id)
                 req_episodes_available = 0
                 for req_episode in req_season.episodes:
                     matched_episode = next(
