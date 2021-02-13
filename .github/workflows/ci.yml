@@ -1,4 +1,4 @@
-name: Build
+name: CI
 
 on: [push,pull_request]
 
@@ -18,9 +18,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Build Node
       run: |
-        npm install
-        npm run build --if-present
-        npm test
+        cd client
+        yarn install
+        yarn run build --if-present
+        yarn test
       env:
         CI: true
     - name: Set up Python 3.8
