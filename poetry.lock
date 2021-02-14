@@ -189,7 +189,7 @@ toml = ["toml"]
 
 [[package]]
 name = "cryptography"
-version = "3.4.4"
+version = "3.4.5"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 category = "main"
 optional = false
