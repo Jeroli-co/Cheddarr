@@ -28,7 +28,7 @@ import {
 } from "../../../../../shared/components/Divider";
 import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
 import { InputField } from "../../../../../shared/components/inputs/InputField";
-import { Help } from "../../../../../shared/components/Help";
+import { Help, HelpDanger } from "../../../../../shared/components/Help";
 import { H1, H2, H3 } from "../../../../../shared/components/Titles";
 import { Row } from "../../../../../shared/components/layout/Row";
 import { Buttons } from "../../../../../shared/components/layout/Buttons";
@@ -125,9 +125,7 @@ const PlexConfig = () => {
             })}
           />
           {errors.apiKey && errors.apiKey.type === "required" && (
-            <p className="help is-danger">
-              {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-            </p>
+            <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
           )}
         </InputField>
 
@@ -145,9 +143,7 @@ const PlexConfig = () => {
               })}
             />
             {errors.host && errors.host.type === "required" && (
-              <p className="help is-danger">
-                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-              </p>
+              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
             )}
             <Help>
               <Icon icon={faExclamationCircle} /> Change this value with your
@@ -192,9 +188,7 @@ const PlexConfig = () => {
               })}
             />
             {errors.serverId && errors.serverId.type === "required" && (
-              <p className="help is-danger">
-                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-              </p>
+              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
             )}
           </InputField>
 
@@ -211,9 +205,7 @@ const PlexConfig = () => {
               })}
             />
             {errors.serverName && errors.serverName.type === "required" && (
-              <p className="help is-danger">
-                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-              </p>
+              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
             )}
           </InputField>
         </Row>
@@ -288,7 +280,8 @@ const PlexConfig = () => {
       {isServersModalActive && (
         <ServersModal
           selectServer={_onSelectServer}
-          onClose={() => setIsServersModalActive(false)}
+          isOpen={isServersModalActive}
+          closeModal={() => setIsServersModalActive(false)}
         />
       )}
 
@@ -298,14 +291,16 @@ const PlexConfig = () => {
           onUnlink={() =>
             currentConfig.data ? _onUnlinkPlexConfig(currentConfig.data.id) : {}
           }
-          onClose={() => setIsUnlinkServerModalActive(false)}
+          isOpen={isUnlinkServerModalActive}
+          closeModal={() => setIsUnlinkServerModalActive(false)}
         />
       )}
 
       {isUnlinkAccountModalActive && (
         <UnlinkAccountModal
           onUnlink={() => _onUnlinkPlexAccount()}
-          onClose={() => setIsUnlinkAccountModalActive(false)}
+          isOpen={isUnlinkAccountModalActive}
+          closeModal={() => setIsUnlinkAccountModalActive(false)}
         />
       )}
     </div>

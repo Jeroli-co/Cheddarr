@@ -1,46 +1,41 @@
 import React from "react";
+import { Modal } from "../../../../../../shared/components/Modal";
+import { H2 } from "../../../../../../shared/components/Titles";
+import {
+  Button,
+  DangerButton,
+} from "../../../../../../shared/components/Button";
+import { Buttons } from "../../../../../../shared/components/layout/Buttons";
 
 type UnlinkAccountModalProps = {
   onUnlink: () => void;
-  onClose: () => void;
+  isOpen: boolean;
+  closeModal: () => void;
 };
 
-const UnlinkAccountModal = ({ onUnlink, onClose }: UnlinkAccountModalProps) => {
+const UnlinkAccountModal = (props: UnlinkAccountModalProps) => {
   return (
-    <div
-      className="UnlinkAccountModal modal is-active"
-      data-testid="UnlinkAccountModal"
-    >
-      <div className="modal-background" onClick={() => onClose()} />
+    <Modal isOpen={props.isOpen} close={props.closeModal}>
+      <header>
+        <H2>Unlink Plex Account</H2>
+      </header>
 
-      <div className="modal-card">
-        <header className="modal-card-head">
-          <p className="modal-card-title">Unlink Plex Account</p>
-          <button
-            className="delete"
-            aria-label="close"
-            type="button"
-            onClick={() => onClose()}
-          />
-        </header>
+      <section>
+        <p>You are about to unlink your Plex account from Cheddarr.</p>
+        <p>You will no longer have access to Plex related features.</p>
+      </section>
 
-        <section className="modal-card-body">
-          <div className="content">
-            <p>You are about to unlink your Plex account from Cheddarr.</p>
-            <p>You will no longer have access to Plex related features.</p>
-          </div>
-        </section>
-
-        <footer className="modal-card-foot">
-          <button className="button is-danger" onClick={() => onUnlink()}>
+      <footer>
+        <Buttons>
+          <DangerButton onClick={() => props.onUnlink()}>
             Unlink Account
-          </button>
-          <button className="button" type="button" onClick={() => onClose()}>
+          </DangerButton>
+          <Button type="button" onClick={() => props.closeModal()}>
             Cancel
-          </button>
-        </footer>
-      </div>
-    </div>
+          </Button>
+        </Buttons>
+      </footer>
+    </Modal>
   );
 };
 

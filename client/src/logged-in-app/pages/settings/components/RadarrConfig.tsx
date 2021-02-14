@@ -20,6 +20,7 @@ import { Row } from "../../../../shared/components/layout/Row";
 import { H1, H2 } from "../../../../shared/components/Titles";
 import { InputField } from "../../../../shared/components/inputs/InputField";
 import { Checkbox } from "../../../../shared/components/inputs/Checkbox";
+import { HelpDanger } from "../../../../shared/components/Help";
 
 export const RadarrConfig = () => {
   const [instanceInfo, setInstanceInfo] = useState<
@@ -110,7 +111,6 @@ export const RadarrConfig = () => {
               <label>API Key</label>
               <input
                 name="apiKey"
-                className="input"
                 type="text"
                 placeholder="API Key"
                 ref={register({
@@ -118,9 +118,9 @@ export const RadarrConfig = () => {
                 })}
               />
               {errors.apiKey && errors.apiKey.type === "required" && (
-                <p className="help is-danger">
+                <HelpDanger>
                   {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                </p>
+                </HelpDanger>
               )}
             </InputField>
 
@@ -129,7 +129,6 @@ export const RadarrConfig = () => {
                 <label>Hostname or IP Address</label>
                 <input
                   name="host"
-                  className="input"
                   type="text"
                   placeholder="Hostname or IP"
                   ref={register({
@@ -137,9 +136,9 @@ export const RadarrConfig = () => {
                   })}
                 />
                 {errors.host && errors.host.type === "required" && (
-                  <p className="help is-danger">
+                  <HelpDanger>
                     {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                  </p>
+                  </HelpDanger>
                 )}
               </InputField>
 
@@ -154,7 +153,6 @@ export const RadarrConfig = () => {
                 </label>
                 <input
                   name="port"
-                  className="input"
                   type="number"
                   placeholder="Port"
                   ref={register({ minLength: 4, maxLength: 5 })}
@@ -192,7 +190,6 @@ export const RadarrConfig = () => {
               <label>Version</label>
               <input
                 name="version"
-                className="input"
                 type="text"
                 ref={register}
                 value={instanceInfo.data ? instanceInfo.data.version : ""}

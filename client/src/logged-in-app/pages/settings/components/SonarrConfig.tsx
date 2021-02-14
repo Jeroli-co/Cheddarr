@@ -20,6 +20,7 @@ import { Row } from "../../../../shared/components/layout/Row";
 import { H1, H2 } from "../../../../shared/components/Titles";
 import { InputField } from "../../../../shared/components/inputs/InputField";
 import { Checkbox } from "../../../../shared/components/inputs/Checkbox";
+import { HelpDanger } from "../../../../shared/components/Help";
 
 export const SonarrConfig = () => {
   const [instanceInfo, setInstanceInfo] = useState<
@@ -111,7 +112,6 @@ export const SonarrConfig = () => {
             <label>API Key</label>
             <input
               name="apiKey"
-              className="input"
               type="text"
               placeholder="API Key"
               ref={register({
@@ -119,9 +119,7 @@ export const SonarrConfig = () => {
               })}
             />
             {errors.apiKey && errors.apiKey.type === "required" && (
-              <p className="help is-danger">
-                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-              </p>
+              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
             )}
           </InputField>
 
@@ -130,7 +128,6 @@ export const SonarrConfig = () => {
               <label>Hostname or IP Address</label>
               <input
                 name="host"
-                className="input"
                 type="text"
                 placeholder="Hostname or IP"
                 ref={register({
@@ -138,9 +135,9 @@ export const SonarrConfig = () => {
                 })}
               />
               {errors.host && errors.host.type === "required" && (
-                <p className="help is-danger">
+                <HelpDanger>
                   {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                </p>
+                </HelpDanger>
               )}
             </InputField>
 
@@ -155,7 +152,6 @@ export const SonarrConfig = () => {
               </label>
               <input
                 name="port"
-                className="input"
                 type="number"
                 placeholder="Port"
                 ref={register({ minLength: 4, maxLength: 5 })}
@@ -193,7 +189,6 @@ export const SonarrConfig = () => {
             <label>Version</label>
             <input
               name="version"
-              className="input"
               type="text"
               ref={register}
               value={

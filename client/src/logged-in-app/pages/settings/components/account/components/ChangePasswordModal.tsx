@@ -1,164 +1,143 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../../shared/enums/FormDefaultValidators";
-import { useHistory } from "react-router";
 import {
   IChangePasswordModel,
   useUserService,
 } from "../../../../../../shared/hooks/useUserService";
 import {
   Button,
-  SecondaryButton,
+  PrimaryButton,
 } from "../../../../../../shared/components/Button";
+import { Modal } from "../../../../../../shared/components/Modal";
+import { Buttons } from "../../../../../../shared/components/layout/Buttons";
+import { H2 } from "../../../../../../shared/components/Titles";
+import { InputField } from "../../../../../../shared/components/inputs/InputField";
+import { Icon } from "../../../../../../shared/components/Icon";
+import { HelpDanger } from "../../../../../../shared/components/Help";
 
-const ChangePasswordModal = () => {
+type ChangePasswordModalProps = {
+  isOpen: boolean;
+  closeModal: () => void;
+};
+
+const ChangePasswordModal = (props: ChangePasswordModalProps) => {
   const { register, handleSubmit, errors, watch } = useForm<
     IChangePasswordModel
   >();
-  const history = useHistory();
   const { updatePassword } = useUserService();
 
   const onSubmit = (data: IChangePasswordModel) => {
     updatePassword(data);
   };
 
-  const closeModal = () => {
-    history.goBack();
-  };
-
   return (
-    <div
-      className="ChangePasswordModal modal is-active"
-      data-testid="ChangePasswordModal"
-    >
-      <div className="modal-background" onClick={closeModal} />
-      <div className="modal-card">
-        <header className="modal-card-head">
-          <p className="modal-card-title">Change your password</p>
-          <button
-            className="delete"
-            aria-label="close"
-            type="button"
-            onClick={closeModal}
-          />
-        </header>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <section className="modal-card-body">
-            {/* OLD PASSWORD */}
-            <div className="field">
-              <label className="label">Old password</label>
-              <div className="control has-icons-left">
-                <input
-                  name="oldPassword"
-                  className={
-                    "input " + (errors["oldPassword"] ? "is-danger" : "")
-                  }
-                  type="password"
-                  placeholder={"Enter your old password"}
-                  ref={register({
-                    required: true,
-                    pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
-                  })}
-                />
-                <span className="icon is-small is-left">
-                  <FontAwesomeIcon icon={faKey} />
-                </span>
-              </div>
-              {errors["oldPassword"] &&
-                errors["oldPassword"].type === "required" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                  </p>
-                )}
-              {errors["oldPassword"] &&
-                errors["oldPassword"].type === "pattern" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
-                  </p>
-                )}
+    <Modal isOpen={props.isOpen} close={props.closeModal}>
+      <header>
+        <H2>Change your password</H2>
+      </header>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <section>
+          {/* OLD PASSWORD */}
+          <InputField withIcon>
+            <label>Old password</label>
+            <div className="with-left-icon">
+              <input
+                name="oldPassword"
+                type="password"
+                placeholder={"Enter your old password"}
+                ref={register({
+                  required: true,
+                  pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
+                })}
+              />
+              <span className="icon">
+                <Icon icon={faKey} />
+              </span>
             </div>
+          </InputField>
+          {errors["oldPassword"] &&
+            errors["oldPassword"].type === "required" && (
+              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
+            )}
+          {errors["oldPassword"] &&
+            errors["oldPassword"].type === "pattern" && (
+              <HelpDanger>
+                {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
+              </HelpDanger>
+            )}
 
-            {/* NEW PASSWORD */}
-            <div className="field">
-              <label className="label">New password</label>
-              <div className="control has-icons-left">
-                <input
-                  name="newPassword"
-                  className={
-                    "input " + (errors["newPassword"] ? "is-danger" : "")
-                  }
-                  type="password"
-                  placeholder="Enter a strong password"
-                  ref={register({
-                    required: true,
-                    pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
-                  })}
-                />
-                <span className="icon is-small is-left">
-                  <FontAwesomeIcon icon={faKey} />
-                </span>
-              </div>
-              {errors["newPassword"] &&
-                errors["newPassword"].type === "required" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                  </p>
-                )}
-              {errors["newPassword"] &&
-                errors["newPassword"].type === "pattern" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
-                  </p>
-                )}
+          {/* NEW PASSWORD */}
+          <InputField withIcon>
+            <label>New password</label>
+            <div className="with-left-icon">
+              <input
+                name="newPassword"
+                type="password"
+                placeholder="Enter a strong password"
+                ref={register({
+                  required: true,
+                  pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
+                })}
+              />
+              <span className="icon">
+                <Icon icon={faKey} />
+              </span>
             </div>
+          </InputField>
+          {errors["newPassword"] &&
+            errors["newPassword"].type === "required" && (
+              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
+            )}
+          {errors["newPassword"] &&
+            errors["newPassword"].type === "pattern" && (
+              <HelpDanger>
+                {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
+              </HelpDanger>
+            )}
 
-            {/* CONFIRM NEW PASSWORD */}
-            <div className="field">
-              <label className="label">Confirm new password</label>
-              <div className="control has-icons-left">
-                <input
-                  name="passwordConfirmation"
-                  className={
-                    "input " + (errors.passwordConfirmation ? "is-danger" : "")
-                  }
-                  type="password"
-                  placeholder="Confirm your new password"
-                  ref={register({
-                    required: true,
-                    validate: (value) => {
-                      return value === watch("newPassword");
-                    },
-                  })}
-                />
-                <span className="icon is-small is-left">
-                  <FontAwesomeIcon icon={faKey} />
-                </span>
-              </div>
-              {errors.passwordConfirmation &&
-                errors.passwordConfirmation.type === "required" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                  </p>
-                )}
-              {errors.passwordConfirmation &&
-                errors.passwordConfirmation.type === "validate" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.WATCH_PASSWORD.message}
-                  </p>
-                )}
+          {/* CONFIRM NEW PASSWORD */}
+          <InputField withIcon>
+            <label>Confirm new password</label>
+            <div className="with-left-icon">
+              <input
+                name="passwordConfirmation"
+                type="password"
+                placeholder="Confirm your new password"
+                ref={register({
+                  required: true,
+                  validate: (value) => {
+                    return value === watch("newPassword");
+                  },
+                })}
+              />
+              <span className="icon">
+                <Icon icon={faKey} />
+              </span>
             </div>
-          </section>
-          <footer className="modal-card-foot">
-            <SecondaryButton type="submit">Change password</SecondaryButton>
-            <Button type="button" onClick={closeModal}>
+          </InputField>
+          {errors.passwordConfirmation &&
+            errors.passwordConfirmation.type === "required" && (
+              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
+            )}
+          {errors.passwordConfirmation &&
+            errors.passwordConfirmation.type === "validate" && (
+              <HelpDanger>
+                {FORM_DEFAULT_VALIDATOR.WATCH_PASSWORD.message}
+              </HelpDanger>
+            )}
+        </section>
+        <footer>
+          <Buttons>
+            <PrimaryButton type="submit">Change password</PrimaryButton>
+            <Button type="button" onClick={() => props.closeModal()}>
               Cancel
             </Button>
-          </footer>
-        </form>
-      </div>
-    </div>
+          </Buttons>
+        </footer>
+      </form>
+    </Modal>
   );
 };
 

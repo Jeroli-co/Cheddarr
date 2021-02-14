@@ -1,101 +1,87 @@
 import React from "react";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useForm } from "react-hook-form";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../../shared/enums/FormDefaultValidators";
-import { useHistory } from "react-router";
 import { useUserService } from "../../../../../../shared/hooks/useUserService";
+import { Modal } from "../../../../../../shared/components/Modal";
+import { H2 } from "../../../../../../shared/components/Titles";
+import { InputField } from "../../../../../../shared/components/inputs/InputField";
+import { Buttons } from "../../../../../../shared/components/layout/Buttons";
+import {
+  Button,
+  PrimaryButton,
+} from "../../../../../../shared/components/Button";
+import { Icon } from "../../../../../../shared/components/Icon";
+import { HelpDanger } from "../../../../../../shared/components/Help";
 
-const ChangeUsernameModal = () => {
+type ChangeUsernameModalProps = {
+  isOpen: boolean;
+  closeModal: () => void;
+};
+
+const ChangeUsernameModal = (props: ChangeUsernameModalProps) => {
   const { register, handleSubmit, errors } = useForm<{ username: string }>();
-  const history = useHistory();
   const { updateUsername } = useUserService();
 
   const onSubmit = handleSubmit((data) => {
     updateUsername(data.username).then((res) => {
-      if (res.status === 200) closeModal();
+      if (res.status === 200) props.closeModal();
     });
   });
 
-  const closeModal = () => {
-    history.goBack();
-  };
-
   return (
-    <div
-      className="ChangeUsernameModal modal is-active"
-      data-testid="ChangeUsernameModal"
-    >
-      <div className="modal-background" onClick={closeModal} />
+    <Modal isOpen={props.isOpen} close={props.closeModal}>
+      <header>
+        <H2>Change your username</H2>
+      </header>
 
-      <div className="modal-card">
-        <header className="modal-card-head">
-          <p className="modal-card-title">Change your username</p>
-          <button
-            className="delete"
-            aria-label="close"
-            type="button"
-            onClick={closeModal}
-          />
-        </header>
-
-        <form onSubmit={onSubmit}>
-          <section className="modal-card-body">
-            <div className="field">
-              <label className="label">New username</label>
-              <div className="control has-icons-left">
-                <input
-                  name="username"
-                  className={"input " + (errors["username"] ? "is-danger" : "")}
-                  type="text"
-                  placeholder="Enter your new username"
-                  ref={register({
-                    required: true,
-                    minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
-                    maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
-                    pattern: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value,
-                  })}
-                />
-                <span className="icon is-small is-left">
-                  <FontAwesomeIcon icon={faUser} />
-                </span>
-              </div>
-              {errors["username"] && errors["username"].type === "required" && (
-                <p className="help is-danger">
-                  {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                </p>
-              )}
-              {errors["username"] &&
-                errors["username"].type === "minLength" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.MIN_LENGTH.message}
-                  </p>
-                )}
-              {errors["username"] &&
-                errors["username"].type === "maxLength" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}
-                  </p>
-                )}
-              {errors["username"] && errors["username"].type === "pattern" && (
-                <p className="help is-danger">
-                  {FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message}
-                </p>
-              )}
+      <form onSubmit={onSubmit}>
+        <section>
+          <InputField withIcon>
+            <label>New username</label>
+            <div className="with-left-icon">
+              <input
+                name="username"
+                type="text"
+                placeholder="Enter your new username"
+                ref={register({
+                  required: true,
+                  minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
+                  maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
+                  pattern: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value,
+                })}
+              />
+              <span className="icon">
+                <Icon icon={faUser} />
+              </span>
             </div>
-          </section>
+          </InputField>
+          {errors["username"] && errors["username"].type === "required" && (
+            <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
+          )}
+          {errors["username"] && errors["username"].type === "minLength" && (
+            <HelpDanger>{FORM_DEFAULT_VALIDATOR.MIN_LENGTH.message}</HelpDanger>
+          )}
+          {errors["username"] && errors["username"].type === "maxLength" && (
+            <HelpDanger>{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</HelpDanger>
+          )}
+          {errors["username"] && errors["username"].type === "pattern" && (
+            <HelpDanger>
+              {FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message}
+            </HelpDanger>
+          )}
+        </section>
 
-          <footer className="modal-card-foot">
-            <button className="button is-secondary-button">
-              Change username
-            </button>
-            <button className="button" type="button" onClick={closeModal}>
+        <footer>
+          <Buttons>
+            <PrimaryButton>Change username</PrimaryButton>
+            <Button type="button" onClick={() => props.closeModal()}>
               Cancel
-            </button>
-          </footer>
-        </form>
-      </div>
-    </div>
+            </Button>
+          </Buttons>
+        </footer>
+      </form>
+    </Modal>
   );
 };
 

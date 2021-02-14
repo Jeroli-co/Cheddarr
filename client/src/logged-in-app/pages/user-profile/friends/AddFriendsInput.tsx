@@ -1,8 +1,19 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { PrimaryButton } from "../../../../shared/components/Button";
+import { IconButton } from "../../../../shared/components/Button";
 import { InputField } from "../../../../shared/components/inputs/InputField";
+import styled from "styled-components";
+import { Icon } from "../../../../shared/components/Icon";
+
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  button {
+    margin-left: 20px;
+  }
+`;
 
 type AddFriendsInputProp = {
   sendFriendRequest: (username: string) => void;
@@ -25,11 +36,10 @@ const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
   };
 
   return (
-    <div className="level-item">
+    <Container>
       <InputField withIcon>
         <div className="with-left-icon">
           <input
-            className="input"
             type="search"
             placeholder="Add friends"
             autoComplete="off"
@@ -37,18 +47,15 @@ const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
             value={searchFriends}
             onChange={(e) => setSearchFriends(e.target.value)}
           />
-          <span className="icon is-small is-left">
-            <FontAwesomeIcon icon={faSearch} />
+          <span className="icon">
+            <Icon icon={faSearch} />
           </span>
         </div>
       </InputField>
-
-      <PrimaryButton onClick={_onAddFriend}>
-        <span>
-          <FontAwesomeIcon icon={faPlus} />
-        </span>
-      </PrimaryButton>
-    </div>
+      <IconButton onClick={_onAddFriend}>
+        <Icon icon={faPlus} />
+      </IconButton>
+    </Container>
   );
 };
 

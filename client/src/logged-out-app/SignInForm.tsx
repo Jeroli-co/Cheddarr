@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
-import { Route, useLocation } from "react-router-dom";
-import { routes } from "../router/routes";
+import { useLocation } from "react-router-dom";
 import { FORM_DEFAULT_VALIDATOR } from "../shared/enums/FormDefaultValidators";
 import { ISignInFormData } from "../shared/models/ISignInFormData";
 import { useAuthentication } from "../shared/contexts/AuthenticationContext";
@@ -15,20 +14,21 @@ import { SignUpButton } from "../shared/components/SignUpButton";
 import { Row } from "../shared/components/layout/Row";
 import { InputField } from "../shared/components/inputs/InputField";
 import { HelpDanger, HelpLink } from "../shared/components/Help";
-import { useHistory } from "react-router";
 import { Icon } from "../shared/components/Icon";
+import { InitResetPasswordModal } from "./elements/InitResetPasswordModal";
+import { CenteredContent } from "../shared/components/layout/CenteredContent";
 
 function useRedirectURI() {
   const query = new URLSearchParams(useLocation().search);
   return query.get("redirectURI");
 }
 
-const SignInForm = () => {
+export const SignInForm = () => {
   const { signIn } = useAuthentication();
   const { signInWithPlex } = usePlexAuth();
   const { register, handleSubmit, errors } = useForm<ISignInFormData>();
   const redirectURI = useRedirectURI();
-  const history = useHistory();
+  const [isInitPasswordModalOpen, setIsInitPasswordModalOpen] = useState(false);
 
   const onSubmit = handleSubmit((data) => {
     redirectURI ? signIn(data, redirectURI) : signIn(data);
@@ -40,7 +40,7 @@ const SignInForm = () => {
 
   return (
     <div className="SignInForm" data-testid="SignInForm">
-      <PrimaryHero>Sign into your Cheddarr account</PrimaryHero>
+      <PrimaryHero>Sign in to Cheddarr</PrimaryHero>
 
       <br />
 
@@ -107,9 +107,7 @@ const SignInForm = () => {
                   {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
                 </HelpDanger>
               )}
-              <HelpLink
-                onClick={() => history.push(routes.INIT_RESET_PASSWORD.url)}
-              >
+              <HelpLink onClick={() => setIsInitPasswordModalOpen(true)}>
                 Forgot your password ?
               </HelpLink>
             </InputField>
@@ -123,10 +121,12 @@ const SignInForm = () => {
 
           <PrimaryDivider />
 
-          <PlexButton
-            text="Sign in with Plex"
-            onClick={() => initSignInWithPlex()}
-          />
+          <CenteredContent>
+            <PlexButton
+              text="Sign in with Plex"
+              onClick={() => initSignInWithPlex()}
+            />
+          </CenteredContent>
 
           <br />
 
@@ -137,13 +137,10 @@ const SignInForm = () => {
         </div>
       </div>
 
-      <Route
-        exact
-        path={routes.INIT_RESET_PASSWORD.url}
-        component={routes.INIT_RESET_PASSWORD.component}
+      <InitResetPasswordModal
+        isOpen={isInitPasswordModalOpen}
+        closeModal={() => setIsInitPasswordModalOpen(false)}
       />
     </div>
   );
 };
-
-export { SignInForm };

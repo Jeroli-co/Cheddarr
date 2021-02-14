@@ -5,19 +5,39 @@ import { usePlexServers } from "../../../../../../shared/hooks/usePlexServers";
 import { useAPI } from "../../../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../../../shared/enums/APIRoutes";
 import { ComponentSizes } from "../../../../../../shared/enums/ComponentSizes";
-import { PrimaryOutlinedButton } from "../../../../../../shared/components/Button";
+import {
+  Button,
+  PrimaryButton,
+} from "../../../../../../shared/components/Button";
 import { IPlexConfig } from "../models/IPlexConfig";
+import styled from "styled-components";
+import { Modal } from "../../../../../../shared/components/Modal";
+import { H2 } from "../../../../../../shared/components/Titles";
+import { Buttons } from "../../../../../../shared/components/layout/Buttons";
+
+const ServerContainer = styled.div`
+  display: flex;
+  align-items: center;
+  input {
+    cursor: pointer;
+    margin-right: 20px;
+  }
+  &:not(:last-child) {
+    margin-bottom: 20px;
+  }
+`;
 
 type PlexServerComponentProps = {
   server: IPlexServerInfo;
 };
 
 type ServersModalProps = {
-  onClose: () => void;
+  isOpen: boolean;
+  closeModal: () => void;
   selectServer: (config: IPlexConfig) => void;
 };
 
-const ServersModal = ({ onClose, selectServer }: ServersModalProps) => {
+const ServersModal = (props: ServersModalProps) => {
   const [serverSelected, setServerSelected] = useState<IPlexServerInfo | null>(
     null
   );
@@ -32,8 +52,8 @@ const ServersModal = ({ onClose, selectServer }: ServersModalProps) => {
         APIRoutes.GET_PLEX_SERVER(serverSelected.serverName)
       ).then((serverDetail) => {
         if (serverDetail.data && serverDetail.status === 200) {
-          selectServer(serverDetail.data);
-          onClose();
+          props.selectServer(serverDetail.data);
+          props.closeModal();
         }
       });
     }
@@ -45,57 +65,45 @@ const ServersModal = ({ onClose, selectServer }: ServersModalProps) => {
     };
 
     return (
-      <div className="level is-mobile">
-        <div className="level-left is-pointed" onClick={_onChange}>
-          <div className="level-item">
-            <input
-              type="radio"
-              name={server.serverName}
-              checked={
-                serverSelected !== null &&
-                server.serverName === serverSelected.serverName
-              }
-              onChange={_onChange}
-              className="is-pointed"
-            />
-          </div>
-          <div className="level-item has-text-grey-dark">
-            {server.serverName}
-          </div>
-        </div>
-      </div>
+      <ServerContainer>
+        <input
+          type="radio"
+          name={server.serverName}
+          checked={
+            serverSelected !== null &&
+            server.serverName === serverSelected.serverName
+          }
+          onChange={_onChange}
+        />
+        <p>{server.serverName}</p>
+      </ServerContainer>
     );
   };
 
   return (
-    <div className="modal is-active">
-      <div className="modal-background" onClick={(e) => onClose()} />
-      <div className="modal-card">
-        <header className="modal-card-head">
-          <p className="modal-card-title has-text-weight-semibold">
-            Plex servers
-          </p>
-          <button
-            className="delete"
-            aria-label="close"
-            onClick={(e) => onClose()}
-          />
-        </header>
-        <section className="modal-card-body">
-          {servers.isLoading && <Spinner size={ComponentSizes.LARGE} />}
-          {!servers.isLoading &&
-            servers.data &&
-            servers.data.map((server) => {
-              return <Server key={server.serverName} server={server} />;
-            })}
-        </section>
-        <footer className="modal-card-foot">
-          <PrimaryOutlinedButton type="button" onClick={() => linkServer()}>
+    <Modal isOpen={props.isOpen} close={props.closeModal}>
+      <header>
+        <H2>Plex servers</H2>
+      </header>
+      <section>
+        {servers.isLoading && <Spinner size={ComponentSizes.LARGE} />}
+        {!servers.isLoading &&
+          servers.data &&
+          servers.data.map((server) => {
+            return <Server key={server.serverName} server={server} />;
+          })}
+      </section>
+      <footer>
+        <Buttons>
+          <PrimaryButton type="button" onClick={() => linkServer()}>
             Save changes
-          </PrimaryOutlinedButton>
-        </footer>
-      </div>
-    </div>
+          </PrimaryButton>
+          <Button type="button" onClick={() => props.closeModal()}>
+            Cancel
+          </Button>
+        </Buttons>
+      </footer>
+    </Modal>
   );
 };
 

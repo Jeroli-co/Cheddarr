@@ -18,7 +18,7 @@ import { Icon } from "../../../../shared/components/Icon";
 
 const Container = styled.div`
   padding: 0 20px 0 0;
-  width: 50%;
+  width: 49%;
   @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
     width: 100%;
     padding: 0;

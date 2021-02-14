@@ -11,10 +11,6 @@ const Container = styled.div`
   align-items: center;
   text-align: center;
   padding-top: 40px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 
   p {
     margin-top: 20px;
