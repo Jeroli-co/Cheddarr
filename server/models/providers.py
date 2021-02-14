@@ -14,7 +14,7 @@ class ProviderType(str, Enum):
     media_server = "media_server"
 
 
-class ProviderConfig(Model):
+class ProviderSetting(Model):
     id = Column(String, default=lambda: uuid4().hex, primary_key=True)
     api_key = Column(String, nullable=False)
     host = Column(String, nullable=False)
@@ -31,10 +31,10 @@ class ProviderConfig(Model):
         return {"polymorphic_identity": cls.__name__, "polymorphic_on": "name"}
 
 
-class PlexConfig(ProviderConfig):
+class PlexSetting(ProviderSetting):
     __repr_props__ = ("host", "port", "ssl", "server_name")
 
-    id = Column(ForeignKey("providerconfig.id"), primary_key=True)
+    id = Column(ForeignKey("providersetting.id"), primary_key=True)
     server_id = Column(String, primary_key=True)
     server_name = Column(String)
 
@@ -43,10 +43,10 @@ class PlexConfig(ProviderConfig):
         self.provider_type = ProviderType.media_server
 
 
-class RadarrConfig(ProviderConfig):
+class RadarrSetting(ProviderSetting):
     __repr_props__ = ("host", "port", "ssl", "version")
 
-    id = Column(ForeignKey("providerconfig.id"), primary_key=True)
+    id = Column(ForeignKey("providersetting.id"), primary_key=True)
     root_folder = Column(String)
     quality_profile_id = Column(Integer)
     version = Column(Integer)
@@ -56,10 +56,10 @@ class RadarrConfig(ProviderConfig):
         self.provider_type = ProviderType.movie_provider
 
 
-class SonarrConfig(ProviderConfig):
+class SonarrSetting(ProviderSetting):
     __repr_props__ = ("host", "port", "ssl", "version")
 
-    id = Column(ForeignKey("providerconfig.id"), primary_key=True)
+    id = Column(ForeignKey("providersetting.id"), primary_key=True)
     root_folder = Column(String(128))
     anime_root_folder = Column(String(128), nullable=True)
     quality_profile_id = Column(Integer)
@@ -69,7 +69,7 @@ class SonarrConfig(ProviderConfig):
     version = Column(Integer)
     """" series_requests = relationship(
         "SeriesChildRequest",
-        primaryjoin="SeriesChildRequest.selected_provider_id==SonarrConfig.id",
+        primaryjoin="SeriesChildRequest.selected_provider_id==SonarrSetting.id",
         foreign_keys="SeriesChildRequest.selected_provider_id",
         backref="selected_provider",
     )"""

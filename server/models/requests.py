@@ -22,14 +22,12 @@ class RequestStatus(str, Enum):
 
 class Request(object):
     id = Column(Integer, primary_key=True)
-    status = Column(
-        DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
-    )
+    status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
     comment = Column(Text)
 
     @declared_attr
     def selected_provider_id(cls):
-        return Column(ForeignKey("providerconfig.id"))
+        return Column(ForeignKey("providersetting.id"))
 
     @declared_attr
     def requesting_user_id(cls):
@@ -41,7 +39,7 @@ class Request(object):
 
     @declared_attr
     def selected_provider(cls):
-        return relationship("ProviderConfig")
+        return relationship("ProviderSetting")
 
     @declared_attr
     def requesting_user(cls):
@@ -64,9 +62,7 @@ class SeriesRequest(Model, Timestamp, Request):
 
     series_id = Column(ForeignKey("series.id"), nullable=False)
     series = relationship("Series", back_populates="requests")
-    seasons = relationship(
-        "SeasonRequest", cascade="all,delete,delete-orphan", backref="request"
-    )
+    seasons = relationship("SeasonRequest", cascade="all,delete,delete-orphan", backref="request")
 
 
 class SeasonRequest(Model):
@@ -75,13 +71,9 @@ class SeasonRequest(Model):
     id = Column(Integer, primary_key=True)
     season_number = Column(Integer, nullable=False)
     series_request_id = Column(ForeignKey("seriesrequest.id"), nullable=False)
-    status = Column(
-        DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
-    )
+    status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
 
-    episodes = relationship(
-        "EpisodeRequest", cascade="all,delete,delete-orphan", backref="season"
-    )
+    episodes = relationship("EpisodeRequest", cascade="all,delete,delete-orphan", backref="season")
 
 
 class EpisodeRequest(Model):
@@ -90,6 +82,4 @@ class EpisodeRequest(Model):
     id = Column(Integer, primary_key=True)
     episode_number = Column(Integer, nullable=False)
     season_request_id = Column(ForeignKey("seasonrequest.id"), nullable=False)
-    status = Column(
-        DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending
-    )
+    status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)

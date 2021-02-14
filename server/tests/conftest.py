@@ -1,5 +1,6 @@
+import os
 from typing import Dict
-from datetime import datetime
+
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -8,107 +9,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from server.api.dependencies import get_db
-from server.database.base import Base
-from server.tests.utils import user_authentication_headers
-
-datasets = {
-    "users": [
-        {
-            "id": 1,
-            "username": "user1",
-            "email": "email1@test.com",
-            "password": "password1",
-            "avatar": "http://avatar.fake",
-            "confirmed": True,
-        },
-        {
-            "id": 2,
-            "username": "user2",
-            "email": "email2@test.com",
-            "password": "password2",
-            "avatar": "http://avatar.fake",
-            "confirmed": True,
-        },
-        {
-            "id": 3,
-            "username": "user3",
-            "email": "email3@test.com",
-            "password": "password3",
-            "avatar": "http://avatar.fake",
-            "confirmed": True,
-        },
-        {
-            "id": 4,
-            "username": "user4",
-            "email": "email4@test.com",
-            "password": "password4",
-            "avatar": "http://avatar.fake",
-            "confirmed": False,
-        },
-    ],
-    "series": [
-        {
-            "id": 1,
-            "title": "Star Wars: The Clone Wars",
-            "release_date": datetime.strptime("2008-10-03", "%Y-%m-%d"),
-            "status": "Ended",
-            "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
-            "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
-            "tvdb_id": 83268,
-            "number_of_seasons": 7,
-            "series_type": "anime",
-        }
-    ],
-    "series_requests": [
-        {
-            "id": 1,
-            "requesting_user_id": 3,
-            "requested_user_id": 1,
-            "status": "pending",
-            "series_id": 1,
-        },
-        {
-            "id": 2,
-            "requesting_user_id": 1,
-            "requested_user_id": 3,
-            "status": "approved",
-            "series_id": 1,
-        },
-    ],
-    "movies": [
-        {
-            "id": 1,
-            "title": "Star Wars: The Clone Wars",
-            "release_date": datetime.strptime("1977-10-18", "%Y-%m-%d"),
-            "status": "Ended",
-            "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
-            "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
-            "tmdb_id": 11,
-        }
-    ],
-    "movies_requests": [
-        {
-            "id": 1,
-            "requesting_user_id": 3,
-            "requested_user_id": 1,
-            "status": "pending",
-            "movie_id": 1,
-        },
-        {
-            "id": 2,
-            "requesting_user_id": 1,
-            "requested_user_id": 3,
-            "status": "approved",
-            "movie_id": 1,
-        },
-    ],
-}
-
+from .utils import datasets, user_authentication_headers
 
 url = "sqlite://"
-_db_conn = create_engine(
-    url, connect_args={"check_same_thread": False}, poolclass=StaticPool
-)
+_db_conn = create_engine(url, connect_args={"check_same_thread": False}, poolclass=StaticPool)
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=_db_conn, expire_on_commit=False
 )
@@ -123,18 +27,21 @@ def get_test_db():
         session.close()
 
 
-@pytest.fixture(scope="module")
-def app() -> FastAPI:
-    from server.main import setup_app  # local import for testing purpose
+def app_v1() -> FastAPI:
+    from server.api.v1.v1 import application as app_
 
-    app_ = setup_app()
     app_.dependency_overrides[get_db] = get_test_db
     return app_
 
 
 @pytest.fixture(scope="module")
-def client(app: FastAPI):
-    with TestClient(app) as c:
+def get_app():
+    return {"v1": app_v1}
+
+
+@pytest.fixture(scope="module", params=["v1"])
+def client(request, get_app):
+    with TestClient(get_app[request.param]()) as c:
         yield c
 
 
@@ -147,6 +54,7 @@ def db():
 
 @pytest.fixture(scope="function", autouse=True)
 def setup():
+    from server.database.base import Base
     from server.models import (
         Movie,
         Series,

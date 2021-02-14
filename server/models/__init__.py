@@ -1,10 +1,11 @@
 from .media import Media, MediaType, Movie, Series, SeriesType
+from .notifications import Notification, NotificationAgent, Agent
 from .providers import (
-    PlexConfig,
-    ProviderConfig,
+    PlexSetting,
+    ProviderSetting,
     ProviderType,
-    RadarrConfig,
-    SonarrConfig,
+    RadarrSetting,
+    SonarrSetting,
 )
 from .requests import (
     EpisodeRequest,
@@ -14,4 +15,3 @@ from .requests import (
     SeriesRequest,
 )
 from .users import Friendship, PlexAccount, User, UserRole
-from .notifications import Notification

@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import AnyHttpUrl, Field, validator
 
@@ -7,7 +7,7 @@ from server.models import ProviderType
 from server.schemas import APIModel
 
 
-class ProviderConfigBase(APIModel):
+class ProviderSettingBase(APIModel):
     host: str
     port: Optional[int]
     ssl: bool
@@ -18,25 +18,25 @@ class ProviderConfigBase(APIModel):
 # Radarr                            #
 #####################################
 class RadarrInstanceInfo(APIModel):
-    root_folders: list[str]
-    quality_profiles: list[dict]
+    root_folders: List[str]
+    quality_profiles: List[dict]
     version: int
 
 
-class RadarrConfigData(APIModel):
+class RadarrSettingData(APIModel):
     root_folder: str
     quality_profile_id: int
     version: int = Field(ge=2, le=3)
 
 
-class RadarrConfig(ProviderConfigBase, RadarrConfigData):
+class RadarrSetting(ProviderSettingBase, RadarrSettingData):
     id: str
     name: str
     enabled: bool = True
     provider_type: ProviderType = Field(default=ProviderType.movie_provider, const=True)
 
 
-class RadarrConfigCreateUpdate(ProviderConfigBase, RadarrConfigData):
+class RadarrSettingCreateUpdate(ProviderSettingBase, RadarrSettingData):
     enabled: Optional[bool] = True
 
 
@@ -53,7 +53,7 @@ class RadarrMovie(APIModel):
     quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
     root_folder_path: Optional[str] = Field(alias="rootFolderPath")
     monitored: bool = Field(alias="monitored")
-    images: list[dict] = Field(alias="images")
+    images: List[dict] = Field(alias="images")
     has_file: bool = Field(alias="hasFile")
     add_options: Optional[RadarrAddOptions] = Field(alias="addOptions")
 
@@ -62,13 +62,13 @@ class RadarrMovie(APIModel):
 # Sonarr                            #
 #####################################
 class SonarrInstanceInfo(APIModel):
-    root_folders: list[str]
-    quality_profiles: list[dict]
-    language_profiles: Optional[list[dict]]
+    root_folders: List[str]
+    quality_profiles: List[dict]
+    language_profiles: Optional[List[dict]]
     version: int
 
 
-class SonarrConfigData(APIModel):
+class SonarrSettingData(APIModel):
     root_folder: str
     anime_root_folder: Optional[str]
     quality_profile_id: int
@@ -78,16 +78,14 @@ class SonarrConfigData(APIModel):
     version: int = Field(ge=2, le=3)
 
 
-class SonarrConfig(ProviderConfigBase, SonarrConfigData):
+class SonarrSetting(ProviderSettingBase, SonarrSettingData):
     id: str
     name: str
     enabled: bool = True
-    provider_type: ProviderType = Field(
-        default=ProviderType.series_provider, const=True
-    )
+    provider_type: ProviderType = Field(default=ProviderType.series_provider, const=True)
 
 
-class SonarrConfigCreateUpdate(ProviderConfigBase, SonarrConfigData):
+class SonarrSettingCreateUpdate(ProviderSettingBase, SonarrSettingData):
     enabled: Optional[bool] = True
 
 
@@ -116,8 +114,8 @@ class SonarrSeries(APIModel):
     id: Optional[int] = Field(alias="id")
     tvdb_id: int = Field(alias="tvdbId")
     title: str = Field(alias="title")
-    images: list[dict] = Field(alias="images")
-    seasons: list[SonarrSeason] = Field(alias="seasons")
+    images: List[dict] = Field(alias="images")
+    seasons: List[SonarrSeason] = Field(alias="seasons")
     year: int = Field(alias="year")
     path: Optional[str] = Field(alias="path")
     profile_id: Optional[int] = Field(alias="profileId")
@@ -127,8 +125,8 @@ class SonarrSeries(APIModel):
     monitored: bool = Field(alias="monitored")
     series_type: str = Field(alias="seriesType")
     title_slug: str = Field(alias="titleSlug")
-    genres: list[str] = Field(alias="genres")
-    tags: list[str] = Field(alias="tags")
+    genres: List[str] = Field(alias="genres")
+    tags: List[str] = Field(alias="tags")
     added: datetime = Field(alias="added")
     episode_file_count: Optional[int] = Field(alias="episodeFileCount")
     total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")
@@ -143,14 +141,14 @@ class PlexServerInfo(APIModel):
     server_name: str
 
 
-class PlexConfig(ProviderConfigBase, PlexServerInfo):
+class PlexSetting(ProviderSettingBase, PlexServerInfo):
     id: str
     name: str
     enabled: bool = True
     provider_type: ProviderType = Field(default=ProviderType.media_server, const=True)
 
 
-class PlexConfigCreateUpdate(ProviderConfigBase, PlexServerInfo):
+class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
     enabled: Optional[bool] = True
 
 
@@ -201,10 +199,10 @@ class PlexVideo(APIModel):
 class PlexMovie(PlexVideo):
     duration: int
     release_date: date = Field(alias="originallyAvailableAt")
-    actors: list[PlexMediaTag]
-    directors: list[PlexMediaTag]
+    actors: List[PlexMediaTag]
+    directors: List[PlexMediaTag]
     studio: str
-    genres: list[PlexMediaTag]
+    genres: List[PlexMediaTag]
 
 
 class PlexEpisode(PlexVideo):
@@ -225,7 +223,7 @@ class PlexSeason(PlexVideo):
     series_id: int = Field(alias="parentRatingKey")
     series_title: str = Field(alias="parentTitle")
     season_number: int = Field(alias="seasonNumber")
-    episodes: list[PlexEpisode]
+    episodes: List[PlexEpisode]
 
     @validator("episodes", pre=True)
     def get_episodes(cls, episodes, **kwargs):
@@ -233,10 +231,10 @@ class PlexSeason(PlexVideo):
 
 
 class PlexSeries(PlexVideo):
-    seasons: list[PlexSeason]
-    actors: list[PlexMediaTag]
+    seasons: List[PlexSeason]
+    actors: List[PlexMediaTag]
     studio: str
-    genres: list[PlexMediaTag]
+    genres: List[PlexMediaTag]
     release_date: date = Field(alias="originallyAvailableAt")
 
     @validator("seasons", pre=True)

@@ -1,29 +1,30 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from server.api import api
-from server.core.config import settings
+from server.api.v1 import v1
+from server.core import config, logger
+from server.core.scheduler import scheduler
 from server.site import site
 
 
 def setup_app() -> FastAPI:
-
-    application = FastAPI(
-        title=settings.APP_NAME,
-        version=settings.API_VERSION,
-        openapi_url=settings.API_PREFIX,
-        docs_url=settings.API_PREFIX + "/docs",
-        redoc_url=settings.API_PREFIX + "/redoc",
-    )
-    application.include_router(api.router, prefix=settings.API_PREFIX)
+    application = FastAPI(title="Cheddarr", docs_url=None, redoc_url=None)
+    application.mount(f"{config.API_PREFIX}/{v1.version}", v1.application)
     application.mount("/", site)
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=[str(origin) for origin in config.BACKEND_CORS_ORIGINS],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    config.setup()
+    scheduler.start()
+
+    logger.log(logging.INFO, "Starting Cheddarr")
     return application
 
 

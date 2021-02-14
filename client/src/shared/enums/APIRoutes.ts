@@ -38,12 +38,12 @@ export const APIRoutes = {
     "/plex/" + plexConfigId + "/seasons/" + seasonId,
   GET_PLEX_EPISODE: (plexConfigId: string, episodeId: number | string) =>
     "/plex/" + plexConfigId + "/episodes/" + episodeId,
-  GET_PLEX_CONFIGS: "/configuration/plex",
-  CREATE_PLEX_CONFIG: "/configuration/plex",
+  GET_PLEX_CONFIGS: "/settings/plex",
+  CREATE_PLEX_CONFIG: "/settings/plex",
   UPDATE_PLEX_CONFIG: (plexConfigId: string) =>
-    "/configuration/plex/" + plexConfigId,
+    "/settings/plex/" + plexConfigId,
   DELETE_PLEX_CONFIG: (plexConfigId: string) =>
-    "/configuration/plex/" + plexConfigId,
+    "/settings/plex/" + plexConfigId,
   GET_PLEX_SERVERS: "/plex/servers",
   GET_PLEX_SERVER: (serverName: string) => "/plex/servers/" + serverName,
   SEARCH_PLEX_MOVIES: (plexConfigId: string, value: string) =>
@@ -52,16 +52,16 @@ export const APIRoutes = {
     "/plex/" + plexConfigId + "/search?section=series&value=" + value,
 
   //RADARR
-  GET_RADARR_CONFIG: "/configuration/radarr",
-  GET_RADARR_INSTANCE_INFO: "/configuration/radarr/instance-info",
-  CREATE_RADARR_CONFIG: "/configuration/radarr",
-  UPDATE_RADARR_CONFIG: (id: string) => "/configuration/radarr/" + id,
+  GET_RADARR_CONFIG: "/settings/radarr",
+  GET_RADARR_INSTANCE_INFO: "/settings/radarr/instance-info",
+  CREATE_RADARR_CONFIG: "/settings/radarr",
+  UPDATE_RADARR_CONFIG: (id: string) => "/settings/radarr/" + id,
 
   // SONARR
-  GET_SONARR_CONFIG: "/configuration/sonarr",
-  GET_SONARR_INSTANCE_INFO: "/configuration/sonarr/instance-info",
-  CREATE_SONARR_CONFIG: "/configuration/sonarr",
-  UPDATE_SONARR_CONFIG: (id: string) => "/configuration/sonarr/" + id,
+  GET_SONARR_CONFIG: "/settings/sonarr",
+  GET_SONARR_INSTANCE_INFO: "/settings/sonarr/instance-info",
+  CREATE_SONARR_CONFIG: "/settings/sonarr",
+  UPDATE_SONARR_CONFIG: (id: string) => "/settings/sonarr/" + id,
 
   // TMDB
   GET_ALL_MEDIA_BY_TITLE: (title: string) => "/search?value=" + title,

@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum as DBEnum
+from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, relationship
 
@@ -31,7 +31,7 @@ class User(Model):
         cascade="all,delete,delete-orphan",
     )
     providers = relationship(
-        "ProviderConfig",
+        "ProviderSetting",
         back_populates="user",
         cascade="all,delete,delete-orphan",
     )

@@ -4,10 +4,10 @@ from typing import Optional
 import tmdbsimple as tmdb
 
 from server import schemas
-from server.core import settings
+from server.core import config
 from server.models import MediaType, SeriesType
 
-tmdb.API_KEY = settings.TMDB_API_KEY
+tmdb.API_KEY = config.TMDB_API_KEY
 
 
 def search_tmdb_media(term: str, page: int) -> dict:
@@ -96,9 +96,7 @@ def set_tmdb_movie_info(movie: dict, from_search: bool = False):
     movie["media_type"] = MediaType.movies
     if from_search:
         tmdb_genres = tmdb.Genres().movie_list().get("genres")
-        genres = [
-            genre["name"] for genre in tmdb_genres if genre["id"] in movie["genre_ids"]
-        ]
+        genres = [genre["name"] for genre in tmdb_genres if genre["id"] in movie["genre_ids"]]
     else:
         genres = [genre["name"] for genre in movie["genres"]]
     movie["genres"] = genres
@@ -111,9 +109,7 @@ def set_tmdb_series_info(series: dict, from_search: bool = False):
     anime_pattern = re.compile("^(?i)anim(e|ation)$")
     if from_search:
         tmdb_genres = tmdb.Genres().tv_list().get("genres")
-        genres = [
-            genre["name"] for genre in tmdb_genres if genre["id"] in series["genre_ids"]
-        ]
+        genres = [genre["name"] for genre in tmdb_genres if genre["id"] in series["genre_ids"]]
     else:
         genres = [genre["name"] for genre in series["genres"]]
     for genre in genres:

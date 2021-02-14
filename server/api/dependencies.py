@@ -6,17 +6,18 @@ from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from server.core.config import settings
-from server.database.session import SessionLocal
+from server.core import config
 from server.models import User, UserRole
-from server.repositories import PlexConfigRepository, UserRepository
+from server.repositories import PlexSettingRepository, UserRepository
 from server.repositories.base import BaseRepository
 from server.schemas import TokenPayload
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_PREFIX}/sign-in")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 
 
 def get_db() -> Generator:
+    from server.database.session import SessionLocal
+
     session = SessionLocal()
     try:
         yield session
@@ -48,9 +49,7 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=settings.SIGNING_ALGORITHM
-        )
+        payload = jwt.decode(token, config.SECRET_KEY, algorithms=config.SIGNING_ALGORITHM)
         token_data = TokenPayload.parse_obj(payload)
     except (jwt.JWTError, ValidationError):
         raise credentials_exception
@@ -71,23 +70,18 @@ def get_current_superuser(
 def get_current_poweruser(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if (
-        current_user.role != UserRole.superuser
-        and current_user.role != UserRole.poweruser
-    ):
+    if current_user.role != UserRole.superuser and current_user.role != UserRole.poweruser:
         raise HTTPException(status_code=403, detail="Not enough privileges.")
     return current_user
 
 
-def get_current_user_plex_configs(
+def get_current_user_plex_settings(
     cur_user: User = Depends(get_current_user),
-    plex_config_repository: PlexConfigRepository = Depends(
-        get_repository(PlexConfigRepository)
+    plex_setting_repository: PlexSettingRepository = Depends(
+        get_repository(PlexSettingRepository)
     ),
 ):
-    configs = plex_config_repository.find_all_by(user_id=cur_user.id, enabled=True)
-    if configs is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No Plex configuration found for the user."
-        )
-    return configs
+    settings = plex_setting_repository.find_all_by(user_id=cur_user.id, enabled=True)
+    if settings is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex settings found for the user.")
+    return settings

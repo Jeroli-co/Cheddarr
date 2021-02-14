@@ -1,7 +1,10 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
+from server.core.scheduler import scheduler
 from server.helpers import search
 from server.repositories import (
     MovieRepository,
@@ -14,7 +17,7 @@ from server.repositories.requests import SeriesRepository
 router = APIRouter()
 
 
-@router.get("/movies/incoming", response_model=list[schemas.MovieRequest])
+@router.get("/movies/incoming", response_model=List[schemas.MovieRequest])
 def get_received_movie_requests(
     current_user: models.User = Depends(deps.get_current_user),
     movie_request_repo: MovieRequestRepository = Depends(
@@ -25,7 +28,7 @@ def get_received_movie_requests(
     return requests
 
 
-@router.get("/movies/outgoing", response_model=list[schemas.MovieRequest])
+@router.get("/movies/outgoing", response_model=List[schemas.MovieRequest])
 def get_sent_movie_requests(
     current_user: models.User = Depends(deps.get_current_user),
     movie_request_repo: MovieRequestRepository = Depends(
@@ -57,9 +60,7 @@ def add_movie_request(
 
     requested_user = user_repo.find_by_username(request.requested_username)
     if requested_user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "The requested user does not exist."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
     existing_request = movie_request_repo.find_by_user_ids_and_tmdb_id(
         tmdb_id=request.tmdb_id,
@@ -67,19 +68,13 @@ def add_movie_request(
         requested_user_id=requested_user.id,
     )
     if existing_request is not None:
-        raise HTTPException(
-            status.HTTP_409_CONFLICT, "This movie has already been requested."
-        )
+        raise HTTPException(status.HTTP_409_CONFLICT, "This movie has already been requested.")
 
     movie = movie_repo.find_by(tmdb_id=request.tmdb_id)
     if movie is None:
-        searched_movie = schemas.Movie.parse_obj(
-            search.find_tmdb_movie(request.tmdb_id)
-        )
+        searched_movie = schemas.Movie.parse_obj(search.find_tmdb_movie(request.tmdb_id))
         if searched_movie is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, "The requested movie was not found"
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested movie was not found")
         movie = searched_movie.to_orm(models.Movie)
 
     movie_request = models.MovieRequest(
@@ -120,9 +115,7 @@ def update_movie_request(
     if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != models.RequestStatus.pending:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "Cannot update a non pending request."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
     if update.status == models.RequestStatus.approved:
         if update.provider_id is None:
             raise HTTPException(
@@ -130,19 +123,15 @@ def update_movie_request(
                 "provider_id must be set to accept a request.",
             )
         selected_provider = next(
-            (
-                provider
-                for provider in current_user.providers
-                if provider.id == update.provider_id
-            ),
+            (provider for provider in current_user.providers if provider.id == update.provider_id),
             None,
         )
         if selected_provider is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
         request.selected_provider = selected_provider
         request.status = models.RequestStatus.approved
-        if isinstance(request.selected_provider, models.RadarrConfig):
-            tasks.send_radarr_request_task.delay(request.id)
+        if isinstance(request.selected_provider, models.RadarrSetting):
+            scheduler.add_job(tasks.send_radarr_request_task, args=request.id)
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
@@ -173,14 +162,12 @@ def delete_movie_request(
         request.status != models.RequestStatus.pending
         and request.requested_user_id != current_user.id
     ):
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
     movies_request_repo.remove(request)
     return {"detail": "Request deleted."}
 
 
-@router.get("/series/incoming", response_model=list[schemas.SeriesRequest])
+@router.get("/series/incoming", response_model=List[schemas.SeriesRequest])
 def get_received_series_requests(
     current_user: models.User = Depends(deps.get_current_user),
     series_request_repo: SeriesRequestRepository = Depends(
@@ -191,7 +178,7 @@ def get_received_series_requests(
     return requests
 
 
-@router.get("/series/outgoing", response_model=list[schemas.SeriesRequest])
+@router.get("/series/outgoing", response_model=List[schemas.SeriesRequest])
 def get_sent_series_requests(
     current_user: models.User = Depends(deps.get_current_user),
     series_request_repo: SeriesRequestRepository = Depends(
@@ -222,17 +209,13 @@ def add_series_request(
 ):
     requested_user = user_repo.find_by_username(request_in.requested_username)
     if requested_user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "The requested user does not exist."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
     series = series_repo.find_by(tvdb_id=request_in.tvdb_id)
     if series is None:
         searched_series = search.find_tmdb_series_by_tvdb_id(request_in.tvdb_id)
         if searched_series is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, "The requested series was not found"
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested series was not found")
 
         series = schemas.Series.parse_obj(searched_series).to_orm(models.Series)
 
@@ -322,11 +305,7 @@ def unify_series_request(
             season.episodes = episodes
 
         already_added_season = next(
-            (
-                s
-                for s in series_request.seasons
-                if s.season_number == season.season_number
-            ),
+            (s for s in series_request.seasons if s.season_number == season.season_number),
             None,
         )
 
@@ -360,9 +339,7 @@ def update_series_request(
     if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != models.RequestStatus.pending:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "Cannot update a non pending request."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
     if update.status == models.RequestStatus.approved:
         if update.provider_id is None:
             raise HTTPException(
@@ -370,11 +347,7 @@ def update_series_request(
                 "provider_id must be set to accept a request.",
             )
         selected_provider = next(
-            (
-                provider
-                for provider in current_user.providers
-                if provider.id == update.provider_id
-            ),
+            (provider for provider in current_user.providers if provider.id == update.provider_id),
             None,
         )
         if selected_provider is None:
@@ -385,8 +358,8 @@ def update_series_request(
             season.status = models.RequestStatus.approved
             for episode in season.episodes:
                 episode.status = models.RequestStatus.approved
-        if isinstance(request.selected_provider, models.SonarrConfig):
-            tasks.send_sonarr_request_task.delay(request.id)
+        if isinstance(request.selected_provider, models.SonarrSetting):
+            scheduler.add_job(tasks.send_sonarr_request_task, args=request.id)
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
@@ -413,8 +386,6 @@ def delete_series_request(
         request.status != models.RequestStatus.pending
         and request.requested_user_id != current_user.id
     ):
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
     series_request_repo.remove(request)
     return {"detail": "Request deleted."}

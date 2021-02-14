@@ -1,14 +1,15 @@
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.core import security, settings, utils
+from server.core import config, security
+from server.core.scheduler import scheduler
 from server.repositories import (
     FriendshipRepository,
     PlexAccountRepository,
-    PlexConfigRepository,
+    PlexSettingRepository,
     UserRepository,
 )
 
@@ -55,9 +56,7 @@ def get_user_by_username(
 ):
     user = user_repo.find_by_username(username)
     if user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No user with this username exists."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this username exists.")
     return user
 
 
@@ -83,16 +82,12 @@ def delete_user(
 @current_user_router.delete("/plex-account")
 def unlink_plex_account(
     current_user: models.User = Depends(deps.get_current_user),
-    plex_account_repo: PlexAccountRepository = Depends(
-        deps.get_repository(PlexAccountRepository)
-    ),
-    plex_config_repo: PlexConfigRepository = Depends(
-        deps.get_repository(PlexConfigRepository)
-    ),
+    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
-    configs = plex_config_repo.find_all_by(user_id=current_user.id)
-    for config in configs:
-        plex_config_repo.remove(config)
+    settings = plex_setting_repo.find_all_by(user_id=current_user.id)
+    for setting in settings:
+        plex_setting_repo.remove(setting)
     plex_account_repo.remove(current_user.plex_account)
     return {"detail": "Plex account unlinked."}
 
@@ -113,9 +108,7 @@ def update_user(
 ):
     if user_in.username is not None:
         if user_repo.find_by_username(user_in.username):
-            raise HTTPException(
-                status.HTTP_409_CONFLICT, "This username is already taken."
-            )
+            raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
         current_user.username = user_in.username
 
     if user_in.password is not None:
@@ -126,33 +119,33 @@ def update_user(
             )
 
         if not security.verify_password(user_in.old_password, current_user.password):
-            raise HTTPException(
-                status.HTTP_401_UNAUTHORIZED, "The passwords don't match."
-            )
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The passwords don't match.")
         current_user.password = user_in.password
-        if settings.MAIL_ENABLED:
-            tasks.send_email_task.delay(
-                to_email=current_user.email,
-                subject="Your password has been changed",
-                html_template_name="email/change_password_notice.html",
+        if config.MAIL_ENABLED:
+            scheduler.add_job(
+                tasks.send_email_task,
+                kwargs=dict(
+                    to_email=current_user.email,
+                    subject="Your password has been changed",
+                    html_template_name="email/change_password_notice.html",
+                ),
             )
 
     if user_in.email is not None:
         if user_repo.find_by_email(user_in.email):
-            raise HTTPException(
-                status.HTTP_409_CONFLICT, "This email is already taken."
-            )
-        if settings.MAIL_ENABLED:
+            raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
+        if config.MAIL_ENABLED:
             email_data = schemas.EmailConfirm(
                 email=user_in.email, old_email=current_user.email
             ).dict()
             token = security.generate_timed_token(email_data)
-            tasks.send_email_task.delay(
-                to_email=user_in.email,
-                subject="Please confirm your new email",
-                html_template_name="email/email_confirmation.html",
-                environment=dict(
-                    confirm_url=request.url_for("confirm_email", token=token)
+            scheduler.add_job(
+                tasks.send_email_task,
+                kwargs=dict(
+                    to_email=user_in.email,
+                    subject="Please confirm your new email",
+                    html_template_name="email/email_confirmation.html",
+                    environment=dict(confirm_url=request.url_for("confirm_email", token=token)),
                 ),
             )
         else:
@@ -178,16 +171,15 @@ def reset_password(
     email = email_data.email
     user = user_repo.find_by_email(email_data.email)
     if user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No user registered with this email."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user registered with this email.")
     token = security.generate_timed_token(user.email)
-    tasks.send_email_task.delay(
-        to_email=email,
-        subject="Reset your password",
-        html_template_name="email/reset_password_instructions.html",
-        environment=dict(
-            reset_url=request.url_for("check_reset_password", token=token)
+    scheduler.add_job(
+        tasks.send_email_task,
+        kwargs=dict(
+            to_email=email,
+            subject="Reset your password",
+            html_template_name="email/reset_password_instructions.html",
+            environment=dict(reset_url=request.url_for("check_reset_password", token=token)),
         ),
     )
     return {"detail": "Reset instructions sent."}
@@ -210,15 +202,11 @@ def check_reset_password(
     try:
         email = security.confirm_timed_token(token)
     except Exception:
-        raise HTTPException(
-            status.HTTP_410_GONE, "The reset link is invalid or has expired."
-        )
+        raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
 
     user = user_repo.find_by_email(email)
     if user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No user with with this email was found."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
 
     return {"detail": "Able to reset."}
 
@@ -240,57 +228,23 @@ def confirm_reset_password(
     try:
         email = security.confirm_timed_token(token)
     except Exception:
-        raise HTTPException(
-            status.HTTP_410_GONE, "The reset link is invalid or has expired."
-        )
+        raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
 
     user = user_repo.find_by_email(email)
     if user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No user with with this email was found."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
 
     user.password = password
     user_repo.save(user)
-    tasks.send_email_task.delay(
-        to_email=user.email,
-        subject="Your password has been reset",
-        html_template_name="email/reset_password_notice.html",
+    scheduler.add_job(
+        tasks.send_email_task,
+        kwargs=dict(
+            to_email=user.email,
+            subject="Your password has been reset",
+            html_template_name="email/reset_password_notice.html",
+        ),
     )
     return {"detail": "Password reset."}
-
-
-##########################################
-# Notifications                          #
-##########################################
-
-
-@current_user_router.get("/notifications", tags=["notifications"])
-def get_notifications(current_user: models.User = Depends(deps.get_current_user)):
-    return current_user.notifications
-
-
-@current_user_router.delete("/notifications/{id}", tags=["notifications"])
-def delete_notification(
-    id: int,
-    current_user: models.User = Depends(deps.get_current_user),
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    current_user.notifications = [n for n in current_user.notifications if n.id != id]
-    user_repo.save(current_user)
-
-    return {"detail": "Notification deleted"}
-
-
-@current_user_router.delete("/notifications", tags=["notifications"])
-def delete_all_notifications(
-    current_user: models.User = Depends(deps.get_current_user),
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    current_user.notifications = []
-    user_repo.save(current_user)
-
-    return {"detail": "Notifications deleted"}
 
 
 ##########################################
@@ -298,15 +252,11 @@ def delete_all_notifications(
 ##########################################
 
 
-@current_user_router.get(
-    "/friends", response_model=list[schemas.UserPublic], tags=["friends"]
-)
+@current_user_router.get("/friends", response_model=List[schemas.UserPublic], tags=["friends"])
 def get_friends(
     providers_type: Optional[models.ProviderType] = None,
     current_user: models.User = Depends(deps.get_current_user),
-    friendship_repo: FriendshipRepository = Depends(
-        deps.get_repository(FriendshipRepository)
-    ),
+    friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
     friendships = friendship_repo.find_all_by_user_id(current_user.id, pending=False)
     friends = [
@@ -324,8 +274,7 @@ def get_friends(
                 (
                     provider
                     for provider in friend.providers
-                    if provider.provider_type == providers_type
-                    and provider.enabled is True
+                    if provider.provider_type == providers_type and provider.enabled is True
                 ),
                 None,
             )
@@ -335,32 +284,24 @@ def get_friends(
 
 
 @current_user_router.get(
-    "/friends/incoming", response_model=list[schemas.UserPublic], tags=["friends"]
+    "/friends/incoming", response_model=List[schemas.UserPublic], tags=["friends"]
 )
 def get_pending_incoming_friends(
     current_user: models.User = Depends(deps.get_current_user),
-    friendship_repo: FriendshipRepository = Depends(
-        deps.get_repository(FriendshipRepository)
-    ),
+    friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
-    friendships = friendship_repo.find_all_by(
-        requested_user_id=current_user.id, pending=True
-    )
+    friendships = friendship_repo.find_all_by(requested_user_id=current_user.id, pending=True)
     return [friendship.requesting_user for friendship in friendships]
 
 
 @current_user_router.get(
-    "/friends/outgoing", response_model=list[schemas.UserPublic], tags=["friends"]
+    "/friends/outgoing", response_model=List[schemas.UserPublic], tags=["friends"]
 )
 def get_pending_outgoing_friends(
     current_user: models.User = Depends(deps.get_current_user),
-    friendship_repo: FriendshipRepository = Depends(
-        deps.get_repository(FriendshipRepository)
-    ),
+    friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
-    friendships = friendship_repo.find_all_by(
-        requesting_user_id=current_user.id, pending=True
-    )
+    friendships = friendship_repo.find_all_by(requesting_user_id=current_user.id, pending=True)
     return [friendship.requested_user for friendship in friendships]
 
 
@@ -378,9 +319,7 @@ def add_friend(
     friend: schemas.FriendshipCreate,
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    friendship_repo: FriendshipRepository = Depends(
-        deps.get_repository(FriendshipRepository)
-    ),
+    friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
     friend = user_repo.find_by_username_or_email(friend.username_or_email)
     if friend is None or friend == current_user or not friend.confirmed:
@@ -389,9 +328,7 @@ def add_friend(
     if friendship_repo.find_by_user_ids(current_user.id, friend.id) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This user is already a friend.")
 
-    friendship = models.Friendship(
-        requesting_user_id=current_user.id, requested_user_id=friend.id
-    )
+    friendship = models.Friendship(requesting_user_id=current_user.id, requested_user_id=friend.id)
     friendship_repo.save(friendship)
     return friendship.requested_user
 
@@ -409,9 +346,7 @@ def accept_friend(
     username,
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    friendship_repo: FriendshipRepository = Depends(
-        deps.get_repository(FriendshipRepository)
-    ),
+    friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
     friend = user_repo.find_by_username(username)
     if friend is None:
@@ -419,9 +354,7 @@ def accept_friend(
 
     friendship = friendship_repo.find_by_user_ids(current_user.id, friend.id)
     if friendship is None:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "This user is not in your friend list."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "This user is not in your friend list.")
     friendship.pending = False
     friendship_repo.save(friendship)
     return friend
@@ -439,9 +372,7 @@ def remove_friend(
     username: str,
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    friendship_repo: FriendshipRepository = Depends(
-        deps.get_repository(FriendshipRepository)
-    ),
+    friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
     friend = user_repo.find_by_username(username)
     if friend is None:
@@ -449,16 +380,14 @@ def remove_friend(
 
     friendship = friendship_repo.find_by_user_ids(current_user.id, friend.id)
     if friendship is None:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "This user is not in your friend list."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "This user is not in your friend list.")
 
     friendship_repo.remove(friendship)
     return {"detail": "Friend removed."}
 
 
 @current_user_router.get(
-    "/friends/search", response_model=list[schemas.UserPublic], tags=["friends"]
+    "/friends/search", response_model=List[schemas.UserPublic], tags=["friends"]
 )
 def search_friends(
     value: str,

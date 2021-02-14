@@ -1,3 +1,4 @@
+import re
 from random import randrange
 
 import requests
@@ -14,7 +15,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.core import security, settings, utils
+from server.core import config, security, utils
+from server.core.scheduler import scheduler
 from server.repositories import PlexAccountRepository, UserRepository
 
 router = APIRouter()
@@ -24,9 +26,7 @@ router = APIRouter()
     "/sign-up",
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.User,
-    responses={
-        status.HTTP_409_CONFLICT: {"description": "Email or username not available"}
-    },
+    responses={status.HTTP_409_CONFLICT: {"description": "Email or username not available"}},
 )
 def signup(
     user_in: schemas.UserCreate,
@@ -46,16 +46,20 @@ def signup(
     if user_repo.count() == 0:
         user.role = models.UserRole.superuser
 
-    if settings.MAIL_ENABLED:
+    if config.MAIL_ENABLED:
         email_data = schemas.EmailConfirm(email=user.email).dict()
         token = security.generate_timed_token(email_data)
-        tasks.send_email_task.delay(
-            to_email=user.email,
-            subject="Welcome!",
-            html_template_name="email/welcome.html",
-            environment=dict(
-                username=user.username,
-                confirm_url=request.url_for("confirm_email", token=token),
+        scheduler.add_job(
+            tasks.send_email_task,
+            "date",
+            kwargs=dict(
+                to_email=user.email,
+                subject="Welcome!",
+                html_template_name="email/welcome.html",
+                environment=dict(
+                    username=user.username,
+                    confirm_url=request.url_for("confirm_email", token=token),
+                ),
             ),
         )
     else:
@@ -85,21 +89,15 @@ def confirm_email(
     if email_data.old_email is not None:
         user = user_repo.find_by_email(email_data.old_email)
         if user is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, "No user with this email was found."
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email was found.")
         user.email = email_data.email
     else:
         user = user_repo.find_by_email(email_data.email)
         if user is None:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND, "No user with this email was found."
-            )
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email was found.")
 
         if user.confirmed:
-            raise HTTPException(
-                status.HTTP_403_FORBIDDEN, "This email is already confirmed."
-            )
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "This email is already confirmed.")
         user.confirmed = True
     user_repo.save(user)
     return {"detail": "This email is now confirmed."}
@@ -120,20 +118,19 @@ def resend_confirmation(
     email = body.email
     existing_user = user_repo.find_by_email(email)
     if existing_user is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "No user with this email exists."
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email exists.")
     if existing_user.confirmed:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, "This email is already confirmed."
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "This email is already confirmed.")
     email_data = schemas.EmailConfirm(email=email).dict()
     token = security.generate_timed_token(email_data)
-    tasks.send_email_task.delay(
-        to_email=email,
-        subject="Please confirm your email",
-        html_template_name="email/email_confirmation.html",
-        environment=dict(confirm_url=request.url_for("confirm_email", token=token)),
+    scheduler.add_job(
+        tasks.send_email_task,
+        kwargs=dict(
+            to_email=email,
+            subject="Please confirm your email",
+            html_template_name="email/email_confirmation.html",
+            environment=dict(confirm_url=request.url_for("confirm_email", token=token)),
+        ),
     )
 
     return {"detail": "Confirmation email sent."}
@@ -183,11 +180,11 @@ def signin(
 @router.get("/sign-in/plex")
 def start_signin_plex():
     request_pin_url = utils.make_url(
-        settings.PLEX_TOKEN_URL,
+        config.PLEX_TOKEN_URL,
         queries_dict={
             "strong": "true",
-            "X-Plex-Product": settings.APP_NAME,
-            "X-Plex-Client-Identifier": settings.PLEX_CLIENT_IDENTIFIER,
+            "X-Plex-Product": "Cheddarr",
+            "X-Plex-Client-Identifier": config.PLEX_CLIENT_IDENTIFIER,
         },
     )
     return request_pin_url
@@ -195,8 +192,8 @@ def start_signin_plex():
 
 @router.post("/sign-in/plex/authorize")
 def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSignin):
-    forward_url = request.url_for("confirm_signin_plex").replace(
-        settings.API_PREFIX, ""
+    forward_url = re.sub(
+        f"{config.API_PREFIX}/v[0-9]+", "", request.url_for("confirm_signin_plex")
     )
     token = security.generate_token(
         {
@@ -207,10 +204,10 @@ def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSign
     )
     authorize_url = (
         utils.make_url(
-            settings.PLEX_AUTHORIZE_URL,
+            config.PLEX_AUTHORIZE_URL,
             queries_dict={
-                "context[device][product]": settings.APP_NAME,
-                "clientID": settings.PLEX_CLIENT_IDENTIFIER,
+                "context[device][product]": "Cheddarr",
+                "clientID": config.PLEX_CLIENT_IDENTIFIER,
                 "code": auth_data.code,
                 "forwardUrl": forward_url,
             },
@@ -225,39 +222,33 @@ def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSign
     "/sign-in/plex/confirm",
     response_model=schemas.Token,
     responses={
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {
-            "description": "Plex authorization error"
-        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Plex authorization error"},
     },
 )
 def confirm_signin_plex(
     token: str,
     response: Response,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    plex_account_repo: PlexAccountRepository = Depends(
-        deps.get_repository(PlexAccountRepository)
-    ),
+    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
 ):
     token = security.confirm_token(token)
     state = token.get("id")
     code = token.get("code")
     redirect_uri = token.get("redirectUri", "")
     access_url = utils.make_url(
-        settings.PLEX_TOKEN_URL + state,
+        config.PLEX_TOKEN_URL + state,
         queries_dict={
             "code": code,
-            "X-Plex-Client-Identifier": settings.PLEX_CLIENT_IDENTIFIER,
+            "X-Plex-Client-Identifier": config.PLEX_CLIENT_IDENTIFIER,
         },
     )
     r = requests.get(access_url, headers={"Accept": "application/json"})
     auth_token = r.json().get("authToken")
     if auth_token is None:
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "Error while authorizing Plex."
-        )
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Error while authorizing Plex.")
 
     r = requests.get(
-        settings.PLEX_USER_RESOURCE_URL,
+        config.PLEX_USER_RESOURCE_URL,
         headers={"X-Plex-Token": auth_token, "Accept": "application/json"},
     )
     info = r.json()
