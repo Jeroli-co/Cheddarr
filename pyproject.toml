@@ -41,6 +41,18 @@ pytest-cov = "^2.11.1"
 
 [tool.black]
 line-length = 99
+exclude = '''
+
+(
+  /(
+      \.git
+    | \.venv
+    | venv
+    | build
+    | migrations
+  )/
+)
+'''
 
 
 [build-system]
