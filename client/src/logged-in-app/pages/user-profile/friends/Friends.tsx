@@ -21,7 +21,7 @@ const ListContainer = styled.div`
 const FriendRequestContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 49%;
   @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
     width: 100%;
   }

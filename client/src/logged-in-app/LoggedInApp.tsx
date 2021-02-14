@@ -21,9 +21,8 @@ type PageLayoutProps = {
 
 const PageLayoutContainer = styled.div`
   padding: 20px;
-  width: 100%;
   min-height: calc(
-    100vh - ${STATIC_STYLES.NAVBAR_HEIGHT}px - ${STATIC_STYLES.FOOTER_HEIGHT}px
+    100vh - ${STATIC_STYLES.NAVBAR_HEIGHT + STATIC_STYLES.FOOTER_HEIGHT + 40}px
   );
   overflow-x: hidden;
   transition: ${STATIC_STYLES.SIDEBAR_TRANSITION_DURATION} ease;
@@ -74,6 +73,7 @@ export const LoggedInApp = () => {
         <PageLayoutMobile isSidebarOpen={isOpen}>
           <SwitchRoutes />
         </PageLayoutMobile>
+        <Footer />
       </Layout>
     );
   } else {

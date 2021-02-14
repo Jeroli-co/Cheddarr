@@ -25,7 +25,7 @@ import {
 import { RequestStatus } from "../../../../shared/enums/RequestStatus";
 import {
   DangerIconButton,
-  PrimaryOutlinedButton,
+  PrimaryButton,
   SuccessButton,
 } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
@@ -334,12 +334,12 @@ const RequestsFooterContainer = styled.header`
 export const RequestFooter = () => {
   return (
     <RequestsFooterContainer>
-      <PrimaryOutlinedButton>
+      <PrimaryButton>
         <Icon icon={faArrowLeft} />
-      </PrimaryOutlinedButton>
-      <PrimaryOutlinedButton>
+      </PrimaryButton>
+      <PrimaryButton>
         <Icon icon={faArrowRight} />
-      </PrimaryOutlinedButton>
+      </PrimaryButton>
     </RequestsFooterContainer>
   );
 };

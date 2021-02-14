@@ -1,18 +1,28 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FORM_DEFAULT_VALIDATOR } from "../../shared/enums/FormDefaultValidators";
-import { useHistory } from "react-router";
 import { useAPI } from "../../shared/hooks/useAPI";
 import { APIRoutes } from "../../shared/enums/APIRoutes";
 import { useAlert } from "../../shared/contexts/AlertContext";
 import { Modal } from "../../shared/components/Modal";
+import { InputField } from "../../shared/components/inputs/InputField";
+import { Button, PrimaryButton } from "../../shared/components/Button";
+import { Icon } from "../../shared/components/Icon";
+import { Buttons } from "../../shared/components/layout/Buttons";
+import { H2 } from "../../shared/components/Titles";
+import { HelpDanger } from "../../shared/components/Help";
 
-const InitResetPasswordModal = () => {
+type InitResetPasswordModalProps = {
+  isOpen: boolean;
+  closeModal: () => void;
+};
+
+const InitResetPasswordModal = ({
+  isOpen,
+  closeModal,
+}: InitResetPasswordModalProps) => {
   const { register, handleSubmit, errors } = useForm<{ email: string }>();
-
-  const history = useHistory();
 
   const { put } = useAPI();
   const { pushSuccess, pushDanger } = useAlert();
@@ -30,30 +40,18 @@ const InitResetPasswordModal = () => {
     });
   });
 
-  const closeModal = () => {
-    history.goBack();
-  };
-
   return (
-    <Modal isOpen={true}>
-      <div className="modal-header">hehe</div>
-      <div className="modal-body">
-        <form onSubmit={onSubmit}>
-          <header className="modal-card-head">
-            <p className="modal-card-title">Reset your password</p>
-            <button
-              className="delete"
-              aria-label="close"
-              type="button"
-              onClick={closeModal}
-            />
-          </header>
-          <div className="field">
-            <label className="label">Email</label>
-            <div className="control has-icons-left">
+    <Modal isOpen={isOpen} close={closeModal}>
+      <header>
+        <H2>Reset your password</H2>
+      </header>
+      <form onSubmit={onSubmit}>
+        <section>
+          <InputField withIcon>
+            <label>Email</label>
+            <div className="with-left-icon">
               <input
                 name="email"
-                className={"input " + (errors["email"] ? "is-danger" : "")}
                 type="email"
                 placeholder="Enter a valid email"
                 ref={register({
@@ -62,36 +60,32 @@ const InitResetPasswordModal = () => {
                   pattern: FORM_DEFAULT_VALIDATOR.EMAIL_PATTERN.value,
                 })}
               />
-              <span className="icon is-small is-left">
-                <FontAwesomeIcon icon={faEnvelope} />
+              <span className="icon">
+                <Icon icon={faEnvelope} />
               </span>
             </div>
-            {errors["email"] && errors["email"].type === "required" && (
-              <p className="help is-danger">
-                {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-              </p>
-            )}
-            {errors["email"] && errors["email"].type === "maxLength" && (
-              <p className="help is-danger">
-                {FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}
-              </p>
-            )}
-            {errors["email"] && errors["email"].type === "pattern" && (
-              <p className="help is-danger">
-                {FORM_DEFAULT_VALIDATOR.EMAIL_PATTERN.message}
-              </p>
-            )}
-          </div>
-          <footer className="modal-footer">
-            <button type="submit" className="button is-info">
-              Reset password
-            </button>
-            <button type="button" className="button" onClick={closeModal}>
+          </InputField>
+          {errors["email"] && errors["email"].type === "required" && (
+            <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
+          )}
+          {errors["email"] && errors["email"].type === "maxLength" && (
+            <HelpDanger>{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</HelpDanger>
+          )}
+          {errors["email"] && errors["email"].type === "pattern" && (
+            <HelpDanger>
+              {FORM_DEFAULT_VALIDATOR.EMAIL_PATTERN.message}
+            </HelpDanger>
+          )}
+        </section>
+        <footer>
+          <Buttons>
+            <PrimaryButton type="submit">Reset password</PrimaryButton>
+            <Button type="button" onClick={() => closeModal()}>
               Cancel
-            </button>
-          </footer>
-        </form>
-      </div>
+            </Button>
+          </Buttons>
+        </footer>
+      </form>
     </Modal>
   );
 };

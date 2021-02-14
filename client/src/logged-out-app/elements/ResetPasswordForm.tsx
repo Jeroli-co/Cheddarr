@@ -1,11 +1,14 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
 import { FORM_DEFAULT_VALIDATOR } from "../../shared/enums/FormDefaultValidators";
 import { useAPI } from "../../shared/hooks/useAPI";
 import { APIRoutes } from "../../shared/enums/APIRoutes";
 import { useAlert } from "../../shared/contexts/AlertContext";
+import { PrimaryButton } from "../../shared/components/Button";
+import { Icon } from "../../shared/components/Icon";
+import { HelpDanger } from "../../shared/components/Help";
+import { InputField } from "../../shared/components/inputs/InputField";
 
 type ResetPasswordFormProps = {
   token: string;
@@ -35,7 +38,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
   });
 
   return (
-    <div className="ResetPasswordForm" data-testid="ResetPasswordForm">
+    <div>
       <div className="columns is-mobile is-centered">
         <div className="column is-one-third">
           <form
@@ -44,12 +47,11 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
             onSubmit={onSubmit}
           >
             {/* NEW PASSWORD */}
-            <div className="field">
+            <InputField withIcon>
               <label className="label">New password</label>
-              <div className="control has-icons-left">
+              <div className="with-icon-left">
                 <input
                   name="password"
-                  className={"input " + (errors.newPassword ? "is-danger" : "")}
                   type="password"
                   placeholder="Enter a strong password"
                   ref={register({
@@ -57,31 +59,26 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
                     pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
                   })}
                 />
-                <span className="icon is-small is-left">
-                  <FontAwesomeIcon icon={faKey} />
+                <span className="icon">
+                  <Icon icon={faKey} />
                 </span>
               </div>
-              {errors.newPassword && errors.newPassword.type === "required" && (
-                <p className="help is-danger">
-                  {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                </p>
-              )}
-              {errors.newPassword && errors.newPassword.type === "pattern" && (
-                <p className="help is-danger">
-                  {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
-                </p>
-              )}
-            </div>
+            </InputField>
+            {errors.newPassword && errors.newPassword.type === "required" && (
+              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
+            )}
+            {errors.newPassword && errors.newPassword.type === "pattern" && (
+              <HelpDanger>
+                {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
+              </HelpDanger>
+            )}
 
             {/* CONFIRM NEW PASSWORD */}
-            <div className="field">
+            <InputField>
               <label className="label">Confirm new password</label>
-              <div className="control has-icons-left">
+              <div className="with-icon-left">
                 <input
                   name="password-confirmation"
-                  className={
-                    "input " + (errors.passwordConfirmation ? "is-danger" : "")
-                  }
                   type="password"
                   placeholder="Enter the same password"
                   ref={register({
@@ -91,29 +88,25 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
                     },
                   })}
                 />
-                <span className="icon is-small is-left">
-                  <FontAwesomeIcon icon={faKey} />
+                <span className="icon">
+                  <Icon icon={faKey} />
                 </span>
               </div>
-              {errors.passwordConfirmation &&
-                errors.passwordConfirmation.type === "required" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                  </p>
-                )}
-              {errors.passwordConfirmation &&
-                errors.passwordConfirmation.type === "validate" && (
-                  <p className="help is-danger">
-                    {FORM_DEFAULT_VALIDATOR.WATCH_PASSWORD.message}
-                  </p>
-                )}
-            </div>
+            </InputField>
+            {errors.passwordConfirmation &&
+              errors.passwordConfirmation.type === "required" && (
+                <HelpDanger>
+                  {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
+                </HelpDanger>
+              )}
+            {errors.passwordConfirmation &&
+              errors.passwordConfirmation.type === "validate" && (
+                <HelpDanger>
+                  {FORM_DEFAULT_VALIDATOR.WATCH_PASSWORD.message}
+                </HelpDanger>
+              )}
 
-            <div className="field">
-              <div className="control">
-                <button className="button is-link">Reset password</button>
-              </div>
-            </div>
+            <PrimaryButton type="submit">Reset password</PrimaryButton>
           </form>
         </div>
       </div>

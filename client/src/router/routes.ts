@@ -2,16 +2,11 @@ import { NotFound } from "../shared/components/errors/NotFound";
 import { PageLoader } from "../shared/components/PageLoader";
 import { ConfirmEmail } from "../logged-out-app/elements/ConfirmEmail";
 import { ResetPassword } from "../logged-out-app/elements/ResetPassword";
-import { InitResetPasswordModal } from "../logged-out-app/elements/InitResetPasswordModal";
 import { SignInForm } from "../logged-out-app/SignInForm";
 import { SignUpForm } from "../logged-out-app/SignUpForm";
 import { PublicUser } from "../logged-in-app/pages/PublicUser";
 import { Friends } from "../logged-in-app/pages/user-profile/friends/Friends";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
-import { ChangeEmailModal } from "../logged-in-app/pages/settings/components/account/components/ChangeEmailModal";
-import { ChangePasswordModal } from "../logged-in-app/pages/settings/components/account/components/ChangePasswordModal";
-import { ChangeUsernameModal } from "../logged-in-app/pages/settings/components/account/components/ChangeUsernameModal";
-import { DeleteAccountModal } from "../logged-in-app/pages/settings/components/account/components/DeleteAccountModal";
 import { SettingsAccount } from "../logged-in-app/pages/settings/components/account/SettingsAccount";
 import { PlexConfig } from "../logged-in-app/pages/settings/components/plex/PlexConfig";
 import { RadarrConfig } from "../logged-in-app/pages/settings/components/RadarrConfig";
@@ -40,10 +35,6 @@ const routes = {
     component: SignInForm,
   },
   CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm", component: PageLoader },
-  INIT_RESET_PASSWORD: {
-    url: "/sign-in/init-reset-password",
-    component: InitResetPasswordModal,
-  },
   SIGN_UP: { url: "/sign-up", component: SignUpForm },
   CONFIRM_EMAIL: {
     url: (token: string) => "/sign-up/" + token,
@@ -80,22 +71,6 @@ const routes = {
   SETTINGS_SONARR: {
     url: "/settings/sonarr",
     component: SonarrConfig,
-  },
-  CHANGE_PASSWORD_MODAL: {
-    url: "/settings/account/change-password",
-    component: ChangePasswordModal,
-  },
-  CHANGE_USERNAME_MODAL: {
-    url: "/settings/account/change-username",
-    component: ChangeUsernameModal,
-  },
-  CHANGE_EMAIL_MODAL: {
-    url: "/settings/account/change-email",
-    component: ChangeEmailModal,
-  },
-  DELETE_ACCOUNT_MODAL: {
-    url: "/settings/account/delete",
-    component: DeleteAccountModal,
   },
 
   /** PLEX **/

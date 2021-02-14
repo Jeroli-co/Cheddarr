@@ -32,8 +32,7 @@ export const Button = styled.button<ButtonStyleProps>`
   cursor: pointer;
   text-align: center;
   white-space: nowrap;
-  background: ${(props) =>
-    props.bgColor ? props.bgColor : props.theme.bgColor};
+  background: ${(props) => (props.bgColor ? props.bgColor : props.theme.grey)};
   color: ${(props) => props.theme.white};
 
   &:focus {
@@ -85,24 +84,6 @@ export const PrimaryRoundedButton = styled(RoundedButton)`
   background-color: ${(props) => props.theme.primary};
 `;
 
-export const PrimaryOutlinedButton = styled(Button)`
-  border: 1px solid ${(props) => props.theme.primary};
-  color: ${(props) => props.theme.primary};
-  &:hover {
-    color: ${(props) => props.theme.white};
-    background-color: ${(props) => props.theme.primary};
-  }
-`;
-
-export const PrimaryOutlinedRoundedButton = styled(RoundedButton)`
-  border: 1px solid ${(props) => props.theme.primary};
-  color: ${(props) => props.theme.primary};
-  &:hover {
-    color: ${(props) => props.theme.white};
-    background-color: ${(props) => props.theme.primary};
-  }
-`;
-
 export const SecondaryButton = styled(Button)`
   background-color: ${(props) => props.theme.secondary};
 `;
@@ -113,7 +94,6 @@ export const SecondaryRoundedButton = styled(RoundedButton)`
 
 export const SuccessButton = styled(Button)`
   background-color: ${(props) => props.theme.success};
-  color: ${(props) => props.theme.white};
   font-size: 15px;
   width: 30px;
   height: 30px;
@@ -121,14 +101,11 @@ export const SuccessButton = styled(Button)`
 
 export const DangerButton = styled(Button)`
   background-color: ${(props) => props.theme.danger};
-  color: ${(props) => props.theme.white};
   min-width: 50px;
   min-height: 40px;
 `;
 
-export const IconButton = styled(Button)`
-  background-color: ${(props) => props.theme.primaryLighter};
-  color: ${(props) => props.theme.white};
+export const IconButton = styled(PrimaryButton)`
   font-size: 15px;
   width: 30px;
   height: 30px;

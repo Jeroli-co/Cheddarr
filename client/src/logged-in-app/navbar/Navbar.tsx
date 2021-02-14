@@ -64,8 +64,8 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
         <img
           src={navbarLogo}
           alt="Chedarr"
-          width={40}
-          height={24}
+          width={45}
+          height={45}
           onClick={() => history.push("/")}
         />
       </NavbarAppLogo>

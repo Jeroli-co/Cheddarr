@@ -8,27 +8,29 @@ import { useSession } from "../../../../shared/contexts/SessionContext";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 import { useHistory } from "react-router";
 import { useOutsideAlerter } from "../../../../shared/hooks/useOutsideAlerter";
+import { Icon } from "../../../../shared/components/Icon";
 
 const Container = styled.div<{ isVisible: boolean }>`
   position: fixed;
   top: ${STATIC_STYLES.NAVBAR_HEIGHT + 5}px;
   right: 5px;
-  display: ${(props) => (props.isVisible ? "flex" : "none")};
-  flex-direction: column;
-  align-items: center;
+  display: ${(props) => (props.isVisible ? "block" : "none")};
   border: 1px solid ${(props) => props.theme.primaryLight};
   background: ${(props) => props.theme.primary};
   border-radius: 6px;
   z-index: 1;
+  width: 150px;
 `;
 
 const Item = styled.div`
   display: flex;
+  justify-content: center;
   align-items: center;
   cursor: pointer;
-  padding: 10px 25px;
-  width: 100%;
+  padding: 10px 0;
+  margin: auto;
   border-radius: 6px;
+  width: 100%;
 
   &:first-child {
     border-radius: 6px 6px 0 0;
@@ -45,7 +47,7 @@ const Item = styled.div`
 `;
 
 const DropdownMenuItemIcon = styled.div`
-  margin-right: 1em;
+  padding-right: 10px;
 `;
 
 type UserDropdownProps = {
@@ -75,13 +77,13 @@ const UserDropdown = ({
     <Container isVisible={isVisible} ref={dropdownRef}>
       <Item onClick={() => history.push(routes.PROFILE.url)}>
         <DropdownMenuItemIcon>
-          <FontAwesomeIcon icon={faUserCircle} />
+          <Icon icon={faUserCircle} />
         </DropdownMenuItemIcon>
         <span>Profile</span>
       </Item>
       <Item onClick={() => logout()}>
         <DropdownMenuItemIcon>
-          <FontAwesomeIcon icon={faSignOutAlt} />
+          <Icon icon={faSignOutAlt} />
         </DropdownMenuItemIcon>
         <span>Sign out</span>
       </Item>

@@ -18,6 +18,7 @@ import { SignInButton } from "../shared/components/SignInButton";
 import { Row } from "../shared/components/layout/Row";
 import { InputField } from "../shared/components/inputs/InputField";
 import { HelpDanger } from "../shared/components/Help";
+import { CenteredContent } from "../shared/components/layout/CenteredContent";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();
@@ -41,7 +42,7 @@ const SignUpForm = () => {
 
   return (
     <div className="SignUpForm" data-testid="SignUpForm">
-      <PrimaryHero>Create a Cheddarr account</PrimaryHero>
+      <PrimaryHero>Sign up to Cheddarr</PrimaryHero>
       <br />
 
       <div className="columns is-mobile is-centered">
@@ -194,10 +195,12 @@ const SignUpForm = () => {
 
             <PrimaryDivider />
 
-            <PlexButton
-              text="Sign in with Plex"
-              onClick={() => signInWithPlex()}
-            />
+            <CenteredContent>
+              <PlexButton
+                text="Sign in with Plex"
+                onClick={() => signInWithPlex()}
+              />
+            </CenteredContent>
 
             <br />
 
@@ -208,6 +211,7 @@ const SignUpForm = () => {
           </form>
         </div>
       </div>
+      <br />
     </div>
   );
 };

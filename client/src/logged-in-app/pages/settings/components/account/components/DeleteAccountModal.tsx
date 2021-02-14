@@ -1,54 +1,43 @@
 import React from "react";
-import { useHistory } from "react-router";
 import { useUserService } from "../../../../../../shared/hooks/useUserService";
+import { Modal } from "../../../../../../shared/components/Modal";
+import { H2 } from "../../../../../../shared/components/Titles";
+import { Buttons } from "../../../../../../shared/components/layout/Buttons";
+import {
+  Button,
+  DangerButton,
+} from "../../../../../../shared/components/Button";
 
-const DeleteAccountModal = () => {
-  const history = useHistory();
+type DeleteAccountModalProps = {
+  isOpen: boolean;
+  closeModal: () => void;
+};
 
+const DeleteAccountModal = (props: DeleteAccountModalProps) => {
   const { deleteAccount } = useUserService();
 
   const onSubmit = () => {
     deleteAccount().then((res) => {
-      if (res.status === 200) closeModal();
+      if (res.status === 200) props.closeModal();
     });
   };
 
-  const closeModal = () => {
-    history.goBack();
-  };
-
   return (
-    <div
-      className="DeleteAccountModal modal is-active"
-      data-testid="DeleteAccountModal"
-    >
-      <div className="modal-background" onClick={closeModal} />
-      <div className="modal-card">
-        <header className="modal-card-head">
-          <p className="modal-card-title">
-            Are you sure you want to delete your account ?
-          </p>
-          <button
-            className="delete"
-            aria-label="close"
-            type="button"
-            onClick={closeModal}
-          />
-        </header>
-        <footer className="modal-card-foot">
-          <button
-            className="button is-danger"
-            type="button"
-            onClick={() => onSubmit()}
-          >
+    <Modal isOpen={props.isOpen} close={props.closeModal}>
+      <header>
+        <H2>Are you sure you want to delete your account ?</H2>
+      </header>
+      <footer>
+        <Buttons>
+          <DangerButton type="button" onClick={() => onSubmit()}>
             Delete account
-          </button>
-          <button className="button" type="button" onClick={closeModal}>
+          </DangerButton>
+          <Button type="button" onClick={() => props.closeModal()}>
             Cancel
-          </button>
-        </footer>
-      </div>
-    </div>
+          </Button>
+        </Buttons>
+      </footer>
+    </Modal>
   );
 };
 
