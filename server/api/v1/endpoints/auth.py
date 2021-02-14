@@ -15,10 +15,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.core import security, config, utils
+from server.core import config, security, utils
 from server.core.scheduler import scheduler
 from server.repositories import PlexAccountRepository, UserRepository
-
 
 router = APIRouter()
 

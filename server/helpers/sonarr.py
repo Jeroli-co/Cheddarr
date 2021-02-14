@@ -1,5 +1,5 @@
 import time
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 import requests
 from pydantic.tools import parse_obj_as

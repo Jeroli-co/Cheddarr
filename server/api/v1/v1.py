@@ -1,5 +1,6 @@
 from fastapi import APIRouter, FastAPI
-from .endpoints import auth, settings, plex, requests, search, users, notifications
+
+from .endpoints import auth, notifications, plex, requests, search, settings, users
 
 version = "v1"
 

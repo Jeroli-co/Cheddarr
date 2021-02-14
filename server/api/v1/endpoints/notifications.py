@@ -12,12 +12,8 @@ from server.api import (
     dependencies as deps,
 )
 from server.core import config
-from server.repositories import (
-    UserRepository,
-)
-from server.repositories.notifications import (
-    NotificationAgentRepository,
-)
+from server.repositories import UserRepository, NotificationAgentRepository
+
 
 router = APIRouter()
 
@@ -60,60 +56,44 @@ def delete_all_notifications(
 
 
 ##########################################
-# Email agent                            #
+#  Agents                                #
 ##########################################
 
 
 @router.get(
-    "/email",
-    response_model=List[schemas.EmailAgent],
-    dependencies=[Depends(deps.get_current_user)],
-)
-def get_email_agents(
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
-):
-    agents = notif_agent_repo.find_all_by(name="email")
-    return agents
-
-
-@router.post(
-    "/email",
+    "/agents/email",
     response_model=schemas.EmailAgent,
     dependencies=[Depends(deps.get_current_user)],
 )
-def add_email_agent(
-    agent_in: schemas.EmailAgentCreateUpdate,
+def get_email_agent(
     notif_agent_repo: NotificationAgentRepository = Depends(
         deps.get_repository(NotificationAgentRepository)
     ),
 ):
-    agent = agent_in.to_orm(models.NotificationAgent)
-    agent.name = "email"
-    notif_agent_repo.save(agent)
-    config.set_config(MAIL_ENABLED=True)
+    agent = notif_agent_repo.find_by(name=models.Agent.email)
     return agent
 
 
 @router.put(
-    "/email/{id}",
+    "/agents/email",
     response_model=schemas.EmailAgent,
     dependencies=[Depends(deps.get_current_user)],
 )
 def update_email_agent(
-    agent_id: int,
-    agent_in: schemas.EmailAgentCreateUpdate,
+    agent_in: schemas.EmailAgent,
     notif_agent_repo: NotificationAgentRepository = Depends(
         deps.get_repository(NotificationAgentRepository)
     ),
 ):
-    agent = notif_agent_repo.find_by(id=agent_id)
+    agent = notif_agent_repo.find_by(name=models.Agent.email)
     if agent is None:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            "No email agent settings found with this id.",
-        )
-    agent.update(agent_in)
+        agent = agent_in.to_orm(models.NotificationAgent)
+        agent.name = models.Agent.email
+    else:
+        agent.update(agent_in)
     notif_agent_repo.save(agent)
+    if agent.enabled:
+        config.set(MAIL_ENABLED=True)
+    else:
+        config.set(MAIL_ENABLED=False)
     return agent

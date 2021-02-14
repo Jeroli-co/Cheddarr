@@ -24,7 +24,7 @@ def cli(ctx, debug):
 @cli.command("init-db")
 def init_db():
     """Initialize the database."""
-    from server.database.base import init_db
+    from server.database.init_db import init_db
 
     init_db()
     click.echo("Database initialized.")

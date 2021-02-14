@@ -28,7 +28,7 @@ RUN pip3 install --upgrade pip && pip3 install poetry \
     && poetry install --no-root --no-dev
 
 # Run migration
-RUN alembic upgrade head
+RUN cd server && alembic upgrade head
 
 ENTRYPOINT ["python", "cheddarr.py", "run"]
 EXPOSE 9090

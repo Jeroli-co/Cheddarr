@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import (
 )
 from sqlalchemy.orm import class_mapper
 
+
 Base = declarative_base()
 
 
@@ -70,9 +71,6 @@ class Model(Base):
         return out
 
 
-ModelType = TypeVar("ModelType", bound=Model)
-
-
 class Timestamp(object):
     """Mixin that define timestamp columns."""
 
@@ -88,11 +86,4 @@ class Timestamp(object):
     )
 
 
-def init_db():
-    # Import all models so that they are registered befored the init
-    from server import models  # noqa
-    from server.database.session import engine
-
-    Base.metadata.reflect(bind=engine)
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+ModelType = TypeVar("ModelType", bound=Model)

@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import date
-from typing import Optional, List
+from typing import List, Optional
 
 from pydantic import Field
 

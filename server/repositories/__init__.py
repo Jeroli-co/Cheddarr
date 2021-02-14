@@ -9,3 +9,4 @@ from .requests import (
     SeriesRequestRepository,
 )
 from .users import FriendshipRepository, PlexAccountRepository, UserRepository
+from .notifications import NotificationAgentRepository

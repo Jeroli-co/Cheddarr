@@ -1,14 +1,17 @@
-from dataclasses import dataclass
+from enum import Enum
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, JSON, String, Text, Enum as DBEnum
 from sqlalchemy.orm import relationship
 
 from server.database import Model, Timestamp
 
 
+class Agent(str, Enum):
+    email = "email"
+
+
 class NotificationAgent(Model):
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(DBEnum(Agent), primary_key=True)
     enabled = Column(Boolean, default=True)
     settings = Column(JSON)
 

@@ -4,7 +4,7 @@ import requests
 
 from server import schemas
 from server.core import utils
-from server.models import MovieRequest, RadarrSetting, RequestStatus
+from server.models import MovieRequest, RadarrSetting
 
 
 def make_url(

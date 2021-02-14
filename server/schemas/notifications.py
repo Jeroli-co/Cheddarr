@@ -1,4 +1,6 @@
-from typing import Any
+from typing import Any, Optional
+
+from pydantic import Field
 
 from server.schemas import APIModel, UserPublic
 
@@ -7,6 +9,11 @@ class Notification(APIModel):
     message: str
     read: bool
     user: UserPublic
+
+
+class NotificationAgent(APIModel):
+    enabled: bool
+    settings: Any
 
 
 class EmailAgentSettings(APIModel):
@@ -19,12 +26,5 @@ class EmailAgentSettings(APIModel):
     ssl: bool
 
 
-class EmailAgent(APIModel):
-    id: int
-    enabled: bool
-    settings: EmailAgentSettings
-
-
-class EmailAgentCreateUpdate(APIModel):
-    enabled: bool
+class EmailAgent(NotificationAgent):
     settings: EmailAgentSettings

@@ -1,8 +1,7 @@
 import secrets
-from functools import lru_cache
 from json import dump, load
 from pathlib import Path
-from typing import Any, List
+from typing import List
 
 from pydantic import (
     AnyHttpUrl,
@@ -20,7 +19,6 @@ class Config(BaseSettings):
     DOMAIN: str = "localhost:9090"
     SERVER_HOST: str = f"http://{DOMAIN}"
     LOG_LEVEL: str = "INFO"
-    TESTING: bool = False
 
     ##########################################################################
     # folders/files                                                          #
@@ -56,8 +54,8 @@ class Config(BaseSettings):
     # database                                                               #
     ##########################################################################
     DB_NAME: str = "cheddarr.sqlite"
-    DATABASE_URL: str = "sqlite:///" + str(DB_FOLDER / DB_NAME)
-    DATABASE_OPTIONS: dict = {"check_same_thread": False}
+    DB_URL: str = "sqlite:///" + str(DB_FOLDER / DB_NAME)
+    DB_OPTIONS: dict = {"check_same_thread": False}
 
     ##########################################################################
     # notifications                                                          #
@@ -65,42 +63,31 @@ class Config(BaseSettings):
     MAIL_ENABLED: bool = False
 
     ##########################################################################
-    # config file                                                            #
-    ##########################################################################
-    def __init__(self, **values: Any):
-        super().__init__(**values)
 
-        if self.TESTING:
-            return
-
-        self.CONFIG_FOLDER.mkdir(exist_ok=True)
-        self.DB_FOLDER.mkdir(exist_ok=True)
-        self.LOGS_FOLDER.mkdir(exist_ok=True)
-
+    def setup(self):
         try:
             with open(self.CONFIG_FILE, "r") as existing_config_file:
                 existing_config = load(existing_config_file)
                 for k, v in existing_config.items():
-                    setattr(self, k, v)
+                    setattr(self, k.upper(), v)
         except FileNotFoundError:
             pass
         try:
-            self.write_config_file()
+            self.write_file()
         except OSError:
             raise
 
-    def set_config(self, **config_kwargs):
-        print(config_kwargs)
+    def set(self, **config_kwargs):
         for field_k, field_v in config_kwargs.items():
             if field_k in self.__fields__:
                 setattr(self, field_k, field_v)
-        self.write_config_file()
+        self.write_file()
 
-    def write_config_file(self):
+    def write_file(self):
         with open(self.CONFIG_FILE, "w+") as config_file:
             dump(
                 {
-                    item: getattr(self, item)
+                    item.lower(): getattr(self, item)
                     for item in self.__fields__
                     if item in self._config_file_fields
                 },

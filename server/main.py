@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.api.v1 import v1
-from server.core import logger, config
+from server.core import config, logger
 from server.core.scheduler import scheduler
 from server.site import site
 
@@ -20,8 +20,9 @@ def setup_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    if not config.TESTING:
-        scheduler.start()
+
+    config.setup()
+    scheduler.start()
 
     logger.log(logging.INFO, "Starting Cheddarr")
     return application

@@ -1,6 +1,5 @@
 from .auth import EmailConfirm, PlexAuthorizeSignin, Token, TokenPayload
 from .base import APIModel
-from .media import Episode, Media, Movie, Season, Series
 from .users import (
     FriendshipCreate,
     PasswordResetConfirm,
@@ -10,31 +9,33 @@ from .users import (
     UserPublic,
     UserUpdate,
 )
+from .media import Episode, Media, Movie, Season, Series
+from .notifications import EmailAgent, EmailAgentSettings, Notification
 from .providers import (
     MediaSearchResultSchema,
-    PlexSetting,
-    PlexSettingCreateUpdate,
     PlexEpisode,
     PlexMovie,
     PlexSeason,
     PlexSeries,
     PlexServerInfo,
     PlexServerOut,
+    PlexSetting,
+    PlexSettingCreateUpdate,
     ProviderSettingBase,
     RadarrAddOptions,
+    RadarrInstanceInfo,
+    RadarrMovie,
     RadarrSetting,
     RadarrSettingCreateUpdate,
     RadarrSettingData,
-    RadarrInstanceInfo,
-    RadarrMovie,
     SonarrAddOptions,
-    SonarrSetting,
-    SonarrSettingCreateUpdate,
-    SonarrSettingData,
     SonarrEpisode,
     SonarrInstanceInfo,
     SonarrSeason,
     SonarrSeries,
+    SonarrSetting,
+    SonarrSettingCreateUpdate,
+    SonarrSettingData,
 )
 from .requests import (
     MovieRequest,
@@ -51,10 +52,4 @@ from .search import (
     TmdbSearchResult,
     TmdbSeason,
     TmdbSeries,
-)
-from .notifications import (
-    Notification,
-    EmailAgent,
-    EmailAgentCreateUpdate,
-    EmailAgentSettings,
 )

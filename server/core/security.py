@@ -4,6 +4,7 @@ from itsdangerous import URLSafeSerializer, URLSafeTimedSerializer
 from jose import jwt
 from passlib import pwd
 from passlib.context import CryptContext
+
 from server.core.config import config
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

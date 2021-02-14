@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from plexapi.exceptions import PlexApiException
 from plexapi.library import LibrarySection, MovieSection, ShowSection

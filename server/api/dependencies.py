@@ -7,12 +7,10 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from server.core import config
-
 from server.models import User, UserRole
 from server.repositories import PlexSettingRepository, UserRepository
 from server.repositories.base import BaseRepository
 from server.schemas import TokenPayload
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 

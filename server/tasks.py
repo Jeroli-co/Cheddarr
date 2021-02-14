@@ -1,5 +1,6 @@
-from server import repositories
+from server import repositories, models, schemas
 from server.api.dependencies import get_db
+from server.core import logger
 from server.core.scheduler import scheduler
 from server.core.utils import send_email
 from server.helpers import radarr, sonarr
@@ -9,7 +10,17 @@ from server.models import RequestStatus
 def send_email_task(
     to_email: str, subject: str, html_template_name: str, environment: dict = None
 ):
-    send_email(to_email, subject, html_template_name, environment)
+    notif_agent_repo = repositories.NotificationAgentRepository(next(get_db()))
+    email_agent = notif_agent_repo.find_by(name=models.Agent.email)
+    if email_agent is None or not email_agent.enabled:
+        logger.error("Cannot send email: No email agent enabled")
+    send_email(
+        schemas.EmailAgentSettings(**email_agent.settings),
+        to_email,
+        subject,
+        html_template_name,
+        environment,
+    )
 
 
 def send_radarr_request_task(request_id: int):

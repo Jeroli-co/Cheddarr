@@ -6,7 +6,6 @@ from fastapi.templating import Jinja2Templates
 
 from server.core.config import config
 
-
 site_routes = [
     Mount("/images", StaticFiles(directory=str(config.IMAGES_FOLDER)), name="images"),
     Mount(

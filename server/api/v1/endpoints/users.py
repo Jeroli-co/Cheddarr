@@ -1,10 +1,10 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.core import security, config
+from server.core import config, security
 from server.core.scheduler import scheduler
 from server.repositories import (
     FriendshipRepository,

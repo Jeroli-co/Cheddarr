@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from server.models import Movie, MovieRequest, Series, SeriesRequest
 from server.repositories.base import BaseRepository
