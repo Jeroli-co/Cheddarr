@@ -6,8 +6,12 @@ import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Spin } from "../../shared/components/animations/Animations";
 import { useHistory } from "react-router";
 import { useSession } from "../../shared/contexts/SessionContext";
-import { NavbarContainer, navbarLogo, NavbarUserAvatar } from "./NavbarCommon";
+import { NavbarContainer, NavbarUserAvatar } from "./NavbarCommon";
 import { SearchBar2 } from "./components/search-bar/SearchBar2";
+
+const cheddarrPreLogo = require("../../assets/cheddarr-pre.svg");
+const cheddarrMinLogo = require("../../assets/cheddarr-min.svg");
+const cheddarrPostLogo = require("../../assets/cheddarr-post.svg");
 
 const Container = styled(NavbarContainer)<{ isSidebarOpen: boolean }>`
   width: calc(
@@ -22,12 +26,19 @@ const Container = styled(NavbarContainer)<{ isSidebarOpen: boolean }>`
 `;
 
 const NavbarAppLogo = styled.div`
-  width: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH - 10}px;
+  height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-left: 20px;
+  cursor: pointer;
+
   img {
-    &:hover {
+    height: 35px;
+  }
+
+  &:hover {
+    #cheddarrMinLogo {
       animation-name: ${Spin};
       animation-duration: 1s;
       animation-iteration-count: 1;
@@ -60,14 +71,10 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
 
   return (
     <Container className="noselect" isSidebarOpen={isSidebarOpen}>
-      <NavbarAppLogo>
-        <img
-          src={navbarLogo}
-          alt="Chedarr"
-          width={45}
-          height={45}
-          onClick={() => history.push("/")}
-        />
+      <NavbarAppLogo onClick={() => history.push("/")}>
+        <img src={cheddarrPreLogo} alt="Chedarr" />
+        <img id="cheddarrMinLogo" src={cheddarrMinLogo} alt="Chedarr" />
+        <img src={cheddarrPostLogo} alt="Chedarr" />
       </NavbarAppLogo>
       <SearchBar2 isSidebarOpen={isSidebarOpen} />
       <GitHubButton />

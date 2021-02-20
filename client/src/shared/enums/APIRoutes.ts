@@ -77,4 +77,8 @@ export const APIRoutes = {
   // TODO REMOVE MediaTypes & RequestTypes DEPENDENCIES
   GET_REQUESTS: (mediaType: MediaTypes, requestType: RequestTypes) =>
     "/requests/" + mediaType + "/" + requestType,
+
+  // NOTIFICATIONS
+  GET_EMAIL_SETTINGS: "/notifications/agents/email",
+  PUT_EMAIL_SETTINGS: "/notifications/agents/email",
 };

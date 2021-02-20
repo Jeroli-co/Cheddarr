@@ -10,6 +10,7 @@ import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 import { useWindowSize } from "../../../../shared/hooks/useWindowSize";
 
 const Container = styled.div`
+  width: 80%;
   user-select: none;
 `;
 

@@ -7,6 +7,7 @@ export const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    max-width: 100vw;
     background-color: ${(props) => props.theme.bgColor};
     color: ${(props) => props.theme.color};
     transition: background .5s ease;

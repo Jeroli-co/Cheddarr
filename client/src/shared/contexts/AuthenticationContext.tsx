@@ -19,7 +19,10 @@ interface IAuthenticationContextInterface {
   ) => Promise<IAsyncCall<IUser> | IAsyncCall<null>>;
   readonly confirmEmail: (token: string) => void;
   readonly resendEmailConfirmation: (email: string) => void;
-  readonly signIn: (data: ISignInFormData, redirectURI?: string) => void;
+  readonly signIn: (
+    data: ISignInFormData,
+    redirectURI?: string
+  ) => Promise<IAsyncCall | IAsyncCall<null>>;
 }
 
 const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
@@ -28,7 +31,9 @@ const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
   },
   confirmEmail(): void {},
   resendEmailConfirmation(): void {},
-  signIn(): void {},
+  signIn(): Promise<IAsyncCall | IAsyncCall<null>> {
+    return Promise.resolve(DefaultAsyncCall);
+  },
 };
 
 const AuthenticationContext = createContext<IAuthenticationContextInterface>(
@@ -76,7 +81,7 @@ export default function AuthenticationContextProvider(props: any) {
     const fd = new FormData();
     fd.append("username", data.username);
     fd.append("password", data.password);
-    post<IEncodedToken>(APIRoutes.SIGN_IN, fd).then((res) => {
+    return post<IEncodedToken>(APIRoutes.SIGN_IN, fd).then((res) => {
       if (res.data && res.status === 200) {
         initSession(res.data);
         if (redirectURI) {
@@ -87,16 +92,17 @@ export default function AuthenticationContextProvider(props: any) {
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }
+      return res;
     });
   };
 
   return (
     <AuthenticationContext.Provider
       value={{
-        signUp: signUp,
-        confirmEmail: confirmEmail,
-        resendEmailConfirmation: resendEmailConfirmation,
-        signIn: signIn,
+        signUp,
+        confirmEmail,
+        resendEmailConfirmation,
+        signIn,
       }}
     >
       {props.children}

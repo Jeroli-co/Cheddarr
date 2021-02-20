@@ -17,6 +17,8 @@ import { HelpDanger, HelpLink } from "../shared/components/Help";
 import { Icon } from "../shared/components/Icon";
 import { InitResetPasswordModal } from "./elements/InitResetPasswordModal";
 import { CenteredContent } from "../shared/components/layout/CenteredContent";
+import { IAsyncCall } from "../shared/models/IAsyncCall";
+import { WaitingEmailConfirmation } from "./elements/WaitingEmailConfirmation";
 
 function useRedirectURI() {
   const query = new URLSearchParams(useLocation().search);
@@ -29,17 +31,36 @@ export const SignInForm = () => {
   const { register, handleSubmit, errors } = useForm<ISignInFormData>();
   const redirectURI = useRedirectURI();
   const [isInitPasswordModalOpen, setIsInitPasswordModalOpen] = useState(false);
+  const [isUserNotConfirmed, setIsUserNotConfirmed] = useState(false);
+
+  const handleError = (res: IAsyncCall) => {
+    if (!res.data) {
+      if (res.status === 400) {
+        setIsUserNotConfirmed(true);
+      }
+    }
+  };
 
   const onSubmit = handleSubmit((data) => {
-    redirectURI ? signIn(data, redirectURI) : signIn(data);
+    redirectURI
+      ? signIn(data, redirectURI).then(handleError)
+      : signIn(data).then(handleError);
   });
 
   function initSignInWithPlex() {
     redirectURI ? signInWithPlex(redirectURI) : signInWithPlex();
   }
 
+  if (isUserNotConfirmed) {
+    return (
+      <WaitingEmailConfirmation
+        closePanel={() => setIsUserNotConfirmed(false)}
+      />
+    );
+  }
+
   return (
-    <div className="SignInForm" data-testid="SignInForm">
+    <div>
       <PrimaryHero>Sign in to Cheddarr</PrimaryHero>
 
       <br />
@@ -47,7 +68,6 @@ export const SignInForm = () => {
       <div className="columns is-mobile is-centered">
         <div className="column is-one-quarter-desktop is-half-tablet is-three-quarters-mobile">
           <form
-            id="sign-in-form"
             onSubmit={onSubmit}
             autoCorrect="off"
             autoCapitalize="off"

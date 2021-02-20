@@ -54,7 +54,7 @@ export const useUserService = () => {
       if (res.status === 200) {
         pushSuccess("Password changed");
         invalidSession();
-        history.push(routes.SIGN_IN.url(routes.SETTINGS_ACCOUNT.url));
+        history.push(routes.SIGN_IN.url(routes.PROFILE.url));
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }

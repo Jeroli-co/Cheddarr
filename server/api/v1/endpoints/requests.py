@@ -131,7 +131,7 @@ def update_movie_request(
         request.selected_provider = selected_provider
         request.status = models.RequestStatus.approved
         if isinstance(request.selected_provider, models.RadarrSetting):
-            scheduler.add_job(tasks.send_radarr_request_task, args=request.id)
+            scheduler.add_job(tasks.send_radarr_request_task, args=[request.id])
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
@@ -359,7 +359,8 @@ def update_series_request(
             for episode in season.episodes:
                 episode.status = models.RequestStatus.approved
         if isinstance(request.selected_provider, models.SonarrSetting):
-            scheduler.add_job(tasks.send_sonarr_request_task, args=request.id)
+            print(request.id)
+            scheduler.add_job(tasks.send_sonarr_request_task, args=[request.id])
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused

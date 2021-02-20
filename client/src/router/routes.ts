@@ -5,15 +5,12 @@ import { ResetPassword } from "../logged-out-app/elements/ResetPassword";
 import { SignInForm } from "../logged-out-app/SignInForm";
 import { SignUpForm } from "../logged-out-app/SignUpForm";
 import { PublicUser } from "../logged-in-app/pages/PublicUser";
-import { Friends } from "../logged-in-app/pages/user-profile/friends/Friends";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
-import { SettingsAccount } from "../logged-in-app/pages/settings/components/account/SettingsAccount";
 import { PlexConfig } from "../logged-in-app/pages/settings/components/plex/PlexConfig";
 import { RadarrConfig } from "../logged-in-app/pages/settings/components/RadarrConfig";
 import { SonarrConfig } from "../logged-in-app/pages/settings/components/SonarrConfig";
 import { Search } from "../logged-in-app/pages/search/Search";
 import { Requests } from "../logged-in-app/pages/requests/Requests";
-import { UserProfile } from "../logged-in-app/pages/user-profile/UserProfile";
 import { PlexMovie } from "../logged-in-app/pages/plex-media/PlexMovie";
 import { PlexSeries } from "../logged-in-app/pages/plex-media/PlexSeries";
 import { PlexSeason } from "../logged-in-app/pages/plex-media/PlexSeason";
@@ -21,6 +18,7 @@ import { Home } from "../shared/Home";
 import { RequestsSent } from "../logged-in-app/pages/requests/elements/RequestsSent";
 import { RequestsReceived } from "../logged-in-app/pages/requests/elements/RequestsReceived";
 import { Profile } from "../logged-in-app/pages/user-profile/Profile";
+import { NotificationsConfig } from "../logged-in-app/pages/settings/components/notifications/NotificationsConfig";
 
 const routes = {
   HOME: {
@@ -47,8 +45,6 @@ const routes = {
 
   /** USERS **/
   PROFILE: { url: "/user", component: Profile },
-  USER_PROFILE: { url: "/user/profile", component: UserProfile },
-  USER_FRIENDS: { url: "/user/friends", component: Friends },
   PUBLIC_USER: {
     url: (username: string) => "/users/" + username,
     component: PublicUser,
@@ -56,10 +52,6 @@ const routes = {
 
   /** SETTINGS **/
   SETTINGS: { url: "/settings", component: Settings },
-  SETTINGS_ACCOUNT: {
-    url: "/settings/account",
-    component: SettingsAccount,
-  },
   SETTINGS_PLEX: {
     url: "/settings/plex",
     component: PlexConfig,
@@ -71,6 +63,10 @@ const routes = {
   SETTINGS_SONARR: {
     url: "/settings/sonarr",
     component: SonarrConfig,
+  },
+  SETTINGS_NOTIFICATIONS: {
+    url: "/settings/notifications",
+    component: NotificationsConfig,
   },
 
   /** PLEX **/

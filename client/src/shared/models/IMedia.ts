@@ -11,15 +11,11 @@ export interface IMedia {
   summary?: string;
   rating?: number;
   duration?: number;
-  studio: string;
-  genres: IMediaTag[];
-  actors?: IMediaTag[];
-  directors?: IMediaTag[];
-  watchUrl?: string;
-  isWatched?: boolean;
-  webUrl?: {
-    tmdb: string;
-  };
+  studio?: string;
+  genres?: string[];
+  actors?: IPerson[];
+  directors?: IPerson[];
+  plexServerInfo?: PlexServerInfo;
 }
 
 export interface IMovie extends IMedia {}
@@ -45,10 +41,16 @@ export interface IEpisode extends IMedia {
   seriesTitle: string;
 }
 
-export interface IMediaTag {
+export interface IPerson {
   name: string;
-  description?: string;
+  role?: string;
   posterUrl?: string;
+}
+
+export interface PlexServerInfo {
+  isWatched: boolean;
+  addedAt: Date;
+  webUrl: string;
 }
 
 export const isMedia = (arg: any): arg is IMedia => {
@@ -105,6 +107,6 @@ export const isEpisode = (arg: any): arg is IEpisode => {
   );
 };
 
-export const isMediaTag = (arg: any): arg is IMediaTag => {
+export const isPerson = (arg: any): arg is IPerson => {
   return arg.name && typeof arg.name == "string";
 };

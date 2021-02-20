@@ -22,7 +22,7 @@ type PageLayoutProps = {
 const PageLayoutContainer = styled.div`
   padding: 20px;
   min-height: calc(
-    100vh - ${STATIC_STYLES.NAVBAR_HEIGHT + STATIC_STYLES.FOOTER_HEIGHT + 40}px
+    100vh - ${STATIC_STYLES.NAVBAR_HEIGHT + STATIC_STYLES.FOOTER_HEIGHT}px
   );
   overflow-x: hidden;
   transition: ${STATIC_STYLES.SIDEBAR_TRANSITION_DURATION} ease;

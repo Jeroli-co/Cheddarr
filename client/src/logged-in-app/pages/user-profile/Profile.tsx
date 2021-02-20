@@ -1,23 +1,84 @@
 import React from "react";
-import { Route } from "react-router-dom";
-import { routes } from "../../../router/routes";
-import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
-import { Switch } from "react-router";
+import styled from "styled-components";
+import { useCurrentUser } from "../../../shared/hooks/useCurrentUser";
+import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
+import { Spinner } from "../../../shared/components/Spinner";
+import { UpdateProfile } from "../settings/components/account/UpdateProfile";
+import { H1 } from "../../../shared/components/Titles";
+import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
+import { PrimaryDivider } from "../../../shared/components/Divider";
+import { Friends } from "./friends/Friends";
+import { useWindowSize } from "../../../shared/hooks/useWindowSize";
 
-export const Profile = () => {
+const SubContainer = styled.div`
+  display: flex;
+  text-align: center;
+  width: 100%;
+  flex-wrap: wrap;
+`;
+
+const InfosContainer = styled.div`
+  p {
+    margin-top: 10px;
+  }
+
+  .username {
+    font-weight: bold;
+  }
+
+  width: 20%;
+  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    width: 100%;
+  }
+`;
+
+const UserFriends = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  @media screen and (min-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    width: 80%;
+  }
+`;
+
+const UserPictureStyle = styled.img`
+  width: 75%;
+  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    width: 50%;
+  }
+`;
+
+const Profile = () => {
+  const user = useCurrentUser();
+  const { width } = useWindowSize();
+
+  if (user.isLoading) return <Spinner />;
+
+  if (user.data === null) return <SwitchErrors status={user.status} />;
+
   return (
-    <TabsContextProvider tabs={["Profile", "Friends"]} url={routes.PROFILE.url}>
-      <Switch>
-        <Route
-          exact
-          path={routes.USER_FRIENDS.url}
-          component={routes.USER_FRIENDS.component}
-        />
-        <Route
-          path={[routes.PROFILE.url, routes.USER_PROFILE.url]}
-          component={routes.USER_PROFILE.component}
-        />
-      </Switch>
-    </TabsContextProvider>
+    <>
+      <H1>Account</H1>
+      <PrimaryDivider />
+      <div>
+        <SubContainer>
+          <InfosContainer>
+            <UserPictureStyle src={user.data.avatar} alt="User" />
+            <p className="username">
+              <i>{"@" + user.data.username}</i>
+            </p>
+            <p>{user.data.email}</p>
+          </InfosContainer>
+          {width <= STATIC_STYLES.TABLET_MAX_WIDTH && <PrimaryDivider />}
+          <UserFriends>
+            <Friends />
+          </UserFriends>
+        </SubContainer>
+        <PrimaryDivider />
+        <UpdateProfile />
+      </div>
+    </>
   );
 };
+
+export { Profile };

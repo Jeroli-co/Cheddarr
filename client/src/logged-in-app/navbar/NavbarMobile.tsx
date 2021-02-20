@@ -2,21 +2,29 @@ import React, { useRef, useState } from "react";
 import { useSession } from "../../shared/contexts/SessionContext";
 import { useHistory } from "react-router";
 import { UserDropdown } from "./components/user-dropdown/UserDropdown";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { Icon } from "../../shared/components/Icon";
 import { Row } from "../../shared/components/layout/Row";
 import { SearchBarMobile } from "./components/search-bar/SearchBarMobile";
-import { NavbarContainer, navbarLogo, NavbarUserAvatar } from "./NavbarCommon";
+import { NavbarContainer, NavbarUserAvatar } from "./NavbarCommon";
 
-const Item = styled.div`
+const cheddarrLogo = require("../../assets/cheddarr.svg");
+
+const Item = styled.div<{ width?: string }>`
   width: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   height: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 5px;
+
+  ${(props) =>
+    props.width &&
+    css`
+      width: ${props.width};
+    `}
 `;
 
 export type NavbarMobileProps = {
@@ -42,12 +50,10 @@ export const NavbarMobile = ({ toggle }: NavbarMobileProps) => {
         <Item onClick={() => toggle()}>
           <Icon icon={faBars} />
         </Item>
-        <Item>
+        <Item width="120px">
           <img
-            src={navbarLogo}
-            alt="Chedarr"
-            width={40}
-            height={24}
+            src={cheddarrLogo}
+            alt="Cheddarr"
             onClick={() => history.push("/")}
           />
         </Item>

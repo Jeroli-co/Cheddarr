@@ -6,7 +6,7 @@ export const Hero = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
-  wrap: nowrap;
+  white-space: nowrap;
 `;
 
 export const PrimaryHero = styled(Hero)`

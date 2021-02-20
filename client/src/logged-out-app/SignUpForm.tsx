@@ -33,7 +33,7 @@ const SignUpForm = () => {
   };
 
   if (user && !user.confirmed) {
-    return <WaitingEmailConfirmation user={user} />;
+    return <WaitingEmailConfirmation />;
   }
 
   if (user && user.confirmed) {
@@ -41,7 +41,7 @@ const SignUpForm = () => {
   }
 
   return (
-    <div className="SignUpForm" data-testid="SignUpForm">
+    <div>
       <PrimaryHero>Sign up to Cheddarr</PrimaryHero>
       <br />
 
