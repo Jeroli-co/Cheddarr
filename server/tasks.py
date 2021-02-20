@@ -1,7 +1,6 @@
 from server import repositories, models, schemas
 from server.api.dependencies import get_db
-from server.core import logger
-from server.core.scheduler import scheduler
+from server.core import logger, scheduler
 from server.core.utils import send_email
 from server.helpers import radarr, sonarr
 from server.models import RequestStatus

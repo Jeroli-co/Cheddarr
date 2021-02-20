@@ -7,12 +7,11 @@ from server.api import dependencies as deps
 from server.core.scheduler import scheduler
 from server.helpers import search
 from server.repositories import (
-    MovieRepository,
+    MediaRepository,
     MovieRequestRepository,
     SeriesRequestRepository,
     UserRepository,
 )
-from server.repositories.requests import SeriesRepository
 
 router = APIRouter()
 
@@ -52,7 +51,7 @@ def add_movie_request(
     request: schemas.MovieRequestCreate,
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    movie_repo: MovieRepository = Depends(deps.get_repository(MovieRepository)),
+    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     movie_request_repo: MovieRequestRepository = Depends(
         deps.get_repository(MovieRequestRepository)
     ),
@@ -70,12 +69,12 @@ def add_movie_request(
     if existing_request is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This movie has already been requested.")
 
-    movie = movie_repo.find_by(tmdb_id=request.tmdb_id)
+    movie = media_repo.find_by(tmdb_id=request.tmdb_id)
     if movie is None:
         searched_movie = schemas.Movie.parse_obj(search.find_tmdb_movie(request.tmdb_id))
         if searched_movie is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested movie was not found")
-        movie = searched_movie.to_orm(models.Movie)
+        movie = searched_movie.to_orm(models.Media)
 
     movie_request = models.MovieRequest(
         requested_user=requested_user,
@@ -202,7 +201,7 @@ def add_series_request(
     request_in: schemas.SeriesRequestCreate,
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    series_repo: SeriesRepository = Depends(deps.get_repository(SeriesRepository)),
+    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     series_request_repo: SeriesRequestRepository = Depends(
         deps.get_repository(SeriesRequestRepository)
     ),
@@ -211,13 +210,13 @@ def add_series_request(
     if requested_user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
-    series = series_repo.find_by(tvdb_id=request_in.tvdb_id)
+    series = media_repo.find_by(tvdb_id=request_in.tvdb_id)
     if series is None:
         searched_series = search.find_tmdb_series_by_tvdb_id(request_in.tvdb_id)
         if searched_series is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested series was not found")
 
-        series = schemas.Series.parse_obj(searched_series).to_orm(models.Series)
+        series = schemas.Series.parse_obj(searched_series).to_orm(models.Media)
 
     series_requests = series_request_repo.find_all_by_user_ids_and_tvdb_id(
         tvdb_id=request_in.tvdb_id,

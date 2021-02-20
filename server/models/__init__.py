@@ -1,4 +1,4 @@
-from .media import Media, MediaType, Movie, Series, SeriesType
+from .media import Media, Season, Episode, MediaType, SeriesType
 from .notifications import Notification, NotificationAgent, Agent
 from .providers import (
     PlexSetting,

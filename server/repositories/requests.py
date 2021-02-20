@@ -1,15 +1,7 @@
 from typing import List, Optional
 
-from server.models import Movie, MovieRequest, Series, SeriesRequest
+from server.models import Media, MovieRequest, SeriesRequest
 from server.repositories.base import BaseRepository
-
-
-class MovieRepository(BaseRepository[Movie]):
-    pass
-
-
-class SeriesRepository(BaseRepository[Series]):
-    pass
 
 
 class MovieRequestRepository(BaseRepository[MovieRequest]):
@@ -20,7 +12,7 @@ class MovieRequestRepository(BaseRepository[MovieRequest]):
             self.session.query(MovieRequest)
             .join(MovieRequest.movie)
             .filter(
-                Movie.tmdb_id == tmdb_id,
+                Media.tmdb_id == tmdb_id,
                 MovieRequest.requesting_user_id == requesting_user_id,
                 MovieRequest.requested_user_id == requested_user_id,
             )
@@ -36,7 +28,7 @@ class SeriesRequestRepository(BaseRepository[SeriesRequest]):
             self.session.query(SeriesRequest)
             .join(SeriesRequest.series)
             .filter(
-                Series.tvdb_id == tvdb_id,
+                Media.tvdb_id == tvdb_id,
                 SeriesRequest.requesting_user_id == requesting_user_id,
                 SeriesRequest.requested_user_id == requested_user_id,
             )

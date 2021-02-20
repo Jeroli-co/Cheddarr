@@ -340,9 +340,10 @@ sketch
 # Ignore all local history of files
 .history
 
-##Databases
+### Databases ###
 *.db
+*.sqlite
 db_local/
 
-###Config
+### Config ###
 config/

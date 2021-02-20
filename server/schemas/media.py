@@ -2,32 +2,40 @@ from abc import ABC
 from datetime import date
 from typing import List, Optional
 
-from pydantic import Field
+from pydantic import AnyHttpUrl, Field
 
 from server.models import MediaType, SeriesType
-from server.schemas import APIModel
+from server.schemas import APIModel, PlexMediaInfo
 
 
 class Media(APIModel, ABC):
+    tmdb_id: int
     title: str
+    summary: Optional[str]
     release_date: Optional[date]
     status: Optional[str]
     poster_url: Optional[str]
     art_url: Optional[str]
+    rating: Optional[float]
+    duration: Optional[int]
+    studio: Optional[str]
+    genres: Optional[List[str]]
+    actors: Optional[List[str]]
+    directors: Optional[List[str]]
+    plex_media_info: Optional[PlexMediaInfo]
 
 
 class Movie(Media):
-    tmdb_id: int
     media_type: MediaType = Field(default=MediaType.movies, const=True)
 
 
-class Episode(APIModel):
+class Episode(Media):
     episode_number: int
     title: str
     release_date: Optional[date]
 
 
-class Season(APIModel):
+class Season(Media):
     season_number: int
     title: str
     release_date: Optional[date]

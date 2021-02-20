@@ -9,18 +9,15 @@ from .users import (
     UserPublic,
     UserUpdate,
 )
-from .media import Episode, Media, Movie, Season, Series
 from .notifications import EmailAgent, EmailAgentSettings, Notification
 from .providers import (
-    MediaSearchResultSchema,
-    PlexEpisode,
-    PlexMovie,
-    PlexSeason,
-    PlexSeries,
+    PlexEpisodeInfo,
+    PlexSeasonInfo,
     PlexServerInfo,
     PlexServerOut,
     PlexSetting,
     PlexSettingCreateUpdate,
+    PlexMediaInfo,
     ProviderSettingBase,
     RadarrAddOptions,
     RadarrInstanceInfo,
@@ -37,6 +34,7 @@ from .providers import (
     SonarrSettingCreateUpdate,
     SonarrSettingData,
 )
+from .media import Episode, Media, Movie, Season, Series
 from .requests import (
     MovieRequest,
     MovieRequestCreate,

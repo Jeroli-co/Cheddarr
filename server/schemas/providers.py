@@ -152,14 +152,6 @@ class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
     enabled: Optional[bool] = True
 
 
-#####################################
-# PlexAPI                           #
-#####################################
-class PlexServerUrl(APIModel):
-    base_url: str = Field(alias="_baseurl")
-    server_id: str = Field(alias="machineIdentifier")
-
-
 class PlexServerOut(APIModel):
     host: str
     port: int
@@ -169,82 +161,35 @@ class PlexServerOut(APIModel):
     server_name: str
 
 
-class PlexMediaTag(APIModel):
-    name: str = Field(alias="tag")
-    role: Optional[str]
-    poster_url: Optional[AnyHttpUrl] = Field(alias="thumb")
-
-
-class PlexVideo(APIModel):
-    id: int = Field(alias="ratingKey")
-    type: str = Field(alias="type")
-    title: str = Field(alias="title")
-    summary: str = Field(alias="summary")
-    poster_url: Optional[AnyHttpUrl] = Field(alias="thumbUrl")
-    art_url: Optional[AnyHttpUrl] = Field(alias="artUrl")
-    rating: Optional[float] = Field(alias="audienceRating")
-    is_watched: Optional[bool] = Field(alias="isWatched")
-    server: PlexServerUrl = Field(alias="_server")
-    web_url: Optional[AnyHttpUrl] = Field(alias="url")
+class PlexInfoBase(APIModel):
+    provider_media_id: str
+    added_at: date
+    web_url: str
+    _server: PlexServerOut
 
     @validator("web_url", pre=True)
     def get_web_url(cls, web_url, values):
-        return "%s/web/index.html#!/server/%s/details?key=%s" % (
-            values["server"].base_url,
+        return "https://app.plex.tv/web/app#!/server/%s/details?key=library/metadata/%s" % (
             values["server"].server_id,
-            values["id"],
+            values["provider_media_id"],
         )
 
 
-class PlexMovie(PlexVideo):
-    duration: int
-    release_date: date = Field(alias="originallyAvailableAt")
-    actors: List[PlexMediaTag]
-    directors: List[PlexMediaTag]
-    studio: str
-    genres: List[PlexMediaTag]
+class PlexEpisodeInfo(PlexInfoBase):
+    series_id: int
+    season_number: int
+    episode_number: int
 
 
-class PlexEpisode(PlexVideo):
-    series_id: int = Field(alias="grandparentRatingKey")
-    series_title: str = Field(alias="grandparentTitle")
-    season_number: int = Field(alias="seasonNumber")
-    episode_number: int = Field(alias="index")
-    release_date: date = Field(alias="originallyAvailableAt")
-    season_poster_url: AnyHttpUrl = Field(
-        alias="seasonThumbUrl",
-        default_factory=lambda ep: ep.url(ep.parentThumb),
-        const=True,
-    )
-    duration: int
+class PlexSeasonInfo(PlexInfoBase):
+    series_id: int
+    season_number: int
+    episodes: Optional[List[PlexEpisodeInfo]]
 
 
-class PlexSeason(PlexVideo):
-    series_id: int = Field(alias="parentRatingKey")
-    series_title: str = Field(alias="parentTitle")
-    season_number: int = Field(alias="seasonNumber")
-    episodes: List[PlexEpisode]
-
-    @validator("episodes", pre=True)
-    def get_episodes(cls, episodes, **kwargs):
-        return episodes()
-
-
-class PlexSeries(PlexVideo):
-    seasons: List[PlexSeason]
-    actors: List[PlexMediaTag]
-    studio: str
-    genres: List[PlexMediaTag]
-    release_date: date = Field(alias="originallyAvailableAt")
-
-    @validator("seasons", pre=True)
-    def get_seasons(cls, seasons, **kwargs):
-        return seasons()
-
-
-class MediaSearchResultSchema(APIModel):
-    id: int = Field(alias="ratingKey")
-    type: str = Field(alias="type")
-    title: str = Field(alias="title")
-    year: int = Field(alias="year")
-    poster_url: Optional[AnyHttpUrl] = Field(alias="thumbUrl")
+class PlexMediaInfo(PlexInfoBase):
+    media_type: str
+    tmdb_id: str
+    imdb_id: str
+    tvdb_id: str
+    seasons: Optional[List[PlexSeasonInfo]]

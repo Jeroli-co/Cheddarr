@@ -1,5 +1,5 @@
 import re
-from typing import Optional
+from typing import List, Optional, Union
 
 import tmdbsimple as tmdb
 
@@ -10,7 +10,9 @@ from server.models import MediaType, SeriesType
 tmdb.API_KEY = config.TMDB_API_KEY
 
 
-def search_tmdb_media(term: str, page: int) -> dict:
+def search_tmdb_media(
+    term: str, page: int
+) -> (List[Union[schemas.TmdbMovie, schemas.TmdbSeries]], int, int):
     search = tmdb.Search().multi(query=term, page=page)
     results = []
     for media in search["results"]:
@@ -25,22 +27,20 @@ def search_tmdb_media(term: str, page: int) -> dict:
         else:
             continue
         results.append(parsed_media)
-    search["results"] = results
-    return schemas.TmdbSearchResult.parse_obj(search).dict()
+    return results, search["total_pages"], search["total_results"]
 
 
-def search_tmdb_movies(term: str, page: int) -> dict:
+def search_tmdb_movies(term: str, page: int) -> (List[schemas.TmdbMovie], int, int):
     search = tmdb.Search().movie(query=term, page=page)
     results = []
     for movie in search["results"]:
         set_tmdb_movie_info(movie, from_search=True)
         parsed_movie = schemas.TmdbMovie.parse_obj(movie)
         results.append(parsed_movie)
-    search["results"] = results
-    return schemas.TmdbSearchResult.parse_obj(search).dict()
+    return results, search["total_pages"], search["total_results"]
 
 
-def search_tmdb_series(term: str, page: int) -> dict:
+def search_tmdb_series(term: str, page: int) -> (List[schemas.TmdbSeries], int, int):
     search = tmdb.Search().tv(query=term, page=page)
     results = []
     for series in search["results"]:
@@ -49,47 +49,47 @@ def search_tmdb_series(term: str, page: int) -> dict:
             continue
         parsed_media = schemas.TmdbSeries.parse_obj(series)
         results.append(parsed_media)
-    search["results"] = results
-    return schemas.TmdbSearchResult.parse_obj(search).dict()
+    return results, search["total_pages"], search["total_results"]
 
 
-def find_tmdb_movie(tmdb_id: int) -> Optional[dict]:
+def find_tmdb_movie(tmdb_id: int) -> Optional[schemas.TmdbMovie]:
     try:
         movie = tmdb.Movies(tmdb_id).info()
+        print(movie)
     except Exception:
         return None
     set_tmdb_movie_info(movie)
-    return schemas.TmdbMovie.parse_obj(movie).dict()
+    return schemas.TmdbMovie.parse_obj(movie)
 
 
-def find_tmdb_series_by_tvdb_id(tvdb_id: int) -> Optional[dict]:
+def find_tmdb_series_by_tvdb_id(tvdb_id: int) -> Optional[schemas.TmdbSeries]:
     tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
     if not tmdb_result:
         return None
     tmdb_id = tmdb_result[0]["id"]
     series = tmdb.TV(tmdb_id).info()
     set_tmdb_series_info(series)
-    return schemas.TmdbSeries.parse_obj(series).dict()
+    return schemas.TmdbSeries.parse_obj(series)
 
 
-def find_tmdb_season_by_tvdb_id(tvdb_id: int, season_number: int) -> Optional[dict]:
+def find_tmdb_season_by_tvdb_id(tvdb_id: int, season_number: int) -> Optional[schemas.TmdbSeason]:
     tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
     if not tmdb_result:
         return None
     tmdb_id = tmdb_result[0]["id"]
     season = tmdb.TV_Seasons(tmdb_id, season_number).info()
-    return schemas.TmdbSeason.parse_obj(season).dict()
+    return schemas.TmdbSeason.parse_obj(season)
 
 
 def find_tmdb_episode_by_tvdb_id(
     tvdb_id: int, season_number: int, episode_number: int
-) -> Optional[dict]:
+) -> Optional[schemas.TmdbEpisode]:
     tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
     if not tmdb_result:
         return None
     tmdb_id = tmdb_result[0]["id"]
     episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info()
-    return schemas.TmdbEpisode.parse_obj(episode).dict()
+    return schemas.TmdbEpisode.parse_obj(episode)
 
 
 def set_tmdb_movie_info(movie: dict, from_search: bool = False):

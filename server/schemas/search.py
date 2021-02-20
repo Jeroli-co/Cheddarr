@@ -11,12 +11,6 @@ MovieResultType = TypeVar("MovieResultType")
 SeriesResultType = TypeVar("SeriesResultType")
 
 
-class SearchedMedia(Media):
-    summary: Optional[str]
-    rating: Optional[float]
-    genres: Optional[List[str]]
-
-
 class SearchResult(GenericModel, Generic[MovieResultType, SeriesResultType]):
     page: int = 1
     total_pages: int
@@ -38,7 +32,7 @@ def empty_date(cls, v) -> Optional[date]:
     return None if not v else v
 
 
-class TmdbMedia(SearchedMedia, ABC):
+class TmdbMedia(Media, ABC):
     tmdb_id: int = Field(alias="id")
     title: str = Field(alias="name")
     summary: Optional[str] = Field(alias="overview")
@@ -61,14 +55,14 @@ class TmdbMovie(TmdbMedia, Movie):
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
-class TmdbEpisode(Episode):
+class TmdbEpisode(TmdbMedia, Episode):
     episode_number: int = Field(alias="episode_number")
     title: str = Field(alias="name")
     release_date: Optional[date] = Field(alias="air_date")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
-class TmdbSeason(Season):
+class TmdbSeason(TmdbMedia, Season):
     season_number: int = Field(alias="season_number")
     title: str = Field(alias="name")
     release_date: Optional[date] = Field(alias="air_date")

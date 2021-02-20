@@ -30,38 +30,41 @@ class Request(object):
         return Column(ForeignKey("providersetting.id"))
 
     @declared_attr
-    def requesting_user_id(cls):
-        return Column(ForeignKey("user.id"), nullable=False)
-
-    @declared_attr
-    def requested_user_id(cls):
-        return Column(ForeignKey("user.id"), nullable=False)
-
-    @declared_attr
     def selected_provider(cls):
         return relationship("ProviderSetting")
+
+    @declared_attr
+    def requesting_user_id(cls):
+        return Column(ForeignKey("user.id"), nullable=False)
 
     @declared_attr
     def requesting_user(cls):
         return relationship("User", foreign_keys=cls.requesting_user_id)
 
     @declared_attr
+    def requested_user_id(cls):
+        return Column(ForeignKey("user.id"), nullable=False)
+
+    @declared_attr
     def requested_user(cls):
         return relationship("User", foreign_keys=cls.requested_user_id)
+
+    @declared_attr
+    def media_id(cls):
+        return Column(ForeignKey("media.id"))
+
+    @declared_attr
+    def media(cls):
+        return relationship("Media")
 
 
 class MovieRequest(Model, Timestamp, Request):
     __repr_props__ = ("movie", "requested_user", "requesting_user")
 
-    movie_id = Column(ForeignKey("movie.id"), nullable=False)
-    movie = relationship("Movie")
-
 
 class SeriesRequest(Model, Timestamp, Request):
     __repr_props__ = ("series", "requested_user", "requesting_user")
 
-    series_id = Column(ForeignKey("series.id"), nullable=False)
-    series = relationship("Series", back_populates="requests")
     seasons = relationship("SeasonRequest", cascade="all,delete,delete-orphan", backref="request")
 
 

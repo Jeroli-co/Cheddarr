@@ -4,6 +4,7 @@ from sqlalchemy import (
     Column,
     Date,
     Enum as DBEnum,
+    ForeignKey,
     Integer,
     String,
 )
@@ -22,26 +23,33 @@ class SeriesType(str, Enum):
     standard = "standard"
 
 
-class Media(object):
+class MediaBase(object):
     id = Column(Integer, primary_key=True)
+    provider_media_id = Column(String, nullable=False)
+    added_at = Column(Date)
+
+
+class Media(MediaBase, Model):
+    provider_setting_id = Column(ForeignKey("providersetting.id"), nullable=False)
+    tmdb_id = Column(String, unique=True, index=True)
+    imdb_id = Column(String, unique=True, index=True)
+    tvdb_id = Column(String, unique=True, index=True)
+    media_type = Column(DBEnum(MediaType), nullable=False)
     title = Column(String, nullable=False)
-    poster_url = Column(String)
-    art_url = Column(String)
-    release_date = Column(Date)
-    status = Column(String)
+    seasons = relationship("Season", back_populates="media")
 
 
-class Movie(Model, Media):
-    __repr_props__ = ("title", "tmdb_id")
+class Season(MediaBase, Model):
+    season_number = Column(Integer, nullable=False)
+    provider_series_id = Column(String, nullable=False)
+    series_id = Column(ForeignKey("media.id"), nullable=False)
+    media = relationship("Media", back_populates="seasons")
+    episodes = relationship("Episode", back_populates="season")
 
-    tmdb_id = Column(Integer, unique=True, index=True)
-    requests = relationship("MovieRequest")
 
-
-class Series(Model, Media):
-    __repr_props__ = ("title", "tvdb_id", "series_type")
-
-    tvdb_id = Column(Integer, nullable=False)
-    number_of_seasons = Column(Integer)
-    series_type = Column(DBEnum(SeriesType), nullable=False)
-    requests = relationship("SeriesRequest", back_populates="series")
+class Episode(MediaBase, Model):
+    episode_number = Column(Integer, nullable=False)
+    provider_series_id = Column(String, nullable=False)
+    provider_season_id = Column(String, nullable=False)
+    season_id = Column(ForeignKey("season.id"), nullable=False)
+    season = relationship("Season", back_populates="episodes")

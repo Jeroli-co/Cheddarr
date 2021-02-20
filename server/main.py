@@ -22,6 +22,9 @@ def setup_app() -> FastAPI:
     )
 
     config.setup()
+
+    from server import jobs  # noqa
+
     scheduler.start()
 
     logger.log(logging.INFO, "Starting Cheddarr")
