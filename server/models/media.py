@@ -30,24 +30,29 @@ class MediaBase(object):
 
 
 class Media(MediaBase, Model):
+    __repr_props__ = ("tmdb_id", "imdb_id", "tvdb_id", "title")
+
     provider_setting_id = Column(ForeignKey("providersetting.id"), nullable=False)
-    tmdb_id = Column(String, unique=True, index=True)
+    tmdb_id = Column(Integer, unique=True, index=True)
     imdb_id = Column(String, unique=True, index=True)
-    tvdb_id = Column(String, unique=True, index=True)
+    tvdb_id = Column(Integer, unique=True, index=True)
     media_type = Column(DBEnum(MediaType), nullable=False)
     title = Column(String, nullable=False)
-    seasons = relationship("Season", back_populates="media")
 
 
 class Season(MediaBase, Model):
+    __repr_props__ = ("season_number", "episodes")
+
     season_number = Column(Integer, nullable=False)
     provider_series_id = Column(String, nullable=False)
     series_id = Column(ForeignKey("media.id"), nullable=False)
-    media = relationship("Media", back_populates="seasons")
+    media = relationship("Media")
     episodes = relationship("Episode", back_populates="season")
 
 
 class Episode(MediaBase, Model):
+    __repr_props__ = "episode_number"
+
     episode_number = Column(Integer, nullable=False)
     provider_series_id = Column(String, nullable=False)
     provider_season_id = Column(String, nullable=False)

@@ -161,35 +161,15 @@ class PlexServerOut(APIModel):
     server_name: str
 
 
-class PlexInfoBase(APIModel):
+class PlexMediaInfo(APIModel):
     provider_media_id: str
     added_at: date
-    web_url: str
-    _server: PlexServerOut
+    server_id: str
+    web_url: Optional[AnyHttpUrl]
 
     @validator("web_url", pre=True)
     def get_web_url(cls, web_url, values):
         return "https://app.plex.tv/web/app#!/server/%s/details?key=library/metadata/%s" % (
-            values["server"].server_id,
+            values["server_id"],
             values["provider_media_id"],
         )
-
-
-class PlexEpisodeInfo(PlexInfoBase):
-    series_id: int
-    season_number: int
-    episode_number: int
-
-
-class PlexSeasonInfo(PlexInfoBase):
-    series_id: int
-    season_number: int
-    episodes: Optional[List[PlexEpisodeInfo]]
-
-
-class PlexMediaInfo(PlexInfoBase):
-    media_type: str
-    tmdb_id: str
-    imdb_id: str
-    tvdb_id: str
-    seasons: Optional[List[PlexSeasonInfo]]

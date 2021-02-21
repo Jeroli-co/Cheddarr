@@ -79,7 +79,7 @@ def add_movie_request(
     movie_request = models.MovieRequest(
         requested_user=requested_user,
         requesting_user=current_user,
-        movie=movie,
+        media=movie,
     )
     movie_request_repo.save(movie_request)
     return movie_request
@@ -210,16 +210,16 @@ def add_series_request(
     if requested_user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
-    series = media_repo.find_by(tvdb_id=request_in.tvdb_id)
+    series = media_repo.find_by(tmdb_id=request_in.tmdb_id)
     if series is None:
-        searched_series = search.find_tmdb_series_by_tvdb_id(request_in.tvdb_id)
+        searched_series = search.find_tmdb_series(request_in.tmdb_id)
         if searched_series is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested series was not found")
 
         series = schemas.Series.parse_obj(searched_series).to_orm(models.Media)
 
     series_requests = series_request_repo.find_all_by_user_ids_and_tvdb_id(
-        tvdb_id=request_in.tvdb_id,
+        tvdb_id=series.tvdb_id,
         requesting_user_id=current_user.id,
         requested_user_id=requested_user.id,
     )
@@ -234,7 +234,7 @@ def add_series_request(
         series_request = models.SeriesRequest(
             requested_user=requested_user,
             requesting_user=current_user,
-            series=series,
+            media=series,
         )
         unify_series_request(series_request, request_in)
         series_request_repo.save(series_request)

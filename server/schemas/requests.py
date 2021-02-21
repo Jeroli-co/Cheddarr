@@ -21,12 +21,16 @@ class RequestUpdate(APIModel):
 
 
 class MovieRequest(Request):
-    movie: Movie
+    media: Movie
 
 
-class MovieRequestCreate(APIModel):
+class RequestCreate(APIModel):
     tmdb_id: int
     requested_username: str
+
+
+class MovieRequestCreate(RequestCreate):
+    pass
 
 
 class EpisodeRequest(APIModel):
@@ -39,11 +43,9 @@ class SeasonRequest(APIModel):
 
 
 class SeriesRequest(Request):
-    series: Series
+    media: Series
     seasons: Optional[List[SeasonRequest]]
 
 
-class SeriesRequestCreate(APIModel):
-    tvdb_id: int
-    requested_username: str
+class SeriesRequestCreate(RequestCreate):
     seasons: Optional[List[SeasonRequest]]

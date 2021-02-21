@@ -27,7 +27,7 @@ const SearchedSeriesCard = ({
     null
   );
 
-  const seriesWithSeason = useSearchedSeries(series.tvdbId);
+  const seriesWithSeason = useSearchedSeries(series.tmdbId);
 
   const {
     options,

@@ -56,8 +56,7 @@ def db():
 def setup():
     from server.database.base import Base
     from server.models import (
-        Movie,
-        Series,
+        Media,
         MovieRequest,
         SeriesRequest,
         Friendship,
@@ -75,8 +74,8 @@ def setup():
     friendship1 = Friendship(requesting_user=user1, requested_user=user2, pending=False)
     friendship2 = Friendship(requesting_user=user1, requested_user=user4, pending=True)
     session.add_all((friendship1, friendship2))
-    series1 = Series(**datasets["series"][0])
-    movie1 = Movie(**datasets["movies"][0])
+    series1 = Media(**datasets["series"][0])
+    movie1 = Media(**datasets["movies"][0])
     session.add_all((movie1, series1))
     series_request1 = SeriesRequest(**datasets["series_requests"][0])
     series_request2 = SeriesRequest(**datasets["series_requests"][1])
@@ -97,7 +96,10 @@ def normal_user_token_headers(client: TestClient) -> Dict[str, str]:
 
 @pytest.fixture(scope="function")
 def mock_tmdb(mocker):
+    series = datasets["series"][0]
+    series["number_of_seasons"] = 7
+    series["series_type"] = "anime"
     mocker.patch(
-        "server.helpers.search.find_tmdb_series_by_tvdb_id",
-        return_value=datasets["series"],
+        "server.helpers.search.find_tmdb_series",
+        return_value=series,
     )

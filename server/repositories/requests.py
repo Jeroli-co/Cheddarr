@@ -10,7 +10,7 @@ class MovieRequestRepository(BaseRepository[MovieRequest]):
     ) -> Optional[MovieRequest]:
         return (
             self.session.query(MovieRequest)
-            .join(MovieRequest.movie)
+            .join(MovieRequest.media)
             .filter(
                 Media.tmdb_id == tmdb_id,
                 MovieRequest.requesting_user_id == requesting_user_id,
@@ -26,7 +26,7 @@ class SeriesRequestRepository(BaseRepository[SeriesRequest]):
     ) -> List[SeriesRequest]:
         return (
             self.session.query(SeriesRequest)
-            .join(SeriesRequest.series)
+            .join(SeriesRequest.media)
             .filter(
                 Media.tvdb_id == tvdb_id,
                 SeriesRequest.requesting_user_id == requesting_user_id,

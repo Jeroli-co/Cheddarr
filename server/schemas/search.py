@@ -5,17 +5,17 @@ from typing import Generic, List, Optional, TypeVar, Union
 from pydantic import Field, validator
 from pydantic.generics import GenericModel
 
-from server.schemas import Episode, Media, Movie, Season, Series
+from server.schemas import APIModel, Episode, Media, Movie, Season, Series
 
 MovieResultType = TypeVar("MovieResultType")
 SeriesResultType = TypeVar("SeriesResultType")
 
 
-class SearchResult(GenericModel, Generic[MovieResultType, SeriesResultType]):
+class SearchResult(APIModel):
     page: int = 1
     total_pages: int
     total_results: int
-    results: List[Union[SeriesResultType, MovieResultType]]
+    results: List[Union[Series, Movie]]
 
 
 ###########################################
@@ -71,11 +71,8 @@ class TmdbSeason(TmdbMedia, Season):
 
 
 class TmdbSeries(TmdbMedia, Series):
+    tvdb_id: int = Field(alias="external_ids.tvdb_id")
     release_date: Optional[date] = Field(alias="first_air_date", default=None)
     number_of_seasons: Optional[int] = Field(alias="number_of_seasons")
     seasons: Optional[List[TmdbSeason]] = Field(alias="seasons")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
-
-
-class TmdbSearchResult(SearchResult[TmdbSeries, TmdbMovie]):
-    pass

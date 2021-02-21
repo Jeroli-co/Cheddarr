@@ -129,7 +129,7 @@ def add_movie(setting: RadarrSetting, movie: schemas.RadarrMovie):
 
 def send_request(request: MovieRequest):
     setting = request.selected_provider
-    movie = lookup(setting, tmdb_id=request.movie.tmdb_id, title=request.movie.title)
+    movie = lookup(setting, tmdb_id=request.media.tmdb_id, title=request.media.title)
     if movie.id is not None:
         return
     movie.root_folder_path = setting.root_folder

@@ -2,7 +2,6 @@ from abc import ABC
 from datetime import date
 from typing import List, Optional
 
-from pydantic import AnyHttpUrl, Field
 
 from server.models import MediaType, SeriesType
 from server.schemas import APIModel, PlexMediaInfo
@@ -26,7 +25,7 @@ class Media(APIModel, ABC):
 
 
 class Movie(Media):
-    media_type: MediaType = Field(default=MediaType.movies, const=True)
+    media_type: MediaType
 
 
 class Episode(Media):
@@ -44,7 +43,7 @@ class Season(Media):
 
 class Series(Media):
     tvdb_id: int
-    number_of_seasons: int
+    number_of_seasons: Optional[int]
     seasons: Optional[List[Season]]
-    media_type: MediaType = Field(default=MediaType.series, const=True)
-    series_type: SeriesType
+    media_type: MediaType
+    series_type: Optional[SeriesType]

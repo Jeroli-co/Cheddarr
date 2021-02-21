@@ -11,13 +11,11 @@ from .users import (
 )
 from .notifications import EmailAgent, EmailAgentSettings, Notification
 from .providers import (
-    PlexEpisodeInfo,
-    PlexSeasonInfo,
+    PlexMediaInfo,
     PlexServerInfo,
     PlexServerOut,
     PlexSetting,
     PlexSettingCreateUpdate,
-    PlexMediaInfo,
     ProviderSettingBase,
     RadarrAddOptions,
     RadarrInstanceInfo,
@@ -47,7 +45,6 @@ from .search import (
     SearchResult,
     TmdbEpisode,
     TmdbMovie,
-    TmdbSearchResult,
     TmdbSeason,
     TmdbSeries,
 )

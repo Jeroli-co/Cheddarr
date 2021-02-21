@@ -5,12 +5,12 @@ from server.tests.utils import datasets
 
 
 def test_add_series_never_requested_without_seasons(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
-        json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
+        json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
     assert r.status_code == 201
     from server.models import SeriesRequest
@@ -25,18 +25,18 @@ def test_add_series_never_requested_without_seasons(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert actual["seasons"] == expected.seasons
 
 
 def test_add_series_never_requested_with_all_seasons(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1},
@@ -63,18 +63,16 @@ def test_add_series_never_requested_with_all_seasons(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 7
 
 
-def test_add_series_already_requested_with_seasons(
-    client: TestClient, normal_user_token_headers, mock_tmdb
-):
+def test_add_series_already_requested_with_seasons(client: TestClient, normal_user_token_headers):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1},
@@ -90,25 +88,25 @@ def test_add_series_already_requested_with_seasons(
     r2 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
-        json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
+        json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
     assert r1.status_code == 201
     assert r2.status_code == 201
 
 
 def test_add_series_already_requested_without_seasons(
-    client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
-        json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
+        json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
     r2 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1},
@@ -125,14 +123,12 @@ def test_add_series_already_requested_without_seasons(
     assert r2.status_code == 409
 
 
-def test_add_season_never_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
-):
+def test_add_season_never_requested(client: TestClient, db: Session, normal_user_token_headers):
     r = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
@@ -150,20 +146,20 @@ def test_add_season_never_requested(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
     assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
 
 
 def test_add_season_already_requested_conflict_with_seasons(
-    client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
@@ -172,7 +168,7 @@ def test_add_season_already_requested_conflict_with_seasons(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
@@ -182,13 +178,13 @@ def test_add_season_already_requested_conflict_with_seasons(
 
 
 def test_add_season_already_requested_some_season_conflict(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
@@ -197,7 +193,7 @@ def test_add_season_already_requested_some_season_conflict(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 2},
@@ -221,7 +217,7 @@ def test_add_season_already_requested_some_season_conflict(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 4
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
     assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
@@ -230,18 +226,18 @@ def test_add_season_already_requested_some_season_conflict(
 
 
 def test_add_season_whereas_all_series_requested_without_seasons(
-    client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
-        json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
+        json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
     r2 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
@@ -251,13 +247,13 @@ def test_add_season_whereas_all_series_requested_without_seasons(
 
 
 def test_add_season_whereas_all_series_requested_with_all_seasons(
-    client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1},
@@ -274,7 +270,7 @@ def test_add_season_whereas_all_series_requested_with_all_seasons(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
@@ -284,13 +280,13 @@ def test_add_season_whereas_all_series_requested_with_all_seasons(
 
 
 def test_add_series_with_seasons_already_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
@@ -298,7 +294,7 @@ def test_add_series_with_seasons_already_requested(
     r2 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
-        json={"tvdb_id": 83268, "requested_username": datasets["users"][1]["username"]},
+        json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
     assert r1.status_code == 201
     assert r2.status_code == 201
@@ -315,18 +311,18 @@ def test_add_series_with_seasons_already_requested(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 0
 
 
 def test_add_series_with_seasons_already_requested_with_all_seasons(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
@@ -335,7 +331,7 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1},
@@ -363,7 +359,7 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 7
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
     assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
@@ -374,14 +370,12 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
     assert actual["seasons"][6]["season_number"] == expected.seasons[6].season_number == 7
 
 
-def test_add_episode_never_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
-):
+def test_add_episode_never_requested(client: TestClient, db: Session, normal_user_token_headers):
     r = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -410,7 +404,7 @@ def test_add_episode_never_requested(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
     assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 3
@@ -438,14 +432,12 @@ def test_add_episode_never_requested(
     )
 
 
-def test_add_episode_already_requested_conflict(
-    client: TestClient, normal_user_token_headers, mock_tmdb
-):
+def test_add_episode_already_requested_conflict(client: TestClient, normal_user_token_headers):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -464,7 +456,7 @@ def test_add_episode_already_requested_conflict(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -484,13 +476,13 @@ def test_add_episode_already_requested_conflict(
 
 
 def test_add_episode_already_requested_some_episodes_conflict(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -509,7 +501,7 @@ def test_add_episode_already_requested_some_episodes_conflict(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -543,7 +535,7 @@ def test_add_episode_already_requested_some_episodes_conflict(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 3
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
     assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 3
@@ -594,13 +586,13 @@ def test_add_episode_already_requested_some_episodes_conflict(
 
 
 def test_add_episode_whereas_all_series_is_requested_without_seasons(
-    client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
         },
     )
@@ -608,7 +600,7 @@ def test_add_episode_whereas_all_series_is_requested_without_seasons(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -620,13 +612,13 @@ def test_add_episode_whereas_all_series_is_requested_without_seasons(
 
 
 def test_add_episode_whereas_all_series_is_requested_with_seasons(
-    client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1},
@@ -643,7 +635,7 @@ def test_add_episode_whereas_all_series_is_requested_with_seasons(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -655,13 +647,13 @@ def test_add_episode_whereas_all_series_is_requested_with_seasons(
 
 
 def test_add_series_without_seasons_whereas_episodes_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -672,7 +664,7 @@ def test_add_series_without_seasons_whereas_episodes_requested(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
         },
     )
@@ -691,18 +683,18 @@ def test_add_series_without_seasons_whereas_episodes_requested(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 0
 
 
 def test_add_series_with_all_seasons_whereas_episodes_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1, "episodes": [{"episode_number": 1}]},
@@ -713,7 +705,7 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {"season_number": 1},
@@ -741,18 +733,18 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 7
 
 
 def test_add_seasons_with_all_episodes_whereas_episodes_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {
@@ -770,7 +762,7 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {
@@ -862,20 +854,20 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
     assert len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 22
     assert len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 2
 
 
 def test_add_seasons_without_episodes_whereas_episodes_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
+    client: TestClient, db: Session, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {
@@ -893,7 +885,7 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {
@@ -917,20 +909,20 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
     assert len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 0
     assert len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 2
 
 
 def test_add_episodes_whereas_all_season_requested_with_all_episodes(
-    client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {
@@ -1011,7 +1003,7 @@ def test_add_episodes_whereas_all_season_requested_with_all_episodes(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {
@@ -1026,13 +1018,13 @@ def test_add_episodes_whereas_all_season_requested_with_all_episodes(
 
 
 def test_add_episodes_whereas_all_season_requested_without_episodes(
-    client: TestClient, normal_user_token_headers, mock_tmdb
+    client: TestClient, normal_user_token_headers
 ):
     r1 = client.post(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {
@@ -1045,7 +1037,7 @@ def test_add_episodes_whereas_all_season_requested_without_episodes(
         client.app.url_path_for("add_series_request"),
         headers=normal_user_token_headers,
         json={
-            "tvdb_id": 83268,
+            "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [
                 {
@@ -1078,7 +1070,7 @@ def test_get_incoming_series_requests(client: TestClient, db: Session, normal_us
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert actual["seasons"] == expected.seasons
 
 
@@ -1101,7 +1093,7 @@ def test_get_outgoing_series_requests(client: TestClient, db: Session, normal_us
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["series"]
+    assert actual["media"]
     assert actual["seasons"] == expected.seasons
 
 
@@ -1172,9 +1164,7 @@ def test_delete_series_request_not_pending_not_requested_user(
     assert r.status_code == 403
 
 
-def test_add_movie_never_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
-):
+def test_add_movie_never_requested(client: TestClient, db: Session, normal_user_token_headers):
     r = client.post(
         client.app.url_path_for("add_movie_request"),
         headers=normal_user_token_headers,
@@ -1192,12 +1182,10 @@ def test_add_movie_never_requested(
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["movie"]
+    assert actual["media"]
 
 
-def test_add_movie_not_existing_user(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
-):
+def test_add_movie_not_existing_user(client: TestClient, db: Session, normal_user_token_headers):
     r = client.post(
         client.app.url_path_for("add_movie_request"),
         headers=normal_user_token_headers,
@@ -1206,13 +1194,11 @@ def test_add_movie_not_existing_user(
     assert r.status_code == 404
 
 
-def test_add_movie_already_requested(
-    client: TestClient, db: Session, normal_user_token_headers, mock_tmdb
-):
+def test_add_movie_already_requested(client: TestClient, db: Session, normal_user_token_headers):
     r = client.post(
         client.app.url_path_for("add_movie_request"),
         headers=normal_user_token_headers,
-        json={"tmdb_id": 11, "requested_username": datasets["users"][2]["username"]},
+        json={"tmdb_id": 4194, "requested_username": datasets["users"][2]["username"]},
     )
     assert r.status_code == 409
 
@@ -1236,7 +1222,7 @@ def test_get_incoming_movies_requests(client: TestClient, db: Session, normal_us
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["movie"]
+    assert actual["media"]
 
 
 def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_user_token_headers):
@@ -1258,7 +1244,7 @@ def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_us
     assert actual["status"] == expected.status
     assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
     assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["movie"]
+    assert actual["media"]
 
 
 def test_update_movie_request_wrong_status(client: TestClient, normal_user_token_headers):

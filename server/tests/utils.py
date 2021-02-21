@@ -54,13 +54,11 @@ datasets = {
         {
             "id": 1,
             "title": "Star Wars: The Clone Wars",
-            "release_date": datetime.strptime("2008-10-03", "%Y-%m-%d"),
-            "status": "Ended",
-            "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
-            "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+            "tmdb_id": 4194,
             "tvdb_id": 83268,
-            "number_of_seasons": 7,
-            "series_type": "anime",
+            "media_type": "series",
+            "provider_media_id": 1,
+            "provider_setting_id": 1,
         }
     ],
     "series_requests": [
@@ -69,25 +67,24 @@ datasets = {
             "requesting_user_id": 3,
             "requested_user_id": 1,
             "status": "pending",
-            "series_id": 1,
+            "media_id": 1,
         },
         {
             "id": 2,
             "requesting_user_id": 1,
             "requested_user_id": 3,
             "status": "approved",
-            "series_id": 1,
+            "media_id": 1,
         },
     ],
     "movies": [
         {
-            "id": 1,
+            "id": 2,
             "title": "Star Wars: The Clone Wars",
-            "release_date": datetime.strptime("1977-10-18", "%Y-%m-%d"),
-            "status": "Ended",
-            "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
-            "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
             "tmdb_id": 11,
+            "media_type": "movies",
+            "provider_media_id": 2,
+            "provider_setting_id": 1,
         }
     ],
     "movies_requests": [
@@ -96,14 +93,14 @@ datasets = {
             "requesting_user_id": 3,
             "requested_user_id": 1,
             "status": "pending",
-            "movie_id": 1,
+            "media_id": 1,
         },
         {
             "id": 2,
             "requesting_user_id": 1,
             "requested_user_id": 3,
             "status": "approved",
-            "movie_id": 1,
+            "media_id": 1,
         },
     ],
 }

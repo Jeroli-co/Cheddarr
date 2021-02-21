@@ -58,16 +58,16 @@ def process_plex_media(plex_media_list: List[PlexVideo], setting_id):
             exists = media_repo.find_by(provider_media_id=plex_media.ratingKey)
             if exists:
                 continue
-            new_media = process_plex_movie(plex_media)
-            new_media.provider_setting_id = setting_id
+            new_media = process_plex_movie(plex_media, setting_id)
 
         elif isinstance(plex_media, PlexSeries):
             exists = media_repo.find_by(provider_media_id=plex_media.ratingKey)
             if exists:
                 process_plex_media(plex_media.seasons(), setting_id)
                 continue
-            new_media = process_plex_series(plex_media)
-            new_media.provider_setting_id = setting_id
+            new_media = process_plex_series(plex_media, setting_id)
+            for season in plex_media.seasons():
+                process_plex_season(season, new_media)
 
         elif isinstance(plex_media, PlexSeason):
             exists = season_repo.find_by(
@@ -77,11 +77,10 @@ def process_plex_media(plex_media_list: List[PlexVideo], setting_id):
             if exists:
                 process_plex_media(plex_media.episodes(), setting_id)
                 continue
-            new_media = process_plex_season(plex_media)
+            new_media = process_plex_season(plex_media, plex_media.show())
             series = media_repo.find_by(provider_media_id=new_media.provider_series_id)
             if series is None:
-                series = process_plex_series(plex_media.show())
-            series.provider_setting_id = setting_id
+                series = process_plex_series(plex_media.show(), setting_id)
             new_media.media = series
 
         elif isinstance(plex_media, PlexEpisode):
@@ -100,7 +99,7 @@ def process_plex_media(plex_media_list: List[PlexVideo], setting_id):
         media_repo.save(new_media)
 
 
-def process_plex_movie(plex_movie: PlexMovie) -> Media:
+def process_plex_movie(plex_movie: PlexMovie, setting_id: str) -> Media:
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_movie)
 
     movie = Media(
@@ -111,12 +110,13 @@ def process_plex_movie(plex_movie: PlexMovie) -> Media:
         title=plex_movie.title,
         added_at=plex_movie.addedAt,
         media_type=MediaType.movies,
+        provider_setting_id=setting_id,
     )
 
     return movie
 
 
-def process_plex_series(plex_series: PlexSeries) -> Media:
+def process_plex_series(plex_series: PlexSeries, setting_id: str) -> Media:
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_series)
 
     series = Media(
@@ -127,17 +127,13 @@ def process_plex_series(plex_series: PlexSeries) -> Media:
         title=plex_series.title,
         added_at=plex_series.addedAt,
         media_type=MediaType.series,
+        provider_setting_id=setting_id,
     )
 
-    seasons = []
-    for plex_season in plex_series.seasons():
-        season = process_plex_season(plex_season)
-        seasons.append(season)
-    series.seasons = seasons
     return series
 
 
-def process_plex_season(plex_season: PlexSeason) -> Season:
+def process_plex_season(plex_season: PlexSeason, parent_series: Media) -> Season:
     episodes = []
     for episode in plex_season.episodes():
         episodes.append(process_plex_episode(episode))
@@ -148,6 +144,7 @@ def process_plex_season(plex_season: PlexSeason) -> Season:
         provider_series_id=plex_season.parentRatingKey,
         added_at=plex_season.addedAt,
         episodes=episodes,
+        media=parent_series,
     )
 
     return season

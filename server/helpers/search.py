@@ -54,41 +54,39 @@ def search_tmdb_series(term: str, page: int) -> (List[schemas.TmdbSeries], int, 
 
 def find_tmdb_movie(tmdb_id: int) -> Optional[schemas.TmdbMovie]:
     try:
-        movie = tmdb.Movies(tmdb_id).info()
-        print(movie)
+        movie = tmdb.Movies(tmdb_id).info(append_to_response="external_ids")
     except Exception:
         return None
     set_tmdb_movie_info(movie)
     return schemas.TmdbMovie.parse_obj(movie)
 
 
-def find_tmdb_series_by_tvdb_id(tvdb_id: int) -> Optional[schemas.TmdbSeries]:
-    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
-    if not tmdb_result:
+def find_tmdb_series(tmdb_id: int) -> Optional[schemas.TmdbSeries]:
+    try:
+        series = tmdb.TV(tmdb_id).info(append_to_response="external_ids")
+    except Exception:
         return None
-    tmdb_id = tmdb_result[0]["id"]
-    series = tmdb.TV(tmdb_id).info()
     set_tmdb_series_info(series)
     return schemas.TmdbSeries.parse_obj(series)
 
 
-def find_tmdb_season_by_tvdb_id(tvdb_id: int, season_number: int) -> Optional[schemas.TmdbSeason]:
-    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
-    if not tmdb_result:
+def find_tmdb_season(tmdb_id: int, season_number: int) -> Optional[schemas.TmdbSeason]:
+    try:
+        season = tmdb.TV_Seasons(tmdb_id, season_number).info(append_to_response="external_ids")
+    except Exception:
         return None
-    tmdb_id = tmdb_result[0]["id"]
-    season = tmdb.TV_Seasons(tmdb_id, season_number).info()
     return schemas.TmdbSeason.parse_obj(season)
 
 
-def find_tmdb_episode_by_tvdb_id(
-    tvdb_id: int, season_number: int, episode_number: int
+def find_tmdb_episode(
+    tmdb_id: int, season_number: int, episode_number: int
 ) -> Optional[schemas.TmdbEpisode]:
-    tmdb_result = tmdb.Find(tvdb_id).info(external_source="tvdb_id").get("tv_results")
-    if not tmdb_result:
+    try:
+        episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info(
+            append_to_response="external_ids"
+        )
+    except Exception:
         return None
-    tmdb_id = tmdb_result[0]["id"]
-    episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info()
     return schemas.TmdbEpisode.parse_obj(episode)
 
 

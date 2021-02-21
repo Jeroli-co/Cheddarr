@@ -21,6 +21,7 @@ class RequestStatus(str, Enum):
 
 
 class Request(object):
+
     id = Column(Integer, primary_key=True)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
     comment = Column(Text)
@@ -59,11 +60,11 @@ class Request(object):
 
 
 class MovieRequest(Model, Timestamp, Request):
-    __repr_props__ = ("movie", "requested_user", "requesting_user")
+    __repr_props__ = ("media", "requested_user", "requesting_user")
 
 
 class SeriesRequest(Model, Timestamp, Request):
-    __repr_props__ = ("series", "requested_user", "requesting_user")
+    __repr_props__ = ("media", "requested_user", "requesting_user")
 
     seasons = relationship("SeasonRequest", cascade="all,delete,delete-orphan", backref="request")
 

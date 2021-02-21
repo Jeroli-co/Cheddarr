@@ -206,7 +206,7 @@ def update_episode(
 
 def send_request(request: SeriesRequest):
     setting: SonarrSetting = request.selected_provider
-    series = lookup(setting, request.series.tvdb_id)
+    series = lookup(setting, request.media.tvdb_id)
     if series.id is None:  # series is not added to sonarr yet.
         root_folder_path = setting.root_folder
         quality_profile_id = setting.quality_profile_id

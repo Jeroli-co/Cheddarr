@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server import schemas, models
@@ -13,80 +15,36 @@ from server.repositories import (
 router = APIRouter()
 
 
-@router.get(
-    "",
-    response_model=schemas.SearchResult,
-    response_model_exclude_none=True,
-)
+@router.get("", response_model=schemas.SearchResult, response_model_exclude_none=True)
 def search_media(
     value,
     page=1,
+    media_type: Optional[models.MediaType] = None,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     provider_setting_repo: ProviderSettingRepository = Depends(
         deps.get_repository(ProviderSettingRepository)
     ),
 ):
-    tmdb_media, total_pages, total_results = search.search_tmdb_media(value, page)
-    for media in tmdb_media:
+    if media_type == models.MediaType.series:
+        media_results, total_pages, total_results = search.search_tmdb_series(value, page)
+    elif media_type == models.MediaType.movies:
+        media_results, total_pages, total_results = search.search_tmdb_movies(value, page)
+    else:
+        media_results, total_pages, total_results = search.search_tmdb_media(value, page)
+
+    for media in media_results:
         media_info = media_repo.find_by(tmdb_id=media.tmdb_id)
         if media_info is not None:
             provider = provider_setting_repo.find_by(id=media_info.provider_setting_id)
             if provider.name == models.PlexSetting.__name__:
-                media.plex_media_info = media_info
-    search_result = schemas.TmdbSearchResult(
-        results=tmdb_media, page=page, total_pages=total_pages, total_results=total_results
-    )
-    return search_result
-
-
-@router.get(
-    "/movies",
-    response_model=schemas.SearchResult,
-    response_model_exclude_none=True,
-)
-def search_movies(
-    value,
-    page=1,
-    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
-    provider_setting_repo: ProviderSettingRepository = Depends(
-        deps.get_repository(ProviderSettingRepository)
-    ),
-):
-    tmdb_movies, total_pages, total_results = search.search_tmdb_movies(value, page)
-    for movie in tmdb_movies:
-        media_info = media_repo.find_by(tmdb_id=movie.tmdb_id)
-        if media_info is not None:
-            provider = provider_setting_repo.find_by(id=media_info.provider_setting_id)
-            if provider.name == models.PlexSetting.__name__:
-                movie.plex_media_info = media_info
-    search_result = schemas.TmdbSearchResult(
-        results=tmdb_movies, page=page, total_pages=total_pages, total_results=total_results
-    )
-    return search_result
-
-
-@router.get(
-    "/series",
-    response_model=schemas.SearchResult,
-    response_model_exclude_none=True,
-)
-def search_series(
-    value,
-    page=1,
-    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
-    provider_setting_repo: ProviderSettingRepository = Depends(
-        deps.get_repository(ProviderSettingRepository)
-    ),
-):
-    tmdb_series, total_pages, total_results = search.search_tmdb_series(value, page)
-    for series in tmdb_series:
-        media_info = media_repo.find_by(tmdb_id=series.tmdb_id)
-        if media_info is not None:
-            provider = provider_setting_repo.find_by(id=media_info.provider_setting_id)
-            if provider.name == models.PlexSetting.__name__:
-                series.plex_media_info = media_info
-    search_result = schemas.TmdbSearchResult(
-        results=tmdb_series, page=page, total_pages=total_pages, total_results=total_results
+                media.plex_media_info = schemas.PlexMediaInfo(
+                    **media_info.as_dict(), server_id=media_info.provider_setting_id
+                )
+    search_result = schemas.SearchResult(
+        results=[m.dict(by_alias=False) for m in media_results],
+        page=page,
+        total_pages=total_pages,
+        total_results=total_results,
     )
     return search_result
 
@@ -100,14 +58,13 @@ def search_series(
     },
 )
 def find_movie(
-    provider_id: int,
+    tmdb_id: int,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     provider_setting_repo: ProviderSettingRepository = Depends(
         deps.get_repository(ProviderSettingRepository)
     ),
 ):
-    """ Find a movie with  an external search provider id (TMDB) """
-    movie = search.find_tmdb_movie(provider_id)
+    movie = search.find_tmdb_movie(tmdb_id)
     if movie is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Movie not found.")
 
@@ -115,12 +72,14 @@ def find_movie(
     if media_info is not None:
         provider = provider_setting_repo.find_by(id=media_info.provider_setting_id)
         if provider.name == models.PlexSetting.__name__:
-            movie.plex_media_info = media_info
-    return movie
+            movie.plex_media_info = schemas.PlexMediaInfo(
+                **media_info.as_dict(), server_id=media_info.provider_setting_id
+            )
+    return movie.dict()
 
 
 @router.get(
-    "/series/{provider_id}",
+    "/series/{media_id}",
     response_model=schemas.Series,
     response_model_exclude_none=True,
     responses={
@@ -128,14 +87,13 @@ def find_movie(
     },
 )
 def find_series(
-    provider_id: int,
+    media_id: int,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     provider_setting_repo: ProviderSettingRepository = Depends(
         deps.get_repository(ProviderSettingRepository)
     ),
 ):
-    """ Find a TV series with an external search provider id (TVDB) """
-    series = search.find_tmdb_series_by_tvdb_id(provider_id)
+    series = search.find_tmdb_series(media_id)
     if series is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Series not found.")
 
@@ -143,12 +101,14 @@ def find_series(
     if media_info is not None:
         provider = provider_setting_repo.find_by(id=media_info.provider_setting_id)
         if provider.name == models.PlexSetting.__name__:
-            series.plex_media_info = media_info
-    return series
+            series.plex_media_info = schemas.PlexMediaInfo(
+                **media_info.as_dict(), server_id=media_info.provider_setting_id
+            )
+    return series.dict()
 
 
 @router.get(
-    "/series/{provider_id}/seasons/{season_number}",
+    "/series/{media_id}/seasons/{season_number}",
     response_model=schemas.Season,
     response_model_exclude_none=True,
     responses={
@@ -156,30 +116,31 @@ def find_series(
     },
 )
 def find_season(
-    provider_id: int,
+    media_id: int,
     season_number: int,
     season_repo: SeasonRepisitory = Depends(deps.get_repository(SeasonRepisitory)),
     provider_setting_repo: ProviderSettingRepository = Depends(
         deps.get_repository(ProviderSettingRepository)
     ),
 ):
-    """ Find a TV season with  an external search provider id (TVDB) and a season number """
-    season = search.find_tmdb_season_by_tvdb_id(provider_id, season_number)
+    season = search.find_tmdb_season(media_id, season_number)
     if season is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Season not found.")
 
     media_info = season_repo.find_by_tmdb_id_and_season_number(
-        tmdb_id=provider_id, season_number=season_number
+        tmdb_id=media_id, season_number=season_number
     )
     if media_info is not None:
         provider = provider_setting_repo.find_by(id=media_info.media.provider_setting_id)
         if provider.name == models.PlexSetting.__name__:
-            season.plex_media_info = media_info
-    return season
+            season.plex_media_info = schemas.PlexMediaInfo(
+                **media_info.as_dict(), server_id=media_info.media.provider_setting_id
+            )
+    return season.dict()
 
 
 @router.get(
-    "/series/{provider_id}/seasons/{season_number}/episodes/{episode_number}",
+    "/series/{media_id}/seasons/{season_number}/episodes/{episode_number}",
     response_model=schemas.Episode,
     response_model_exclude_none=True,
     responses={
@@ -187,7 +148,7 @@ def find_season(
     },
 )
 def find_episode(
-    provider_id: int,
+    media_id: int,
     season_number: int,
     episode_number: int,
     episode_repo: EpisodeRepository = Depends(deps.get_repository(EpisodeRepository)),
@@ -195,16 +156,17 @@ def find_episode(
         deps.get_repository(ProviderSettingRepository)
     ),
 ):
-    """ Find a TV episode with an external search provider id (TVDB), a season number and an episode number """
-    episode = search.find_tmdb_episode_by_tvdb_id(provider_id, season_number, episode_number)
+    episode = search.find_tmdb_episode(media_id, season_number, episode_number)
     if episode is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Episode not found.")
 
     media_info = episode_repo.find_by_tmdb_id_and_season_number_and_episode_number(
-        tmdb_id=provider_id, season_number=season_number, episode_number=episode_number
+        tmdb_id=media_id, season_number=season_number, episode_number=episode_number
     )
     if media_info is not None:
-        provider = provider_setting_repo.find_by(id=media_info.media.provider_setting_id)
+        provider = provider_setting_repo.find_by(id=media_info.season.media.provider_setting_id)
         if provider.name == models.PlexSetting.__name__:
-            episode.plex_media_info = media_info
-    return episode
+            episode.plex_media_info = schemas.PlexMediaInfo(
+                **media_info.as_dict(), server_id=media_info.season.media.provider_setting_id
+            )
+    return episode.dict()
