@@ -141,6 +141,10 @@ class PlexServerInfo(APIModel):
     server_name: str
 
 
+class PlexServer(ProviderSettingBase, PlexServerInfo):
+    local: bool
+
+
 class PlexSetting(ProviderSettingBase, PlexServerInfo):
     id: str
     name: str
@@ -152,15 +156,6 @@ class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
     enabled: Optional[bool] = True
 
 
-class PlexServerOut(APIModel):
-    host: str
-    port: int
-    ssl: bool
-    api_key: str
-    server_id: str
-    server_name: str
-
-
 class PlexMediaInfo(APIModel):
     provider_media_id: str
     added_at: date
@@ -169,6 +164,7 @@ class PlexMediaInfo(APIModel):
 
     @validator("web_url", pre=True)
     def get_web_url(cls, web_url, values):
+        print(values)
         return "https://app.plex.tv/web/app#!/server/%s/details?key=library/metadata/%s" % (
             values["server_id"],
             values["provider_media_id"],
