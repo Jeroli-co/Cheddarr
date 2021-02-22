@@ -13,7 +13,7 @@ from .notifications import EmailAgent, EmailAgentSettings, Notification
 from .providers import (
     PlexMediaInfo,
     PlexServerInfo,
-    PlexServerOut,
+    PlexServer,
     PlexSetting,
     PlexSettingCreateUpdate,
     ProviderSettingBase,
