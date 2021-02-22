@@ -16,7 +16,6 @@ class TokenPayload(BaseModel):
     username: str
     avatar: str
     role: UserRole
-    plex: bool
 
 
 class EmailConfirm(APIModel):
