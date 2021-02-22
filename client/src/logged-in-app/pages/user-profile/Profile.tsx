@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useCurrentUser } from "../../../shared/hooks/useCurrentUser";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { Spinner } from "../../../shared/components/Spinner";
-import { UpdateProfile } from "../settings/components/account/UpdateProfile";
+import { UpdateProfile } from "./account/UpdateProfile";
 import { H1 } from "../../../shared/components/Titles";
 import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
 import { PrimaryDivider } from "../../../shared/components/Divider";

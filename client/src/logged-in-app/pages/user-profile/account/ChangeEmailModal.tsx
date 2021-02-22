@@ -1,21 +1,17 @@
 import React from "react";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../../../shared/enums/FormDefaultValidators";
-import { useUserService } from "../../../../../../shared/hooks/useUserService";
-import {
-  Button,
-  PrimaryButton,
-} from "../../../../../../shared/components/Button";
-import { Modal } from "../../../../../../shared/components/Modal";
-import { H2 } from "../../../../../../shared/components/Titles";
-import { InputField } from "../../../../../../shared/components/inputs/InputField";
-import { Buttons } from "../../../../../../shared/components/layout/Buttons";
-import { HelpDanger } from "../../../../../../shared/components/Help";
-import { Icon } from "../../../../../../shared/components/Icon";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultValidators";
+import { useUserService } from "../../../../shared/hooks/useUserService";
+import { Button, PrimaryButton } from "../../../../shared/components/Button";
+import { Modal } from "../../../../shared/components/Modal";
+import { H2 } from "../../../../shared/components/Titles";
+import { InputField } from "../../../../shared/components/inputs/InputField";
+import { Buttons } from "../../../../shared/components/layout/Buttons";
+import { HelpDanger } from "../../../../shared/components/Help";
+import { Icon } from "../../../../shared/components/Icon";
 
 type ChangeEmailModalProps = {
-  isOpen: boolean;
   closeModal: () => void;
 };
 
@@ -30,7 +26,7 @@ const ChangeEmailModal = (props: ChangeEmailModalProps) => {
   };
 
   return (
-    <Modal isOpen={props.isOpen} close={props.closeModal}>
+    <Modal close={props.closeModal}>
       <header>
         <H2>Change your email</H2>
       </header>

@@ -116,11 +116,11 @@ export const SessionContextProvider = (props: any) => {
   return (
     <SessionContext.Provider
       value={{
-        session: session,
-        initSession: initSession,
-        invalidSession: invalidSession,
-        updateUsername: updateUsername,
-        unlinkPlexAccount: unlinkPlexAccount,
+        session,
+        initSession,
+        invalidSession,
+        updateUsername,
+        unlinkPlexAccount,
       }}
     >
       {props.children}

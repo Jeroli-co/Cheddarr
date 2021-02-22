@@ -6,9 +6,8 @@ import { SignInForm } from "../logged-out-app/SignInForm";
 import { SignUpForm } from "../logged-out-app/SignUpForm";
 import { PublicUser } from "../logged-in-app/pages/PublicUser";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
-import { PlexConfig } from "../logged-in-app/pages/settings/components/plex/PlexConfig";
-import { RadarrConfig } from "../logged-in-app/pages/settings/components/RadarrConfig";
-import { SonarrConfig } from "../logged-in-app/pages/settings/components/SonarrConfig";
+import { RadarrConfig } from "../logged-in-app/pages/settings/media-providers/RadarrConfig";
+import { SonarrConfig } from "../logged-in-app/pages/settings/media-providers/SonarrConfig";
 import { Search } from "../logged-in-app/pages/search/Search";
 import { Requests } from "../logged-in-app/pages/requests/Requests";
 import { PlexMovie } from "../logged-in-app/pages/plex-media/PlexMovie";
@@ -18,7 +17,9 @@ import { Home } from "../shared/Home";
 import { RequestsSent } from "../logged-in-app/pages/requests/elements/RequestsSent";
 import { RequestsReceived } from "../logged-in-app/pages/requests/elements/RequestsReceived";
 import { Profile } from "../logged-in-app/pages/user-profile/Profile";
-import { NotificationsConfig } from "../logged-in-app/pages/settings/components/notifications/NotificationsConfig";
+import { NotificationsConfig } from "../logged-in-app/pages/settings/notifications/NotificationsConfig";
+import { MediaServersSettings } from "../logged-in-app/pages/settings/media-servers/MediaServersSettings";
+import { ConnectionsSettings } from "../logged-in-app/pages/settings/connections/ConnectionsSettings";
 
 const routes = {
   HOME: {
@@ -52,9 +53,13 @@ const routes = {
 
   /** SETTINGS **/
   SETTINGS: { url: "/settings", component: Settings },
-  SETTINGS_PLEX: {
-    url: "/settings/plex",
-    component: PlexConfig,
+  SETTINGS_CONNECTIONS: {
+    url: "/settings/connections",
+    component: ConnectionsSettings,
+  },
+  SETTINGS_MEDIA_SERVERS: {
+    url: "/settings/media-servers",
+    component: MediaServersSettings,
   },
   SETTINGS_RADARR: {
     url: "/settings/radarr",
@@ -86,11 +91,11 @@ const routes = {
     component: Requests,
   },
   REQUESTS_SENT: {
-    url: "/requests/sent",
+    url: "/requests/outgoing",
     component: RequestsSent,
   },
   REQUESTS_RECEIVED: {
-    url: "/requests/received",
+    url: "/requests/incoming",
     component: RequestsReceived,
   },
 

@@ -6,7 +6,13 @@ import { RequestsContextProvider } from "../../../shared/contexts/RequestsContex
 
 const Requests = () => {
   return (
-    <TabsContextProvider tabs={["Sent", "Received"]} url={routes.REQUESTS.url}>
+    <TabsContextProvider
+      tabs={[
+        { label: "Sent", uri: "outgoing" },
+        { label: "Received", uri: "incoming" },
+      ]}
+      url={routes.REQUESTS.url}
+    >
       <RequestsContextProvider>
         <Switch>
           <Route

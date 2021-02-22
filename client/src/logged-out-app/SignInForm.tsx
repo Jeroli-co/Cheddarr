@@ -157,10 +157,11 @@ export const SignInForm = () => {
         </div>
       </div>
 
-      <InitResetPasswordModal
-        isOpen={isInitPasswordModalOpen}
-        closeModal={() => setIsInitPasswordModalOpen(false)}
-      />
+      {isInitPasswordModalOpen && (
+        <InitResetPasswordModal
+          closeModal={() => setIsInitPasswordModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

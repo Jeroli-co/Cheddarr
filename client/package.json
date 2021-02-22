@@ -33,7 +33,7 @@
     "mutationobserver-shim": "^0.3.7",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "react-hook-form": "^4.9.8",
+    "react-hook-form": "^6.15.3",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.4",

@@ -128,7 +128,7 @@ const SearchBar = ({ isSidebarOpen }: SearchBarProps) => {
 
   useEffect(() => {
     clearTimeout(timer);
-    timer = setTimeout(() => _search(), 500);
+    timer = setTimeout(() => _search(), 800);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 

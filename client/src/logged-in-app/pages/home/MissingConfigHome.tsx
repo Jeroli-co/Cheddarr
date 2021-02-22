@@ -2,33 +2,29 @@ import { PrimaryDivider } from "../../../shared/components/Divider";
 import { routes } from "../../../router/routes";
 import React from "react";
 import styled from "styled-components";
-import { Spin } from "../../../shared/components/animations/Animations";
 import { useHistory } from "react-router";
 import { H2 } from "../../../shared/components/Titles";
+import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
 
-const logo = require("../../../assets/cheddarr.png");
+const logo = require("../../../assets/cheddarr.svg");
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  height: calc(100vh - ${STATIC_STYLES.NAVBAR_HEIGHT}px);
 `;
 
 const Logo = styled.img`
-  height: 40vmin;
+  height: 200px;
   pointer-events: none;
   align-self: center;
-
-  @media (prefers-reduced-motion: no-preference) {
-    animation: ${Spin} infinite 20s linear;
-  }
 `;
 
 const Link = styled(H2)`
   text-align: center;
-  color: ${(props) => props.theme.primary};
+  color: ${(props) => props.theme.primaryLighter};
   cursor: pointer;
 
   &:hover {
@@ -41,11 +37,10 @@ export const MissingConfigHome = () => {
 
   return (
     <Container className="home-content">
-      <Logo src={logo} className="home-logo" alt="logo" />
-      <br />
+      <Logo src={logo} alt="logo" />
       <PrimaryDivider />
-      <Link onClick={() => history.push(routes.SETTINGS_PLEX.url)}>
-        ADD A PLEX SERVER TO START USING THIS HUB
+      <Link onClick={() => history.push(routes.SETTINGS_MEDIA_SERVERS.url)}>
+        ADD A MEDIA SERVER TO START USING THIS HUB
       </Link>
     </Container>
   );

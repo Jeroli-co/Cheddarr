@@ -5,9 +5,8 @@ import { Icon } from "./Icon";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { STATIC_STYLES } from "../enums/StaticStyles";
 
-export const Container = styled.div<{ isOpen: boolean }>`
-  display: ${(props) =>
-    props.isOpen ? "flex" : "none"}; /* Hidden by default */
+export const Container = styled.div<{ isOpen?: boolean }>`
+  display: flex;
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
   left: 0;
@@ -69,7 +68,6 @@ export const Container = styled.div<{ isOpen: boolean }>`
 `;
 
 type ModalProps = {
-  isOpen: boolean;
   close: () => void;
   children: any;
 };
@@ -78,7 +76,7 @@ export const Modal = (props: ModalProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
   useOutsideAlerter([contentRef], () => props.close());
   return (
-    <Container isOpen={props.isOpen}>
+    <Container>
       <div className="modal-content" ref={contentRef}>
         <Icon className="close" icon={faTimes} onClick={() => props.close()} />
         {props.children}

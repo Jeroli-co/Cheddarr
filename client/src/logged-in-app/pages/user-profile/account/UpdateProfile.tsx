@@ -4,17 +4,17 @@ import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import {
   DangerButton,
   PrimaryButton,
-} from "../../../../../shared/components/Button";
-import { H2 } from "../../../../../shared/components/Titles";
-import { Help } from "../../../../../shared/components/Help";
-import { ChangeUsernameModal } from "./components/ChangeUsernameModal";
-import { ChangeEmailModal } from "./components/ChangeEmailModal";
-import { ChangePasswordModal } from "./components/ChangePasswordModal";
-import { DeleteAccountModal } from "./components/DeleteAccountModal";
-import { PrimaryDivider } from "../../../../../shared/components/Divider";
+} from "../../../../shared/components/Button";
+import { H2 } from "../../../../shared/components/Titles";
+import { Help } from "../../../../shared/components/Help";
+import { ChangeUsernameModal } from "./ChangeUsernameModal";
+import { ChangeEmailModal } from "./ChangeEmailModal";
+import { ChangePasswordModal } from "./ChangePasswordModal";
+import { DeleteAccountModal } from "./DeleteAccountModal";
+import { PrimaryDivider } from "../../../../shared/components/Divider";
 import styled from "styled-components";
-import { useWindowSize } from "../../../../../shared/hooks/useWindowSize";
-import { STATIC_STYLES } from "../../../../../shared/enums/StaticStyles";
+import { useWindowSize } from "../../../../shared/hooks/useWindowSize";
+import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 
 const Container = styled.div`
   width: 100%;
@@ -120,22 +120,24 @@ export const UpdateProfile = () => {
         </DangerButton>
       </div>
 
-      <ChangeUsernameModal
-        isOpen={isChangeUsernameModalOpen}
-        closeModal={() => setIsChangeUsernameModalOpen(false)}
-      />
-      <ChangeEmailModal
-        isOpen={isChangeEmailModalOpen}
-        closeModal={() => setIsChangeEmailModalOpen(false)}
-      />
-      <ChangePasswordModal
-        isOpen={isChangePasswordModalOpen}
-        closeModal={() => setIsChangePasswordModalOpen(false)}
-      />
-      <DeleteAccountModal
-        isOpen={isDeleteAccountModalOpen}
-        closeModal={() => setIsDeleteAccountModalOpen(false)}
-      />
+      {isChangeUsernameModalOpen && (
+        <ChangeUsernameModal
+          closeModal={() => setIsChangeUsernameModalOpen(false)}
+        />
+      )}
+      {isChangeEmailModalOpen && (
+        <ChangeEmailModal closeModal={() => setIsChangeEmailModalOpen(false)} />
+      )}
+      {isChangePasswordModalOpen && (
+        <ChangePasswordModal
+          closeModal={() => setIsChangePasswordModalOpen(false)}
+        />
+      )}
+      {isDeleteAccountModalOpen && (
+        <DeleteAccountModal
+          closeModal={() => setIsDeleteAccountModalOpen(false)}
+        />
+      )}
     </Container>
   );
 };

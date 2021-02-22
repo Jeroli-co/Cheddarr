@@ -1,6 +1,6 @@
 import React from "react";
 import { EmailConfig } from "./Email";
-import { FullWidthTag } from "../../../../../shared/components/FullWidthTag";
+import { FullWidthTag } from "../../../../shared/components/FullWidthTag";
 
 export const NotificationsConfig = () => {
   return (

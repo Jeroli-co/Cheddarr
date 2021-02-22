@@ -54,7 +54,7 @@ export const InputField = styled.div<InputFieldProps>`
     width: 100%;
     padding: 12px 20px;
     display: inline-block;
-    border: 1px solid ${(props) => props.theme.primary};
+    border: 3px solid ${(props) => props.theme.primaryLight};
     border-radius: 4px;
     box-sizing: border-box;
     background: ${(props) => props.theme.primary};

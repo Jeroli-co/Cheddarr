@@ -66,10 +66,11 @@ export const WaitingEmailConfirmation = (
           </PrimaryRoundedButton>
         </Buttons>
       </CenteredContent>
-      <InitResetPasswordModal
-        isOpen={isInitPasswordModalOpen}
-        closeModal={() => setIsInitPasswordModalOpen(false)}
-      />
+      {isInitPasswordModalOpen && (
+        <InitResetPasswordModal
+          closeModal={() => setIsInitPasswordModalOpen(false)}
+        />
+      )}
     </>
   );
 };

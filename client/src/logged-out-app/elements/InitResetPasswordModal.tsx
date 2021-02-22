@@ -14,12 +14,10 @@ import { H2 } from "../../shared/components/Titles";
 import { HelpDanger } from "../../shared/components/Help";
 
 type InitResetPasswordModalProps = {
-  isOpen: boolean;
   closeModal: () => void;
 };
 
 const InitResetPasswordModal = ({
-  isOpen,
   closeModal,
 }: InitResetPasswordModalProps) => {
   const { register, handleSubmit, errors } = useForm<{ email: string }>();
@@ -41,7 +39,7 @@ const InitResetPasswordModal = ({
   });
 
   return (
-    <Modal isOpen={isOpen} close={closeModal}>
+    <Modal close={closeModal}>
       <header>
         <H2>Reset your password</H2>
       </header>

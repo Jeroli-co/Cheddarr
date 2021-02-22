@@ -6,10 +6,21 @@ import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
 const Settings = () => {
   return (
     <TabsContextProvider
-      tabs={["Plex", "Radarr", "Sonarr", "Notifications"]}
+      tabs={[
+        { label: "Connect", uri: "connections" },
+        { label: "Media servers", uri: "media-servers" },
+        { label: "Radarr", uri: "radarr" },
+        { label: "Sonarr", uri: "sonarr" },
+        { label: "Notifications", uri: "notifications" },
+      ]}
       url={routes.SETTINGS.url}
     >
       <Switch>
+        <Route
+          exact
+          path={routes.SETTINGS_MEDIA_SERVERS.url}
+          component={routes.SETTINGS_MEDIA_SERVERS.component}
+        />
         <Route
           exact
           path={routes.SETTINGS_RADARR.url}
@@ -26,8 +37,8 @@ const Settings = () => {
           component={routes.SETTINGS_NOTIFICATIONS.component}
         />
         <Route
-          path={[routes.SETTINGS.url, routes.SETTINGS_PLEX.url]}
-          component={routes.SETTINGS_PLEX.component}
+          path={[routes.SETTINGS.url, routes.SETTINGS_CONNECTIONS.url]}
+          component={routes.SETTINGS_CONNECTIONS.component}
         />
       </Switch>
     </TabsContextProvider>

@@ -1,23 +1,23 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { IEmailConfig } from "../../../../../shared/models/IEmailConfig";
-import { SecondaryButton } from "../../../../../shared/components/Button";
-import { InputField } from "../../../../../shared/components/inputs/InputField";
-import { Icon } from "../../../../../shared/components/Icon";
+import { IEmailConfig } from "../../../../shared/models/IEmailConfig";
+import { SecondaryButton } from "../../../../shared/components/Button";
+import { InputField } from "../../../../shared/components/inputs/InputField";
+import { Icon } from "../../../../shared/components/Icon";
 import {
   faAt,
   faEnvelope,
   faKey,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import { H1 } from "../../../../../shared/components/Titles";
-import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
-import { Row } from "../../../../../shared/components/layout/Row";
-import { useAPI } from "../../../../../shared/hooks/useAPI";
-import { APIRoutes } from "../../../../../shared/enums/APIRoutes";
-import { useAlert } from "../../../../../shared/contexts/AlertContext";
-import { ERRORS_MESSAGE } from "../../../../../shared/enums/ErrorsMessage";
-import { INotificationsConfig } from "../../../../../shared/models/INotificationsConfig";
+import { H1 } from "../../../../shared/components/Titles";
+import { Checkbox } from "../../../../shared/components/inputs/Checkbox";
+import { Row } from "../../../../shared/components/layout/Row";
+import { useAPI } from "../../../../shared/hooks/useAPI";
+import { APIRoutes } from "../../../../shared/enums/APIRoutes";
+import { useAlert } from "../../../../shared/contexts/AlertContext";
+import { ERRORS_MESSAGE } from "../../../../shared/enums/ErrorsMessage";
+import { INotificationsConfig } from "../../../../shared/models/INotificationsConfig";
 
 export const EmailConfig = () => {
   const { register, handleSubmit, reset } = useForm<IEmailConfig>();

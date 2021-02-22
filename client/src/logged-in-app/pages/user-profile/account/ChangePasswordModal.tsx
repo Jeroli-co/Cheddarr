@@ -1,24 +1,20 @@
 import React from "react";
 import { faKey } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../../../shared/enums/FormDefaultValidators";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultValidators";
 import {
   IChangePasswordModel,
   useUserService,
-} from "../../../../../../shared/hooks/useUserService";
-import {
-  Button,
-  PrimaryButton,
-} from "../../../../../../shared/components/Button";
-import { Modal } from "../../../../../../shared/components/Modal";
-import { Buttons } from "../../../../../../shared/components/layout/Buttons";
-import { H2 } from "../../../../../../shared/components/Titles";
-import { InputField } from "../../../../../../shared/components/inputs/InputField";
-import { Icon } from "../../../../../../shared/components/Icon";
-import { HelpDanger } from "../../../../../../shared/components/Help";
+} from "../../../../shared/hooks/useUserService";
+import { Button, PrimaryButton } from "../../../../shared/components/Button";
+import { Modal } from "../../../../shared/components/Modal";
+import { Buttons } from "../../../../shared/components/layout/Buttons";
+import { H2 } from "../../../../shared/components/Titles";
+import { InputField } from "../../../../shared/components/inputs/InputField";
+import { Icon } from "../../../../shared/components/Icon";
+import { HelpDanger } from "../../../../shared/components/Help";
 
 type ChangePasswordModalProps = {
-  isOpen: boolean;
   closeModal: () => void;
 };
 
@@ -33,7 +29,7 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
   };
 
   return (
-    <Modal isOpen={props.isOpen} close={props.closeModal}>
+    <Modal close={props.closeModal}>
       <header>
         <H2>Change your password</H2>
       </header>

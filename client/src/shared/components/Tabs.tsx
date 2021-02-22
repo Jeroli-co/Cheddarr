@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { useHistory } from "react-router-dom";
+import { Tab } from "../contexts/TabsContext";
 
 const TabsStyle = styled.div`
   overflow: hidden;
@@ -49,8 +50,8 @@ const TabStyle = styled.div<{ isActive: boolean }>`
 `;
 
 type TabsProps = {
-  tabs: string[];
-  activeTab: string;
+  tabs: Tab[];
+  activeTab: Tab;
   url: string;
 };
 
@@ -62,11 +63,11 @@ export const Tabs = ({ tabs, activeTab, url }: TabsProps) => {
       {tabs.map((tab, index) => {
         return (
           <TabStyle
-            isActive={activeTab === tab}
-            onClick={() => history.push(url + "/" + tab.toLowerCase())}
+            isActive={activeTab.uri === tab.uri}
+            onClick={() => history.push(url + "/" + tab.uri.toLowerCase())}
             key={index}
           >
-            {tab}
+            {tab.label}
           </TabStyle>
         );
       })}

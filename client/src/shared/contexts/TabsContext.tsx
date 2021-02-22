@@ -3,11 +3,26 @@ import { useLocation } from "react-router-dom";
 import { createContext, useContext } from "react";
 import { Tabs } from "../components/Tabs";
 
+export type Tab = {
+  label: string;
+  uri: string;
+};
+
 export const TabsContext = createContext({});
 
 export const useTabs = () => useContext(TabsContext);
 
-export const TabsContextProvider = ({ url, tabs, children }: any) => {
+type TabsContextProviderProps = {
+  url: string;
+  tabs: Tab[];
+  children: any;
+};
+
+export const TabsContextProvider = ({
+  url,
+  tabs,
+  children,
+}: TabsContextProviderProps) => {
   const location = useLocation();
 
   const isActiveTab = (uri: string) => {
@@ -18,7 +33,7 @@ export const TabsContextProvider = ({ url, tabs, children }: any) => {
   };
 
   const getActiveTab = () => {
-    const activeTab = tabs.find((t: string) => isActiveTab(t));
+    const activeTab = tabs.find((t: Tab) => isActiveTab(t.uri));
     return activeTab ? activeTab : tabs[0];
   };
 

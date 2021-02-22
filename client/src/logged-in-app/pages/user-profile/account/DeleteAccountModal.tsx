@@ -1,15 +1,11 @@
 import React from "react";
-import { useUserService } from "../../../../../../shared/hooks/useUserService";
-import { Modal } from "../../../../../../shared/components/Modal";
-import { H2 } from "../../../../../../shared/components/Titles";
-import { Buttons } from "../../../../../../shared/components/layout/Buttons";
-import {
-  Button,
-  DangerButton,
-} from "../../../../../../shared/components/Button";
+import { useUserService } from "../../../../shared/hooks/useUserService";
+import { Modal } from "../../../../shared/components/Modal";
+import { H2 } from "../../../../shared/components/Titles";
+import { Buttons } from "../../../../shared/components/layout/Buttons";
+import { Button, DangerButton } from "../../../../shared/components/Button";
 
 type DeleteAccountModalProps = {
-  isOpen: boolean;
   closeModal: () => void;
 };
 
@@ -23,7 +19,7 @@ const DeleteAccountModal = (props: DeleteAccountModalProps) => {
   };
 
   return (
-    <Modal isOpen={props.isOpen} close={props.closeModal}>
+    <Modal close={props.closeModal}>
       <header>
         <H2>Are you sure you want to delete your account ?</H2>
       </header>

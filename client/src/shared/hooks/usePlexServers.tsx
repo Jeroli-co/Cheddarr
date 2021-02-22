@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { useAPI } from "./useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
-import { IPlexServerInfo } from "../../logged-in-app/pages/settings/components/plex/models/IPlexServerInfo";
+import { IPlexServerInfo } from "../models/IPlexServerInfo";
 
 export const usePlexServers = () => {
   const [plexServers, setPlexServers] = useState<

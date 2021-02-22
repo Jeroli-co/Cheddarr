@@ -5,32 +5,40 @@ import { APIRoutes } from "../enums/APIRoutes";
 
 import { createContext, useContext } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
-import { IPlexConfig } from "../../logged-in-app/pages/settings/components/plex/models/IPlexConfig";
+import { IPlexSettings } from "../models/IPlexSettings";
 import { DefaultAsyncData, IAsyncData } from "../models/IAsyncData";
 import { useAlert } from "./AlertContext";
-import { IPlexServerInfo } from "../../logged-in-app/pages/settings/components/plex/models/IPlexServerInfo";
+import { IPlexServerInfo } from "../models/IPlexServerInfo";
 
 interface PlexConfigContextInterface {
-  configs: IAsyncCall<IPlexConfig[] | null>;
-  currentConfig: IAsyncData<IPlexConfig | null>;
-  readonly createConfig: (_: IPlexConfig) => void;
-  readonly createConfigFromServerInfo: (_: IPlexServerInfo) => void;
-  readonly updateConfig: (_: IPlexConfig) => void;
-  readonly deleteConfig: (_: string) => Promise<IAsyncCall>;
-  readonly addConfig: (_: IPlexConfig) => void;
-  readonly isPlexAccountLinked: () => boolean;
+  configs: IAsyncCall<IPlexSettings[] | null>;
+  currentConfig: IAsyncData<IPlexSettings | null>;
+  createConfig: (_: IPlexSettings) => Promise<IAsyncCall>;
+  updateConfig: (_: IPlexSettings) => Promise<IAsyncCall>;
+  deleteConfig: (_: string) => Promise<IAsyncCall>;
+  addConfig: (_: IPlexSettings) => void;
+  isPlexAccountLinked: () => boolean;
+  //  unlinkPlexAccount: () => Promise<IAsyncCall>;
+  unlinkPlexAccount: () => void;
 }
 
 export const PlexConfigContextDefaultImpl: PlexConfigContextInterface = {
+  unlinkPlexAccount(): void {},
+  /*  unlinkPlexAccount(): Promise<IAsyncCall> {
+    return Promise.resolve(DefaultAsyncCall);
+  },*/
+  createConfig(_: IPlexSettings): Promise<IAsyncCall> {
+    return Promise.resolve(DefaultAsyncCall);
+  },
+  updateConfig(_: IPlexSettings): Promise<IAsyncCall> {
+    return Promise.resolve(DefaultAsyncCall);
+  },
   configs: DefaultAsyncCall,
   currentConfig: DefaultAsyncData,
-  createConfig(_: IPlexConfig): void {},
-  createConfigFromServerInfo(_: IPlexServerInfo): void {},
-  updateConfig(_: IPlexConfig): void {},
   deleteConfig(_: string): Promise<IAsyncCall> {
     return Promise.resolve(DefaultAsyncCall);
   },
-  addConfig(_: IPlexConfig): void {},
+  addConfig(_: IPlexSettings): void {},
   isPlexAccountLinked(): boolean {
     return false;
   },
@@ -47,20 +55,22 @@ export default function PlexConfigContextProvider(props: any) {
     session: { plex },
   } = useSession();
 
-  const [configs, setConfigs] = useState<IAsyncCall<IPlexConfig[] | null>>(
+  const [configs, setConfigs] = useState<IAsyncCall<IPlexSettings[] | null>>(
     DefaultAsyncCall
   );
   const [currentConfig, setCurrentConfig] = useState<
-    IAsyncData<IPlexConfig | null>
+    IAsyncData<IPlexSettings | null>
   >(DefaultAsyncData);
 
   const { get, put, remove, post } = useAPI();
 
   const { pushSuccess, pushDanger } = useAlert();
 
+  const { unlinkPlexAccount: unlinkPlex } = useSession();
+
   useEffect(() => {
     if (plex) {
-      get<IPlexConfig[]>(APIRoutes.GET_PLEX_CONFIGS).then((res) => {
+      get<IPlexSettings[]>(APIRoutes.GET_PLEX_CONFIGS).then((res) => {
         if (res) {
           setConfigs(res);
         }
@@ -79,7 +89,7 @@ export default function PlexConfigContextProvider(props: any) {
     }
   }, [configs]);
 
-  const addConfig = (newConfig: IPlexConfig) => {
+  const addConfig = (newConfig: IPlexSettings) => {
     if (configs.data) {
       let configurations = configs.data;
       configurations.push(newConfig);
@@ -87,32 +97,24 @@ export default function PlexConfigContextProvider(props: any) {
     }
   };
 
-  const createConfig = (config: IPlexConfig) => {
-    post<IPlexConfig>(APIRoutes.CREATE_PLEX_CONFIG, config).then((res) => {
-      if (res.data && res.status === 201) {
-        addConfig(res.data);
-        pushSuccess("Configuration created");
-      } else {
-        pushDanger("Cannot create config");
-      }
-    });
-  };
-
-  const createConfigFromServerInfo = (serverDetail: IPlexServerInfo) => {
-    post<IPlexConfig>(APIRoutes.CREATE_PLEX_CONFIG, serverDetail).then(
+  const createConfig = (config: IPlexSettings) => {
+    return post<IPlexSettings>(APIRoutes.CREATE_PLEX_CONFIG, config).then(
       (res) => {
         if (res.data && res.status === 201) {
           addConfig(res.data);
           pushSuccess("Configuration created");
+        } else if (res.status === 409) {
+          pushDanger("Config already added");
         } else {
           pushDanger("Cannot create config");
         }
+        return res;
       }
     );
   };
 
-  const updateConfig = (newConfig: IPlexConfig) => {
-    put<IPlexConfig>(
+  const updateConfig = (newConfig: IPlexSettings) => {
+    return put<IPlexSettings>(
       APIRoutes.UPDATE_PLEX_CONFIG(newConfig.id),
       newConfig
     ).then((res) => {
@@ -129,6 +131,7 @@ export default function PlexConfigContextProvider(props: any) {
       } else {
         pushDanger("Cannot update configuration");
       }
+      return res;
     });
   };
 
@@ -138,6 +141,7 @@ export default function PlexConfigContextProvider(props: any) {
         if (configs.data) {
           let configurations = configs.data.filter((c) => c.id !== id);
           setConfigs({ ...configs, data: configurations });
+          pushSuccess("Config deleted");
         }
       }
       return res;
@@ -148,17 +152,23 @@ export default function PlexConfigContextProvider(props: any) {
     return plex;
   };
 
+  // TODO addRequest
+  const unlinkPlexAccount = () => {
+    unlinkPlex();
+    pushDanger("TODO: Add request to API");
+  };
+
   return (
     <PlexConfigContext.Provider
       value={{
-        configs: configs,
-        currentConfig: currentConfig,
+        configs,
+        currentConfig,
         createConfig,
-        createConfigFromServerInfo,
         updateConfig,
         deleteConfig,
         addConfig,
         isPlexAccountLinked,
+        unlinkPlexAccount,
       }}
     >
       {props.children}
