@@ -8,7 +8,7 @@ from server.helpers import search
 from server.repositories import (
     EpisodeRepository,
     MediaRepository,
-    ProviderSettingRepository,
+    ExternalServiceSettingRepository,
     SeasonRepisitory,
 )
 
@@ -21,8 +21,8 @@ def search_media(
     page=1,
     media_type: Optional[models.MediaType] = None,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
-    provider_setting_repo: ProviderSettingRepository = Depends(
-        deps.get_repository(ProviderSettingRepository)
+    external_service_repo: ExternalServiceSettingRepository = Depends(
+        deps.get_repository(ExternalServiceSettingRepository)
     ),
 ):
     if media_type == models.MediaType.series:
@@ -35,10 +35,10 @@ def search_media(
     for media in media_results:
         media_info = media_repo.find_by(tmdb_id=media.tmdb_id)
         if media_info is not None:
-            provider = provider_setting_repo.find_by(id=media_info.provider_setting_id)
-            if provider.name == models.PlexSetting.__name__:
+            server = external_service_repo.find_media_server_by(id=media_info.setting_id)
+            if server.name == models.PlexSetting.__name__:
                 media.plex_media_info = schemas.PlexMediaInfo(
-                    **media_info.as_dict(), server_id=media_info.provider_setting_id
+                    **media_info.as_dict(), server_id=media_info.setting_id
                 )
     search_result = schemas.SearchResult(
         results=[m.dict(by_alias=False) for m in media_results],
@@ -60,8 +60,8 @@ def search_media(
 def find_movie(
     tmdb_id: int,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
-    provider_setting_repo: ProviderSettingRepository = Depends(
-        deps.get_repository(ProviderSettingRepository)
+    external_service_repo: ExternalServiceSettingRepository = Depends(
+        deps.get_repository(ExternalServiceSettingRepository)
     ),
 ):
     movie = search.find_tmdb_movie(tmdb_id)
@@ -70,10 +70,10 @@ def find_movie(
 
     media_info = media_repo.find_by(tmdb_id=movie.tmdb_id)
     if media_info is not None:
-        provider = provider_setting_repo.find_by(id=media_info.provider_setting_id)
-        if provider.name == models.PlexSetting.__name__:
+        server = external_service_repo.find_media_server_by(id=media_info.setting_id)
+        if server.name == models.PlexSetting.__name__:
             movie.plex_media_info = schemas.PlexMediaInfo(
-                **media_info.as_dict(), server_id=media_info.provider_setting_id
+                **media_info.as_dict(), server_id=media_info.setting_id
             )
     return movie.dict()
 
@@ -89,8 +89,8 @@ def find_movie(
 def find_series(
     media_id: int,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
-    provider_setting_repo: ProviderSettingRepository = Depends(
-        deps.get_repository(ProviderSettingRepository)
+    external_service_repo: ExternalServiceSettingRepository = Depends(
+        deps.get_repository(ExternalServiceSettingRepository)
     ),
 ):
     series = search.find_tmdb_series(media_id)
@@ -99,10 +99,10 @@ def find_series(
 
     media_info = media_repo.find_by(tmdb_id=series.tmdb_id)
     if media_info is not None:
-        provider = provider_setting_repo.find_by(id=media_info.provider_setting_id)
-        if provider.name == models.PlexSetting.__name__:
+        server = external_service_repo.find_media_server_by(id=media_info.setting_id)
+        if server.name == models.PlexSetting.__name__:
             series.plex_media_info = schemas.PlexMediaInfo(
-                **media_info.as_dict(), server_id=media_info.provider_setting_id
+                **media_info.as_dict(), server_id=media_info.setting_id
             )
     return series.dict()
 
@@ -119,8 +119,8 @@ def find_season(
     media_id: int,
     season_number: int,
     season_repo: SeasonRepisitory = Depends(deps.get_repository(SeasonRepisitory)),
-    provider_setting_repo: ProviderSettingRepository = Depends(
-        deps.get_repository(ProviderSettingRepository)
+    external_service_repo: ExternalServiceSettingRepository = Depends(
+        deps.get_repository(ExternalServiceSettingRepository)
     ),
 ):
     season = search.find_tmdb_season(media_id, season_number)
@@ -131,10 +131,10 @@ def find_season(
         tmdb_id=media_id, season_number=season_number
     )
     if media_info is not None:
-        provider = provider_setting_repo.find_by(id=media_info.media.provider_setting_id)
-        if provider.name == models.PlexSetting.__name__:
+        server = external_service_repo.find_media_server_by(id=media_info.media.setting_id)
+        if server.name == models.PlexSetting.__name__:
             season.plex_media_info = schemas.PlexMediaInfo(
-                **media_info.as_dict(), server_id=media_info.media.provider_setting_id
+                **media_info.as_dict(), server_id=media_info.media.setting_id
             )
     return season.dict()
 
@@ -152,8 +152,8 @@ def find_episode(
     season_number: int,
     episode_number: int,
     episode_repo: EpisodeRepository = Depends(deps.get_repository(EpisodeRepository)),
-    provider_setting_repo: ProviderSettingRepository = Depends(
-        deps.get_repository(ProviderSettingRepository)
+    external_service_repo: ExternalServiceSettingRepository = Depends(
+        deps.get_repository(ExternalServiceSettingRepository)
     ),
 ):
     episode = search.find_tmdb_episode(media_id, season_number, episode_number)
@@ -164,9 +164,9 @@ def find_episode(
         tmdb_id=media_id, season_number=season_number, episode_number=episode_number
     )
     if media_info is not None:
-        provider = provider_setting_repo.find_by(id=media_info.season.media.provider_setting_id)
-        if provider.name == models.PlexSetting.__name__:
+        server = external_service_repo.find_media_server_by(id=media_info.season.media.setting_id)
+        if server.name == models.PlexSetting.__name__:
             episode.plex_media_info = schemas.PlexMediaInfo(
-                **media_info.as_dict(), server_id=media_info.season.media.provider_setting_id
+                **media_info.as_dict(), server_id=media_info.season.media.setting_id
             )
     return episode.dict()

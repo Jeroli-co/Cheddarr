@@ -10,27 +10,29 @@ from .users import (
     UserUpdate,
 )
 from .notifications import EmailAgent, EmailAgentSettings, Notification
-from .providers import (
+from .external_services import (
     PlexMediaInfo,
+    RadarrAddOptions,
+    RadarrMovie,
+    SonarrAddOptions,
+    SonarrEpisode,
+    SonarrSeason,
+    SonarrSeries,
+)
+from .settings import (
     PlexServerInfo,
     PlexServer,
     PlexSetting,
     PlexSettingCreateUpdate,
     ProviderSettingBase,
-    RadarrAddOptions,
-    RadarrInstanceInfo,
-    RadarrMovie,
     RadarrSetting,
     RadarrSettingCreateUpdate,
     RadarrSettingData,
-    SonarrAddOptions,
-    SonarrEpisode,
-    SonarrInstanceInfo,
-    SonarrSeason,
-    SonarrSeries,
+    RadarrInstanceInfo,
     SonarrSetting,
     SonarrSettingCreateUpdate,
     SonarrSettingData,
+    SonarrInstanceInfo,
 )
 from .media import Episode, Media, Movie, Season, Series
 from .requests import (

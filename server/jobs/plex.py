@@ -55,13 +55,13 @@ def process_plex_media(plex_media_list: List[PlexVideo], setting_id):
     episode_repo = EpisodeRepository(next(get_db()))
     for plex_media in plex_media_list:
         if isinstance(plex_media, PlexMovie):
-            exists = media_repo.find_by(provider_media_id=plex_media.ratingKey)
+            exists = media_repo.find_by(external_media_id=plex_media.ratingKey)
             if exists:
                 continue
             new_media = process_plex_movie(plex_media, setting_id)
 
         elif isinstance(plex_media, PlexSeries):
-            exists = media_repo.find_by(provider_media_id=plex_media.ratingKey)
+            exists = media_repo.find_by(external_media_id=plex_media.ratingKey)
             if exists:
                 process_plex_media(plex_media.seasons(), setting_id)
                 continue
@@ -71,23 +71,23 @@ def process_plex_media(plex_media_list: List[PlexVideo], setting_id):
 
         elif isinstance(plex_media, PlexSeason):
             exists = season_repo.find_by(
-                provider_media_id=plex_media.ratingKey,
-                provider_series_id=plex_media.parentRatingKey,
+                external_media_id=plex_media.ratingKey,
+                external_series_id=plex_media.parentRatingKey,
             )
             if exists:
                 process_plex_media(plex_media.episodes(), setting_id)
                 continue
             new_media = process_plex_season(plex_media, plex_media.show())
-            series = media_repo.find_by(provider_media_id=new_media.provider_series_id)
+            series = media_repo.find_by(external_media_id=new_media.external_series_id)
             if series is None:
                 series = process_plex_series(plex_media.show(), setting_id)
             new_media.media = series
 
         elif isinstance(plex_media, PlexEpisode):
             exists = episode_repo.find_by(
-                provider_media_id=plex_media.ratingKey,
-                provider_season_id=plex_media.parentRatingKey,
-                provider_series_id=plex_media.grandparentRatingKey,
+                external_media_id=plex_media.ratingKey,
+                external_season_id=plex_media.parentRatingKey,
+                external_series_id=plex_media.grandparentRatingKey,
             )
             if exists:
                 continue
@@ -103,14 +103,14 @@ def process_plex_movie(plex_movie: PlexMovie, setting_id: str) -> Media:
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_movie)
 
     movie = Media(
-        provider_media_id=plex_movie.ratingKey,
+        external_media_id=plex_movie.ratingKey,
         tmdb_id=tmdb_id,
         imdb_id=imdb_id,
         tvdb_id=tvdb_id,
         title=plex_movie.title,
         added_at=plex_movie.addedAt,
         media_type=MediaType.movies,
-        provider_setting_id=setting_id,
+        setting_id=setting_id,
     )
 
     return movie
@@ -120,14 +120,14 @@ def process_plex_series(plex_series: PlexSeries, setting_id: str) -> Media:
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_series)
 
     series = Media(
-        provider_media_id=plex_series.ratingKey,
+        external_media_id=plex_series.ratingKey,
         tmdb_id=tmdb_id,
         imdb_id=imdb_id,
         tvdb_id=tvdb_id,
         title=plex_series.title,
         added_at=plex_series.addedAt,
         media_type=MediaType.series,
-        provider_setting_id=setting_id,
+        setting_id=setting_id,
     )
 
     return series
@@ -140,8 +140,8 @@ def process_plex_season(plex_season: PlexSeason, parent_series: Media) -> Season
 
     season = Season(
         season_number=plex_season.seasonNumber,
-        provider_media_id=plex_season.ratingKey,
-        provider_series_id=plex_season.parentRatingKey,
+        external_media_id=plex_season.ratingKey,
+        external_series_id=plex_season.parentRatingKey,
         added_at=plex_season.addedAt,
         episodes=episodes,
         media=parent_series,
@@ -153,9 +153,9 @@ def process_plex_season(plex_season: PlexSeason, parent_series: Media) -> Season
 def process_plex_episode(plex_episode: PlexEpisode) -> Episode:
     episode = Episode(
         episode_number=plex_episode.index,
-        provider_media_id=plex_episode.ratingKey,
-        provider_season_id=plex_episode.parentRatingKey,
-        provider_series_id=plex_episode.grandparentRatingKey,
+        external_media_id=plex_episode.ratingKey,
+        external_season_id=plex_episode.parentRatingKey,
+        external_series_id=plex_episode.grandparentRatingKey,
         added_at=plex_episode.addedAt,
     )
     return episode

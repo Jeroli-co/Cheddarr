@@ -30,8 +30,8 @@ class User(Model):
         back_populates="user",
         cascade="all,delete,delete-orphan",
     )
-    providers = relationship(
-        "ProviderSetting",
+    external_settings = relationship(
+        "ExternalServiceSetting",
         back_populates="user",
         cascade="all,delete,delete-orphan",
     )

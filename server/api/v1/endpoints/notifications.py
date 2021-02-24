@@ -3,8 +3,6 @@ from typing import List
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
-    status,
 )
 
 from server import models, schemas

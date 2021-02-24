@@ -3,41 +3,32 @@ from typing import List, Optional
 
 from pydantic import AnyHttpUrl, Field, validator
 
-from server.models import ProviderType
 from server.schemas import APIModel
 
 
-class ProviderSettingBase(APIModel):
-    host: str
-    port: Optional[int]
-    ssl: bool
-    api_key: str
+#####################################
+# Plex                              #
+#####################################
+
+
+class PlexMediaInfo(APIModel):
+    external_media_id: str
+    added_at: date
+    server_id: str
+    web_url: Optional[AnyHttpUrl]
+
+    @validator("web_url", pre=True)
+    def get_web_url(cls, web_url, values):
+        print(values)
+        return "https://app.plex.tv/web/app#!/server/%s/details?key=library/metadata/%s" % (
+            values["server_id"],
+            values["external_media_id"],
+        )
 
 
 #####################################
 # Radarr                            #
 #####################################
-class RadarrInstanceInfo(APIModel):
-    root_folders: List[str]
-    quality_profiles: List[dict]
-    version: int
-
-
-class RadarrSettingData(APIModel):
-    root_folder: str
-    quality_profile_id: int
-    version: int = Field(ge=2, le=3)
-
-
-class RadarrSetting(ProviderSettingBase, RadarrSettingData):
-    id: str
-    name: str
-    enabled: bool = True
-    provider_type: ProviderType = Field(default=ProviderType.movie_provider, const=True)
-
-
-class RadarrSettingCreateUpdate(ProviderSettingBase, RadarrSettingData):
-    enabled: Optional[bool] = True
 
 
 class RadarrAddOptions(APIModel):
@@ -61,32 +52,6 @@ class RadarrMovie(APIModel):
 #####################################
 # Sonarr                            #
 #####################################
-class SonarrInstanceInfo(APIModel):
-    root_folders: List[str]
-    quality_profiles: List[dict]
-    language_profiles: Optional[List[dict]]
-    version: int
-
-
-class SonarrSettingData(APIModel):
-    root_folder: str
-    anime_root_folder: Optional[str]
-    quality_profile_id: int
-    anime_quality_profile_id: Optional[int]
-    language_profile_id: Optional[int]
-    anime_language_profile_id: Optional[int]
-    version: int = Field(ge=2, le=3)
-
-
-class SonarrSetting(ProviderSettingBase, SonarrSettingData):
-    id: str
-    name: str
-    enabled: bool = True
-    provider_type: ProviderType = Field(default=ProviderType.series_provider, const=True)
-
-
-class SonarrSettingCreateUpdate(ProviderSettingBase, SonarrSettingData):
-    enabled: Optional[bool] = True
 
 
 class SonarrAddOptions(APIModel):
@@ -131,41 +96,3 @@ class SonarrSeries(APIModel):
     episode_file_count: Optional[int] = Field(alias="episodeFileCount")
     total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")
     add_options: Optional[SonarrAddOptions] = Field(alias="addOptions")
-
-
-#####################################
-# Plex                              #
-#####################################
-class PlexServerInfo(APIModel):
-    server_id: str
-    server_name: str
-
-
-class PlexServer(ProviderSettingBase, PlexServerInfo):
-    local: bool
-
-
-class PlexSetting(ProviderSettingBase, PlexServerInfo):
-    id: str
-    name: str
-    enabled: bool = True
-    provider_type: ProviderType = Field(default=ProviderType.media_server, const=True)
-
-
-class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
-    enabled: Optional[bool] = True
-
-
-class PlexMediaInfo(APIModel):
-    provider_media_id: str
-    added_at: date
-    server_id: str
-    web_url: Optional[AnyHttpUrl]
-
-    @validator("web_url", pre=True)
-    def get_web_url(cls, web_url, values):
-        print(values)
-        return "https://app.plex.tv/web/app#!/server/%s/details?key=library/metadata/%s" % (
-            values["server_id"],
-            values["provider_media_id"],
-        )

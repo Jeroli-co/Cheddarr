@@ -1,5 +1,5 @@
-from .providers import (
-    ProviderSettingRepository,
+from .settings import (
+    ExternalServiceSettingRepository,
     PlexSettingRepository,
     RadarrSettingRepository,
     SonarrSettingRepository,
