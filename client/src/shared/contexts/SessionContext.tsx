@@ -15,7 +15,6 @@ import { useAlert } from "./AlertContext";
 interface ISessionContextInterface {
   session: ISession;
   readonly updateUsername: (username: string) => void;
-  readonly unlinkPlexAccount: () => void;
   readonly initSession: (encodedToken: IEncodedToken) => void;
   readonly invalidSession: () => void;
 }
@@ -24,7 +23,6 @@ const SessionContextDefaultImpl: ISessionContextInterface = {
   session: SessionDefaultImpl,
   invalidSession(): void {},
   initSession(): void {},
-  unlinkPlexAccount(): void {},
   updateUsername(): void {},
 };
 
@@ -91,7 +89,6 @@ export const SessionContextProvider = (props: any) => {
       username: decodedToken.username,
       avatar: decodedToken.avatar,
       admin: decodedToken.admin,
-      plex: decodedToken.plex,
       isLoading: false,
     });
   };
@@ -109,10 +106,6 @@ export const SessionContextProvider = (props: any) => {
     setSession({ ...session, username: username });
   };
 
-  const unlinkPlexAccount = () => {
-    setSession({ ...session, plex: false });
-  };
-
   return (
     <SessionContext.Provider
       value={{
@@ -120,7 +113,6 @@ export const SessionContextProvider = (props: any) => {
         initSession,
         invalidSession,
         updateUsername,
-        unlinkPlexAccount,
       }}
     >
       {props.children}

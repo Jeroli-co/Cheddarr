@@ -13,11 +13,11 @@ from fastapi import (
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from server import models, schemas, tasks
+from server import models, schemas
 from server.api import dependencies as deps
 from server.core import config, security, utils
 from server.core.scheduler import scheduler
-from server.repositories import PlexAccountRepository, UserRepository
+from server.repositories import NotificationAgentRepository, PlexAccountRepository, UserRepository
 
 router = APIRouter()
 
@@ -32,6 +32,9 @@ def signup(
     user_in: schemas.UserCreate,
     request: Request,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
 ):
     existing_email = user_repo.find_by(email=user_in.email)
     if existing_email:
@@ -47,12 +50,15 @@ def signup(
         user.role = models.UserRole.superuser
 
     if config.MAIL_ENABLED:
+        email_agent = notif_agent_repo.find_by(name=models.Agent.email)
+        if email_agent is None or not email_agent.enabled:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
         email_data = schemas.EmailConfirm(email=user.email).dict()
         token = security.generate_timed_token(email_data)
         scheduler.add_job(
-            tasks.send_email_task,
-            "date",
+            utils.send_email,
             kwargs=dict(
+                email_settings=email_agent.settings,
                 to_email=user.email,
                 subject="Welcome!",
                 html_template_name="email/welcome.html",
@@ -114,6 +120,9 @@ def resend_confirmation(
     body: schemas.EmailConfirm,
     request: Request,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
 ):
     email = body.email
     existing_user = user_repo.find_by_email(email)
@@ -121,11 +130,17 @@ def resend_confirmation(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email exists.")
     if existing_user.confirmed:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "This email is already confirmed.")
+
+    email_agent = notif_agent_repo.find_by(name=models.Agent.email)
+    if email_agent is None or not email_agent.enabled:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
     email_data = schemas.EmailConfirm(email=email).dict()
     token = security.generate_timed_token(email_data)
     scheduler.add_job(
-        tasks.send_email_task,
+        utils.send_email,
         kwargs=dict(
+            email_settings=email_agent.settings,
             to_email=email,
             subject="Please confirm your email",
             html_template_name="email/email_confirmation.html",

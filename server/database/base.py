@@ -74,12 +74,12 @@ class Model(Base):
 class Timestamp(object):
     """Mixin that define timestamp columns."""
 
-    __datetime_func__ = func.now()
+    __datetime_func__ = datetime.utcnow
 
-    created_at = Column(DateTime, default=__datetime_func__, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=__datetime_func__, nullable=False)
 
     updated_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=__datetime_func__,
         onupdate=__datetime_func__,
         nullable=False,

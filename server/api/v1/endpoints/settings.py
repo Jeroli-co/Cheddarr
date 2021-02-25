@@ -15,23 +15,23 @@ router = APIRouter()
 
 
 ##########################################
-# All providers                          #
+#  All external services                 #
 ##########################################
 
 
 @router.get("")
-def get_user_providers(
-    type: Optional[models.ProviderType] = None,
+def get_user_external_services_settings(
+    service_type: Optional[models.ExternalServiceType] = None,
     current_user: models.User = Depends(deps.get_current_user),
 ):
-    user_providers = current_user.providers
-    if type is not None:
+    external_settings = current_user.external_settings
+    if service_type is not None:
         return [
-            provider
-            for provider in user_providers
-            if provider.provider_type == type and provider.enabled
+            setting
+            for setting in external_settings
+            if setting.provider_type == service_type and setting.enabled
         ]
-    return user_providers
+    return external_settings
 
 
 ##########################################

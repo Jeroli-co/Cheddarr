@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSession } from "./SessionContext";
 import { useAPI } from "../hooks/useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
 
@@ -8,7 +7,6 @@ import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { IPlexSettings } from "../models/IPlexSettings";
 import { DefaultAsyncData, IAsyncData } from "../models/IAsyncData";
 import { useAlert } from "./AlertContext";
-import { IPlexServerInfo } from "../models/IPlexServerInfo";
 
 interface PlexConfigContextInterface {
   configs: IAsyncCall<IPlexSettings[] | null>;
@@ -17,16 +15,10 @@ interface PlexConfigContextInterface {
   updateConfig: (_: IPlexSettings) => Promise<IAsyncCall>;
   deleteConfig: (_: string) => Promise<IAsyncCall>;
   addConfig: (_: IPlexSettings) => void;
-  isPlexAccountLinked: () => boolean;
-  //  unlinkPlexAccount: () => Promise<IAsyncCall>;
-  unlinkPlexAccount: () => void;
+  hasPlexConfigs: () => boolean;
 }
 
 export const PlexConfigContextDefaultImpl: PlexConfigContextInterface = {
-  unlinkPlexAccount(): void {},
-  /*  unlinkPlexAccount(): Promise<IAsyncCall> {
-    return Promise.resolve(DefaultAsyncCall);
-  },*/
   createConfig(_: IPlexSettings): Promise<IAsyncCall> {
     return Promise.resolve(DefaultAsyncCall);
   },
@@ -39,7 +31,7 @@ export const PlexConfigContextDefaultImpl: PlexConfigContextInterface = {
     return Promise.resolve(DefaultAsyncCall);
   },
   addConfig(_: IPlexSettings): void {},
-  isPlexAccountLinked(): boolean {
+  hasPlexConfigs(): boolean {
     return false;
   },
 };
@@ -51,10 +43,6 @@ export const PlexConfigContext = createContext<PlexConfigContextInterface>(
 export const usePlexConfig = () => useContext(PlexConfigContext);
 
 export default function PlexConfigContextProvider(props: any) {
-  const {
-    session: { plex },
-  } = useSession();
-
   const [configs, setConfigs] = useState<IAsyncCall<IPlexSettings[] | null>>(
     DefaultAsyncCall
   );
@@ -66,20 +54,12 @@ export default function PlexConfigContextProvider(props: any) {
 
   const { pushSuccess, pushDanger } = useAlert();
 
-  const { unlinkPlexAccount: unlinkPlex } = useSession();
-
   useEffect(() => {
-    if (plex) {
-      get<IPlexSettings[]>(APIRoutes.GET_PLEX_CONFIGS).then((res) => {
-        if (res) {
-          setConfigs(res);
-        }
-      });
-    } else {
-      setConfigs({ ...DefaultAsyncCall, isLoading: false });
-    }
+    get<IPlexSettings[]>(APIRoutes.GET_PLEX_CONFIGS).then((res) => {
+      if (res) setConfigs(res);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plex]);
+  }, []);
 
   useEffect(() => {
     if (!configs.isLoading && configs.data && configs.data?.length > 0) {
@@ -148,14 +128,8 @@ export default function PlexConfigContextProvider(props: any) {
     });
   };
 
-  const isPlexAccountLinked = () => {
-    return plex;
-  };
-
-  // TODO addRequest
-  const unlinkPlexAccount = () => {
-    unlinkPlex();
-    pushDanger("TODO: Add request to API");
+  const hasPlexConfigs = () => {
+    return configs.data !== null && configs.data.length > 0;
   };
 
   return (
@@ -167,8 +141,7 @@ export default function PlexConfigContextProvider(props: any) {
         updateConfig,
         deleteConfig,
         addConfig,
-        isPlexAccountLinked,
-        unlinkPlexAccount,
+        hasPlexConfigs,
       }}
     >
       {props.children}

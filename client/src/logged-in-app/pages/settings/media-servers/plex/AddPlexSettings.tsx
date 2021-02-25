@@ -2,15 +2,12 @@ import React, { useEffect, useState } from "react";
 import { usePlexServers } from "../../../../../shared/hooks/usePlexServers";
 import { Spinner } from "../../../../../shared/components/Spinner";
 import { ComponentSizes } from "../../../../../shared/enums/ComponentSizes";
-import { MediaServerRadio } from "../components/MediaServerRadio";
-import { IMediaServerInfo } from "../../../../../shared/models/IMediaServerInfo";
-import { H3 } from "../../../../../shared/components/Titles";
-import { APIRoutes } from "../../../../../shared/enums/APIRoutes";
-import { useAPI } from "../../../../../shared/hooks/useAPI";
+import { MediaServerRadio } from "../MediaServerRadio";
 import { Divider } from "../../../../../shared/components/Divider";
 import { PlexSettingsForm } from "./PlexSettingsForm";
 import { IPlexSettings } from "../../../../../shared/models/IPlexSettings";
-import { usePlexConfig } from "../../../../../shared/contexts/PlexConfigContext";
+import { LinkPlexAccount } from "../../../../../shared/components/LinkPlexAccount";
+import { useLocation } from "react-router-dom";
 
 type AddPlexSettingsProps = {
   closeModal: () => void;
@@ -18,60 +15,48 @@ type AddPlexSettingsProps = {
 
 export const AddPlexSettings = (props: AddPlexSettingsProps) => {
   const servers = usePlexServers();
-  const [selectedServer, setSelectedServer] = useState<IMediaServerInfo | null>(
+  const [selectedServer, setSelectedServer] = useState<IPlexSettings | null>(
     null
   );
   const [
     selectedServerConfig,
     setSelectedServerConfig,
   ] = useState<IPlexSettings | null>(null);
-  const { get } = useAPI();
-  const { isPlexAccountLinked } = usePlexConfig();
+  const location = useLocation();
 
   useEffect(() => {
     if (selectedServer) {
-      get<IPlexSettings>(
-        APIRoutes.GET_PLEX_SERVER(selectedServer.serverName)
-      ).then((plexConfig) => {
-        if (plexConfig.data && plexConfig.status === 200) {
-          setSelectedServerConfig(plexConfig.data);
-        }
-      });
+      setSelectedServerConfig(selectedServer);
     }
   }, [selectedServer]);
 
   return (
     <div>
-      <H3>Select a server or add one manually</H3>
+      <div>
+        {servers.isLoading && <Spinner size={ComponentSizes.LARGE} />}
+        {!servers.isLoading && servers.status === 404 && (
+          <LinkPlexAccount redirectURI={location.pathname} />
+        )}
+        {!servers.isLoading &&
+          servers.data &&
+          servers.data.map((server) => {
+            return (
+              <MediaServerRadio
+                key={server.serverName}
+                serverName={server.serverName}
+                isSelected={
+                  selectedServer !== null &&
+                  selectedServer.serverId === server.serverId
+                }
+                select={() => setSelectedServer(server)}
+              />
+            );
+          })}
+      </div>
 
-      <br />
-      {isPlexAccountLinked() && (
-        <div>
-          {servers.isLoading && <Spinner size={ComponentSizes.LARGE} />}
-          {!servers.isLoading &&
-            servers.data &&
-            servers.data.map((server) => {
-              return (
-                <MediaServerRadio
-                  key={server.serverName}
-                  serverName={server.serverName}
-                  isSelected={
-                    selectedServer !== null &&
-                    selectedServer.serverId === server.serverId
-                  }
-                  select={() => setSelectedServer(server)}
-                />
-              );
-            })}
-        </div>
-      )}
+      <Divider />
 
-      {isPlexAccountLinked() && <Divider />}
-
-      <PlexSettingsForm
-        config={selectedServerConfig}
-        closeModal={props.closeModal}
-      />
+      <PlexSettingsForm config={selectedServerConfig} />
     </div>
   );
 };

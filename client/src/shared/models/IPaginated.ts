@@ -1,11 +1,11 @@
-export interface IPaginated {
+export interface IPaginated<T = any> {
   page: number;
   totalPages: number;
   totalResults: number;
-  results: any[];
+  results: T[];
 }
 
-export const IPaginated = (arg: any): arg is IPaginated => {
+export function IPaginated<T = any>(arg: any): arg is IPaginated {
   return (
     arg &&
     arg.page &&
@@ -17,4 +17,4 @@ export const IPaginated = (arg: any): arg is IPaginated => {
     arg.results &&
     Array.isArray(arg.results)
   );
-};
+}

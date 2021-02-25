@@ -10,7 +10,6 @@ import { Icon } from "../../../../../shared/components/Icon";
 
 type PlexSettingsFormProps = {
   config: IPlexSettings | null;
-  closeModal: () => void;
 };
 
 export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
@@ -22,6 +21,7 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
       reset(props.config);
       setUsePort(props.config.port !== null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.config]);
 
   useEffect(() => {
@@ -33,6 +33,19 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
 
   return (
     <>
+      {/* Config name */}
+      <InputField>
+        <label>Config name</label>
+        <input
+          name="name"
+          type="text"
+          placeholder="Name"
+          ref={register({
+            required: true,
+          })}
+        />
+      </InputField>
+
       {/* Authentication token */}
       <InputField>
         <label>Authentication token</label>

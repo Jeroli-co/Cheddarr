@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { SingleItemBox } from "../../../../../shared/components/SingleItemBox";
 import { IPlexSettings } from "../../../../../shared/models/IPlexSettings";
 import { EditPlexSettingsModal } from "./EditPlexSettingsModal";
+import { ItemBox } from "../../../../../shared/components/ItemBox";
+import { isEmpty } from "../../../../../utils/strings";
 
 type PlexSettingsBoxPreview = {
   plexSettings: IPlexSettings;
@@ -10,14 +11,18 @@ type PlexSettingsBoxPreview = {
 export const PlexSettingsBoxPreview = (props: PlexSettingsBoxPreview) => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   return (
-    <SingleItemBox onClick={() => setIsSettingsModalOpen(true)}>
-      {props.plexSettings.serverName}
+    <>
+      <ItemBox onClick={() => setIsSettingsModalOpen(true)}>
+        {isEmpty(props.plexSettings.name)
+          ? props.plexSettings.serverName
+          : props.plexSettings.name}
+      </ItemBox>
       {isSettingsModalOpen && (
         <EditPlexSettingsModal
           closeModal={() => setIsSettingsModalOpen(false)}
           plexSettings={props.plexSettings}
         />
       )}
-    </SingleItemBox>
+    </>
   );
 };

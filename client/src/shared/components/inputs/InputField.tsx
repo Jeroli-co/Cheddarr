@@ -5,9 +5,16 @@ type InputFieldProps = {
   width?: string;
   withIcon?: boolean;
   isInline?: boolean;
+  hidden?: boolean;
 };
 
 export const InputField = styled.div<InputFieldProps>`
+  ${(props) =>
+    props.hidden &&
+    css`
+      visibility: hidden;
+    `};
+
   ${(props) =>
     props.width &&
     css`

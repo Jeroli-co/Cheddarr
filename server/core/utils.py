@@ -13,7 +13,7 @@ from server.core.config import config
 
 
 def send_email(
-    email_settings,
+    email_options: dict,
     to_email: str,
     subject: str,
     html_template_name: str,
@@ -26,7 +26,7 @@ def send_email(
     with open(Path(config.MAIL_TEMPLATES_FOLDER) / html_template_name) as f:
         template_str = f.read()
     message = emails.Message(
-        mail_from=(email_settings.sender_name, email_settings.sender_address),
+        mail_from=(email_options["sender_name"], email_options["sender_address"]),
         subject=subject,
         html=JinjaTemplate(
             template_str,
@@ -35,11 +35,11 @@ def send_email(
     )
 
     smtp_options = {
-        "host": email_settings.smtp_host,
-        "port": email_settings.smtp_port,
-        "user": email_settings.smtp_user,
-        "password": email_settings.smtp_password,
-        "ssl": email_settings.ssl,
+        "host": email_options["smtp_host"],
+        "port": email_options["smtp_port"],
+        "user": email_options["smtp_user"],
+        "password": email_options["smtp_password"],
+        "ssl": email_options["ssl"],
     }
     message.send(
         to=to_email,

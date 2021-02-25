@@ -1,11 +1,6 @@
 from typing import List
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status,
-)
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from server import models, schemas
 from server.api import (
@@ -97,3 +92,23 @@ def update_email_agent(
     else:
         config.set(MAIL_ENABLED=False)
     return agent
+
+
+@router.delete(
+    "/agents/email",
+    dependencies=[Depends(deps.get_current_user)],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No email agent"},
+    },
+)
+def delete_email_agent(
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
+):
+    agent = notif_agent_repo.find_by(name=models.Agent.email)
+    if agent is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No email agent is configured.")
+    notif_agent_repo.remove(agent)
+    config.set(MAIL_ENABLED=False)
+    return {"detail": "Email agent deleted."}

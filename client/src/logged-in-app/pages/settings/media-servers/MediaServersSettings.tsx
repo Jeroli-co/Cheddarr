@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { H1 } from "../../../../shared/components/Titles";
-import { PickMediaServerTypeModal } from "./components/PickMediaServersTypeModal";
 import { Row } from "../../../../shared/components/layout/Row";
 import { usePlexConfig } from "../../../../shared/contexts/PlexConfigContext";
-import { AddItemBox } from "../../../../shared/components/AddItemBox";
 import { PlexSettingsBoxPreview } from "./plex/PlexSettingsBoxPreview";
+import { AddItemBox } from "../../../../shared/components/ItemBox";
+import { PickMediaServerTypeModal } from "./PickMediaServerTypeModal";
 
 export const MediaServersSettings = () => {
   const [

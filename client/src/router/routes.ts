@@ -6,8 +6,6 @@ import { SignInForm } from "../logged-out-app/SignInForm";
 import { SignUpForm } from "../logged-out-app/SignUpForm";
 import { PublicUser } from "../logged-in-app/pages/PublicUser";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
-import { RadarrConfig } from "../logged-in-app/pages/settings/media-providers/RadarrConfig";
-import { SonarrConfig } from "../logged-in-app/pages/settings/media-providers/SonarrConfig";
 import { Search } from "../logged-in-app/pages/search/Search";
 import { Requests } from "../logged-in-app/pages/requests/Requests";
 import { PlexMovie } from "../logged-in-app/pages/plex-media/PlexMovie";
@@ -17,9 +15,9 @@ import { Home } from "../shared/Home";
 import { RequestsSent } from "../logged-in-app/pages/requests/elements/RequestsSent";
 import { RequestsReceived } from "../logged-in-app/pages/requests/elements/RequestsReceived";
 import { Profile } from "../logged-in-app/pages/user-profile/Profile";
-import { NotificationsConfig } from "../logged-in-app/pages/settings/notifications/NotificationsConfig";
 import { MediaServersSettings } from "../logged-in-app/pages/settings/media-servers/MediaServersSettings";
-import { ConnectionsSettings } from "../logged-in-app/pages/settings/connections/ConnectionsSettings";
+import { MediaProvidersSettings } from "../logged-in-app/pages/settings/media-providers/MediaProvidersSettings";
+import { NotificationsServicesSettings } from "../logged-in-app/pages/settings/notifications/NotificationsServicesSettings";
 
 const routes = {
   HOME: {
@@ -53,25 +51,17 @@ const routes = {
 
   /** SETTINGS **/
   SETTINGS: { url: "/settings", component: Settings },
-  SETTINGS_CONNECTIONS: {
-    url: "/settings/connections",
-    component: ConnectionsSettings,
-  },
   SETTINGS_MEDIA_SERVERS: {
     url: "/settings/media-servers",
     component: MediaServersSettings,
   },
-  SETTINGS_RADARR: {
-    url: "/settings/radarr",
-    component: RadarrConfig,
-  },
-  SETTINGS_SONARR: {
-    url: "/settings/sonarr",
-    component: SonarrConfig,
+  SETTINGS_MEDIA_PROVIDERS: {
+    url: "/settings/media-providers",
+    component: MediaProvidersSettings,
   },
   SETTINGS_NOTIFICATIONS: {
     url: "/settings/notifications",
-    component: NotificationsConfig,
+    component: NotificationsServicesSettings,
   },
 
   /** PLEX **/

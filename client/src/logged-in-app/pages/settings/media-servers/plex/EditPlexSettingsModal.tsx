@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Modal } from "../../../../../shared/components/Modal";
 import { H2 } from "../../../../../shared/components/Titles";
 import { IPlexSettings } from "../../../../../shared/models/IPlexSettings";
@@ -10,10 +10,7 @@ import {
   SecondaryButton,
 } from "../../../../../shared/components/Button";
 import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
-import {
-  PlexConfigContext,
-  usePlexConfig,
-} from "../../../../../shared/contexts/PlexConfigContext";
+import { usePlexConfig } from "../../../../../shared/contexts/PlexConfigContext";
 import { Row } from "../../../../../shared/components/layout/Row";
 
 type EditPlexSettingsModalProps = {
@@ -40,14 +37,6 @@ export const EditPlexSettingsModal = (props: EditPlexSettingsModalProps) => {
     });
   };
 
-  const onDeletePlexSettings = () => {
-    deleteConfig(props.plexSettings.id).then((res) => {
-      if (res.status === 200) {
-        props.closeModal();
-      }
-    });
-  };
-
   return (
     <Modal close={() => props.closeModal()}>
       <header>
@@ -57,10 +46,7 @@ export const EditPlexSettingsModal = (props: EditPlexSettingsModalProps) => {
       <FormProvider {...formsMethods}>
         <form onSubmit={formsMethods.handleSubmit(onEditPlexSettings)}>
           <section>
-            <PlexSettingsForm
-              config={props.plexSettings}
-              closeModal={props.closeModal}
-            />
+            <PlexSettingsForm config={props.plexSettings} />
           </section>
 
           <footer>

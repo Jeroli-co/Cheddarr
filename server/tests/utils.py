@@ -57,8 +57,8 @@ datasets = {
             "tmdb_id": 4194,
             "tvdb_id": 83268,
             "media_type": "series",
-            "provider_media_id": 1,
-            "provider_setting_id": 1,
+            "external_media_id": 1,
+            "setting_id": 1,
         }
     ],
     "series_requests": [
@@ -83,8 +83,8 @@ datasets = {
             "title": "Star Wars: The Clone Wars",
             "tmdb_id": 11,
             "media_type": "movies",
-            "provider_media_id": 2,
-            "provider_setting_id": 1,
+            "external_media_id": 2,
+            "setting_id": 1,
         }
     ],
     "movies_requests": [

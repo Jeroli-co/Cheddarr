@@ -8,7 +8,7 @@ import {
 } from "../../../shared/components/layout/Layouts";
 import { Image } from "../../../shared/components/Image";
 import { MediaTitle } from "./components/MediaTitle";
-import { Tag } from "./components/Tag";
+import { Tag } from "../../../shared/components/Tag";
 import { MediaRating } from "./components/MediaRating";
 import { Text } from "../../../shared/components/Text";
 import { PlexEpisode } from "./components/PlexEpisode";

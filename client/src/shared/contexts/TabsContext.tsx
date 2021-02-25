@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { createContext, useContext } from "react";
-import { Tabs } from "../components/Tabs";
+import { Tabs } from "../components/layout/Tabs";
 
 export type Tab = {
   label: string;

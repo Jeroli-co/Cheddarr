@@ -6,7 +6,7 @@ import {
   isMediaServerEpisode,
 } from "../../../../shared/models/IMediaServerMedia";
 import { MediaTypes } from "../../../../shared/enums/MediaTypes";
-import { MovieTag, SeriesTag } from "./Tag";
+import { MovieTag, SeriesTag } from "../../../../shared/components/Tag";
 
 const MediaPreviewCardStyle = styled.div`
   position: relative;

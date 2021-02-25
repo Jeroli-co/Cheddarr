@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { useHistory } from "react-router-dom";
-import { Tab } from "../contexts/TabsContext";
+import { Tab } from "../../contexts/TabsContext";
 
 const TabsStyle = styled.div`
   overflow: hidden;

@@ -1,13 +1,14 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from server import models, schemas, tasks
+from server import models, schemas
 from server.api import dependencies as deps
-from server.core import config, security
+from server.core import config, security, utils
 from server.core.scheduler import scheduler
 from server.repositories import (
     FriendshipRepository,
+    NotificationAgentRepository,
     PlexAccountRepository,
     PlexSettingRepository,
     UserRepository,
@@ -105,7 +106,12 @@ def update_user(
     request: Request,
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
 ):
+    email_agent = notif_agent_repo.find_by(name=models.Agent.email)
+
     if user_in.username is not None:
         if user_repo.find_by_username(user_in.username):
             raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
@@ -122,9 +128,13 @@ def update_user(
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The passwords don't match.")
         current_user.password = user_in.password
         if config.MAIL_ENABLED:
+            if email_agent is None or not email_agent.enabled:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
             scheduler.add_job(
-                tasks.send_email_task,
+                utils.send_email,
                 kwargs=dict(
+                    email_settings=email_agent.settings,
                     to_email=current_user.email,
                     subject="Your password has been changed",
                     html_template_name="email/change_password_notice.html",
@@ -135,13 +145,17 @@ def update_user(
         if user_repo.find_by_email(user_in.email):
             raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
         if config.MAIL_ENABLED:
+            if email_agent is None or not email_agent.enabled:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
             email_data = schemas.EmailConfirm(
                 email=user_in.email, old_email=current_user.email
             ).dict()
             token = security.generate_timed_token(email_data)
             scheduler.add_job(
-                tasks.send_email_task,
+                utils.send_email,
                 kwargs=dict(
+                    email_settings=email_agent.settings,
                     to_email=user_in.email,
                     subject="Please confirm your new email",
                     html_template_name="email/email_confirmation.html",
@@ -167,15 +181,24 @@ def reset_password(
     email_data: schemas.PasswordResetCreate,
     request: Request,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
 ):
+    email_agent = notif_agent_repo.find_by(name=models.Agent.email)
+    if email_agent is None or not email_agent.enabled:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
     email = email_data.email
     user = user_repo.find_by_email(email_data.email)
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user registered with this email.")
+
     token = security.generate_timed_token(user.email)
     scheduler.add_job(
-        tasks.send_email_task,
+        utils.send_email,
         kwargs=dict(
+            email_settings=email_agent.settings,
             to_email=email,
             subject="Reset your password",
             html_template_name="email/reset_password_instructions.html",
@@ -224,7 +247,14 @@ def confirm_reset_password(
     token: str,
     password: schemas.PasswordResetConfirm,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
 ):
+    email_agent = notif_agent_repo.find_by(name=models.Agent.email)
+    if email_agent is None or not email_agent.enabled:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
     try:
         email = security.confirm_timed_token(token)
     except Exception:
@@ -237,8 +267,9 @@ def confirm_reset_password(
     user.password = password
     user_repo.save(user)
     scheduler.add_job(
-        tasks.send_email_task,
+        utils.send_email,
         kwargs=dict(
+            email_settings=email_agent.settings,
             to_email=user.email,
             subject="Your password has been reset",
             html_template_name="email/reset_password_notice.html",
@@ -254,7 +285,7 @@ def confirm_reset_password(
 
 @current_user_router.get("/friends", response_model=List[schemas.UserPublic], tags=["friends"])
 def get_friends(
-    providers_type: Optional[models.ProviderType] = None,
+    service_type: Optional[models.ExternalServiceType] = None,
     current_user: models.User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
@@ -265,7 +296,7 @@ def get_friends(
         else friendship.requested_user
         for friendship in friendships
     ]
-    if providers_type is not None:
+    if service_type is not None:
         friends.append(current_user)
         return [
             friend
@@ -273,8 +304,8 @@ def get_friends(
             if next(
                 (
                     provider
-                    for provider in friend.providers
-                    if provider.provider_type == providers_type and provider.enabled is True
+                    for provider in friend.external_settings
+                    if provider.provider_type == service_type and provider.enabled is True
                 ),
                 None,
             )

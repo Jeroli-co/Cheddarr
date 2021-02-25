@@ -7,7 +7,7 @@ import {
 } from "../../../../shared/components/layout/Layouts";
 import { Image } from "../../../../shared/components/Image";
 import { MediaTitle } from "./MediaTitle";
-import { Tag } from "./Tag";
+import { Tag } from "../../../../shared/components/Tag";
 import { MediaRating } from "./MediaRating";
 import { PlexButton } from "../../../../shared/components/PlexButton";
 import { MediaBackground } from "./MediaBackground";

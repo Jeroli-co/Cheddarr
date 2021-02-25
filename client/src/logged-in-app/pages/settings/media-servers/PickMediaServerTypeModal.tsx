@@ -1,17 +1,14 @@
 import React, { useContext, useState } from "react";
-import { Modal } from "../../../../../shared/components/Modal";
-import { H2 } from "../../../../../shared/components/Titles";
-import { Buttons } from "../../../../../shared/components/layout/Buttons";
-import {
-  Button,
-  SecondaryButton,
-} from "../../../../../shared/components/Button";
-import { SingleItemBox } from "../../../../../shared/components/SingleItemBox";
-import { MediaServerTypes } from "../../../../../shared/enums/MediaServersTypes";
-import { AddPlexSettings } from "../plex/AddPlexSettings";
+import { Modal } from "../../../../shared/components/Modal";
+import { H2 } from "../../../../shared/components/Titles";
+import { Buttons } from "../../../../shared/components/layout/Buttons";
+import { Button, SecondaryButton } from "../../../../shared/components/Button";
+import { MediaServerTypes } from "../../../../shared/enums/MediaServersTypes";
+import { AddPlexSettings } from "./plex/AddPlexSettings";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
-import { IPlexSettings } from "../../../../../shared/models/IPlexSettings";
-import { PlexConfigContext } from "../../../../../shared/contexts/PlexConfigContext";
+import { IPlexSettings } from "../../../../shared/models/IPlexSettings";
+import { PlexConfigContext } from "../../../../shared/contexts/PlexConfigContext";
+import { ItemBox } from "../../../../shared/components/ItemBox";
 
 type PickMediaServerTypeModalProps = {
   closeModal: () => void;
@@ -50,17 +47,21 @@ export const PickMediaServerTypeModal = (
   return (
     <Modal close={() => closeModal()}>
       <header>
-        <H2>Choose a media server type</H2>
+        {mediaServersTypePick &&
+          mediaServersTypePick === MediaServerTypes.PLEX && (
+            <H2>Add a Plex media server</H2>
+          )}
+        {!mediaServersTypePick && <H2>Choose a media server type</H2>}
       </header>
 
       {!mediaServersTypePick && (
         <>
           <section>
-            <SingleItemBox
+            <ItemBox
               onClick={() => setMediaServersTypePick(MediaServerTypes.PLEX)}
             >
               Plex
-            </SingleItemBox>
+            </ItemBox>
           </section>
           <footer>
             <Buttons>
@@ -75,7 +76,7 @@ export const PickMediaServerTypeModal = (
         <FormProvider {...formsMethods}>
           <form onSubmit={formsMethods.handleSubmit(onAddPlexSettings)}>
             <section>
-              <AddPlexSettings closeModal={props.closeModal} />
+              <AddPlexSettings closeModal={closeModal} />
             </section>
             <footer>
               <Buttons>

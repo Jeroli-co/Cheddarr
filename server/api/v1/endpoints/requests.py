@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from server import models, schemas, tasks
+from server import models, schemas, jobs
 from server.api import dependencies as deps
 from server.core.scheduler import scheduler
 from server.helpers import search
@@ -122,7 +122,11 @@ def update_movie_request(
                 "provider_id must be set to accept a request.",
             )
         selected_provider = next(
-            (provider for provider in current_user.providers if provider.id == update.provider_id),
+            (
+                provider
+                for provider in current_user.external_settings
+                if provider.id == update.provider_id
+            ),
             None,
         )
         if selected_provider is None:
@@ -130,12 +134,12 @@ def update_movie_request(
         request.selected_provider = selected_provider
         request.status = models.RequestStatus.approved
         if isinstance(request.selected_provider, models.RadarrSetting):
-            scheduler.add_job(tasks.send_radarr_request_task, args=[request.id])
+            scheduler.add_job(jobs.radarr.send_radarr_request_task, args=[request.id])
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
 
-    current_movie_requests = movies_request_repo.find_all_by(movie_id=request.movie_id)
+    current_movie_requests = movies_request_repo.find_all_by(movie_id=request.media_id)
     for r in current_movie_requests:
         r.status = request.status
         movies_request_repo.save(r)
@@ -346,7 +350,11 @@ def update_series_request(
                 "provider_id must be set to accept a request.",
             )
         selected_provider = next(
-            (provider for provider in current_user.providers if provider.id == update.provider_id),
+            (
+                provider
+                for provider in current_user.external_settings
+                if provider.id == update.provider_id
+            ),
             None,
         )
         if selected_provider is None:
@@ -358,8 +366,7 @@ def update_series_request(
             for episode in season.episodes:
                 episode.status = models.RequestStatus.approved
         if isinstance(request.selected_provider, models.SonarrSetting):
-            print(request.id)
-            scheduler.add_job(tasks.send_sonarr_request_task, args=[request.id])
+            scheduler.add_job(jobs.sonarr.send_sonarr_request_task, args=[request.id])
 
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused

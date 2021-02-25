@@ -4,7 +4,7 @@ import {
   ColumnLayout,
   RowLayout,
 } from "../../../shared/components/layout/Layouts";
-import { Tag } from "./components/Tag";
+import { Tag } from "../../../shared/components/Tag";
 import { Actors } from "./components/Actors";
 import { Image } from "../../../shared/components/Image";
 import { MediaTitle } from "./components/MediaTitle";

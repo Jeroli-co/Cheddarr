@@ -1,9 +1,9 @@
 from .media import Media, Season, Episode, MediaType, SeriesType
 from .notifications import Notification, NotificationAgent, Agent
-from .providers import (
+from .settings import (
     PlexSetting,
-    ProviderSetting,
-    ProviderType,
+    ExternalServiceSetting,
+    ExternalServiceType,
     RadarrSetting,
     SonarrSetting,
 )

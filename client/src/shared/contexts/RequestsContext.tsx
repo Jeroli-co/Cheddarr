@@ -10,8 +10,8 @@ import {
 } from "../models/IMediaRequest";
 import { IRadarrConfig } from "../models/IRadarrConfig";
 import { ISonarrConfig } from "../models/ISonarrConfig";
-import { useRadarrConfig } from "../hooks/useRadarrConfig";
-import { useSonarrConfig } from "../hooks/useSonarrConfig";
+import { useRadarrConfigs } from "../hooks/useRadarrConfigs";
+import { useSonarrConfigs } from "../hooks/useSonarrConfigs";
 import { useRequests } from "../hooks/useRequests";
 import { MediaTypes } from "../enums/MediaTypes";
 import { RequestTypes } from "../enums/RequestTypes";
@@ -22,7 +22,7 @@ import { APIRoutes } from "../enums/APIRoutes";
 import { DefaultAsyncData, IAsyncData } from "../models/IAsyncData";
 
 interface RequestsContextInterface {
-  radarrConfig: IAsyncCall<IRadarrConfig | null>;
+  radarrConfigs: IAsyncCall<IRadarrConfig[] | null>;
   currentSonarrConfig: ISonarrConfig | null;
   requestsReceived: IAsyncData<IMediaRequest[] | null>;
   requestsSent: IAsyncData<IMediaRequest[] | null>;
@@ -36,7 +36,7 @@ interface RequestsContextInterface {
 }
 
 export const RequestsContextDefaultImpl: RequestsContextInterface = {
-  radarrConfig: DefaultAsyncCall,
+  radarrConfigs: DefaultAsyncCall,
   currentSonarrConfig: null,
   requestsReceived: DefaultAsyncData,
   requestsSent: DefaultAsyncData,
@@ -56,8 +56,8 @@ export const RequestsContext = createContext<RequestsContextInterface>(
 export const useRequestsContext = () => useContext(RequestsContext);
 
 export const RequestsContextProvider = (props: any) => {
-  const { radarrConfig } = useRadarrConfig();
-  const { currentSonarrConfig } = useSonarrConfig();
+  const { radarrConfigs } = useRadarrConfigs();
+  const { sonarrConfigs } = useSonarrConfigs();
   const { patch, remove } = useAPI();
 
   const {
@@ -130,10 +130,10 @@ export const RequestsContextProvider = (props: any) => {
   }, [moviesRequestsSent, seriesRequestsSent]);
 
   const acceptMovieRequest = (requestId: number) => {
-    if (radarrConfig.data) {
+    if (radarrConfigs.data && radarrConfigs.data.length > 0) {
       patch<IMovieRequest>(APIRoutes.UPDATE_REQUEST_MOVIE(requestId), {
         status: RequestStatus.APPROVED,
-        providerId: radarrConfig.data.id,
+        providerId: radarrConfigs.data[0].id,
       }).then((res) => {
         if (res.status === 200) {
           updateReceivedMovieRequest(requestId, RequestStatus.APPROVED);
@@ -147,10 +147,10 @@ export const RequestsContextProvider = (props: any) => {
   };
 
   const acceptSeriesRequest = (requestId: number) => {
-    if (currentSonarrConfig.data) {
+    if (sonarrConfigs.data && sonarrConfigs.data?.length > 0) {
       patch<ISeriesRequest>(APIRoutes.UPDATE_REQUEST_SERIES(requestId), {
         status: RequestStatus.APPROVED,
-        providerId: currentSonarrConfig.data.id,
+        providerId: sonarrConfigs.data[0].id,
       }).then((res) => {
         if (res.status === 200) {
           updateReceivedSeriesRequest(requestId, RequestStatus.APPROVED);
@@ -285,8 +285,8 @@ export const RequestsContextProvider = (props: any) => {
   return (
     <RequestsContext.Provider
       value={{
-        radarrConfig,
-        currentSonarrConfig: currentSonarrConfig.data,
+        radarrConfigs,
+        currentSonarrConfig: sonarrConfigs.data ? sonarrConfigs.data[0] : null,
         requestsReceived,
         requestsSent,
         acceptRequest,

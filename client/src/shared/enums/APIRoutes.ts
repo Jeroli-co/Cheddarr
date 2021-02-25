@@ -45,7 +45,6 @@ export const APIRoutes = {
   DELETE_PLEX_CONFIG: (plexConfigId: string) =>
     "/settings/plex/" + plexConfigId,
   GET_PLEX_SERVERS: "/plex/servers",
-  GET_PLEX_SERVER: (serverName: string) => "/plex/servers/" + serverName,
   SEARCH_PLEX_MOVIES: (plexConfigId: string, value: string) =>
     "/plex/" + plexConfigId + "/search?section=movies&value=" + value,
   SEARCH_PLEX_SERIES: (plexConfigId: string, value: string) =>
@@ -56,12 +55,14 @@ export const APIRoutes = {
   GET_RADARR_INSTANCE_INFO: "/settings/radarr/instance-info",
   CREATE_RADARR_CONFIG: "/settings/radarr",
   UPDATE_RADARR_CONFIG: (id: string) => "/settings/radarr/" + id,
+  DELETE_RADARR_CONFIG: (id: string) => "/settings/radarr/" + id,
 
   // SONARR
   GET_SONARR_CONFIG: "/settings/sonarr",
   GET_SONARR_INSTANCE_INFO: "/settings/sonarr/instance-info",
   CREATE_SONARR_CONFIG: "/settings/sonarr",
   UPDATE_SONARR_CONFIG: (id: string) => "/settings/sonarr/" + id,
+  DELETE_SONARR_CONFIG: (id: string) => "/settings/sonarr/" + id,
 
   // TMDB
   GET_ALL_MEDIA_BY_TITLE: (title: string) => "/search?value=" + title,
@@ -81,4 +82,5 @@ export const APIRoutes = {
   // NOTIFICATIONS
   GET_EMAIL_SETTINGS: "/notifications/agents/email",
   PUT_EMAIL_SETTINGS: "/notifications/agents/email",
+  DELETE_EMAIL_SETTINGS: "/notifications/agents/email",
 };

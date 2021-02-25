@@ -45,7 +45,7 @@ import {
   SeriesTag,
   SuccessTag,
   WarningTag,
-} from "../../plex-media/components/Tag";
+} from "../../../../shared/components/Tag";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;

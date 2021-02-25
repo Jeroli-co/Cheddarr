@@ -4,11 +4,7 @@ import { useOutsideAlerter } from "../../../../../shared/hooks/useOutsideAlerter
 import { SearchFilters } from "../../../../../shared/enums/SearchFilters";
 import { uppercaseFirstLetter } from "../../../../../utils/strings";
 import { STATIC_STYLES } from "../../../../../shared/enums/StaticStyles";
-import {
-  MovieTag,
-  SeriesTag,
-  Tag,
-} from "../../../../pages/plex-media/components/Tag";
+import { MovieTag, SeriesTag, Tag } from "../../../../../shared/components/Tag";
 
 const Container = styled.div<{ isActive: boolean }>`
   position: relative;
