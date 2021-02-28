@@ -12,3 +12,7 @@ class APIModel(BaseModel):
 
     def to_orm(self, orm_model: Type[ModelType], exclude=None) -> ModelType:
         return orm_model(**self.dict(include=vars(orm_model).keys(), exclude=exclude))
+
+
+class ResponseMessage(BaseModel):
+    detail: str

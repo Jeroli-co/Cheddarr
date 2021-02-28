@@ -30,8 +30,13 @@ class User(Model):
         back_populates="user",
         cascade="all,delete,delete-orphan",
     )
-    external_settings = relationship(
-        "ExternalServiceSetting",
+    media_servers = relationship(
+        "MediaServerSetting",
+        back_populates="user",
+        cascade="all,delete,delete-orphan",
+    )
+    media_providers = relationship(
+        "MediaProviderSetting",
         back_populates="user",
         cascade="all,delete,delete-orphan",
     )

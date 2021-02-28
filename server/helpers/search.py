@@ -54,7 +54,7 @@ def search_tmdb_series(term: str, page: int) -> (List[schemas.TmdbSeries], int, 
 
 def find_tmdb_movie(tmdb_id: int) -> Optional[schemas.TmdbMovie]:
     try:
-        movie = tmdb.Movies(tmdb_id).info(append_to_response="external_ids")
+        movie = tmdb.Movies(tmdb_id).info(append_to_response="external_ids,credits")
     except Exception:
         return None
     set_tmdb_movie_info(movie)
@@ -63,7 +63,7 @@ def find_tmdb_movie(tmdb_id: int) -> Optional[schemas.TmdbMovie]:
 
 def find_tmdb_series(tmdb_id: int) -> Optional[schemas.TmdbSeries]:
     try:
-        series = tmdb.TV(tmdb_id).info(append_to_response="external_ids")
+        series = tmdb.TV(tmdb_id).info(append_to_response="external_ids,credits")
     except Exception:
         return None
     set_tmdb_series_info(series)
@@ -72,7 +72,9 @@ def find_tmdb_series(tmdb_id: int) -> Optional[schemas.TmdbSeries]:
 
 def find_tmdb_season(tmdb_id: int, season_number: int) -> Optional[schemas.TmdbSeason]:
     try:
-        season = tmdb.TV_Seasons(tmdb_id, season_number).info(append_to_response="external_ids")
+        season = tmdb.TV_Seasons(tmdb_id, season_number).info(
+            append_to_response="external_ids,credits"
+        )
     except Exception:
         return None
     return schemas.TmdbSeason.parse_obj(season)
@@ -83,7 +85,7 @@ def find_tmdb_episode(
 ) -> Optional[schemas.TmdbEpisode]:
     try:
         episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info(
-            append_to_response="external_ids"
+            append_to_response="external_ids,credits"
         )
     except Exception:
         return None
@@ -104,7 +106,7 @@ def set_tmdb_series_info(series: dict, from_search: bool = False):
     series["media_type"] = MediaType.series
     series["tvdb_id"] = tmdb.TV(series["id"]).external_ids().get("tvdb_id")
     series["series_type"] = SeriesType.standard
-    anime_pattern = re.compile("^(?i)anim(e|ation)$")
+    anime_pattern = re.compile("(?i)anim(e|ation)")
     if from_search:
         tmdb_genres = tmdb.Genres().tv_list().get("genres")
         genres = [genre["name"] for genre in tmdb_genres if genre["id"] in series["genre_ids"]]

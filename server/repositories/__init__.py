@@ -1,5 +1,6 @@
 from .settings import (
-    ExternalServiceSettingRepository,
+    MediaProviderSettingRepository,
+    MediaServerSettingRepository,
     PlexSettingRepository,
     RadarrSettingRepository,
     SonarrSettingRepository,

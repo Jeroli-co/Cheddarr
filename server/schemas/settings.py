@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from server.models import ExternalServiceType
+from server.models import MediaProviderType
 from server.schemas import APIModel
 
 
@@ -32,9 +32,6 @@ class PlexSetting(ProviderSettingBase, PlexServerInfo):
     id: str
     name: str
     enabled: bool = True
-    provider_type: ExternalServiceType = Field(
-        default=ExternalServiceType.media_server, const=True
-    )
 
 
 class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
@@ -62,9 +59,7 @@ class RadarrSetting(ProviderSettingBase, RadarrSettingData):
     id: str
     name: str
     enabled: bool = True
-    provider_type: ExternalServiceType = Field(
-        default=ExternalServiceType.movie_provider, const=True
-    )
+    provider_type: MediaProviderType = Field(default=MediaProviderType.movie_provider, const=True)
 
 
 class RadarrSettingCreateUpdate(ProviderSettingBase, RadarrSettingData):
@@ -96,9 +91,7 @@ class SonarrSetting(ProviderSettingBase, SonarrSettingData):
     id: str
     name: str
     enabled: bool = True
-    provider_type: ExternalServiceType = Field(
-        default=ExternalServiceType.series_provider, const=True
-    )
+    provider_type: MediaProviderType = Field(default=MediaProviderType.series_provider, const=True)
 
 
 class SonarrSettingCreateUpdate(ProviderSettingBase, SonarrSettingData):

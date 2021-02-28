@@ -28,11 +28,11 @@ class Request(object):
 
     @declared_attr
     def selected_provider_id(cls):
-        return Column(ForeignKey("externalservicesetting.id"))
+        return Column(ForeignKey("mediaprovidersetting.id"))
 
     @declared_attr
     def selected_provider(cls):
-        return relationship("ExternalServiceSetting")
+        return relationship("MediaProviderSetting")
 
     @declared_attr
     def requesting_user_id(cls):

@@ -1,5 +1,5 @@
 from .auth import EmailConfirm, PlexAuthorizeSignin, Token, TokenPayload
-from .base import APIModel
+from .base import APIModel,ResponseMessage
 from .users import (
     FriendshipCreate,
     PasswordResetConfirm,

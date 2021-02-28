@@ -8,70 +8,65 @@ from sqlalchemy.orm import relationship
 from server.database import Model
 
 
-class ExternalServiceType(str, Enum):
-    movie_provider = "movies_provider"
-    series_provider = "series_provider"
-    media_server = "media_server"
-
-
-class ExternalServiceSetting(Model):
+class ExternalServiceSetting(object):
     id = Column(String, default=lambda: uuid4().hex, primary_key=True)
     api_key = Column(String, nullable=False)
     host = Column(String, nullable=False)
     port = Column(Integer)
     ssl = Column(Boolean, default=False)
     enabled = Column(Boolean, default=True)
-    service_type = Column(DBEnum(ExternalServiceType), nullable=False)
     service_name = Column(String)
-    name = Column(String)
-    user_id = Column(ForeignKey("user.id"), nullable=False)
-    user = relationship("User", back_populates="external_settings")
+    name = Column(String, default=service_name)
 
     @declared_attr
     def __mapper_args__(cls):
         return {"polymorphic_identity": cls.__name__, "polymorphic_on": "service_name"}
 
 
-class PlexSetting(ExternalServiceSetting):
-    __repr_props__ = ("host", "port", "ssl", "server_name")
-
-    id = Column(ForeignKey("externalservicesetting.id"), primary_key=True)
+class MediaServerSetting(Model, ExternalServiceSetting):
     server_id = Column(String, primary_key=True)
     server_name = Column(String)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.name = self.name or self.server_name
-        self.service_type = ExternalServiceType.media_server
+    user_id = Column(ForeignKey("user.id"), nullable=False)
+    user = relationship("User", back_populates="media_servers")
 
 
-class RadarrSetting(ExternalServiceSetting):
-    __repr_props__ = ("host", "port", "ssl", "version")
+class PlexSetting(MediaServerSetting):
+    __tablename__ = None
+    __repr_props__ = ("host", "port", "ssl", "server_anme", "name")
 
-    id = Column(ForeignKey("externalservicesetting.id"), primary_key=True)
-    root_folder = Column(String)
+
+class MediaProviderType(str, Enum):
+    movie_provider = "movies_provider"
+    series_provider = "series_provider"
+
+
+class MediaProviderSetting(Model, ExternalServiceSetting):
+    provider_type = Column(DBEnum(MediaProviderType), nullable=False)
+    root_folder = Column(String, nullable=False)
     quality_profile_id = Column(Integer)
     version = Column(Integer)
+    user_id = Column(ForeignKey("user.id"), nullable=False)
+    user = relationship("User", back_populates="media_providers")
+
+
+class RadarrSetting(MediaProviderSetting):
+    __tablename__ = None
+    __repr_props__ = ("host", "port", "ssl", "version", "name")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.name = self.name or self.service_name
-        self.service_type = ExternalServiceType.movie_provider
+        self.provider_type = MediaProviderType.movie_provider
 
 
-class SonarrSetting(ExternalServiceSetting):
-    __repr_props__ = ("host", "port", "ssl", "version")
+class SonarrSetting(MediaProviderSetting):
+    __tablename__ = None
+    __repr_props__ = ("host", "port", "ssl", "version", "name")
 
-    id = Column(ForeignKey("externalservicesetting.id"), primary_key=True)
-    root_folder = Column(String(128))
-    anime_root_folder = Column(String(128), nullable=True)
-    quality_profile_id = Column(Integer)
-    anime_quality_profile_id = Column(Integer, nullable=True)
-    language_profile_id = Column(Integer, nullable=True)
-    anime_language_profile_id = Column(Integer, nullable=True)
-    version = Column(Integer)
+    anime_root_folder = Column(String(128))
+    anime_quality_profile_id = Column(Integer)
+    language_profile_id = Column(Integer)
+    anime_language_profile_id = Column(Integer)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.name = self.name or self.service_name
-        self.service_type = ExternalServiceType.series_provider
+        self.provider_type = MediaProviderType.series_provider

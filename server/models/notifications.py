@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, JSON, String, Text, Enum as DBEnum
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, JSON, Text, Enum as DBEnum
 from sqlalchemy.orm import relationship
 
 from server.database import Model, Timestamp

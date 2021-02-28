@@ -1,5 +1,5 @@
 from abc import ABC
-from datetime import date
+from datetime import date, datetime
 from typing import List, Optional
 
 from server.models import RequestStatus
@@ -11,8 +11,8 @@ class Request(APIModel, ABC):
     status: RequestStatus
     requested_user: UserPublic
     requesting_user: UserPublic
-    created_at: date
-    updated_at: date
+    created_at: datetime
+    updated_at: datetime
 
 
 class RequestUpdate(APIModel):

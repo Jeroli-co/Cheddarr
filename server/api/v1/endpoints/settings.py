@@ -6,6 +6,7 @@ from server import models, schemas
 from server.api import dependencies as deps
 from server.helpers import plex, radarr, sonarr
 from server.repositories import (
+    PlexAccountRepository,
     PlexSettingRepository,
     RadarrSettingRepository,
     SonarrSettingRepository,
@@ -20,16 +21,16 @@ router = APIRouter()
 
 
 @router.get("")
-def get_user_external_services_settings(
-    service_type: Optional[models.ExternalServiceType] = None,
+def get_user_media_providers(
+    provider_type: Optional[models.MediaProviderType] = None,
     current_user: models.User = Depends(deps.get_current_user),
 ):
-    external_settings = current_user.external_settings
-    if service_type is not None:
+    external_settings = current_user.media_providers
+    if provider_type is not None:
         return [
             setting
             for setting in external_settings
-            if setting.provider_type == service_type and setting.enabled
+            if setting.provider_type == provider_type and setting.enabled
         ]
     return external_settings
 
@@ -37,6 +38,24 @@ def get_user_external_services_settings(
 ##########################################
 # Plex                                   #
 ##########################################
+
+
+@router.get(
+    "/plex/servers",
+    response_model=List[schemas.PlexServer],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex account linked"},
+    },
+)
+def get_plex_account_servers(
+    current_user: models.User = Depends(deps.get_current_user),
+    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
+):
+    plex_account = plex_account_repo.find_by(user_id=current_user.id)
+    if plex_account is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex account linked to the user.")
+    servers = plex.get_plex_account_servers(plex_account.api_key)
+    return servers
 
 
 @router.get("/plex", response_model=List[schemas.PlexSetting])
@@ -121,6 +140,7 @@ def update_plex_setting(
 
 @router.delete(
     "/plex/{setting_id}",
+    response_model=schemas.ResponseMessage,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
     },
@@ -162,6 +182,10 @@ def get_radarr_instance_info(
 @router.get(
     "/radarr/{setting_id}/instance-info",
     response_model=schemas.RadarrInstanceInfo,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Setting not found"},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"},
+    },
     dependencies=[Depends(deps.get_current_poweruser)],
 )
 def get_radarr_setting_instance_info(
@@ -253,6 +277,7 @@ def update_radarr_setting(
 
 @router.delete(
     "/radarr/{setting_id}",
+    response_model=schemas.ResponseMessage,
     responses={status.HTTP_404_NOT_FOUND: {"description": "No Radarr setting"}},
 )
 def delete_radarr_setting(
@@ -294,6 +319,10 @@ def get_sonarr_instance_info(
 @router.get(
     "/sonarr/{setting_id}/instance-info",
     response_model=schemas.SonarrInstanceInfo,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Setting not found"},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"},
+    },
     dependencies=[Depends(deps.get_current_poweruser)],
 )
 def get_sonarr_setting_instance_info(
@@ -385,6 +414,7 @@ def update_sonarr_setting(
 
 @router.delete(
     "/sonarr/{setting_id}",
+    response_model=schemas.ResponseMessage,
     responses={status.HTTP_404_NOT_FOUND: {"description": "No Sonarr setting"}},
 )
 def delete_sonarr_setting(

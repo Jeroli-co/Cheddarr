@@ -7,8 +7,7 @@ from server.api import (
     dependencies as deps,
 )
 from server.core import config
-from server.repositories import UserRepository, NotificationAgentRepository
-
+from server.repositories import NotificationAgentRepository, UserRepository
 
 router = APIRouter()
 
@@ -27,7 +26,7 @@ def get_all_notifications(
     return current_user.notifications
 
 
-@router.delete("/{id}", tags=["notifications"])
+@router.delete("/{id}", response_model=schemas.ResponseMessage)
 def delete_notification(
     id: int,
     current_user: models.User = Depends(deps.get_current_user),
@@ -39,7 +38,7 @@ def delete_notification(
     return {"detail": "Notification deleted"}
 
 
-@router.delete("", tags=["notifications"])
+@router.delete("", response_model=schemas.ResponseMessage)
 def delete_all_notifications(
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
@@ -97,6 +96,7 @@ def update_email_agent(
 @router.delete(
     "/agents/email",
     dependencies=[Depends(deps.get_current_user)],
+    response_model=schemas.ResponseMessage,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No email agent"},
     },

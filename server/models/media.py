@@ -8,6 +8,7 @@ from sqlalchemy import (
     Integer,
     String,
 )
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
 from server.database import Model
@@ -23,38 +24,58 @@ class SeriesType(str, Enum):
     standard = "standard"
 
 
-class MediaBase(object):
-    id = Column(Integer, primary_key=True)
-    external_media_id = Column(String, nullable=False)
-    added_at = Column(Date)
-
-
-class Media(MediaBase, Model):
+class Media(Model):
     __repr_props__ = ("tmdb_id", "imdb_id", "tvdb_id", "title")
 
-    setting_id = Column(ForeignKey("externalservicesetting.id"), nullable=False)
+    id = Column(Integer, primary_key=True)
     tmdb_id = Column(Integer, unique=True, index=True)
     imdb_id = Column(String, unique=True, index=True)
     tvdb_id = Column(Integer, unique=True, index=True)
     media_type = Column(DBEnum(MediaType), nullable=False)
     title = Column(String, nullable=False)
+    server_media = relationship("MediaServerMedia", back_populates="media")
 
 
-class Season(MediaBase, Model):
+class Season(Model):
     __repr_props__ = ("season_number", "episodes")
 
+    id = Column(Integer, primary_key=True)
     season_number = Column(Integer, nullable=False)
-    external_series_id = Column(String, nullable=False)
     series_id = Column(ForeignKey("media.id"), nullable=False)
     media = relationship("Media")
     episodes = relationship("Episode", back_populates="season")
+    server_season = relationship("MediaServerSeason", back_populates="season")
 
 
-class Episode(MediaBase, Model):
+class Episode(Model):
     __repr_props__ = "episode_number"
 
+    id = Column(Integer, primary_key=True)
     episode_number = Column(Integer, nullable=False)
-    external_series_id = Column(String, nullable=False)
-    external_season_id = Column(String, nullable=False)
     season_id = Column(ForeignKey("season.id"), nullable=False)
     season = relationship("Season", back_populates="episodes")
+    server_episode = relationship("MediaServerEpisode", back_populates="episode")
+
+
+class MediaServerContent(object):
+    external_media_id = Column(String, nullable=False)
+    added_at = Column(Date)
+
+    @declared_attr
+    def server_id(cls):
+        return Column(ForeignKey("mediaserversetting.server_id"), primary_key=True)
+
+
+class MediaServerMedia(Model, MediaServerContent):
+    media_id = Column(ForeignKey("media.id"), primary_key=True)
+    media = relationship("Media", back_populates="server_media")
+
+
+class MediaServerSeason(Model, MediaServerContent):
+    season_id = Column(ForeignKey("season.id"), primary_key=True)
+    season = relationship("Season", back_populates="server_season")
+
+
+class MediaServerEpisode(Model, MediaServerContent):
+    episode_id = Column(ForeignKey("episode.id"), primary_key=True)
+    episode = relationship("Episode", back_populates="server_episode")

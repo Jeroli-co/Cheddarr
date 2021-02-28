@@ -28,7 +28,7 @@ def get_test_db():
 
 
 def app_v1() -> FastAPI:
-    from server.api.v1.v1 import application as app_
+    from server.api.v1.router import application as app_
 
     app_.dependency_overrides[get_db] = get_test_db
     return app_

@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
@@ -71,7 +71,7 @@ async def get_current_user(current_user: models.User = Depends(deps.get_current_
     return current_user
 
 
-@current_user_router.delete("")
+@current_user_router.delete("", response_model=schemas.ResponseMessage)
 def delete_user(
     current_user: models.User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
@@ -80,7 +80,7 @@ def delete_user(
     return {"detail": "User deleted."}
 
 
-@current_user_router.delete("/plex-account")
+@current_user_router.delete("/plex-account", response_model=schemas.ResponseMessage)
 def unlink_plex_account(
     current_user: models.User = Depends(deps.get_current_user),
     plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
@@ -171,10 +171,12 @@ def update_user(
 
 @current_user_router.put(
     "/password",
+    response_model=schemas.ResponseMessage,
     responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
         status.HTTP_404_NOT_FOUND: {
             "description": "User not found",
-        }
+        },
     },
 )
 def reset_password(
@@ -211,6 +213,7 @@ def reset_password(
 @current_user_router.get(
     "/password/{token}",
     status_code=status.HTTP_202_ACCEPTED,
+    response_model=schemas.ResponseMessage,
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "User not found",
@@ -236,11 +239,13 @@ def check_reset_password(
 
 @current_user_router.post(
     "/password/{token}",
+    response_model=schemas.ResponseMessage,
     responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
         status.HTTP_404_NOT_FOUND: {
             "description": "User not found",
         },
-        status.HTTP_410_GONE: {"description": "Invalid or expired link "},
+        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
     },
 )
 def confirm_reset_password(
@@ -285,7 +290,7 @@ def confirm_reset_password(
 
 @current_user_router.get("/friends", response_model=List[schemas.UserPublic], tags=["friends"])
 def get_friends(
-    service_type: Optional[models.ExternalServiceType] = None,
+    provider_type: Optional[models.MediaProviderType] = None,
     current_user: models.User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
@@ -296,7 +301,7 @@ def get_friends(
         else friendship.requested_user
         for friendship in friendships
     ]
-    if service_type is not None:
+    if provider_type is not None:
         friends.append(current_user)
         return [
             friend
@@ -304,8 +309,8 @@ def get_friends(
             if next(
                 (
                     provider
-                    for provider in friend.external_settings
-                    if provider.provider_type == service_type and provider.enabled is True
+                    for provider in friend.media_providers
+                    if provider.provider_type == provider_type and provider.enabled is True
                 ),
                 None,
             )

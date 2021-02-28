@@ -1,6 +1,6 @@
 from fastapi import APIRouter, FastAPI
 
-from .endpoints import auth, notifications, plex, requests, search, settings, users
+from .endpoints import auth, notifications, requests, search, settings, users
 
 version = "v1"
 
@@ -14,7 +14,6 @@ router.include_router(
     prefix="/settings",
     tags=["settings"],
 )
-router.include_router(plex.router, prefix="/plex", tags=["plex"])
 router.include_router(search.router, prefix="/search", tags=["search"])
 router.include_router(requests.router, prefix="/requests", tags=["requests"])
 

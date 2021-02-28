@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from server import models, schemas, jobs
+from server import jobs, models, schemas
 from server.api import dependencies as deps
 from server.core.scheduler import scheduler
 from server.helpers import search
@@ -71,10 +71,10 @@ def add_movie_request(
 
     movie = media_repo.find_by(tmdb_id=request.tmdb_id)
     if movie is None:
-        searched_movie = schemas.Movie.parse_obj(search.find_tmdb_movie(request.tmdb_id))
+        searched_movie = search.find_tmdb_movie(request.tmdb_id)
         if searched_movie is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested movie was not found")
-        movie = searched_movie.to_orm(models.Media)
+        movie = schemas.Movie.parse_obj(searched_movie).to_orm(models.Media)
 
     movie_request = models.MovieRequest(
         requested_user=requested_user,
@@ -89,9 +89,9 @@ def add_movie_request(
     "/movies/{request_id}",
     response_model=schemas.MovieRequest,
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "Request not found"},
-        status.HTTP_403_FORBIDDEN: {"description": "Definitive status"},
         status.HTTP_400_BAD_REQUEST: {"description": "Missing provider ID"},
+        status.HTTP_403_FORBIDDEN: {"description": "Wrong request status"},
+        status.HTTP_404_NOT_FOUND: {"description": "Request or provider not found"},
     },
 )
 def update_movie_request(
@@ -147,7 +147,14 @@ def update_movie_request(
     return request
 
 
-@router.delete("/movies/{request_id}")
+@router.delete(
+    "/movies/{request_id}",
+    response_model=schemas.ResponseMessage,
+    responses={
+        status.HTTP_403_FORBIDDEN: {"description": "Wrong request status"},
+        status.HTTP_404_NOT_FOUND: {"description": "Request not found"},
+    },
+)
 def delete_movie_request(
     request_id: int,
     current_user: models.User = Depends(deps.get_current_user),
@@ -321,7 +328,15 @@ def unify_series_request(
                 already_added_season.episodes = season.episodes
 
 
-@router.patch("/series/{request_id}", response_model=schemas.SeriesRequest)
+@router.patch(
+    "/series/{request_id}",
+    response_model=schemas.SeriesRequest,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "Missing provider ID"},
+        status.HTTP_403_FORBIDDEN: {"description": "Wrong request status"},
+        status.HTTP_404_NOT_FOUND: {"description": "Request or provider not found"},
+    },
+)
 def update_series_request(
     request_id: int,
     update: schemas.RequestUpdate,
@@ -375,7 +390,14 @@ def update_series_request(
     return request
 
 
-@router.delete("/series/{request_id}")
+@router.delete(
+    "/series/{request_id}",
+    response_model=schemas.ResponseMessage,
+    responses={
+        status.HTTP_403_FORBIDDEN: {"description": "Wrong request status"},
+        status.HTTP_404_NOT_FOUND: {"description": "Request not found"},
+    },
+)
 def delete_series_request(
     request_id: int,
     current_user: models.User = Depends(deps.get_current_user),

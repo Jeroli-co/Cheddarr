@@ -1,4 +1,5 @@
 import secrets
+from datetime import datetime
 from json import dump, load
 from pathlib import Path
 from typing import List
@@ -19,6 +20,7 @@ class Config(BaseSettings):
     DOMAIN: str = "localhost:9090"
     SERVER_HOST: str = f"http://{DOMAIN}"
     LOG_LEVEL: str = "INFO"
+    TIMEZONE: str = datetime.now().astimezone().tzname()
 
     ##########################################################################
     # folders/files                                                          #
@@ -94,11 +96,7 @@ class Config(BaseSettings):
                 config_file,
             )
 
-    _config_file_fields = {
-        "SECRET_KEY",
-        "LOG_LEVEL",
-        "MAIL_ENABLED",
-    }
+    _config_file_fields = {"SECRET_KEY", "LOG_LEVEL", "MAIL_ENABLED", "TIMEZONE"}
 
 
 config = Config()

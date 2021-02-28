@@ -76,6 +76,7 @@ def signup(
 
 @router.get(
     "/sign-up/{token}",
+    response_model=schemas.ResponseMessage,
     responses={
         status.HTTP_403_FORBIDDEN: {"description": "Email already confirmed"},
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
@@ -111,6 +112,7 @@ def confirm_email(
 
 @router.patch(
     "/sign-up",
+    response_model=schemas.ResponseMessage,
     responses={
         status.HTTP_403_FORBIDDEN: {"description": "Email already confirmed"},
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},

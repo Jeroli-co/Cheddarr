@@ -44,7 +44,7 @@ export const APIRoutes = {
     "/settings/plex/" + plexConfigId,
   DELETE_PLEX_CONFIG: (plexConfigId: string) =>
     "/settings/plex/" + plexConfigId,
-  GET_PLEX_SERVERS: "/plex/servers",
+  GET_PLEX_SERVERS: "/settings/plex/servers",
   SEARCH_PLEX_MOVIES: (plexConfigId: string, value: string) =>
     "/plex/" + plexConfigId + "/search?section=movies&value=" + value,
   SEARCH_PLEX_SERIES: (plexConfigId: string, value: string) =>
