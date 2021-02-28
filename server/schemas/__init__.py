@@ -1,5 +1,5 @@
 from .auth import EmailConfirm, PlexAuthorizeSignin, Token, TokenPayload
-from .base import APIModel,ResponseMessage
+from .base import APIModel, ResponseMessage
 from .users import (
     FriendshipCreate,
     PasswordResetConfirm,
@@ -21,6 +21,7 @@ from .external_services import (
 )
 from .settings import (
     PlexServerInfo,
+    PlexLibrarySection,
     PlexServer,
     PlexSetting,
     PlexSettingCreateUpdate,

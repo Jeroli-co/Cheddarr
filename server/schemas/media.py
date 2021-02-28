@@ -14,6 +14,15 @@ class Person(APIModel):
     picture_url: Optional[AnyHttpUrl]
 
 
+class Credits(APIModel):
+    cast: List[Person]
+    crew: List[Person]
+
+
+class Company(APIModel):
+    name: str
+
+
 class Media(APIModel, ABC):
     tmdb_id: Optional[int]
     imdb_id: Optional[str]
@@ -27,9 +36,8 @@ class Media(APIModel, ABC):
     rating: Optional[float]
     duration: Optional[int]
     genres: Optional[List[str]]
-    studio: Optional[str]
-    cast: Optional[List[Person]]
-    crew: Optional[List[Person]]
+    studios: Optional[List[Company]]
+    credits: Optional[Credits]
     plex_media_info: Optional[List[PlexMediaInfo]]
 
 

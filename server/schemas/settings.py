@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from server.models import MediaProviderType
+from server.models import MediaProviderType, MediaType
 from server.schemas import APIModel
 
 
@@ -28,14 +28,23 @@ class PlexServer(ProviderSettingBase, PlexServerInfo):
     local: bool
 
 
+class PlexLibrarySection(APIModel):
+    id: int
+    name: str
+    type: MediaType
+    enabled: bool = False
+
+
 class PlexSetting(ProviderSettingBase, PlexServerInfo):
     id: str
     name: str
     enabled: bool = True
+    library_sections: List[PlexLibrarySection]
 
 
 class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
     enabled: Optional[bool] = True
+    library_sections: Optional[List[PlexLibrarySection]] = []
 
 
 #####################################

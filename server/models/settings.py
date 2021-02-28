@@ -1,11 +1,21 @@
 from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, JSON, String
 from sqlalchemy.orm import relationship
 
 from server.database import Model
+
+
+class ServiceNames(str, Enum):
+    plex = "Plex"
+    radarr = "Radarr"
+    sonarr = "Sonarr"
+
+
+class MediaProviderType(str, Enum):
+    movie_provider = "movies_provider"
+    series_provider = "series_provider"
 
 
 class ExternalServiceSetting(object):
@@ -18,9 +28,7 @@ class ExternalServiceSetting(object):
     service_name = Column(String)
     name = Column(String, default=service_name)
 
-    @declared_attr
-    def __mapper_args__(cls):
-        return {"polymorphic_identity": cls.__name__, "polymorphic_on": "service_name"}
+    __mapper_args__ = {"polymorphic_on": "service_name"}
 
 
 class MediaServerSetting(Model, ExternalServiceSetting):
@@ -32,12 +40,9 @@ class MediaServerSetting(Model, ExternalServiceSetting):
 
 class PlexSetting(MediaServerSetting):
     __tablename__ = None
-    __repr_props__ = ("host", "port", "ssl", "server_anme", "name")
-
-
-class MediaProviderType(str, Enum):
-    movie_provider = "movies_provider"
-    series_provider = "series_provider"
+    __mapper_args__ = {"polymorphic_identity": ServiceNames.plex}
+    __repr_props__ = ("host", "port", "ssl", "server_name", "name")
+    library_sections = Column(JSON, default=list)
 
 
 class MediaProviderSetting(Model, ExternalServiceSetting):
@@ -51,6 +56,7 @@ class MediaProviderSetting(Model, ExternalServiceSetting):
 
 class RadarrSetting(MediaProviderSetting):
     __tablename__ = None
+    __mapper_args__ = {"polymorphic_identity": ServiceNames.radarr}
     __repr_props__ = ("host", "port", "ssl", "version", "name")
 
     def __init__(self, **kwargs):
@@ -60,6 +66,7 @@ class RadarrSetting(MediaProviderSetting):
 
 class SonarrSetting(MediaProviderSetting):
     __tablename__ = None
+    __mapper_args__ = {"polymorphic_identity": ServiceNames.sonarr}
     __repr_props__ = ("host", "port", "ssl", "version", "name")
 
     anime_root_folder = Column(String(128))

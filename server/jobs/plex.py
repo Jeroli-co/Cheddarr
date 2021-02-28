@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from server.api.dependencies import get_db
 from server.core import scheduler
+from server.models.settings import ServiceNames
 from server.repositories import (
     MediaServerSettingRepository,
     EpisodeRepository,
@@ -24,6 +25,7 @@ from server.models import (
     MediaServerSeason,
     MediaServerEpisode,
     MediaType,
+    PlexSetting,
     Season,
     Episode,
 )
@@ -38,26 +40,36 @@ TVDB_REGEX = "tvdb|thetvdb"
 def sync_plex_servers_library():
     db_session = next(get_db())
     plex_setting_repo = MediaServerSettingRepository(db_session)
-    plex_settings = plex_setting_repo.find_all_by()
+    plex_settings = [
+        PlexSetting(setting)
+        for setting in plex_setting_repo.find_all_by(service_name=ServiceNames.plex)
+    ]
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
         )
-        plex_library = server.library.all()
-        process_plex_media_list(plex_library, setting.server_id, db_session)
+        for section in setting.library_sections:
+            process_plex_media_list(
+                server.library.section(section["name"]).all(), setting.server_id, db_session
+            )
 
 
-@scheduler.scheduled_job("interval", minutes=15)
+@scheduler.scheduled_job("interval", seconds=5)
 def sync_plex_servers_recently_added():
     db_session = next(get_db())
     plex_setting_repo = MediaServerSettingRepository(db_session)
-    plex_settings = plex_setting_repo.find_all_by()
+    plex_settings = plex_setting_repo.find_all_by(service_name=ServiceNames.plex)
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
         )
-        plex_recent = server.library.recentlyAdded()
-        process_plex_media_list(plex_recent, setting.server_id, db_session)
+        for section in setting.library_sections:
+            if section["enabled"]:
+                process_plex_media_list(
+                    server.library.section(section["name"]).recentlyAdded(),
+                    setting.server_id,
+                    db_session,
+                )
 
 
 def process_plex_media_list(plex_media_list: List[PlexVideo], server_id, db_session: Session):
