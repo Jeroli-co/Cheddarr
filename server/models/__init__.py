@@ -25,4 +25,4 @@ from .requests import (
     SeasonRequest,
     SeriesRequest,
 )
-from .users import Friendship, PlexAccount, User, UserRole
+from .users import Friendship, User, UserRole

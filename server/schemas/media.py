@@ -56,6 +56,7 @@ class Season(Media):
     title: str
     release_date: Optional[date]
     episodes: Optional[List[Episode]]
+    plex_media_info: Optional[List[PlexMediaInfo]]
 
 
 class Series(Media):

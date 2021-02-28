@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import date
 from typing import List, Optional, Union
 
-from pydantic import AnyHttpUrl, create_model, Field, validator
+from pydantic import AnyHttpUrl, Field, validator
 
 from server.schemas import APIModel, Episode, Media, Movie, Season, Series
 from server.schemas.media import Person
@@ -104,7 +104,6 @@ class TmdbSeason(TmdbMedia, Season):
 class TmdbSeries(TmdbMedia, Series):
     number_of_seasons: Optional[int] = Field(alias="number_of_seasons")
     seasons: Optional[List[TmdbSeason]] = Field(alias="seasons")
-    duration: int = Field(alias="episode_run_time")
     studios: Optional[List[TmdbCompany]] = Field(alias="networks")
     release_date: Optional[date] = Field(alias="first_air_date")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)

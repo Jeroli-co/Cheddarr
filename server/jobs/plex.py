@@ -17,7 +17,7 @@ from server.repositories import (
     MediaServerSettingRepository,
     EpisodeRepository,
     MediaRepository,
-    SeasonRepisitory,
+    SeasonRepository,
 )
 from server.models import (
     Media,
@@ -54,7 +54,7 @@ def sync_plex_servers_library():
             )
 
 
-@scheduler.scheduled_job("interval", seconds=5)
+@scheduler.scheduled_job("interval", minutes=5)
 def sync_plex_servers_recently_added():
     db_session = next(get_db())
     plex_setting_repo = MediaServerSettingRepository(db_session)
@@ -74,7 +74,7 @@ def sync_plex_servers_recently_added():
 
 def process_plex_media_list(plex_media_list: List[PlexVideo], server_id, db_session: Session):
     media_repo = MediaRepository(db_session)
-    season_repo = SeasonRepisitory(db_session)
+    season_repo = SeasonRepository(db_session)
     episode_repo = EpisodeRepository(db_session)
     for plex_media in plex_media_list:
         if isinstance(plex_media, PlexMovie):
@@ -118,7 +118,7 @@ def process_plex_media(
             MediaServerMedia(
                 server_id=server_id,
                 media=media,
-                external_media_id=plex_media.ratingKey,
+                server_media_id=plex_media.ratingKey,
                 added_at=plex_media.addedAt,
             )
         )
@@ -130,7 +130,7 @@ def process_plex_season(
     plex_season: PlexSeason,
     server_id: str,
     media_repo: MediaRepository,
-    season_repo: SeasonRepisitory,
+    season_repo: SeasonRepository,
 ) -> Season:
 
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_season.show())
@@ -147,7 +147,7 @@ def process_plex_season(
             MediaServerSeason(
                 server_id=server_id,
                 season=season,
-                external_media_id=plex_season.ratingKey,
+                server_media_id=plex_season.ratingKey,
                 added_at=plex_season.addedAt,
             )
         )
@@ -159,7 +159,7 @@ def process_plex_episode(
     plex_episode: PlexEpisode,
     server_id: str,
     media_repo: MediaRepository,
-    season_repo: SeasonRepisitory,
+    season_repo: SeasonRepository,
     episode_repo: EpisodeRepository,
 ) -> Episode:
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_episode.show())
@@ -181,7 +181,7 @@ def process_plex_episode(
             MediaServerEpisode(
                 server_id=server_id,
                 episode=episode,
-                external_media_id=plex_episode.ratingKey,
+                server_media_id=plex_episode.ratingKey,
                 added_at=plex_episode.addedAt,
             )
         )

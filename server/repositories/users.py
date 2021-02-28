@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from sqlalchemy import func
 
-from server.models import Friendship, PlexAccount, User
+from server.models import Friendship, User
 from .base import BaseRepository
 
 
@@ -30,10 +30,6 @@ class UserRepository(BaseRepository[User]):
             )
             .one_or_none()
         )
-
-
-class PlexAccountRepository(BaseRepository[PlexAccount]):
-    pass
 
 
 class FriendshipRepository(BaseRepository[Friendship]):

@@ -25,6 +25,9 @@ class User(Model):
     avatar = Column(String)
     confirmed = Column(Boolean, nullable=False, default=False)
     role = Column(DBEnum(UserRole), nullable=False, default="user")
+    plex_user_id = Column(Integer)
+    plex_api_key = Column(String)
+
     notifications = relationship(
         "Notification",
         back_populates="user",
@@ -40,12 +43,6 @@ class User(Model):
         back_populates="user",
         cascade="all,delete,delete-orphan",
     )
-    plex_account = relationship(
-        "PlexAccount",
-        back_populates="user",
-        cascade="all,delete,delete-orphan",
-        uselist=False,
-    )
 
     @hybrid_property
     def password(self):
@@ -59,13 +56,6 @@ class User(Model):
         super().__init__(**kwargs)
         if "avatar" not in kwargs:
             self.avatar = get_random_avatar()
-
-
-class PlexAccount(Model):
-    plex_user_id = Column(Integer, primary_key=True)
-    user_id = Column(ForeignKey("user.id"), primary_key=True)
-    api_key = Column(String, unique=True, nullable=False)
-    user = relationship("User", back_populates="plex_account")
 
 
 class Friendship(Model):

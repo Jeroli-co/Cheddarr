@@ -19,6 +19,8 @@ class MediaProviderType(str, Enum):
 
 
 class ExternalServiceSetting(object):
+    __mapper_args__ = {"polymorphic_on": "service_name"}
+
     id = Column(String, default=lambda: uuid4().hex, primary_key=True)
     api_key = Column(String, nullable=False)
     host = Column(String, nullable=False)
@@ -27,8 +29,6 @@ class ExternalServiceSetting(object):
     enabled = Column(Boolean, default=True)
     service_name = Column(String)
     name = Column(String, default=service_name)
-
-    __mapper_args__ = {"polymorphic_on": "service_name"}
 
 
 class MediaServerSetting(Model, ExternalServiceSetting):

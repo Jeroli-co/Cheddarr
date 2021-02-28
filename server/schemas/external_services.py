@@ -12,16 +12,16 @@ from server.schemas import APIModel
 
 
 class PlexMediaInfo(APIModel):
-    external_media_id: str
+    server_media_id: str
     added_at: date
     server_id: str
     web_url: Optional[AnyHttpUrl]
 
     @validator("web_url", pre=True)
     def get_web_url(cls, web_url, values):
-        return "https://app.plex.tv/web/app#!/server/%s/details?key=library/metadata/%s" % (
+        return "https://app.plex.tv/desktop#!/server/%s/details?key=library/metadata/%s" % (
             values["server_id"],
-            values["external_media_id"],
+            values["server_media_id"],
         )
 
 

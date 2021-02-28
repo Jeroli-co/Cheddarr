@@ -9,6 +9,6 @@ from .requests import (
     MovieRequestRepository,
     SeriesRequestRepository,
 )
-from .media import MediaRepository, SeasonRepisitory, EpisodeRepository
-from .users import FriendshipRepository, PlexAccountRepository, UserRepository
+from .media import MediaRepository, SeasonRepository, EpisodeRepository
+from .users import FriendshipRepository, UserRepository
 from .notifications import NotificationAgentRepository

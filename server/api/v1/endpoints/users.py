@@ -9,7 +9,6 @@ from server.core.scheduler import scheduler
 from server.repositories import (
     FriendshipRepository,
     NotificationAgentRepository,
-    PlexAccountRepository,
     PlexSettingRepository,
     UserRepository,
 )
@@ -78,19 +77,6 @@ def delete_user(
 ):
     user_repo.remove(current_user)
     return {"detail": "User deleted."}
-
-
-@current_user_router.delete("/plex-account", response_model=schemas.ResponseMessage)
-def unlink_plex_account(
-    current_user: models.User = Depends(deps.get_current_user),
-    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
-    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
-):
-    settings = plex_setting_repo.find_all_by(user_id=current_user.id)
-    for setting in settings:
-        plex_setting_repo.remove(setting)
-    plex_account_repo.remove(current_user.plex_account)
-    return {"detail": "Plex account unlinked."}
 
 
 @current_user_router.patch(

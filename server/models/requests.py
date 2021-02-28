@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
 from server.database import Model, Timestamp
+from server.models import MediaType
 
 
 class RequestStatus(str, Enum):
@@ -20,9 +21,11 @@ class RequestStatus(str, Enum):
     available = "available"
 
 
-class Request(object):
+class MediaRequest(Model, Timestamp):
+    __mapper_args__ = {"polymorphic_on": "media_type"}
 
     id = Column(Integer, primary_key=True)
+    media_type = Column(DBEnum(MediaType))
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
     comment = Column(Text)
 
@@ -59,11 +62,15 @@ class Request(object):
         return relationship("Media")
 
 
-class MovieRequest(Model, Timestamp, Request):
+class MovieRequest(MediaRequest):
+    __tablename__ = None
+    __mapper_args__ = {"polymorphic_identity": MediaType.movies}
     __repr_props__ = ("media", "requested_user", "requesting_user")
 
 
-class SeriesRequest(Model, Timestamp, Request):
+class SeriesRequest(MediaRequest):
+    __tablename__ = None
+    __mapper_args__ = {"polymorphic_identity": MediaType.series}
     __repr_props__ = ("media", "requested_user", "requesting_user")
 
     seasons = relationship("SeasonRequest", cascade="all,delete,delete-orphan", backref="request")
@@ -74,7 +81,7 @@ class SeasonRequest(Model):
 
     id = Column(Integer, primary_key=True)
     season_number = Column(Integer, nullable=False)
-    series_request_id = Column(ForeignKey("seriesrequest.id"), nullable=False)
+    series_request_id = Column(ForeignKey("mediarequest.id"), nullable=False)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
 
     episodes = relationship("EpisodeRequest", cascade="all,delete,delete-orphan", backref="season")

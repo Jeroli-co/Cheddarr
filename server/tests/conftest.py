@@ -100,6 +100,6 @@ def mock_tmdb(mocker):
     series["number_of_seasons"] = 7
     series["series_type"] = "anime"
     mocker.patch(
-        "server.helpers.search.find_tmdb_series",
+        "server.helpers.search.get_tmdb_series",
         return_value=series,
     )

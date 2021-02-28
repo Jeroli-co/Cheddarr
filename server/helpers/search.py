@@ -52,7 +52,7 @@ def search_tmdb_series(term: str, page: int) -> (List[schemas.TmdbSeries], int, 
     return results, search["total_pages"], search["total_results"]
 
 
-def find_tmdb_movie(tmdb_id: int) -> Optional[schemas.TmdbMovie]:
+def get_tmdb_movie(tmdb_id: int) -> Optional[schemas.TmdbMovie]:
     try:
         movie = tmdb.Movies(tmdb_id).info(append_to_response="external_ids,credits")
     except Exception:
@@ -61,7 +61,7 @@ def find_tmdb_movie(tmdb_id: int) -> Optional[schemas.TmdbMovie]:
     return schemas.TmdbMovie.parse_obj(movie)
 
 
-def find_tmdb_series(tmdb_id: int) -> Optional[schemas.TmdbSeries]:
+def get_tmdb_series(tmdb_id: int) -> Optional[schemas.TmdbSeries]:
     try:
         series = tmdb.TV(tmdb_id).info(append_to_response="external_ids,credits")
     except Exception:
@@ -70,7 +70,7 @@ def find_tmdb_series(tmdb_id: int) -> Optional[schemas.TmdbSeries]:
     return schemas.TmdbSeries.parse_obj(series)
 
 
-def find_tmdb_season(tmdb_id: int, season_number: int) -> Optional[schemas.TmdbSeason]:
+def get_tmdb_season(tmdb_id: int, season_number: int) -> Optional[schemas.TmdbSeason]:
     try:
         season = tmdb.TV_Seasons(tmdb_id, season_number).info(
             append_to_response="external_ids,credits"
@@ -80,7 +80,7 @@ def find_tmdb_season(tmdb_id: int, season_number: int) -> Optional[schemas.TmdbS
     return schemas.TmdbSeason.parse_obj(season)
 
 
-def find_tmdb_episode(
+def get_tmdb_episode(
     tmdb_id: int, season_number: int, episode_number: int
 ) -> Optional[schemas.TmdbEpisode]:
     try:

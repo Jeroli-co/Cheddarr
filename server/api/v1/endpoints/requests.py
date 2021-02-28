@@ -71,7 +71,7 @@ def add_movie_request(
 
     movie = media_repo.find_by(tmdb_id=request.tmdb_id)
     if movie is None:
-        searched_movie = search.find_tmdb_movie(request.tmdb_id)
+        searched_movie = search.get_tmdb_movie(request.tmdb_id)
         if searched_movie is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested movie was not found")
         movie = schemas.Movie.parse_obj(searched_movie).to_orm(models.Media)
@@ -139,7 +139,7 @@ def update_movie_request(
     elif update.status == models.RequestStatus.refused:
         request.status = models.RequestStatus.refused
 
-    current_movie_requests = movies_request_repo.find_all_by(movie_id=request.media_id)
+    current_movie_requests = movies_request_repo.find_all_by(media_id=request.media_id)
     for r in current_movie_requests:
         r.status = request.status
         movies_request_repo.save(r)
@@ -223,7 +223,7 @@ def add_series_request(
 
     series = media_repo.find_by(tmdb_id=request_in.tmdb_id)
     if series is None:
-        searched_series = search.find_tmdb_series(request_in.tmdb_id)
+        searched_series = search.get_tmdb_series(request_in.tmdb_id)
         if searched_series is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested series was not found")
 

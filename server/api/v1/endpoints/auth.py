@@ -17,7 +17,7 @@ from server import models, schemas
 from server.api import dependencies as deps
 from server.core import config, security, utils
 from server.core.scheduler import scheduler
-from server.repositories import NotificationAgentRepository, PlexAccountRepository, UserRepository
+from server.repositories import NotificationAgentRepository, UserRepository
 
 router = APIRouter()
 
@@ -245,7 +245,6 @@ def confirm_signin_plex(
     token: str,
     response: Response,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
 ):
     token = security.confirm_token(token)
     state = token.get("id")
@@ -274,8 +273,8 @@ def confirm_signin_plex(
     plex_avatar = info["thumb"]
 
     # Find this plex account in the database, or create it with the corresponding user
-    plex_account = plex_account_repo.find_by(plex_user_id=plex_user_id)
-    if plex_account is None:
+    user = user_repo.find_by(plex_user_id=plex_user_id)
+    if user is None:
         user = user_repo.find_by_email(plex_email)
         if user is None:
             if user_repo.find_by_username(plex_username) is not None:
@@ -284,6 +283,8 @@ def confirm_signin_plex(
                 username=plex_username,
                 email=plex_email,
                 password=security.get_random_password(),
+                plex_user_id=plex_user_id,
+                plex_api_key=auth_token,
                 avatar=plex_avatar,
                 confirmed=True,
             )
@@ -291,18 +292,16 @@ def confirm_signin_plex(
             if user_repo.count() == 0:
                 user.role = models.UserRole.superuser
 
-            user_repo.save(user)
-        plex_account = models.PlexAccount(
-            plex_user_id=plex_user_id, user_id=user.id, api_key=auth_token
-        )
     # Update the Plex account with the API key (possibly different at each login)
-    plex_account.api_key = auth_token
-    plex_account_repo.save(plex_account)
+    user.plex_user_id = plex_user_id
+    user.plex_api_key = auth_token
+    user_repo.save(user)
+
     payload = schemas.TokenPayload(
-        sub=str(plex_account.user.id),
-        username=plex_account.user.username,
-        avatar=plex_account.user.avatar,
-        role=plex_account.user.role,
+        sub=str(user.id),
+        username=user.username,
+        avatar=user.avatar,
+        role=user.role,
     )
     access_token = security.create_jwt_access_token(payload)
     token = schemas.Token(

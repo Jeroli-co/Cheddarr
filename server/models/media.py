@@ -58,24 +58,25 @@ class Episode(Model):
 
 
 class MediaServerContent(object):
-    external_media_id = Column(String, nullable=False)
+    id = Column(Integer, primary_key=True)
+    server_media_id = Column(String)
     added_at = Column(Date)
 
     @declared_attr
     def server_id(cls):
-        return Column(ForeignKey("mediaserversetting.server_id"), primary_key=True)
+        return Column(ForeignKey("mediaserversetting.server_id"))
 
 
 class MediaServerMedia(Model, MediaServerContent):
-    media_id = Column(ForeignKey("media.id"), primary_key=True)
+    media_id = Column(ForeignKey("media.id"))
     media = relationship("Media", back_populates="server_media")
 
 
 class MediaServerSeason(Model, MediaServerContent):
-    season_id = Column(ForeignKey("season.id"), primary_key=True)
+    season_id = Column(ForeignKey("season.id"))
     season = relationship("Season", back_populates="server_season")
 
 
 class MediaServerEpisode(Model, MediaServerContent):
-    episode_id = Column(ForeignKey("episode.id"), primary_key=True)
+    episode_id = Column(ForeignKey("episode.id"))
     episode = relationship("Episode", back_populates="server_episode")

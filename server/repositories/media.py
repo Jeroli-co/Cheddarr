@@ -21,13 +21,13 @@ class MediaRepository(BaseRepository[Media]):
         )
 
 
-class SeasonRepisitory(BaseRepository[Season]):
+class SeasonRepository(BaseRepository[Season]):
     def find_by_any_external_id_and_season_number(
         self, season_number: int, external_ids: List
     ) -> Optional[Season]:
         return (
             self.session.query(Season)
-            .join(Media)
+            .join(Season.media)
             .filter(
                 or_(
                     Media.tmdb_id.in_(external_ids),
