@@ -1,8 +1,8 @@
 from typing import List, Optional
 
-from sqlalchemy import or_
+from sqlalchemy import desc, or_
 
-from server.models import Episode, Media, MediaServerMedia, MediaServerSetting, Season
+from server.models import Episode, Media, MediaServerMedia, MediaServerSetting, MediaType, Season
 from server.repositories.base import BaseRepository
 
 
@@ -18,6 +18,16 @@ class MediaRepository(BaseRepository[Media]):
                 )
             )
             .one_or_none()
+        )
+
+    def find_all_recently_added(self, media_type: MediaType, limit=20):
+        return (
+            self.session.query(Media)
+            .join(MediaServerMedia)
+            .filter(Media.media_type == media_type)
+            .order_by(desc(MediaServerMedia.added_at))
+            .limit(limit)
+            .all()
         )
 
 

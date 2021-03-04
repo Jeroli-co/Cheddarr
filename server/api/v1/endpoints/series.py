@@ -1,7 +1,9 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-from server import schemas
+from server import models, schemas
 from server.api import dependencies as deps
 from server.helpers import search
 from server.repositories import EpisodeRepository, MediaRepository, SeasonRepository
@@ -10,7 +12,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/series/{tmdb_id}",
+    "/{tmdb_id:int}",
     response_model=schemas.Series,
     response_model_exclude_none=True,
     responses={
@@ -48,7 +50,7 @@ def get_series(
 
 
 @router.get(
-    "/series/{tmdb_id}/seasons/{season_number}",
+    "/{tmdb_id:int}/seasons/{season_number}",
     response_model=schemas.Season,
     response_model_exclude_none=True,
     responses={
@@ -88,7 +90,7 @@ def get_season(
 
 
 @router.get(
-    "/series/{tmdb_id}/seasons/{season_number}/episodes/{episode_number}",
+    "/{tmdb_id:int}/seasons/{season_number}/episodes/{episode_number}",
     response_model=schemas.Episode,
     response_model_exclude_none=True,
     responses={
@@ -116,3 +118,22 @@ def get_episode(
             for server_media in db_episode.server_episode
         ]
     return episode.dict()
+
+
+@router.get(
+    "/recent",
+    dependencies=[Depends(deps.get_current_user)],
+    response_model=List[schemas.Series],
+)
+def get_recent_series(
+    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
+):
+
+    db_recent_series = media_repo.find_all_recently_added(media_type=models.MediaType.series)
+    recent_series = []
+    for movie in db_recent_series:
+        tmdb_series = search.get_tmdb_series(movie.tmdb_id)
+        tmdb_series.plex_media_info = movie.server_media
+        recent_series.append(tmdb_series.dict())
+
+    return recent_series

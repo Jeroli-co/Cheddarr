@@ -1,6 +1,8 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from server import schemas
+from server import models, schemas
 from server.api import dependencies as deps
 from server.helpers import search
 from server.repositories import MediaRepository
@@ -9,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/movies/{tmdb_id}",
+    "/{tmdb_id:int}",
     response_model=schemas.Movie,
     response_model_exclude_none=True,
     responses={
@@ -35,6 +37,18 @@ def get_movie(
     return movie.dict()
 
 
-@router.get("/movies/recent")
-def get_recent_movies():
-    pass
+@router.get(
+    "/recent", dependencies=[Depends(deps.get_current_user)], response_model=List[schemas.Movie]
+)
+def get_recent_movies(
+    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
+):
+
+    db_recent_movies = media_repo.find_all_recently_added(media_type=models.MediaType.movies)
+    recent_movies = []
+    for movie in db_recent_movies:
+        tmdb_movie = search.get_tmdb_movie(movie.tmdb_id)
+        tmdb_movie.plex_media_info = movie.server_media
+        recent_movies.append(tmdb_movie.dict())
+
+    return recent_movies
