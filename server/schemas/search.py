@@ -21,7 +21,7 @@ class SearchResult(APIModel):
 
 TMDB_URL = "https://www.themoviedb.org"
 TMDB_IMAGES_URL = "https://image.tmdb.org/t/p"
-TMDB_POSTER_SIZE = "w500"
+TMDB_POSTER_SIZE = "w600_and_h900_bestv2"
 TMDB_PROFILE_SIZE = "w185"
 TMDB_ART_SIZE = "w1280"
 
@@ -33,7 +33,7 @@ def empty_date(cls, v) -> Optional[date]:
 def get_image_url(cls, v, field):
     if v is None:
         return None
-    if field.name == "poster_path":
+    if field.alias == "poster_path":
         return f"{TMDB_IMAGES_URL}/{TMDB_POSTER_SIZE}/{v}"
     if field.alias == "backdrop_path":
         return f"{TMDB_IMAGES_URL}/{TMDB_ART_SIZE}/{v}"

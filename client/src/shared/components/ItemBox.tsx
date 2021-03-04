@@ -15,6 +15,7 @@ export const ItemBox = styled.div`
   color: ${(props) => props.theme.white};
   cursor: pointer;
   margin: 10px;
+  padding: 30px 0;
 
   @media screen and (min-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
     width: 260px;

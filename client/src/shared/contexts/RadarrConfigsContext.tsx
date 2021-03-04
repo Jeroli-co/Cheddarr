@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
-import { IProviderConfigBase } from "../models/IProviderConfigBase";
+import { IProviderSettingsBase } from "../models/IProviderSettingsBase";
 import { IRadarrConfig } from "../models/IRadarrConfig";
 import { IRadarrInstanceInfo } from "../models/IRadarrInstanceInfo";
 import { useRadarrConfigs } from "../hooks/useRadarrConfigs";
@@ -8,7 +8,7 @@ import { useRadarrConfigs } from "../hooks/useRadarrConfigs";
 interface IRadarrConfigsContext {
   radarrConfigs: IAsyncCall<IRadarrConfig[] | null>;
   getRadarrInstanceInfo: (
-    config: IProviderConfigBase,
+    config: IProviderSettingsBase,
     withAlert: boolean
   ) => Promise<IAsyncCall<IRadarrInstanceInfo | null>>;
   createRadarrConfig: (

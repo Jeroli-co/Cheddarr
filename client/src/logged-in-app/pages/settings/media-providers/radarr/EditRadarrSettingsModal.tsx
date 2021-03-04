@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal } from "../../../../../shared/components/Modal";
+import { Modal } from "../../../../../shared/components/layout/Modal";
 import { H2 } from "../../../../../shared/components/Titles";
 import { Buttons } from "../../../../../shared/components/layout/Buttons";
 import {

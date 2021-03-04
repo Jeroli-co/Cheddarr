@@ -7,7 +7,7 @@ import {
 import { ISonarrInstanceInfo } from "../../../../../shared/models/ISonarrInstanceInfo";
 import { useSonarrConfigs } from "../../../../../shared/hooks/useSonarrConfigs";
 import { ISonarrConfig } from "../../../../../shared/models/ISonarrConfig";
-import { IProviderConfigBase } from "../../../../../shared/models/IProviderConfigBase";
+import { IProviderSettingsBase } from "../../../../../shared/models/IProviderSettingsBase";
 import { InputField } from "../../../../../shared/components/inputs/InputField";
 import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
 import { HelpDanger } from "../../../../../shared/components/Help";
@@ -31,7 +31,7 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
     ISonarrConfig
   >();
 
-  const getInstanceInfo = (data: IProviderConfigBase, withAlert: boolean) => {
+  const getInstanceInfo = (data: IProviderSettingsBase, withAlert: boolean) => {
     if (data.port === "") {
       data.port = null;
     }

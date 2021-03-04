@@ -1,7 +1,7 @@
 import { ProviderTypes } from "../enums/ProviderTypes";
-import { IProviderConfigBase } from "./IProviderConfigBase";
+import { IProviderSettingsBase } from "./IProviderSettingsBase";
 
-export interface IPlexSettings extends IProviderConfigBase {
+export interface IPlexSettings extends IProviderSettingsBase {
   id: string;
   name: string;
   enabled: boolean;

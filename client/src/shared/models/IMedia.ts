@@ -2,26 +2,29 @@ import { MediaTypes, SeriesTypes } from "../enums/MediaTypes";
 
 export interface IMedia {
   title: string;
+  mediaType: MediaTypes;
   tmdbId: number;
-  type: MediaTypes;
-  releaseDate?: Date;
+  tvdbId?: number;
+  imdbId?: string;
+  releaseDate?: string;
   status?: string;
   posterUrl?: string;
   artUrl?: string;
   summary?: string;
   rating?: number;
   duration?: number;
-  studio?: string;
+  studios?: string[];
   genres?: string[];
-  actors?: IPerson[];
-  directors?: IPerson[];
-  plexServerInfo?: PlexServerInfo;
+  credits?: {
+    cast?: IPerson[];
+    crew?: IPerson[];
+  };
+  plexMediaInfo?: PlexMediaInfo[];
 }
 
 export interface IMovie extends IMedia {}
 
 export interface ISeries extends IMedia {
-  tvdbId: number;
   numberOfSeasons: number;
   seriesType: SeriesTypes;
   seasons?: ISeason[];
@@ -47,10 +50,11 @@ export interface IPerson {
   posterUrl?: string;
 }
 
-export interface PlexServerInfo {
-  isWatched: boolean;
+export interface PlexMediaInfo {
+  externalMediaId: string;
+  serverId: string;
   addedAt: Date;
-  webUrl: string;
+  webUrl?: string;
 }
 
 export const isMedia = (arg: any): arg is IMedia => {
@@ -60,8 +64,8 @@ export const isMedia = (arg: any): arg is IMedia => {
     typeof arg.title == "string" &&
     arg.tmdbId &&
     typeof arg.tmdbId == "number" &&
-    arg.type &&
-    Object.values(MediaTypes).includes(arg.type)
+    arg.mediaType &&
+    Object.values(MediaTypes).includes(arg.mediaType)
   );
 };
 
@@ -71,8 +75,7 @@ export const isMovie = (arg: any): arg is IMovie => {
 
 export const isSeries = (arg: any): arg is ISeries => {
   return (
-    arg.tvdbId &&
-    typeof arg.tvdbId == "number" &&
+    arg &&
     arg.numberOfSeasons &&
     typeof arg.numberOfSeasons == "number" &&
     arg.seriesType &&
@@ -109,4 +112,10 @@ export const isEpisode = (arg: any): arg is IEpisode => {
 
 export const isPerson = (arg: any): arg is IPerson => {
   return arg.name && typeof arg.name == "string";
+};
+
+export const isOnServers = (media: IMedia): boolean => {
+  return (
+    media && media.plexMediaInfo !== undefined && media.plexMediaInfo.length > 0
+  );
 };

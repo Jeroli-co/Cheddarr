@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime
+from tzlocal import get_localzone
 from json import dump, load
 from pathlib import Path
 from typing import List
@@ -20,7 +20,7 @@ class Config(BaseSettings):
     DOMAIN: str = "localhost:9090"
     SERVER_HOST: str = f"http://{DOMAIN}"
     LOG_LEVEL: str = "INFO"
-    TIMEZONE: str = datetime.now().astimezone().tzname()
+    TIMEZONE: str = get_localzone().zone
 
     ##########################################################################
     # folders/files                                                          #

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { IAsyncCall } from "../models/IAsyncCall";
 import { useAPI } from "./useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
-import { IProviderConfigBase } from "../models/IProviderConfigBase";
+import { IProviderSettingsBase } from "../models/IProviderSettingsBase";
 import { ISonarrInstanceInfo } from "../models/ISonarrInstanceInfo";
 import { ISonarrConfig } from "../models/ISonarrConfig";
 import { useAlert } from "../contexts/AlertContext";
@@ -24,7 +24,7 @@ export const useSonarrConfigs = () => {
   }, []);
 
   const getSonarrInstanceInfo = (
-    config: IProviderConfigBase,
+    config: IProviderSettingsBase,
     withAlert: boolean
   ) => {
     return post<ISonarrInstanceInfo>(

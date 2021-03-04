@@ -1,12 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Carousel } from "../../plex-media/components/Carousel";
-import { MediaPreviewCard } from "../../plex-media/components/MediaPreviewCard";
+import React, { useEffect, useState } from "react";
 import { Spinner } from "../../../../shared/components/Spinner";
 import { MediaRecentlyAddedType } from "../enums/MediaRecentlyAddedType";
-import { IMediaServerMedia } from "../../../../shared/models/IMediaServerMedia";
-import { PlexConfigContext } from "../../../../shared/contexts/PlexConfigContext";
-import styled, { useTheme } from "styled-components";
-import { useRedirectToMediasDetails } from "../../../../shared/hooks/useRedirectToMediasDetails";
+import styled from "styled-components";
 import { useAPI } from "../../../../shared/hooks/useAPI";
 import {
   DefaultAsyncCall,
@@ -18,6 +13,10 @@ import { Icon } from "../../../../shared/components/Icon";
 import { H2 } from "../../../../shared/components/Titles";
 import { ComponentSizes } from "../../../../shared/enums/ComponentSizes";
 import { CenteredContent } from "../../../../shared/components/layout/CenteredContent";
+import { Carousel } from "../../../../shared/components/layout/Carousel";
+import { MediaPreviewCard } from "../../../../shared/components/media/MediaPreviewCard";
+import { IMedia } from "../../../../shared/models/IMedia";
+import { useHistory } from "react-router-dom";
 
 const MediaRecentlyAddedTitleContainer = styled(H2)`
   display: flex;
@@ -33,14 +32,12 @@ type MediaRecentlyAddedProps = {
 };
 
 export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
-  const [media, setMedia] = useState<IAsyncCall<IMediaServerMedia[] | null>>(
+  const [media, setMedia] = useState<IAsyncCall<IMedia[] | null>>(
     DefaultAsyncCall
   );
-  const { currentConfig } = useContext(PlexConfigContext);
-  const { redirectToMediaPage } = useRedirectToMediasDetails();
   const { get } = useAPI();
   const [hidden, setHidden] = useState(false);
-  const theme = useTheme();
+  const history = useHistory();
 
   let title;
   switch (type) {
@@ -58,21 +55,11 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
   }
 
   useEffect(() => {
-    if (currentConfig.data) {
-      let url = "/plex/" + currentConfig.data.id;
-      if (type === MediaRecentlyAddedType.ON_DECK) {
-        url += "/on-deck";
-      } else {
-        url += "/" + type + "/recent";
-      }
-
-      get<IMediaServerMedia[]>(url).then((res) => {
-        setMedia(res);
-      });
-    }
-
+    get<IMedia[]>("/" + type + "/recent").then((res) => {
+      setMedia(res);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentConfig]);
+  }, []);
 
   if (media.isLoading) {
     return (
@@ -91,7 +78,7 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
       <MediaRecentlyAddedTitleContainer onClick={() => setHidden(!hidden)}>
         {title}
         {hidden && <Icon icon={faCaretRight} />}
-        {!hidden && <Icon icon={faCaretDown} color={theme.primary} />}
+        {!hidden && <Icon icon={faCaretDown} />}
       </MediaRecentlyAddedTitleContainer>
 
       <br />
@@ -99,7 +86,10 @@ export const MediaRecentlyAdded = ({ type }: MediaRecentlyAddedProps) => {
       {media.data && !hidden && (
         <Carousel>
           {media.data.map((m, index) => (
-            <div key={index} onClick={() => redirectToMediaPage(m)}>
+            <div
+              key={index}
+              onClick={() => history.push(m.mediaType + "/" + m.tmdbId)}
+            >
               <MediaPreviewCard media={m} />
             </div>
           ))}

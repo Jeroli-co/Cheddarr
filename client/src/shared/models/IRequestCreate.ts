@@ -1,24 +1,22 @@
 export interface IRequestCreate {
-  readonly requestedUsername: string;
+  requestedUsername: string;
+  tmdbId: number;
 }
 
-export interface IMovieRequestCreate extends IRequestCreate {
-  readonly tmdbId: number;
-}
-
-export const isMovieRequestCreate = (arg: any): arg is IMovieRequestCreate => {
-  return arg && arg.tmdbId && typeof arg.tmdbId == "number";
-};
+export interface IMovieRequestCreate extends IRequestCreate {}
 
 export interface ISeriesRequestCreate extends IRequestCreate {
-  readonly tvdbId: number;
-  readonly seasons: {
+  seasons: {
     seasonNumber: number;
     episodes: {
       episodeNumber: number;
     }[];
   }[];
 }
+
+export const isMovieRequestCreate = (arg: any): arg is IMovieRequestCreate => {
+  return arg && arg.tmdbId && typeof arg.tmdbId == "number";
+};
 
 export const isSeriesRequestCreate = (
   arg: any

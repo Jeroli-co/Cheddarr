@@ -1,7 +1,7 @@
 import { ProviderTypes } from "../enums/ProviderTypes";
-import { IProviderConfigBase } from "./IProviderConfigBase";
+import { IProviderSettingsBase } from "./IProviderSettingsBase";
 
-export interface ISonarrConfig extends IProviderConfigBase {
+export interface ISonarrConfig extends IProviderSettingsBase {
   readonly id: string;
   readonly name: string;
   readonly enabled: boolean;

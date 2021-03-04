@@ -46,7 +46,7 @@ def get_series(
                         schemas.PlexMediaInfo(**s.as_dict()) for s in season_info.server_season
                     ]
 
-        return series.dict()
+    return series.dict()
 
 
 @router.get(
@@ -76,16 +76,16 @@ def get_season(
             schemas.PlexMediaInfo(**server_media.as_dict())
             for server_media in db_season.server_season
         ]
-    db_episodes = episode_repo.find_all_by(season_id=db_season.id)
-    if db_episodes is not None:
-        for episode in season.episodes:
-            episode_info = next(
-                (e for e in db_episodes if e.episode_number == episode.episode_number), None
-            )
-            if episode_info is not None:
-                episode.plex_media_info = [
-                    schemas.PlexMediaInfo(**s.as_dict()) for s in episode_info.server_episode
-                ]
+        db_episodes = episode_repo.find_all_by(season_id=db_season.id)
+        if db_episodes is not None:
+            for episode in season.episodes:
+                episode_info = next(
+                    (e for e in db_episodes if e.episode_number == episode.episode_number), None
+                )
+                if episode_info is not None:
+                    episode.plex_media_info = [
+                        schemas.PlexMediaInfo(**s.as_dict()) for s in episode_info.server_episode
+                    ]
     return season.dict()
 
 

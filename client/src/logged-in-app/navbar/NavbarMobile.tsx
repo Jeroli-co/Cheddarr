@@ -7,8 +7,8 @@ import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { Icon } from "../../shared/components/Icon";
 import { Row } from "../../shared/components/layout/Row";
-import { SearchBarMobile } from "./components/search-bar/SearchBarMobile";
 import { NavbarContainer, NavbarUserAvatar } from "./NavbarCommon";
+import { SearchBar } from "./components/search-bar/SearchBar";
 
 const cheddarrLogo = require("../../assets/cheddarr.svg");
 
@@ -66,7 +66,7 @@ export const NavbarMobile = ({ toggle }: NavbarMobileProps) => {
           />
         </Item>
       </Row>
-      <SearchBarMobile />
+      <SearchBar />
       <UserDropdown
         isVisible={isDropdownOpen}
         hideDropdown={() => setIsDropdownOpen(false)}

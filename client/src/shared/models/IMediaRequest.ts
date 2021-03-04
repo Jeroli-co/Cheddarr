@@ -1,25 +1,25 @@
 import { RequestStatus } from "../enums/RequestStatus";
 import { IPublicUser } from "./IPublicUser";
-import { ISearchedMovie, ISearchedSeries } from "./ISearchedMedias";
+import { IMovie, ISeries } from "./IMedia";
 
 export interface IMediaRequest {
-  readonly id: number;
+  id: number;
   status: RequestStatus;
-  readonly requestedUser: IPublicUser;
-  readonly requestingUser: IPublicUser;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
+  requestedUser: IPublicUser;
+  requestingUser: IPublicUser;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IMovieRequest extends IMediaRequest {
-  readonly movie: ISearchedMovie;
+  movie: IMovie;
 }
 
 export interface ISeriesRequest extends IMediaRequest {
-  readonly tvdbId: number;
-  readonly seriesType: string;
-  readonly series: ISearchedSeries;
-  readonly seasons: {
+  tvdbId: number;
+  seriesType: string;
+  series: ISeries;
+  seasons: {
     seasonNumber: number;
     episodes: { episodeNumber: number }[];
   }[];

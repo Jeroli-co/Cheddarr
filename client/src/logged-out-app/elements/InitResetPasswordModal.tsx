@@ -5,7 +5,7 @@ import { FORM_DEFAULT_VALIDATOR } from "../../shared/enums/FormDefaultValidators
 import { useAPI } from "../../shared/hooks/useAPI";
 import { APIRoutes } from "../../shared/enums/APIRoutes";
 import { useAlert } from "../../shared/contexts/AlertContext";
-import { Modal } from "../../shared/components/Modal";
+import { Modal } from "../../shared/components/layout/Modal";
 import { InputField } from "../../shared/components/inputs/InputField";
 import { Button, PrimaryButton } from "../../shared/components/Button";
 import { Icon } from "../../shared/components/Icon";

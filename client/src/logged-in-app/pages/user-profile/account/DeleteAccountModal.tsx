@@ -1,6 +1,6 @@
 import React from "react";
-import { useUserService } from "../../../../shared/hooks/useUserService";
-import { Modal } from "../../../../shared/components/Modal";
+import { useUserService } from "../../../../shared/toRefactor/useUserService";
+import { Modal } from "../../../../shared/components/layout/Modal";
 import { H2 } from "../../../../shared/components/Titles";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { Button, DangerButton } from "../../../../shared/components/Button";

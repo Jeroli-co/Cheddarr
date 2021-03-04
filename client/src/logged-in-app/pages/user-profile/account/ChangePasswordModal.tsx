@@ -5,9 +5,9 @@ import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultVali
 import {
   IChangePasswordModel,
   useUserService,
-} from "../../../../shared/hooks/useUserService";
+} from "../../../../shared/toRefactor/useUserService";
 import { Button, PrimaryButton } from "../../../../shared/components/Button";
-import { Modal } from "../../../../shared/components/Modal";
+import { Modal } from "../../../../shared/components/layout/Modal";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { H2 } from "../../../../shared/components/Titles";
 import { InputField } from "../../../../shared/components/inputs/InputField";

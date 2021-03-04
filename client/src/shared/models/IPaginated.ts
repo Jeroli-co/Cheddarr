@@ -5,7 +5,7 @@ export interface IPaginated<T = any> {
   results: T[];
 }
 
-export function IPaginated<T = any>(arg: any): arg is IPaginated {
+export function isIPaginated<T = any>(arg: any): arg is IPaginated {
   return (
     arg &&
     arg.page &&

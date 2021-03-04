@@ -105,10 +105,20 @@ export const DangerButton = styled(Button)`
   min-height: 40px;
 `;
 
-export const IconButton = styled(PrimaryButton)`
+export const IconButton = styled(Button)`
   font-size: 15px;
   width: 30px;
   height: 30px;
+`;
+
+export const PrimaryIconButton = styled(IconButton)`
+  background-color: ${(props) => props.theme.primaryLighter};
+`;
+
+export const OutlinePrimaryIconButton = styled(IconButton)`
+  background-color: ${(props) => props.theme.black};
+  color: ${(props) => props.theme.primaryLighter};
+  border: 1px solid ${(props) => props.theme.primaryLighter};
 `;
 
 export const DangerIconButton = styled(IconButton)`

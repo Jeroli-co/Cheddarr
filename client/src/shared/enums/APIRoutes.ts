@@ -1,5 +1,6 @@
 import { MediaTypes } from "./MediaTypes";
 import { RequestTypes } from "./RequestTypes";
+import { SearchFilters } from "./SearchFilters";
 
 export const APIRoutes = {
   // AUTH
@@ -20,8 +21,8 @@ export const APIRoutes = {
   ACCEPT_FRIEND_REQUEST: (username: string) => "/user/friends/" + username,
   SEND_FRIEND_REQUEST: "/user/friends",
   SEARCH_FRIENDS: (value: string) => "/user/friends/search?value=" + value,
-  GET_FRIENDS_MOVIES_PROVIDERS: "/user/friends?providers_type=movies_provider",
-  GET_FRIENDS_SERIES_PROVIDERS: "/user/friends?providers_type=series_provider",
+  GET_FRIENDS_MOVIES_PROVIDERS: "/user/friends?provider_type=movies_provider",
+  GET_FRIENDS_SERIES_PROVIDERS: "/user/friends?provider_type=series_provider",
   UPDATE_USER: "/user",
   DELETE_ACCOUNT: "/user",
   INIT_RESET_PASSWORD: "/user/password",
@@ -65,10 +66,18 @@ export const APIRoutes = {
   DELETE_SONARR_CONFIG: (id: string) => "/settings/sonarr/" + id,
 
   // TMDB
-  GET_ALL_MEDIA_BY_TITLE: (title: string) => "/search?value=" + title,
-  GET_SERIES_BY_ID: (tvdbId: number) => "/search/series/" + tvdbId,
-  GET_SEASON_BY_NUMBER: (tvdbId: number, number: number) =>
-    "/search/series/" + tvdbId + "/seasons/" + number,
+  GET_MEDIA: (title: string, page: number, type: SearchFilters | null) =>
+    "/search?value=" +
+    title +
+    "&page=" +
+    page +
+    (type ? "&media_type=" + type : ""),
+  GET_MOVIE: (id: number) => "/movies/" + id,
+  GET_SERIES: (id: number) => "/series/" + id,
+  GET_SEASON: (id: number, seasonNumber: number) =>
+    "/series/" + id + "/seasons/" + seasonNumber,
+  GET_EPISODE: (id: number, seasonNumber: number, episodeNumber: number) =>
+    "/series/" + id + "/seasons/" + seasonNumber + "/episodes/" + episodeNumber,
 
   // REQUESTS
   CREATE_REQUEST_MOVIE: "/requests/movies",

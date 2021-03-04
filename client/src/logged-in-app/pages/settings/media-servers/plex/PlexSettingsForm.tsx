@@ -36,14 +36,7 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
       {/* Config name */}
       <InputField>
         <label>Config name</label>
-        <input
-          name="name"
-          type="text"
-          placeholder="Name"
-          ref={register({
-            required: true,
-          })}
-        />
+        <input name="name" type="text" placeholder="Name" ref={register} />
       </InputField>
 
       {/* Authentication token */}

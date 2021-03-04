@@ -10,11 +10,9 @@ export default function Home() {
   if (currentConfig.data) {
     return (
       <div className="noselect">
-        <MediaRecentlyAdded type={MediaRecentlyAddedType.ON_DECK} />
-        <br />
         <MediaRecentlyAdded type={MediaRecentlyAddedType.MOVIES} />
-        <br />
-        <MediaRecentlyAdded type={MediaRecentlyAddedType.SERIES} />
+        {/*<br/>
+          <MediaRecentlyAdded type={MediaRecentlyAddedType.SERIES} />*/}
       </div>
     );
   } else {

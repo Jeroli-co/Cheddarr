@@ -12,7 +12,7 @@ import {
 } from "../../../../../shared/models/IAsyncCall";
 import { IRadarrInstanceInfo } from "../../../../../shared/models/IRadarrInstanceInfo";
 import { useFormContext } from "react-hook-form";
-import { IProviderConfigBase } from "../../../../../shared/models/IProviderConfigBase";
+import { IProviderSettingsBase } from "../../../../../shared/models/IProviderSettingsBase";
 import { IRadarrConfig } from "../../../../../shared/models/IRadarrConfig";
 import { useRadarrConfigsContext } from "../../../../../shared/contexts/RadarrConfigsContext";
 
@@ -30,7 +30,7 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
   const [usePort, setUsePort] = useState(false);
   const { getRadarrInstanceInfo } = useRadarrConfigsContext();
 
-  const getInstanceInfo = (data: IProviderConfigBase, withAlert: boolean) => {
+  const getInstanceInfo = (data: IProviderSettingsBase, withAlert: boolean) => {
     if (data.port === "") {
       data.port = null;
     }

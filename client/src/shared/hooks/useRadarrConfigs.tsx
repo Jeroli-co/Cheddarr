@@ -4,7 +4,7 @@ import { IAsyncCall } from "../models/IAsyncCall";
 import { useAPI } from "./useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
 import { useAlert } from "../contexts/AlertContext";
-import { IProviderConfigBase } from "../models/IProviderConfigBase";
+import { IProviderSettingsBase } from "../models/IProviderSettingsBase";
 import { IRadarrInstanceInfo } from "../models/IRadarrInstanceInfo";
 
 export const useRadarrConfigs = () => {
@@ -24,7 +24,7 @@ export const useRadarrConfigs = () => {
   }, []);
 
   const getRadarrInstanceInfo = (
-    config: IProviderConfigBase,
+    config: IProviderSettingsBase,
     withAlert: boolean
   ) => {
     return post<IRadarrInstanceInfo>(

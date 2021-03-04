@@ -3,7 +3,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { AlertContextProvider } from "./shared/contexts/AlertContext";
 import { BrowserRouter } from "react-router-dom";
-import { ThemeContextProvider } from "./shared/contexts/ThemeContextProvider";
+import { ThemeContext } from "./shared/contexts/ThemeContext";
 import { SessionContextProvider } from "./shared/contexts/SessionContext";
 import { DynamicApp } from "./DynamicApp";
 import PlexAuthContextProvider from "./shared/contexts/PlexAuthContext";
@@ -13,7 +13,7 @@ const App = () => {
 
   return (
     <div className="App">
-      <ThemeContextProvider>
+      <ThemeContext>
         <AlertContextProvider>
           <BrowserRouter>
             <SessionContextProvider>
@@ -23,7 +23,7 @@ const App = () => {
             </SessionContextProvider>
           </BrowserRouter>
         </AlertContextProvider>
-      </ThemeContextProvider>
+      </ThemeContext>
     </div>
   );
 };

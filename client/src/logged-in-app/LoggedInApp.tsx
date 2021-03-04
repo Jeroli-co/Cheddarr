@@ -6,7 +6,6 @@ import { useWindowSize } from "../shared/hooks/useWindowSize";
 import { NavbarMobile } from "./navbar/NavbarMobile";
 import { Navbar } from "./navbar/Navbar";
 import { SidebarMenuMobile } from "./sidebarMenu/SidebarMenuMobile";
-import { SearchContextProvider } from "../shared/contexts/SearchContext";
 import { Footer } from "../shared/components/Footer";
 const SwitchRoutes = React.lazy(() => import("../router/SwitchRoutes"));
 
@@ -65,7 +64,7 @@ export const LoggedInApp = () => {
     setIsOpen(!isOpen);
   };
 
-  if (width <= STATIC_STYLES.MOBILE_MAX_WIDTH) {
+  if (width <= STATIC_STYLES.TABLET_MAX_WIDTH) {
     return (
       <Layout>
         <SidebarMenuMobile isOpen={isOpen} toggle={toggle} />
@@ -79,13 +78,11 @@ export const LoggedInApp = () => {
   } else {
     return (
       <Layout>
-        <SearchContextProvider>
-          <SidebarMenu isOpen={isOpen} toggle={toggle} />
-          <Navbar isSidebarOpen={isOpen} />{" "}
-          <PageLayout isSidebarOpen={isOpen}>
-            <SwitchRoutes />
-          </PageLayout>
-        </SearchContextProvider>
+        <SidebarMenu isOpen={isOpen} toggle={toggle} />
+        <Navbar isSidebarOpen={isOpen} />{" "}
+        <PageLayout isSidebarOpen={isOpen}>
+          <SwitchRoutes />
+        </PageLayout>
         <Footer />
       </Layout>
     );

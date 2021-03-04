@@ -7,7 +7,7 @@ import { Spin } from "../../shared/components/animations/Animations";
 import { useHistory } from "react-router";
 import { useSession } from "../../shared/contexts/SessionContext";
 import { NavbarContainer, NavbarUserAvatar } from "./NavbarCommon";
-import { SearchBar2 } from "./components/search-bar/SearchBar2";
+import { SearchBar } from "./components/search-bar/SearchBar";
 
 const cheddarrPreLogo = require("../../assets/cheddarr-pre.svg");
 const cheddarrMinLogo = require("../../assets/cheddarr-min.svg");
@@ -76,7 +76,7 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
         <img id="cheddarrMinLogo" src={cheddarrMinLogo} alt="Chedarr" />
         <img src={cheddarrPostLogo} alt="Chedarr" />
       </NavbarAppLogo>
-      <SearchBar2 isSidebarOpen={isSidebarOpen} />
+      <SearchBar />
       <GitHubButton />
       <UserAvatar
         src={avatar}

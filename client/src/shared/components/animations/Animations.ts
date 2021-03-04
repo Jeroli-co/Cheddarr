@@ -87,4 +87,192 @@ const FadeOut = () => {
   `;
 };
 
+export const LoadingCard16 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    16.66% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1
+    }
+  `;
+};
+
+export const LoadingCard26 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    16.66% {
+      opacity: 1;
+    }
+    
+    33.32% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1
+    }
+  `;
+};
+
+export const LoadingCard36 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    33.32% {
+      opacity: 1;
+    }
+    
+    49.98% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1
+    }
+  `;
+};
+
+export const LoadingCard46 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    49.98% {
+      opacity: 1;
+    }
+    
+    66.64% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1
+    }
+  `;
+};
+
+export const LoadingCard56 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    66.64% {
+      opacity: 1;
+    }
+    
+    83.3% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1
+    }
+  `;
+};
+
+export const LoadingCard66 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    83.3% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0.2;
+    }
+  `;
+};
+
+export const LoadingCard14 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    20% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1
+    }
+  `;
+};
+
+export const LoadingCard24 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    20% {
+      opacity: 1;
+    }
+    
+    40% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  `;
+};
+
+export const LoadingCard34 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    40% {
+      opacity: 1;
+    }
+    
+    60% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  `;
+};
+
+export const LoadingCard44 = () => {
+  return keyframes`
+    0% {
+      opacity: 1;
+    }
+    
+    60% {
+      opacity: 1;
+    }
+    
+    80% {
+      opacity: 0.2;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  `;
+};
+
 export { FadeInUp, FadeOutDown, FadeIn, FadeOut };

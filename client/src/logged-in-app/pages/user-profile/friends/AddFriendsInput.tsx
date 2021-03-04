@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { IconButton } from "../../../../shared/components/Button";
+import { PrimaryIconButton } from "../../../../shared/components/Button";
 import { InputField } from "../../../../shared/components/inputs/InputField";
 import styled from "styled-components";
 import { Icon } from "../../../../shared/components/Icon";
@@ -19,7 +19,7 @@ type AddFriendsInputProp = {
   sendFriendRequest: (username: string) => void;
 };
 
-const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
+export const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
   const [searchFriends, setSearchFriends] = useState("");
 
   const _onAddFriend = async () => {
@@ -52,11 +52,9 @@ const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
           </span>
         </div>
       </InputField>
-      <IconButton onClick={_onAddFriend}>
+      <PrimaryIconButton onClick={_onAddFriend}>
         <Icon icon={faPlus} />
-      </IconButton>
+      </PrimaryIconButton>
     </Container>
   );
 };
-
-export { AddFriendsInput };

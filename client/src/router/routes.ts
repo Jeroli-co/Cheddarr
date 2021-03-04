@@ -6,11 +6,7 @@ import { SignInForm } from "../logged-out-app/SignInForm";
 import { SignUpForm } from "../logged-out-app/SignUpForm";
 import { PublicUser } from "../logged-in-app/pages/PublicUser";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
-import { Search } from "../logged-in-app/pages/search/Search";
 import { Requests } from "../logged-in-app/pages/requests/Requests";
-import { PlexMovie } from "../logged-in-app/pages/plex-media/PlexMovie";
-import { PlexSeries } from "../logged-in-app/pages/plex-media/PlexSeries";
-import { PlexSeason } from "../logged-in-app/pages/plex-media/PlexSeason";
 import { Home } from "../shared/Home";
 import { RequestsSent } from "../logged-in-app/pages/requests/elements/RequestsSent";
 import { RequestsReceived } from "../logged-in-app/pages/requests/elements/RequestsReceived";
@@ -18,6 +14,9 @@ import { Profile } from "../logged-in-app/pages/user-profile/Profile";
 import { MediaServersSettings } from "../logged-in-app/pages/settings/media-servers/MediaServersSettings";
 import { MediaProvidersSettings } from "../logged-in-app/pages/settings/media-providers/MediaProvidersSettings";
 import { NotificationsServicesSettings } from "../logged-in-app/pages/settings/notifications/NotificationsServicesSettings";
+import { Search } from "../logged-in-app/pages/Search";
+import { Movie } from "../shared/components/media/Movie";
+import { Series } from "../shared/components/media/Series";
 
 const routes = {
   HOME: {
@@ -64,10 +63,9 @@ const routes = {
     component: NotificationsServicesSettings,
   },
 
-  /** PLEX **/
-  MOVIE: { url: (id: string) => "/movie/" + id, component: PlexMovie },
-  SERIES: { url: (id: string) => "/series/" + id, component: PlexSeries },
-  SEASON: { url: (id: string) => "/seasons/" + id, component: PlexSeason },
+  /** MEDIA **/
+  MOVIE: { url: (id: string) => "/movies/" + id, component: Movie },
+  SERIES: { url: (id: string) => "/series/" + id, component: Series },
 
   /** SEARCH **/
   SEARCH: {

@@ -3,12 +3,12 @@ import { useSonarrConfigs } from "../hooks/useSonarrConfigs";
 import { ISonarrConfig } from "../models/ISonarrConfig";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { ISonarrInstanceInfo } from "../models/ISonarrInstanceInfo";
-import { IProviderConfigBase } from "../models/IProviderConfigBase";
+import { IProviderSettingsBase } from "../models/IProviderSettingsBase";
 
 interface ISonarrConfigsContext {
   sonarrConfigs: IAsyncCall<ISonarrConfig[] | null>;
   getSonarrInstanceInfo: (
-    config: IProviderConfigBase,
+    config: IProviderSettingsBase,
     withAlert: boolean
   ) => Promise<IAsyncCall<ISonarrInstanceInfo | null>>;
   createSonarrConfig: (

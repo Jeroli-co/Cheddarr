@@ -9,6 +9,7 @@ type RowProps = {
     | "space-between";
   alignItems?: "center";
   width?: string;
+  wrap?: "wrap" | "nowrap";
 };
 
 export const Row = styled.div<RowProps>`
@@ -25,5 +26,5 @@ export const Row = styled.div<RowProps>`
     `}
   
   width: ${(props) => (props.width ? props.width : "100%")};
-  flex-wrap: wrap;
+  flex-wrap: ${(props) => (props.wrap ? props.wrap : "wrap")};
 `;

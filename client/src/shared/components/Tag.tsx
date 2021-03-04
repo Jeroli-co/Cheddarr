@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+import { IMedia } from "../models/IMedia";
+import { MediaTypes } from "../enums/MediaTypes";
 
 export const Tag = styled.div`
   width: min-content;
@@ -7,6 +9,8 @@ export const Tag = styled.div`
   padding-right: 10px;
   border-radius: 12px;
   background: ${(props) => props.theme.grey};
+  white-space: nowrap;
+  margin: 10px;
 `;
 
 export const WarningTag = styled(Tag)`
@@ -35,4 +39,18 @@ const SeriesTagStyle = styled(Tag)`
 
 export const SeriesTag = () => {
   return <SeriesTagStyle>Series</SeriesTagStyle>;
+};
+
+type MediaTagProps = {
+  media: IMedia;
+};
+
+export const MediaTag = (props: MediaTagProps) => {
+  if (props.media.mediaType === MediaTypes.MOVIES) {
+    return <MovieTagStyle>Movie</MovieTagStyle>;
+  } else if (props.media.mediaType === MediaTypes.SERIES) {
+    return <SeriesTagStyle>Series</SeriesTagStyle>;
+  } else {
+    return <></>;
+  }
 };

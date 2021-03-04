@@ -36,6 +36,7 @@ export const InputField = styled.div<InputFieldProps>`
   ${(props) =>
     props.isInline &&
     css`
+      align-items: center;
       label {
         padding-right: 10px;
       }

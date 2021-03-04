@@ -29,7 +29,7 @@ export const SidebarMenuMobile = ({ isOpen, toggle }: SidebarMenuProps) => {
 
   const navigate = (route: string) => {
     history.push(route);
-    if (width <= STATIC_STYLES.MOBILE_MAX_WIDTH && isOpen) {
+    if (width <= STATIC_STYLES.TABLET_MAX_WIDTH && isOpen) {
       toggle();
     }
   };

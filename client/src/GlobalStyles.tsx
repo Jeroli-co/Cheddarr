@@ -5,7 +5,8 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
     min-height: 100vh;
     max-width: 100vw;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Tajawal', sans-serif;
+    //font-family: 'Montserrat', sans-serif;
     //font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
