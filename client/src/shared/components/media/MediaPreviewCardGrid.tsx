@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
 import { MovieTag, SeriesTag } from "../Tag";
 import { IMedia, isOnServers } from "../../models/IMedia";
@@ -10,7 +10,10 @@ import { RequestMediaModal } from "./RequestMediaModal";
 import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
 
-const Container = styled.div`
+const Container = styled.div<{
+  hasPoster: boolean;
+  size: { width: number; height: number };
+}>`
   position: relative;
   flex: 0 0 calc(16.66% - 10px);
   cursor: pointer;
@@ -85,17 +88,34 @@ const Container = styled.div`
       font-weight: bold;
     }
   }
+
+  ${(props) =>
+    !props.hasPoster &&
+    css`
+      .media-hover-info {
+        width: ${props.size.width}px;
+        height: ${props.size.height}px;
+        opacity: 1;
+      }
+    `}
 `;
 
 type MediaPreviewCardProps = {
   media: IMedia;
+  size: {
+    width: number;
+    height: number;
+  };
 };
 
-export const MediaPreviewCardGrid = ({ media }: MediaPreviewCardProps) => {
+export const MediaPreviewCardGrid = ({
+  media,
+  size,
+}: MediaPreviewCardProps) => {
   const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
 
   return (
-    <Container>
+    <Container hasPoster={!!media.posterUrl} size={size}>
       <img className="media-image" src={media.posterUrl} alt="" />
       {isOnServers(media) && (
         <span className="media-is-present">

@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import { SearchFilters } from "../../shared/enums/SearchFilters";
 import { H1 } from "../../shared/components/Titles";
 import { MediaPreviewCardGrid } from "../../shared/components/media/MediaPreviewCardGrid";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useMedia } from "../../shared/hooks/useMedia";
 import { IMedia } from "../../shared/models/IMedia";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
@@ -22,24 +22,21 @@ import {
 import { useWindowSize } from "../../shared/hooks/useWindowSize";
 
 const Container = styled.div`
-  .media-cards {
-    display: flex;
-    flex-wrap: wrap;
-  }
+  display: flex;
+  flex-wrap: wrap;
 
   .media-loading-container {
     display: flex;
+    flex-wrap: wrap;
   }
 `;
 
-const LoadingCard = styled.div`
-  flex: 0 0 calc(16.66% - 10px);
-
-  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    flex: 0 0 calc(25% - 10px);
-  }
-
-  height: 20px;
+const LoadingCard = styled.div<{
+  index: number;
+  size: { width: number; height: number };
+}>`
+  width: ${(props) => props.size.width}px;
+  height: ${(props) => props.size.height}px;
   margin: 5px;
   border: 3px solid ${(props) => props.theme.primaryLighter};
   background: ${(props) => props.theme.primaryLighter};
@@ -47,47 +44,41 @@ const LoadingCard = styled.div`
   animation: 1s ease infinite running;
 
   @media screen and (min-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    &:nth-child(1) {
-      animation-name: ${LoadingCard16};
-    }
-
-    &:nth-child(2) {
-      animation-name: ${LoadingCard26};
-    }
-
-    &:nth-child(3) {
-      animation-name: ${LoadingCard36};
-    }
-
-    &:nth-child(4) {
-      animation-name: ${LoadingCard46};
-    }
-
-    &:nth-child(5) {
-      animation-name: ${LoadingCard56};
-    }
-
-    &:nth-child(6) {
-      animation-name: ${LoadingCard66};
-    }
+    animation-name: ${(props) => {
+      switch (props.index) {
+        case 1:
+          return LoadingCard16;
+        case 2:
+          return LoadingCard26;
+        case 3:
+          return LoadingCard36;
+        case 4:
+          return LoadingCard46;
+        case 5:
+          return LoadingCard56;
+        case 6:
+          return LoadingCard66;
+        default:
+          return;
+      }
+    }};
   }
 
   @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    &:nth-child(1) {
-      animation-name: ${LoadingCard14};
-    }
-
-    &:nth-child(2) {
-      animation-name: ${LoadingCard24};
-    }
-
-    &:nth-child(3) {
-      animation-name: ${LoadingCard34};
-    }
-
-    &:nth-child(4) {
-      animation-name: ${LoadingCard44};
-    }
+    animation-name: ${(props) => {
+      switch (props.index) {
+        case 1:
+          return LoadingCard14;
+        case 2:
+          return LoadingCard24;
+        case 3:
+          return LoadingCard34;
+        case 4:
+          return LoadingCard44;
+        default:
+          return;
+      }
+    }};
   }
 `;
 
@@ -103,7 +94,9 @@ const Search = () => {
   const [page, setPage] = useState(1);
   const mediaPage = useMedia(title, type, page);
   const pageRef = useRef<{ page: number; totalPages: number }>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { width } = useWindowSize();
+  const [cardSize, setCardSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     setPage(1);
@@ -129,7 +122,6 @@ const Search = () => {
 
     window.addEventListener("scroll", () => {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-        console.log("you're at the bottom of the page");
         loadNextPage();
       }
     });
@@ -152,6 +144,21 @@ const Search = () => {
     }
   }, [mediaPage.data]);
 
+  useEffect(() => {
+    if (containerRef.current) {
+      const numberOfElem =
+        width < STATIC_STYLES.MOBILE_MAX_WIDTH
+          ? 1
+          : width < STATIC_STYLES.TABLET_MAX_WIDTH
+          ? 4
+          : 6;
+      const containerWidth = containerRef.current.offsetWidth;
+      const cardWidth = containerWidth / numberOfElem - 10;
+      const cardHeight = cardWidth + cardWidth / 2;
+      setCardSize({ width: cardWidth, height: cardHeight });
+    }
+  }, [containerRef.current]);
+
   if (
     media.length === 0 &&
     mediaPage.data &&
@@ -161,25 +168,24 @@ const Search = () => {
   }
 
   return (
-    <Container>
-      <div className="media-cards">
-        {media.map(
-          (m, index) =>
-            m.posterUrl && <MediaPreviewCardGrid key={index} media={m} />
-        )}
-      </div>
-      <div className="media-loading-container">
-        {mediaPage.isLoading && (
-          <>
-            <LoadingCard />
-            <LoadingCard />
-            <LoadingCard />
-            <LoadingCard />
-            {width > STATIC_STYLES.TABLET_MAX_WIDTH && <LoadingCard />}
-            {width > STATIC_STYLES.TABLET_MAX_WIDTH && <LoadingCard />}
-          </>
-        )}
-      </div>
+    <Container ref={containerRef}>
+      {media.map((m, index) => (
+        <MediaPreviewCardGrid key={index} media={m} size={cardSize} />
+      ))}
+      {mediaPage.isLoading && (
+        <>
+          <LoadingCard index={1} size={cardSize} />
+          <LoadingCard index={2} size={cardSize} />
+          <LoadingCard index={3} size={cardSize} />
+          <LoadingCard index={4} size={cardSize} />
+          {width > STATIC_STYLES.TABLET_MAX_WIDTH && (
+            <LoadingCard index={5} size={cardSize} />
+          )}
+          {width > STATIC_STYLES.TABLET_MAX_WIDTH && (
+            <LoadingCard index={6} size={cardSize} />
+          )}
+        </>
+      )}
     </Container>
   );
 };
