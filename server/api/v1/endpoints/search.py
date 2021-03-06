@@ -36,7 +36,7 @@ def search_media(
             external_ids=[media.tmdb_id, media.imdb_id, media.tvdb_id],
         )
         if db_media is not None:
-            media.plex_media_info = [
+            media.media_server_info = [
                 PlexMediaInfo(**server_media.as_dict()) for server_media in db_media.server_media
             ]
     search_result = SearchResult(

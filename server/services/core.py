@@ -79,7 +79,7 @@ def set_episode_db_info(
         episode_number=episode.episode_number,
     )
     if db_episode is not None:
-        episode.plex_media_info = [
+        episode.media_server_info = [
             PlexMediaInfo(**server_media.as_dict()) for server_media in db_episode.server_episodes
         ]
 
@@ -91,7 +91,7 @@ def set_seasons_db_info(series: SeriesSchema, season_repo: SeasonRepository):
             (s for s in db_seasons if s.season_number == season.season_number), None
         )
         if season_info is not None:
-            season.plex_media_info = [
+            season.media_server_info = [
                 PlexMediaInfo(**s.as_dict()) for s in season_info.server_seasons
             ]
 
@@ -109,6 +109,6 @@ def set_episodes_db_info(
             (e for e in db_episodes if e.episode_number == episode.episode_number), None
         )
         if episode_info is not None:
-            episode.plex_media_info = [
+            episode.media_server_info = [
                 PlexMediaInfo(**s.as_dict()) for s in episode_info.server_episodes
             ]

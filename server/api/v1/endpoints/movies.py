@@ -47,7 +47,7 @@ def get_recent_movies(
     recent_movies = []
     for movie in db_recent_movies:
         tmdb_movie = tmdb.get_tmdb_movie(movie.tmdb_id)
-        tmdb_movie.plex_media_info = movie.server_media
+        tmdb_movie.media_server_info = movie.server_media
         recent_movies.append(tmdb_movie.dict())
 
     return recent_movies

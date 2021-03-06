@@ -63,7 +63,7 @@ class SeasonSchema(MediaSchema):
     title: str
     release_date: Optional[date]
     episodes: Optional[List[EpisodeSchema]]
-    plex_media_info: Optional[List[MediaServerInfo]]
+    medi_server_info: Optional[List[MediaServerInfo]]
 
 
 class SeriesSchema(MediaSchema):

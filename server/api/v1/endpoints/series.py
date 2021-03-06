@@ -115,7 +115,7 @@ def get_recent_series(
     recent_series = []
     for series in db_recent_series:
         tmdb_series = tmdb.get_tmdb_series(series.tmdb_id)
-        tmdb_series.plex_media_info = series.server_media
+        tmdb_series.media_server_info = series.server_media
         recent_series.append(tmdb_series.dict())
 
     return recent_series
