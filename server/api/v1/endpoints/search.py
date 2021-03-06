@@ -27,7 +27,7 @@ def search_media(
         media_results, total_pages, total_results = tmdb.search_tmdb_media(value, page)
 
     for media in media_results:
-        db_media = media_repo.find_by_any_external_id(
+        db_media = media_repo.find_by_external_id(
             external_ids=[media.tmdb_id, media.imdb_id, media.tvdb_id],
         )
         if db_media is not None:

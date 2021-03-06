@@ -105,7 +105,7 @@ def process_plex_media(
     plex_media: Union[PlexMovie, PlexSeries], server_id: str, media_repo: MediaRepository
 ) -> Media:
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_media)
-    media = media_repo.find_by_any_external_id(external_ids=[tmdb_id, imdb_id, tvdb_id])
+    media = media_repo.find_by_external_id(external_ids=[tmdb_id, imdb_id, tvdb_id])
     if media is None:
         media = Media(
             tmdb_id=tmdb_id,
@@ -135,7 +135,7 @@ def process_plex_season(
 
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_season.show())
 
-    season = season_repo.find_by_any_external_id_and_season_number(
+    season = season_repo.find_by_external_id_and_season_number(
         season_number=plex_season.index, external_ids=[tmdb_id, imdb_id, tvdb_id]
     )
     if season is None:
@@ -164,7 +164,7 @@ def process_plex_episode(
 ) -> Episode:
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_episode.show())
 
-    episode = episode_repo.find_by_any_external_id_and_season_number_and_episode_number(
+    episode = episode_repo.find_by_external_id_and_season_number_and_episode_number(
         episode_number=plex_episode.index,
         season_number=plex_episode.seasonNumber,
         external_ids=[tmdb_id, imdb_id, tvdb_id],

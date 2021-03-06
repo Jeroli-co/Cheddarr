@@ -19,11 +19,6 @@ class MediaServerInfo(APIModel):
 
 
 class PlexMediaInfo(MediaServerInfo):
-    server_media_id: str
-    added_at: date
-    server_id: str
-    web_url: Optional[AnyHttpUrl]
-
     @validator("web_url", pre=True)
     def get_web_url(cls, web_url, values):
         return "https://app.plex.tv/desktop#!/server/%s/details?key=library/metadata/%s" % (
