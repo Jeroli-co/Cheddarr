@@ -1,7 +1,6 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import parse_obj_as
 from starlette import status
 
 from server.api import dependencies as deps
@@ -12,11 +11,16 @@ from server.repositories.media import (
     SeasonRepository,
 )
 from server.repositories.requests import MediaRequestRepository
-from server.schemas.external_services import PlexMediaInfo
 from server.schemas.media import EpisodeSchema, SeasonSchema, SeriesSchema
-from server.schemas.requests import MovieRequestSchema
 from server.schemas.search import SearchResult
 from server.services import tmdb
+from server.services.core import (
+    set_episode_db_info,
+    set_episodes_db_info,
+    set_media_db_info,
+    set_season_db_info,
+    set_seasons_db_info,
+)
 
 router = APIRouter()
 
@@ -33,34 +37,15 @@ def get_series(
     tmdb_id: int,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     season_repo: SeasonRepository = Depends(deps.get_repository(SeasonRepository)),
-    media_request_repo: MediaRequestRepository = Depends(
-        deps.get_repository(MediaRequestRepository)
-    ),
+    request_repo: MediaRequestRepository = Depends(deps.get_repository(MediaRequestRepository)),
 ):
     series = tmdb.get_tmdb_series(tmdb_id)
     if series is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Series not found.")
 
-    db_media = media_repo.find_by_any_external_id(
-        external_ids=[series.tmdb_id, series.imdb_id, series.tvdb_id],
-    )
-    if db_media is not None:
-        series.plex_media_info = [
-            PlexMediaInfo(**media_info.as_dict()) for media_info in db_media.server_media
-        ]
-        db_seasons = season_repo.find_all_by(series_id=db_media.id)
-        if db_seasons is not None:
-            for season in series.seasons:
-                season_info = next(
-                    (s for s in db_seasons if s.season_number == season.season_number), None
-                )
-                if season_info is not None:
-                    season.plex_media_info = [
-                        PlexMediaInfo(**s.as_dict()) for s in season_info.server_seasons
-                    ]
-        series.requests = parse_obj_as(
-            List[MovieRequestSchema], media_request_repo.find_all_by_tmdb_id(tmdb_id=tmdb_id)
-        )
+    set_media_db_info(series, media_repo, request_repo)
+    if series.media_server_info is not None:
+        set_seasons_db_info(series, season_repo)
 
     return series.dict()
 
@@ -83,24 +68,9 @@ def get_season(
     if season is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Season not found.")
 
-    db_season = season_repo.find_by_any_external_id_and_season_number(
-        external_ids=[tmdb_id],
-        season_number=season.season_number,
-    )
-    if db_season is not None:
-        season.plex_media_info = [
-            PlexMediaInfo(**server_media.as_dict()) for server_media in db_season.server_seasons
-        ]
-        db_episodes = episode_repo.find_all_by(season_id=db_season.id)
-        if db_episodes is not None:
-            for episode in season.episodes:
-                episode_info = next(
-                    (e for e in db_episodes if e.episode_number == episode.episode_number), None
-                )
-                if episode_info is not None:
-                    episode.plex_media_info = [
-                        PlexMediaInfo(**s.as_dict()) for s in episode_info.server_episodes
-                    ]
+    set_season_db_info(season, tmdb_id, season_repo)
+    set_episodes_db_info(season, tmdb_id, episode_repo)
+
     return season.dict()
 
 
@@ -122,15 +92,8 @@ def get_episode(
     if episode is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Episode not found.")
 
-    db_episode = episode_repo.find_by_any_external_id_and_season_number_and_episode_number(
-        external_ids=[tmdb_id],
-        season_number=season_number,
-        episode_number=episode_number,
-    )
-    if db_episode is not None:
-        episode.plex_media_info = [
-            PlexMediaInfo(**server_media.as_dict()) for server_media in db_episode.server_episodes
-        ]
+    set_episode_db_info(episode, tmdb_id, season_number, episode_repo)
+
     return episode.dict()
 
 
@@ -158,8 +121,8 @@ def get_popular_series(
     page: int = 1, media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository))
 ):
     popular_series, total_pages, total_results = tmdb.get_tmdb_popular_series(page=page)
-    for movie in popular_series:
-        set_movie_db_info(movie, media_repo)
+    for series in popular_series:
+        set_media_db_info(series, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in popular_series],
@@ -176,8 +139,8 @@ def get_upcoming_series(
     page: int = 1, media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository))
 ):
     upcoming_series, total_pages, total_results = tmdb.get_tmdb_upcoming_series(page=page)
-    for movie in upcoming_series:
-        set_movie_db_info(movie, media_repo)
+    for series in upcoming_series:
+        set_media_db_info(series, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in upcoming_series],
@@ -200,8 +163,8 @@ def get_similar_series(
     similar_series, total_pages, total_results = tmdb.get_tmdb_similar_series(
         tmdb_id=tmdb_id, page=page
     )
-    for movie in similar_series:
-        set_movie_db_info(movie, media_repo)
+    for series in similar_series:
+        set_media_db_info(series, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in similar_series],
@@ -224,8 +187,8 @@ def get_recommended_series(
     recommended_series, total_pages, total_results = tmdb.get_tmdb_recommended_series(
         tmdb_id=tmdb_id, page=page
     )
-    for movie in recommended_series:
-        set_movie_db_info(movie, media_repo)
+    for series in recommended_series:
+        set_media_db_info(series, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in recommended_series],

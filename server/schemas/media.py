@@ -5,7 +5,7 @@ from typing import List, Optional
 from pydantic import AnyHttpUrl, Field, validator
 
 from server.models.media import MediaType, SeriesType
-from server.schemas.external_services import PlexMediaInfo
+from server.schemas.external_services import MediaServerInfo
 from .base import APIModel
 
 
@@ -44,7 +44,7 @@ class MediaSchema(APIModel, ABC):
     genres: Optional[List[str]]
     studios: Optional[List[CompanySchema]]
     credits: Optional[CreditsSchema]
-    plex_media_info: Optional[List[PlexMediaInfo]]
+    media_server_info: Optional[List[MediaServerInfo]]
 
 
 class MovieSchema(MediaSchema):
@@ -63,7 +63,7 @@ class SeasonSchema(MediaSchema):
     title: str
     release_date: Optional[date]
     episodes: Optional[List[EpisodeSchema]]
-    plex_media_info: Optional[List[PlexMediaInfo]]
+    plex_media_info: Optional[List[MediaServerInfo]]
 
 
 class SeriesSchema(MediaSchema):

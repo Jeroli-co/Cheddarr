@@ -9,7 +9,7 @@ from server.repositories.requests import MediaRequestRepository
 from server.schemas.media import MovieSchema
 from server.schemas.search import SearchResult
 from server.services import tmdb
-from server.services.core import set_movie_db_info
+from server.services.core import set_media_db_info
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ def get_movie(
     movie = tmdb.get_tmdb_movie(tmdb_id)
     if movie is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Movie not found.")
-    set_movie_db_info(movie, media_repo, request_repo)
+    set_media_db_info(movie, media_repo, request_repo)
     return movie.dict()
 
 
@@ -57,7 +57,7 @@ def get_popular_movies(
 ):
     popular_movies, total_pages, total_results = tmdb.get_tmdb_popular_movies(page=page)
     for movie in popular_movies:
-        set_movie_db_info(movie, media_repo)
+        set_media_db_info(movie, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in popular_movies],
@@ -69,16 +69,13 @@ def get_popular_movies(
     return search_result
 
 
-
-
-
 @router.get("/upcoming", response_model=SearchResult, response_model_exclude_none=True)
 def get_upcoming_movies(
     page: int = 1, media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository))
 ):
     upcoming_movies, total_pages, total_results = tmdb.get_tmdb_upcoming_movies(page=page)
     for movie in upcoming_movies:
-        set_movie_db_info(movie, media_repo)
+        set_media_db_info(movie, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in upcoming_movies],
@@ -102,7 +99,7 @@ def get_similar_movies(
         tmdb_id=tmdb_id, page=page
     )
     for movie in similar_movies:
-        set_movie_db_info(movie, media_repo)
+        set_media_db_info(movie, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in similar_movies],
@@ -126,7 +123,7 @@ def get_recommended_movies(
         tmdb_id=tmdb_id, page=page
     )
     for movie in recommended_movies:
-        set_movie_db_info(movie, media_repo)
+        set_media_db_info(movie, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in recommended_movies],

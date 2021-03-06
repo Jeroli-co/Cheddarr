@@ -7,11 +7,18 @@ from .base import APIModel
 
 
 #####################################
-# Plex                              #
+# Media Servers                     #
 #####################################
 
 
-class PlexMediaInfo(APIModel):
+class MediaServerInfo(APIModel):
+    server_media_id: str
+    added_at: date
+    server_id: str
+    web_url: Optional[AnyHttpUrl]
+
+
+class PlexMediaInfo(MediaServerInfo):
     server_media_id: str
     added_at: date
     server_id: str
@@ -26,7 +33,7 @@ class PlexMediaInfo(APIModel):
 
 
 #####################################
-# Radarr                            #
+# Media Providers                   #
 #####################################
 
 
@@ -46,11 +53,6 @@ class RadarrMovie(APIModel):
     images: List[dict] = Field(alias="images")
     has_file: bool = Field(alias="hasFile")
     add_options: Optional[RadarrAddOptions] = Field(alias="addOptions")
-
-
-#####################################
-# Sonarr                            #
-#####################################
 
 
 class SonarrAddOptions(APIModel):
