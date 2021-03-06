@@ -25,7 +25,7 @@ class MediaRequest(Model, Timestamp):
     __mapper_args__ = {"polymorphic_on": "media_type"}
 
     id = Column(Integer, primary_key=True)
-    media_type = Column(DBEnum(MediaType))
+    media_type = Column(DBEnum(MediaType), nullable=False)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
     comment = Column(Text)
 

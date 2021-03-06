@@ -10,6 +10,7 @@ from server.database import Model
 
 
 class UserRole(int, Enum):
+    none = 0
     admin = 2
     request = auto()
     manage_settings = auto()
@@ -25,7 +26,7 @@ class User(Model):
     password_hash = Column(String, nullable=False)
     avatar = Column(String)
     confirmed = Column(Boolean, nullable=False, default=False)
-    roles = Column(Integer)
+    roles = Column(Integer, default=UserRole.none)
     plex_user_id = Column(Integer)
     plex_api_key = Column(String)
 

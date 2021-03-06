@@ -5,6 +5,7 @@ from starlette import status
 
 from server.api import dependencies as deps
 from server.models.media import MediaType
+from server.models.users import User
 from server.repositories.media import (
     EpisodeRepository,
     MediaRepository,
@@ -32,9 +33,11 @@ router = APIRouter()
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No series found"},
     },
+    dependencies=[Depends(deps.get_current_user)],
 )
 def get_series(
     tmdb_id: int,
+    current_user: User = Depends(deps.get_current_user),
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     season_repo: SeasonRepository = Depends(deps.get_repository(SeasonRepository)),
     request_repo: MediaRequestRepository = Depends(deps.get_repository(MediaRequestRepository)),
@@ -43,7 +46,7 @@ def get_series(
     if series is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Series not found.")
 
-    set_media_db_info(series, media_repo, request_repo)
+    set_media_db_info(series, current_user.id, media_repo, request_repo)
     if series.media_server_info is not None:
         set_seasons_db_info(series, season_repo)
 
@@ -57,6 +60,7 @@ def get_series(
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No season found"},
     },
+    dependencies=[Depends(deps.get_current_user)],
 )
 def get_season(
     tmdb_id: int,
@@ -81,6 +85,7 @@ def get_season(
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No episode found"},
     },
+    dependencies=[Depends(deps.get_current_user)],
 )
 def get_episode(
     tmdb_id: int,
@@ -118,11 +123,13 @@ def get_recent_series(
 
 @router.get("/popular", response_model=SearchResult, response_model_exclude_none=True)
 def get_popular_series(
-    page: int = 1, media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository))
+    page: int = 1,
+    current_user: User = Depends(deps.get_current_user),
+    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
 ):
     popular_series, total_pages, total_results = tmdb.get_tmdb_popular_series(page=page)
     for series in popular_series:
-        set_media_db_info(series, media_repo)
+        set_media_db_info(series, current_user.id, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in popular_series],
@@ -136,11 +143,13 @@ def get_popular_series(
 
 @router.get("/upcoming", response_model=SearchResult, response_model_exclude_none=True)
 def get_upcoming_series(
-    page: int = 1, media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository))
+    page: int = 1,
+    current_user: User = Depends(deps.get_current_user),
+    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
 ):
     upcoming_series, total_pages, total_results = tmdb.get_tmdb_upcoming_series(page=page)
     for series in upcoming_series:
-        set_media_db_info(series, media_repo)
+        set_media_db_info(series, current_user.id, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in upcoming_series],
@@ -158,13 +167,14 @@ def get_upcoming_series(
 def get_similar_series(
     tmdb_id: int,
     page: int = 1,
+    current_user: User = Depends(deps.get_current_user),
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
 ):
     similar_series, total_pages, total_results = tmdb.get_tmdb_similar_series(
         tmdb_id=tmdb_id, page=page
     )
     for series in similar_series:
-        set_media_db_info(series, media_repo)
+        set_media_db_info(series, current_user.id, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in similar_series],
@@ -182,13 +192,14 @@ def get_similar_series(
 def get_recommended_series(
     tmdb_id: int,
     page: int = 1,
+    current_user: User = Depends(deps.get_current_user),
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
 ):
     recommended_series, total_pages, total_results = tmdb.get_tmdb_recommended_series(
         tmdb_id=tmdb_id, page=page
     )
     for series in recommended_series:
-        set_media_db_info(series, media_repo)
+        set_media_db_info(series, current_user.id, media_repo)
 
     search_result = SearchResult(
         results=[m.dict() for m in recommended_series],

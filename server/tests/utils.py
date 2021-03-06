@@ -2,6 +2,9 @@ from typing import Dict
 
 from fastapi.testclient import TestClient
 
+from server.models.media import MediaType
+from server.models.requests import RequestStatus
+
 
 def user_authentication_headers(
     *, client: TestClient, email: str, password: str
@@ -55,9 +58,7 @@ datasets = {
             "title": "Star Wars: The Clone Wars",
             "tmdb_id": 4194,
             "tvdb_id": 83268,
-            "media_type": "series",
-            "external_media_id": 1,
-            "setting_id": 1,
+            "media_type": MediaType.series,
         }
     ],
     "series_requests": [
@@ -65,41 +66,43 @@ datasets = {
             "id": 1,
             "requesting_user_id": 3,
             "requested_user_id": 1,
-            "status": "pending",
+            "status": RequestStatus.pending,
             "media_id": 1,
+            "media_type": MediaType.series,
         },
         {
             "id": 2,
             "requesting_user_id": 1,
             "requested_user_id": 3,
-            "status": "approved",
+            "status": RequestStatus.approved,
             "media_id": 1,
+            "media_type": MediaType.series,
         },
     ],
     "movies": [
         {
             "id": 2,
-            "title": "Star Wars: The Clone Wars",
+            "title": "Star Wars",
             "tmdb_id": 11,
-            "media_type": "movies",
-            "external_media_id": 2,
-            "setting_id": 1,
+            "media_type": MediaType.movies,
         }
     ],
     "movies_requests": [
         {
-            "id": 1,
+            "id": 3,
             "requesting_user_id": 3,
             "requested_user_id": 1,
-            "status": "pending",
+            "status": RequestStatus.pending,
             "media_id": 1,
+            "media_type": MediaType.movies,
         },
         {
-            "id": 2,
+            "id": 4,
             "requesting_user_id": 1,
             "requested_user_id": 3,
-            "status": "approved",
+            "status": RequestStatus.approved,
             "media_id": 1,
+            "media_type": MediaType.movies,
         },
     ],
 }

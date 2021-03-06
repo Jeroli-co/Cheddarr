@@ -4,18 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from server.api import dependencies as deps
 from server.core.scheduler import scheduler
+from server.core.security import check_permissions
 from server.jobs.radarr import send_radarr_request_task
 from server.jobs.sonarr import send_sonarr_request_task
-from server.models.media import Media
+from server.models.media import Media, MediaType
 from server.models.requests import (
-    EpisodeRequest,
     MovieRequest,
     RequestStatus,
-    SeasonRequest,
     SeriesRequest,
 )
 from server.models.settings import RadarrSetting, SonarrSetting
-from server.models.users import User
+from server.models.users import User, UserRole
 from server.repositories.media import MediaRepository
 from server.repositories.requests import MediaRequestRepository
 from server.repositories.users import UserRepository
@@ -29,6 +28,7 @@ from server.schemas.requests import (
     SeriesRequestSchema,
 )
 from server.services import tmdb
+from server.services.core import unify_series_request
 
 router = APIRouter()
 
@@ -40,7 +40,9 @@ def get_received_movie_requests(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests = media_request_repo.find_all_by(requested_user_id=current_user.id)
+    requests = media_request_repo.find_all_by(
+        requested_user_id=current_user.id, media_type=MediaType.movies
+    )
     return requests
 
 
@@ -51,7 +53,9 @@ def get_sent_movie_requests(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests = media_request_repo.find_all_by(requesting_user_id=current_user.id)
+    requests = media_request_repo.find_all_by(
+        requesting_user_id=current_user.id, media_type=MediaType.movies
+    )
     return requests
 
 
@@ -98,7 +102,13 @@ def add_movie_request(
         requesting_user=current_user,
         media=movie,
     )
+    if check_permissions(
+        current_user.roles, permissions=[UserRole.admin, UserRole.auto_approve], options="or"
+    ):
+        movie_request.status = RequestStatus.approved
+
     media_request_repo.save(movie_request)
+
     return movie_request
 
 
@@ -195,7 +205,9 @@ def get_received_series_requests(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests = media_request_repo.find_all_by(requested_user_id=current_user.id)
+    requests = media_request_repo.find_all_by(
+        requested_user_id=current_user.id, media_type=MediaType.series
+    )
     return requests
 
 
@@ -206,7 +218,9 @@ def get_sent_series_requests(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests = media_request_repo.find_all_by(requesting_user_id=current_user.id)
+    requests = media_request_repo.find_all_by(
+        requesting_user_id=current_user.id, media_type=MediaType.series
+    )
     return requests
 
 
@@ -259,7 +273,13 @@ def add_series_request(
             media=series,
         )
         unify_series_request(series_request, request_in)
+        if check_permissions(
+            current_user.roles, permissions=[UserRole.admin, UserRole.auto_approve], options="or"
+        ):
+            series_request.status = RequestStatus.approved
+
         media_request_repo.save(series_request)
+
         return series_request
 
     if request_in.seasons:
@@ -307,34 +327,14 @@ def add_series_request(
     else:
         series_request.seasons = []
 
+    if check_permissions(
+        current_user.roles, permissions=[UserRole.admin, UserRole.auto_approve], options="or"
+    ):
+        series_request.status = RequestStatus.approved
+
     media_request_repo.save(series_request)
+
     return series_request
-
-
-def unify_series_request(series_request: SeriesRequest, request_in: SeriesRequestCreate):
-    if request_in.seasons is None:
-        request_in.seasons = []
-    for season in request_in.seasons:
-        if season.episodes is None:
-            season.episodes = []
-        else:
-            episodes = []
-            for episode in season.episodes:
-                episodes.append(episode.to_orm(EpisodeRequest))
-            season.episodes = episodes
-
-        already_added_season = next(
-            (s for s in series_request.seasons if s.season_number == season.season_number),
-            None,
-        )
-
-        if not already_added_season:
-            series_request.seasons.append(season.to_orm(SeasonRequest))
-        else:
-            if season.episodes:
-                already_added_season.episodes.extend(season.episodes)
-            else:
-                already_added_season.episodes = season.episodes
 
 
 @router.patch(

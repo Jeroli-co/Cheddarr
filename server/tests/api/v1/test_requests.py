@@ -24,8 +24,8 @@ def test_add_series_never_requested_without_seasons(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert actual["seasons"] == expected.seasons
 
@@ -61,8 +61,8 @@ def test_add_series_never_requested_with_all_seasons(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 7
 
@@ -143,8 +143,8 @@ def test_add_season_never_requested(client: TestClient, db: Session, normal_user
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
@@ -212,8 +212,8 @@ def test_add_season_already_requested_some_season_conflict(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 4
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
@@ -304,8 +304,8 @@ def test_add_series_with_seasons_already_requested(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 0
 
@@ -350,8 +350,8 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 7
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
@@ -393,8 +393,8 @@ def test_add_episode_never_requested(client: TestClient, db: Session, normal_use
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
@@ -522,8 +522,8 @@ def test_add_episode_already_requested_some_episodes_conflict(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 3
     assert actual["seasons"][0]["season_number"] == expected.seasons[0].season_number == 1
@@ -668,8 +668,8 @@ def test_add_series_without_seasons_whereas_episodes_requested(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 0
 
@@ -716,8 +716,8 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 7
 
@@ -835,8 +835,8 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
     assert len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 22
@@ -888,8 +888,8 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert len(actual["seasons"]) == len(expected.seasons) == 2
     assert len(actual["seasons"][0]["episodes"]) == len(expected.seasons[0].episodes) == 0
@@ -1048,8 +1048,8 @@ def test_get_incoming_series_requests(client: TestClient, db: Session, normal_us
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert actual["seasons"] == expected.seasons
 
@@ -1070,8 +1070,8 @@ def test_get_outgoing_series_requests(client: TestClient, db: Session, normal_us
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
     assert actual["seasons"] == expected.seasons
 
@@ -1157,8 +1157,8 @@ def test_add_movie_never_requested(client: TestClient, db: Session, normal_user_
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
 
 
@@ -1196,8 +1196,8 @@ def test_get_incoming_movies_requests(client: TestClient, db: Session, normal_us
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
 
 
@@ -1217,8 +1217,8 @@ def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_us
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
     assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.strftime("%Y-%m-%d")
-    assert actual["updated_at"] == expected.created_at.strftime("%Y-%m-%d")
+    assert actual["created_at"] == expected.created_at.isoformat()
+    assert actual["updated_at"] == expected.created_at.isoformat()
     assert actual["media"]
 
 

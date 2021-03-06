@@ -2,6 +2,7 @@ from typing import List
 
 from pydantic import parse_obj_as
 
+from server.models.requests import EpisodeRequest, SeasonRequest, SeriesRequest
 from server.repositories.media import EpisodeRepository, MediaRepository, SeasonRepository
 from server.repositories.requests import MediaRequestRepository
 from server.schemas.external_services import PlexMediaInfo
@@ -11,11 +12,37 @@ from server.schemas.media import (
     SeasonSchema,
     SeriesSchema,
 )
-from server.schemas.requests import MovieRequestSchema
+from server.schemas.requests import MovieRequestSchema, SeriesRequestCreate
+
+
+def unify_series_request(series_request: SeriesRequest, request_in: SeriesRequestCreate):
+    if request_in.seasons is None:
+        request_in.seasons = []
+    for season in request_in.seasons:
+        if season.episodes is None:
+            season.episodes = []
+        else:
+            episodes = []
+            for episode in season.episodes:
+                episodes.append(episode.to_orm(EpisodeRequest))
+            season.episodes = episodes
+
+        already_added_season = next(
+            (s for s in series_request.seasons if s.season_number == season.season_number),
+            None,
+        )
+
+        if not already_added_season:
+            series_request.seasons.append(season.to_orm(SeasonRequest))
+        else:
+            if season.episodes:
+                already_added_season.episodes.extend(season.episodes)
+            else:
+                already_added_season.episodes = season.episodes
 
 
 def set_media_db_info(
-    media: MediaSchema, media_repo: MediaRepository, request_repo: MediaRequestRepository = None
+    media: MediaSchema, current_user_id:int,media_repo: MediaRepository, request_repo: MediaRequestRepository = None
 ):
     db_media = media_repo.find_by_external_id(
         external_ids=[media.tmdb_id, media.imdb_id, media.tvdb_id],
@@ -27,7 +54,7 @@ def set_media_db_info(
 
         if request_repo is not None:
             media.requests = parse_obj_as(
-                List[MovieRequestSchema], request_repo.find_all_by_tmdb_id(tmdb_id=media.tmdb_id)
+                List[MovieRequestSchema], request_repo.find_all_by_user_ids_and_tmdb_id(requesting_user_id=current_user_id,tmdb_id=media.tmdb_id)
             )
 
 

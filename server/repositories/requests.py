@@ -17,8 +17,12 @@ class MediaRequestRepository(BaseRepository[MediaRequest]):
             .join(Media)
             .filter(
                 Media.tmdb_id == tmdb_id,
-                MediaRequest.requesting_user_id == requesting_user_id,
-                MediaRequest.requested_user_id == requested_user_id,
+                (MediaRequest.requesting_user_id == requesting_user_id)
+                if requesting_user_id
+                else None,
+                (MediaRequest.requested_user_id == requested_user_id)
+                if requested_user_id
+                else None,
             )
             .all()
         )

@@ -6,6 +6,7 @@ from server.models.requests import RequestStatus
 from server.schemas.media import MovieSchema, SeriesSchema
 from server.schemas.users import UserPublicSchema
 from .base import APIModel
+from ..models.media import MediaType
 
 
 class MediaRequest(APIModel, ABC):
@@ -15,6 +16,7 @@ class MediaRequest(APIModel, ABC):
     requesting_user: UserPublicSchema
     created_at: datetime
     updated_at: datetime
+    media_type: MediaType
 
 
 class MediaRequestCreate(APIModel):

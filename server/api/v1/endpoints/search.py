@@ -12,7 +12,12 @@ from server.services import tmdb
 router = APIRouter()
 
 
-@router.get("", response_model=SearchResult, response_model_exclude_none=True)
+@router.get(
+    "",
+    response_model=SearchResult,
+    response_model_exclude_none=True,
+    dependencies=[Depends(deps.get_current_user)],
+)
 def search_media(
     value: str,
     page: int = 1,

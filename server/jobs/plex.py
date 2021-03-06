@@ -39,10 +39,10 @@ TVDB_REGEX = "tvdb|thetvdb"
 @scheduler.scheduled_job("interval", hours=5)
 def sync_plex_servers_library():
     db_session = next(get_db())
-    plex_setting_repo = MediaServerSettingRepository(db_session)
+    media_server_setting_repo = MediaServerSettingRepository(db_session)
     plex_settings = [
         PlexSetting(setting)
-        for setting in plex_setting_repo.find_all_by(service_name=ServiceNames.plex)
+        for setting in media_server_setting_repo.find_all_by(service_name=ServiceNames.plex)
     ]
     for setting in plex_settings:
         server = plex.get_server(
@@ -57,8 +57,8 @@ def sync_plex_servers_library():
 @scheduler.scheduled_job("interval", minutes=5)
 def sync_plex_servers_recently_added():
     db_session = next(get_db())
-    plex_setting_repo = MediaServerSettingRepository(db_session)
-    plex_settings = plex_setting_repo.find_all_by(service_name=ServiceNames.plex)
+    media_server_setting_repo = MediaServerSettingRepository(db_session)
+    plex_settings = media_server_setting_repo.find_all_by(service_name=ServiceNames.plex)
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
