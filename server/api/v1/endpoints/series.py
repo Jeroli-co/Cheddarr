@@ -50,7 +50,7 @@ def get_series(
     if series.media_server_info is not None:
         set_seasons_db_info(series, season_repo)
 
-    return series.dict()
+    return series.dict(exclude={"requests": {"__all__": {"media"}}})
 
 
 @router.get(

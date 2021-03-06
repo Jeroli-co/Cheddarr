@@ -10,19 +10,17 @@ class MediaRequestRepository(BaseRepository[MediaRequest]):
         return self.session.query(MediaRequest).join(Media).filter(Media.tmdb_id == tmdb_id).all()
 
     def find_all_by_user_ids_and_tmdb_id(
-        self, tmdb_id: int, requesting_user_id: int, requested_user_id: int
+        self, tmdb_id: int, requesting_user_id: int = None, requested_user_id: int = None
     ) -> List[Type[MediaRequest]]:
+        filters = []
+        if requesting_user_id is not None:
+            filters.append(MediaRequest.requesting_user_id == requesting_user_id)
+        if requested_user_id is not None:
+            filters.append(MediaRequest.requested_user_id == requested_user_id)
         return (
             self.session.query(MediaRequest)
             .join(Media)
-            .filter(
-                Media.tmdb_id == tmdb_id,
-                (MediaRequest.requesting_user_id == requesting_user_id)
-                if requesting_user_id
-                else None,
-                (MediaRequest.requested_user_id == requested_user_id)
-                if requested_user_id
-                else None,
-            )
+            .filter(Media.tmdb_id == tmdb_id)
+            .filter(*filters)
             .all()
         )

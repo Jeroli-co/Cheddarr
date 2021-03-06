@@ -42,7 +42,10 @@ def unify_series_request(series_request: SeriesRequest, request_in: SeriesReques
 
 
 def set_media_db_info(
-    media: MediaSchema, current_user_id:int,media_repo: MediaRepository, request_repo: MediaRequestRepository = None
+    media: MediaSchema,
+    current_user_id: int,
+    media_repo: MediaRepository,
+    request_repo: MediaRequestRepository = None,
 ):
     db_media = media_repo.find_by_external_id(
         external_ids=[media.tmdb_id, media.imdb_id, media.tvdb_id],
@@ -54,7 +57,10 @@ def set_media_db_info(
 
         if request_repo is not None:
             media.requests = parse_obj_as(
-                List[MovieRequestSchema], request_repo.find_all_by_user_ids_and_tmdb_id(requesting_user_id=current_user_id,tmdb_id=media.tmdb_id)
+                List[MovieRequestSchema],
+                request_repo.find_all_by_user_ids_and_tmdb_id(
+                    requesting_user_id=current_user_id, tmdb_id=media.tmdb_id
+                ),
             )
 
 
