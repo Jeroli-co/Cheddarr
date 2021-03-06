@@ -2,12 +2,16 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from server import models, schemas
 from server.api import (
     dependencies as deps,
 )
 from server.core import config
-from server.repositories import NotificationAgentRepository, UserRepository
+from server.models.notifications import Agent, NotificationAgent
+from server.models.users import User
+from server.repositories.notifications import NotificationAgentRepository
+from server.repositories.users import UserRepository
+from server.schemas.base import ResponseMessage
+from server.schemas.notifications import EmailAgentSchema, NotificationSchema
 
 router = APIRouter()
 
@@ -18,18 +22,18 @@ router = APIRouter()
 
 @router.get(
     "",
-    response_model=List[schemas.Notification],
+    response_model=List[NotificationSchema],
 )
 def get_all_notifications(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
 ):
     return current_user.notifications
 
 
-@router.delete("/{id}", response_model=schemas.ResponseMessage)
+@router.delete("/{id}", response_model=ResponseMessage)
 def delete_notification(
     id: int,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     current_user.notifications = [n for n in current_user.notifications if n.id != id]
@@ -38,9 +42,9 @@ def delete_notification(
     return {"detail": "Notification deleted"}
 
 
-@router.delete("", response_model=schemas.ResponseMessage)
+@router.delete("", response_model=ResponseMessage)
 def delete_all_notifications(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     current_user.notifications = []
@@ -56,7 +60,7 @@ def delete_all_notifications(
 
 @router.get(
     "/agents/email",
-    response_model=schemas.EmailAgent,
+    response_model=EmailAgentSchema,
     dependencies=[Depends(deps.get_current_user)],
 )
 def get_email_agent(
@@ -64,25 +68,25 @@ def get_email_agent(
         deps.get_repository(NotificationAgentRepository)
     ),
 ):
-    agent = notif_agent_repo.find_by(name=models.Agent.email)
+    agent = notif_agent_repo.find_by(name=Agent.email)
     return agent
 
 
 @router.put(
     "/agents/email",
-    response_model=schemas.EmailAgent,
+    response_model=EmailAgentSchema,
     dependencies=[Depends(deps.get_current_user)],
 )
 def update_email_agent(
-    agent_in: schemas.EmailAgent,
+    agent_in: EmailAgentSchema,
     notif_agent_repo: NotificationAgentRepository = Depends(
         deps.get_repository(NotificationAgentRepository)
     ),
 ):
-    agent = notif_agent_repo.find_by(name=models.Agent.email)
+    agent = notif_agent_repo.find_by(name=Agent.email)
     if agent is None:
-        agent = agent_in.to_orm(models.NotificationAgent)
-        agent.name = models.Agent.email
+        agent = agent_in.to_orm(NotificationAgent)
+        agent.name = Agent.email
     else:
         agent.update(agent_in)
     notif_agent_repo.save(agent)
@@ -96,7 +100,7 @@ def update_email_agent(
 @router.delete(
     "/agents/email",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=schemas.ResponseMessage,
+    response_model=ResponseMessage,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No email agent"},
     },
@@ -106,7 +110,7 @@ def delete_email_agent(
         deps.get_repository(NotificationAgentRepository)
     ),
 ):
-    agent = notif_agent_repo.find_by(name=models.Agent.email)
+    agent = notif_agent_repo.find_by(name=Agent.email)
     if agent is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No email agent is configured.")
     notif_agent_repo.remove(agent)

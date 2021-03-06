@@ -1,4 +1,3 @@
-import os
 from typing import Dict
 
 import pytest
@@ -55,13 +54,9 @@ def db():
 @pytest.fixture(scope="function", autouse=True)
 def setup():
     from server.database.base import Base
-    from server.models import (
-        Media,
-        MovieRequest,
-        SeriesRequest,
-        Friendship,
-        User,
-    )
+    from server.models.media import Media
+    from server.models.requests import MovieRequest, SeriesRequest
+    from server.models.users import Friendship, User
 
     Base.metadata.drop_all(_db_conn)
     Base.metadata.create_all(_db_conn)
@@ -100,6 +95,6 @@ def mock_tmdb(mocker):
     series["number_of_seasons"] = 7
     series["series_type"] = "anime"
     mocker.patch(
-        "server.helpers.search.get_tmdb_series",
+        "server.services.search.get_tmdb_series",
         return_value=series,
     )

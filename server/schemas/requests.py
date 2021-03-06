@@ -1,51 +1,53 @@
 from abc import ABC
-from datetime import date, datetime
+from datetime import datetime
 from typing import List, Optional
 
-from server.models import RequestStatus
-from server.schemas import APIModel, Movie, Series, UserPublic
+from server.models.requests import RequestStatus
+from server.schemas.media import MovieSchema, SeriesSchema
+from server.schemas.users import UserPublicSchema
+from .base import APIModel
 
 
-class Request(APIModel, ABC):
+class MediaRequest(APIModel, ABC):
     id: int
     status: RequestStatus
-    requested_user: UserPublic
-    requesting_user: UserPublic
+    requested_user: UserPublicSchema
+    requesting_user: UserPublicSchema
     created_at: datetime
     updated_at: datetime
 
 
-class RequestUpdate(APIModel):
-    status: RequestStatus
-    provider_id: Optional[str]
-
-
-class MovieRequest(Request):
-    media: Movie
-
-
-class RequestCreate(APIModel):
+class MediaRequestCreate(APIModel):
     tmdb_id: int
     requested_username: str
 
 
-class MovieRequestCreate(RequestCreate):
+class MediaRequestUpdate(APIModel):
+    status: RequestStatus
+    provider_id: Optional[str]
+
+
+class MovieRequestSchema(MediaRequest):
+    media: MovieSchema
+
+
+class MovieRequestCreate(MediaRequestCreate):
     pass
 
 
-class EpisodeRequest(APIModel):
+class EpisodeRequestSchema(APIModel):
     episode_number: int
 
 
-class SeasonRequest(APIModel):
+class SeasonRequestSchema(APIModel):
     season_number: int
-    episodes: Optional[List[EpisodeRequest]]
+    episodes: Optional[List[EpisodeRequestSchema]]
 
 
-class SeriesRequest(Request):
-    media: Series
-    seasons: Optional[List[SeasonRequest]]
+class SeriesRequestSchema(MediaRequest):
+    media: SeriesSchema
+    seasons: Optional[List[SeasonRequestSchema]]
 
 
-class SeriesRequestCreate(RequestCreate):
-    seasons: Optional[List[SeasonRequest]]
+class SeriesRequestCreate(MediaRequestCreate):
+    seasons: Optional[List[SeasonRequestSchema]]

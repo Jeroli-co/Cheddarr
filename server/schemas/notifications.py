@@ -1,16 +1,16 @@
 from typing import Any
 
+from server.schemas.users import UserPublicSchema
+from .base import APIModel
 
-from server.schemas import APIModel, UserPublic
 
-
-class Notification(APIModel):
+class NotificationSchema(APIModel):
     message: str
     read: bool
-    user: UserPublic
+    user: UserPublicSchema
 
 
-class NotificationAgent(APIModel):
+class NotificationAgentSchema(APIModel):
     enabled: bool
     settings: Any
 
@@ -25,5 +25,5 @@ class EmailAgentSettings(APIModel):
     ssl: bool
 
 
-class EmailAgent(NotificationAgent):
+class EmailAgentSchema(NotificationAgentSchema):
     settings: EmailAgentSettings

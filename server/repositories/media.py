@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from sqlalchemy import desc, or_
 
-from server.models import Episode, Media, MediaServerMedia, MediaServerSetting, MediaType, Season
+from server.models.media import Episode, Media, MediaServerMedia, MediaType, Season
 from server.repositories.base import BaseRepository
 
 

@@ -1,11 +1,10 @@
-from server.models import (
-    MediaServerSetting,
+from server.models.settings import (
     MediaProviderSetting,
+    MediaServerSetting,
     PlexSetting,
     RadarrSetting,
     SonarrSetting,
 )
-
 from server.repositories.base import BaseRepository
 
 

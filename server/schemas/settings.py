@@ -2,8 +2,9 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from server.models import MediaProviderType, MediaType
-from server.schemas import APIModel
+from server.models.media import MediaType
+from server.models.settings import MediaProviderType
+from .base import APIModel
 
 
 class ProviderSettingBase(APIModel):
@@ -35,7 +36,7 @@ class PlexLibrarySection(APIModel):
     enabled: bool = False
 
 
-class PlexSetting(ProviderSettingBase, PlexServerInfo):
+class PlexSettingSchema(ProviderSettingBase, PlexServerInfo):
     id: str
     name: str
     enabled: bool = True
@@ -64,7 +65,7 @@ class RadarrSettingData(APIModel):
     version: int = Field(ge=2, le=3)
 
 
-class RadarrSetting(ProviderSettingBase, RadarrSettingData):
+class RadarrSettingSchema(ProviderSettingBase, RadarrSettingData):
     id: str
     name: str
     enabled: bool = True
@@ -96,7 +97,7 @@ class SonarrSettingData(APIModel):
     version: int = Field(ge=2, le=3)
 
 
-class SonarrSetting(ProviderSettingBase, SonarrSettingData):
+class SonarrSettingSchema(ProviderSettingBase, SonarrSettingData):
     id: str
     name: str
     enabled: bool = True

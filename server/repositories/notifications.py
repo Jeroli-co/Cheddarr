@@ -1,4 +1,4 @@
-from server.models import Notification, NotificationAgent
+from server.models.notifications import Notification, NotificationAgent
 from server.repositories.base import BaseRepository
 
 

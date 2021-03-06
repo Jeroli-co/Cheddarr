@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from server.models.requests import MovieRequest, SeriesRequest
+from server.repositories.requests import MediaRequestRepository
 from server.tests.utils import datasets
 
 
@@ -13,7 +15,6 @@ def test_add_series_never_requested_without_seasons(
         json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
     assert r.status_code == 201
-    from server.models import SeriesRequest
 
     actual = r.json()
     expected = (
@@ -50,7 +51,6 @@ def test_add_series_never_requested_with_all_seasons(
         },
     )
     assert r.status_code == 201
-    from server.models import SeriesRequest
 
     actual = r.json()
     expected = (
@@ -134,7 +134,6 @@ def test_add_season_never_requested(client: TestClient, db: Session, normal_user
         },
     )
     assert r.status_code == 201
-    from server.models import SeriesRequest
 
     actual = r.json()
     expected = (
@@ -204,8 +203,6 @@ def test_add_season_already_requested_some_season_conflict(
     )
     assert r1.status_code == 201
     assert r2.status_code == 201
-
-    from server.models import SeriesRequest
 
     actual = r2.json()
     expected = (
@@ -299,8 +296,6 @@ def test_add_series_with_seasons_already_requested(
     assert r1.status_code == 201
     assert r2.status_code == 201
 
-    from server.models import SeriesRequest
-
     actual = r2.json()
     expected = (
         db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
@@ -347,8 +342,6 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
     assert r1.status_code == 201
     assert r2.status_code == 201
 
-    from server.models import SeriesRequest
-
     actual = r2.json()
     expected = (
         db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
@@ -391,8 +384,6 @@ def test_add_episode_never_requested(client: TestClient, db: Session, normal_use
         },
     )
     assert r.status_code == 201
-
-    from server.models import SeriesRequest
 
     actual = r.json()
     expected = (
@@ -522,8 +513,6 @@ def test_add_episode_already_requested_some_episodes_conflict(
     )
     assert r1.status_code == 201
     assert r2.status_code == 201
-
-    from server.models import SeriesRequest
 
     actual = r2.json()
     expected = (
@@ -671,8 +660,6 @@ def test_add_series_without_seasons_whereas_episodes_requested(
     assert r1.status_code == 201
     assert r2.status_code == 201
 
-    from server.models import SeriesRequest
-
     actual = r2.json()
     expected = (
         db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
@@ -720,8 +707,6 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
     )
     assert r1.status_code == 201
     assert r2.status_code == 201
-
-    from server.models import SeriesRequest
 
     actual = r2.json()
     expected = (
@@ -842,8 +827,6 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
     assert r1.status_code == 201
     assert r2.status_code == 201
 
-    from server.models import SeriesRequest
-
     actual = r2.json()
     expected = (
         db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
@@ -896,8 +879,6 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
     )
     assert r1.status_code == 201
     assert r2.status_code == 201
-
-    from server.models import SeriesRequest
 
     actual = r2.json()
     expected = (
@@ -1057,7 +1038,6 @@ def test_get_incoming_series_requests(client: TestClient, db: Session, normal_us
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
-    from server.models import SeriesRequest
 
     actual = r.json()[0]
     expected = (
@@ -1080,7 +1060,6 @@ def test_get_outgoing_series_requests(client: TestClient, db: Session, normal_us
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
-    from server.models import SeriesRequest
 
     actual = r.json()[0]
     expected = (
@@ -1134,9 +1113,8 @@ def test_update_series_request_approved_no_provider(client: TestClient, normal_u
 
 
 def test_delete_series_request(client: TestClient, db: Session, normal_user_token_headers):
-    from server.repositories import SeriesRequestRepository
 
-    series_request_repo = SeriesRequestRepository(db)
+    series_request_repo = MediaRequestRepository(db)
 
     r = client.delete(
         client.app.url_path_for("delete_series_request", request_id="1"),
@@ -1172,7 +1150,6 @@ def test_add_movie_never_requested(client: TestClient, db: Session, normal_user_
     )
     assert r.status_code == 201
     actual = r.json()
-    from server.models import MovieRequest
 
     expected = (
         db.query(MovieRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
@@ -1209,7 +1186,6 @@ def test_get_incoming_movies_requests(client: TestClient, db: Session, normal_us
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
-    from server.models import MovieRequest
 
     actual = r.json()[0]
     expected = (
@@ -1231,7 +1207,6 @@ def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_us
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
-    from server.models import MovieRequest
 
     actual = r.json()[0]
     expected = (
@@ -1284,9 +1259,8 @@ def test_update_movie_request_approved_no_provider(client: TestClient, normal_us
 
 
 def test_delete_movie_request(client: TestClient, db: Session, normal_user_token_headers):
-    from server.repositories import MovieRequestRepository
 
-    movies_request_repo = MovieRequestRepository(db)
+    movies_request_repo = MediaRequestRepository(db)
 
     r = client.delete(
         client.app.url_path_for("delete_movie_request", request_id="1"),

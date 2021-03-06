@@ -1,9 +1,8 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from server import models
 from server.core.security import verify_password
-from server.repositories import FriendshipRepository, UserRepository
+from server.repositories.users import FriendshipRepository, UserRepository
 from server.tests.utils import datasets
 
 
@@ -14,11 +13,13 @@ def test_get_current_user(client: TestClient, normal_user_token_headers):
     )
     assert r.status_code == 200
     current_user = r.json()
+    from server.models.users import UserRole
+
     assert current_user["email"] == datasets["users"][0]["email"]
     assert current_user["username"] == datasets["users"][0]["username"]
     assert current_user["avatar"] == datasets["users"][0]["avatar"]
     assert current_user["confirmed"] is True
-    assert current_user["role"] == models.UserRole.user
+    assert current_user["roles"] == UserRole.user
 
 
 def test_get_user_by_id(client: TestClient, normal_user_token_headers):

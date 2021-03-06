@@ -2,15 +2,29 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from server import models, schemas
 from server.api import dependencies as deps
-from server.helpers import plex, radarr, sonarr
-from server.repositories import (
+from server.models.settings import MediaProviderType, PlexSetting, RadarrSetting, SonarrSetting
+from server.models.users import User, UserRole
+from server.repositories.settings import (
     PlexSettingRepository,
     RadarrSettingRepository,
     SonarrSettingRepository,
-    UserRepository,
 )
+from server.schemas.base import ResponseMessage
+from server.schemas.settings import (
+    PlexLibrarySection,
+    PlexServer,
+    PlexSettingCreateUpdate,
+    PlexSettingSchema,
+    ProviderSettingBase,
+    RadarrInstanceInfo,
+    RadarrSettingCreateUpdate,
+    RadarrSettingSchema,
+    SonarrInstanceInfo,
+    SonarrSettingCreateUpdate,
+    SonarrSettingSchema,
+)
+from server.services import plex, radarr, sonarr
 
 router = APIRouter()
 
@@ -22,8 +36,8 @@ router = APIRouter()
 
 @router.get("")
 def get_user_media_providers(
-    provider_type: Optional[models.MediaProviderType] = None,
-    current_user: models.User = Depends(deps.get_current_user),
+    provider_type: Optional[MediaProviderType] = None,
+    current_user: User = Depends(deps.get_current_user),
 ):
     external_settings = current_user.media_providers
     if provider_type is not None:
@@ -42,13 +56,14 @@ def get_user_media_providers(
 
 @router.get(
     "/plex/servers",
-    response_model=List[schemas.PlexServer],
+    response_model=List[PlexServer],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex account linked"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def get_plex_account_servers(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
 ):
     if current_user.plex_api_key is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex account linked to the user.")
@@ -58,15 +73,16 @@ def get_plex_account_servers(
 
 @router.get(
     "/plex/{server_id}/libraries",
-    response_model=List[schemas.PlexLibrarySection],
+    response_model=List[PlexLibrarySection],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Server connection fail"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def get_plex_library_sections(
     server_id: str,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
 
@@ -83,9 +99,13 @@ def get_plex_library_sections(
     return libraries
 
 
-@router.get("/plex", response_model=List[schemas.PlexSetting])
+@router.get(
+    "/plex",
+    response_model=List[PlexSettingSchema],
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
+)
 def get_plex_settings(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     settings = plex_setting_repo.find_all_by(user_id=current_user.id)
@@ -95,15 +115,16 @@ def get_plex_settings(
 @router.post(
     "/plex",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.PlexSetting,
+    response_model=PlexSettingSchema,
     responses={
         status.HTTP_409_CONFLICT: {"description": "Server already added"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Server connection fail"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def add_plex_setting(
-    setting_in: schemas.PlexSettingCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_user),
+    setting_in: PlexSettingCreateUpdate,
+    current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     if (
@@ -122,7 +143,7 @@ def add_plex_setting(
     setting = plex_setting_repo.find_by(user_id=current_user.id, server_id=setting_in.server_id)
     if setting is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This server is already added.")
-    setting = setting_in.to_orm(models.PlexSetting)
+    setting = setting_in.to_orm(PlexSetting)
     setting.user_id = current_user.id
     setting = plex_setting_repo.save(setting)
     return setting
@@ -130,16 +151,17 @@ def add_plex_setting(
 
 @router.put(
     "/plex/{setting_id}",
-    response_model=schemas.PlexSetting,
+    response_model=PlexSettingSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Server connection fail"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def update_plex_setting(
     setting_id: str,
-    setting_in: schemas.PlexSettingCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_user),
+    setting_in: PlexSettingCreateUpdate,
+    current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     setting = plex_setting_repo.find_by(id=setting_id)
@@ -165,14 +187,15 @@ def update_plex_setting(
 
 @router.delete(
     "/plex/{setting_id}",
-    response_model=schemas.ResponseMessage,
+    response_model=ResponseMessage,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def delete_plex_setting(
     setting_id: str,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     setting = plex_setting_repo.find_by(id=setting_id)
@@ -189,12 +212,12 @@ def delete_plex_setting(
 
 @router.post(
     "/radarr/instance-info",
-    response_model=schemas.RadarrInstanceInfo,
+    response_model=RadarrInstanceInfo,
     responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
-    dependencies=[Depends(deps.get_current_poweruser)],
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def get_radarr_instance_info(
-    setting_in: schemas.ProviderSettingBase,
+    setting_in: ProviderSettingBase,
 ):
     instance_info = radarr.get_instance_info(
         setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
@@ -206,12 +229,12 @@ def get_radarr_instance_info(
 
 @router.get(
     "/radarr/{setting_id}/instance-info",
-    response_model=schemas.RadarrInstanceInfo,
+    response_model=RadarrInstanceInfo,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "Setting not found"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"},
     },
-    dependencies=[Depends(deps.get_current_poweruser)],
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def get_radarr_setting_instance_info(
     setting_id: str,
@@ -231,9 +254,13 @@ def get_radarr_setting_instance_info(
     return instance_info
 
 
-@router.get("/radarr", response_model=List[schemas.RadarrSetting])
+@router.get(
+    "/radarr",
+    response_model=List[RadarrSettingSchema],
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
+)
 def get_radarr_settings(
-    current_user: models.User = Depends(deps.get_current_poweruser),
+    current_user: User = Depends(deps.get_current_user),
     radarr_setting_repo: RadarrSettingRepository = Depends(
         deps.get_repository(RadarrSettingRepository)
     ),
@@ -245,12 +272,13 @@ def get_radarr_settings(
 @router.post(
     "/radarr",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.RadarrSetting,
+    response_model=RadarrSettingSchema,
     responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def add_radarr_setting(
-    setting_in: schemas.RadarrSettingCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_poweruser),
+    setting_in: RadarrSettingCreateUpdate,
+    current_user: User = Depends(deps.get_current_user),
     radarr_setting_repo: RadarrSettingRepository = Depends(
         deps.get_repository(RadarrSettingRepository)
     ),
@@ -262,7 +290,7 @@ def add_radarr_setting(
         ssl=setting_in.ssl,
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
-    setting = setting_in.to_orm(models.RadarrSetting)
+    setting = setting_in.to_orm(RadarrSetting)
     setting.user_id = current_user.id
     setting = radarr_setting_repo.save(setting)
     return setting
@@ -270,16 +298,17 @@ def add_radarr_setting(
 
 @router.put(
     "/radarr/{setting_id}",
-    response_model=schemas.RadarrSetting,
+    response_model=RadarrSettingSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "Setting not found"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def update_radarr_setting(
     setting_id: str,
-    setting_in: schemas.RadarrSettingCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_poweruser),
+    setting_in: RadarrSettingCreateUpdate,
+    current_user: User = Depends(deps.get_current_user),
     radarr_setting_repo: RadarrSettingRepository = Depends(
         deps.get_repository(RadarrSettingRepository)
     ),
@@ -302,12 +331,13 @@ def update_radarr_setting(
 
 @router.delete(
     "/radarr/{setting_id}",
-    response_model=schemas.ResponseMessage,
+    response_model=ResponseMessage,
     responses={status.HTTP_404_NOT_FOUND: {"description": "No Radarr setting"}},
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def delete_radarr_setting(
     setting_id: str,
-    current_user: models.User = Depends(deps.get_current_poweruser),
+    current_user: User = Depends(deps.get_current_user),
     radarr_setting_repo: RadarrSettingRepository = Depends(
         deps.get_repository(RadarrSettingRepository)
     ),
@@ -326,12 +356,12 @@ def delete_radarr_setting(
 
 @router.post(
     "/sonarr/instance-info",
-    response_model=schemas.SonarrInstanceInfo,
+    response_model=SonarrInstanceInfo,
     responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
-    dependencies=[Depends(deps.get_current_poweruser)],
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def get_sonarr_instance_info(
-    setting_in: schemas.ProviderSettingBase,
+    setting_in: ProviderSettingBase,
 ):
     instance_info = sonarr.get_instance_info(
         setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
@@ -343,12 +373,12 @@ def get_sonarr_instance_info(
 
 @router.get(
     "/sonarr/{setting_id}/instance-info",
-    response_model=schemas.SonarrInstanceInfo,
+    response_model=SonarrInstanceInfo,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "Setting not found"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"},
     },
-    dependencies=[Depends(deps.get_current_poweruser)],
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def get_sonarr_setting_instance_info(
     setting_id: str,
@@ -367,9 +397,13 @@ def get_sonarr_setting_instance_info(
     return instance_info
 
 
-@router.get("/sonarr", response_model=List[schemas.SonarrSetting])
+@router.get(
+    "/sonarr",
+    response_model=List[SonarrSettingSchema],
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
+)
 def get_sonarr_settings(
-    current_user: models.User = Depends(deps.get_current_poweruser),
+    current_user: User = Depends(deps.get_current_user),
     sonarr_setting_repo: SonarrSettingRepository = Depends(
         deps.get_repository(SonarrSettingRepository)
     ),
@@ -381,12 +415,13 @@ def get_sonarr_settings(
 @router.post(
     "/sonarr",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.SonarrSetting,
+    response_model=SonarrSettingSchema,
     responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def add_sonarr_setting(
-    setting_in: schemas.SonarrSettingCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_poweruser),
+    setting_in: SonarrSettingCreateUpdate,
+    current_user: User = Depends(deps.get_current_user),
     sonarr_setting_repo: SonarrSettingRepository = Depends(
         deps.get_repository(SonarrSettingRepository)
     ),
@@ -398,7 +433,7 @@ def add_sonarr_setting(
         ssl=setting_in.ssl,
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
-    setting = setting_in.to_orm(models.SonarrSetting)
+    setting = setting_in.to_orm(SonarrSetting)
     setting.user_id = current_user.id
     sonarr_setting_repo.save(setting)
     return setting
@@ -406,16 +441,17 @@ def add_sonarr_setting(
 
 @router.put(
     "/sonarr/{setting_id}",
-    response_model=schemas.SonarrSetting,
+    response_model=SonarrSettingSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "Setting not found"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def update_sonarr_setting(
     setting_id: str,
-    setting_in: schemas.SonarrSettingCreateUpdate,
-    current_user: models.User = Depends(deps.get_current_poweruser),
+    setting_in: SonarrSettingCreateUpdate,
+    current_user: User = Depends(deps.get_current_user),
     sonarr_setting_repo: SonarrSettingRepository = Depends(
         deps.get_repository(SonarrSettingRepository)
     ),
@@ -439,12 +475,13 @@ def update_sonarr_setting(
 
 @router.delete(
     "/sonarr/{setting_id}",
-    response_model=schemas.ResponseMessage,
+    response_model=ResponseMessage,
     responses={status.HTTP_404_NOT_FOUND: {"description": "No Sonarr setting"}},
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def delete_sonarr_setting(
     setting_id: str,
-    current_user: models.User = Depends(deps.get_current_poweruser),
+    current_user: User = Depends(deps.get_current_user),
     sonarr_setting_repo: SonarrSettingRepository = Depends(
         deps.get_repository(SonarrSettingRepository)
     ),

@@ -1,29 +1,30 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends
-from server import models, schemas
+
 from server.api import dependencies as deps
-from server.helpers import search
-from server.repositories import (
-    MediaRepository,
-)
+from server.models.media import MediaType
+from server.repositories.media import MediaRepository
+from server.schemas.external_services import PlexMediaInfo
+from server.schemas.search import SearchResult
+from server.services import tmdb
 
 router = APIRouter()
 
 
-@router.get("", response_model=schemas.SearchResult, response_model_exclude_none=True)
+@router.get("", response_model=SearchResult, response_model_exclude_none=True)
 def search_media(
-    value,
-    page=1,
-    media_type: Optional[models.MediaType] = None,
+    value: str,
+    page: int = 1,
+    media_type: Optional[MediaType] = None,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
 ):
-    if media_type == models.MediaType.series:
-        media_results, total_pages, total_results = search.search_tmdb_series(value, page)
-    elif media_type == models.MediaType.movies:
-        media_results, total_pages, total_results = search.search_tmdb_movies(value, page)
+    if media_type == MediaType.series:
+        media_results, total_pages, total_results = tmdb.search_tmdb_series(value, page)
+    elif media_type == MediaType.movies:
+        media_results, total_pages, total_results = tmdb.search_tmdb_movies(value, page)
     else:
-        media_results, total_pages, total_results = search.search_tmdb_media(value, page)
+        media_results, total_pages, total_results = tmdb.search_tmdb_media(value, page)
 
     for media in media_results:
         db_media = media_repo.find_by_any_external_id(
@@ -31,11 +32,10 @@ def search_media(
         )
         if db_media is not None:
             media.plex_media_info = [
-                schemas.PlexMediaInfo(**server_media.as_dict())
-                for server_media in db_media.server_media
+                PlexMediaInfo(**server_media.as_dict()) for server_media in db_media.server_media
             ]
-    search_result = schemas.SearchResult(
-        results=[m.dict(by_alias=False) for m in media_results],
+    search_result = SearchResult(
+        results=[m.dict() for m in media_results],
         page=page,
         total_pages=total_pages,
         total_results=total_results,

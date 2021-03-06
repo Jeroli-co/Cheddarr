@@ -1,6 +1,6 @@
 # Import all the models, so that Base has them fot creating the tables
-from .base import Base
 from server import models  # noqa
+from .base import Base
 
 
 def init_db():

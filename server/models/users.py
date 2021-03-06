@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import auto, Enum
 
-from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, relationship
 
@@ -9,14 +9,15 @@ from server.core.utils import get_random_avatar
 from server.database import Model
 
 
-class UserRole(str, Enum):
-    user = "user"
-    poweruser = "poweruser"
-    superuser = "superuser"
+class UserRole(int, Enum):
+    admin = 2
+    request = auto()
+    manage_settings = auto()
+    auto_approve = auto()
 
 
 class User(Model):
-    __repr_props__ = ("username", "email", "role", "confirmed")
+    __repr_props__ = ("username", "email", "roles", "confirmed")
 
     id = Column(Integer, primary_key=True)
     username = Column(String, nullable=False, unique=True, index=True)
@@ -24,7 +25,7 @@ class User(Model):
     password_hash = Column(String, nullable=False)
     avatar = Column(String)
     confirmed = Column(Boolean, nullable=False, default=False)
-    role = Column(DBEnum(UserRole), nullable=False, default="user")
+    roles = Column(Integer)
     plex_user_id = Column(Integer)
     plex_api_key = Column(String)
 

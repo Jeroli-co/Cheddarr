@@ -1,14 +1,14 @@
 from server.api.dependencies import get_db
 from server.core import scheduler
-from server.helpers import sonarr
-from server.models import RequestStatus
-from server.repositories import SeriesRequestRepository
+from server.models.requests import RequestStatus
+from server.repositories.requests import MediaRequestRepository
+from server.services import sonarr
 
 
 @scheduler.scheduled_job("interval", minutes=10)
 def check_sonarr_series_availability():
-    series_request_repo = SeriesRequestRepository(next(get_db()))
-    requests = series_request_repo.find_all_by(status=RequestStatus.approved)
+    media_request_repo = MediaRequestRepository(next(get_db()))
+    requests = media_request_repo.find_all_by(status=RequestStatus.approved)
     for request in requests:
         setting = request.selected_provider
         series_lookup = sonarr.lookup(setting, tvdb_id=request.media.tvdb_id)
@@ -40,10 +40,10 @@ def check_sonarr_series_availability():
                     req_seasons_available += 1
         if req_seasons_available == len(request.seasons):
             request.status = RequestStatus.available
-        series_request_repo.save(request)
+        media_request_repo.save(request)
 
 
 def send_sonarr_request_task(request_id: int):
-    series_request_repo = SeriesRequestRepository(next(get_db()))
+    series_request_repo = MediaRequestRepository(next(get_db()))
     request = series_request_repo.find_by(id=request_id)
     sonarr.send_request(request)

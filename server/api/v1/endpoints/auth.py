@@ -12,12 +12,18 @@ from fastapi import (
 )
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import EmailStr
 
-from server import models, schemas
 from server.api import dependencies as deps
 from server.core import config, security, utils
 from server.core.scheduler import scheduler
-from server.repositories import NotificationAgentRepository, UserRepository
+from server.models.notifications import Agent
+from server.models.users import User, UserRole
+from server.repositories.notifications import NotificationAgentRepository
+from server.repositories.users import UserRepository
+from server.schemas.auth import EmailConfirm, PlexAuthorizeSignin, Token, TokenPayload
+from server.schemas.base import ResponseMessage
+from server.schemas.users import UserCreate, UserSchema
 
 router = APIRouter()
 
@@ -25,11 +31,11 @@ router = APIRouter()
 @router.post(
     "/sign-up",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.User,
+    response_model=UserSchema,
     responses={status.HTTP_409_CONFLICT: {"description": "Email or username not available"}},
 )
 def signup(
-    user_in: schemas.UserCreate,
+    user_in: UserCreate,
     request: Request,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
@@ -43,17 +49,17 @@ def signup(
     existing_username = user_repo.find_by_username(user_in.username)
     if existing_username:
         raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
-    user = user_in.to_orm(models.User)
+    user = user_in.to_orm(User)
 
     # First signed-up user
     if user_repo.count() == 0:
-        user.role = models.UserRole.superuser
+        user.roles = UserRole.admin
 
     if config.MAIL_ENABLED:
-        email_agent = notif_agent_repo.find_by(name=models.Agent.email)
+        email_agent = notif_agent_repo.find_by(name=Agent.email)
         if email_agent is None or not email_agent.enabled:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
-        email_data = schemas.EmailConfirm(email=user.email).dict()
+        email_data = EmailConfirm(email=EmailStr(user.email)).dict()
         token = security.generate_timed_token(email_data)
         scheduler.add_job(
             utils.send_email,
@@ -76,7 +82,7 @@ def signup(
 
 @router.get(
     "/sign-up/{token}",
-    response_model=schemas.ResponseMessage,
+    response_model=ResponseMessage,
     responses={
         status.HTTP_403_FORBIDDEN: {"description": "Email already confirmed"},
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
@@ -88,7 +94,7 @@ def confirm_email(
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     try:
-        email_data = schemas.EmailConfirm.parse_obj(security.confirm_timed_token(token))
+        email_data = EmailConfirm.parse_obj(security.confirm_timed_token(token))
     except Exception:
         raise HTTPException(
             status.HTTP_410_GONE, "The confirmation link is invalid or has expired."
@@ -112,14 +118,14 @@ def confirm_email(
 
 @router.patch(
     "/sign-up",
-    response_model=schemas.ResponseMessage,
+    response_model=ResponseMessage,
     responses={
         status.HTTP_403_FORBIDDEN: {"description": "Email already confirmed"},
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     },
 )
 def resend_confirmation(
-    body: schemas.EmailConfirm,
+    body: EmailConfirm,
     request: Request,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
@@ -133,11 +139,11 @@ def resend_confirmation(
     if existing_user.confirmed:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "This email is already confirmed.")
 
-    email_agent = notif_agent_repo.find_by(name=models.Agent.email)
+    email_agent = notif_agent_repo.find_by(name=Agent.email)
     if email_agent is None or not email_agent.enabled:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
 
-    email_data = schemas.EmailConfirm(email=email).dict()
+    email_data = EmailConfirm(email=email).dict()
     token = security.generate_timed_token(email_data)
     scheduler.add_job(
         utils.send_email,
@@ -155,7 +161,7 @@ def resend_confirmation(
 
 @router.post(
     "/sign-in",
-    response_model=schemas.Token,
+    response_model=Token,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "Email needs to be confirmed"},
         status.HTTP_401_UNAUTHORIZED: {"description": "Wrong credentials"},
@@ -179,14 +185,14 @@ def signin(
             "This account's email needs to be confirmed.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    payload = schemas.TokenPayload(
+    payload = TokenPayload(
         sub=str(user.id),
         username=user.username,
         avatar=user.avatar,
-        role=user.role,
+        roles=user.roles,
     )
     access_token = security.create_jwt_access_token(payload)
-    token = schemas.Token(
+    token = Token(
         access_token=access_token,
         token_type="Bearer",
     )
@@ -207,7 +213,7 @@ def start_signin_plex():
 
 
 @router.post("/sign-in/plex/authorize")
-def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSignin):
+def authorize_signin_plex(request: Request, auth_data: PlexAuthorizeSignin):
     forward_url = re.sub(
         f"{config.API_PREFIX}/v[0-9]+", "", request.url_for("confirm_signin_plex")
     )
@@ -236,7 +242,7 @@ def authorize_signin_plex(request: Request, auth_data: schemas.PlexAuthorizeSign
 
 @router.get(
     "/sign-in/plex/confirm",
-    response_model=schemas.Token,
+    response_model=Token,
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Plex authorization error"},
     },
@@ -279,7 +285,7 @@ def confirm_signin_plex(
         if user is None:
             if user_repo.find_by_username(plex_username) is not None:
                 plex_username = "{}{}".format(plex_username, randrange(1, 999))
-            user = models.User(
+            user = User(
                 username=plex_username,
                 email=plex_email,
                 password=security.get_random_password(),
@@ -290,21 +296,21 @@ def confirm_signin_plex(
             )
             # First signed-up user
             if user_repo.count() == 0:
-                user.role = models.UserRole.superuser
+                user.roles = UserRole.admin
 
     # Update the Plex account with the API key (possibly different at each login)
     user.plex_user_id = plex_user_id
     user.plex_api_key = auth_token
     user_repo.save(user)
 
-    payload = schemas.TokenPayload(
+    payload = TokenPayload(
         sub=str(user.id),
         username=user.username,
         avatar=user.avatar,
-        role=user.role,
+        roles=user.roles,
     )
     access_token = security.create_jwt_access_token(payload)
-    token = schemas.Token(
+    token = Token(
         access_token=access_token,
         token_type="bearer",
     )

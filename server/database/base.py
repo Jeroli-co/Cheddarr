@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import (
     declared_attr,
 )
 from sqlalchemy.orm import class_mapper
+
 from server.core import config
 
 Base = declarative_base()

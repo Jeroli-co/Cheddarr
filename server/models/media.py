@@ -33,7 +33,7 @@ class Media(Model):
     tvdb_id = Column(Integer, unique=True, index=True)
     media_type = Column(DBEnum(MediaType), nullable=False)
     title = Column(String, nullable=False)
-    server_media = relationship("MediaServerMedia", back_populates="media")
+    server_media: list = relationship("MediaServerMedia", back_populates="media")
 
 
 class Season(Model):
@@ -43,8 +43,8 @@ class Season(Model):
     season_number = Column(Integer, nullable=False)
     series_id = Column(ForeignKey("media.id"), nullable=False)
     media = relationship("Media")
-    episodes = relationship("Episode", back_populates="season")
-    server_season = relationship("MediaServerSeason", back_populates="season")
+    episodes: list = relationship("Episode", back_populates="season")
+    server_seasons: list = relationship("MediaServerSeason", back_populates="season")
 
 
 class Episode(Model):
@@ -54,7 +54,7 @@ class Episode(Model):
     episode_number = Column(Integer, nullable=False)
     season_id = Column(ForeignKey("season.id"), nullable=False)
     season = relationship("Season", back_populates="episodes")
-    server_episode = relationship("MediaServerEpisode", back_populates="episode")
+    server_episodes: list = relationship("MediaServerEpisode", back_populates="episode")
 
 
 class MediaServerContent(object):
@@ -74,9 +74,9 @@ class MediaServerMedia(Model, MediaServerContent):
 
 class MediaServerSeason(Model, MediaServerContent):
     season_id = Column(ForeignKey("season.id"))
-    season = relationship("Season", back_populates="server_season")
+    season = relationship("Season", back_populates="server_seasons")
 
 
 class MediaServerEpisode(Model, MediaServerContent):
     episode_id = Column(ForeignKey("episode.id"))
-    episode = relationship("Episode", back_populates="server_episode")
+    episode = relationship("Episode", back_populates="server_episodes")

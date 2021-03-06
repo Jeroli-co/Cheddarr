@@ -1,5 +1,4 @@
 import secrets
-from tzlocal import get_localzone
 from json import dump, load
 from pathlib import Path
 from typing import List
@@ -9,6 +8,7 @@ from pydantic import (
     BaseSettings,
     DirectoryPath,
 )
+from tzlocal import get_localzone
 
 
 class Config(BaseSettings):

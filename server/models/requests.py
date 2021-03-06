@@ -11,7 +11,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
 from server.database import Model, Timestamp
-from server.models import MediaType
+from server.models.media import MediaType
 
 
 class RequestStatus(str, Enum):
@@ -73,7 +73,9 @@ class SeriesRequest(MediaRequest):
     __mapper_args__ = {"polymorphic_identity": MediaType.series}
     __repr_props__ = ("media", "requested_user", "requesting_user")
 
-    seasons = relationship("SeasonRequest", cascade="all,delete,delete-orphan", backref="request")
+    seasons: list = relationship(
+        "SeasonRequest", cascade="all,delete,delete-orphan", backref="request"
+    )
 
 
 class SeasonRequest(Model):
@@ -84,7 +86,9 @@ class SeasonRequest(Model):
     series_request_id = Column(ForeignKey("mediarequest.id"), nullable=False)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
 
-    episodes = relationship("EpisodeRequest", cascade="all,delete,delete-orphan", backref="season")
+    episodes: list = relationship(
+        "EpisodeRequest", cascade="all,delete,delete-orphan", backref="season"
+    )
 
 
 class EpisodeRequest(Model):

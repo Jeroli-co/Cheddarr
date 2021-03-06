@@ -1,4 +1,4 @@
-from typing import Callable, Generator, Type
+from typing import Callable, Generator, List, Literal, Type
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -7,10 +7,11 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from server.core import config
-from server.models import User, UserRole
-from server.repositories import PlexSettingRepository, UserRepository
+from server.models.users import User, UserRole
 from server.repositories.base import BaseRepository
-from server.schemas import TokenPayload
+from server.repositories.settings import PlexSettingRepository
+from server.repositories.users import UserRepository
+from server.schemas.auth import TokenPayload
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 
@@ -59,22 +60,6 @@ def get_current_user(
     return user
 
 
-def get_current_superuser(
-    current_user: User = Depends(get_current_user),
-) -> User:
-    if current_user.role != UserRole.superuser:
-        raise HTTPException(status_code=403, detail="Not enough privileges.")
-    return current_user
-
-
-def get_current_poweruser(
-    current_user: User = Depends(get_current_user),
-) -> User:
-    if current_user.role != UserRole.superuser and current_user.role != UserRole.poweruser:
-        raise HTTPException(status_code=403, detail="Not enough privileges.")
-    return current_user
-
-
 def get_current_user_plex_settings(
     cur_user: User = Depends(get_current_user),
     plex_setting_repository: PlexSettingRepository = Depends(
@@ -85,3 +70,22 @@ def get_current_user_plex_settings(
     if settings is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex settings found for the user.")
     return settings
+
+
+def has_user_permissions(
+    permissions: List[UserRole], options: Literal["and", "or"] = "and"
+) -> Callable[[User], None]:
+    def _check_permissions(current_user: User = Depends(get_current_user)):
+        has_permission = False
+
+        if current_user.roles & UserRole.admin:
+            has_permission = True
+        elif options == "and":
+            has_permission = all(current_user.roles & permission for permission in permissions)
+        elif options == "or":
+            has_permission = any(current_user.roles & permission for permission in permissions)
+
+        if not has_permission:
+            raise HTTPException(status_code=403, detail="Not enough privileges.")
+
+    return _check_permissions

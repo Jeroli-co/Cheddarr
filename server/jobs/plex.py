@@ -2,34 +2,34 @@ import re
 from typing import List, Union
 
 from plexapi.video import (
-    Video as PlexVideo,
-    Show as PlexSeries,
-    Season as PlexSeason,
     Episode as PlexEpisode,
     Movie as PlexMovie,
+    Season as PlexSeason,
+    Show as PlexSeries,
+    Video as PlexVideo,
 )
 from sqlalchemy.orm import Session
 
 from server.api.dependencies import get_db
 from server.core import scheduler
-from server.models.settings import ServiceNames
-from server.repositories import (
-    MediaServerSettingRepository,
+from server.models.media import (
+    Episode,
+    Media,
+    MediaServerEpisode,
+    MediaServerMedia,
+    MediaServerSeason,
+    MediaType,
+    Season,
+)
+from server.models.settings import PlexSetting, ServiceNames
+from server.repositories.media import (
     EpisodeRepository,
     MediaRepository,
     SeasonRepository,
 )
-from server.models import (
-    Media,
-    MediaServerMedia,
-    MediaServerSeason,
-    MediaServerEpisode,
-    MediaType,
-    PlexSetting,
-    Season,
-    Episode,
-)
-from server.helpers import plex
+from server.repositories.settings import MediaServerSettingRepository
+from server.services import plex
+from server.services.tmdb import find_tmdb_id_from_external_id
 
 TMDB_REGEX = "tmdb|themoviedb"
 IMDB_REGEX = "imdb"
@@ -143,7 +143,7 @@ def process_plex_season(
             season_number=plex_season.seasonNumber,
         )
         season.media = process_plex_media(plex_season.show(), server_id, media_repo)
-        season.server_season.append(
+        season.server_seasons.append(
             MediaServerSeason(
                 server_id=server_id,
                 season=season,
@@ -177,7 +177,7 @@ def process_plex_episode(
         episode.season = process_plex_season(
             plex_episode.season(), server_id, media_repo, season_repo
         )
-        episode.server_episode.append(
+        episode.server_episodes.append(
             MediaServerEpisode(
                 server_id=server_id,
                 episode=episode,
@@ -207,4 +207,9 @@ def find_guids(media: Union[PlexMovie, PlexSeries, PlexSeason, PlexEpisode]):
             None,
         )
 
-    return find_guid(TMDB_REGEX), find_guid(IMDB_REGEX), find_guid(TVDB_REGEX)
+    tmdb_id, imdb_id, tvdb_id = find_guid(TMDB_REGEX), find_guid(IMDB_REGEX), find_guid(TVDB_REGEX)
+
+    if tmdb_id is None:
+        tmdb_id = find_tmdb_id_from_external_id(imdb_id, tvdb_id)
+
+    return tmdb_id, imdb_id, tvdb_id

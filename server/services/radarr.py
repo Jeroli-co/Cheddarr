@@ -2,9 +2,11 @@ from typing import Optional, Union
 
 import requests
 
-from server import schemas
 from server.core import utils
-from server.models import MovieRequest, RadarrSetting
+from server.models.requests import MovieRequest
+from server.models.settings import RadarrSetting
+from server.schemas.external_services import RadarrMovie
+from server.schemas.settings import RadarrInstanceInfo
 
 
 def make_url(
@@ -53,7 +55,7 @@ def get_instance_info(
     host: str,
     port: int,
     ssl: bool,
-) -> Optional[schemas.RadarrInstanceInfo]:
+) -> Optional[RadarrInstanceInfo]:
 
     test = check_instance_status(
         api_key=api_key,
@@ -95,12 +97,12 @@ def get_instance_info(
         {"id": profile["id"], "name": profile["name"]}
         for profile in requests.get(quality_profiles_url).json()
     ]
-    return schemas.RadarrInstanceInfo(
+    return RadarrInstanceInfo(
         version=version, root_folders=root_folders, quality_profiles=quality_profiles
     )
 
 
-def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> schemas.RadarrMovie:
+def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> RadarrMovie:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -112,10 +114,10 @@ def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> schemas.RadarrMo
     )
     lookup_result = requests.get(url).json()
     movie = next(res for res in lookup_result if res["tmdbId"] == tmdb_id)
-    return schemas.RadarrMovie.parse_obj(movie)
+    return RadarrMovie.parse_obj(movie)
 
 
-def add_movie(setting: RadarrSetting, movie: schemas.RadarrMovie):
+def add_movie(setting: RadarrSetting, movie: RadarrMovie):
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -134,5 +136,5 @@ def send_request(request: MovieRequest):
         return
     movie.root_folder_path = setting.root_folder
     movie.quality_profile_id = setting.quality_profile_id
-    movie.add_options = schemas.RadarrAddOptions(search_for_movie=False)
+    movie.add_options = RadarrAddOptions(search_for_movie=False)
     add_movie(setting, movie)

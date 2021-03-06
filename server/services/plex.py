@@ -4,8 +4,8 @@ from plexapi.exceptions import PlexApiException
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer as PlexAPIServer
 
-from server.models import MediaType
-from server.schemas import PlexServer, PlexLibrarySection
+from server.models.media import MediaType
+from server.schemas.settings import PlexLibrarySection, PlexServer
 
 
 def get_plex_account_servers(api_key: str) -> List[PlexServer]:

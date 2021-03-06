@@ -4,13 +4,12 @@ from typing import List, Optional, Union
 import requests
 from pydantic.tools import parse_obj_as
 
-from server import schemas
 from server.core import utils
-from server.models import (
-    SeriesRequest,
-    SeriesType,
-    SonarrSetting,
-)
+from server.models.media import SeriesType
+from server.models.requests import SeriesRequest
+from server.models.settings import SonarrSetting
+from server.schemas.external_services import SonarrAddOptions, SonarrEpisode, SonarrSeries
+from server.schemas.settings import SonarrInstanceInfo
 
 
 def make_url(
@@ -57,7 +56,7 @@ def check_instance_status(api_key: str, host: str, port: int, ssl: bool) -> Unio
 
 def get_instance_info(
     api_key: str, host: str, port: int, ssl: bool
-) -> Optional[schemas.SonarrInstanceInfo]:
+) -> Optional[SonarrInstanceInfo]:
     test = check_instance_status(
         api_key=api_key,
         host=host,
@@ -111,7 +110,7 @@ def get_instance_info(
         {"id": profile["id"], "name": profile["name"]}
         for profile in requests.get(quality_profile_url).json()
     ]
-    return schemas.SonarrInstanceInfo(
+    return SonarrInstanceInfo(
         version=version,
         quality_profiles=quality_profiles,
         language_profiles=language_profiles,
@@ -122,7 +121,7 @@ def get_instance_info(
 def lookup(
     setting: SonarrSetting,
     tvdb_id: int,
-) -> schemas.SonarrSeries:
+) -> SonarrSeries:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -133,10 +132,10 @@ def lookup(
         queries={"term": f"tvdb:{tvdb_id}"},
     )
     lookup_result = requests.get(url).json()[0]
-    return schemas.SonarrSeries.parse_obj(lookup_result)
+    return SonarrSeries.parse_obj(lookup_result)
 
 
-def get_series(setting: SonarrSetting, series_id: int) -> schemas.SonarrSeries:
+def get_series(setting: SonarrSetting, series_id: int) -> SonarrSeries:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -146,10 +145,10 @@ def get_series(setting: SonarrSetting, series_id: int) -> schemas.SonarrSeries:
         resource_path=f"/series/{series_id}",
     )
     res = requests.get(url)
-    return schemas.SonarrSeries.parse_obj(res.json())
+    return SonarrSeries.parse_obj(res.json())
 
 
-def add_series(setting: SonarrSetting, series: schemas.SonarrSeries) -> schemas.SonarrSeries:
+def add_series(setting: SonarrSetting, series: SonarrSeries) -> SonarrSeries:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -159,10 +158,10 @@ def add_series(setting: SonarrSetting, series: schemas.SonarrSeries) -> schemas.
         resource_path="/series",
     )
     res = requests.post(url, data=series.json(by_alias=True, exclude_none=True))
-    return schemas.SonarrSeries.parse_obj(res.json())
+    return SonarrSeries.parse_obj(res.json())
 
 
-def update_series(setting: SonarrSetting, series: schemas.SonarrSeries) -> schemas.SonarrSeries:
+def update_series(setting: SonarrSetting, series: SonarrSeries) -> SonarrSeries:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -172,10 +171,10 @@ def update_series(setting: SonarrSetting, series: schemas.SonarrSeries) -> schem
         resource_path="/series",
     )
     res = requests.put(url, data=series.json(by_alias=True, exclude_none=True))
-    return schemas.SonarrSeries.parse_obj(res.json())
+    return SonarrSeries.parse_obj(res.json())
 
 
-def get_episodes(setting: SonarrSetting, series_id: int) -> List[schemas.SonarrEpisode]:
+def get_episodes(setting: SonarrSetting, series_id: int) -> List[SonarrEpisode]:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -186,12 +185,10 @@ def get_episodes(setting: SonarrSetting, series_id: int) -> List[schemas.SonarrE
         queries={"seriesId": series_id},
     )
     res = requests.get(url)
-    return parse_obj_as(List[schemas.SonarrEpisode], res.json())
+    return parse_obj_as(List[SonarrEpisode], res.json())
 
 
-def update_episode(
-    setting: schemas.SonarrSetting, episode: schemas.SonarrEpisode
-) -> schemas.SonarrEpisode:
+def update_episode(setting: SonarrSetting, episode: SonarrEpisode) -> SonarrEpisode:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -201,7 +198,7 @@ def update_episode(
         resource_path=f"/episode/{episode.id}",
     )
     res = requests.put(url, data=episode.json(by_alias=True, exclude_none=True))
-    return schemas.SonarrEpisode.parse_obj(res.json())
+    return SonarrEpisode.parse_obj(res.json())
 
 
 def send_request(request: SeriesRequest):
@@ -219,7 +216,7 @@ def send_request(request: SeriesRequest):
         series.quality_profile_id = quality_profile_id
         if setting.version == 3:
             series.language_profile_id = language_profile_id
-        series.add_options = schemas.SonarrAddOptions(
+        series.add_options = SonarrAddOptions(
             ignore_episodes_with_files=False,
             ignore_episodes_without_files=False,
             search_for_missing_episodes=False,

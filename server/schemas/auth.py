@@ -3,7 +3,6 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 
 from .base import APIModel
-from ..models import UserRole
 
 
 class Token(BaseModel):
@@ -15,7 +14,7 @@ class TokenPayload(BaseModel):
     sub: str
     username: str
     avatar: str
-    role: UserRole
+    roles: int
 
 
 class EmailConfirm(APIModel):
