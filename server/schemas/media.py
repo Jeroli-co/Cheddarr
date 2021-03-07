@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import date
 from typing import List, Optional
 
-from pydantic import AnyHttpUrl, Field, validator
+from pydantic import AnyHttpUrl, create_model, Field, root_validator, validator
 
 from server.models.media import MediaType, SeriesType
 from server.schemas.external_services import MediaServerInfo
@@ -29,6 +29,10 @@ class CompanySchema(APIModel):
     name: str
 
 
+class Video(APIModel):
+    url: AnyHttpUrl
+
+
 class MediaSchema(APIModel, ABC):
     tmdb_id: Optional[int]
     imdb_id: Optional[str]
@@ -44,6 +48,7 @@ class MediaSchema(APIModel, ABC):
     genres: Optional[List[str]]
     studios: Optional[List[CompanySchema]]
     credits: Optional[CreditsSchema]
+    trailers: Optional[List[Video]]
     media_server_info: Optional[List[MediaServerInfo]]
 
 
@@ -123,6 +128,19 @@ class TmdbCompany(APIModel):
     name: str
 
 
+class TmdbVideo(APIModel):
+    _key: str = Field(alias="key")
+    _type: str = Field(alias="type")
+    _site: str = Field(alias="site")
+    url: AnyHttpUrl
+
+    @root_validator(pre=True)
+    def get_url(cls, values):
+        if values["type"] == "Trailer" and values["site"] == "YouTube":
+            values["url"] = f"https://www.youtube.com/watch?v={values['key']}"
+            return values
+
+
 class TmdbMedia(MediaSchema, ABC):
     tmdb_id: int = Field(alias="id")
     imdb_id: Optional[str] = Field(alias="external_ids.imdb_id")
@@ -134,8 +152,15 @@ class TmdbMedia(MediaSchema, ABC):
     poster_url: Optional[AnyHttpUrl] = Field(alias="poster_path")
     art_url: Optional[AnyHttpUrl] = Field(alias="backdrop_path")
     credits: Optional[TmdbCredits] = Field(alias="credits")
+    trailers: Optional[create_model("VideosResults", results=(List[TmdbVideo], ...))] = Field(
+        alias="videos"
+    )
     _poster_validator = validator("poster_url", allow_reuse=True, pre=True)(get_image_url)
     _art_validator = validator("art_url", allow_reuse=True, pre=True)(get_image_url)
+
+    @validator("trailers")
+    def get_trailer(cls, trailer):
+        return trailer.results
 
 
 class TmdbMovie(TmdbMedia, MovieSchema):

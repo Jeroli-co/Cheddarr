@@ -46,7 +46,7 @@ def search_tmdb_series(term: str, page: int) -> (List[TmdbSeries], int, int):
 
 def get_tmdb_movie(tmdb_id: int) -> Optional[TmdbMovie]:
     try:
-        movie = tmdb.Movies(tmdb_id).info(append_to_response="external_ids,credits")
+        movie = tmdb.Movies(tmdb_id).info(append_to_response="external_ids,credits,videos")
     except Exception:
         return None
     set_tmdb_movie_info(movie)
@@ -55,7 +55,7 @@ def get_tmdb_movie(tmdb_id: int) -> Optional[TmdbMovie]:
 
 def get_tmdb_series(tmdb_id: int) -> Optional[TmdbSeries]:
     try:
-        series = tmdb.TV(tmdb_id).info(append_to_response="external_ids,credits")
+        series = tmdb.TV(tmdb_id).info(append_to_response="external_ids,credits,videos")
     except Exception:
         return None
     set_tmdb_series_info(series)
@@ -65,7 +65,7 @@ def get_tmdb_series(tmdb_id: int) -> Optional[TmdbSeries]:
 def get_tmdb_season(tmdb_id: int, season_number: int) -> Optional[TmdbSeason]:
     try:
         season = tmdb.TV_Seasons(tmdb_id, season_number).info(
-            append_to_response="external_ids,credits"
+            append_to_response="external_ids,credits,videos"
         )
     except Exception:
         return None
@@ -77,7 +77,7 @@ def get_tmdb_episode(
 ) -> Optional[TmdbEpisode]:
     try:
         episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info(
-            append_to_response="external_ids,credits"
+            append_to_response="external_ids,credits,videos"
         )
     except Exception:
         return None

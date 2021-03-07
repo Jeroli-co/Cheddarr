@@ -33,6 +33,7 @@ def get_movie(
     if movie is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Movie not found.")
     set_media_db_info(movie, current_user.id, media_repo, request_repo)
+
     return movie.dict(exclude={"requests": {"__all__": {"media"}}})
 
 
