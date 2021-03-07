@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import date
 from typing import List, Optional
 
-from pydantic import AnyHttpUrl, create_model, Field, root_validator, validator
+from pydantic import AnyHttpUrl, Field, validator
 
 from server.models.media import MediaType, SeriesType
 from server.schemas.external_services import MediaServerInfo
@@ -30,7 +30,7 @@ class CompanySchema(APIModel):
 
 
 class Video(APIModel):
-    url: AnyHttpUrl
+    video_url: Optional[AnyHttpUrl]
 
 
 class MediaSchema(APIModel, ABC):
@@ -119,26 +119,25 @@ class TmdbCrew(PersonSchema):
     _picture_validator = validator("picture_url", allow_reuse=True, pre=True)(get_image_url)
 
 
-class TmdbCredits(APIModel):
+class TmdbCredits(CreditsSchema):
     cast: List[TmdbCast] = Field(alias="cast")
     crew: List[TmdbCrew] = Field(alias="crew")
 
 
-class TmdbCompany(APIModel):
+class TmdbCompany(CompanySchema):
     name: str
 
 
-class TmdbVideo(APIModel):
-    _key: str = Field(alias="key")
-    _type: str = Field(alias="type")
-    _site: str = Field(alias="site")
-    url: AnyHttpUrl
+class TmdbVideo(Video):
+    key: str = Field(alias="key")
+    type: str = Field(alias="type")
+    site: str = Field(alias="site")
+    video_url: Optional[AnyHttpUrl]
 
-    @root_validator(pre=True)
-    def get_url(cls, values):
-        if values["type"] == "Trailer" and values["site"] == "YouTube":
-            values["url"] = f"https://www.youtube.com/watch?v={values['key']}"
-            return values
+    @validator("key", pre=True)
+    def get_video_url(cls, key, values):
+        values["video_url"] = f"https://www.youtube.com/watch?v={key}"
+        return key
 
 
 class TmdbMedia(MediaSchema, ABC):
@@ -152,15 +151,9 @@ class TmdbMedia(MediaSchema, ABC):
     poster_url: Optional[AnyHttpUrl] = Field(alias="poster_path")
     art_url: Optional[AnyHttpUrl] = Field(alias="backdrop_path")
     credits: Optional[TmdbCredits] = Field(alias="credits")
-    trailers: Optional[create_model("VideosResults", results=(List[TmdbVideo], ...))] = Field(
-        alias="videos"
-    )
+    trailers: Optional[List[TmdbVideo]] = Field(alias="videos")
     _poster_validator = validator("poster_url", allow_reuse=True, pre=True)(get_image_url)
     _art_validator = validator("art_url", allow_reuse=True, pre=True)(get_image_url)
-
-    @validator("trailers")
-    def get_trailer(cls, trailer):
-        return trailer.results
 
 
 class TmdbMovie(TmdbMedia, MovieSchema):

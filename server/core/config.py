@@ -32,6 +32,8 @@ class Config(BaseSettings):
     IMAGES_FOLDER: DirectoryPath = PROJECT_ROOT / "server" / "static" / "images"
     CONFIG_FOLDER: Path = PROJECT_ROOT / "config"
     LOGS_FOLDER: Path = CONFIG_FOLDER / "logs"
+    LOGS_FILENAME = "cheddarr.log"
+    LOGS_MAX_FILES = 10
     DB_FOLDER: Path = CONFIG_FOLDER / "db"
     CONFIG_FILE: Path = CONFIG_FOLDER / "config.json"
 

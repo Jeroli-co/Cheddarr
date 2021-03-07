@@ -19,8 +19,23 @@ class BaseRepository(Generic[ModelType], ABC):
     def find_by(self, **filters) -> Optional[ModelType]:
         return self.session.query(self.model).filter_by(**filters).one_or_none()
 
-    def find_all_by(self, limit: int = 100, **filters) -> List[ModelType]:
-        return self.session.query(self.model).filter_by(**filters).limit(limit).all()
+    def find_all_by(
+        self, limit: int = 100, page: int = None, **filters
+    ) -> (List[ModelType], Optional[int], Optional[int]):
+        query = self.session.query(self.model).filter_by(**filters)
+        offset = ((page - 1) * limit) if page else None
+        results = query.limit(limit).offset(offset).all()
+
+        if page is not None:
+            if page == 1 and len(results) < limit:
+                total_results = len(results)
+            else:
+                total_results = query.order_by(None).count()
+            total_pages = limit / total_results
+
+            return results, total_results, total_pages
+
+        return results
 
     def search_by(self, field: str, value: str, limit: int = 3):
         return (

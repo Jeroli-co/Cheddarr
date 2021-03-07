@@ -65,7 +65,7 @@ def get_tmdb_series(tmdb_id: int) -> Optional[TmdbSeries]:
 def get_tmdb_season(tmdb_id: int, season_number: int) -> Optional[TmdbSeason]:
     try:
         season = tmdb.TV_Seasons(tmdb_id, season_number).info(
-            append_to_response="external_ids,credits,videos"
+            append_to_response="external_ids,credits"
         )
     except Exception:
         return None
@@ -77,7 +77,7 @@ def get_tmdb_episode(
 ) -> Optional[TmdbEpisode]:
     try:
         episode = tmdb.TV_Episodes(tmdb_id, season_number, episode_number).info(
-            append_to_response="external_ids,credits,videos"
+            append_to_response="external_ids,credits"
         )
     except Exception:
         return None
@@ -87,6 +87,11 @@ def get_tmdb_episode(
 def set_tmdb_movie_info(movie: dict):
     genres = [genre["name"] for genre in movie["genres"]]
     movie["genres"] = genres
+    movie["videos"] = [
+        video
+        for video in movie["videos"]["results"]
+        if video["type"] == "Trailer" and video["site"] == "YouTube"
+    ]
 
 
 def set_tmdb_series_info(series: dict):
@@ -98,6 +103,11 @@ def set_tmdb_series_info(series: dict):
             series["series_type"] = SeriesType.anime
             break
     series["genres"] = genres
+    series["videos"] = [
+        video
+        for video in series["videos"]["results"]
+        if video["type"] == "Trailer" and video["site"] == "YouTube"
+    ]
 
 
 def find_tmdb_id_from_external_id(imdb_id=None, tvdb_id=None) -> int:

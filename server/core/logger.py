@@ -4,11 +4,8 @@ from copy import copy
 
 from server.core import config
 
-LOG_FILENAME = "cheddarr.log"
-MAX_FILES = 10
 
-
-class ColoredFormatter(logging.Formatter):
+class LogFormatter(logging.Formatter):
     MAPPING = {
         "DEBUG": 37,  # white
         "INFO": 32,  # cyan
@@ -20,42 +17,46 @@ class ColoredFormatter(logging.Formatter):
     PREFIX = "\033["
     SUFFIX = "\033[0m"
 
-    def __init__(
-        self,
-        patern,
-    ):
+    def __init__(self, patern: str, colored: bool = True):
         logging.Formatter.__init__(self, patern)
+        self.colored = colored
 
     def format(self, record):
-        colored_record = copy(record)
-        levelname = colored_record.levelname
-        seq = self.MAPPING.get(levelname, 37)  # default white
-        colored_levelname = ("{0}{1}m{2}{3}").format(self.PREFIX, seq, levelname, self.SUFFIX)
-        colored_record.levelname = colored_levelname
-        return logging.Formatter.format(self, colored_record)
+        record_ = copy(record)
+        if self.colored:
+            levelname = record_.levelname
+            seq = self.MAPPING.get(levelname, 37)  # default white
+            colored_levelname = ("{0}{1}m{2}{3}").format(self.PREFIX, seq, levelname, self.SUFFIX)
+            record_.levelname = colored_levelname
+
+        formatted_record = logging.Formatter.format(self, record_)
+        if not self.colored and record.exc_info:
+            formatted_record = formatted_record.replace("\n", "")
+        return formatted_record
 
 
 def log_setup():
     config.LOGS_FOLDER.mkdir(parents=True, exist_ok=True)
 
     file_handler = logging.handlers.TimedRotatingFileHandler(
-        config.LOGS_FOLDER / LOG_FILENAME,
+        config.LOGS_FOLDER / config.LOGS_FILENAME,
         "midnight",
         1,
         utc=True,
         encoding="utf-8",
-        backupCount=MAX_FILES,
+        backupCount=config.LOGS_MAX_FILES,
     )
-    log_format = "%(asctime)s - %(levelname)s - %(message)s"
+    log_format = "%(asctime)s - %(levelname)s - %(message)s "
     file_handler.suffix = "%Y-%m-%d.log"
-    file_handler.setFormatter(logging.Formatter(log_format))
+    file_handler.setFormatter(LogFormatter(log_format, colored=False))
 
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(ColoredFormatter(log_format))
+    for logger_name in logging.root.manager.loggerDict.keys():
+        override_logger = logging.getLogger(logger_name)
+        for handler in override_logger.handlers:
+            handler.setFormatter(LogFormatter(log_format))
 
     log = logging.getLogger()
-    log.addHandler(file_handler)
-    log.addHandler(stream_handler)
+    log.handlers = [file_handler]
     log.setLevel(config.LOG_LEVEL)
 
     return log

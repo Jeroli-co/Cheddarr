@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -21,6 +21,7 @@ from server.repositories.users import UserRepository
 from server.schemas.base import ResponseMessage
 from server.schemas.media import MovieSchema, SeriesSchema
 from server.schemas.requests import (
+    MediaRequestSearchResult,
     MediaRequestUpdate,
     MovieRequestCreate,
     MovieRequestSchema,
@@ -33,30 +34,40 @@ from server.services.core import unify_series_request
 router = APIRouter()
 
 
-@router.get("/movies/incoming", response_model=List[MovieRequestSchema])
+@router.get("/movies/incoming", response_model=MediaRequestSearchResult)
 def get_received_movie_requests(
+    page: int = 1,
+    per_page: int = 20,
     current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests = media_request_repo.find_all_by(
-        requested_user_id=current_user.id, media_type=MediaType.movies
+    requests, total_results, total_pages = media_request_repo.find_all_by(
+        limit=per_page, page=page, requested_user_id=current_user.id, media_type=MediaType.movies
     )
-    return requests
+
+    return MediaRequestSearchResult(
+        page=page, total_pages=total_pages, total_results=total_results, results=requests
+    )
 
 
-@router.get("/movies/outgoing", response_model=List[MovieRequestSchema])
+@router.get("/movies/outgoing", response_model=MediaRequestSearchResult)
 def get_sent_movie_requests(
+    page: int = 1,
+    per_page: int = 20,
     current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests = media_request_repo.find_all_by(
-        requesting_user_id=current_user.id, media_type=MediaType.movies
+    requests, total_results, total_pages = media_request_repo.find_all_by(
+        limit=per_page, page=page, requesting_user_id=current_user.id, media_type=MediaType.movies
     )
-    return requests
+
+    return MediaRequestSearchResult(
+        page=page, total_pages=total_pages, total_results=total_results, results=requests
+    )
 
 
 @router.post(
@@ -102,10 +113,9 @@ def add_movie_request(
         requesting_user=current_user,
         media=movie,
     )
-    if check_permissions(
-        current_user.roles, permissions=[UserRole.admin, UserRole.auto_approve], options="or"
-    ):
+    if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
         movie_request.status = RequestStatus.approved
+        scheduler.add_job(send_radarr_request_task, args=[movie_request.id])
 
     media_request_repo.save(movie_request)
 
@@ -198,30 +208,40 @@ def delete_movie_request(
     return {"detail": "Request deleted."}
 
 
-@router.get("/series/incoming", response_model=List[SeriesRequestSchema])
+@router.get("/series/incoming", response_model=MediaRequestSearchResult)
 def get_received_series_requests(
+    page: int = 1,
+    per_page: int = 1,
     current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests = media_request_repo.find_all_by(
-        requested_user_id=current_user.id, media_type=MediaType.series
+    requests, total_results, total_pages = media_request_repo.find_all_by(
+        limit=per_page, page=page, requested_user_id=current_user.id, media_type=MediaType.series
     )
-    return requests
+
+    return MediaRequestSearchResult(
+        page=page, total_pages=total_pages, total_results=total_results, results=requests
+    )
 
 
-@router.get("/series/outgoing", response_model=List[SeriesRequestSchema])
+@router.get("/series/outgoing", response_model=MediaRequestSearchResult)
 def get_sent_series_requests(
+    page: int = 1,
+    per_page: int = 1,
     current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests = media_request_repo.find_all_by(
-        requesting_user_id=current_user.id, media_type=MediaType.series
+    requests, total_results, total_pages = media_request_repo.find_all_by(
+        limit=per_page, page=page, requesting_user_id=current_user.id, media_type=MediaType.series
     )
-    return requests
+
+    return MediaRequestSearchResult(
+        page=page, total_pages=total_pages, total_results=total_results, results=requests
+    )
 
 
 @router.post(
@@ -273,10 +293,9 @@ def add_series_request(
             media=series,
         )
         unify_series_request(series_request, request_in)
-        if check_permissions(
-            current_user.roles, permissions=[UserRole.admin, UserRole.auto_approve], options="or"
-        ):
+        if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
             series_request.status = RequestStatus.approved
+            scheduler.add_job(send_sonarr_request_task, args=[series_request.id])
 
         media_request_repo.save(series_request)
 

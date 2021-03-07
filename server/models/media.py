@@ -9,7 +9,7 @@ from sqlalchemy import (
     String,
 )
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from server.database import Model
 
@@ -33,7 +33,9 @@ class Media(Model):
     tvdb_id = Column(Integer, unique=True, index=True)
     media_type = Column(DBEnum(MediaType), nullable=False)
     title = Column(String, nullable=False)
-    server_media: list = relationship("MediaServerMedia", back_populates="media")
+    server_media: list = relationship(
+        "MediaServerMedia", back_populates="media", cascade="all,delete,delete-orphan"
+    )
 
 
 class Season(Model):
@@ -42,8 +44,10 @@ class Season(Model):
     id = Column(Integer, primary_key=True)
     season_number = Column(Integer, nullable=False)
     series_id = Column(ForeignKey("media.id"), nullable=False)
-    media = relationship("Media")
-    episodes: list = relationship("Episode", back_populates="season")
+    media = relationship("Media", backref=backref("seasons", cascade="all,delete,delete-orphan"))
+    episodes: list = relationship(
+        "Episode", back_populates="season", cascade="all,delete,delete-orphan"
+    )
     server_seasons: list = relationship("MediaServerSeason", back_populates="season")
 
 
@@ -70,13 +74,22 @@ class MediaServerContent(object):
 class MediaServerMedia(Model, MediaServerContent):
     media_id = Column(ForeignKey("media.id"))
     media = relationship("Media", back_populates="server_media")
+    server = relationship(
+        "MediaServerSetting", backref=backref("media", cascade="all,delete,delete-orphan")
+    )
 
 
 class MediaServerSeason(Model, MediaServerContent):
     season_id = Column(ForeignKey("season.id"))
     season = relationship("Season", back_populates="server_seasons")
+    server = relationship(
+        "MediaServerSetting", backref=backref("seasons", cascade="all,delete,delete-orphan")
+    )
 
 
 class MediaServerEpisode(Model, MediaServerContent):
     episode_id = Column(ForeignKey("episode.id"))
     episode = relationship("Episode", back_populates="server_episodes")
+    server = relationship(
+        "MediaServerSetting", backref=backref("episodes", cascade="all,delete,delete-orphan")
+    )

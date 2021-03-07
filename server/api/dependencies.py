@@ -7,7 +7,6 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from server.core import config
-from server.core.security import check_permissions
 from server.models.users import User, UserRole
 from server.repositories.base import BaseRepository
 from server.repositories.settings import PlexSettingRepository
@@ -77,7 +76,9 @@ def has_user_permissions(
     permissions: List[UserRole], options: Literal["and", "or"] = "and"
 ) -> Callable[[User], None]:
     def _has_permissions(current_user: User = Depends(get_current_user)):
-        if not check_permissions(current_user.roles, permissions,options):
+        from server.core.security import check_permissions
+
+        if not check_permissions(current_user.roles, permissions, options):
             raise HTTPException(status_code=403, detail="Not enough privileges.")
 
     return _has_permissions

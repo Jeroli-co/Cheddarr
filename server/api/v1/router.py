@@ -1,6 +1,16 @@
 from fastapi import APIRouter, FastAPI
 
-from .endpoints import auth, notifications, requests, search, settings, users, movies, series
+from .endpoints import (
+    auth,
+    movies,
+    notifications,
+    requests,
+    search,
+    series,
+    settings,
+    system,
+    users,
+)
 
 version = "v1"
 
@@ -16,6 +26,7 @@ router.include_router(
     prefix="/settings",
     tags=["settings"],
 )
+router.include_router(system.router, prefix="/system", tags=["system"])
 router.include_router(users.current_user_router, prefix="/user", tags=["current user"])
 router.include_router(users.users_router, prefix="/users", tags=["users"])
 

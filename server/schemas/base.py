@@ -16,3 +16,9 @@ class APIModel(BaseModel):
 
 class ResponseMessage(BaseModel):
     detail: str
+
+
+class Log(BaseModel):
+    time: str
+    level: str
+    message: str
