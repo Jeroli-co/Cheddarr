@@ -38,6 +38,8 @@ class LogFormatter(logging.Formatter):
 def log_setup():
     config.LOGS_FOLDER.mkdir(parents=True, exist_ok=True)
 
+    log_format = "%(asctime)s | %(levelname)s | %(message)s "
+
     file_handler = logging.handlers.TimedRotatingFileHandler(
         config.LOGS_FOLDER / config.LOGS_FILENAME,
         "midnight",
@@ -46,18 +48,19 @@ def log_setup():
         encoding="utf-8",
         backupCount=config.LOGS_MAX_FILES,
     )
-    log_format = "%(asctime)s - %(levelname)s - %(message)s "
     file_handler.suffix = "%Y-%m-%d.log"
     file_handler.setFormatter(LogFormatter(log_format, colored=False))
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(LogFormatter(log_format))
 
-    for logger_name in logging.root.manager.loggerDict.keys():
+    log = logging.getLogger()
+    log.handlers = [file_handler, stream_handler]
+    log.setLevel(config.LOG_LEVEL)
+
+    for logger_name in log.root.manager.loggerDict.keys():
         override_logger = logging.getLogger(logger_name)
         for handler in override_logger.handlers:
             handler.setFormatter(LogFormatter(log_format))
-
-    log = logging.getLogger()
-    log.handlers = [file_handler]
-    log.setLevel(config.LOG_LEVEL)
 
     return log
 

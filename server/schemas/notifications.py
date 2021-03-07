@@ -1,7 +1,7 @@
 from typing import Any
 
 from server.schemas.users import UserPublicSchema
-from .base import APIModel
+from .core import APIModel
 
 
 class NotificationSchema(APIModel):

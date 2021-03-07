@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
@@ -12,8 +10,7 @@ from server.repositories.media import (
     SeasonRepository,
 )
 from server.repositories.requests import MediaRequestRepository
-from server.schemas.media import EpisodeSchema, SeasonSchema, SeriesSchema
-from server.schemas.search import SearchResult
+from server.schemas.media import EpisodeSchema, MediaSearchResult, SeasonSchema, SeriesSchema
 from server.services import tmdb
 from server.services.core import (
     set_episode_db_info,
@@ -105,23 +102,29 @@ def get_episode(
 @router.get(
     "/recent",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=List[SeriesSchema],
+    response_model=MediaSearchResult,
 )
 def get_recent_series(
+    page: int = 1,
+    per_page: int = 20,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
 ):
 
-    db_recent_series = media_repo.find_all_recently_added(media_type=MediaType.series)
+    db_recent_series, total_results, total_pages = media_repo.find_all_recently_added(
+        media_type=MediaType.series, per_page=per_page, page=page
+    )
     recent_series = []
     for series in db_recent_series:
         tmdb_series = tmdb.get_tmdb_series(series.tmdb_id)
         tmdb_series.media_server_info = series.server_media
         recent_series.append(tmdb_series.dict())
 
-    return recent_series
+    return MediaSearchResult(
+        page=page, total_pages=total_pages, total_results=total_results, results=recent_series
+    )
 
 
-@router.get("/popular", response_model=SearchResult, response_model_exclude_none=True)
+@router.get("/popular", response_model=MediaSearchResult, response_model_exclude_none=True)
 def get_popular_series(
     page: int = 1,
     current_user: User = Depends(deps.get_current_user),
@@ -131,7 +134,7 @@ def get_popular_series(
     for series in popular_series:
         set_media_db_info(series, current_user.id, media_repo)
 
-    search_result = SearchResult(
+    search_result = MediaSearchResult(
         results=[m.dict() for m in popular_series],
         page=page,
         total_pages=total_pages,
@@ -141,28 +144,8 @@ def get_popular_series(
     return search_result
 
 
-@router.get("/upcoming", response_model=SearchResult, response_model_exclude_none=True)
-def get_upcoming_series(
-    page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
-    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
-):
-    upcoming_series, total_pages, total_results = tmdb.get_tmdb_upcoming_series(page=page)
-    for series in upcoming_series:
-        set_media_db_info(series, current_user.id, media_repo)
-
-    search_result = SearchResult(
-        results=[m.dict() for m in upcoming_series],
-        page=page,
-        total_pages=total_pages,
-        total_results=total_results,
-    )
-
-    return search_result
-
-
 @router.get(
-    "/{tmdb_id:int}/similar", response_model=SearchResult, response_model_exclude_none=True
+    "/{tmdb_id:int}/similar", response_model=MediaSearchResult, response_model_exclude_none=True
 )
 def get_similar_series(
     tmdb_id: int,
@@ -176,7 +159,7 @@ def get_similar_series(
     for series in similar_series:
         set_media_db_info(series, current_user.id, media_repo)
 
-    search_result = SearchResult(
+    search_result = MediaSearchResult(
         results=[m.dict() for m in similar_series],
         page=page,
         total_pages=total_pages,
@@ -187,7 +170,9 @@ def get_similar_series(
 
 
 @router.get(
-    "/{tmdb_id:int}/recommended", response_model=SearchResult, response_model_exclude_none=True
+    "/{tmdb_id:int}/recommended",
+    response_model=MediaSearchResult,
+    response_model_exclude_none=True,
 )
 def get_recommended_series(
     tmdb_id: int,
@@ -201,7 +186,7 @@ def get_recommended_series(
     for series in recommended_series:
         set_media_db_info(series, current_user.id, media_repo)
 
-    search_result = SearchResult(
+    search_result = MediaSearchResult(
         results=[m.dict() for m in recommended_series],
         page=page,
         total_pages=total_pages,

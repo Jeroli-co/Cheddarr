@@ -21,7 +21,7 @@ from server.models.media import (
     MediaType,
     Season,
 )
-from server.models.settings import PlexSetting, ServiceNames
+from server.models.settings import ServiceNames
 from server.repositories.media import (
     EpisodeRepository,
     MediaRepository,
@@ -36,25 +36,25 @@ IMDB_REGEX = "imdb"
 TVDB_REGEX = "tvdb|thetvdb"
 
 
-@scheduler.scheduled_job("interval", hours=5)
+@scheduler.scheduled_job("interval", id="plex-full-sync", name="Plex Full Library Sync", hours=5)
 def sync_plex_servers_library():
     db_session = next(get_db())
     media_server_setting_repo = MediaServerSettingRepository(db_session)
-    plex_settings = [
-        PlexSetting(setting)
-        for setting in media_server_setting_repo.find_all_by(service_name=ServiceNames.plex)
-    ]
+    plex_settings = media_server_setting_repo.find_all_by(service_name=ServiceNames.plex)
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
         )
         for section in setting.library_sections:
-            process_plex_media_list(
-                server.library.section(section["name"]).all(), setting.server_id, db_session
-            )
+            if section["enabled"]:
+                process_plex_media_list(
+                    server.library.section(section["name"]).all(), setting.server_id, db_session
+                )
 
 
-@scheduler.scheduled_job("interval", minutes=5)
+@scheduler.scheduled_job(
+    "interval", id="plex-recently-added-sync", name="Plex Recently Added Sync", minutes=5
+)
 def sync_plex_servers_recently_added():
     db_session = next(get_db())
     media_server_setting_repo = MediaServerSettingRepository(db_session)

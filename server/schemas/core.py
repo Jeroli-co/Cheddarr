@@ -1,4 +1,5 @@
-from typing import Type
+from datetime import datetime
+from typing import List, Optional, Type
 
 from pydantic import BaseModel
 
@@ -18,7 +19,24 @@ class ResponseMessage(BaseModel):
     detail: str
 
 
+class PaginatedResult(BaseModel):
+    page: int = 1
+    total_pages: int
+    total_results: int
+    results: List
+
+
 class Log(BaseModel):
     time: str
     level: str
     message: str
+
+
+class LogResult(PaginatedResult):
+    results: List[Log]
+
+
+class Job(BaseModel):
+    id: str
+    name: str
+    next_run_time: Optional[datetime]

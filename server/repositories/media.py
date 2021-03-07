@@ -3,7 +3,7 @@ from typing import List, Optional
 from sqlalchemy import desc, or_
 
 from server.models.media import Episode, Media, MediaServerMedia, MediaType, Season
-from server.repositories.base import BaseRepository
+from server.repositories.base import BaseRepository, paginate
 
 
 class MediaRepository(BaseRepository[Media]):
@@ -20,15 +20,18 @@ class MediaRepository(BaseRepository[Media]):
             .one_or_none()
         )
 
-    def find_all_recently_added(self, media_type: MediaType, limit=20):
-        return (
+    def find_all_recently_added(
+        self, media_type: MediaType, page: int = None, per_page: int = None
+    ):
+        query = (
             self.session.query(Media)
             .join(MediaServerMedia)
             .filter(Media.media_type == media_type)
             .order_by(desc(MediaServerMedia.added_at))
-            .limit(limit)
-            .all()
         )
+        if page is not None:
+            return paginate(query, per_page, page)
+        return query.all()
 
 
 class SeasonRepository(BaseRepository[Season]):

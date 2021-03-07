@@ -6,7 +6,7 @@ from server.api import dependencies as deps
 from server.models.media import MediaType
 from server.repositories.media import MediaRepository
 from server.schemas.external_services import PlexMediaInfo
-from server.schemas.search import SearchResult
+from server.schemas.media import MediaSearchResult
 from server.services import tmdb
 
 router = APIRouter()
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get(
     "",
-    response_model=SearchResult,
+    response_model=MediaSearchResult,
     response_model_exclude_none=True,
     dependencies=[Depends(deps.get_current_user)],
 )
@@ -39,7 +39,7 @@ def search_media(
             media.media_server_info = [
                 PlexMediaInfo(**server_media.as_dict()) for server_media in db_media.server_media
             ]
-    search_result = SearchResult(
+    search_result = MediaSearchResult(
         results=[m.dict() for m in media_results],
         page=page,
         total_pages=total_pages,

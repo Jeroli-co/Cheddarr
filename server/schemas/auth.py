@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
-from .base import APIModel
+from .core import APIModel
 
 
 class Token(BaseModel):

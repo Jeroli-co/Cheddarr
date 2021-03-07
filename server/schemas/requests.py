@@ -5,7 +5,7 @@ from typing import List, Optional, Union
 from server.models.requests import RequestStatus
 from server.schemas.media import MovieSchema, SeriesSchema
 from server.schemas.users import UserPublicSchema
-from .base import APIModel
+from .core import APIModel, PaginatedResult
 from ..models.media import MediaType
 
 
@@ -55,8 +55,5 @@ class SeriesRequestCreate(MediaRequestCreate):
     seasons: Optional[List[SeasonRequestSchema]]
 
 
-class MediaRequestSearchResult(APIModel):
-    page: int = 1
-    total_pages: int
-    total_results: int
+class MediaRequestSearchResult(PaginatedResult):
     results: List[Union[SeriesRequestSchema, MovieRequestSchema]]

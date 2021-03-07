@@ -4,7 +4,7 @@ from pydantic import Field
 
 from server.models.media import MediaType
 from server.models.settings import MediaProviderType
-from .base import APIModel
+from .core import APIModel
 
 
 class ProviderSettingBase(APIModel):

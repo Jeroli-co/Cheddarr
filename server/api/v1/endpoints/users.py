@@ -15,7 +15,7 @@ from server.repositories.users import (
     UserRepository,
 )
 from server.schemas.auth import EmailConfirm
-from server.schemas.base import ResponseMessage
+from server.schemas.core import ResponseMessage
 from server.schemas.users import (
     FriendshipCreate,
     PasswordResetConfirm,

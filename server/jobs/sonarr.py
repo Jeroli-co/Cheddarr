@@ -5,8 +5,8 @@ from server.repositories.requests import MediaRequestRepository
 from server.services import sonarr
 
 
-@scheduler.scheduled_job("interval", minutes=10)
-def check_sonarr_series_availability():
+@scheduler.scheduled_job("interval", name="Sonarr Sync", minutes=10)
+def sonarr_sync():
     media_request_repo = MediaRequestRepository(next(get_db()))
     requests = media_request_repo.find_all_by(status=RequestStatus.approved)
     for request in requests:

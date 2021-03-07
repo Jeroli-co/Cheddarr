@@ -18,7 +18,7 @@ from server.models.users import User, UserRole
 from server.repositories.media import MediaRepository
 from server.repositories.requests import MediaRequestRepository
 from server.repositories.users import UserRepository
-from server.schemas.base import ResponseMessage
+from server.schemas.core import ResponseMessage
 from server.schemas.media import MovieSchema, SeriesSchema
 from server.schemas.requests import (
     MediaRequestSearchResult,

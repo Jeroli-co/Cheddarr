@@ -170,16 +170,6 @@ def get_tmdb_popular_series(page: int = 1) -> (List[TmdbSeries], int, int):
     return results, search["total_pages"], search["total_results"]
 
 
-def get_tmdb_upcoming_series(page: int = 1) -> (List[TmdbSeries], int, int):
-    search = tmdb.TV().upcoming(page=page)
-    results = []
-
-    for movie in search["results"]:
-        parsed_movie = TmdbSeries.parse_obj(movie)
-        results.append(parsed_movie)
-    return results, search["total_pages"], search["total_results"]
-
-
 def get_tmdb_similar_series(tmdb_id: int, page: int = 1) -> (List[TmdbSeries], int, int):
     search = tmdb.TV(tmdb_id).similar_movies(page=page)
     results = []

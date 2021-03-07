@@ -10,7 +10,7 @@ from server.repositories.settings import (
     RadarrSettingRepository,
     SonarrSettingRepository,
 )
-from server.schemas.base import ResponseMessage
+from server.schemas.core import ResponseMessage
 from server.schemas.settings import (
     PlexLibrarySection,
     PlexServer,

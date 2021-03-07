@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import AnyHttpUrl, EmailStr
 
-from .base import APIModel
+from .core import APIModel
 
 
 class UserBase(APIModel):

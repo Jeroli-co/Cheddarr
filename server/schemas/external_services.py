@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import AnyHttpUrl, Field, validator
 
-from .base import APIModel
+from .core import APIModel
 
 
 #####################################

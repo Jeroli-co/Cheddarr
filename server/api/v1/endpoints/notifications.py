@@ -10,7 +10,7 @@ from server.models.notifications import Agent, NotificationAgent
 from server.models.users import User
 from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import UserRepository
-from server.schemas.base import ResponseMessage
+from server.schemas.core import ResponseMessage
 from server.schemas.notifications import EmailAgentSchema, NotificationSchema
 
 router = APIRouter()

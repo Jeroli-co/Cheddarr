@@ -5,8 +5,8 @@ from server.repositories.requests import MediaRequestRepository
 from server.services import radarr
 
 
-@scheduler.scheduled_job("interval", minutes=10)
-def check_radarr_movies_availability():
+@scheduler.scheduled_job("interval", name="Radarr Sync", minutes=10)
+def sync_radarr():
     media_request_repo = MediaRequestRepository(next(get_db()))
     requests = media_request_repo.find_all_by(status=RequestStatus.approved)
     for request in requests:

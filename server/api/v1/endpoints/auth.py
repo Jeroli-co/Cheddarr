@@ -22,7 +22,7 @@ from server.models.users import User, UserRole
 from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import UserRepository
 from server.schemas.auth import EmailConfirm, PlexAuthorizeSignin, Token, TokenPayload
-from server.schemas.base import ResponseMessage
+from server.schemas.core import ResponseMessage
 from server.schemas.users import UserCreate, UserSchema
 
 router = APIRouter()

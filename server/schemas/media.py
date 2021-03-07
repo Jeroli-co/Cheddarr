@@ -1,12 +1,12 @@
 from abc import ABC
 from datetime import date
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import AnyHttpUrl, Field, validator
 
 from server.models.media import MediaType, SeriesType
 from server.schemas.external_services import MediaServerInfo
-from .base import APIModel
+from .core import APIModel, PaginatedResult
 
 
 ###########################################
@@ -68,7 +68,6 @@ class SeasonSchema(MediaSchema):
     title: str
     release_date: Optional[date]
     episodes: Optional[List[EpisodeSchema]]
-    medi_server_info: Optional[List[MediaServerInfo]]
 
 
 class SeriesSchema(MediaSchema):
@@ -77,6 +76,10 @@ class SeriesSchema(MediaSchema):
     media_type: MediaType = Field(default=MediaType.series, const=True)
     series_type: Optional[SeriesType]
     requests: List = []
+
+
+class MediaSearchResult(PaginatedResult):
+    results: List[Union[SeriesSchema, MovieSchema]]
 
 
 ###########################################

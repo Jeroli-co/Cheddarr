@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server.api import dependencies as deps
@@ -7,8 +5,7 @@ from server.models.media import MediaType
 from server.models.users import User
 from server.repositories.media import MediaRepository
 from server.repositories.requests import MediaRequestRepository
-from server.schemas.media import MovieSchema
-from server.schemas.search import SearchResult
+from server.schemas.media import MediaSearchResult, MovieSchema
 from server.services import tmdb
 from server.services.core import set_media_db_info
 
@@ -38,23 +35,29 @@ def get_movie(
 
 
 @router.get(
-    "/recent", dependencies=[Depends(deps.get_current_user)], response_model=List[MovieSchema]
+    "/recent", dependencies=[Depends(deps.get_current_user)], response_model=MediaSearchResult
 )
 def get_recent_movies(
+    page: int = 1,
+    per_page: int = 20,
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
 ):
 
-    db_recent_movies = media_repo.find_all_recently_added(media_type=MediaType.movies)
+    db_recent_movies, total_results, total_pages = media_repo.find_all_recently_added(
+        media_type=MediaType.movies, page=page, per_page=per_page
+    )
     recent_movies = []
     for movie in db_recent_movies:
         tmdb_movie = tmdb.get_tmdb_movie(movie.tmdb_id)
         tmdb_movie.media_server_info = movie.server_media
         recent_movies.append(tmdb_movie.dict())
 
-    return recent_movies
+    return MediaSearchResult(
+        page=page, total_pages=total_pages, total_results=total_results, results=recent_movies
+    )
 
 
-@router.get("/popular", response_model=SearchResult, response_model_exclude_none=True)
+@router.get("/popular", response_model=MediaSearchResult, response_model_exclude_none=True)
 def get_popular_movies(
     page: int = 1,
     current_user: User = Depends(deps.get_current_user),
@@ -64,7 +67,7 @@ def get_popular_movies(
     for movie in popular_movies:
         set_media_db_info(movie, current_user.id, media_repo)
 
-    search_result = SearchResult(
+    search_result = MediaSearchResult(
         results=[m.dict() for m in popular_movies],
         page=page,
         total_pages=total_pages,
@@ -74,7 +77,7 @@ def get_popular_movies(
     return search_result
 
 
-@router.get("/upcoming", response_model=SearchResult, response_model_exclude_none=True)
+@router.get("/upcoming", response_model=MediaSearchResult, response_model_exclude_none=True)
 def get_upcoming_movies(
     page: int = 1,
     current_user: User = Depends(deps.get_current_user),
@@ -84,7 +87,7 @@ def get_upcoming_movies(
     for movie in upcoming_movies:
         set_media_db_info(movie, current_user.id, media_repo)
 
-    search_result = SearchResult(
+    search_result = MediaSearchResult(
         results=[m.dict() for m in upcoming_movies],
         page=page,
         total_pages=total_pages,
@@ -95,7 +98,7 @@ def get_upcoming_movies(
 
 
 @router.get(
-    "/{tmdb_id:int}/similar", response_model=SearchResult, response_model_exclude_none=True
+    "/{tmdb_id:int}/similar", response_model=MediaSearchResult, response_model_exclude_none=True
 )
 def get_similar_movies(
     tmdb_id: int,
@@ -109,7 +112,7 @@ def get_similar_movies(
     for movie in similar_movies:
         set_media_db_info(movie, current_user.id, media_repo)
 
-    search_result = SearchResult(
+    search_result = MediaSearchResult(
         results=[m.dict() for m in similar_movies],
         page=page,
         total_pages=total_pages,
@@ -120,7 +123,9 @@ def get_similar_movies(
 
 
 @router.get(
-    "/{tmdb_id:int}/recommended", response_model=SearchResult, response_model_exclude_none=True
+    "/{tmdb_id:int}/recommended",
+    response_model=MediaSearchResult,
+    response_model_exclude_none=True,
 )
 def get_recommended_movies(
     tmdb_id: int,
@@ -134,7 +139,7 @@ def get_recommended_movies(
     for movie in recommended_movies:
         set_media_db_info(movie, current_user.id, media_repo)
 
-    search_result = SearchResult(
+    search_result = MediaSearchResult(
         results=[m.dict() for m in recommended_movies],
         page=page,
         total_pages=total_pages,
