@@ -31,14 +31,6 @@ export const APIRoutes = {
   RESET_PASSWORD: (token: string) => "/user/password" + token,
 
   // PLEX
-  GET_PLEX_MOVIE: (plexConfigId: string, movieId: number | string) =>
-    "/plex/" + plexConfigId + "/movies/" + movieId,
-  GET_PLEX_SERIES: (plexConfigId: string, episodeId: number | string) =>
-    "/plex/" + plexConfigId + "/series/" + episodeId,
-  GET_PLEX_SEASON: (plexConfigId: string, seasonId: number | string) =>
-    "/plex/" + plexConfigId + "/seasons/" + seasonId,
-  GET_PLEX_EPISODE: (plexConfigId: string, episodeId: number | string) =>
-    "/plex/" + plexConfigId + "/episodes/" + episodeId,
   GET_PLEX_LIBRARIES: (serverId: string) =>
     "/settings/plex/" + serverId + "/libraries",
   GET_PLEX_CONFIGS: "/settings/plex",
@@ -48,10 +40,6 @@ export const APIRoutes = {
   DELETE_PLEX_CONFIG: (plexConfigId: string) =>
     "/settings/plex/" + plexConfigId,
   GET_PLEX_SERVERS: "/settings/plex/servers",
-  SEARCH_PLEX_MOVIES: (plexConfigId: string, value: string) =>
-    "/plex/" + plexConfigId + "/search?section=movies&value=" + value,
-  SEARCH_PLEX_SERIES: (plexConfigId: string, value: string) =>
-    "/plex/" + plexConfigId + "/search?section=series&value=" + value,
 
   //RADARR
   GET_RADARR_CONFIG: "/settings/radarr",
@@ -67,7 +55,7 @@ export const APIRoutes = {
   UPDATE_SONARR_CONFIG: (id: string) => "/settings/sonarr/" + id,
   DELETE_SONARR_CONFIG: (id: string) => "/settings/sonarr/" + id,
 
-  // TMDB
+  // MEDIA
   GET_MEDIA: (title: string, page: number, type: SearchFilters | null) =>
     "/search?value=" +
     title +
@@ -86,6 +74,9 @@ export const APIRoutes = {
     "/series/" + id + "/recommended",
   GET_SIMILAR_MOVIES: (id: number | string) => "/movies/" + id + "/similar",
   GET_SIMILAR_SERIES: (id: number | string) => "/series/" + id + "/similar",
+  GET_MEDIA_RECENTLY_ADDED: (type: MediaTypes) => "/" + type + "/recent",
+  GET_MEDIA_POPULAR: (type: MediaTypes) => "/" + type + "/popular",
+  GET_MEDIA_UPCOMING: (type: MediaTypes) => "/" + type + "/upcoming",
 
   // REQUESTS
   CREATE_REQUEST_MOVIE: "/requests/movies",
