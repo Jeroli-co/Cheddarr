@@ -6,6 +6,7 @@ import { routes } from "../../../../router/routes";
 import { SearchFilters } from "../../../../shared/enums/SearchFilters";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 import { isEmpty } from "../../../../utils/strings";
+import { useLocation } from "react-router-dom";
 
 const Container = styled.div<{
   isInputFocus: boolean;
@@ -93,6 +94,7 @@ export const SearchBar = () => {
   const [searchValue, setSearchValue] = useState("");
   const history = useHistory();
   const inputRef = useRef<HTMLInputElement>(null);
+  const location = useLocation();
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
@@ -104,6 +106,13 @@ export const SearchBar = () => {
       inputRef.current.focus();
     }
   };
+
+  useEffect(() => {
+    if (!location.pathname.startsWith("/search") && !isEmpty(searchValue)) {
+      setSearchValue("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!isEmpty(searchValue)) {
@@ -120,6 +129,7 @@ export const SearchBar = () => {
       />
       <input
         ref={inputRef}
+        value={searchValue}
         onChange={onInputChange}
         onFocus={() => setIsInputFocus(true)}
         onBlur={() => setIsInputFocus(false)}

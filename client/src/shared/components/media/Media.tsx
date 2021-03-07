@@ -8,14 +8,13 @@ import { MediaTag, Tag } from "../Tag";
 import { MediaPersonCarousel } from "./MediaPersonCarousel";
 import { useRecommendedMedia } from "../../hooks/useRecommendedMedia";
 import { Spinner } from "../Spinner";
-import { Carousel } from "../layout/Carousel";
-import { MediaPreviewCardGrid } from "./MediaPreviewCardGrid";
 import { useSimilarMedia } from "../../hooks/useSimilarMedia";
 import { PrimaryButton } from "../Button";
 import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
 import { RequestMediaModal } from "./RequestMediaModal";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
 import { PrimaryDivider } from "../Divider";
+import { MediaCarousel } from "./MediaCarousel";
 
 export const Container = styled.div``;
 
@@ -253,30 +252,22 @@ export const Media = (props: MediaProps) => {
           <MediaPersonCarousel personList={props.media.credits.cast} />
         </>
       )}
-      <H2>Recommended</H2>
       {recommended.isLoading && <Spinner />}
-      {!recommended.isLoading && recommended.data && (
-        <Carousel>
-          {recommended.data &&
-            recommended.data?.results &&
-            recommended.data?.results.map(
-              (m, index) =>
-                m.posterUrl && <MediaPreviewCardGrid key={index} media={m} />
-            )}
-        </Carousel>
-      )}
-      <H2>Similar</H2>
+      {!recommended.isLoading &&
+        recommended.data &&
+        recommended.data?.results.length > 0 && (
+          <>
+            <H2>Recommended</H2>
+            <MediaCarousel mediaList={recommended.data.results} />
+          </>
+        )}
 
       {similar.isLoading && <Spinner />}
-      {!similar.isLoading && similar.data && (
-        <Carousel>
-          {similar.data &&
-            similar.data?.results &&
-            similar.data?.results.map(
-              (m, index) =>
-                m.posterUrl && <MediaPreviewCardGrid key={index} media={m} />
-            )}
-        </Carousel>
+      {!similar.isLoading && similar.data && similar.data?.results.length > 0 && (
+        <>
+          <H2>Similar</H2>
+          <MediaCarousel mediaList={similar.data.results} />
+        </>
       )}
       {isRequestMediaModalOpen && (
         <SeriesRequestOptionsContextProvider>
