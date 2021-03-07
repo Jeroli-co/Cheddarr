@@ -39,6 +39,8 @@ export const APIRoutes = {
     "/plex/" + plexConfigId + "/seasons/" + seasonId,
   GET_PLEX_EPISODE: (plexConfigId: string, episodeId: number | string) =>
     "/plex/" + plexConfigId + "/episodes/" + episodeId,
+  GET_PLEX_LIBRARIES: (serverId: string) =>
+    "/settings/plex/" + serverId + "/libraries",
   GET_PLEX_CONFIGS: "/settings/plex",
   CREATE_PLEX_CONFIG: "/settings/plex",
   UPDATE_PLEX_CONFIG: (plexConfigId: string) =>

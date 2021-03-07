@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { IMedia } from "../../models/IMedia";
-import { H1, H2, H3 } from "../Titles";
+import { H1, H2 } from "../Titles";
 import { minToHoursMinutes } from "../../../utils/media-utils";
-import { Row } from "../layout/Row";
 import { MediaRating } from "./MediaRating";
 import { MediaTag, Tag } from "../Tag";
 import { MediaPersonCarousel } from "./MediaPersonCarousel";

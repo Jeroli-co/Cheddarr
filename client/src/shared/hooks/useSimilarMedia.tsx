@@ -22,6 +22,7 @@ export const useSimilarMedia = (media: IMedia) => {
         setSimilarMedia(res);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return similarMedia;

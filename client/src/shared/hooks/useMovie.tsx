@@ -34,6 +34,7 @@ export const useMovie = (movieId: number | string) => {
     if (movie.isLoading) {
       fetchMovie();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movie.isLoading]);
 
   return movie;

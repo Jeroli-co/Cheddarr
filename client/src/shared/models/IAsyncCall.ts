@@ -1,5 +1,4 @@
 import { AxiosError, AxiosResponse } from "axios";
-import { IPaginated } from "./IPaginated";
 
 export interface IAsyncCall<T = any> {
   data: T | null;

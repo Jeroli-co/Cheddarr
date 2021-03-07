@@ -123,6 +123,8 @@ export default function PlexConfigContextProvider(props: any) {
           setConfigs({ ...configs, data: configurations });
           pushSuccess("Config deleted");
         }
+      } else {
+        pushDanger("Cannot delete config");
       }
       return res;
     });

@@ -44,18 +44,21 @@ export const useSearchMedia = (
         setMedia(DefaultAsyncCall);
       }, 800);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);
 
   useEffect(() => {
     if (!media.isLoading) {
       setMedia(DefaultAsyncCall);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, page]);
 
   useEffect(() => {
     if (media.isLoading) {
       fetchMedia();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [media]);
 
   return media;

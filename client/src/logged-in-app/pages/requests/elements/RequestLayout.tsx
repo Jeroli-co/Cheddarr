@@ -22,16 +22,10 @@ import {
 import { RequestStatus } from "../../../../shared/enums/RequestStatus";
 import {
   DangerIconButton,
-  PrimaryButton,
   SuccessButton,
 } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
-import {
-  faArrowLeft,
-  faArrowRight,
-  faCheck,
-  faTimes,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
 import { useRequestsContext } from "../../../../shared/contexts/RequestsContext";
 import { RequestTypes } from "../../../../shared/enums/RequestTypes";
@@ -43,8 +37,6 @@ import {
   SuccessTag,
   WarningTag,
 } from "../../../../shared/components/Tag";
-import { useMovie } from "../../../../shared/hooks/useMovie";
-import { useSeries } from "../../../../shared/hooks/useSeries";
 import { useMedia } from "../../../../shared/hooks/useMedia";
 import { useHistory } from "react-router-dom";
 import { routes } from "../../../../router/routes";

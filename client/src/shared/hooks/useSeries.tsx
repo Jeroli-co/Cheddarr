@@ -34,6 +34,7 @@ export const useSeries = (seriesId: number) => {
     if (series.isLoading) {
       fetchSeries();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [series.isLoading]);
 
   return series;

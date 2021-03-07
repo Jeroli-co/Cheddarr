@@ -5,7 +5,7 @@ import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
 import { HelpDanger } from "../../../../../shared/components/Help";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
 import { PrimaryButton } from "../../../../../shared/components/Button";
-import { PrimaryDivider } from "../../../../../shared/components/Divider";
+import { PrimaryLightDivider } from "../../../../../shared/components/Divider";
 import {
   DefaultAsyncCall,
   IAsyncCall,
@@ -149,7 +149,7 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
         </PrimaryButton>
       </div>
 
-      <PrimaryDivider />
+      <PrimaryLightDivider />
 
       {instanceInfo.data && (
         <div>

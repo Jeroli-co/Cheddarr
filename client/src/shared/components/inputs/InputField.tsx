@@ -9,11 +9,13 @@ type InputFieldProps = {
 };
 
 export const InputField = styled.div<InputFieldProps>`
-  ${(props) =>
-    props.hidden &&
-    css`
-      visibility: hidden;
-    `};
+  display: flex;
+  flex-direction: ${(props) => (props.isInline ? "row" : "column")};
+  margin: 8px 0;
+
+  label {
+    white-space: nowrap;
+  }
 
   ${(props) =>
     props.width &&
@@ -25,20 +27,27 @@ export const InputField = styled.div<InputFieldProps>`
     width: 100%;
   }
 
-  display: flex;
-  flex-direction: ${(props) => (props.isInline ? "row" : "column")};
-  margin: 8px 0;
-
-  label {
-    white-space: nowrap;
-  }
+  ${(props) =>
+    props.hidden &&
+    css`
+      visibility: hidden;
+      width: 0;
+      height: 0;
+      margin: 0;
+      padding: 0;
+    `};
 
   ${(props) =>
     props.isInline &&
     css`
       align-items: center;
       label {
-        padding-right: 10px;
+        &:first-child {
+          padding-right: 10px;
+        }
+        &:not(:first-child) {
+          padding-left: 10px;
+        }
       }
     `};
 

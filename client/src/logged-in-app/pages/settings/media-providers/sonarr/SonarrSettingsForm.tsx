@@ -13,7 +13,7 @@ import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
 import { HelpDanger } from "../../../../../shared/components/Help";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
 import { PrimaryButton } from "../../../../../shared/components/Button";
-import { PrimaryDivider } from "../../../../../shared/components/Divider";
+import { PrimaryLightDivider } from "../../../../../shared/components/Divider";
 import { Row } from "../../../../../shared/components/layout/Row";
 
 type SonarrSettingsFormProps = {
@@ -153,7 +153,7 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
         Get instance info
       </PrimaryButton>
 
-      <PrimaryDivider />
+      <PrimaryLightDivider />
 
       {instanceInfo.data && (
         <div>

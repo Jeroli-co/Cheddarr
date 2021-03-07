@@ -22,6 +22,7 @@ export const useRecommendedMedia = (media: IMedia) => {
         setRecommendedMedia(res);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return recommendedMedia;

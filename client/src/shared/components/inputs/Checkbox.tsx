@@ -71,7 +71,6 @@ const Container = styled.label<ContainerProps>`
 `;
 
 type CheckboxProps = {
-  defaultChecked?: boolean;
   round?: boolean;
   color?: string;
   size?: ComponentSizes;

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { useAPI } from "./useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
-import { useAlert } from "../contexts/AlertContext";
 import { IMedia } from "../models/IMedia";
 import { MediaTypes } from "../enums/MediaTypes";
 
@@ -11,7 +10,6 @@ export const useMedia = (type: MediaTypes, mediaId: number | string) => {
     DefaultAsyncCall
   );
   const { get } = useAPI();
-  const { pushDanger } = useAlert();
 
   const fetchMedia = () => {
     get<IMedia>(
@@ -36,6 +34,7 @@ export const useMedia = (type: MediaTypes, mediaId: number | string) => {
     if (media.isLoading) {
       fetchMedia();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [media.isLoading]);
 
   return media;

@@ -150,6 +150,7 @@ const Search = () => {
         totalPages: mediaPage.data?.totalPages,
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaPage.data]);
 
   useEffect(() => {
@@ -165,6 +166,7 @@ const Search = () => {
       const cardHeight = cardWidth + cardWidth / 2;
       setCardSize({ width: cardWidth, height: cardHeight });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width, containerRef.current]);
 
   if (

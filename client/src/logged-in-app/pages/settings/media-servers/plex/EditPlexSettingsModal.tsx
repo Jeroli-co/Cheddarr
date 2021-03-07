@@ -37,6 +37,14 @@ export const EditPlexSettingsModal = (props: EditPlexSettingsModalProps) => {
     });
   };
 
+  const onDeletePlexConfig = () => {
+    deleteConfig(props.plexSettings.id).then((res) => {
+      if (res.status === 200) {
+        props.closeModal();
+      }
+    });
+  };
+
   return (
     <Modal close={() => props.closeModal()}>
       <header>
@@ -57,10 +65,7 @@ export const EditPlexSettingsModal = (props: EditPlexSettingsModalProps) => {
                   Cancel
                 </Button>
               </Buttons>
-              <DangerButton
-                type="button"
-                onClick={() => deleteConfig(props.plexSettings.id)}
-              >
+              <DangerButton type="button" onClick={() => onDeletePlexConfig()}>
                 Delete
               </DangerButton>
             </Row>
