@@ -111,6 +111,7 @@ export const SearchBar = () => {
     if (!location.pathname.startsWith("/search") && !isEmpty(searchValue)) {
       setSearchValue("");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   useEffect(() => {
