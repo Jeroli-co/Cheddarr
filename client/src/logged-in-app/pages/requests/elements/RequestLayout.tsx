@@ -17,9 +17,6 @@ import {
   compareRequestTitleDesc,
   compareRequestUpdatedDateAsc,
   compareRequestUpdatedDateDesc,
-  getMediaTypeFromRequest,
-  getPosterFromRequest,
-  getTitleFromRequest,
   IMediaRequest,
 } from "../../../../shared/models/IMediaRequest";
 import { RequestStatus } from "../../../../shared/enums/RequestStatus";
@@ -46,6 +43,11 @@ import {
   SuccessTag,
   WarningTag,
 } from "../../../../shared/components/Tag";
+import { useMovie } from "../../../../shared/hooks/useMovie";
+import { useSeries } from "../../../../shared/hooks/useSeries";
+import { useMedia } from "../../../../shared/hooks/useMedia";
+import { useHistory } from "react-router-dom";
+import { routes } from "../../../../router/routes";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;
@@ -334,12 +336,12 @@ const RequestsFooterContainer = styled.header`
 export const RequestFooter = () => {
   return (
     <RequestsFooterContainer>
-      <PrimaryButton>
-        <Icon icon={faArrowLeft} />
+      {/*<PrimaryButton>
+        <Icon icon={faArrowLeft}/>
       </PrimaryButton>
-      <PrimaryButton>
+        <PrimaryButton>
         <Icon icon={faArrowRight} />
-      </PrimaryButton>
+        </PrimaryButton>*/}
     </RequestsFooterContainer>
   );
 };
@@ -363,18 +365,30 @@ const RequestMediaTitle = styled.p`
 `;
 
 type RequestImageAndTitleProps = {
+  id: number;
   title: string;
-  posterUrl: string;
+  type: MediaTypes;
+  posterUrl?: string;
 };
 
 const RequestImageAndTitle = ({
+  id,
   title,
+  type,
   posterUrl,
 }: RequestImageAndTitleProps) => {
-  // const history = useHistory();
+  const history = useHistory();
   return (
-    <RequestTitleContainer onClick={() => {}}>
-      <RequestMediaPoster src={posterUrl} alt="User" />
+    <RequestTitleContainer
+      onClick={() =>
+        history.push(
+          type === MediaTypes.MOVIES
+            ? routes.MOVIE.url(id.toString())
+            : routes.SERIES.url(id.toString())
+        )
+      }
+    >
+      {posterUrl && <RequestMediaPoster src={posterUrl} alt="User" />}
       <RequestMediaTitle>{title}</RequestMediaTitle>
     </RequestTitleContainer>
   );
@@ -404,21 +418,26 @@ type RequestLayoutProps = {
 };
 
 export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
-  let posterUrl = getPosterFromRequest(request);
-  let title = getTitleFromRequest(request);
-  let type = getMediaTypeFromRequest(request);
-
   const { acceptRequest, refuseRequest, deleteRequest } = useRequestsContext();
+
+  const media = useMedia(request.media.mediaType, request.media.tmdbId);
 
   return (
     <RequestContainer>
-      {posterUrl && title && (
-        <RequestElement grow={2}>
-          <RequestImageAndTitle title={title} posterUrl={posterUrl} />
-        </RequestElement>
-      )}
+      <RequestElement grow={2}>
+        <RequestImageAndTitle
+          id={request.media.tmdbId}
+          type={request.media.mediaType}
+          title={request.media.title}
+          posterUrl={media.data ? media.data.posterUrl : undefined}
+        />
+      </RequestElement>
       <RequestElement>
-        {type && type === MediaTypes.MOVIES ? <MovieTag /> : <SeriesTag />}
+        {request.media.mediaType === MediaTypes.MOVIES ? (
+          <MovieTag />
+        ) : (
+          <SeriesTag />
+        )}
       </RequestElement>
       <RequestElement>
         <UserSmallCard
@@ -429,8 +448,12 @@ export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
           }
         />
       </RequestElement>
-      <RequestElement>{request.createdAt}</RequestElement>
-      <RequestElement>{request.updatedAt}</RequestElement>
+      <RequestElement>
+        {new Date(request.createdAt).toLocaleDateString()}
+      </RequestElement>
+      <RequestElement>
+        {new Date(request.updatedAt).toLocaleDateString()}
+      </RequestElement>
       <RequestElement>
         {request.status === RequestStatus.PENDING && (
           <WarningTag>{request.status.toUpperCase()}</WarningTag>

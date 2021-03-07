@@ -1,6 +1,6 @@
-export const msToHoursMinutes = (ms: number) => {
-  const hours = Math.floor(ms / 3600000);
-  const minutes = Math.ceil((ms - hours * 3600000) / 60000);
+export const minToHoursMinutes = (min: number) => {
+  const hours = Math.floor(min / 60);
+  const minutes = Math.ceil(min - hours * 60);
   return hours + "h " + minutes + "m";
 };
 

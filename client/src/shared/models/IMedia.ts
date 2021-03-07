@@ -13,13 +13,13 @@ export interface IMedia {
   summary?: string;
   rating?: number;
   duration?: number;
-  studios?: string[];
+  studios?: { name: string }[];
   genres?: string[];
   credits?: {
     cast?: IPerson[];
     crew?: IPerson[];
   };
-  plexMediaInfo?: PlexMediaInfo[];
+  mediaServerInfo?: MediaServerInfo[];
 }
 
 export interface IMovie extends IMedia {}
@@ -47,10 +47,10 @@ export interface IEpisode extends IMedia {
 export interface IPerson {
   name: string;
   role?: string;
-  posterUrl?: string;
+  pictureUrl?: string;
 }
 
-export interface PlexMediaInfo {
+export interface MediaServerInfo {
   externalMediaId: string;
   serverId: string;
   addedAt: Date;
@@ -116,6 +116,8 @@ export const isPerson = (arg: any): arg is IPerson => {
 
 export const isOnServers = (media: IMedia): boolean => {
   return (
-    media && media.plexMediaInfo !== undefined && media.plexMediaInfo.length > 0
+    media &&
+    media.mediaServerInfo !== undefined &&
+    media.mediaServerInfo.length > 0
   );
 };

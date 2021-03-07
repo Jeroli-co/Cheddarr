@@ -36,14 +36,22 @@ export const RequestMediaModal = (props: RequestMediaModalProps) => {
         requestedUsername: data.requestedUsername,
         tmdbId: props.media.tmdbId,
       };
-      requestMovie(request);
+      requestMovie(request).then((res) => {
+        if (res.status === 201) {
+          props.closeModal();
+        }
+      });
     } else if (props.media.mediaType === MediaTypes.SERIES) {
       const request: ISeriesRequestCreate = {
         requestedUsername: data.requestedUsername,
         tmdbId: props.media.tmdbId,
         seasons: options.seasons,
       };
-      requestSeries(request);
+      requestSeries(request).then((res) => {
+        if (res.status === 200) {
+          props.closeModal();
+        }
+      });
     }
   };
 

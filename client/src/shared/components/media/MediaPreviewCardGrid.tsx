@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, MouseEvent } from "react";
 import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
 import { MovieTag, SeriesTag } from "../Tag";
@@ -9,10 +9,12 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { RequestMediaModal } from "./RequestMediaModal";
 import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
+import { useHistory } from "react-router-dom";
+import { routes } from "../../../router/routes";
 
 const Container = styled.div<{
   hasPoster: boolean;
-  size: { width: number; height: number };
+  size?: { width: number; height: number };
 }>`
   position: relative;
   flex: 0 0 calc(16.66% - 10px);
@@ -91,18 +93,20 @@ const Container = styled.div<{
 
   ${(props) =>
     !props.hasPoster &&
+    props.size &&
     css`
       .media-hover-info {
         width: ${props.size.width}px;
         height: ${props.size.height}px;
         opacity: 1;
+        border: 1px solid black;
       }
     `}
 `;
 
 type MediaPreviewCardProps = {
   media: IMedia;
-  size: {
+  size?: {
     width: number;
     height: number;
   };
@@ -113,41 +117,62 @@ export const MediaPreviewCardGrid = ({
   size,
 }: MediaPreviewCardProps) => {
   const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
+  const history = useHistory();
+
+  const onCardClick = (e: MouseEvent<HTMLDivElement>) => {
+    history.push(
+      media.mediaType === MediaTypes.MOVIES
+        ? routes.MOVIE.url(media.tmdbId.toString())
+        : routes.SERIES.url(media.tmdbId.toString())
+    );
+  };
+
+  const onRequestClick = (e: MouseEvent<HTMLButtonElement>) => {
+    setIsRequestMediaModalOpen(true);
+    e.stopPropagation();
+  };
 
   return (
-    <Container hasPoster={!!media.posterUrl} size={size}>
-      <img className="media-image" src={media.posterUrl} alt="" />
-      {isOnServers(media) && (
-        <span className="media-is-present">
-          <span>
-            <Icon icon={faCheck} />
-          </span>
-        </span>
-      )}
-      <div className="media-hover-info">
-        <span className="media-type">
-          {media.mediaType === MediaTypes.MOVIES && <MovieTag />}
-          {media.mediaType === MediaTypes.SERIES && <SeriesTag />}
-        </span>
-        <p>{media.title}</p>
-        {media.releaseDate && (
-          <p>{new Date(media.releaseDate).getFullYear()}</p>
-        )}
-        {!isOnServers(media) && (
-          <PrimaryButton
-            type="button"
-            width="100%"
-            onClick={() => setIsRequestMediaModalOpen(true)}
-          >
-            Request
-          </PrimaryButton>
-        )}
+    <>
+      <Container
+        hasPoster={!!media.posterUrl}
+        size={size}
+        onClick={(e) => onCardClick(e)}
+      >
+        <img className="media-image" src={media.posterUrl} alt="" />
         {isOnServers(media) && (
-          <PrimaryButton type="button" width="100%">
-            Play
-          </PrimaryButton>
+          <span className="media-is-present">
+            <span>
+              <Icon icon={faCheck} />
+            </span>
+          </span>
         )}
-      </div>
+        <div className="media-hover-info">
+          <span className="media-type">
+            {media.mediaType === MediaTypes.MOVIES && <MovieTag />}
+            {media.mediaType === MediaTypes.SERIES && <SeriesTag />}
+          </span>
+          <p>{media.title}</p>
+          {media.releaseDate && (
+            <p>{new Date(media.releaseDate).getFullYear()}</p>
+          )}
+          {!isOnServers(media) && (
+            <PrimaryButton
+              className="request-button"
+              type="button"
+              width="100%"
+              onClick={(e) => onRequestClick(e)}
+            >
+              Request
+            </PrimaryButton>
+          )}
+          {isOnServers(media) && (
+            <PrimaryButton type="button" width="100%">
+              Play
+            </PrimaryButton>
+          )}
+        </div>
+      </Container>
       {isRequestMediaModalOpen && (
         <SeriesRequestOptionsContextProvider>
           <RequestMediaModal
@@ -156,6 +181,6 @@ export const MediaPreviewCardGrid = ({
           />
         </SeriesRequestOptionsContextProvider>
       )}
-    </Container>
+    </>
   );
 };

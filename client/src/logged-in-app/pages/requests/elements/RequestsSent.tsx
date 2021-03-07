@@ -5,7 +5,7 @@ import {
   RequestHeader,
   RequestLayout,
   ScrollingTable,
-} from "./RequestStyles";
+} from "./RequestLayout";
 import { CenteredContent } from "../../../../shared/components/layout/CenteredContent";
 import { ComponentSizes } from "../../../../shared/enums/ComponentSizes";
 import { useRequestsContext } from "../../../../shared/contexts/RequestsContext";

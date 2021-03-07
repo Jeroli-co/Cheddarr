@@ -7,7 +7,11 @@ import { IPaginated } from "../models/IPaginated";
 import { useEffect, useRef, useState } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 
-export const useMedia = (title: string, type: SearchFilters, page: number) => {
+export const useSearchMedia = (
+  title: string,
+  type: SearchFilters,
+  page: number
+) => {
   const [media, setMedia] = useState<IAsyncCall<IPaginated<IMedia> | null>>(
     DefaultAsyncCall
   );
@@ -34,14 +38,18 @@ export const useMedia = (title: string, type: SearchFilters, page: number) => {
       clearTimeout(timer.current);
     }
 
-    // @ts-ignore
-    timer.current = setTimeout(() => {
-      setMedia(DefaultAsyncCall);
-    }, 800);
+    if (!media.isLoading) {
+      // @ts-ignore
+      timer.current = setTimeout(() => {
+        setMedia(DefaultAsyncCall);
+      }, 800);
+    }
   }, [title]);
 
   useEffect(() => {
-    setMedia(DefaultAsyncCall);
+    if (!media.isLoading) {
+      setMedia(DefaultAsyncCall);
+    }
   }, [type, page]);
 
   useEffect(() => {

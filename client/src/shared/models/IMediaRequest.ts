@@ -1,6 +1,6 @@
 import { RequestStatus } from "../enums/RequestStatus";
 import { IPublicUser } from "./IPublicUser";
-import { IMovie, ISeries } from "./IMedia";
+import { IMedia, IMovie, ISeries } from "./IMedia";
 
 export interface IMediaRequest {
   id: number;
@@ -9,6 +9,7 @@ export interface IMediaRequest {
   requestingUser: IPublicUser;
   createdAt: Date;
   updatedAt: Date;
+  media: IMedia;
 }
 
 export interface IMovieRequest extends IMediaRequest {
@@ -26,35 +27,11 @@ export interface ISeriesRequest extends IMediaRequest {
 }
 
 export const isMovieRequest = (arg: any): arg is IMovieRequest => {
-  return arg && arg.movie;
+  return arg;
 };
 
 export const isSeriesRequest = (arg: any): arg is ISeriesRequest => {
   return arg && arg.series;
-};
-
-export const getPosterFromRequest = (request: IMediaRequest) => {
-  return isMovieRequest(request)
-    ? request.movie.posterUrl
-    : isSeriesRequest(request)
-    ? request.series.posterUrl
-    : undefined;
-};
-
-export const getTitleFromRequest = (request: IMediaRequest) => {
-  return isMovieRequest(request)
-    ? request.movie.title
-    : isSeriesRequest(request)
-    ? request.series.title
-    : undefined;
-};
-
-export const getMediaTypeFromRequest = (request: IMediaRequest) => {
-  return isMovieRequest(request)
-    ? request.movie.mediaType
-    : isSeriesRequest(request)
-    ? request.series.mediaType
-    : undefined;
 };
 
 export const compareRequestDefault = (
@@ -85,8 +62,8 @@ export const compareRequestTitleDesc = (
   first: IMediaRequest,
   second: IMediaRequest
 ) => {
-  const titleFirst = getTitleFromRequest(first);
-  const titleSecond = getTitleFromRequest(second);
+  const titleFirst = first.media.title;
+  const titleSecond = second.media.title;
   if (titleFirst && titleSecond) {
     if (titleFirst < titleSecond) {
       return -1;
@@ -103,8 +80,8 @@ export const compareRequestTitleAsc = (
   first: IMediaRequest,
   second: IMediaRequest
 ) => {
-  const titleFirst = getTitleFromRequest(first);
-  const titleSecond = getTitleFromRequest(second);
+  const titleFirst = first.media.title;
+  const titleSecond = second.media.title;
   if (titleFirst && titleSecond) {
     if (titleFirst > titleSecond) {
       return -1;
@@ -121,8 +98,8 @@ export const compareRequestMediaTypeDesc = (
   first: IMediaRequest,
   second: IMediaRequest
 ) => {
-  const typeFirst = getMediaTypeFromRequest(first);
-  const typeSecond = getMediaTypeFromRequest(second);
+  const typeFirst = first.media.mediaType;
+  const typeSecond = second.media.mediaType;
   if (typeFirst && typeSecond) {
     if (typeFirst < typeSecond) {
       return -1;
@@ -139,8 +116,8 @@ export const compareRequestMediaTypeAsc = (
   first: IMediaRequest,
   second: IMediaRequest
 ) => {
-  const typeFirst = getMediaTypeFromRequest(first);
-  const typeSecond = getMediaTypeFromRequest(second);
+  const typeFirst = first.media.mediaType;
+  const typeSecond = second.media.mediaType;
   if (typeFirst && typeSecond) {
     if (typeFirst > typeSecond) {
       return -1;

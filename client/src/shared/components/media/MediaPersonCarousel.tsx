@@ -4,16 +4,16 @@ import { Carousel } from "../layout/Carousel";
 import { getActorInitial } from "../../../utils/media-utils";
 import { IPerson } from "../../models/IMedia";
 
-const ActorsStyle = styled.div`
+const Container = styled.div`
   width: 100%;
   margin-top: 1em;
 `;
 
-const Actor = styled.div`
+const Person = styled.div`
   margin: 1em;
 `;
 
-const ActorPicture = styled.img`
+const PersonPicture = styled.img`
   min-width: 120px;
   max-width: 120px;
   height: 120px;
@@ -22,7 +22,7 @@ const ActorPicture = styled.img`
   object-position: 50% 50%;
 `;
 
-const ActorInitials = styled.div`
+const PersonInitials = styled.div`
   min-width: 120px;
   max-width: 120px;
   height: 120px;
@@ -34,33 +34,32 @@ const ActorInitials = styled.div`
   font-size: 2em;
 `;
 
-type ActorsProps = {
-  actors: IPerson[];
+type MediaPersonCarouselProps = {
+  personList: IPerson[];
 };
 
-const Actors = ({ actors }: ActorsProps) => {
+const MediaPersonCarousel = ({ personList }: MediaPersonCarouselProps) => {
   return (
-    <ActorsStyle>
-      <p className="is-size-6">Actors</p>
+    <Container>
       <Carousel>
-        {actors.map((actor, index) => (
-          <Actor key={index}>
-            {actor.posterUrl ? (
-              <ActorPicture src={actor.posterUrl} alt="" />
+        {personList.map((person, index) => (
+          <Person key={index}>
+            {person.pictureUrl ? (
+              <PersonPicture src={person.pictureUrl} alt="" />
             ) : (
-              <ActorInitials>
-                <p>{getActorInitial(actor.name)}</p>
-              </ActorInitials>
+              <PersonInitials>
+                <p>{getActorInitial(person.name)}</p>
+              </PersonInitials>
             )}
             <div className="content has-text-centered">
-              <p className="is-size-7">{actor.name}</p>
-              <p className="is-size-7 has-text-weight-light">{actor.role}</p>
+              <p className="is-size-7">{person.name}</p>
+              <p className="is-size-7 has-text-weight-light">{person.role}</p>
             </div>
-          </Actor>
+          </Person>
         ))}
       </Carousel>
-    </ActorsStyle>
+    </Container>
   );
 };
 
-export { Actors };
+export { MediaPersonCarousel };

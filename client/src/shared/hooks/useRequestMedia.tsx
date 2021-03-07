@@ -12,23 +12,31 @@ export const useRequestMedia = () => {
   const { pushSuccess, pushDanger } = useAlert();
 
   const requestMovie = (request: IMovieRequestCreate) => {
-    post<IMovieRequest>(APIRoutes.CREATE_REQUEST_MOVIE, request).then((res) => {
-      if (res.status === 201) {
-        pushSuccess("Movie requested");
-      } else {
-        pushDanger("Cannot request movie");
+    return post<IMovieRequest>(APIRoutes.CREATE_REQUEST_MOVIE, request).then(
+      (res) => {
+        if (res.status === 201) {
+          pushSuccess("Movie requested");
+        } else if (res.status === 409) {
+          pushDanger("Movie already requested");
+        } else {
+          pushDanger("Cannot request movie");
+        }
+        return res;
       }
-    });
+    );
   };
 
   const requestSeries = (request: ISeriesRequestCreate) => {
-    post<ISeriesRequest>(APIRoutes.CREATE_REQUEST_SERIES, request).then(
+    return post<ISeriesRequest>(APIRoutes.CREATE_REQUEST_SERIES, request).then(
       (res) => {
         if (res.status === 201) {
           pushSuccess("Series requested");
+        } else if (res.status === 409) {
+          pushDanger("Series already requested");
         } else {
           pushDanger("Cannot request series");
         }
+        return res;
       }
     );
   };

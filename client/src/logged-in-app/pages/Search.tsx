@@ -3,8 +3,8 @@ import { useParams } from "react-router";
 import { SearchFilters } from "../../shared/enums/SearchFilters";
 import { H1 } from "../../shared/components/Titles";
 import { MediaPreviewCardGrid } from "../../shared/components/media/MediaPreviewCardGrid";
-import styled, { css } from "styled-components";
-import { useMedia } from "../../shared/hooks/useMedia";
+import styled from "styled-components";
+import { useSearchMedia } from "../../shared/hooks/useSearchMedia";
 import { IMedia } from "../../shared/models/IMedia";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import {
@@ -20,6 +20,8 @@ import {
   LoadingCard66,
 } from "../../shared/components/animations/Animations";
 import { useWindowSize } from "../../shared/hooks/useWindowSize";
+import { IAsyncCall } from "../../shared/models/IAsyncCall";
+import { IPaginated } from "../../shared/models/IPaginated";
 
 const Container = styled.div`
   display: flex;
@@ -38,8 +40,8 @@ const LoadingCard = styled.div<{
   width: ${(props) => props.size.width}px;
   height: ${(props) => props.size.height}px;
   margin: 5px;
-  border: 3px solid ${(props) => props.theme.primaryLighter};
-  background: ${(props) => props.theme.primaryLighter};
+  border: 3px solid ${(props) => props.theme.primaryLight};
+  background: ${(props) => props.theme.primaryLight};
   border-radius: 12px;
   animation: 1s ease infinite running;
 
@@ -92,8 +94,9 @@ const Search = () => {
 
   const [media, setMedia] = useState<IMedia[]>([]);
   const [page, setPage] = useState(1);
-  const mediaPage = useMedia(title, type, page);
+  const mediaPage = useSearchMedia(title, type, page);
   const pageRef = useRef<{ page: number; totalPages: number }>(null);
+  const mediaPageRef = useRef<IAsyncCall<IPaginated<IMedia>>>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { width } = useWindowSize();
   const [cardSize, setCardSize] = useState({ width: 0, height: 0 });
@@ -105,11 +108,18 @@ const Search = () => {
     pageRef.current = null;
   }, [title, type]);
 
+  useEffect(() => {
+    // @ts-ignore
+    mediaPageRef.current = mediaPage;
+  }, [mediaPage]);
+
   useLayoutEffect(() => {
     const loadNextPage = () => {
       if (
         pageRef.current &&
-        pageRef.current.page < pageRef.current.totalPages
+        pageRef.current.page < pageRef.current.totalPages &&
+        mediaPageRef.current &&
+        !mediaPageRef.current.isLoading
       ) {
         setPage(pageRef.current.page + 1);
         // @ts-ignore
@@ -134,13 +144,11 @@ const Search = () => {
   useEffect(() => {
     if (mediaPage.data) {
       setMedia([...media, ...mediaPage.data.results]);
-      if (pageRef.current === null) {
-        // @ts-ignore
-        pageRef.current = {
-          page: 1,
-          totalPages: mediaPage.data?.totalPages,
-        };
-      }
+      // @ts-ignore
+      pageRef.current = {
+        page: mediaPage.data?.page,
+        totalPages: mediaPage.data?.totalPages,
+      };
     }
   }, [mediaPage.data]);
 
@@ -157,7 +165,7 @@ const Search = () => {
       const cardHeight = cardWidth + cardWidth / 2;
       setCardSize({ width: cardWidth, height: cardHeight });
     }
-  }, [containerRef.current]);
+  }, [width, containerRef.current]);
 
   if (
     media.length === 0 &&

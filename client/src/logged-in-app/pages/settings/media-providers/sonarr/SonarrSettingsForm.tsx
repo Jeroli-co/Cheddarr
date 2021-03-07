@@ -55,7 +55,11 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
 
   useEffect(() => {
     if (instanceInfo.data) {
-      reset({ ...getValues(), ...instanceInfo.data });
+      reset({
+        ...getValues(),
+        ...instanceInfo.data,
+        enabled: props.config ? props.config.enabled : true,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceInfo]);

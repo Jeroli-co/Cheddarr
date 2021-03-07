@@ -5,6 +5,7 @@ import { usePlexConfig } from "../../../../shared/contexts/PlexConfigContext";
 import { PlexSettingsBoxPreview } from "./plex/PlexSettingsBoxPreview";
 import { AddItemBox } from "../../../../shared/components/ItemBox";
 import { PickMediaServerTypeModal } from "./PickMediaServerTypeModal";
+import { FullWidthTag } from "../../../../shared/components/FullWidthTag";
 
 export const MediaServersSettings = () => {
   const [
@@ -15,6 +16,8 @@ export const MediaServersSettings = () => {
 
   return (
     <div>
+      <FullWidthTag>More media servers will be supported soon</FullWidthTag>
+      <br />
       <H1>Configure your media servers</H1>
       <br />
       <Row>

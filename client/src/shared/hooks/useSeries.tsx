@@ -12,16 +12,29 @@ export const useSeries = (seriesId: number) => {
   const { get } = useAPI();
   const { pushDanger } = useAlert();
 
-  useEffect(() => {
+  const fetchSeries = () => {
     get<ISeries>(APIRoutes.GET_SERIES(seriesId)).then((res) => {
       if (res.status !== 200) {
         pushDanger("Cannot get series");
+        setSeries({ ...DefaultAsyncCall, isLoading: false });
       } else {
         setSeries(res);
       }
     });
+  };
+
+  useEffect(() => {
+    if (!series.isLoading) {
+      setSeries(DefaultAsyncCall);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seriesId]);
+
+  useEffect(() => {
+    if (series.isLoading) {
+      fetchSeries();
+    }
+  }, [series.isLoading]);
 
   return series;
 };

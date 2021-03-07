@@ -72,12 +72,18 @@ export const APIRoutes = {
     "&page=" +
     page +
     (type ? "&media_type=" + type : ""),
-  GET_MOVIE: (id: number) => "/movies/" + id,
-  GET_SERIES: (id: number) => "/series/" + id,
+  GET_MOVIE: (id: number | string) => "/movies/" + id,
+  GET_SERIES: (id: number | string) => "/series/" + id,
   GET_SEASON: (id: number, seasonNumber: number) =>
     "/series/" + id + "/seasons/" + seasonNumber,
   GET_EPISODE: (id: number, seasonNumber: number, episodeNumber: number) =>
     "/series/" + id + "/seasons/" + seasonNumber + "/episodes/" + episodeNumber,
+  GET_RECOMMENDED_MOVIES: (id: number | string) =>
+    "/movies/" + id + "/recommended",
+  GET_RECOMMENDED_SERIES: (id: number | string) =>
+    "/series/" + id + "/recommended",
+  GET_SIMILAR_MOVIES: (id: number | string) => "/movies/" + id + "/similar",
+  GET_SIMILAR_SERIES: (id: number | string) => "/series/" + id + "/similar",
 
   // REQUESTS
   CREATE_REQUEST_MOVIE: "/requests/movies",
