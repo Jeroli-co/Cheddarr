@@ -66,6 +66,21 @@ const routes = {
   /** MEDIA **/
   MOVIE: { url: (id: string) => "/movies/" + id, component: Movie },
   SERIES: { url: (id: string) => "/series/" + id, component: Series },
+  SEASON: {
+    url: (id: string, seasonNumber: string) =>
+      "/series/" + id + "/seasons/" + seasonNumber,
+    component: Series,
+  },
+  EPISODE: {
+    url: (id: string, seasonNumber: string, episodeNumber: string) =>
+      "/series/" +
+      id +
+      "/seasons/" +
+      seasonNumber +
+      "/episodes/" +
+      episodeNumber,
+    component: Series,
+  },
 
   /** SEARCH **/
   SEARCH: {

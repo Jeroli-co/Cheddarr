@@ -22,18 +22,23 @@ import {
 import { RequestStatus } from "../../../../shared/enums/RequestStatus";
 import {
   DangerIconButton,
+  PrimaryButton,
   SuccessButton,
 } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
-import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faArrowRight,
+  faCheck,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
 import { useRequestsContext } from "../../../../shared/contexts/RequestsContext";
 import { RequestTypes } from "../../../../shared/enums/RequestTypes";
 import { Tooltiped } from "../../../../shared/components/Tooltiped";
 import {
   DangerTag,
-  MovieTag,
-  SeriesTag,
+  MediaTag,
   SuccessTag,
   WarningTag,
 } from "../../../../shared/components/Tag";
@@ -328,12 +333,12 @@ const RequestsFooterContainer = styled.header`
 export const RequestFooter = () => {
   return (
     <RequestsFooterContainer>
-      {/*<PrimaryButton>
-        <Icon icon={faArrowLeft}/>
+      <PrimaryButton type="button">
+        <Icon icon={faArrowLeft} />
       </PrimaryButton>
-        <PrimaryButton>
+      <PrimaryButton type="button">
         <Icon icon={faArrowRight} />
-        </PrimaryButton>*/}
+      </PrimaryButton>
     </RequestsFooterContainer>
   );
 };
@@ -357,7 +362,7 @@ const RequestMediaTitle = styled.p`
 `;
 
 type RequestImageAndTitleProps = {
-  id: number;
+  id: string;
   title: string;
   type: MediaTypes;
   posterUrl?: string;
@@ -425,11 +430,7 @@ export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
         />
       </RequestElement>
       <RequestElement>
-        {request.media.mediaType === MediaTypes.MOVIES ? (
-          <MovieTag />
-        ) : (
-          <SeriesTag />
-        )}
+        <MediaTag media={request.media} />
       </RequestElement>
       <RequestElement>
         <UserSmallCard

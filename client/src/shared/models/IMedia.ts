@@ -2,8 +2,8 @@ import { MediaTypes, SeriesTypes } from "../enums/MediaTypes";
 
 export interface IMedia {
   title: string;
+  tmdbId: string;
   mediaType: MediaTypes;
-  tmdbId: number;
   tvdbId?: number;
   imdbId?: string;
   releaseDate?: string;
@@ -20,28 +20,24 @@ export interface IMedia {
     crew?: IPerson[];
   };
   mediaServerInfo?: MediaServerInfo[];
+  trailers?: { videoUrl: string }[];
 }
 
 export interface IMovie extends IMedia {}
 
 export interface ISeries extends IMedia {
-  numberOfSeasons: number;
-  seriesType: SeriesTypes;
+  numberOfSeasons?: number;
+  seriesType?: SeriesTypes;
   seasons?: ISeason[];
 }
 
 export interface ISeason extends IMedia {
   seasonNumber: number;
-  seriesId: number;
-  seriesTitle: string;
   episodes?: IEpisode[];
 }
 
 export interface IEpisode extends IMedia {
   episodeNumber: number;
-  seasonNumber: number;
-  seriesId: number;
-  seriesTitle: string;
 }
 
 export interface IPerson {
@@ -63,51 +59,40 @@ export const isMedia = (arg: any): arg is IMedia => {
     arg.title &&
     typeof arg.title == "string" &&
     arg.tmdbId &&
-    typeof arg.tmdbId == "number" &&
-    arg.mediaType &&
-    Object.values(MediaTypes).includes(arg.mediaType)
+    typeof arg.tmdbId == "number"
   );
 };
 
 export const isMovie = (arg: any): arg is IMovie => {
-  return isMedia(arg);
+  return (
+    arg &&
+    arg.title &&
+    typeof arg.title == "string" &&
+    arg.tmdbId &&
+    typeof arg.tmdbId == "number" &&
+    arg.mediaType &&
+    arg.mediaType === MediaTypes.MOVIES
+  );
 };
 
 export const isSeries = (arg: any): arg is ISeries => {
   return (
     arg &&
-    arg.numberOfSeasons &&
-    typeof arg.numberOfSeasons == "number" &&
-    arg.seriesType &&
-    Object.values(SeriesTypes).includes(arg.seriesType) &&
-    isMedia(arg)
+    arg.title &&
+    typeof arg.title == "string" &&
+    arg.tmdbId &&
+    typeof arg.tmdbId == "number" &&
+    arg.mediaType &&
+    arg.mediaType === MediaTypes.SERIES
   );
 };
 
 export const isSeason = (arg: any): arg is ISeason => {
-  return (
-    arg.seasonNumber &&
-    typeof arg.seasonNumber == "number" &&
-    arg.seriesId &&
-    typeof arg.seriesId == "number" &&
-    arg.seriesTitle &&
-    typeof arg.seriesTitle == "string" &&
-    isMedia(arg)
-  );
+  return arg && arg.seasonNumber && typeof arg.seasonNumber == "number";
 };
 
 export const isEpisode = (arg: any): arg is IEpisode => {
-  return (
-    arg.episodeNumber &&
-    typeof arg.episodeNumber == "number" &&
-    arg.seasonNumber &&
-    typeof arg.seasonNumber == "number" &&
-    arg.seriesId &&
-    typeof arg.seriesId == "number" &&
-    arg.seriesTitle &&
-    typeof arg.seriesTitle == "string" &&
-    isMedia(arg)
-  );
+  return arg && arg.episodeNumber && typeof arg.episodeNumber == "number";
 };
 
 export const isPerson = (arg: any): arg is IPerson => {
@@ -120,4 +105,15 @@ export const isOnServers = (media: IMedia): boolean => {
     media.mediaServerInfo !== undefined &&
     media.mediaServerInfo.length > 0
   );
+};
+
+export const isMovieOrSeries = (media: IMedia): boolean => {
+  return (
+    media.mediaType === MediaTypes.MOVIES ||
+    media.mediaType === MediaTypes.SERIES
+  );
+};
+
+export const isMovieOrEpisode = (media: IMedia): boolean => {
+  return media.mediaType === MediaTypes.MOVIES || isEpisode(media);
 };

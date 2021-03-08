@@ -1,6 +1,6 @@
 import { IMedia } from "../../models/IMedia";
 import { Carousel } from "../layout/Carousel";
-import { MediaPreviewCardGrid } from "./MediaPreviewCardGrid";
+import { MediaPreviewCard } from "./MediaPreviewCard";
 import React from "react";
 
 type MediaCarouselProps = {
@@ -13,7 +13,7 @@ export const MediaCarousel = (props: MediaCarouselProps) => {
       {props.mediaList &&
         props.mediaList.map(
           (m, index) =>
-            m.posterUrl && <MediaPreviewCardGrid key={index} media={m} />
+            m.posterUrl && <MediaPreviewCard key={index} media={m} />
         )}
     </Carousel>
   );

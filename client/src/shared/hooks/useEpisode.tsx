@@ -6,17 +6,18 @@ import { useAlert } from "../contexts/AlertContext";
 import { IEpisode } from "../models/IMedia";
 
 export const useEpisode = (
-  seriesId: number,
+  seriesId: string,
   seasonNumber: number,
   episodeNumber: number
 ) => {
-  const [episode, setEpisode] = useState<IAsyncCall<IEpisode | null>>(
-    DefaultAsyncCall
-  );
+  const [episode, setEpisode] = useState<IAsyncCall<IEpisode | null>>({
+    ...DefaultAsyncCall,
+    isLoading: false,
+  });
   const { get } = useAPI();
   const { pushDanger } = useAlert();
 
-  useEffect(() => {
+  const fetchEpisode = () => {
     get<IEpisode>(
       APIRoutes.GET_EPISODE(seriesId, seasonNumber, episodeNumber)
     ).then((res) => {
@@ -26,8 +27,22 @@ export const useEpisode = (
         setEpisode(res);
       }
     });
+  };
+
+  useEffect(() => {
+    if (!episode.isLoading) {
+      setEpisode(DefaultAsyncCall);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seriesId, seasonNumber, episodeNumber]);
+  }, [episodeNumber]);
+
+  useEffect(() => {
+    if (episode.isLoading) {
+      fetchEpisode();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [episode.isLoading]);
 
   return episode;
 };

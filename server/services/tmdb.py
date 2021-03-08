@@ -55,7 +55,7 @@ def get_tmdb_movie(tmdb_id: int) -> Optional[TmdbMovie]:
 
 def get_tmdb_series(tmdb_id: int) -> Optional[TmdbSeries]:
     try:
-        series = tmdb.TV(tmdb_id).info(append_to_response="external_ids,credits,videos")
+        series = tmdb.TV(tmdb_id).info(append_to_response="external_ids,aggregate_credits,videos")
     except Exception:
         return None
     set_tmdb_series_info(series)
@@ -171,7 +171,7 @@ def get_tmdb_popular_series(page: int = 1) -> (List[TmdbSeries], int, int):
 
 
 def get_tmdb_similar_series(tmdb_id: int, page: int = 1) -> (List[TmdbSeries], int, int):
-    search = tmdb.TV(tmdb_id).similar_movies(page=page)
+    search = tmdb.TV(tmdb_id).similar(page=page)
     results = []
 
     for movie in search["results"]:

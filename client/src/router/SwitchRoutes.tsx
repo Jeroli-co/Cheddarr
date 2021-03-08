@@ -61,6 +61,18 @@ export default function SwitchRoutes(props: any) {
       />
       <LoggedInRoute
         exact
+        path={routes.SEASON.url(":id", ":seasonNumber")}
+        component={routes.SERIES.component}
+        {...props}
+      />
+      <LoggedInRoute
+        exact
+        path={routes.EPISODE.url(":id", ":seasonNumber", ":episodeNumber")}
+        component={routes.EPISODE.component}
+        {...props}
+      />
+      <LoggedInRoute
+        exact
         path={routes.SEARCH.url(":type", ":title")}
         component={routes.SEARCH.component}
         {...props}

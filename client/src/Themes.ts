@@ -16,4 +16,6 @@ export const THEMES: DefaultTheme = {
   plex: "#282a2d",
   movie: "#3e92ea",
   series: "#a37bc3",
+  season: "#864b6d",
+  episode: "#96194a",
 };

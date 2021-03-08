@@ -181,3 +181,4 @@ class TmdbSeries(TmdbMedia, SeriesSchema):
     studios: Optional[List[TmdbCompany]] = Field(alias="networks")
     release_date: Optional[date] = Field(alias="first_air_date")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
+    credits: Optional[TmdbCredits] = Field(alias="aggregate_credits")

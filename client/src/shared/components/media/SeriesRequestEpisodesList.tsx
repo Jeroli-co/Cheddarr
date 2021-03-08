@@ -11,7 +11,7 @@ import { Buttons } from "../layout/Buttons";
 import { CenteredContent } from "../layout/CenteredContent";
 
 type SeasonEpisodesProps = {
-  seriesId: number;
+  seriesId: string;
   seasonNumber: number;
 };
 

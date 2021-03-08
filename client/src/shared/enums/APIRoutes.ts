@@ -62,18 +62,16 @@ export const APIRoutes = {
     "&page=" +
     page +
     (type ? "&media_type=" + type : ""),
-  GET_MOVIE: (id: number | string) => "/movies/" + id,
-  GET_SERIES: (id: number | string) => "/series/" + id,
-  GET_SEASON: (id: number, seasonNumber: number) =>
+  GET_MOVIE: (id: string) => "/movies/" + id,
+  GET_SERIES: (id: string) => "/series/" + id,
+  GET_SEASON: (id: string, seasonNumber: number) =>
     "/series/" + id + "/seasons/" + seasonNumber,
-  GET_EPISODE: (id: number, seasonNumber: number, episodeNumber: number) =>
+  GET_EPISODE: (id: string, seasonNumber: number, episodeNumber: number) =>
     "/series/" + id + "/seasons/" + seasonNumber + "/episodes/" + episodeNumber,
-  GET_RECOMMENDED_MOVIES: (id: number | string) =>
-    "/movies/" + id + "/recommended",
-  GET_RECOMMENDED_SERIES: (id: number | string) =>
-    "/series/" + id + "/recommended",
-  GET_SIMILAR_MOVIES: (id: number | string) => "/movies/" + id + "/similar",
-  GET_SIMILAR_SERIES: (id: number | string) => "/series/" + id + "/similar",
+  GET_RECOMMENDED_MOVIES: (id: string) => "/movies/" + id + "/recommended",
+  GET_RECOMMENDED_SERIES: (id: string) => "/series/" + id + "/recommended",
+  GET_SIMILAR_MOVIES: (id: string) => "/movies/" + id + "/similar",
+  GET_SIMILAR_SERIES: (id: string) => "/series/" + id + "/similar",
   GET_MEDIA_RECENTLY_ADDED: (type: MediaTypes) => "/" + type + "/recent",
   GET_MEDIA_POPULAR: (type: MediaTypes) => "/" + type + "/popular",
   GET_MEDIA_UPCOMING: (type: MediaTypes) => "/" + type + "/upcoming",

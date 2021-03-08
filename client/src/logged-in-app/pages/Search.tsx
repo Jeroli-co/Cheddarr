@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { SearchFilters } from "../../shared/enums/SearchFilters";
 import { H1 } from "../../shared/components/Titles";
-import { MediaPreviewCardGrid } from "../../shared/components/media/MediaPreviewCardGrid";
+import { MediaPreviewCard } from "../../shared/components/media/MediaPreviewCard";
 import styled from "styled-components";
 import { useSearchMedia } from "../../shared/hooks/useSearchMedia";
 import { IMedia } from "../../shared/models/IMedia";
@@ -180,7 +180,7 @@ const Search = () => {
   return (
     <Container ref={containerRef}>
       {media.map((m, index) => (
-        <MediaPreviewCardGrid key={index} media={m} size={cardSize} />
+        <MediaPreviewCard key={index} media={m} size={cardSize} />
       ))}
       {mediaPage.isLoading && (
         <>

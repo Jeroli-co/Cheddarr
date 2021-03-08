@@ -52,7 +52,6 @@ export const SeriesRequestOptionsContextProvider = (props: any) => {
   };
 
   const removeSeason = (seasonNumber: number) => {
-    console.log(seasonNumber);
     const seasons = options.seasons.filter(
       (s) => s.seasonNumber !== seasonNumber
     );

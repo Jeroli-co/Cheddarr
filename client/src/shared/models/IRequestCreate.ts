@@ -1,6 +1,6 @@
 export interface IRequestCreate {
   requestedUsername: string;
-  tmdbId: number;
+  tmdbId: string;
 }
 
 export interface IMovieRequestCreate extends IRequestCreate {}

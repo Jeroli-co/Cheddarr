@@ -1,84 +1,98 @@
-import React from "react";
-import styled from "styled-components";
+import React, { MouseEvent, useState } from "react";
+import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
-import { MovieTag, SeriesTag } from "../Tag";
-import { IMedia, isEpisode } from "../../models/IMedia";
+import { MediaTag } from "../Tag";
+import {
+  IEpisode,
+  IMedia,
+  ISeason,
+  isEpisode,
+  isMovie,
+  isOnServers,
+  isSeason,
+  isSeries,
+} from "../../models/IMedia";
+import { PrimaryButton, PrimaryLinkButton } from "../Button";
+import { Icon } from "../Icon";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { RequestMediaModal } from "./RequestMediaModal";
+import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
+import { STATIC_STYLES } from "../../enums/StaticStyles";
+import { useHistory, useLocation } from "react-router-dom";
+import { routes } from "../../../router/routes";
 
-const MediaPreviewCardStyle = styled.div`
+const logo = require("../../../assets/cheddarr-min.svg");
+
+const Container = styled.div<{
+  hasPoster: boolean;
+  size?: { width: number; height: number };
+}>`
   position: relative;
-  min-width: calc(10vw - 15px);
-  max-width: calc(10vw - 15px);
-  min-height: calc(10vw + (10vw / 3));
-  max-height: calc(10vw + (10vw / 3));
-  height: 100%;
+  flex: 0 0 calc(16.66% - 10px);
   cursor: pointer;
-  transition: 0.5s ease;
-  margin-right: 5px;
-  margin-left: 5px;
-  filter: brightness(125%);
+  margin: 5px;
 
-  @media only screen and (max-width: 1024px) {
-    min-width: 30vw;
-    max-width: 30vw;
-    min-height: calc(30vw + (30vw / 3));
-    max-height: calc(30vw + (30vw / 3));
+  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    flex: 0 0 calc(25% - 10px);
   }
 
-  .is-played {
+  @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
+    flex: 0 0 100%;
+    margin: 0 0 10px 0;
+  }
+
+  .media-is-present {
     position: absolute;
-    bottom: 0;
-    background: ${(props) => props.theme.black};
-    border-radius: 12px;
+    top: 10px;
+    right: 10px;
+    background: ${(props) => props.theme.success};
+    color: ${(props) => props.theme.white};
+    border: 1px solid ${(props) => props.theme.white};
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
     font-size: 10px;
-    display: flex;
-    justify-content: center;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 2px 5px;
+    padding: 10px;
+
+    span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
 
   .media-image {
     display: block;
     width: 100%;
-    min-height: 100%;
-    max-height: 100%;
+    height: 100%;
     opacity: 1;
     border-radius: 12px;
-  }
-
-  .is-played {
-    position: absolute;
-    right: 5px;
-    bottom: 5px;
-    z-index: 10;
   }
 
   .media-hover-info {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     text-align: center;
+    padding: 15px;
     position: absolute;
-    width: 100%;
-    height: 100%;
     top: 0;
+    right: 0;
+    bottom: 0;
     left: 0;
-    visibility: hidden;
+    opacity: 0;
     color: white;
-    padding: 20px;
     border: 3px solid ${(props) => props.theme.secondary};
     background: rgba(0, 0, 0, 0.8);
     border-radius: 12px;
+    transition: opacity 0.4s ease;
   }
 
   &:hover {
     .media-hover-info {
-      visibility: visible;
-    }
-
-    .is-played {
-      visibility: hidden;
+      opacity: 1;
     }
   }
 
@@ -87,32 +101,148 @@ const MediaPreviewCardStyle = styled.div`
       font-weight: bold;
     }
   }
+
+  ${(props) =>
+    !props.hasPoster &&
+    css`
+      .media-hover-info {
+        ${props.size &&
+        css`
+          width: ${props.size.width}px;
+          height: ${props.size.height}px;
+        `}
+        opacity: 1;
+        border: 1px solid black;
+      }
+    `}
 `;
 
 type MediaPreviewCardProps = {
   media: IMedia;
+  size?: {
+    width: number;
+    height: number;
+  };
 };
 
-export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
+export const MediaPreviewCard = ({ media, size }: MediaPreviewCardProps) => {
+  const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
+  const history = useHistory();
+  const location = useLocation();
+
+  const onCardClick = () => {
+    const getSeasonUrl = () => {
+      const splitUrl = location.pathname.split("/");
+      let url = null;
+      if (splitUrl.length > 3) {
+        const index = splitUrl.findIndex((s) => s === MediaTypes.SEASONS);
+        if (index !== -1 && index + 1 < splitUrl.length) {
+          splitUrl[index + 1] = (media as ISeason).seasonNumber.toString();
+          if (index + 1 < splitUrl.length - 1) {
+            splitUrl.splice(index + 2, splitUrl.length - index + 1);
+          }
+          url = splitUrl.join("/");
+        }
+      } else {
+        url =
+          splitUrl.join("/") + "/seasons/" + (media as ISeason).seasonNumber;
+      }
+      return url;
+    };
+
+    const getEpisodeUrl = () => {
+      const splitUrl = location.pathname.split("/");
+      let url = null;
+      if (splitUrl.length > 5) {
+        const index = splitUrl.findIndex((s) => s === MediaTypes.EPISODES);
+        if (index !== -1 && index + 1 < splitUrl.length) {
+          splitUrl[index + 1] = (media as IEpisode).episodeNumber.toString();
+          url = splitUrl.join("/");
+        }
+      } else {
+        url =
+          splitUrl.join("/") + "/episodes/" + (media as IEpisode).episodeNumber;
+      }
+      return url;
+    };
+
+    const uri =
+      media.mediaType === MediaTypes.MOVIES
+        ? routes.MOVIE.url(media.tmdbId)
+        : media.mediaType === MediaTypes.SERIES
+        ? routes.SERIES.url(media.tmdbId)
+        : isSeason(media)
+        ? getSeasonUrl()
+        : isEpisode(media)
+        ? getEpisodeUrl()
+        : null;
+    if (uri) {
+      history.push(uri);
+    }
+  };
+
+  const onRequestClick = (e: MouseEvent<HTMLButtonElement>) => {
+    setIsRequestMediaModalOpen(true);
+    e.stopPropagation();
+  };
+
   return (
-    <MediaPreviewCardStyle>
-      <img className="media-image" src={media.posterUrl} alt="" />
-      <div className="media-hover-info">
-        {media.releaseDate && (
-          <p>{new Date(media.releaseDate).getFullYear()}</p>
+    <>
+      <Container
+        hasPoster={!!media.posterUrl}
+        size={size}
+        onClick={() => onCardClick()}
+      >
+        <img
+          className="media-image"
+          src={media.posterUrl ? media.posterUrl : logo}
+          alt=""
+        />
+        {isOnServers(media) && (
+          <span className="media-is-present">
+            <span>
+              <Icon icon={faCheck} />
+            </span>
+          </span>
         )}
-        <p>{(isEpisode(media) && media.seriesTitle) || media.title}</p>
-        {isEpisode(media) && (
-          <p>
-            S{media.seasonNumber}・E{media.episodeNumber}
-          </p>
-        )}
-        {isEpisode(media) && <p>{media.title}</p>}
-        <span className="media-type">
-          {media.mediaType === MediaTypes.MOVIES && <MovieTag />}
-          {media.mediaType === MediaTypes.EPISODES && <SeriesTag />}
-        </span>
-      </div>
-    </MediaPreviewCardStyle>
+        <div className="media-hover-info">
+          <MediaTag media={media} />
+          <p>{media.title}</p>
+          {media.releaseDate && (
+            <p>{new Date(media.releaseDate).getFullYear()}</p>
+          )}
+          {((isMovie(media) && !isOnServers(media)) || isSeries(media)) && (
+            <PrimaryButton
+              className="request-button"
+              type="button"
+              width="100%"
+              onClick={(e) => onRequestClick(e)}
+            >
+              Request
+            </PrimaryButton>
+          )}
+          {isOnServers(media) &&
+            (isMovie(media) || isEpisode(media)) &&
+            media.mediaServerInfo &&
+            media.mediaServerInfo.length > 0 &&
+            media.mediaServerInfo[0].webUrl && (
+              <PrimaryLinkButton
+                href={media.mediaServerInfo[0].webUrl}
+                target="_blank"
+              >
+                Play
+              </PrimaryLinkButton>
+            )}
+        </div>
+      </Container>
+      {isRequestMediaModalOpen && (
+        <SeriesRequestOptionsContextProvider>
+          <RequestMediaModal
+            media={media}
+            closeModal={() => setIsRequestMediaModalOpen(false)}
+          />
+        </SeriesRequestOptionsContextProvider>
+      )}
+    </>
   );
 };

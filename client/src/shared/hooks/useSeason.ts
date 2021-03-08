@@ -5,14 +5,15 @@ import { APIRoutes } from "../enums/APIRoutes";
 import { ISeason } from "../models/IMedia";
 import { useAlert } from "../contexts/AlertContext";
 
-export const useSeason = (seriesId: number, seasonNumber: number) => {
-  const [season, setSeason] = useState<IAsyncCall<ISeason | null>>(
-    DefaultAsyncCall
-  );
+export const useSeason = (seriesId: string, seasonNumber: number) => {
+  const [season, setSeason] = useState<IAsyncCall<ISeason | null>>({
+    ...DefaultAsyncCall,
+    isLoading: false,
+  });
   const { get } = useAPI();
   const { pushDanger } = useAlert();
 
-  useEffect(() => {
+  const fetchSeason = () => {
     get<ISeason>(APIRoutes.GET_SEASON(seriesId, seasonNumber)).then((res) => {
       if (res.status !== 200) {
         pushDanger("Cannot get season");
@@ -20,8 +21,22 @@ export const useSeason = (seriesId: number, seasonNumber: number) => {
         setSeason(res);
       }
     });
+  };
+
+  useEffect(() => {
+    if (!season.isLoading) {
+      setSeason(DefaultAsyncCall);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seriesId, seasonNumber]);
+  }, [seasonNumber]);
+
+  useEffect(() => {
+    if (season.isLoading) {
+      fetchSeason();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [season.isLoading]);
 
   return season;
 };

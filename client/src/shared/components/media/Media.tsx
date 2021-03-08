@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { IMedia } from "../../models/IMedia";
+import { IMedia, isSeries } from "../../models/IMedia";
 import { H1, H2 } from "../Titles";
 import { minToHoursMinutes } from "../../../utils/media-utils";
 import { MediaRating } from "./MediaRating";
@@ -9,26 +9,56 @@ import { MediaPersonCarousel } from "./MediaPersonCarousel";
 import { useRecommendedMedia } from "../../hooks/useRecommendedMedia";
 import { Spinner } from "../Spinner";
 import { useSimilarMedia } from "../../hooks/useSimilarMedia";
-import { PrimaryButton } from "../Button";
+import { PrimaryButton, PrimaryLinkButton } from "../Button";
 import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
 import { RequestMediaModal } from "./RequestMediaModal";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
 import { PrimaryDivider } from "../Divider";
 import { MediaCarousel } from "./MediaCarousel";
+import { Row } from "../layout/Row";
+import { Icon } from "../Icon";
+import { faFilm } from "@fortawesome/free-solid-svg-icons";
+import { Buttons } from "../layout/Buttons";
 
-export const Container = styled.div``;
+const BackgroundContainer = styled.div`
+  position: relative;
+  z-index: 0;
+`;
+
+const Background = styled.div<{ image: string }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-image: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0),
+          ${(props) => props.theme.black}
+        ),
+        url('${(props) => props.image}');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+  opacity: 0.2;
+  z-index: -1;
+`;
 
 const MediaHeader = styled.div`
-  position: relative;
   display: flex;
   width: 100%;
-  z-index: 0;
   padding: 20px;
   margin-bottom: 20px;
 
   .media-poster {
-    width: 20%;
+    width: 15%;
     border-radius: 12px;
+  }
+
+  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    .media-poster {
+      width: 25%;
+    }
   }
 
   @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
@@ -36,7 +66,6 @@ const MediaHeader = styled.div`
     align-items: center;
     .media-poster {
       width: 80%;
-      border-radius: 12px;
     }
   }
 `;
@@ -46,7 +75,6 @@ const MediaHeaderInfo = styled.div`
   padding: 5px 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 `;
 
 const MediaHeaderTags = styled.div`
@@ -100,31 +128,15 @@ const MediaHeaderTitle = styled(H1)`
   }
 `;
 
-const Background = styled.div<{ image: string }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  background-image: url('${(props) => props.image}');
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: cover;
-  opacity: 0.2;
-  z-index: -1;
-`;
-
 const MediaCrewInfo = styled.div`
   display: flex;
   flex-wrap: wrap;
-
-  @media screen and (min-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
-    justify-content: space-between;
-  }
 `;
 
 const Bubble = styled.div`
   margin-top: 40px;
+  flex-grow: 1;
+
   @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
     width: 50%;
   }
@@ -132,126 +144,185 @@ const Bubble = styled.div`
 
 type MediaProps = {
   media: IMedia;
+  mediaRef?: any;
 };
 
 export const Media = (props: MediaProps) => {
+  const [studio, setStudio] = useState<string | null>(null);
+  const [directors, setDirectors] = useState<string[] | null>(null);
+  const [producers, setProducers] = useState<string[] | null>(null);
+  const [screenplay, setScreenplay] = useState<string[] | null>(null);
   const recommended = useRecommendedMedia(props.media);
   const similar = useSimilarMedia(props.media);
   const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
 
+  useEffect(() => {
+    const directorsTmp: string[] = [];
+    const producersTmp: string[] = [];
+    const screenplayTmp: string[] = [];
+    if (props.media.studios && props.media.studios.length > 0) {
+      setStudio(props.media.studios[0].name);
+    }
+    if (props.media.credits && props.media.credits.crew) {
+      props.media.credits.crew.forEach((p) => {
+        if (p.role === "Director") {
+          directorsTmp.push(p.name);
+        } else if (p.role === "Producer") {
+          producersTmp.push(p.name);
+        } else if (p.role === "Screenplay") {
+          screenplayTmp.push(p.name);
+        }
+      });
+    }
+    setDirectors(directorsTmp);
+    setProducers(producersTmp);
+    setScreenplay(screenplayTmp);
+  }, [props.media]);
+
   return (
-    <>
-      <MediaHeader>
+    <span ref={props.mediaRef}>
+      <BackgroundContainer>
         {props.media.artUrl && <Background image={props.media.artUrl} />}
-        {props.media.posterUrl && (
-          <img
-            className="media-poster"
-            src={props.media.posterUrl}
-            alt="poster"
-          />
-        )}
-        <MediaHeaderInfo>
-          <MediaHeaderTags>
-            <MediaTag media={props.media} />
-            {props.media.status && <Tag>{props.media.status}</Tag>}
-            {props.media.mediaServerInfo && <Tag>Available</Tag>}
-          </MediaHeaderTags>
-          <MediaHeaderTitle>
-            {props.media.title + " "}
-            {props.media.releaseDate && (
-              <span className="media-title-release-date">
-                ({props.media.releaseDate})
-              </span>
-            )}
-          </MediaHeaderTitle>
-          <MediaHeaderSubInfo>
-            {props.media.releaseDate && (
-              <>
-                <p>{props.media.releaseDate}</p>
-                <p className="pipe-separator">|</p>
-              </>
-            )}
-            {props.media.duration && (
-              <>
-                <p>{minToHoursMinutes(props.media.duration)}</p>
-                <p className="pipe-separator">|</p>
-              </>
-            )}
-            <p>
-              {props.media.genres &&
-                props.media.genres.map((genre, index) => (
-                  <span key={index}>
-                    {genre}
-                    {props.media.genres && index !== props.media.genres.length
-                      ? ", "
-                      : ""}
-                  </span>
-                ))}
-            </p>
-          </MediaHeaderSubInfo>
-          <MediaRating media={props.media} />
-        </MediaHeaderInfo>
-        <MediaHeaderActions>
-          {props.media.mediaServerInfo ? (
-            <PrimaryButton type="button">Play</PrimaryButton>
-          ) : (
-            <PrimaryButton
-              type="button"
-              width="100%"
-              onClick={() => setIsRequestMediaModalOpen(true)}
-            >
-              Request
-            </PrimaryButton>
+        <MediaHeader>
+          {props.media.posterUrl && (
+            <img
+              className="media-poster"
+              src={props.media.posterUrl}
+              alt="poster"
+            />
           )}
-        </MediaHeaderActions>
-      </MediaHeader>
-      {props.media.summary && (
-        <>
-          <H2>Overview</H2>
-          <p>{props.media.summary}</p>
-        </>
-      )}
-      <MediaCrewInfo>
-        {props.media.studios && props.media.studios.length > 0 && (
-          <Bubble>
-            <H2>Studio</H2>
-            <p>{props.media.studios[0].name}</p>
-          </Bubble>
-        )}
-        {props.media.credits && props.media.credits.crew && (
+          <MediaHeaderInfo>
+            <MediaHeaderTags>
+              <MediaTag media={props.media} />
+              {props.media.status && <Tag>{props.media.status}</Tag>}
+              {props.media.mediaServerInfo && <Tag>Available</Tag>}
+            </MediaHeaderTags>
+            <br />
+            <MediaHeaderTitle>
+              {props.media.title + " "}
+              {props.media.releaseDate && (
+                <span className="media-title-release-date">
+                  ({props.media.releaseDate})
+                </span>
+              )}
+            </MediaHeaderTitle>
+            <MediaHeaderSubInfo>
+              {props.media.releaseDate && (
+                <>
+                  <p>{props.media.releaseDate}</p>
+                  {(props.media.duration || props.media.genres) && (
+                    <p className="pipe-separator">|</p>
+                  )}
+                </>
+              )}
+              {props.media.duration && (
+                <>
+                  <p>{minToHoursMinutes(props.media.duration)}</p>
+                  {props.media.genres && <p className="pipe-separator">|</p>}
+                </>
+              )}
+              <p>
+                {props.media.genres &&
+                  props.media.genres.map((genre, index) => (
+                    <span key={index}>
+                      {genre}
+                      {props.media.genres && index !== props.media.genres.length
+                        ? ", "
+                        : ""}
+                    </span>
+                  ))}
+              </p>
+            </MediaHeaderSubInfo>
+            <br />
+            <Row alignItems="center">
+              <MediaRating media={props.media} />
+              {props.media.trailers && props.media.trailers.length > 0 && (
+                <Buttons>
+                  <PrimaryLinkButton
+                    href={props.media.trailers[0].videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span className="left-icon">
+                      <Icon icon={faFilm} />
+                    </span>
+                    Watch trailer
+                  </PrimaryLinkButton>
+                </Buttons>
+              )}
+            </Row>
+          </MediaHeaderInfo>
+          <MediaHeaderActions>
+            {props.media.mediaServerInfo &&
+              props.media.mediaServerInfo.length > 0 &&
+              props.media.mediaServerInfo[0].webUrl && (
+                <PrimaryLinkButton
+                  href={props.media.mediaServerInfo[0].webUrl}
+                  target="_blank"
+                >
+                  Play
+                </PrimaryLinkButton>
+              )}
+            {(!props.media.mediaServerInfo || isSeries(props.media)) && (
+              <PrimaryButton
+                type="button"
+                width="100%"
+                onClick={() => setIsRequestMediaModalOpen(true)}
+              >
+                Request
+              </PrimaryButton>
+            )}
+          </MediaHeaderActions>
+        </MediaHeader>
+        {props.media.summary && (
           <>
-            <Bubble>
-              <H2>Directors</H2>
-              {props.media.credits.crew.map(
-                (p, index) =>
-                  p.role && p.role === "Director" && <p key={index}>{p.name}</p>
-              )}
-            </Bubble>
-            <Bubble>
-              <H2>Producers</H2>
-              {props.media.credits.crew.map(
-                (p, index) =>
-                  p.role && p.role === "Producer" && <p key={index}>{p.name}</p>
-              )}
-            </Bubble>
-            <Bubble>
-              <H2>Screenplay</H2>
-              {props.media.credits.crew.map(
-                (p, index) =>
-                  p.role &&
-                  p.role === "Screenplay" && <p key={index}>{p.name}</p>
-              )}
-            </Bubble>
+            <H2>Overview</H2>
+            <p>{props.media.summary}</p>
           </>
         )}
+      </BackgroundContainer>
+      <MediaCrewInfo>
+        {studio && (
+          <Bubble>
+            <H2>Studio</H2>
+            <p>{studio}</p>
+          </Bubble>
+        )}
+        {directors && directors.length > 0 && (
+          <Bubble>
+            <H2>Directors</H2>
+            {directors.map((name, index) => (
+              <p key={index}>{name}</p>
+            ))}
+          </Bubble>
+        )}
+        {producers && producers.length > 0 && (
+          <Bubble>
+            <H2>Producers</H2>
+            {producers.map((name, index) => (
+              <p key={index}>{name}</p>
+            ))}
+          </Bubble>
+        )}
+
+        {screenplay && screenplay.length > 0 && (
+          <Bubble>
+            <H2>Screenplay</H2>
+            {screenplay.map((name, index) => (
+              <p key={index}>{name}</p>
+            ))}
+          </Bubble>
+        )}
       </MediaCrewInfo>
-      {props.media.credits && props.media.credits.cast && (
-        <>
-          <PrimaryDivider />
-          <H2>Actors</H2>
-          <MediaPersonCarousel personList={props.media.credits.cast} />
-        </>
-      )}
+      {props.media.credits &&
+        props.media.credits.cast &&
+        props.media.credits.cast.length > 0 && (
+          <>
+            <PrimaryDivider />
+            <H2>Actors</H2>
+            <MediaPersonCarousel personList={props.media.credits.cast} />
+          </>
+        )}
       {recommended.isLoading && <Spinner />}
       {!recommended.isLoading &&
         recommended.data &&
@@ -277,6 +348,6 @@ export const Media = (props: MediaProps) => {
           />
         </SeriesRequestOptionsContextProvider>
       )}
-    </>
+    </span>
   );
 };
