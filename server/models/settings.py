@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 from server.database import Model
 
 
-class ServiceNames(str, Enum):
+class ExternalServiceName(str, Enum):
     plex = "Plex"
     radarr = "Radarr"
     sonarr = "Sonarr"
@@ -40,7 +40,7 @@ class MediaServerSetting(Model, ExternalServiceSetting):
 
 class PlexSetting(MediaServerSetting):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": ServiceNames.plex}
+    __mapper_args__ = {"polymorphic_identity": ExternalServiceName.plex}
     __repr_props__ = ("host", "port", "ssl", "server_name", "name")
     library_sections = Column(JSON, default=list)
 
@@ -56,7 +56,7 @@ class MediaProviderSetting(Model, ExternalServiceSetting):
 
 class RadarrSetting(MediaProviderSetting):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": ServiceNames.radarr}
+    __mapper_args__ = {"polymorphic_identity": ExternalServiceName.radarr}
     __repr_props__ = ("host", "port", "ssl", "version", "name")
 
     def __init__(self, **kwargs):
@@ -66,7 +66,7 @@ class RadarrSetting(MediaProviderSetting):
 
 class SonarrSetting(MediaProviderSetting):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": ServiceNames.sonarr}
+    __mapper_args__ = {"polymorphic_identity": ExternalServiceName.sonarr}
     __repr_props__ = ("host", "port", "ssl", "version", "name")
 
     anime_root_folder = Column(String(128))

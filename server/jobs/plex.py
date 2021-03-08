@@ -21,7 +21,7 @@ from server.models.media import (
     MediaType,
     Season,
 )
-from server.models.settings import ServiceNames
+from server.models.settings import ExternalServiceName
 from server.repositories.media import (
     EpisodeRepository,
     MediaRepository,
@@ -40,7 +40,7 @@ TVDB_REGEX = "tvdb|thetvdb"
 def sync_plex_servers_library():
     db_session = next(get_db())
     media_server_setting_repo = MediaServerSettingRepository(db_session)
-    plex_settings = media_server_setting_repo.find_all_by(service_name=ServiceNames.plex)
+    plex_settings = media_server_setting_repo.find_all_by(service_name=ExternalServiceName.plex)
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
@@ -58,7 +58,7 @@ def sync_plex_servers_library():
 def sync_plex_servers_recently_added():
     db_session = next(get_db())
     media_server_setting_repo = MediaServerSettingRepository(db_session)
-    plex_settings = media_server_setting_repo.find_all_by(service_name=ServiceNames.plex)
+    plex_settings = media_server_setting_repo.find_all_by(service_name=ExternalServiceName.plex)
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
@@ -114,6 +114,10 @@ def process_plex_media(
             title=plex_media.title,
             media_type=MediaType.movies if isinstance(plex_media, PlexMovie) else MediaType.series,
         )
+    current_server_media = next(
+        (server for server in media.server_media if server.server_id == server_id), None
+    )
+    if current_server_media is None:
         media.server_media.append(
             MediaServerMedia(
                 server_id=server_id,
@@ -143,6 +147,11 @@ def process_plex_season(
             season_number=plex_season.seasonNumber,
         )
         season.media = process_plex_media(plex_season.show(), server_id, media_repo)
+
+    current_server_season = next(
+        (server for server in season.server_seasons if server.server_id == server_id), None
+    )
+    if current_server_season is None:
         season.server_seasons.append(
             MediaServerSeason(
                 server_id=server_id,
@@ -177,6 +186,10 @@ def process_plex_episode(
         episode.season = process_plex_season(
             plex_episode.season(), server_id, media_repo, season_repo
         )
+    current_server_season = next(
+        (server for server in episode.server_episodes if server.server_id == server_id), None
+    )
+    if current_server_season is None:
         episode.server_episodes.append(
             MediaServerEpisode(
                 server_id=server_id,
