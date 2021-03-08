@@ -33,7 +33,7 @@ def get_logs(page: int = 1, per_page: int = 50):
         page=page,
         total_results=len(lines),
         total_pages=math.ceil(len(lines) / per_page),
-        logs=logs,
+        results=logs,
     )
 
 
@@ -46,11 +46,10 @@ def get_logs(page: int = 1, per_page: int = 50):
     ],
 )
 def get_jobs():
-    jobs = []
-    for job in scheduler.get_jobs():
-        jobs.append(Job(id=job.id, name=job.name, next_run_time=job.next_run_time))
-
-    return jobs
+    return [
+        Job(id=job.id, name=job.name, next_run_time=job.next_run_time)
+        for job in scheduler.get_jobs()
+    ]
 
 
 @router.patch(

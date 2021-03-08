@@ -3,6 +3,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server.api import dependencies as deps
+from server.core import scheduler
+from server.jobs.plex import sync_plex_servers_recently_added
 from server.models.settings import MediaProviderType, PlexSetting, RadarrSetting, SonarrSetting
 from server.models.users import User, UserRole
 from server.repositories.settings import (
@@ -146,6 +148,10 @@ def add_plex_setting(
     setting = setting_in.to_orm(PlexSetting)
     setting.user_id = current_user.id
     setting = plex_setting_repo.save(setting)
+
+    if setting.library_sections:
+        scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
+
     return setting
 
 
@@ -180,8 +186,13 @@ def update_plex_setting(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             "Failed to connect to  the Plex server.",
         )
+
+    if setting.library_sections != setting_in.library_sections:
+        scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
+
     setting.update(setting_in)
-    plex_setting_repo.save(setting)
+    setting = plex_setting_repo.save(setting)
+
     return setting
 
 
