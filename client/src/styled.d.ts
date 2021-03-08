@@ -17,5 +17,7 @@ declare module "styled-components" {
     plex: string;
     movie: string;
     series: string;
+    season: string;
+    episode: string;
   }
 }

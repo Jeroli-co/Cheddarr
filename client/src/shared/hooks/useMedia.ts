@@ -5,7 +5,7 @@ import { APIRoutes } from "../enums/APIRoutes";
 import { IMedia } from "../models/IMedia";
 import { MediaTypes } from "../enums/MediaTypes";
 
-export const useMedia = (type: MediaTypes, mediaId: number | string) => {
+export const useMedia = (type: MediaTypes, mediaId: string) => {
   const [media, setMedia] = useState<IAsyncCall<IMedia | null>>(
     DefaultAsyncCall
   );

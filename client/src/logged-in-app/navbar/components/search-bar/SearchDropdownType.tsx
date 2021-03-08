@@ -1,10 +1,11 @@
-import React, { useRef, useState, MouseEvent } from "react";
+import React, { MouseEvent, useRef, useState } from "react";
 import styled from "styled-components";
 import { useOutsideAlerter } from "../../../../shared/hooks/useOutsideAlerter";
 import { SearchFilters } from "../../../../shared/enums/SearchFilters";
 import { uppercaseFirstLetter } from "../../../../utils/strings";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
-import { MovieTag, SeriesTag } from "../../../../shared/components/Tag";
+import { MediaTag } from "../../../../shared/components/Tag";
+import { MediaTypes } from "../../../../shared/enums/MediaTypes";
 
 const Container = styled.div<{ isActive: boolean }>`
   position: relative;
@@ -85,8 +86,12 @@ const SearchDropdownType = ({
   return (
     <Container ref={dropdownRef} isActive={isOpen} onClick={onDropdownClick}>
       <ActiveItem>
-        {selectedOption === SearchFilters.MOVIES && <MovieTag />}
-        {selectedOption === SearchFilters.SERIES && <SeriesTag />}
+        {selectedOption === SearchFilters.MOVIES && (
+          <MediaTag type={MediaTypes.MOVIES} />
+        )}
+        {selectedOption === SearchFilters.SERIES && (
+          <MediaTag type={MediaTypes.SERIES} />
+        )}
         {selectedOption === SearchFilters.ALL &&
           uppercaseFirstLetter(selectedOption)}
       </ActiveItem>

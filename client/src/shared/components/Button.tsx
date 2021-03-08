@@ -9,6 +9,72 @@ type ButtonStyleProps = {
   width?: string;
 };
 
+export const LinkButton = styled.a<ButtonStyleProps>`
+  margin: 0;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  align-items: center;
+  border-radius: 4px;
+  box-shadow: none;
+  display: flex;
+  justify-content: center;
+  height: 2.5em;
+  line-height: 1.5;
+  padding: calc(0.5em - 1px) calc(1.25em - 1px);
+  position: relative;
+  vertical-align: top;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 1px none #8c8c8c;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  background: ${(props) => (props.bgColor ? props.bgColor : props.theme.grey)};
+  color: ${(props) => props.theme.white};
+
+  &:focus {
+    outline: none;
+  }
+
+  font-size: ${(props) => {
+    switch (props.fontSize) {
+      case ComponentSizes.SMALL:
+        return ".75rem";
+      case ComponentSizes.MEDIUM:
+        return "1rem";
+      case ComponentSizes.LARGE:
+        return "1.25rem";
+      case ComponentSizes.XLARGE:
+        return "1.50rem";
+      default:
+        return "1rem";
+    }
+  }};
+
+  ${(props) =>
+    props.borderColor &&
+    css`
+      border: 1px solid ${props.borderColor};
+    `}
+
+  ${(props) =>
+    props.width &&
+    css`
+      width: ${props.width};
+    `}
+  
+  .left-icon {
+    padding-right: 10px;
+  }
+
+  .right-icon {
+    padding-left: 10px;
+  }
+`;
+
 export const Button = styled.button<ButtonStyleProps>`
   margin: 0;
   -moz-appearance: none;
@@ -74,6 +140,10 @@ export const Button = styled.button<ButtonStyleProps>`
 
 export const RoundedButton = styled(Button)`
   border-radius: 290486px;
+`;
+
+export const PrimaryLinkButton = styled(LinkButton)`
+  background: ${(props) => props.theme.primaryLighter};
 `;
 
 export const PrimaryButton = styled(Button)`

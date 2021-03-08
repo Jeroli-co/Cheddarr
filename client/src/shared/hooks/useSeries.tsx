@@ -5,7 +5,7 @@ import { APIRoutes } from "../enums/APIRoutes";
 import { ISeries } from "../models/IMedia";
 import { useAlert } from "../contexts/AlertContext";
 
-export const useSeries = (seriesId: number) => {
+export const useSeries = (seriesId: string) => {
   const [series, setSeries] = useState<IAsyncCall<ISeries | null>>(
     DefaultAsyncCall
   );

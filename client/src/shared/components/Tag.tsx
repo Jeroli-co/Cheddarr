@@ -1,7 +1,13 @@
 import React from "react";
 import styled from "styled-components";
-import { IMedia } from "../models/IMedia";
 import { MediaTypes } from "../enums/MediaTypes";
+import {
+  IMedia,
+  isEpisode,
+  isMovie,
+  isSeason,
+  isSeries,
+} from "../models/IMedia";
 
 export const Tag = styled.div`
   width: min-content;
@@ -25,31 +31,42 @@ export const DangerTag = styled(Tag)`
   background: ${(props) => props.theme.danger};
 `;
 
-const MovieTagStyle = styled(Tag)`
+const MovieTag = styled(Tag)`
   background: ${(props) => props.theme.movie};
 `;
 
-export const MovieTag = () => {
-  return <MovieTagStyle>Movie</MovieTagStyle>;
-};
-
-const SeriesTagStyle = styled(Tag)`
+const SeriesTag = styled(Tag)`
   background: ${(props) => props.theme.series};
 `;
 
-export const SeriesTag = () => {
-  return <SeriesTagStyle>Series</SeriesTagStyle>;
-};
+const SeasonTag = styled(Tag)`
+  background: ${(props) => props.theme.season};
+`;
+
+const EpisodeTag = styled(Tag)`
+  background: ${(props) => props.theme.episode};
+`;
 
 type MediaTagProps = {
-  media: IMedia;
+  media?: IMedia;
+  type?: MediaTypes;
 };
 
 export const MediaTag = (props: MediaTagProps) => {
-  if (props.media.mediaType === MediaTypes.MOVIES) {
-    return <MovieTagStyle>Movie</MovieTagStyle>;
-  } else if (props.media.mediaType === MediaTypes.SERIES) {
-    return <SeriesTagStyle>Series</SeriesTagStyle>;
+  if (
+    (props.type && props.type === MediaTypes.MOVIES) ||
+    isMovie(props.media)
+  ) {
+    return <MovieTag>Movie</MovieTag>;
+  } else if (
+    (props.type && props.type === MediaTypes.SERIES) ||
+    isSeries(props.media)
+  ) {
+    return <SeriesTag>Series</SeriesTag>;
+  } else if (isSeason(props.media)) {
+    return <SeasonTag>Season</SeasonTag>;
+  } else if (isEpisode(props.media)) {
+    return <EpisodeTag>Episode</EpisodeTag>;
   } else {
     return <></>;
   }

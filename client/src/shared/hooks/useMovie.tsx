@@ -5,7 +5,7 @@ import { APIRoutes } from "../enums/APIRoutes";
 import { useAlert } from "../contexts/AlertContext";
 import { IMovie } from "../models/IMedia";
 
-export const useMovie = (movieId: number | string) => {
+export const useMovie = (movieId: string) => {
   const [movie, setMovie] = useState<IAsyncCall<IMovie | null>>(
     DefaultAsyncCall
   );
