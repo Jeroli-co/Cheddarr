@@ -44,7 +44,10 @@ def get_received_movie_requests(
     ),
 ):
     requests, total_results, total_pages = media_request_repo.find_all_by(
-        limit=per_page, page=page, requested_user_id=current_user.id, media_type=MediaType.movies
+        per_page=per_page,
+        page=page,
+        requested_user_id=current_user.id,
+        media_type=MediaType.movies,
     )
 
     return MediaRequestSearchResult(
@@ -62,7 +65,10 @@ def get_sent_movie_requests(
     ),
 ):
     requests, total_results, total_pages = media_request_repo.find_all_by(
-        limit=per_page, page=page, requesting_user_id=current_user.id, media_type=MediaType.movies
+        per_page=per_page,
+        page=page,
+        requesting_user_id=current_user.id,
+        media_type=MediaType.movies,
     )
 
     return MediaRequestSearchResult(
@@ -218,7 +224,10 @@ def get_received_series_requests(
     ),
 ):
     requests, total_results, total_pages = media_request_repo.find_all_by(
-        limit=per_page, page=page, requested_user_id=current_user.id, media_type=MediaType.series
+        per_page=per_page,
+        page=page,
+        requested_user_id=current_user.id,
+        media_type=MediaType.series,
     )
 
     return MediaRequestSearchResult(
@@ -236,7 +245,10 @@ def get_sent_series_requests(
     ),
 ):
     requests, total_results, total_pages = media_request_repo.find_all_by(
-        limit=per_page, page=page, requesting_user_id=current_user.id, media_type=MediaType.series
+        per_page=per_page,
+        page=page,
+        requesting_user_id=current_user.id,
+        media_type=MediaType.series,
     )
 
     return MediaRequestSearchResult(
