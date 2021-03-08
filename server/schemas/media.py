@@ -59,14 +59,10 @@ class MovieSchema(MediaSchema):
 
 class EpisodeSchema(MediaSchema):
     episode_number: int
-    title: str
-    release_date: Optional[date]
 
 
 class SeasonSchema(MediaSchema):
     season_number: int
-    title: str
-    release_date: Optional[date]
     episodes: Optional[List[EpisodeSchema]]
 
 
@@ -168,14 +164,12 @@ class TmdbMovie(TmdbMedia, MovieSchema):
 
 class TmdbEpisode(TmdbMedia, EpisodeSchema):
     episode_number: int = Field(alias="episode_number")
-    title: str = Field(alias="name")
     release_date: Optional[date] = Field(alias="air_date")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
 class TmdbSeason(TmdbMedia, SeasonSchema):
     season_number: int = Field(alias="season_number")
-    title: str = Field(alias="name")
     episodes: Optional[List[TmdbEpisode]] = Field(alias="episodes")
     release_date: Optional[date] = Field(alias="air_date")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)

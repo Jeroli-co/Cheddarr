@@ -5,7 +5,7 @@ import requests
 from server.core import utils
 from server.models.requests import MovieRequest
 from server.models.settings import RadarrSetting
-from server.schemas.external_services import RadarrMovie
+from server.schemas.external_services import RadarrAddOptions, RadarrMovie
 from server.schemas.settings import RadarrInstanceInfo
 
 

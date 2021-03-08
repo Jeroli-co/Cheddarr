@@ -1039,7 +1039,7 @@ def test_get_incoming_series_requests(client: TestClient, db: Session, normal_us
     )
     assert r.status_code == 200
 
-    actual = r.json()[0]
+    actual = r.json()["results"][0]
     expected = (
         db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][0]["id"]).first()
     )
@@ -1060,8 +1060,7 @@ def test_get_outgoing_series_requests(client: TestClient, db: Session, normal_us
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
-
-    actual = r.json()[0]
+    actual = r.json()["results"][0]
     expected = (
         db.query(SeriesRequest).filter_by(requesting_user_id=datasets["users"][0]["id"]).first()
     )
@@ -1187,7 +1186,7 @@ def test_get_incoming_movies_requests(client: TestClient, db: Session, normal_us
     )
     assert r.status_code == 200
 
-    actual = r.json()[0]
+    actual = r.json()["results"][0]
     expected = (
         db.query(MovieRequest).filter_by(requested_user_id=datasets["users"][0]["id"]).first()
     )
@@ -1208,7 +1207,7 @@ def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_us
     )
     assert r.status_code == 200
 
-    actual = r.json()[0]
+    actual = r.json()["results"][0]
     expected = (
         db.query(MovieRequest).filter_by(requesting_user_id=datasets["users"][0]["id"]).first()
     )
