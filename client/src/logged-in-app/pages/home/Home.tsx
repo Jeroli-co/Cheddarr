@@ -8,7 +8,9 @@ import { MediaTypes } from "../../../shared/enums/MediaTypes";
 export default function Home() {
   const { currentConfig } = usePlexConfig();
 
-  if (currentConfig.data) {
+  if (!currentConfig.isLoading && !currentConfig.data) {
+    return <MissingConfigHome />;
+  } else if (!currentConfig.isLoading && currentConfig.data) {
     return (
       <div className="noselect">
         <MediaCarouselWidget
@@ -38,6 +40,6 @@ export default function Home() {
       </div>
     );
   } else {
-    return <MissingConfigHome />;
+    return <div />;
   }
 }

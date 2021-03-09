@@ -1,25 +1,22 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { IMedia, isSeries } from "../../models/IMedia";
+import { IMedia, isMovie, isSeries } from "../../models/IMedia";
 import { H1, H2 } from "../Titles";
 import { minToHoursMinutes } from "../../../utils/media-utils";
 import { MediaRating } from "./MediaRating";
 import { MediaTag, Tag } from "../Tag";
 import { MediaPersonCarousel } from "./MediaPersonCarousel";
-import { useRecommendedMedia } from "../../hooks/useRecommendedMedia";
-import { Spinner } from "../Spinner";
-import { useSimilarMedia } from "../../hooks/useSimilarMedia";
 import { PrimaryButton, PrimaryLinkButton } from "../Button";
 import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
-import { RequestMediaModal } from "./RequestMediaModal";
+import { RequestMediaModal } from "../requests/RequestMediaModal";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
 import { PrimaryDivider } from "../Divider";
-import { MediaCarousel } from "./MediaCarousel";
 import { Row } from "../layout/Row";
 import { Icon } from "../Icon";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import { Buttons } from "../layout/Buttons";
-import { MediaCardsLoader } from "./MediaCardsLoader";
+import { MediaCarouselWidget } from "./MediaCarouselWidget";
+import { APIRoutes } from "../../enums/APIRoutes";
 
 const BackgroundContainer = styled.div`
   position: relative;
@@ -153,8 +150,6 @@ export const Media = (props: MediaProps) => {
   const [directors, setDirectors] = useState<string[] | null>(null);
   const [producers, setProducers] = useState<string[] | null>(null);
   const [screenplay, setScreenplay] = useState<string[] | null>(null);
-  const recommended = useRecommendedMedia(props.media);
-  const similar = useSimilarMedia(props.media);
   const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
 
   useEffect(() => {
@@ -315,6 +310,7 @@ export const Media = (props: MediaProps) => {
           </Bubble>
         )}
       </MediaCrewInfo>
+
       {props.media.credits &&
         props.media.credits.cast &&
         props.media.credits.cast.length > 0 && (
@@ -324,23 +320,37 @@ export const Media = (props: MediaProps) => {
             <MediaPersonCarousel personList={props.media.credits.cast} />
           </>
         )}
-      {recommended.isLoading && <MediaCardsLoader />}
-      {!recommended.isLoading &&
-        recommended.data &&
-        recommended.data?.results.length > 0 && (
-          <>
-            <H2>Recommended</H2>
-            <MediaCarousel mediaList={recommended.data.results} />
-          </>
-        )}
 
-      {similar.isLoading && <Spinner />}
-      {!similar.isLoading && similar.data && similar.data?.results.length > 0 && (
-        <>
-          <H2>Similar</H2>
-          <MediaCarousel mediaList={similar.data.results} />
-        </>
+      <PrimaryDivider />
+
+      {isMovie(props.media) && (
+        <MediaCarouselWidget
+          title="Recommended"
+          url={APIRoutes.GET_RECOMMENDED_MOVIES(props.media.tmdbId)}
+        />
       )}
+      {isSeries(props.media) && (
+        <MediaCarouselWidget
+          title="Recommended"
+          url={APIRoutes.GET_RECOMMENDED_SERIES(props.media.tmdbId)}
+        />
+      )}
+
+      <PrimaryDivider />
+
+      {isMovie(props.media) && (
+        <MediaCarouselWidget
+          title="Similar"
+          url={APIRoutes.GET_SIMILAR_MOVIES(props.media.tmdbId)}
+        />
+      )}
+      {isSeries(props.media) && (
+        <MediaCarouselWidget
+          title="Similar"
+          url={APIRoutes.GET_SIMILAR_SERIES(props.media.tmdbId)}
+        />
+      )}
+
       {isRequestMediaModalOpen && (
         <SeriesRequestOptionsContextProvider>
           <RequestMediaModal

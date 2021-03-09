@@ -1,15 +1,15 @@
 import React from "react";
-import { Spinner } from "../../../../shared/components/Spinner";
-import { useRequestsContext } from "../../../../shared/contexts/RequestsContext";
+import { Spinner } from "../Spinner";
+import { useRequestsContext } from "../../contexts/RequestsContext";
 import {
   RequestFooter,
   RequestHeader,
   RequestLayout,
   ScrollingTable,
 } from "./RequestLayout";
-import { ComponentSizes } from "../../../../shared/enums/ComponentSizes";
-import { CenteredContent } from "../../../../shared/components/layout/CenteredContent";
-import { RequestTypes } from "../../../../shared/enums/RequestTypes";
+import { ComponentSizes } from "../../enums/ComponentSizes";
+import { CenteredContent } from "../layout/CenteredContent";
+import { RequestTypes } from "../../enums/RequestTypes";
 
 const RequestsReceived = () => {
   const { requestsReceived } = useRequestsContext();

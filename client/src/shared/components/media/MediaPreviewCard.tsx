@@ -1,7 +1,7 @@
 import React, { MouseEvent, useState } from "react";
 import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
-import { MediaTag } from "../Tag";
+import { MediaTag, SuccessTag } from "../Tag";
 import {
   IMedia,
   isEpisode,
@@ -12,8 +12,8 @@ import {
 } from "../../models/IMedia";
 import { PrimaryButton, PrimaryLinkButton } from "../Button";
 import { Icon } from "../Icon";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { RequestMediaModal } from "./RequestMediaModal";
+import { faCheck, faPlay } from "@fortawesome/free-solid-svg-icons";
+import { RequestMediaModal } from "../requests/RequestMediaModal";
 import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
 import { useHistory, useLocation } from "react-router-dom";
@@ -90,27 +90,16 @@ const Container = styled(MediaPreviewCardContainer)<{
         border: 1px solid black;
       }
     `}
+`;
 
-  .media-is-present {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: ${(props) => props.theme.success};
-    color: ${(props) => props.theme.white};
-    border: 1px solid ${(props) => props.theme.white};
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 10px;
-    padding: 10px;
-
-    span {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  }
+const HeadContainer = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  top: 0;
+  left: 0;
+  right: 0;
 `;
 
 type MediaPreviewCardProps = {
@@ -188,15 +177,15 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
           src={media.posterUrl ? media.posterUrl : logo}
           alt=""
         />
-        {isOnServers(media) && (
-          <span className="media-is-present">
-            <span>
-              <Icon icon={faCheck} />
-            </span>
-          </span>
-        )}
-        <div className="media-hover-info">
+        <HeadContainer>
           <MediaTag media={media} />
+          {isOnServers(media) && (
+            <SuccessTag>
+              <Icon icon={faCheck} />
+            </SuccessTag>
+          )}
+        </HeadContainer>
+        <div className="media-hover-info">
           <p>{media.title}</p>
           {media.releaseDate && (
             <p>{new Date(media.releaseDate).getFullYear()}</p>
@@ -220,6 +209,9 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
                 href={media.mediaServerInfo[0].webUrl}
                 target="_blank"
               >
+                <span className="left-icon">
+                  <Icon icon={faPlay} />
+                </span>
                 Play
               </PrimaryLinkButton>
             )}
