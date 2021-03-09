@@ -12,6 +12,8 @@ import { CenteredContent } from "../layout/CenteredContent";
 import { IMedia } from "../../models/IMedia";
 import { MediaCarousel } from "./MediaCarousel";
 import { IPaginated } from "../../models/IPaginated";
+import { MediaCardsLoader } from "./MediaCardsLoader";
+import { Row } from "../layout/Row";
 
 const Container = styled(H2)`
   display: flex;
@@ -41,14 +43,6 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (media.isLoading) {
-    return (
-      <CenteredContent height="280px">
-        <Spinner size={ComponentSizes.LARGE} />
-      </CenteredContent>
-    );
-  }
-
   if (media.status >= 400) {
     return <SwitchErrors status={media.status} />;
   }
@@ -62,8 +56,8 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
       </Container>
 
       <br />
-
-      {media.data && !hidden && (
+      {media.isLoading && <MediaCardsLoader />}
+      {!media.isLoading && media.data && !hidden && (
         <MediaCarousel mediaList={media.data.results} />
       )}
     </div>

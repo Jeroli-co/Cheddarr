@@ -19,6 +19,7 @@ import { Row } from "../layout/Row";
 import { Icon } from "../Icon";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import { Buttons } from "../layout/Buttons";
+import { MediaCardsLoader } from "./MediaCardsLoader";
 
 const BackgroundContainer = styled.div`
   position: relative;
@@ -323,7 +324,7 @@ export const Media = (props: MediaProps) => {
             <MediaPersonCarousel personList={props.media.credits.cast} />
           </>
         )}
-      {recommended.isLoading && <Spinner />}
+      {recommended.isLoading && <MediaCardsLoader />}
       {!recommended.isLoading &&
         recommended.data &&
         recommended.data?.results.length > 0 && (

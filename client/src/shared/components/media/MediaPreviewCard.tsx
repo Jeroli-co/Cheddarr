@@ -3,9 +3,7 @@ import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
 import { MediaTag } from "../Tag";
 import {
-  IEpisode,
   IMedia,
-  ISeason,
   isEpisode,
   isMovie,
   isOnServers,
@@ -23,14 +21,11 @@ import { routes } from "../../../router/routes";
 
 const logo = require("../../../assets/cheddarr-min.svg");
 
-const Container = styled.div<{
-  hasPoster: boolean;
-  size?: { width: number; height: number };
-}>`
+export const MediaPreviewCardContainer = styled.div`
   position: relative;
   flex: 0 0 calc(16.66% - 10px);
-  cursor: pointer;
   margin: 5px;
+  border-radius: 12px;
 
   @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
     flex: 0 0 calc(25% - 10px);
@@ -41,34 +36,19 @@ const Container = styled.div<{
     margin: 0 0 10px 0;
   }
 
-  .media-is-present {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: ${(props) => props.theme.success};
-    color: ${(props) => props.theme.white};
-    border: 1px solid ${(props) => props.theme.white};
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 10px;
-    padding: 10px;
-
-    span {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  }
-
-  .media-image {
+  .media-poster {
     display: block;
     width: 100%;
     height: 100%;
     opacity: 1;
     border-radius: 12px;
   }
+`;
+
+const Container = styled(MediaPreviewCardContainer)<{
+  hasPoster: boolean;
+}>`
+  cursor: pointer;
 
   .media-hover-info {
     display: flex;
@@ -106,62 +86,76 @@ const Container = styled.div<{
     !props.hasPoster &&
     css`
       .media-hover-info {
-        ${props.size &&
-        css`
-          width: ${props.size.width}px;
-          height: ${props.size.height}px;
-        `}
         opacity: 1;
         border: 1px solid black;
       }
     `}
+
+  .media-is-present {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: ${(props) => props.theme.success};
+    color: ${(props) => props.theme.white};
+    border: 1px solid ${(props) => props.theme.white};
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+    padding: 10px;
+
+    span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
 `;
 
 type MediaPreviewCardProps = {
   media: IMedia;
-  size?: {
-    width: number;
-    height: number;
-  };
 };
 
-export const MediaPreviewCard = ({ media, size }: MediaPreviewCardProps) => {
+export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
   const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
   const history = useHistory();
   const location = useLocation();
 
   const onCardClick = () => {
     const getSeasonUrl = () => {
-      const splitUrl = location.pathname.split("/");
       let url = null;
-      if (splitUrl.length > 3) {
-        const index = splitUrl.findIndex((s) => s === MediaTypes.SEASONS);
-        if (index !== -1 && index + 1 < splitUrl.length) {
-          splitUrl[index + 1] = (media as ISeason).seasonNumber.toString();
-          if (index + 1 < splitUrl.length - 1) {
-            splitUrl.splice(index + 2, splitUrl.length - index + 1);
+      if (isSeason(media)) {
+        const splitUrl = location.pathname.split("/");
+        if (splitUrl.length > 3) {
+          const index = splitUrl.findIndex((s) => s === MediaTypes.SEASONS);
+          if (index !== -1 && index + 1 < splitUrl.length) {
+            splitUrl[index + 1] = media.seasonNumber.toString();
+            if (index + 1 < splitUrl.length - 1) {
+              splitUrl.splice(index + 2, splitUrl.length - index + 1);
+            }
+            url = splitUrl.join("/");
           }
-          url = splitUrl.join("/");
+        } else {
+          url = splitUrl.join("/") + "/seasons/" + media.seasonNumber;
         }
-      } else {
-        url =
-          splitUrl.join("/") + "/seasons/" + (media as ISeason).seasonNumber;
       }
       return url;
     };
 
     const getEpisodeUrl = () => {
-      const splitUrl = location.pathname.split("/");
       let url = null;
-      if (splitUrl.length > 5) {
-        const index = splitUrl.findIndex((s) => s === MediaTypes.EPISODES);
-        if (index !== -1 && index + 1 < splitUrl.length) {
-          splitUrl[index + 1] = (media as IEpisode).episodeNumber.toString();
-          url = splitUrl.join("/");
+      if (isEpisode(media)) {
+        const splitUrl = location.pathname.split("/");
+        if (splitUrl.length > 5) {
+          const index = splitUrl.findIndex((s) => s === MediaTypes.EPISODES);
+          if (index !== -1 && index + 1 < splitUrl.length) {
+            splitUrl[index + 1] = media.episodeNumber.toString();
+            url = splitUrl.join("/");
+          }
+        } else {
+          url = splitUrl.join("/") + "/episodes/" + media.episodeNumber;
         }
-      } else {
-        url =
-          splitUrl.join("/") + "/episodes/" + (media as IEpisode).episodeNumber;
       }
       return url;
     };
@@ -188,13 +182,9 @@ export const MediaPreviewCard = ({ media, size }: MediaPreviewCardProps) => {
 
   return (
     <>
-      <Container
-        hasPoster={!!media.posterUrl}
-        size={size}
-        onClick={() => onCardClick()}
-      >
+      <Container hasPoster={!!media.posterUrl} onClick={() => onCardClick()}>
         <img
-          className="media-image"
+          className="media-poster"
           src={media.posterUrl ? media.posterUrl : logo}
           alt=""
         />
