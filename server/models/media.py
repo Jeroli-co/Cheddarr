@@ -63,7 +63,7 @@ class Episode(Model):
 
 class MediaServerContent(object):
     id = Column(Integer, primary_key=True)
-    server_media_id = Column(String)
+    server_media_id = Column(String, nullable=False)
     added_at = Column(Date)
 
     @declared_attr
@@ -72,15 +72,19 @@ class MediaServerContent(object):
 
 
 class MediaServerMedia(Model, MediaServerContent):
-    media_id = Column(ForeignKey("media.id"))
+    media_id = Column(ForeignKey("media.id"), nullable=False)
+    server_library_id = Column(ForeignKey("mediaserverlibrary.id"))
     media = relationship("Media", back_populates="server_media")
     server = relationship(
         "MediaServerSetting", backref=backref("media", cascade="all,delete,delete-orphan")
     )
+    library = relationship(
+        "MediaServerLibrary", backref=backref("media", cascade="all,delete,delete-orphan")
+    )
 
 
 class MediaServerSeason(Model, MediaServerContent):
-    season_id = Column(ForeignKey("season.id"))
+    season_id = Column(ForeignKey("season.id"), nullable=False)
     season = relationship("Season", back_populates="server_seasons")
     server = relationship(
         "MediaServerSetting", backref=backref("seasons", cascade="all,delete,delete-orphan")
@@ -88,7 +92,7 @@ class MediaServerSeason(Model, MediaServerContent):
 
 
 class MediaServerEpisode(Model, MediaServerContent):
-    episode_id = Column(ForeignKey("episode.id"))
+    episode_id = Column(ForeignKey("episode.id"), nullable=False)
     episode = relationship("Episode", back_populates="server_episodes")
     server = relationship(
         "MediaServerSetting", backref=backref("episodes", cascade="all,delete,delete-orphan")

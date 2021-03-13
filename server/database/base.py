@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Any, Dict, TypeVar, Union
+from typing import TypeVar
 
 import pytz
-from pydantic import BaseModel
 from sqlalchemy import Column, DateTime as DBDateTime, TypeDecorator
 from sqlalchemy.ext.declarative import (
     declarative_base,
@@ -32,25 +31,6 @@ class Model(Base):
             if hasattr(self, prop)
         ]
         return f"<{self.__class__.__name__} {' '.join(properties)}>"
-
-    def update(
-        self,
-        obj_in: Union[BaseModel, Dict[str, Any]],
-    ):
-        """
-        Update an object's attributes
-
-        :param obj_in: The schema or dict of attributes to update the object
-        :return: The updated object
-        """
-        obj_data = self.as_dict()
-        if isinstance(obj_in, dict):
-            update_data = obj_in
-        else:
-            update_data = obj_in.dict(exclude_unset=True)
-        for field in obj_data:
-            if field in update_data:
-                setattr(self, field, update_data[field])
 
     def as_dict(self, found=None):
         if found is None:

@@ -6,7 +6,7 @@ from sqlalchemy.orm import backref, relationship
 
 from server.core.security import hash_password
 from server.core.utils import get_random_avatar
-from server.database import Model
+from server.database import Model, Timestamp
 
 
 class UserRole(int, Enum):
@@ -17,7 +17,7 @@ class UserRole(int, Enum):
     auto_approve = auto()
 
 
-class User(Model):
+class User(Model, Timestamp):
     __repr_props__ = ("username", "email", "roles", "confirmed")
 
     id = Column(Integer, primary_key=True)
@@ -26,7 +26,7 @@ class User(Model):
     password_hash = Column(String, nullable=False)
     avatar = Column(String)
     confirmed = Column(Boolean, nullable=False, default=False)
-    roles = Column(Integer, default=UserRole.none)
+    roles = Column(Integer, default=UserRole.admin)  # TODO: change to UserRole.none
     plex_user_id = Column(Integer)
     plex_api_key = Column(String)
 

@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 from server.core import config
 from server.models.users import User, UserRole
 from server.repositories.base import BaseRepository
-from server.repositories.settings import PlexSettingRepository
 from server.repositories.users import UserRepository
 from server.schemas.auth import TokenPayload
 
@@ -58,18 +57,6 @@ def get_current_user(
     if not user:
         raise credentials_exception
     return user
-
-
-def get_current_user_plex_settings(
-    cur_user: User = Depends(get_current_user),
-    plex_setting_repository: PlexSettingRepository = Depends(
-        get_repository(PlexSettingRepository)
-    ),
-):
-    settings = plex_setting_repository.find_all_by(user_id=cur_user.id, enabled=True)
-    if settings is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex settings found for the user.")
-    return settings
 
 
 def has_user_permissions(

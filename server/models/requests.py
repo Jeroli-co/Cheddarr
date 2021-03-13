@@ -55,7 +55,7 @@ class MediaRequest(Model, Timestamp):
 
     @declared_attr
     def media_id(cls):
-        return Column(ForeignKey("media.id"))
+        return Column(ForeignKey("media.id"), nullable=False)
 
     @declared_attr
     def media(cls):

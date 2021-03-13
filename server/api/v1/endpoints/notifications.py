@@ -87,9 +87,10 @@ def update_email_agent(
     if agent is None:
         agent = agent_in.to_orm(NotificationAgent)
         agent.name = Agent.email
+        agent = notif_agent_repo.save(agent)
     else:
-        agent.update(agent_in)
-    notif_agent_repo.save(agent)
+        agent = notif_agent_repo.update(agent, agent_in)
+
     if agent.enabled:
         config.set(MAIL_ENABLED=True)
     else:

@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from server.models.requests import MovieRequest, SeriesRequest
+from server.models.requests import MediaRequest, MovieRequest, SeriesRequest
 from server.repositories.requests import MediaRequestRepository
 from server.tests.utils import datasets
 
@@ -1032,49 +1032,6 @@ def test_add_episodes_whereas_all_season_requested_without_episodes(
     assert r2.status_code == 409
 
 
-def test_get_incoming_series_requests(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.get(
-        client.app.url_path_for("get_received_series_requests"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 200
-
-    actual = r.json()["results"][0]
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][0]["id"]).first()
-    )
-
-    assert actual["id"] == expected.id
-    assert actual["requested_user"]["username"] == expected.requested_user.username
-    assert actual["requesting_user"]["username"] == expected.requesting_user.username
-    assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.isoformat()
-    assert actual["updated_at"] == expected.created_at.isoformat()
-    assert actual["media"]
-    assert actual["seasons"] == expected.seasons
-
-
-def test_get_outgoing_series_requests(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.get(
-        client.app.url_path_for("get_sent_series_requests"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 200
-    actual = r.json()["results"][0]
-    expected = (
-        db.query(SeriesRequest).filter_by(requesting_user_id=datasets["users"][0]["id"]).first()
-    )
-
-    assert actual["id"] == expected.id
-    assert actual["requested_user"]["username"] == expected.requested_user.username
-    assert actual["requesting_user"]["username"] == expected.requesting_user.username
-    assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.isoformat()
-    assert actual["updated_at"] == expected.created_at.isoformat()
-    assert actual["media"]
-    assert actual["seasons"] == expected.seasons
-
-
 def test_update_series_request_wrong_status(client: TestClient, normal_user_token_headers):
     r = client.patch(
         client.app.url_path_for("update_series_request", request_id="1"),
@@ -1179,46 +1136,62 @@ def test_add_movie_already_requested(client: TestClient, db: Session, normal_use
     assert r.status_code == 409
 
 
-def test_get_incoming_movies_requests(client: TestClient, db: Session, normal_user_token_headers):
+def test_get_incoming_requests(client: TestClient, db: Session, normal_user_token_headers):
     r = client.get(
-        client.app.url_path_for("get_received_movie_requests"),
+        client.app.url_path_for("get_received_requests"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
 
-    actual = r.json()["results"][0]
-    expected = (
-        db.query(MovieRequest).filter_by(requested_user_id=datasets["users"][0]["id"]).first()
-    )
+    actual = r.json()["results"]
+    expected = db.query(MediaRequest).filter_by(requested_user_id=datasets["users"][0]["id"]).all()
 
-    assert actual["id"] == expected.id
-    assert actual["requested_user"]["username"] == expected.requested_user.username
-    assert actual["requesting_user"]["username"] == expected.requesting_user.username
-    assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.isoformat()
-    assert actual["updated_at"] == expected.created_at.isoformat()
-    assert actual["media"]
+    assert len(actual) == 2
+    assert actual[0]["id"] == expected[0].id
+    assert actual[0]["requested_user"]["username"] == expected[0].requested_user.username
+    assert actual[0]["requesting_user"]["username"] == expected[0].requesting_user.username
+    assert actual[0]["status"] == expected[0].status
+    assert actual[0]["created_at"] == expected[0].created_at.isoformat()
+    assert actual[0]["updated_at"] == expected[0].created_at.isoformat()
+    assert actual[0]["media"]
+
+    assert actual[1]["id"] == expected[1].id
+    assert actual[1]["requested_user"]["username"] == expected[1].requested_user.username
+    assert actual[1]["requesting_user"]["username"] == expected[1].requesting_user.username
+    assert actual[1]["status"] == expected[1].status
+    assert actual[1]["created_at"] == expected[1].created_at.isoformat()
+    assert actual[1]["updated_at"] == expected[1].created_at.isoformat()
+    assert actual[1]["media"]
 
 
 def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_user_token_headers):
     r = client.get(
-        client.app.url_path_for("get_sent_movie_requests"),
+        client.app.url_path_for("get_sent_requests"),
         headers=normal_user_token_headers,
     )
     assert r.status_code == 200
 
-    actual = r.json()["results"][0]
+    actual = r.json()["results"]
     expected = (
-        db.query(MovieRequest).filter_by(requesting_user_id=datasets["users"][0]["id"]).first()
+        db.query(MediaRequest).filter_by(requesting_user_id=datasets["users"][0]["id"]).all()
     )
 
-    assert actual["id"] == expected.id
-    assert actual["requested_user"]["username"] == expected.requested_user.username
-    assert actual["requesting_user"]["username"] == expected.requesting_user.username
-    assert actual["status"] == expected.status
-    assert actual["created_at"] == expected.created_at.isoformat()
-    assert actual["updated_at"] == expected.created_at.isoformat()
-    assert actual["media"]
+    assert len(actual) == 2
+    assert actual[0]["id"] == expected[0].id
+    assert actual[0]["requested_user"]["username"] == expected[0].requested_user.username
+    assert actual[0]["requesting_user"]["username"] == expected[0].requesting_user.username
+    assert actual[0]["status"] == expected[0].status
+    assert actual[0]["created_at"] == expected[0].created_at.isoformat()
+    assert actual[0]["updated_at"] == expected[0].created_at.isoformat()
+    assert actual[0]["media"]
+
+    assert actual[1]["id"] == expected[1].id
+    assert actual[1]["requested_user"]["username"] == expected[1].requested_user.username
+    assert actual[1]["requesting_user"]["username"] == expected[1].requesting_user.username
+    assert actual[1]["status"] == expected[1].status
+    assert actual[1]["created_at"] == expected[1].created_at.isoformat()
+    assert actual[1]["updated_at"] == expected[1].created_at.isoformat()
+    assert actual[1]["media"]
 
 
 def test_update_movie_request_wrong_status(client: TestClient, normal_user_token_headers):

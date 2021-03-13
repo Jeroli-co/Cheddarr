@@ -1,13 +1,14 @@
 import math
 from abc import ABC
-from typing import Generic, get_args, List, Optional
+from typing import Any, Dict, Generic, get_args, List, Optional, Union
 
+from pydantic import BaseModel
 from sqlalchemy.orm import Query, Session
 
 from server.database import ModelType
 
 
-class BaseRepository(Generic[ModelType], ABC):
+class BaseRepository(ABC, Generic[ModelType]):
     def __init__(self, session: Session):
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).
@@ -15,7 +16,10 @@ class BaseRepository(Generic[ModelType], ABC):
         :param session: A SQLAlchemy Session
         """
         self.session = session
-        self.model = get_args(self.__orig_bases__[0])[0]
+        self.model = self.get_model()
+
+    def get_model(self) -> ModelType:
+        return get_args(self.__orig_bases__[-1])[0]
 
     def find_by(self, **filters) -> Optional[ModelType]:
         return self.session.query(self.model).filter_by(**filters).one_or_none()
@@ -48,6 +52,30 @@ class BaseRepository(Generic[ModelType], ABC):
         self.session.add(db_obj)
         self.session.commit()
         self.session.refresh(db_obj)
+        return db_obj
+
+    def update(
+        self,
+        db_obj: ModelType,
+        obj_in: Union[BaseModel, Dict[str, Any]],
+    ) -> ModelType:
+        """
+        Update an object's in the database
+
+        :param db_obj: Database object to be updated
+        :param obj_in: The schema or dict of attributes to update the object
+        :return: The updated object
+        """
+        obj_data = db_obj.as_dict()
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+        for field in obj_data:
+            if field in update_data:
+                setattr(db_obj, field, update_data[field])
+
+        db_obj = self.save(db_obj)
         return db_obj
 
     def remove(self, db_obj: ModelType):

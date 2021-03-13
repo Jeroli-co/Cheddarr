@@ -7,16 +7,17 @@ from server.core.scheduler import scheduler
 from server.core.security import check_permissions
 from server.jobs.radarr import send_radarr_request_task
 from server.jobs.sonarr import send_sonarr_request_task
-from server.models.media import Media, MediaType
+from server.models.media import Media
 from server.models.requests import (
     MovieRequest,
     RequestStatus,
     SeriesRequest,
 )
-from server.models.settings import RadarrSetting, SonarrSetting
+from server.models.settings import MediaProviderType, RadarrSetting, SonarrSetting
 from server.models.users import User, UserRole
 from server.repositories.media import MediaRepository
 from server.repositories.requests import MediaRequestRepository
+from server.repositories.settings import MediaProviderSettingRepository
 from server.repositories.users import UserRepository
 from server.schemas.core import ResponseMessage
 from server.schemas.media import MovieSchema, SeriesSchema
@@ -34,8 +35,8 @@ from server.services.core import unify_series_request
 router = APIRouter()
 
 
-@router.get("/movies/incoming", response_model=MediaRequestSearchResult)
-def get_received_movie_requests(
+@router.get("/requests/incoming", response_model=MediaRequestSearchResult)
+def get_received_requests(
     page: int = 1,
     per_page: int = 20,
     current_user: User = Depends(deps.get_current_user),
@@ -47,7 +48,6 @@ def get_received_movie_requests(
         per_page=per_page,
         page=page,
         requested_user_id=current_user.id,
-        media_type=MediaType.movies,
     )
 
     return MediaRequestSearchResult(
@@ -55,8 +55,8 @@ def get_received_movie_requests(
     )
 
 
-@router.get("/movies/outgoing", response_model=MediaRequestSearchResult)
-def get_sent_movie_requests(
+@router.get("/requests/outgoing", response_model=MediaRequestSearchResult)
+def get_sent_requests(
     page: int = 1,
     per_page: int = 20,
     current_user: User = Depends(deps.get_current_user),
@@ -68,7 +68,6 @@ def get_sent_movie_requests(
         per_page=per_page,
         page=page,
         requesting_user_id=current_user.id,
-        media_type=MediaType.movies,
     )
 
     return MediaRequestSearchResult(
@@ -92,6 +91,9 @@ def add_movie_request(
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
+    ),
+    media_provider_repo: MediaProviderSettingRepository = Depends(
+        deps.get_repository(MediaProviderSettingRepository)
     ),
 ):
 
@@ -119,12 +121,18 @@ def add_movie_request(
         requesting_user=current_user,
         media=movie,
     )
+
     if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
-        movie_request.status = RequestStatus.approved
-        scheduler.add_job(send_radarr_request_task, args=[movie_request.id])
+        default_provider = media_provider_repo.find_by(
+            provider_type=MediaProviderType.series_provider, is_default=True
+        )
+        if default_provider is not None:
+            movie_request.status = RequestStatus.approved
+            movie_request.selected_provider = default_provider
+            movie_request = media_request_repo.save(movie_request)
+            scheduler.add_job(send_radarr_request_task, args=[movie_request.id])
 
-    media_request_repo.save(movie_request)
-
+    movie_request = media_request_repo.save(movie_request)
     return movie_request
 
 
@@ -144,6 +152,9 @@ def update_movie_request(
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
+    media_provider_repo: MediaProviderSettingRepository = Depends(
+        deps.get_repository(MediaProviderSettingRepository)
+    ),
 ):
     if update.status != RequestStatus.approved and update.status != RequestStatus.refused:
         raise HTTPException(
@@ -156,22 +167,20 @@ def update_movie_request(
     if request.status != RequestStatus.pending:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
     if update.status == RequestStatus.approved:
-        if update.provider_id is None:
+        if update.provider_id is not None:
+            selected_provider = media_provider_repo.find_by(
+                provider_type=MediaProviderType.series_provider, id=update.provider_id
+            )
+            if selected_provider is None:
+                raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
+            request.selected_provider = selected_provider
+
+        elif request.selected_provider is not None:
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
-                "provider_id must be set to accept a request.",
+                "provider_id must be set or a provider must be set to default to accept a request.",
             )
-        selected_provider = next(
-            (
-                provider
-                for provider in current_user.media_providers
-                if provider.id == update.provider_id
-            ),
-            None,
-        )
-        if selected_provider is None:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
-        request.selected_provider = selected_provider
+
         request.status = RequestStatus.approved
         if isinstance(request.selected_provider, RadarrSetting):
             scheduler.add_job(send_radarr_request_task, args=[request.id])
@@ -214,48 +223,6 @@ def delete_movie_request(
     return {"detail": "Request deleted."}
 
 
-@router.get("/series/incoming", response_model=MediaRequestSearchResult)
-def get_received_series_requests(
-    page: int = 1,
-    per_page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
-    media_request_repo: MediaRequestRepository = Depends(
-        deps.get_repository(MediaRequestRepository)
-    ),
-):
-    requests, total_results, total_pages = media_request_repo.find_all_by(
-        per_page=per_page,
-        page=page,
-        requested_user_id=current_user.id,
-        media_type=MediaType.series,
-    )
-
-    return MediaRequestSearchResult(
-        page=page, total_pages=total_pages, total_results=total_results, results=requests
-    )
-
-
-@router.get("/series/outgoing", response_model=MediaRequestSearchResult)
-def get_sent_series_requests(
-    page: int = 1,
-    per_page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
-    media_request_repo: MediaRequestRepository = Depends(
-        deps.get_repository(MediaRequestRepository)
-    ),
-):
-    requests, total_results, total_pages = media_request_repo.find_all_by(
-        per_page=per_page,
-        page=page,
-        requesting_user_id=current_user.id,
-        media_type=MediaType.series,
-    )
-
-    return MediaRequestSearchResult(
-        page=page, total_pages=total_pages, total_results=total_results, results=requests
-    )
-
-
 @router.post(
     "/series",
     status_code=status.HTTP_201_CREATED,
@@ -273,6 +240,9 @@ def add_series_request(
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
+    media_provider_repo: MediaProviderSettingRepository = Depends(
+        deps.get_repository(MediaProviderSettingRepository)
+    ),
 ):
     requested_user = user_repo.find_by_username(request_in.requested_username)
     if requested_user is None:
@@ -283,8 +253,7 @@ def add_series_request(
         searched_series = tmdb.get_tmdb_series(request_in.tmdb_id)
         if searched_series is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested series was not found")
-
-        series = SeriesSchema.parse_obj(searched_series).to_orm(Media)
+        series = SeriesSchema.parse_obj(searched_series).to_orm(Media, exclude={"seasons"})
 
     series_requests = media_request_repo.find_all_by_user_ids_and_tmdb_id(
         tmdb_id=series.tmdb_id,
@@ -305,12 +274,17 @@ def add_series_request(
             media=series,
         )
         unify_series_request(series_request, request_in)
+
         if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
-            series_request.status = RequestStatus.approved
-            scheduler.add_job(send_sonarr_request_task, args=[series_request.id])
-
+            default_provider = media_provider_repo.find_by(
+                provider_type=MediaProviderType.series_provider, is_default=True
+            )
+            if default_provider is not None:
+                series_request.status = RequestStatus.approved
+                series_request.selected_provider = default_provider
+                media_request_repo.save(series_request)
+                scheduler.add_job(send_sonarr_request_task, args=[series_request.id])
         media_request_repo.save(series_request)
-
         return series_request
 
     if request_in.seasons:
@@ -358,13 +332,18 @@ def add_series_request(
     else:
         series_request.seasons = []
 
-    if check_permissions(
-        current_user.roles, permissions=[UserRole.admin, UserRole.auto_approve], options="or"
-    ):
-        series_request.status = RequestStatus.approved
+    if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
+        default_provider = media_provider_repo.find_by(
+            provider_type=MediaProviderType.series_provider, is_default=True
+        )
+        if default_provider is not None:
+            series_request.status = RequestStatus.approved
+            series_request.selected_provider = default_provider
+            media_request_repo.save(series_request)
+            scheduler.add_job(send_sonarr_request_task, args=[series_request.id])
+            return series_request
 
     media_request_repo.save(series_request)
-
     return series_request
 
 
@@ -384,6 +363,9 @@ def update_series_request(
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
+    media_provider_repo: MediaProviderSettingRepository = Depends(
+        deps.get_repository(MediaProviderSettingRepository)
+    ),
 ):
     if update.status != RequestStatus.approved and update.status != RequestStatus.refused:
         raise HTTPException(
@@ -396,22 +378,20 @@ def update_series_request(
     if request.status != RequestStatus.pending:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
     if update.status == RequestStatus.approved:
-        if update.provider_id is None:
+        if update.provider_id is not None:
+            selected_provider = media_provider_repo.find_by(
+                provider_type=MediaProviderType.series_provider, id=update.provider_id
+            )
+            if selected_provider is None:
+                raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
+            request.selected_provider = selected_provider
+
+        elif request.selected_provider is not None:
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
-                "provider_id must be set to accept a request.",
+                "provider_id must be set or a provider must be set to default to accept a request.",
             )
-        selected_provider = next(
-            (
-                provider
-                for provider in current_user.media_providers
-                if provider.id == update.provider_id
-            ),
-            None,
-        )
-        if selected_provider is None:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
-        request.selected_provider = selected_provider
+
         request.status = RequestStatus.approved
         for season in request.seasons:
             season.status = RequestStatus.approved

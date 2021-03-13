@@ -1,25 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
-import { useFormContext } from "react-hook-form";
-import {
-  IPlexLibraries,
-  IPlexSettings,
-} from "../../../../../shared/models/IPlexSettings";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
-import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
-import { InputField } from "../../../../../shared/components/inputs/InputField";
-import { Help, HelpDanger } from "../../../../../shared/components/Help";
-import { Icon } from "../../../../../shared/components/Icon";
-import { usePlexLibraries } from "../../../../../shared/hooks/usePlexLibraries";
-import { H3 } from "../../../../../shared/components/Titles";
-import { Spinner } from "../../../../../shared/components/Spinner";
-import { PrimaryButton } from "../../../../../shared/components/Button";
-import {
-  DefaultAsyncCall,
-  IAsyncCall,
-} from "../../../../../shared/models/IAsyncCall";
-import { isEmpty } from "../../../../../utils/strings";
-import { useAlert } from "../../../../../shared/contexts/AlertContext";
+import React, {useEffect, useState} from "react";
+import {faExclamationCircle} from "@fortawesome/free-solid-svg-icons";
+import {useFormContext} from "react-hook-form";
+import {IPlexLibraries, IPlexSettings,} from "../../../../../shared/models/IPlexSettings";
+import {FORM_DEFAULT_VALIDATOR} from "../../../../../shared/enums/FormDefaultValidators";
+import {Checkbox} from "../../../../../shared/components/inputs/Checkbox";
+import {InputField} from "../../../../../shared/components/inputs/InputField";
+import {Help, HelpDanger} from "../../../../../shared/components/Help";
+import {Icon} from "../../../../../shared/components/Icon";
+import {usePlexLibraries} from "../../../../../shared/hooks/usePlexLibraries";
+import {H3} from "../../../../../shared/components/Titles";
+import {Spinner} from "../../../../../shared/components/Spinner";
+import {PrimaryButton} from "../../../../../shared/components/Button";
+import {DefaultAsyncCall, IAsyncCall,} from "../../../../../shared/models/IAsyncCall";
+import {isEmpty} from "../../../../../utils/strings";
+import {useAlert} from "../../../../../shared/contexts/AlertContext";
 
 type PlexSettingsFormProps = {
   config: IPlexSettings | null;
@@ -177,7 +171,7 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
             <span key={index}>
               <InputField isInline>
                 <Checkbox
-                  name={`librarySections[${index}].enabled`}
+                  name={`libraries[${index}].enabled`}
                   register={register}
                   round
                 />
@@ -186,7 +180,7 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
               <InputField hidden>
                 <input
                   type="text"
-                  name={`librarySections[${index}].name`}
+                  name={`libraries[${index}].name`}
                   ref={register}
                   value={l.name}
                   onChange={() => {}}
@@ -195,18 +189,9 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
               <InputField hidden>
                 <input
                   type="number"
-                  name={`librarySections[${index}].id`}
+                  name={`libraries[${index}].libraryId`}
                   ref={register}
-                  value={l.id}
-                  onChange={() => {}}
-                />
-              </InputField>
-              <InputField hidden>
-                <input
-                  type="text"
-                  name={`librarySections[${index}].type`}
-                  ref={register}
-                  value={l.type}
+                  value={l.libraryId}
                   onChange={() => {}}
                 />
               </InputField>

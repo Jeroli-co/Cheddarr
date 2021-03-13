@@ -5,7 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from server.api import dependencies as deps
 from server.core import scheduler
 from server.jobs.plex import sync_plex_servers_recently_added
-from server.models.settings import MediaProviderType, PlexSetting, RadarrSetting, SonarrSetting
+from server.models.settings import (
+    MediaProviderType,
+    MediaServerLibrary,
+    PlexSetting,
+    RadarrSetting,
+    SonarrSetting,
+)
 from server.models.users import User, UserRole
 from server.repositories.settings import (
     PlexSettingRepository,
@@ -147,9 +153,14 @@ def add_plex_setting(
         raise HTTPException(status.HTTP_409_CONFLICT, "This server is already added.")
     setting = setting_in.to_orm(PlexSetting)
     setting.user_id = current_user.id
+    libraries = []
+    for library in setting_in.libraries:
+        libraries.append(library.to_orm(MediaServerLibrary))
+    setting.libraries = libraries
+
     setting = plex_setting_repo.save(setting)
 
-    if setting.library_sections:
+    if setting.libraries:
         scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
 
     return setting
@@ -187,11 +198,16 @@ def update_plex_setting(
             "Failed to connect to  the Plex server.",
         )
 
-    if setting.library_sections != setting_in.library_sections:
-        scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
+    for library in setting_in.libraries:
+        setting_library = next(
+            (l for l in setting.libraries if l.library_id == library.library_id), None
+        )
+        if setting_library is None:
+            setting.libraries.append(library.to_orm(MediaServerLibrary))
+        elif setting_library is not None:
+            setting.libraries.remove(setting_library)
 
-    setting.update(setting_in)
-    setting = plex_setting_repo.save(setting)
+    setting = plex_setting_repo.update(setting, setting_in)
 
     return setting
 
@@ -335,8 +351,7 @@ def update_radarr_setting(
         ssl=setting_in.ssl,
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
-    setting.update(setting_in)
-    radarr_setting_repo.save(setting)
+    setting = radarr_setting_repo.update(setting, setting_in)
     return setting
 
 
@@ -479,8 +494,7 @@ def update_sonarr_setting(
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
 
-    setting.update(setting_in)
-    sonarr_setting_repo.save(setting)
+    setting = sonarr_setting_repo.update(setting, setting_in)
     return setting
 
 

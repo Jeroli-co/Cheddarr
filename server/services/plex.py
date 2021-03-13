@@ -4,7 +4,6 @@ from plexapi.exceptions import PlexApiException
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer as PlexAPIServer
 
-from server.models.media import MediaType
 from server.schemas.settings import PlexLibrarySection, PlexServer
 
 
@@ -39,11 +38,7 @@ def get_plex_server_library_sections(
         return None
     sections = []
     for library in server.library.sections():
-        if library.type == "movie":
-            library_type = MediaType.movies
-        else:
-            library_type = MediaType.series
-        sections.append(PlexLibrarySection(id=library.key, name=library.title, type=library_type))
+        sections.append(PlexLibrarySection(library_id=library.key, name=library.title))
 
     return sections
 

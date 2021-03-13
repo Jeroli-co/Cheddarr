@@ -1,6 +1,5 @@
-import { ProviderTypes } from "../enums/ProviderTypes";
-import { IProviderSettingsBase } from "./IProviderSettingsBase";
-import { MediaTypes } from "../enums/MediaTypes";
+import {ProviderTypes} from "../enums/ProviderTypes";
+import {IProviderSettingsBase} from "./IProviderSettingsBase";
 
 export interface IPlexSettings extends IProviderSettingsBase {
   id: string;
@@ -13,8 +12,7 @@ export interface IPlexSettings extends IProviderSettingsBase {
 }
 
 export interface IPlexLibraries {
-  id: number;
+  libraryId: number;
   name: string;
-  type: MediaTypes;
   enabled: boolean;
 }

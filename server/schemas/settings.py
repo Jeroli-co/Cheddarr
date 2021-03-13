@@ -2,7 +2,6 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from server.models.media import MediaType
 from server.models.settings import MediaProviderType
 from .core import APIModel
 
@@ -30,22 +29,20 @@ class PlexServer(ProviderSettingBase, PlexServerInfo):
 
 
 class PlexLibrarySection(APIModel):
-    id: int
+    library_id: int
     name: str
-    type: MediaType
-    enabled: bool = False
 
 
 class PlexSettingSchema(ProviderSettingBase, PlexServerInfo):
     id: str
     name: str
     enabled: bool = True
-    library_sections: List[PlexLibrarySection]
+    libraries: List[PlexLibrarySection]
 
 
 class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
     enabled: Optional[bool] = True
-    library_sections: Optional[List[PlexLibrarySection]] = []
+    libraries: Optional[List[PlexLibrarySection]] = []
 
 
 #####################################
@@ -68,12 +65,14 @@ class RadarrSettingData(APIModel):
 class RadarrSettingSchema(ProviderSettingBase, RadarrSettingData):
     id: str
     name: str
-    enabled: bool = True
+    enabled: bool
+    is_default: bool
     provider_type: MediaProviderType = Field(default=MediaProviderType.movie_provider, const=True)
 
 
 class RadarrSettingCreateUpdate(ProviderSettingBase, RadarrSettingData):
     enabled: Optional[bool] = True
+    is_default: Optional[bool] = False
 
 
 #####################################
@@ -100,9 +99,11 @@ class SonarrSettingData(APIModel):
 class SonarrSettingSchema(ProviderSettingBase, SonarrSettingData):
     id: str
     name: str
-    enabled: bool = True
+    enabled: bool
+    is_default: bool
     provider_type: MediaProviderType = Field(default=MediaProviderType.series_provider, const=True)
 
 
 class SonarrSettingCreateUpdate(ProviderSettingBase, SonarrSettingData):
     enabled: Optional[bool] = True
+    is_default: Optional[bool] = False

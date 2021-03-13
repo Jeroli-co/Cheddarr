@@ -9,7 +9,7 @@ from server.repositories.base import BaseRepository, paginate
 class MediaRepository(BaseRepository[Media]):
     def find_by_external_id(self, external_ids: List) -> Optional[Media]:
         return (
-            self.session.query(Media)
+            self.session.query(self.model)
             .filter(
                 or_(
                     Media.tmdb_id.in_(external_ids),
@@ -24,7 +24,7 @@ class MediaRepository(BaseRepository[Media]):
         self, media_type: MediaType, page: int = None, per_page: int = None
     ):
         query = (
-            self.session.query(Media)
+            self.session.query(self.model)
             .join(MediaServerMedia)
             .filter(Media.media_type == media_type)
             .order_by(desc(MediaServerMedia.added_at))
@@ -39,7 +39,7 @@ class SeasonRepository(BaseRepository[Season]):
         self, season_number: int, external_ids: List
     ) -> Optional[Season]:
         return (
-            self.session.query(Season)
+            self.session.query(self.model)
             .join(Season.media)
             .filter(
                 or_(
@@ -58,7 +58,7 @@ class EpisodeRepository(BaseRepository[Episode]):
         self, external_ids: List, season_number: int
     ) -> List[Episode]:
         return (
-            self.session.query(Episode)
+            self.session.query(self.model)
             .join(Season)
             .join(Media)
             .filter(
@@ -79,7 +79,7 @@ class EpisodeRepository(BaseRepository[Episode]):
         episode_number: int,
     ) -> Optional[Episode]:
         return (
-            self.session.query(Episode)
+            self.session.query(self.model)
             .join(Season)
             .join(Media)
             .filter(

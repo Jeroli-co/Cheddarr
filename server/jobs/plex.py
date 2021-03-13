@@ -27,7 +27,7 @@ from server.repositories.media import (
     MediaRepository,
     SeasonRepository,
 )
-from server.repositories.settings import MediaServerSettingRepository
+from server.repositories.settings import PlexSettingRepository
 from server.services import plex
 from server.services.tmdb import find_tmdb_id_from_external_id
 
@@ -39,23 +39,22 @@ TVDB_REGEX = "tvdb|thetvdb"
 @scheduler.scheduled_job("interval", id="plex-full-sync", name="Plex Full Library Sync", hours=5)
 def sync_plex_servers_library(server_id=None):
     db_session = next(get_db())
-    media_server_setting_repo = MediaServerSettingRepository(db_session)
+    plex_setting_repo = PlexSettingRepository(db_session)
 
     if server_id is not None:
-        plex_settings = media_server_setting_repo.find_all_by(server_id=server_id)
+        plex_settings = plex_setting_repo.find_all_by(server_id=server_id)
     else:
-        plex_settings = media_server_setting_repo.find_all_by(
+        plex_settings = plex_setting_repo.find_all_by(
             service_name=ExternalServiceName.plex
         )
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
         )
-        for section in setting.library_sections:
-            if section["enabled"]:
-                process_plex_media_list(
-                    server.library.section(section["name"]).all(), setting.server_id, db_session
-                )
+        for section in setting.libraries:
+            process_plex_media_list(
+                server.library.section(section.name).all(), setting.server_id, db_session
+            )
 
 
 @scheduler.scheduled_job(
@@ -63,25 +62,24 @@ def sync_plex_servers_library(server_id=None):
 )
 def sync_plex_servers_recently_added(server_id=None):
     db_session = next(get_db())
-    media_server_setting_repo = MediaServerSettingRepository(db_session)
+    plex_setting_repo = PlexSettingRepository(db_session)
 
     if server_id is not None:
-        plex_settings = media_server_setting_repo.find_all_by(server_id=server_id)
+        plex_settings = plex_setting_repo.find_all_by(server_id=server_id)
     else:
-        plex_settings = media_server_setting_repo.find_all_by(
+        plex_settings = plex_setting_repo.find_all_by(
             service_name=ExternalServiceName.plex
         )
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
         )
-        for section in setting.library_sections:
-            if section["enabled"]:
-                process_plex_media_list(
-                    server.library.section(section["name"]).recentlyAdded(),
-                    setting.server_id,
-                    db_session,
-                )
+        for section in setting.libraries:
+            process_plex_media_list(
+                server.library.section(section.name).recentlyAdded(),
+                setting.server_id,
+                db_session,
+            )
 
 
 def process_plex_media_list(plex_media_list: List[PlexVideo], server_id, db_session: Session):
@@ -133,6 +131,7 @@ def process_plex_media(
         media.server_media.append(
             MediaServerMedia(
                 server_id=server_id,
+                server_library_id=plex_media.section().key,
                 media=media,
                 server_media_id=plex_media.ratingKey,
                 added_at=plex_media.addedAt,
