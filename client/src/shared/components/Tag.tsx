@@ -10,10 +10,12 @@ import {
 } from "../models/IMedia";
 
 export const Tag = styled.div`
-  width: min-content;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 12px;
+  display: inline-block;
+  height: 25px;
+  padding: 0 0.5em;
+  border-radius: 6px;
+  text-align: center;
+  line-height: 25px;
   background: ${(props) => props.theme.grey};
   white-space: nowrap;
   margin: 10px;

@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import React, { useState } from "react";
-import { MediaTypes } from "../../../../shared/enums/MediaTypes";
+import { MediaTypes } from "../../enums/MediaTypes";
 import {
   compareRequestCreationDateAsc,
   compareRequestCreationDateDesc,
@@ -18,33 +18,24 @@ import {
   compareRequestUpdatedDateAsc,
   compareRequestUpdatedDateDesc,
   IMediaRequest,
-} from "../../../../shared/models/IMediaRequest";
-import { RequestStatus } from "../../../../shared/enums/RequestStatus";
-import {
-  DangerIconButton,
-  PrimaryButton,
-  SuccessButton,
-} from "../../../../shared/components/Button";
-import { Icon } from "../../../../shared/components/Icon";
+} from "../../models/IMediaRequest";
+import { RequestStatus } from "../../enums/RequestStatus";
+import { DangerIconButton, PrimaryButton, SuccessButton } from "../Button";
+import { Icon } from "../Icon";
 import {
   faArrowLeft,
   faArrowRight,
   faCheck,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
-import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
-import { useRequestsContext } from "../../../../shared/contexts/RequestsContext";
-import { RequestTypes } from "../../../../shared/enums/RequestTypes";
-import { Tooltiped } from "../../../../shared/components/Tooltiped";
-import {
-  DangerTag,
-  MediaTag,
-  SuccessTag,
-  WarningTag,
-} from "../../../../shared/components/Tag";
-import { useMedia } from "../../../../shared/hooks/useMedia";
+import { UserSmallCard } from "../UserSmallCard";
+import { useRequestsContext } from "../../contexts/RequestsContext";
+import { RequestTypes } from "../../enums/RequestTypes";
+import { Tooltiped } from "../Tooltiped";
+import { DangerTag, MediaTag, SuccessTag, WarningTag } from "../Tag";
+import { useMedia } from "../../hooks/useMedia";
 import { useHistory } from "react-router-dom";
-import { routes } from "../../../../router/routes";
+import { routes } from "../../../router/routes";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;
