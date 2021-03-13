@@ -1,7 +1,7 @@
 import React, { MouseEvent, useState } from "react";
 import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
-import { MediaTag, SuccessTag } from "../Tag";
+import { MediaTag, SuccessIconTag, SuccessTag } from "../Tag";
 import {
   IMedia,
   isEpisode,
@@ -10,7 +10,7 @@ import {
   isSeason,
   isSeries,
 } from "../../models/IMedia";
-import { PrimaryButton, PrimaryLinkButton } from "../Button";
+import { PlayButton, PrimaryButton } from "../Button";
 import { Icon } from "../Icon";
 import { faCheck, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { RequestMediaModal } from "../requests/RequestMediaModal";
@@ -18,6 +18,8 @@ import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesReques
 import { STATIC_STYLES } from "../../enums/StaticStyles";
 import { useHistory, useLocation } from "react-router-dom";
 import { routes } from "../../../router/routes";
+import { useImage } from "../../hooks/useImage";
+import { Image } from "../Image";
 
 const logo = require("../../../assets/cheddarr-min.svg");
 
@@ -40,7 +42,6 @@ export const MediaPreviewCardContainer = styled.div`
     display: block;
     width: 100%;
     height: 100%;
-    opacity: 1;
     border-radius: 12px;
   }
 `;
@@ -63,7 +64,6 @@ const Container = styled(MediaPreviewCardContainer)<{
     bottom: 0;
     left: 0;
     opacity: 0;
-    color: white;
     border: 3px solid ${(props) => props.theme.secondary};
     background: rgba(0, 0, 0, 0.8);
     border-radius: 12px;
@@ -110,6 +110,7 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
   const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
   const history = useHistory();
   const location = useLocation();
+  const poster = useImage(media.posterUrl);
 
   const onCardClick = () => {
     const getSeasonUrl = () => {
@@ -172,17 +173,18 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
   return (
     <>
       <Container hasPoster={!!media.posterUrl} onClick={() => onCardClick()}>
-        <img
+        <Image
           className="media-poster"
           src={media.posterUrl ? media.posterUrl : logo}
           alt=""
+          loaded={poster.loaded}
         />
         <HeadContainer>
           <MediaTag media={media} />
           {isOnServers(media) && (
-            <SuccessTag>
+            <SuccessIconTag>
               <Icon icon={faCheck} />
-            </SuccessTag>
+            </SuccessIconTag>
           )}
         </HeadContainer>
         <div className="media-hover-info">
@@ -205,15 +207,7 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
             media.mediaServerInfo &&
             media.mediaServerInfo.length > 0 &&
             media.mediaServerInfo[0].webUrl && (
-              <PrimaryLinkButton
-                href={media.mediaServerInfo[0].webUrl}
-                target="_blank"
-              >
-                <span className="left-icon">
-                  <Icon icon={faPlay} />
-                </span>
-                Play
-              </PrimaryLinkButton>
+              <PlayButton webUrl={media.mediaServerInfo[0].webUrl} />
             )}
         </div>
       </Container>

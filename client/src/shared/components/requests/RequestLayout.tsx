@@ -23,8 +23,10 @@ import { RequestStatus } from "../../enums/RequestStatus";
 import { DangerIconButton, PrimaryButton, SuccessButton } from "../Button";
 import { Icon } from "../Icon";
 import {
+  faArrowDown,
   faArrowLeft,
   faArrowRight,
+  faArrowUp,
   faCheck,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
@@ -36,6 +38,9 @@ import { DangerTag, MediaTag, SuccessTag, WarningTag } from "../Tag";
 import { useMedia } from "../../hooks/useMedia";
 import { useHistory } from "react-router-dom";
 import { routes } from "../../../router/routes";
+import { useImage } from "../../hooks/useImage";
+import { Image } from "../Image";
+import { Buttons } from "../layout/Buttons";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;
@@ -52,7 +57,6 @@ const RequestsHeaderContainer = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
   background: ${(props) => props.theme.primaryLight};
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
@@ -60,22 +64,40 @@ const RequestsHeaderContainer = styled.header`
   user-select: none;
 `;
 
-const RequestElement = styled.div<{
-  grow?: number;
-  clickable?: boolean;
-}>`
-  flex-basis: ${(props) => {
-    let p = ((props.grow ? props.grow : 1) / 7) * 100;
-    return p + "%";
-  }};
+const RequestElement = styled.div`
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 20px;
 
-  &:first-child {
-    display: flex;
+  &:nth-child(1) {
     justify-content: flex-start;
+    flex: 5 1 0;
   }
 
-  &:last-child {
-    display: flex;
+  &:nth-child(2) {
+    flex: 3 1 0;
+  }
+
+  &:nth-child(3) {
+    flex: 4 1 0;
+  }
+
+  &:nth-child(4) {
+    flex: 3 1 0;
+  }
+
+  &:nth-child(5) {
+    flex: 3 1 0;
+  }
+
+  &:nth-child(6) {
+    flex: 3 1 0;
+  }
+
+  &:nth-child(7) {
+    flex: 1 1 0;
     justify-content: flex-end;
   }
 `;
@@ -114,48 +136,21 @@ const nextFilterDir = (f: FilterDir | undefined) => {
   }
 };
 
-const RequestsHeaderElement = styled(RequestElement)<{ dir?: FilterDir }>`
-  font-weight: bold;
+const RequestsHeaderElement = styled(RequestElement)<{
+  cursor?: string;
+}>`
   white-space: nowrap;
-  ${(props) =>
-    props.clickable &&
-    css`
-      cursor: pointer;
-    `}
-
+  cursor: ${(props) => (props.cursor ? props.cursor : "default")};
   position: relative;
 
-  &:not(:last-child):before {
-    content: "";
-    position: absolute;
-    left: 90%;
-    top: 30%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 4px solid ${(props) => props.theme.primary};
-    filter: brightness(
-      ${(props) => (props.dir && props.dir === FilterDir.ASC ? "100%" : "200%")}
-    );
+  &:first-child {
+    justify-content: center;
   }
 
-  &:not(:last-child):after {
-    content: "";
+  .filters-direction-icon {
     position: absolute;
-    left: 90%;
-    top: 70%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid ${(props) => props.theme.primary};
-    filter: brightness(
-      ${(props) =>
-        props.dir && props.dir === FilterDir.DESC ? "100%" : "200%"}
-    );
+    right: 25%;
+    transform: translateX(25%);
   }
 `;
 
@@ -258,50 +253,81 @@ export const RequestHeader = ({ requestType }: RequestHeaderProps) => {
 
   return (
     <RequestsHeaderContainer>
-      <RequestsHeaderElement
-        grow={2}
-        clickable
-        onClick={() => onTitleClick()}
-        dir={filters.title}
-      >
-        TITLE
+      <RequestsHeaderElement cursor="pointer" onClick={() => onTitleClick()}>
+        <p>TITLE</p>
+        <span className="filters-direction-icon">
+          {filters.title && filters.title === FilterDir.ASC && (
+            <Icon icon={faArrowUp} size="xs" />
+          )}
+          {filters.title && filters.title === FilterDir.DESC && (
+            <Icon icon={faArrowDown} size="xs" />
+          )}
+        </span>
+      </RequestsHeaderElement>
+      <RequestsHeaderElement cursor="pointer" onClick={() => onTypeClick()}>
+        <p>TYPE</p>
+        <span className="filters-direction-icon">
+          {filters.mediaType && filters.mediaType === FilterDir.ASC && (
+            <Icon icon={faArrowUp} size="xs" />
+          )}
+          {filters.mediaType && filters.mediaType === FilterDir.DESC && (
+            <Icon icon={faArrowDown} size="xs" />
+          )}
+        </span>
+      </RequestsHeaderElement>
+      <RequestsHeaderElement cursor="pointer" onClick={() => onUserClick()}>
+        <p>
+          {requestType === RequestTypes.INCOMING
+            ? "REQUESTING USER"
+            : "REQUESTED USER"}
+        </p>
+        <span className="filters-direction-icon">
+          {filters.user && filters.user === FilterDir.ASC && (
+            <Icon icon={faArrowUp} size="xs" />
+          )}
+          {filters.user && filters.user === FilterDir.DESC && (
+            <Icon icon={faArrowDown} size="xs" />
+          )}
+        </span>
       </RequestsHeaderElement>
       <RequestsHeaderElement
-        clickable
-        onClick={() => onTypeClick()}
-        dir={filters.mediaType}
-      >
-        TYPE
-      </RequestsHeaderElement>
-      <RequestsHeaderElement
-        clickable
-        onClick={() => onUserClick()}
-        dir={filters.user}
-      >
-        {requestType === RequestTypes.INCOMING
-          ? "REQUESTING USER"
-          : "REQUESTED USER"}
-      </RequestsHeaderElement>
-      <RequestsHeaderElement
-        clickable
+        cursor="pointer"
         onClick={() => onCreatedAtClick()}
-        dir={filters.createdAt}
       >
-        CREATED AT
+        <p> CREATED AT</p>
+        <span className="filters-direction-icon">
+          {filters.createdAt && filters.createdAt === FilterDir.ASC && (
+            <Icon icon={faArrowUp} size="xs" />
+          )}
+          {filters.createdAt && filters.createdAt === FilterDir.DESC && (
+            <Icon icon={faArrowDown} size="xs" />
+          )}
+        </span>
       </RequestsHeaderElement>
       <RequestsHeaderElement
-        clickable
+        cursor="pointer"
         onClick={() => onUpdatedAtClick()}
-        dir={filters.updatedAt}
       >
-        UPDATED AT
+        <p>UPDATED AT</p>
+        <span className="filters-direction-icon">
+          {filters.updatedAt && filters.updatedAt === FilterDir.ASC && (
+            <Icon icon={faArrowUp} size="xs" />
+          )}
+          {filters.updatedAt && filters.updatedAt === FilterDir.DESC && (
+            <Icon icon={faArrowDown} size="xs" />
+          )}
+        </span>
       </RequestsHeaderElement>
-      <RequestsHeaderElement
-        clickable
-        onClick={() => onStatusClick()}
-        dir={filters.status}
-      >
-        STATUS
+      <RequestsHeaderElement cursor="pointer" onClick={() => onStatusClick()}>
+        <p>STATUS</p>
+        <span className="filters-direction-icon">
+          {filters.status && filters.status === FilterDir.ASC && (
+            <Icon icon={faArrowUp} size="xs" />
+          )}
+          {filters.status && filters.status === FilterDir.DESC && (
+            <Icon icon={faArrowDown} size="xs" />
+          )}
+        </span>
       </RequestsHeaderElement>
       <RequestsHeaderElement />
     </RequestsHeaderContainer>
@@ -341,10 +367,8 @@ const RequestTitleContainer = styled.div`
   cursor: pointer;
 `;
 
-const RequestMediaPoster = styled.img`
+const RequestMediaPoster = styled(Image)`
   margin-right: 10px;
-  width: 60px;
-  height: 90px;
   border-radius: 6px;
 `;
 
@@ -366,6 +390,7 @@ const RequestImageAndTitle = ({
   posterUrl,
 }: RequestImageAndTitleProps) => {
   const history = useHistory();
+  const poster = useImage(posterUrl);
   return (
     <RequestTitleContainer
       onClick={() =>
@@ -376,26 +401,24 @@ const RequestImageAndTitle = ({
         )
       }
     >
-      {posterUrl && <RequestMediaPoster src={posterUrl} alt="User" />}
+      <RequestMediaPoster
+        src={posterUrl}
+        alt=""
+        loaded={poster.loaded}
+        width="60px"
+        height="90px"
+        cursor="pointer"
+      />
       <RequestMediaTitle>{title}</RequestMediaTitle>
     </RequestTitleContainer>
   );
 };
-
-/* ACTIONS */
-const Actions = styled.div`
-  display: flex;
-  > *:not(:last-child) {
-    margin-right: 5px;
-  }
-`;
 
 /* LAYOUT */
 const RequestContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
   min-width: 1500px;
   border: 1px solid ${(props) => props.theme.primaryLight};
 `;
@@ -412,7 +435,7 @@ export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
 
   return (
     <RequestContainer>
-      <RequestElement grow={2}>
+      <RequestElement>
         <RequestImageAndTitle
           id={request.media.tmdbId}
           type={request.media.mediaType}
@@ -452,14 +475,14 @@ export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
       <RequestElement>
         {requestType === RequestTypes.INCOMING &&
           request.status === RequestStatus.PENDING && (
-            <Actions>
+            <Buttons>
               <SuccessButton onClick={() => acceptRequest(request)}>
                 <Icon icon={faCheck} />
               </SuccessButton>
               <DangerIconButton onClick={() => refuseRequest(request)}>
                 <Icon icon={faTimes} />
               </DangerIconButton>
-            </Actions>
+            </Buttons>
           )}
         {request.status !== RequestStatus.PENDING && (
           <Tooltiped text="Delete request">

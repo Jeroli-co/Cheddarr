@@ -17,6 +17,7 @@ import { NotificationsServicesSettings } from "../logged-in-app/pages/settings/n
 import { Search } from "../logged-in-app/pages/Search";
 import { Movie } from "../shared/components/media/Movie";
 import { Series } from "../shared/components/media/Series";
+import { JobsSettings } from "../logged-in-app/pages/settings/jobs/JobsSettings";
 
 const routes = {
   HOME: {
@@ -61,6 +62,10 @@ const routes = {
   SETTINGS_NOTIFICATIONS: {
     url: "/settings/notifications",
     component: NotificationsServicesSettings,
+  },
+  SETTINGS_JOBS: {
+    url: "/settings/jobs",
+    component: JobsSettings,
   },
 
   /** MEDIA **/

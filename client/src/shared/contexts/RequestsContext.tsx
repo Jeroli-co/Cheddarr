@@ -97,8 +97,8 @@ export const RequestsContextProvider = (props: any) => {
   useEffect(() => {
     if (moviesRequestsReceived.data && seriesRequestsReceived.data) {
       let data = [
-        ...moviesRequestsReceived.data,
-        ...seriesRequestsReceived.data,
+        ...moviesRequestsReceived.data?.results,
+        ...seriesRequestsReceived.data?.results,
       ];
       data = data.sort(compareRequestDefault);
       setRequestsReceived({
@@ -115,7 +115,10 @@ export const RequestsContextProvider = (props: any) => {
 
   useEffect(() => {
     if (moviesRequestsSent.data && seriesRequestsSent.data) {
-      let data = [...moviesRequestsSent.data, ...seriesRequestsSent.data];
+      let data = [
+        ...moviesRequestsSent.data?.results,
+        ...seriesRequestsSent.data?.results,
+      ];
       data = data.sort(compareRequestDefault);
       setRequestsSent({
         data: data,

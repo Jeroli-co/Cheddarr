@@ -2,8 +2,9 @@ import styled from "styled-components";
 
 export const Buttons = styled.div`
   display: flex;
+  align-items: center;
   padding: 10px;
   > *:not(:last-child) {
-    margin-right: 5px;
+    margin-right: 10px;
   }
 `;

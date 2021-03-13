@@ -89,4 +89,9 @@ export const APIRoutes = {
   GET_EMAIL_SETTINGS: "/notifications/agents/email",
   PUT_EMAIL_SETTINGS: "/notifications/agents/email",
   DELETE_EMAIL_SETTINGS: "/notifications/agents/email",
+
+  // SYSTEM
+  GET_LOGS: "/system/logs",
+  GET_JOBS: "/system/jobs",
+  PATCH_JOB: (id: string) => "/system/jobs/" + id,
 };

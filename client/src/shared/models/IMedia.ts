@@ -88,11 +88,17 @@ export const isSeries = (arg: any): arg is ISeries => {
 };
 
 export const isSeason = (arg: any): arg is ISeason => {
-  return arg && arg.seasonNumber && typeof arg.seasonNumber == "number";
+  return (
+    arg && arg.seasonNumber !== undefined && typeof arg.seasonNumber == "number"
+  );
 };
 
 export const isEpisode = (arg: any): arg is IEpisode => {
-  return arg && arg.episodeNumber && typeof arg.episodeNumber == "number";
+  return (
+    arg &&
+    arg.episodeNumber !== undefined &&
+    typeof arg.episodeNumber == "number"
+  );
 };
 
 export const isPerson = (arg: any): arg is IPerson => {

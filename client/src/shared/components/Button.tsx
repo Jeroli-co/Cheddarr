@@ -1,5 +1,8 @@
 import styled, { css } from "styled-components";
 import { ComponentSizes } from "../enums/ComponentSizes";
+import React from "react";
+import { Icon } from "./Icon";
+import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 type ButtonStyleProps = {
   fontSize?: ComponentSizes;
@@ -144,6 +147,9 @@ export const RoundedButton = styled(Button)`
 
 export const PrimaryLinkButton = styled(LinkButton)`
   background: ${(props) => props.theme.primaryLighter};
+  &:hover {
+    color: ${(props) => props.theme.primaryLight};
+  }
 `;
 
 export const PrimaryButton = styled(Button)`
@@ -198,3 +204,18 @@ export const DangerIconButton = styled(IconButton)`
 export const SuccessIconButton = styled(IconButton)`
   background-color: ${(props) => props.theme.success};
 `;
+
+type PlayButtonProps = {
+  webUrl: string;
+};
+
+export const PlayButton = (props: PlayButtonProps) => {
+  return (
+    <PrimaryLinkButton href={props.webUrl} target="_blank">
+      <span className="left-icon">
+        <Icon icon={faPlay} />
+      </span>
+      Play
+    </PrimaryLinkButton>
+  );
+};

@@ -3,6 +3,7 @@ import styled, { css } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import smoothscroll from "smoothscroll-polyfill";
+import { Simulate } from "react-dom/test-utils";
 
 const CarouselStyle = styled.div`
   position: relative;
@@ -73,7 +74,13 @@ const PaginationButton = styled.button<PaginationButtonProps>`
   }
 `;
 
-const Carousel = ({ children }: any) => {
+type CarouselProps = {
+  children: any;
+  loadPrev?: () => boolean;
+  loadNext?: () => boolean;
+};
+
+const Carousel = (props: CarouselProps) => {
   smoothscroll.polyfill();
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -84,31 +91,42 @@ const Carousel = ({ children }: any) => {
       setIsButtonNeeded(scrollRef.current.scrollWidth > window.innerWidth);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [props.children]);
 
   const _onSlideLeft = () => {
-    const left =
-      scrollRef.current!.scrollLeft > 0
-        ? -((window.innerWidth + window.innerHeight) * 30) / 100
-        : scrollRef.current!.scrollWidth;
+    let scrollLeft;
+    if (scrollRef.current!.scrollLeft > 0) {
+      scrollLeft = -((window.innerWidth + window.innerHeight) * 30) / 100;
+    } else {
+      scrollLeft = props.loadPrev ? 0 : scrollRef.current!.scrollWidth;
+    }
 
     scrollRef.current!.scrollBy({
       top: 0,
-      left: left,
+      left: scrollLeft,
       behavior: "smooth",
     });
   };
 
   const _onSlideRight = () => {
-    const left =
+    let scrollLeft;
+    if (
       scrollRef.current!.scrollLeft + window.innerWidth <
       scrollRef.current!.scrollWidth
-        ? ((window.innerWidth + window.innerHeight) * 30) / 100
-        : -scrollRef.current!.scrollWidth;
+    ) {
+      scrollLeft = ((window.innerWidth + window.innerHeight) * 30) / 100;
+    } else {
+      if (props.loadNext) {
+        scrollLeft = 0;
+        props.loadNext();
+      } else {
+        scrollLeft = -scrollRef.current!.scrollWidth;
+      }
+    }
 
     scrollRef.current!.scrollBy({
       top: 0,
-      left: left,
+      left: scrollLeft,
       behavior: "smooth",
     });
   };
@@ -131,8 +149,7 @@ const Carousel = ({ children }: any) => {
       >
         <FontAwesomeIcon icon={faAngleRight} size="4x" />
       </PaginationButton>
-
-      <CarouselItems ref={scrollRef}>{children}</CarouselItems>
+      <CarouselItems ref={scrollRef}>{props.children}</CarouselItems>
     </CarouselStyle>
   );
 };

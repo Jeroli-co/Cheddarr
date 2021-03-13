@@ -13,6 +13,7 @@ const Settings = () => {
         { label: "Media servers", uri: "media-servers" },
         { label: "Media providers", uri: "media-providers" },
         { label: "Notifications", uri: "notifications" },
+        { label: "Jobs", uri: "jobs" },
       ]}
       url={routes.SETTINGS.url}
     >
@@ -29,6 +30,11 @@ const Settings = () => {
                 exact
                 path={routes.SETTINGS_NOTIFICATIONS.url}
                 component={routes.SETTINGS_NOTIFICATIONS.component}
+              />
+              <Route
+                exact
+                path={routes.SETTINGS_JOBS.url}
+                component={routes.SETTINGS_JOBS.component}
               />
               <Route
                 path={[routes.SETTINGS.url, routes.SETTINGS_MEDIA_SERVERS.url]}

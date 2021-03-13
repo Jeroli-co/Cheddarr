@@ -21,11 +21,27 @@ export const Tag = styled.div`
   margin: 10px;
 `;
 
+export const IconTag = styled(Tag)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 8px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+`;
+
 export const WarningTag = styled(Tag)`
   background: ${(props) => props.theme.warning};
 `;
 
 export const SuccessTag = styled(Tag)`
+  background: ${(props) => props.theme.success};
+`;
+
+export const SuccessIconTag = styled(IconTag)`
   background: ${(props) => props.theme.success};
 `;
 

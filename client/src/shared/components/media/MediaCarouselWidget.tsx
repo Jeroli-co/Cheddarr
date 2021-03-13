@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { useAPI } from "../../hooks/useAPI";
-import { DefaultAsyncCall, IAsyncCall } from "../../models/IAsyncCall";
 import { SwitchErrors } from "../errors/SwitchErrors";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { Icon } from "../Icon";
 import { H2 } from "../Titles";
 import { IMedia } from "../../models/IMedia";
-import { IPaginated } from "../../models/IPaginated";
-import { MediaCardsLoader } from "./MediaCardsLoader";
 import { Carousel } from "../layout/Carousel";
 import { MediaPreviewCard } from "./MediaPreviewCard";
+import { usePagination } from "../../hooks/usePagination";
+import { MediaCardsLoader } from "./MediaCardsLoader";
 
 const Container = styled(H2)`
   display: flex;
@@ -22,43 +20,36 @@ const Container = styled(H2)`
   user-select: none;
 `;
 
-type MediaCarouselProps = {
-  mediaList: IMedia[];
-};
-
-const MediaCarousel = (props: MediaCarouselProps) => {
-  return (
-    <Carousel>
-      {props.mediaList &&
-        props.mediaList.map(
-          (m, index) =>
-            m.posterUrl && <MediaPreviewCard key={index} media={m} />
-        )}
-    </Carousel>
-  );
-};
-
 type MediaCarouselWidgetProps = {
   title: string;
   url: string;
 };
 
 export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
-  const [media, setMedia] = useState<IAsyncCall<IPaginated<IMedia> | null>>(
-    DefaultAsyncCall
-  );
-  const { get } = useAPI();
+  const [media, setMedia] = useState<IMedia[]>([]);
   const [hidden, setHidden] = useState(false);
+  const { data, loadNext, loadPrev } = usePagination(props.url);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    get<IPaginated<IMedia>>(props.url).then((res) => {
-      setMedia(res);
-    });
+    if (data.data && data.data?.results) {
+      setMedia([...media, ...data.data?.results]);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data.data]);
 
-  if (media.status >= 400) {
-    return <SwitchErrors status={media.status} />;
+  useEffect(() => {
+    if (loaderRef.current && media.length > 0) {
+      loaderRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    }
+  }, [data.isLoading]);
+
+  if (data.status >= 400) {
+    return <SwitchErrors status={data.status} />;
   }
 
   return (
@@ -70,9 +61,15 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
       </Container>
 
       <br />
-      {media.isLoading && !hidden && <MediaCardsLoader />}
-      {!media.isLoading && media.data && !hidden && (
-        <MediaCarousel mediaList={media.data.results} />
+      {!hidden && (
+        <Carousel loadNext={loadNext}>
+          {media.map((m, index) => (
+            <MediaPreviewCard key={index} media={m} />
+          ))}
+          {data.isLoading && (
+            <MediaCardsLoader n={6} refIndex={3} ref={loaderRef} />
+          )}
+        </Carousel>
       )}
     </div>
   );

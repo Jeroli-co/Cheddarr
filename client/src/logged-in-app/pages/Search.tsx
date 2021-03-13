@@ -8,11 +8,7 @@ import { useSearchMedia } from "../../shared/hooks/useSearchMedia";
 import { IMedia } from "../../shared/models/IMedia";
 import { IAsyncCall } from "../../shared/models/IAsyncCall";
 import { IPaginated } from "../../shared/models/IPaginated";
-import {
-  MediaCardsLoader,
-  MediaLoadingCard,
-} from "../../shared/components/media/MediaCardsLoader";
-import { Row } from "../../shared/components/layout/Row";
+import { MediaCardsLoader } from "../../shared/components/media/MediaCardsLoader";
 
 const Container = styled.div`
   display: flex;
@@ -98,16 +94,7 @@ export const Search = () => {
       {media.map((m, index) => (
         <MediaPreviewCard key={index} media={m} />
       ))}
-      {mediaPage.isLoading && (
-        <>
-          <MediaLoadingCard />
-          <MediaLoadingCard />
-          <MediaLoadingCard />
-          <MediaLoadingCard />
-          <MediaLoadingCard />
-          <MediaLoadingCard />
-        </>
-      )}
+      {mediaPage.isLoading && <MediaCardsLoader n={20} />}
     </Container>
   );
 };

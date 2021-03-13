@@ -6,15 +6,16 @@ import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { RequestStatus } from "../enums/RequestStatus";
 import { useAPI } from "./useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
+import { IPaginated } from "../models/IPaginated";
 
 const useRequests = (mediasType: MediaTypes, requestsType: RequestTypes) => {
-  const [requests, setRequests] = useState<IAsyncCall<IMediaRequest[] | null>>(
-    DefaultAsyncCall
-  );
+  const [requests, setRequests] = useState<
+    IAsyncCall<IPaginated<IMediaRequest> | null>
+  >(DefaultAsyncCall);
   const { get } = useAPI();
 
   useEffect(() => {
-    get<IMediaRequest[]>(
+    get<IPaginated<IMediaRequest>>(
       APIRoutes.GET_REQUESTS(mediasType, requestsType)
     ).then((res) => setRequests(res));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -23,7 +24,7 @@ const useRequests = (mediasType: MediaTypes, requestsType: RequestTypes) => {
   const updateRequest = (requestId: number, requestStatus: RequestStatus) => {
     if (requests.data && requestsType === RequestTypes.INCOMING) {
       let data = requests.data;
-      data.forEach((r) => {
+      data?.results.forEach((r) => {
         if (r.id === requestId) {
           r.status = requestStatus;
         }
@@ -34,9 +35,12 @@ const useRequests = (mediasType: MediaTypes, requestsType: RequestTypes) => {
 
   const deleteRequest = (requestId: number) => {
     if (requests.data) {
-      let data = requests.data;
+      let data = requests.data?.results;
       data = data.filter((r) => r.id !== requestId);
-      setRequests({ ...requests, data: data });
+      setRequests({
+        ...requests,
+        data: { ...requests.data, results: [...data] },
+      });
     }
   };
 

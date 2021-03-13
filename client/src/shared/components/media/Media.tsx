@@ -4,9 +4,9 @@ import { IMedia, isMovie, isSeries } from "../../models/IMedia";
 import { H1, H2 } from "../Titles";
 import { minToHoursMinutes } from "../../../utils/media-utils";
 import { MediaRating } from "./MediaRating";
-import { MediaTag, Tag } from "../Tag";
+import { MediaTag, SuccessTag, Tag } from "../Tag";
 import { MediaPersonCarousel } from "./MediaPersonCarousel";
-import { PrimaryButton, PrimaryLinkButton } from "../Button";
+import { PlayButton, PrimaryButton, PrimaryLinkButton } from "../Button";
 import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
 import { RequestMediaModal } from "../requests/RequestMediaModal";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
@@ -17,6 +17,8 @@ import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import { Buttons } from "../layout/Buttons";
 import { MediaCarouselWidget } from "./MediaCarouselWidget";
 import { APIRoutes } from "../../enums/APIRoutes";
+import { useImage } from "../../hooks/useImage";
+import { Image } from "../Image";
 
 const BackgroundContainer = styled.div`
   position: relative;
@@ -26,13 +28,12 @@ const BackgroundContainer = styled.div`
 const Background = styled.div<{ image: string }>`
   position: absolute;
   top: 0;
-  left: 0;
   bottom: 0;
-  right: 0;
+  width: 100%;
   background-image: linear-gradient(
           to bottom,
           rgba(0, 0, 0, 0),
-          ${(props) => props.theme.black}
+          ${(props) => props.theme.primary}
         ),
         url('${(props) => props.image}');
   background-repeat: no-repeat;
@@ -44,35 +45,34 @@ const Background = styled.div<{ image: string }>`
 
 const MediaHeader = styled.div`
   display: flex;
-  width: 100%;
   padding: 20px;
   margin-bottom: 20px;
 
-  .media-poster {
-    width: 15%;
-    border-radius: 12px;
+  span:first-child {
+    flex: 1 1 0;
+    @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
+      width: 75%;
+    }
   }
 
-  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    .media-poster {
-      width: 25%;
-    }
+  span:nth-child(2) {
+    flex: 4 1 0;
   }
 
   @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
     flex-direction: column;
     align-items: center;
-    .media-poster {
-      width: 80%;
-    }
   }
 `;
 
 const MediaHeaderInfo = styled.div`
-  width: 100%;
+  flex-grow: 3;
   padding: 5px 20px;
-  display: flex;
-  flex-direction: column;
+
+  @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
+    justify-content: center;
+    text-align: center;
+  }
 `;
 
 const MediaHeaderTags = styled.div`
@@ -85,8 +85,9 @@ const MediaHeaderTags = styled.div`
 `;
 
 const MediaHeaderSubInfo = styled.div`
-  width: 100%;
   display: flex;
+  align-items: center;
+  white-space: nowrap;
 
   .pipe-separator {
     margin: 0 20px;
@@ -99,16 +100,6 @@ const MediaHeaderSubInfo = styled.div`
     .pipe-separator {
       display: none;
     }
-  }
-`;
-
-const MediaHeaderActions = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
-    width: 100%;
-    margin-top: 20px;
   }
 `;
 
@@ -151,6 +142,7 @@ export const Media = (props: MediaProps) => {
   const [producers, setProducers] = useState<string[] | null>(null);
   const [screenplay, setScreenplay] = useState<string[] | null>(null);
   const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
+  const poster = useImage(props.media.posterUrl);
 
   useEffect(() => {
     const directorsTmp: string[] = [];
@@ -180,95 +172,106 @@ export const Media = (props: MediaProps) => {
       <BackgroundContainer>
         {props.media.artUrl && <Background image={props.media.artUrl} />}
         <MediaHeader>
-          {props.media.posterUrl && (
-            <img
-              className="media-poster"
+          <span>
+            <Image
               src={props.media.posterUrl}
+              loaded={poster.loaded}
               alt="poster"
+              borderRadius="12px"
             />
-          )}
-          <MediaHeaderInfo>
-            <MediaHeaderTags>
-              <MediaTag media={props.media} />
-              {props.media.status && <Tag>{props.media.status}</Tag>}
-              {props.media.mediaServerInfo && <Tag>Available</Tag>}
-            </MediaHeaderTags>
-            <br />
-            <MediaHeaderTitle>
-              {props.media.title + " "}
-              {props.media.releaseDate && (
-                <span className="media-title-release-date">
-                  ({props.media.releaseDate})
-                </span>
-              )}
-            </MediaHeaderTitle>
-            <MediaHeaderSubInfo>
-              {props.media.releaseDate && (
-                <>
-                  <p>{props.media.releaseDate}</p>
-                  {(props.media.duration || props.media.genres) && (
-                    <p className="pipe-separator">|</p>
+          </span>
+          <span>
+            <MediaHeaderInfo>
+              <MediaHeaderTags>
+                <MediaTag media={props.media} />
+                {props.media.status && <Tag>{props.media.status}</Tag>}
+                {props.media.mediaServerInfo && (
+                  <SuccessTag>Available</SuccessTag>
+                )}
+              </MediaHeaderTags>
+              <br />
+              <MediaHeaderTitle>
+                {props.media.title + " "}
+                {props.media.releaseDate && (
+                  <span className="media-title-release-date">
+                    ({props.media.releaseDate})
+                  </span>
+                )}
+              </MediaHeaderTitle>
+              <MediaHeaderSubInfo>
+                {props.media.releaseDate && (
+                  <>
+                    <p>{props.media.releaseDate}</p>
+                    {(props.media.duration || props.media.genres) && (
+                      <p className="pipe-separator">|</p>
+                    )}
+                  </>
+                )}
+                {props.media.duration && (
+                  <>
+                    <p>{minToHoursMinutes(props.media.duration)}</p>
+                    {props.media.genres && <p className="pipe-separator">|</p>}
+                  </>
+                )}
+                <p>
+                  {props.media.genres &&
+                    props.media.genres.map((genre, index) => (
+                      <span key={index}>
+                        {genre}
+                        {props.media.genres &&
+                        index !== props.media.genres.length
+                          ? ", "
+                          : ""}
+                      </span>
+                    ))}
+                </p>
+              </MediaHeaderSubInfo>
+              <br />
+              <Row alignItems="center" wrap="nowrap">
+                <Row alignItems="center" wrap="nowrap">
+                  <MediaRating media={props.media} />
+                  {props.media.trailers && props.media.trailers.length > 0 && (
+                    <Buttons>
+                      <PrimaryLinkButton
+                        href={props.media.trailers[0].videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <span className="left-icon">
+                          <Icon icon={faFilm} />
+                        </span>
+                        Watch trailer
+                      </PrimaryLinkButton>
+                    </Buttons>
                   )}
-                </>
-              )}
-              {props.media.duration && (
-                <>
-                  <p>{minToHoursMinutes(props.media.duration)}</p>
-                  {props.media.genres && <p className="pipe-separator">|</p>}
-                </>
-              )}
-              <p>
-                {props.media.genres &&
-                  props.media.genres.map((genre, index) => (
-                    <span key={index}>
-                      {genre}
-                      {props.media.genres && index !== props.media.genres.length
-                        ? ", "
-                        : ""}
-                    </span>
-                  ))}
-              </p>
-            </MediaHeaderSubInfo>
-            <br />
-            <Row alignItems="center">
-              <MediaRating media={props.media} />
-              {props.media.trailers && props.media.trailers.length > 0 && (
-                <Buttons>
-                  <PrimaryLinkButton
-                    href={props.media.trailers[0].videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span className="left-icon">
-                      <Icon icon={faFilm} />
-                    </span>
-                    Watch trailer
-                  </PrimaryLinkButton>
-                </Buttons>
-              )}
-            </Row>
-          </MediaHeaderInfo>
-          <MediaHeaderActions>
-            {props.media.mediaServerInfo &&
-              props.media.mediaServerInfo.length > 0 &&
-              props.media.mediaServerInfo[0].webUrl && (
-                <PrimaryLinkButton
-                  href={props.media.mediaServerInfo[0].webUrl}
-                  target="_blank"
+                </Row>
+                <Row
+                  justifyContent="flex-end"
+                  alignItems="center"
+                  wrap="nowrap"
                 >
-                  Play
-                </PrimaryLinkButton>
-              )}
-            {(!props.media.mediaServerInfo || isSeries(props.media)) && (
-              <PrimaryButton
-                type="button"
-                width="100%"
-                onClick={() => setIsRequestMediaModalOpen(true)}
-              >
-                Request
-              </PrimaryButton>
-            )}
-          </MediaHeaderActions>
+                  <Buttons>
+                    {(!props.media.mediaServerInfo ||
+                      isSeries(props.media)) && (
+                      <PrimaryButton
+                        type="button"
+                        onClick={() => setIsRequestMediaModalOpen(true)}
+                      >
+                        Request
+                      </PrimaryButton>
+                    )}
+                    {props.media.mediaServerInfo &&
+                      props.media.mediaServerInfo.length > 0 &&
+                      props.media.mediaServerInfo[0].webUrl && (
+                        <PlayButton
+                          webUrl={props.media.mediaServerInfo[0].webUrl}
+                        />
+                      )}
+                  </Buttons>
+                </Row>
+              </Row>
+            </MediaHeaderInfo>
+          </span>
         </MediaHeader>
         {props.media.summary && (
           <>

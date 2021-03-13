@@ -15,4 +15,12 @@ export const GlobalStyle = createGlobalStyle`
     transition: background .5s ease;
     overflow-x: hidden;
   }
+  
+  a {
+    color: ${(props) => props.theme.color};
+    &:hover{
+      color: ${(props) => props.theme.grey};
+    }
+    text-decoration: none;
+  }
 `;
