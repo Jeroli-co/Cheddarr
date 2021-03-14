@@ -35,7 +35,7 @@ from server.services.core import unify_series_request
 router = APIRouter()
 
 
-@router.get("/requests/incoming", response_model=MediaRequestSearchResult)
+@router.get("/incoming", response_model=MediaRequestSearchResult)
 def get_received_requests(
     page: int = 1,
     per_page: int = 20,
@@ -55,7 +55,7 @@ def get_received_requests(
     )
 
 
-@router.get("/requests/outgoing", response_model=MediaRequestSearchResult)
+@router.get("/outgoing", response_model=MediaRequestSearchResult)
 def get_sent_requests(
     page: int = 1,
     per_page: int = 20,
