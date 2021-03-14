@@ -169,7 +169,7 @@ def update_movie_request(
     if update.status == RequestStatus.approved:
         if update.provider_id is not None:
             selected_provider = media_provider_repo.find_by(
-                provider_type=MediaProviderType.series_provider, id=update.provider_id
+                provider_type=MediaProviderType.movie_provider, id=update.provider_id
             )
             if selected_provider is None:
                 raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
@@ -180,10 +180,7 @@ def update_movie_request(
                 status.HTTP_400_BAD_REQUEST,
                 "provider_id must be set or a provider must be set to default to accept a request.",
             )
-
         request.status = RequestStatus.approved
-        if isinstance(request.selected_provider, RadarrSetting):
-            scheduler.add_job(send_radarr_request_task, args=[request.id])
 
     elif update.status == RequestStatus.refused:
         request.status = RequestStatus.refused
@@ -192,6 +189,10 @@ def update_movie_request(
     for r in current_movie_requests:
         r.status = request.status
         media_request_repo.save(r)
+
+    if request.status == RequestStatus.approved:
+        if isinstance(request.selected_provider, RadarrSetting):
+            scheduler.add_job(send_radarr_request_task, args=[request.id])
 
     return request
 
@@ -397,13 +398,16 @@ def update_series_request(
             season.status = RequestStatus.approved
             for episode in season.episodes:
                 episode.status = RequestStatus.approved
-        if isinstance(request.selected_provider, SonarrSetting):
-            scheduler.add_job(send_sonarr_request_task, args=[request.id])
 
     elif update.status == RequestStatus.refused:
         request.status = RequestStatus.refused
 
     media_request_repo.save(request)
+
+    if request.status == RequestStatus.approved:
+        if isinstance(request.selected_provider, SonarrSetting):
+            scheduler.add_job(send_sonarr_request_task, args=[request.id])
+
     return request
 
 
