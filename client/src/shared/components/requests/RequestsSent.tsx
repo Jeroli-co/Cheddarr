@@ -25,7 +25,8 @@ const RequestsSent = () => {
       )}
       {!requestsSent.isLoading &&
         requestsSent.data &&
-        requestsSent.data.map((request, index) => (
+        requestsSent.data.results &&
+        requestsSent.data.results.map((request, index) => (
           <RequestLayout
             key={index}
             request={request}

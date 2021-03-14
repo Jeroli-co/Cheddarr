@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from pydantic import parse_obj_as
 
@@ -15,7 +15,7 @@ from server.schemas.media import (
     MediaSchema,
     SeasonSchema,
 )
-from server.schemas.requests import MovieRequestSchema, SeriesRequestCreate
+from server.schemas.requests import MovieRequestSchema, SeriesRequestCreate, SeriesRequestSchema
 
 
 def unify_series_request(series_request: SeriesRequest, request_in: SeriesRequestCreate):
@@ -63,7 +63,7 @@ def set_media_db_info(
 
     if request_repo is not None:
         media.requests = parse_obj_as(
-            List[MovieRequestSchema],
+            List[Union[SeriesRequestSchema, MovieRequestSchema]],
             request_repo.find_all_by_user_ids_and_tmdb_id(
                 requesting_user_id=current_user_id, tmdb_id=media.tmdb_id
             ),

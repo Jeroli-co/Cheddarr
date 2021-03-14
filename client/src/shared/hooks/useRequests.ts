@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { MediaTypes } from "../enums/MediaTypes";
 import { RequestTypes } from "../enums/RequestTypes";
 import { IMediaRequest } from "../models/IMediaRequest";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
@@ -8,7 +7,7 @@ import { useAPI } from "./useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
 import { IPaginated } from "../models/IPaginated";
 
-const useRequests = (mediasType: MediaTypes, requestsType: RequestTypes) => {
+const useRequests = (requestsType: RequestTypes) => {
   const [requests, setRequests] = useState<
     IAsyncCall<IPaginated<IMediaRequest> | null>
   >(DefaultAsyncCall);
@@ -16,7 +15,7 @@ const useRequests = (mediasType: MediaTypes, requestsType: RequestTypes) => {
 
   useEffect(() => {
     get<IPaginated<IMediaRequest>>(
-      APIRoutes.GET_REQUESTS(mediasType, requestsType)
+      APIRoutes.GET_REQUESTS(requestsType)
     ).then((res) => setRequests(res));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -44,10 +43,25 @@ const useRequests = (mediasType: MediaTypes, requestsType: RequestTypes) => {
     }
   };
 
+  const sortRequests = (
+    compare: (first: IMediaRequest, second: IMediaRequest) => number
+  ) => {
+    if (requests.data) {
+      setRequests({
+        ...requests,
+        data: {
+          ...requests.data,
+          results: requests.data?.results.sort(compare),
+        },
+      });
+    }
+  };
+
   return {
     requests,
     updateRequest,
     deleteRequest,
+    sortRequests,
   };
 };
 

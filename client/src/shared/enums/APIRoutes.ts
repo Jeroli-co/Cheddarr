@@ -82,8 +82,7 @@ export const APIRoutes = {
   UPDATE_REQUEST_MOVIE: (id: number) => "/requests/movies/" + id,
   UPDATE_REQUEST_SERIES: (id: number) => "/requests/series/" + id,
   // TODO REMOVE MediaTypes & RequestTypes DEPENDENCIES
-  GET_REQUESTS: (mediaType: MediaTypes, requestType: RequestTypes) =>
-    "/requests/" + mediaType + "/" + requestType,
+  GET_REQUESTS: (requestType: RequestTypes) => "/requests/" + requestType,
 
   // NOTIFICATIONS
   GET_EMAIL_SETTINGS: "/notifications/agents/email",

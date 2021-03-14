@@ -25,32 +25,43 @@ export const RequestSeriesCard = (props: RequestSeriesCardProps) => {
       {friendsSeriesProviders.isLoading && (
         <Spinner size={ComponentSizes.LARGE} />
       )}
-      {!friendsSeriesProviders.isLoading && friendsSeriesProviders.data && (
-        <FriendsProvidersDropdown users={friendsSeriesProviders.data} />
-      )}
-      <InputField isInline>
-        <label>Request : </label>
-        <select
-          onChange={(e) =>
-            setSeriesRequestScopeOptions(e.target.value as RequestSeriesOptions)
-          }
-        >
-          <option value={RequestSeriesOptions.ALL}>
-            {RequestSeriesOptions.ALL}
-          </option>
-          <option value={RequestSeriesOptions.SELECT}>
-            {RequestSeriesOptions.SELECT}
-          </option>
-        </select>
-      </InputField>
-      {seriesRequestScopeOptions === RequestSeriesOptions.SELECT && (
-        <div>
-          <PrimaryLightDivider />
-          <SeriesRequestOptionsPreview />
-          <PrimaryLightDivider />
-          <SeriesRequestSeasonsList series={props.series} />
-        </div>
-      )}
+      {!friendsSeriesProviders.isLoading &&
+        friendsSeriesProviders.data &&
+        friendsSeriesProviders.data?.length === 0 && (
+          <p>You have no friend to request</p>
+        )}
+      {!friendsSeriesProviders.isLoading &&
+        friendsSeriesProviders.data &&
+        friendsSeriesProviders.data?.length > 0 && (
+          <>
+            <FriendsProvidersDropdown users={friendsSeriesProviders.data} />
+            <InputField isInline>
+              <label>Request : </label>
+              <select
+                onChange={(e) =>
+                  setSeriesRequestScopeOptions(
+                    e.target.value as RequestSeriesOptions
+                  )
+                }
+              >
+                <option value={RequestSeriesOptions.ALL}>
+                  {RequestSeriesOptions.ALL}
+                </option>
+                <option value={RequestSeriesOptions.SELECT}>
+                  {RequestSeriesOptions.SELECT}
+                </option>
+              </select>
+            </InputField>
+            {seriesRequestScopeOptions === RequestSeriesOptions.SELECT && (
+              <div>
+                <PrimaryLightDivider />
+                <SeriesRequestOptionsPreview />
+                <PrimaryLightDivider />
+                <SeriesRequestSeasonsList series={props.series} />
+              </div>
+            )}
+          </>
+        )}
     </div>
   );
 };

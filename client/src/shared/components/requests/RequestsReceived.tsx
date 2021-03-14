@@ -10,9 +10,20 @@ import {
 import { ComponentSizes } from "../../enums/ComponentSizes";
 import { CenteredContent } from "../layout/CenteredContent";
 import { RequestTypes } from "../../enums/RequestTypes";
+import { useRadarrConfigs } from "../../hooks/useRadarrConfigs";
+import { useSonarrConfigs } from "../../hooks/useSonarrConfigs";
+import { IMediaRequest } from "../../models/IMediaRequest";
+import { MediaTypes } from "../../enums/MediaTypes";
 
 const RequestsReceived = () => {
   const { requestsReceived } = useRequestsContext();
+  const { radarrConfigs } = useRadarrConfigs();
+  const { sonarrConfigs } = useSonarrConfigs();
+
+  const providers = (request: IMediaRequest) =>
+    request.media.mediaType === MediaTypes.MOVIES
+      ? radarrConfigs.data
+      : sonarrConfigs.data;
 
   return (
     <ScrollingTable>
@@ -25,8 +36,10 @@ const RequestsReceived = () => {
       )}
       {!requestsReceived.isLoading &&
         requestsReceived.data &&
-        requestsReceived.data.map((r, index) => (
+        requestsReceived.data.results &&
+        requestsReceived.data.results.map((r, index) => (
           <RequestLayout
+            providers={providers(r)}
             key={index}
             request={r}
             requestType={RequestTypes.INCOMING}

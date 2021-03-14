@@ -49,7 +49,7 @@ export const JobsSettings = () => {
               <p>{j.name}</p>
               {j.nextRunTime && (
                 <p>
-                  Last execution: {new Date(j.nextRunTime).toLocaleDateString()}
+                  Next execution: {new Date(j.nextRunTime).toLocaleDateString()}
                   , {new Date(j.nextRunTime).toLocaleTimeString()}
                 </p>
               )}
