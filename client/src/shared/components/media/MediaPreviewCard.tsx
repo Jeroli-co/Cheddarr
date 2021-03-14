@@ -1,25 +1,18 @@
-import React, { MouseEvent, useState } from "react";
-import styled, { css } from "styled-components";
-import { MediaTypes } from "../../enums/MediaTypes";
-import { MediaTag, SuccessIconTag, SuccessTag } from "../Tag";
-import {
-  IMedia,
-  isEpisode,
-  isMovie,
-  isOnServers,
-  isSeason,
-  isSeries,
-} from "../../models/IMedia";
-import { PlayButton, PrimaryButton } from "../Button";
-import { Icon } from "../Icon";
-import { faCheck, faPlay } from "@fortawesome/free-solid-svg-icons";
-import { RequestMediaModal } from "../requests/RequestMediaModal";
-import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
-import { STATIC_STYLES } from "../../enums/StaticStyles";
-import { useHistory, useLocation } from "react-router-dom";
-import { routes } from "../../../router/routes";
-import { useImage } from "../../hooks/useImage";
-import { Image } from "../Image";
+import React, {MouseEvent, useState} from "react";
+import styled, {css} from "styled-components";
+import {MediaTypes} from "../../enums/MediaTypes";
+import {MediaTag, SuccessIconTag} from "../Tag";
+import {IMedia, isEpisode, isMovie, isOnServers, isSeason, isSeries,} from "../../models/IMedia";
+import {PlayButton, PrimaryButton} from "../Button";
+import {Icon} from "../Icon";
+import {faCheck} from "@fortawesome/free-solid-svg-icons";
+import {RequestMediaModal} from "../requests/RequestMediaModal";
+import {SeriesRequestOptionsContextProvider} from "../../contexts/SeriesRequestOptionsContext";
+import {STATIC_STYLES} from "../../enums/StaticStyles";
+import {useHistory, useLocation} from "react-router-dom";
+import {routes} from "../../../router/routes";
+import {useImage} from "../../hooks/useImage";
+import {Image} from "../Image";
 
 const logo = require("../../../assets/cheddarr-min.svg");
 
@@ -204,10 +197,10 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
           )}
           {isOnServers(media) &&
             (isMovie(media) || isEpisode(media)) &&
-            media.mediaServerInfo &&
-            media.mediaServerInfo.length > 0 &&
-            media.mediaServerInfo[0].webUrl && (
-              <PlayButton webUrl={media.mediaServerInfo[0].webUrl} />
+            media.mediaServersInfo &&
+            media.mediaServersInfo.length > 0 &&
+            media.mediaServersInfo[0].webUrl && (
+              <PlayButton webUrl={media.mediaServersInfo[0].webUrl} />
             )}
         </div>
       </Container>

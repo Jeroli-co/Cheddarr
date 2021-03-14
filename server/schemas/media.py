@@ -49,7 +49,7 @@ class MediaSchema(APIModel, ABC):
     studios: Optional[List[CompanySchema]]
     credits: Optional[CreditsSchema]
     trailers: Optional[List[Video]]
-    media_server_info: Optional[List[MediaServerInfo]]
+    media_servers_info: List[MediaServerInfo] = []
 
 
 class MovieSchema(MediaSchema):

@@ -31,6 +31,7 @@ class PlexServer(ProviderSettingBase, PlexServerInfo):
 class PlexLibrarySection(APIModel):
     library_id: int
     name: str
+    enabled: bool = True
 
 
 class PlexSettingSchema(ProviderSettingBase, PlexServerInfo):

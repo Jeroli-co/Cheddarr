@@ -1,4 +1,4 @@
-import { MediaTypes, SeriesTypes } from "../enums/MediaTypes";
+import {MediaTypes, SeriesTypes} from "../enums/MediaTypes";
 
 export interface IMedia {
   title: string;
@@ -19,7 +19,7 @@ export interface IMedia {
     cast?: IPerson[];
     crew?: IPerson[];
   };
-  mediaServerInfo?: MediaServerInfo[];
+  mediaServersInfo?: MediaServerInfo[];
   trailers?: { videoUrl: string }[];
 }
 
@@ -108,8 +108,8 @@ export const isPerson = (arg: any): arg is IPerson => {
 export const isOnServers = (media: IMedia): boolean => {
   return (
     media &&
-    media.mediaServerInfo !== undefined &&
-    media.mediaServerInfo.length > 0
+    media.mediaServersInfo !== undefined &&
+    media.mediaServersInfo.length > 0
   );
 };
 

@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
-import { IMedia, isMovie, isSeries } from "../../models/IMedia";
-import { H1, H2 } from "../Titles";
-import { minToHoursMinutes } from "../../../utils/media-utils";
-import { MediaRating } from "./MediaRating";
-import { MediaTag, SuccessTag, Tag } from "../Tag";
-import { MediaPersonCarousel } from "./MediaPersonCarousel";
-import { PlayButton, PrimaryButton, PrimaryLinkButton } from "../Button";
-import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
-import { RequestMediaModal } from "../requests/RequestMediaModal";
-import { STATIC_STYLES } from "../../enums/StaticStyles";
-import { PrimaryDivider } from "../Divider";
-import { Row } from "../layout/Row";
-import { Icon } from "../Icon";
-import { faFilm } from "@fortawesome/free-solid-svg-icons";
-import { Buttons } from "../layout/Buttons";
-import { MediaCarouselWidget } from "./MediaCarouselWidget";
-import { APIRoutes } from "../../enums/APIRoutes";
-import { useImage } from "../../hooks/useImage";
-import { Image } from "../Image";
+import {IMedia, isMovie, isSeries} from "../../models/IMedia";
+import {H1, H2} from "../Titles";
+import {minToHoursMinutes} from "../../../utils/media-utils";
+import {MediaRating} from "./MediaRating";
+import {MediaTag, SuccessTag, Tag} from "../Tag";
+import {MediaPersonCarousel} from "./MediaPersonCarousel";
+import {PlayButton, PrimaryButton, PrimaryLinkButton} from "../Button";
+import {SeriesRequestOptionsContextProvider} from "../../contexts/SeriesRequestOptionsContext";
+import {RequestMediaModal} from "../requests/RequestMediaModal";
+import {STATIC_STYLES} from "../../enums/StaticStyles";
+import {PrimaryDivider} from "../Divider";
+import {Row} from "../layout/Row";
+import {Icon} from "../Icon";
+import {faFilm} from "@fortawesome/free-solid-svg-icons";
+import {Buttons} from "../layout/Buttons";
+import {MediaCarouselWidget} from "./MediaCarouselWidget";
+import {APIRoutes} from "../../enums/APIRoutes";
+import {useImage} from "../../hooks/useImage";
+import {Image} from "../Image";
 
 const BackgroundContainer = styled.div`
   position: relative;
@@ -185,7 +185,7 @@ export const Media = (props: MediaProps) => {
               <MediaHeaderTags>
                 <MediaTag media={props.media} />
                 {props.media.status && <Tag>{props.media.status}</Tag>}
-                {props.media.mediaServerInfo && (
+                {props.media.mediaServersInfo && (
                   <SuccessTag>Available</SuccessTag>
                 )}
               </MediaHeaderTags>
@@ -251,7 +251,7 @@ export const Media = (props: MediaProps) => {
                   wrap="nowrap"
                 >
                   <Buttons>
-                    {(!props.media.mediaServerInfo ||
+                    {(!props.media.mediaServersInfo ||
                       isSeries(props.media)) && (
                       <PrimaryButton
                         type="button"
@@ -260,11 +260,11 @@ export const Media = (props: MediaProps) => {
                         Request
                       </PrimaryButton>
                     )}
-                    {props.media.mediaServerInfo &&
-                      props.media.mediaServerInfo.length > 0 &&
-                      props.media.mediaServerInfo[0].webUrl && (
+                    {props.media.mediaServersInfo &&
+                      props.media.mediaServersInfo.length > 0 &&
+                      props.media.mediaServersInfo[0].webUrl && (
                         <PlayButton
-                          webUrl={props.media.mediaServerInfo[0].webUrl}
+                          webUrl={props.media.mediaServersInfo[0].webUrl}
                         />
                       )}
                   </Buttons>

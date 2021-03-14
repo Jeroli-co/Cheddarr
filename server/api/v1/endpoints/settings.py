@@ -202,9 +202,9 @@ def update_plex_setting(
         setting_library = next(
             (l for l in setting.libraries if l.library_id == library.library_id), None
         )
-        if setting_library is None:
+        if setting_library is None and library.enabled:
             setting.libraries.append(library.to_orm(MediaServerLibrary))
-        elif setting_library is not None:
+        elif setting_library is not None and not library.enabled:
             setting.libraries.remove(setting_library)
 
     setting = plex_setting_repo.update(setting, setting_in)

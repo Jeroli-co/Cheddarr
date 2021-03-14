@@ -35,6 +35,8 @@ class ExternalServiceSetting(object):
 
 
 class MediaServerSetting(Model, ExternalServiceSetting):
+    __repr_props__ = ("server_name",)
+
     server_id = Column(String, primary_key=True)
     server_name = Column(String)
     user_id = Column(ForeignKey("user.id"), nullable=False)
@@ -43,6 +45,8 @@ class MediaServerSetting(Model, ExternalServiceSetting):
 
 
 class MediaServerLibrary(Model):
+    __repr_props__ = ("name",)
+
     id = Column(Integer, primary_key=True)
     library_id = Column(Integer, nullable=False)
     name = Column(String, nullable=False)

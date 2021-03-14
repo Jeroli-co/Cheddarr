@@ -13,19 +13,17 @@ from sqlalchemy.orm import Session
 from server.api.dependencies import get_db
 from server.core import scheduler
 from server.models.media import (
-    Episode,
     Media,
     MediaServerEpisode,
     MediaServerMedia,
     MediaServerSeason,
     MediaType,
-    Season,
 )
-from server.models.settings import ExternalServiceName
 from server.repositories.media import (
-    EpisodeRepository,
     MediaRepository,
-    SeasonRepository,
+    MediaServerEpisodeRepository,
+    MediaServerMediaRepository,
+    MediaServerSeasonRepository,
 )
 from server.repositories.settings import PlexSettingRepository
 from server.services import plex
@@ -44,9 +42,7 @@ def sync_plex_servers_library(server_id=None):
     if server_id is not None:
         plex_settings = plex_setting_repo.find_all_by(server_id=server_id)
     else:
-        plex_settings = plex_setting_repo.find_all_by(
-            service_name=ExternalServiceName.plex
-        )
+        plex_settings = plex_setting_repo.find_all_by()
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
@@ -67,13 +63,12 @@ def sync_plex_servers_recently_added(server_id=None):
     if server_id is not None:
         plex_settings = plex_setting_repo.find_all_by(server_id=server_id)
     else:
-        plex_settings = plex_setting_repo.find_all_by(
-            service_name=ExternalServiceName.plex
-        )
+        plex_settings = plex_setting_repo.find_all_by()
     for setting in plex_settings:
         server = plex.get_server(
             base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
         )
+
         for section in setting.libraries:
             process_plex_media_list(
                 server.library.section(section.name).recentlyAdded(),
@@ -84,38 +79,56 @@ def sync_plex_servers_recently_added(server_id=None):
 
 def process_plex_media_list(plex_media_list: List[PlexVideo], server_id, db_session: Session):
     media_repo = MediaRepository(db_session)
-    season_repo = SeasonRepository(db_session)
-    episode_repo = EpisodeRepository(db_session)
+    server_media_repo = MediaServerMediaRepository(db_session)
+    server_season_repo = MediaServerSeasonRepository(db_session)
+    server_episode_repo = MediaServerEpisodeRepository(db_session)
     for plex_media in plex_media_list:
         if isinstance(plex_media, PlexMovie):
-            new_media = process_plex_media(plex_media, server_id, media_repo)
-            media_repo.save(new_media)
+            process_plex_media(plex_media, server_id, media_repo, server_media_repo)
 
         elif isinstance(plex_media, PlexSeries):
-            new_media = process_plex_media(plex_media, server_id, media_repo)
-            media_repo.save(new_media)
-            process_plex_media_list(plex_media.seasons(), server_id, db_session)
+            process_plex_series(
+                plex_media,
+                server_id=server_id,
+                media_repo=media_repo,
+                server_media_repo=server_media_repo,
+                server_season_repo=server_season_repo,
+                server_episode_repo=server_episode_repo,
+            )
 
         elif isinstance(plex_media, PlexSeason):
-            new_media = process_plex_season(plex_media, server_id, media_repo, season_repo)
-            season_repo.save(new_media)
-            process_plex_media_list(plex_media.episodes(), server_id, db_session)
+            process_plex_season_and_episodes(
+                plex_media,
+                server_id=server_id,
+                media_repo=media_repo,
+                server_media_repo=server_media_repo,
+                server_season_repo=server_season_repo,
+                server_episode_repo=server_episode_repo,
+            )
 
         elif isinstance(plex_media, PlexEpisode):
-            new_media = process_plex_episode(
-                plex_media, server_id, media_repo, season_repo, episode_repo
+            process_plex_episode(
+                plex_media,
+                server_id=server_id,
+                media_repo=media_repo,
+                server_media_repo=server_media_repo,
+                server_season_repo=server_season_repo,
+                server_episode_repo=server_episode_repo,
             )
-            episode_repo.save(new_media)
 
         else:
             continue
 
 
 def process_plex_media(
-    plex_media: Union[PlexMovie, PlexSeries], server_id: str, media_repo: MediaRepository
-) -> Media:
+    plex_media: Union[PlexMovie, PlexSeries],
+    server_id: str,
+    media_repo: MediaRepository,
+    server_media_repo: MediaServerMediaRepository,
+) -> MediaServerMedia:
     tmdb_id, imdb_id, tvdb_id = find_guids(plex_media)
-    media = media_repo.find_by_external_id(external_ids=[tmdb_id, imdb_id, tvdb_id])
+
+    media = media_repo.find_by_external_id(tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id)
     if media is None:
         media = Media(
             tmdb_id=tmdb_id,
@@ -124,92 +137,150 @@ def process_plex_media(
             title=plex_media.title,
             media_type=MediaType.movies if isinstance(plex_media, PlexMovie) else MediaType.series,
         )
-    current_server_media = next(
-        (server for server in media.server_media if server.server_id == server_id), None
+
+    server_media = server_media_repo.find_by(
+        server_media_id=plex_media.ratingKey, server_id=server_id
     )
-    if current_server_media is None:
-        media.server_media.append(
-            MediaServerMedia(
-                server_id=server_id,
-                server_library_id=plex_media.section().key,
-                media=media,
-                server_media_id=plex_media.ratingKey,
-                added_at=plex_media.addedAt,
-            )
+
+    if server_media is None:
+        server_media = MediaServerMedia(
+            server_id=server_id,
+            server_library_id=plex_media.section().key,
+            media=media,
+            server_media_id=plex_media.ratingKey,
+            added_at=plex_media.addedAt,
+        )
+        server_media_repo.save(server_media)
+    return server_media
+
+
+def process_plex_series(
+    plex_media: Union[PlexMovie, PlexSeries],
+    server_id: str,
+    media_repo: MediaRepository,
+    server_media_repo: MediaServerMediaRepository,
+    server_season_repo: MediaServerSeasonRepository,
+    server_episode_repo: MediaServerEpisodeRepository,
+) -> MediaServerMedia:
+    server_series = process_plex_media(plex_media, server_id, media_repo, server_media_repo)
+
+    for plex_season in plex_media.seasons():
+        process_plex_season_and_episodes(
+            plex_season,
+            server_series=server_series,
+            server_id=server_id,
+            media_repo=media_repo,
+            server_media_repo=server_media_repo,
+            server_season_repo=server_season_repo,
+            server_episode_repo=server_episode_repo,
         )
 
-    return media
+    return server_series
 
 
 def process_plex_season(
     plex_season: PlexSeason,
+    *,
+    server_series: MediaServerMedia = None,
     server_id: str,
     media_repo: MediaRepository,
-    season_repo: SeasonRepository,
-) -> Season:
+    server_media_repo: MediaServerMediaRepository,
+    server_season_repo: MediaServerSeasonRepository,
+) -> MediaServerSeason:
 
-    tmdb_id, imdb_id, tvdb_id = find_guids(plex_season.show())
-
-    season = season_repo.find_by_external_id_and_season_number(
-        season_number=plex_season.index, external_ids=[tmdb_id, imdb_id, tvdb_id]
+    season = server_season_repo.find_by(
+        season_number=plex_season.index,
+        server_media_id=plex_season.ratingKey,
+        server_id=server_id,
     )
     if season is None:
-        season = Season(
+        season = MediaServerSeason(
             season_number=plex_season.seasonNumber,
+            server_media_id=plex_season.ratingKey,
+            added_at=plex_season.addedAt,
+            server_id=server_id,
         )
-        season.media = process_plex_media(plex_season.show(), server_id, media_repo)
-
-    current_server_season = next(
-        (server for server in season.server_seasons if server.server_id == server_id), None
-    )
-    if current_server_season is None:
-        season.server_seasons.append(
-            MediaServerSeason(
+        if server_series is not None:
+            season.media = server_series
+        else:
+            season.media = process_plex_media(
+                plex_season.show(),
                 server_id=server_id,
-                season=season,
-                server_media_id=plex_season.ratingKey,
-                added_at=plex_season.addedAt,
+                media_repo=media_repo,
+                server_media_repo=server_media_repo,
             )
-        )
-
     return season
+
+
+def process_plex_season_and_episodes(
+    plex_season: PlexSeason,
+    *,
+    server_series: MediaServerMedia = None,
+    server_id: str,
+    media_repo: MediaRepository,
+    server_media_repo: MediaServerMediaRepository,
+    server_season_repo: MediaServerSeasonRepository,
+    server_episode_repo: MediaServerEpisodeRepository,
+) -> MediaServerSeason:
+    server_season = process_plex_season(
+        plex_season,
+        server_series=server_series,
+        server_id=server_id,
+        media_repo=media_repo,
+        server_media_repo=server_media_repo,
+        server_season_repo=server_season_repo,
+    )
+    for plex_episode in plex_season.episodes():
+        process_plex_episode(
+            plex_episode,
+            server_series=server_series,
+            server_season=server_season,
+            server_id=server_id,
+            media_repo=media_repo,
+            server_media_repo=server_media_repo,
+            server_season_repo=server_season_repo,
+            server_episode_repo=server_episode_repo,
+        )
+    server_season_repo.save(server_season)
+    return server_season
 
 
 def process_plex_episode(
     plex_episode: PlexEpisode,
+    *,
+    server_series: MediaServerMedia = None,
+    server_season: MediaServerSeason = None,
     server_id: str,
     media_repo: MediaRepository,
-    season_repo: SeasonRepository,
-    episode_repo: EpisodeRepository,
-) -> Episode:
-    tmdb_id, imdb_id, tvdb_id = find_guids(plex_episode.show())
+    server_media_repo: MediaServerMediaRepository,
+    server_season_repo: MediaServerSeasonRepository,
+    server_episode_repo: MediaServerEpisodeRepository,
+) -> MediaServerEpisode:
 
-    episode = episode_repo.find_by_external_id_and_season_number_and_episode_number(
+    episode = server_episode_repo.find_by(
         episode_number=plex_episode.index,
-        season_number=plex_episode.seasonNumber,
-        external_ids=[tmdb_id, imdb_id, tvdb_id],
+        server_media_id=plex_episode.ratingKey,
+        server_id=server_id,
     )
-
     if episode is None:
-        episode = Episode(
+        episode = MediaServerEpisode(
             episode_number=plex_episode.index,
+            server_media_id=plex_episode.ratingKey,
+            added_at=plex_episode.addedAt,
+            server_id=server_id,
         )
-        episode.season = process_plex_season(
-            plex_episode.season(), server_id, media_repo, season_repo
-        )
-    current_server_season = next(
-        (server for server in episode.server_episodes if server.server_id == server_id), None
-    )
-    if current_server_season is None:
-        episode.server_episodes.append(
-            MediaServerEpisode(
+        if server_season is not None:
+            episode.season = server_season
+        else:
+            episode.season = process_plex_season(
+                plex_episode.season(),
+                server_series=server_series,
                 server_id=server_id,
-                episode=episode,
-                server_media_id=plex_episode.ratingKey,
-                added_at=plex_episode.addedAt,
+                media_repo=media_repo,
+                server_media_repo=server_media_repo,
+                server_season_repo=server_season_repo,
             )
-        )
-
+        server_episode_repo.save(episode)
     return episode
 
 
