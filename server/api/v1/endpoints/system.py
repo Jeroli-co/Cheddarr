@@ -60,7 +60,7 @@ def get_jobs():
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def run_job(job_id: str, action: Literal["run", "pause"] = Body(..., embed=True)):
+def modify_job(job_id: str, action: Literal["run", "pause", "resume"] = Body(..., embed=True)):
     job = scheduler.get_job(job_id)
     if job is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This job does not exist.")
@@ -68,4 +68,6 @@ def run_job(job_id: str, action: Literal["run", "pause"] = Body(..., embed=True)
         job.modify(next_run_time=datetime.now())
     elif action == "pause":
         job.pause()
+    elif action == "resume":
+        job.resume()
     return Job(id=job.id, name=job.name, next_run_time=job.next_run_time)
