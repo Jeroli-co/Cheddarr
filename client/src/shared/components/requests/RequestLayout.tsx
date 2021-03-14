@@ -452,7 +452,14 @@ export const RequestLayout = ({
 
   useEffect(() => {
     if (providers && providers.length > 0) {
-      setProviderId(providers[0].id);
+      let defaultProviderId = "";
+      let index = providers.findIndex((p) => p.isDefault);
+      if (index !== -1) {
+        defaultProviderId = providers[index].id;
+      } else {
+        defaultProviderId = providers[0].id;
+      }
+      setProviderId(defaultProviderId);
     }
   }, []);
 
