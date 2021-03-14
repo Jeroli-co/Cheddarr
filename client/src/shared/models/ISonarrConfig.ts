@@ -5,6 +5,7 @@ export interface ISonarrConfig extends IProviderSettingsBase {
   readonly id: string;
   readonly name: string;
   readonly enabled: boolean;
+  readonly isDefault: boolean;
   readonly providerType: ProviderTypes;
   readonly rootFolder: string;
   readonly animeRootFolder: string | null;
