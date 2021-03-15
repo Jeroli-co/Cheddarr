@@ -1,17 +1,29 @@
 from typing import List, Optional
 
-from pydantic import Field
-
 from server.models.settings import MediaProviderType
 from .core import APIModel
 
 
-class ProviderSettingBase(APIModel):
+class ExternalServiceSettingBase(APIModel):
     host: str
     port: Optional[int]
     ssl: bool
     api_key: str
     name: Optional[str]
+    enabled: Optional[bool] = True
+
+
+class MediaServerSettingBase(ExternalServiceSettingBase):
+    server_id: str
+    server_name: str
+
+
+class MediaProviderSettingBase(ExternalServiceSettingBase):
+    provider_type: Optional[MediaProviderType]
+    root_folder: str
+    quality_profile_id: int
+    version: int
+    is_default: bool = False
 
 
 #####################################
@@ -19,12 +31,7 @@ class ProviderSettingBase(APIModel):
 #####################################
 
 
-class PlexServerInfo(APIModel):
-    server_id: str
-    server_name: str
-
-
-class PlexServer(ProviderSettingBase, PlexServerInfo):
+class PlexServer(MediaServerSettingBase):
     local: bool
 
 
@@ -34,14 +41,12 @@ class PlexLibrarySection(APIModel):
     enabled: bool = True
 
 
-class PlexSettingSchema(ProviderSettingBase, PlexServerInfo):
+class PlexSettingSchema(MediaServerSettingBase):
     id: str
-    name: str
-    enabled: bool = True
-    libraries: List[PlexLibrarySection]
+    libraries: List[PlexLibrarySection] = []
 
 
-class PlexSettingCreateUpdate(ProviderSettingBase, PlexServerInfo):
+class PlexSettingCreateUpdate(MediaServerSettingBase):
     enabled: Optional[bool] = True
     libraries: Optional[List[PlexLibrarySection]] = []
 
@@ -57,29 +62,20 @@ class RadarrInstanceInfo(APIModel):
     version: int
 
 
-class RadarrSettingData(APIModel):
-    root_folder: str
-    quality_profile_id: int
-    version: int = Field(ge=2, le=3)
-
-
-class RadarrSettingSchema(ProviderSettingBase, RadarrSettingData):
+class RadarrSettingSchema(MediaProviderSettingBase):
     id: str
-    name: str
-    enabled: bool
-    is_default: bool
-    provider_type: MediaProviderType = Field(default=MediaProviderType.movie_provider, const=True)
 
 
-class RadarrSettingCreateUpdate(ProviderSettingBase, RadarrSettingData):
+class RadarrSettingCreateUpdate(MediaProviderSettingBase):
     enabled: Optional[bool] = True
     is_default: Optional[bool] = False
 
 
 #####################################
 # Sonarr                            #
-
 #####################################
+
+
 class SonarrInstanceInfo(APIModel):
     root_folders: List[str]
     quality_profiles: List[dict]
@@ -87,24 +83,18 @@ class SonarrInstanceInfo(APIModel):
     version: int
 
 
-class SonarrSettingData(APIModel):
-    root_folder: str
+class SonarrSettingSchema(MediaProviderSettingBase):
+    id: str
     anime_root_folder: Optional[str]
-    quality_profile_id: int
     anime_quality_profile_id: Optional[int]
     language_profile_id: Optional[int]
     anime_language_profile_id: Optional[int]
-    version: int = Field(ge=2, le=3)
 
 
-class SonarrSettingSchema(ProviderSettingBase, SonarrSettingData):
-    id: str
-    name: str
-    enabled: bool
-    is_default: bool
-    provider_type: MediaProviderType = Field(default=MediaProviderType.series_provider, const=True)
-
-
-class SonarrSettingCreateUpdate(ProviderSettingBase, SonarrSettingData):
+class SonarrSettingCreateUpdate(MediaProviderSettingBase):
     enabled: Optional[bool] = True
     is_default: Optional[bool] = False
+    anime_root_folder: Optional[str]
+    anime_quality_profile_id: Optional[int]
+    language_profile_id: Optional[int]
+    anime_language_profile_id: Optional[int]
