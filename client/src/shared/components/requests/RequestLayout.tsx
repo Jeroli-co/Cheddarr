@@ -1,5 +1,5 @@
-import styled, { css } from "styled-components";
-import React, { useState } from "react";
+import styled from "styled-components";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { MediaTypes } from "../../enums/MediaTypes";
 import {
   compareRequestCreationDateAsc,
@@ -41,6 +41,8 @@ import { routes } from "../../../router/routes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
 import { Buttons } from "../layout/Buttons";
+import { IMediaProviderConfig } from "../../models/IMediaProviderConfig";
+import { InputField } from "../inputs/InputField";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;
@@ -73,30 +75,34 @@ const RequestElement = styled.div`
 
   &:nth-child(1) {
     justify-content: flex-start;
-    flex: 5 1 0;
-  }
-
-  &:nth-child(2) {
-    flex: 3 1 0;
-  }
-
-  &:nth-child(3) {
     flex: 4 1 0;
   }
 
+  &:nth-child(2) {
+    flex: 1 1 0;
+  }
+
+  &:nth-child(3) {
+    flex: 2 1 0;
+  }
+
   &:nth-child(4) {
-    flex: 3 1 0;
+    flex: 1 1 0;
   }
 
   &:nth-child(5) {
-    flex: 3 1 0;
+    flex: 1 1 0;
   }
 
   &:nth-child(6) {
-    flex: 3 1 0;
+    flex: 2 1 0;
   }
 
-  &:nth-child(7) {
+  &:not(:last-child) &:nth-child(7) {
+    flex: 4 1 0;
+  }
+
+  &:last-child {
     flex: 1 1 0;
     justify-content: flex-end;
   }
@@ -329,6 +335,11 @@ export const RequestHeader = ({ requestType }: RequestHeaderProps) => {
           )}
         </span>
       </RequestsHeaderElement>
+      {requestType === RequestTypes.INCOMING && (
+        <RequestsHeaderElement>
+          <p>PROVIDER</p>
+        </RequestsHeaderElement>
+      )}
       <RequestsHeaderElement />
     </RequestsHeaderContainer>
   );
@@ -424,14 +435,49 @@ const RequestContainer = styled.div`
 `;
 
 type RequestLayoutProps = {
+  providers?: IMediaProviderConfig[] | null;
   request: IMediaRequest;
   requestType: RequestTypes;
 };
 
-export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
-  const { acceptRequest, refuseRequest, deleteRequest } = useRequestsContext();
+export const RequestLayout = ({
+  providers,
+  request,
+  requestType,
+}: RequestLayoutProps) => {
+  const { updateRequest, deleteRequest } = useRequestsContext();
 
   const media = useMedia(request.media.mediaType, request.media.tmdbId);
+  const [providerId, setProviderId] = useState<string>("");
+
+  useEffect(() => {
+    if (providers && providers.length > 0) {
+      let defaultProviderId = "";
+      let index = providers.findIndex((p) => p.isDefault);
+      if (index !== -1) {
+        defaultProviderId = providers[index].id;
+      } else {
+        defaultProviderId = providers[0].id;
+      }
+      setProviderId(defaultProviderId);
+    }
+  }, []);
+
+  const onProviderChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setProviderId(e.target.value);
+  };
+
+  const onUpdateRequest = (requestStatus: RequestStatus) => {
+    console.log(providerId);
+    if (providerId) {
+      updateRequest(
+        request.media.mediaType,
+        providerId,
+        request.id,
+        requestStatus
+      );
+    }
+  };
 
   return (
     <RequestContainer>
@@ -472,21 +518,51 @@ export const RequestLayout = ({ request, requestType }: RequestLayoutProps) => {
           <SuccessTag>{request.status.toUpperCase()}</SuccessTag>
         )}
       </RequestElement>
+      {requestType === RequestTypes.INCOMING && (
+        <RequestElement>
+          {request.status === RequestStatus.PENDING &&
+            providers &&
+            providers.length > 0 && (
+              <>
+                <InputField>
+                  <select
+                    value={providerId}
+                    onChange={(e) => onProviderChange(e)}
+                  >
+                    {providers.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </InputField>
+
+                {providers.length === 0 && <p>No providers found</p>}
+              </>
+            )}
+        </RequestElement>
+      )}
       <RequestElement>
         {requestType === RequestTypes.INCOMING &&
           request.status === RequestStatus.PENDING && (
             <Buttons>
-              <SuccessButton onClick={() => acceptRequest(request)}>
+              <SuccessButton
+                onClick={() => onUpdateRequest(RequestStatus.APPROVED)}
+              >
                 <Icon icon={faCheck} />
               </SuccessButton>
-              <DangerIconButton onClick={() => refuseRequest(request)}>
+              <DangerIconButton
+                onClick={() => onUpdateRequest(RequestStatus.REFUSED)}
+              >
                 <Icon icon={faTimes} />
               </DangerIconButton>
             </Buttons>
           )}
         {request.status !== RequestStatus.PENDING && (
           <Tooltiped text="Delete request">
-            <DangerIconButton onClick={() => deleteRequest(request)}>
+            <DangerIconButton
+              onClick={() => deleteRequest(request.media.mediaType, request.id)}
+            >
               <Icon icon={faTimes} />
             </DangerIconButton>
           </Tooltiped>

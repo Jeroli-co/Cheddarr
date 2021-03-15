@@ -1,17 +1,20 @@
-import React, {useEffect, useState} from "react";
-import {useFormContext} from "react-hook-form";
-import {DefaultAsyncCall, IAsyncCall,} from "../../../../../shared/models/IAsyncCall";
-import {ISonarrInstanceInfo} from "../../../../../shared/models/ISonarrInstanceInfo";
-import {useSonarrConfigs} from "../../../../../shared/hooks/useSonarrConfigs";
-import {ISonarrConfig} from "../../../../../shared/models/ISonarrConfig";
-import {IProviderSettingsBase} from "../../../../../shared/models/IProviderSettingsBase";
-import {InputField} from "../../../../../shared/components/inputs/InputField";
-import {Checkbox} from "../../../../../shared/components/inputs/Checkbox";
-import {HelpDanger} from "../../../../../shared/components/Help";
-import {FORM_DEFAULT_VALIDATOR} from "../../../../../shared/enums/FormDefaultValidators";
-import {PrimaryButton} from "../../../../../shared/components/Button";
-import {PrimaryLightDivider} from "../../../../../shared/components/Divider";
-import {Row} from "../../../../../shared/components/layout/Row";
+import React, { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import {
+  DefaultAsyncCall,
+  IAsyncCall,
+} from "../../../../../shared/models/IAsyncCall";
+import { ISonarrInstanceInfo } from "../../../../../shared/models/ISonarrInstanceInfo";
+import { useSonarrConfigs } from "../../../../../shared/hooks/useSonarrConfigs";
+import { ISonarrConfig } from "../../../../../shared/models/ISonarrConfig";
+import { IProviderSettingsBase } from "../../../../../shared/models/IProviderSettingsBase";
+import { InputField } from "../../../../../shared/components/inputs/InputField";
+import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
+import { HelpDanger } from "../../../../../shared/components/Help";
+import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
+import { PrimaryButton } from "../../../../../shared/components/Button";
+import { PrimaryLightDivider } from "../../../../../shared/components/Divider";
+import { Row } from "../../../../../shared/components/layout/Row";
 
 type SonarrSettingsFormProps = {
   config: ISonarrConfig | null;
@@ -85,7 +88,13 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
           <br />
           <InputField>
             <label>Config name</label>
-            <input name="name" type="text" placeholder="Name" ref={register} />
+            <input
+              name="name"
+              type="text"
+              placeholder="Name"
+              defaultValue="Sonarr"
+              ref={register}
+            />
           </InputField>
         </>
       )}

@@ -12,9 +12,16 @@ export const RequestMovieCard = () => {
       {friendsMoviesProviders.isLoading && (
         <Spinner size={ComponentSizes.LARGE} />
       )}
-      {!friendsMoviesProviders.isLoading && friendsMoviesProviders.data && (
-        <FriendsProvidersDropdown users={friendsMoviesProviders.data} />
-      )}
+      {!friendsMoviesProviders.isLoading &&
+        friendsMoviesProviders.data &&
+        friendsMoviesProviders.data?.length > 0 && (
+          <FriendsProvidersDropdown users={friendsMoviesProviders.data} />
+        )}
+      {!friendsMoviesProviders.isLoading &&
+        friendsMoviesProviders.data &&
+        friendsMoviesProviders.data?.length === 0 && (
+          <p>You have no friend to request</p>
+        )}
     </div>
   );
 };

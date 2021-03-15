@@ -14,7 +14,7 @@ export const FriendsProvidersDropdown = (
 
   return (
     <InputField isInline>
-      <label>Provider : </label>
+      <label>Friend to request: </label>
       <select name="requestedUsername" ref={register}>
         {props.users.map((user, index) => (
           <option key={index} value={user.username}>

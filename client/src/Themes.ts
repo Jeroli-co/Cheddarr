@@ -10,7 +10,7 @@ export const THEMES: DefaultTheme = {
   white: "hsl(214, 24%, 100%)",
   secondary: "hsl(23, 99%, 48%)",
   success: "hsl(129, 30%, 52%)",
-  danger: "hsl(0, 91%, 52%)",
+  danger: "hsl(0, 91%, 49%)",
   warning: "hsl(38,91%,49%)",
   grey: "#a1978a",
   plex: "#282a2d",

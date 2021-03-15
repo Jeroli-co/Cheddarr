@@ -12,14 +12,11 @@ export interface IMediaRequest {
   media: IMedia;
 }
 
-export interface IMovieRequest extends IMediaRequest {
-  movie: IMovie;
-}
+export interface IMovieRequest extends IMediaRequest {}
 
 export interface ISeriesRequest extends IMediaRequest {
   tvdbId: number;
   seriesType: string;
-  series: ISeries;
   seasons: {
     seasonNumber: number;
     episodes: { episodeNumber: number }[];
