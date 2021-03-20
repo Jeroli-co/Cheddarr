@@ -28,7 +28,10 @@ type MediaCarouselWidgetProps = {
 export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   const [media, setMedia] = useState<IMedia[]>([]);
   const [hidden, setHidden] = useState(false);
-  const { data, loadNext, loadPrev } = usePagination(props.url);
+  const { data, loadPrev, loadNext, isFirstPage, isLastPage } = usePagination(
+    props.url,
+    false
+  );
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,7 +65,7 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
 
       <br />
       {!hidden && (
-        <Carousel loadNext={loadNext}>
+        <Carousel loadPrev={loadPrev} loadNext={loadNext}>
           {media.map((m, index) => (
             <MediaPreviewCard key={index} media={m} />
           ))}

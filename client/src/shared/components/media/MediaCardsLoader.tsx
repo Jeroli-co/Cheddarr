@@ -18,6 +18,8 @@ const MediaLoadingCardContainer = styled(MediaPreviewCardContainer)<{
 }>`
   background: ${(props) => props.theme.primary};
   animation: 1s ease infinite running;
+  padding: 0;
+  margin: 4px;
 
   &:nth-last-child(-n + ${(props) => props.n}) {
     animation: ${Shine} 0.5s alternate infinite linear;

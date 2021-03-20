@@ -24,6 +24,8 @@ interface RequestsContextInterface {
     requestType: RequestTypes,
     compare: (first: IMediaRequest, second: IMediaRequest) => number
   ) => void;
+  onLoadPrev: (requestType: RequestTypes) => void;
+  onLoadNext: (requestType: RequestTypes) => void;
 }
 
 export const RequestsContextDefaultImpl: RequestsContextInterface = {
@@ -32,6 +34,8 @@ export const RequestsContextDefaultImpl: RequestsContextInterface = {
   updateRequest(): void {},
   deleteRequest(): void {},
   sortRequests(): void {},
+  onLoadNext(): void {},
+  onLoadPrev(): void {},
 };
 
 export const RequestsContext = createContext<RequestsContextInterface>(
@@ -44,17 +48,21 @@ export const RequestsContextProvider = (props: any) => {
   const { patch, remove } = useAPI();
 
   const {
-    requests: requestsReceived,
+    data: requestsReceived,
     updateRequest: updateReceivedRequest,
     deleteRequest: deleteReceivedRequest,
     sortRequests: sortRequestReceived,
+    loadPrev: loadPrevRequestReceived,
+    loadNext: loadNextRequestReceived,
   } = useRequests(RequestTypes.INCOMING);
 
   const {
-    requests: requestsSent,
+    data: requestsSent,
     updateRequest: updateSentRequest,
     deleteRequest: deleteSentRequest,
     sortRequests: sortRequestSent,
+    loadPrev: loadPrevRequestSent,
+    loadNext: loadNextRequestSent,
   } = useRequests(RequestTypes.OUTGOING);
 
   const { pushSuccess, pushDanger } = useAlert();
@@ -77,9 +85,9 @@ export const RequestsContextProvider = (props: any) => {
       if (res.status === 200) {
         updateReceivedRequest(requestId, requestStatus);
         updateSentRequest(requestId, requestStatus);
-        pushSuccess("Request accepted");
+        pushSuccess("Request " + requestStatus);
       } else {
-        pushDanger("Cannot accept request, try again later...");
+        pushDanger("Internal error, try again later...");
       }
     });
   };
@@ -107,6 +115,22 @@ export const RequestsContextProvider = (props: any) => {
     }
   };
 
+  const onLoadPrev = (requestType: RequestTypes) => {
+    if (requestType === RequestTypes.OUTGOING) {
+      loadPrevRequestSent();
+    } else if (requestType === RequestTypes.INCOMING) {
+      loadPrevRequestReceived();
+    }
+  };
+
+  const onLoadNext = (requestType: RequestTypes) => {
+    if (requestType === RequestTypes.OUTGOING) {
+      loadNextRequestSent();
+    } else if (requestType === RequestTypes.INCOMING) {
+      loadNextRequestReceived();
+    }
+  };
+
   return (
     <RequestsContext.Provider
       value={{
@@ -115,6 +139,8 @@ export const RequestsContextProvider = (props: any) => {
         updateRequest,
         deleteRequest,
         sortRequests,
+        onLoadPrev,
+        onLoadNext,
       }}
     >
       {props.children}

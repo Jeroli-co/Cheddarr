@@ -358,13 +358,23 @@ const RequestsFooterContainer = styled.header`
   min-width: 1500px;
 `;
 
-export const RequestFooter = () => {
+type RequestFooterProps = {
+  currentPage?: number;
+  totalPages?: number;
+  onLoadNext: () => void;
+  onLoadPrev: () => void;
+};
+
+export const RequestFooter = (props: RequestFooterProps) => {
   return (
     <RequestsFooterContainer>
-      <PrimaryButton type="button">
+      <PrimaryButton type="button" onClick={() => props.onLoadPrev()}>
         <Icon icon={faArrowLeft} />
       </PrimaryButton>
-      <PrimaryButton type="button">
+      <p>
+        {props.currentPage} ... {props.totalPages}
+      </p>
+      <PrimaryButton type="button" onClick={() => props.onLoadNext()}>
         <Icon icon={faArrowRight} />
       </PrimaryButton>
     </RequestsFooterContainer>
@@ -468,7 +478,6 @@ export const RequestLayout = ({
   };
 
   const onUpdateRequest = (requestStatus: RequestStatus) => {
-    console.log(providerId);
     if (providerId) {
       updateRequest(
         request.media.mediaType,

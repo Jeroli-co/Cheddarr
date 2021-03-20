@@ -16,7 +16,7 @@ import { IMediaRequest } from "../../models/IMediaRequest";
 import { MediaTypes } from "../../enums/MediaTypes";
 
 const RequestsReceived = () => {
-  const { requestsReceived } = useRequestsContext();
+  const { requestsReceived, onLoadPrev, onLoadNext } = useRequestsContext();
   const { radarrConfigs } = useRadarrConfigs();
   const { sonarrConfigs } = useSonarrConfigs();
 
@@ -45,7 +45,12 @@ const RequestsReceived = () => {
             requestType={RequestTypes.INCOMING}
           />
         ))}
-      <RequestFooter />
+      <RequestFooter
+        currentPage={requestsReceived.data?.page}
+        totalPages={requestsReceived.data?.totalPages}
+        onLoadPrev={() => onLoadPrev(RequestTypes.INCOMING)}
+        onLoadNext={() => onLoadNext(RequestTypes.INCOMING)}
+      />
     </ScrollingTable>
   );
 };

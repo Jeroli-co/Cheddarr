@@ -1,68 +1,50 @@
-import { useEffect, useState } from "react";
 import { RequestTypes } from "../enums/RequestTypes";
 import { IMediaRequest } from "../models/IMediaRequest";
-import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { RequestStatus } from "../enums/RequestStatus";
-import { useAPI } from "./useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
-import { IPaginated } from "../models/IPaginated";
+import { usePagination } from "./usePagination";
 
-const useRequests = (requestsType: RequestTypes) => {
-  const [requests, setRequests] = useState<
-    IAsyncCall<IPaginated<IMediaRequest> | null>
-  >(DefaultAsyncCall);
-  const { get } = useAPI();
-
-  useEffect(() => {
-    get<IPaginated<IMediaRequest>>(
-      APIRoutes.GET_REQUESTS(requestsType)
-    ).then((res) => setRequests(res));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+export const useRequests = (requestsType: RequestTypes) => {
+  const {
+    data,
+    loadPrev,
+    loadNext,
+    updateData,
+    deleteData,
+    sortData,
+  } = usePagination<IMediaRequest>(APIRoutes.GET_REQUESTS(requestsType), true);
 
   const updateRequest = (requestId: number, requestStatus: RequestStatus) => {
-    if (requests.data && requestsType === RequestTypes.INCOMING) {
-      let data = requests.data;
-      data?.results.forEach((r) => {
-        if (r.id === requestId) {
-          r.status = requestStatus;
-        }
-      });
-      setRequests({ ...requests, data: data });
+    const findRequest = (r: IMediaRequest) => {
+      return r.id === requestId;
+    };
+    const updateRequest = (r: IMediaRequest) => {
+      r.status = requestStatus;
+    };
+    if (requestsType === RequestTypes.INCOMING) {
+      updateData(findRequest, updateRequest);
     }
   };
 
   const deleteRequest = (requestId: number) => {
-    if (requests.data) {
-      let data = requests.data?.results;
-      data = data.filter((r) => r.id !== requestId);
-      setRequests({
-        ...requests,
-        data: { ...requests.data, results: [...data] },
-      });
-    }
+    const findRequest = (r: IMediaRequest) => {
+      return r.id === requestId;
+    };
+    deleteData(findRequest);
   };
 
   const sortRequests = (
     compare: (first: IMediaRequest, second: IMediaRequest) => number
   ) => {
-    if (requests.data) {
-      setRequests({
-        ...requests,
-        data: {
-          ...requests.data,
-          results: requests.data?.results.sort(compare),
-        },
-      });
-    }
+    sortData(compare);
   };
 
   return {
-    requests,
+    data,
+    loadPrev,
+    loadNext,
     updateRequest,
     deleteRequest,
     sortRequests,
   };
 };
-
-export { useRequests };

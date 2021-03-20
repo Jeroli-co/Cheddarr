@@ -98,7 +98,8 @@ const Carousel = (props: CarouselProps) => {
     if (scrollRef.current!.scrollLeft > 0) {
       scrollLeft = -((window.innerWidth + window.innerHeight) * 30) / 100;
     } else {
-      scrollLeft = props.loadPrev ? 0 : scrollRef.current!.scrollWidth;
+      scrollLeft =
+        props.loadPrev !== undefined ? 0 : scrollRef.current!.scrollWidth;
     }
 
     scrollRef.current!.scrollBy({
@@ -116,9 +117,12 @@ const Carousel = (props: CarouselProps) => {
     ) {
       scrollLeft = ((window.innerWidth + window.innerHeight) * 30) / 100;
     } else {
-      if (props.loadNext) {
-        scrollLeft = 0;
-        props.loadNext();
+      if (props.loadNext !== undefined) {
+        if (props.loadNext()) {
+          scrollLeft = ((window.innerWidth + window.innerHeight) * 30) / 100;
+        } else {
+          scrollLeft = -scrollRef.current!.scrollWidth;
+        }
       } else {
         scrollLeft = -scrollRef.current!.scrollWidth;
       }
