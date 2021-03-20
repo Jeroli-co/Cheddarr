@@ -135,9 +135,8 @@ def get_recent_series(
     recent_series = []
     for series in db_recent_series:
         tmdb_series = tmdb.get_tmdb_series(series.tmdb_id)
-        set_media_db_info(series, current_user.id, server_ids, server_media_repo)
+        set_media_db_info(tmdb_series, current_user.id, server_ids, server_media_repo)
         recent_series.append(tmdb_series.dict())
-
     return MediaSearchResult(
         page=page, total_pages=total_pages, total_results=total_results, results=recent_series
     )

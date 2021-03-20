@@ -19,19 +19,10 @@ from server.repositories.settings import (
     SonarrSettingRepository,
 )
 from server.schemas.core import ResponseMessage
-from server.schemas.settings import (
-    PlexLibrarySection,
-    PlexServer,
-    PlexSettingCreateUpdate,
-    PlexSettingSchema,
-    ProviderSettingBase,
-    RadarrInstanceInfo,
-    RadarrSettingCreateUpdate,
-    RadarrSettingSchema,
-    SonarrInstanceInfo,
-    SonarrSettingCreateUpdate,
-    SonarrSettingSchema,
-)
+from server.schemas.settings import (ExternalServiceSettingBase, PlexLibrarySection, PlexServer,
+                                     PlexSettingCreateUpdate, PlexSettingSchema, RadarrInstanceInfo,
+                                     RadarrSettingCreateUpdate, RadarrSettingSchema, SonarrInstanceInfo,
+                                     SonarrSettingCreateUpdate, SonarrSettingSchema)
 from server.services import plex, radarr, sonarr
 
 router = APIRouter()
@@ -100,6 +91,10 @@ def get_plex_library_sections(
     libraries = plex.get_plex_server_library_sections(
         setting.host, setting.port, setting.ssl, setting.api_key
     )
+    for library in libraries:
+        library.enabled = next(
+            (l.library_id == library.library_id for l in setting.libraries), False
+        )
     if libraries is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Plex server."
@@ -209,6 +204,9 @@ def update_plex_setting(
 
     setting = plex_setting_repo.update(setting, setting_in)
 
+    if setting.libraries:
+        scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
+
     return setting
 
 
@@ -244,7 +242,7 @@ def delete_plex_setting(
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def get_radarr_instance_info(
-    setting_in: ProviderSettingBase,
+    setting_in: ExternalServiceSettingBase,
 ):
     instance_info = radarr.get_instance_info(
         setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
@@ -387,7 +385,7 @@ def delete_radarr_setting(
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 def get_sonarr_instance_info(
-    setting_in: ProviderSettingBase,
+    setting_in: ExternalServiceSettingBase,
 ):
     instance_info = sonarr.get_instance_info(
         setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
