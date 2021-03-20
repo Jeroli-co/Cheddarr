@@ -80,38 +80,6 @@ def get_plex_account_servers(
 
 
 @router.get(
-    "/plex/{server_id}/libraries",
-    response_model=List[PlexLibrarySection],
-    responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Server connection fail"},
-    },
-    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
-)
-def get_plex_libraries(
-    server_id: str,
-    current_user: User = Depends(deps.get_current_user),
-    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
-):
-
-    setting = plex_setting_repo.find_by(user_id=current_user.id, server_id=server_id)
-    if setting is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex setting for this server.")
-    libraries = plex.get_plex_server_library_sections(
-        setting.host, setting.port, setting.ssl, setting.api_key
-    )
-    for library in libraries:
-        library.enabled = next(
-            (l.library_id == library.library_id for l in setting.libraries), False
-        )
-    if libraries is None:
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Plex server."
-        )
-    return libraries
-
-
-@router.get(
     "/plex",
     response_model=List[PlexSettingSchema],
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
@@ -238,6 +206,38 @@ def delete_plex_setting(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
     plex_setting_repo.remove(setting)
     return {"detail": "Plex setting removed."}
+
+
+@router.get(
+    "/plex/{setting_id}/libraries",
+    response_model=List[PlexLibrarySection],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Server connection fail"},
+    },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
+)
+def get_plex_libraries(
+    setting_id: str,
+    current_user: User = Depends(deps.get_current_user),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
+):
+
+    setting = plex_setting_repo.find_by(user_id=current_user.id, server_id=setting_id)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex setting for this server.")
+    libraries = plex.get_plex_server_library_sections(
+        setting.host, setting.port, setting.ssl, setting.api_key
+    )
+    for library in libraries:
+        library.enabled = next(
+            (l.library_id == library.library_id for l in setting.libraries), False
+        )
+    if libraries is None:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Plex server."
+        )
+    return libraries
 
 
 @router.put(
