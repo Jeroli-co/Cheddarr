@@ -478,7 +478,6 @@ export const RequestLayout = ({
   };
 
   const onUpdateRequest = (requestStatus: RequestStatus) => {
-    console.log(providerId);
     if (providerId) {
       updateRequest(
         request.media.mediaType,

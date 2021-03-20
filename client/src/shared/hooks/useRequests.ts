@@ -12,7 +12,7 @@ export const useRequests = (requestsType: RequestTypes) => {
     updateData,
     deleteData,
     sortData,
-  } = usePagination<IMediaRequest>(APIRoutes.GET_REQUESTS(requestsType));
+  } = usePagination<IMediaRequest>(APIRoutes.GET_REQUESTS(requestsType), true);
 
   const updateRequest = (requestId: number, requestStatus: RequestStatus) => {
     const findRequest = (r: IMediaRequest) => {

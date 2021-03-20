@@ -3,7 +3,7 @@ import { IPaginated } from "../models/IPaginated";
 import { useAPI } from "./useAPI";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 
-export const usePagination = <T = any>(url: string) => {
+export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
   const [data, setData] = useState<IAsyncCall<IPaginated<T> | null>>(
     DefaultAsyncCall
   );
@@ -11,6 +11,20 @@ export const usePagination = <T = any>(url: string) => {
     null
   );
   const { get } = useAPI();
+
+  const isFirstPage = () => {
+    return data && data.data && data.data.page && data.data.page <= 1;
+  };
+
+  const isLastPage = () => {
+    return (
+      data &&
+      data.data &&
+      data.data.page &&
+      data.data.totalPages &&
+      data.data.page >= data.data.totalPages
+    );
+  };
 
   const getPageToLoad = () => {
     if (data.data && loadDirection) {
@@ -33,12 +47,8 @@ export const usePagination = <T = any>(url: string) => {
 
   const fetchData = () => {
     const page = getPageToLoad();
-    let urlWithPageQuery = url;
-    if (url.includes("?")) {
-      urlWithPageQuery = urlWithPageQuery + "&page=" + page;
-    } else {
-      urlWithPageQuery = urlWithPageQuery + "?page=" + page;
-    }
+    let urlWithPageQuery =
+      url + ((url.includes("?") ? "&" : "?") + "page=" + page);
     get<IPaginated<T>>(urlWithPageQuery).then((res) => {
       if (res.status === 200 && res.data) {
         setData(res);
@@ -61,19 +71,37 @@ export const usePagination = <T = any>(url: string) => {
   }, [data.isLoading]);
 
   const loadPrev = () => {
-    if (!loadDirection) {
-      setLoadDirection("prev");
-    } else {
-      setData({ ...data, isLoading: true });
+    let isNewPageLoaded = true;
+    const totalPage = data.data && data.data.totalPages;
+    if (totalPage && totalPage > 1) {
+      if (!loadDirection) {
+        setLoadDirection("prev");
+      } else {
+        if (!isFirstPage() || infiniteLoad) {
+          setData({ ...data, isLoading: true });
+        } else {
+          isNewPageLoaded = false;
+        }
+      }
     }
+    return isNewPageLoaded;
   };
 
   const loadNext = () => {
-    if (!loadDirection) {
-      setLoadDirection("next");
-    } else {
-      setData({ ...data, isLoading: true });
+    let isNewPageLoaded = true;
+    const totalPage = data.data && data.data.totalPages;
+    if (totalPage && totalPage > 1) {
+      if (!loadDirection) {
+        setLoadDirection("next");
+      } else {
+        if (!isLastPage() || infiniteLoad) {
+          setData({ ...data, isLoading: true });
+        } else {
+          isNewPageLoaded = false;
+        }
+      }
     }
+    return isNewPageLoaded;
   };
 
   const updateData = (
@@ -116,5 +144,7 @@ export const usePagination = <T = any>(url: string) => {
     updateData,
     deleteData,
     sortData,
+    isFirstPage,
+    isLastPage,
   };
 };
