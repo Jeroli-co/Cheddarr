@@ -76,8 +76,8 @@ const PaginationButton = styled.button<PaginationButtonProps>`
 
 type CarouselProps = {
   children: any;
-  loadPrev?: () => boolean;
-  loadNext?: () => boolean;
+  loadPrev?: () => void;
+  loadNext?: () => void;
 };
 
 const Carousel = (props: CarouselProps) => {

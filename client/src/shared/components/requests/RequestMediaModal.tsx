@@ -48,7 +48,7 @@ export const RequestMediaModal = (props: RequestMediaModalProps) => {
         seasons: options.seasons,
       };
       requestSeries(request).then((res) => {
-        if (res.status === 200) {
+        if (res.status === 201) {
           props.closeModal();
         }
       });

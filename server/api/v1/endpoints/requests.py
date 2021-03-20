@@ -331,6 +331,9 @@ def add_series_request(
 
         unify_series_request(series_request, request_in)
     else:
+        if not series_request.seasons:
+            raise HTTPException(status.HTTP_409_CONFLICT, "This content has already been requested.")
+
         series_request.seasons = []
 
     if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):

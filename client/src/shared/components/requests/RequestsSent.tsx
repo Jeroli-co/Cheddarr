@@ -12,7 +12,7 @@ import { useRequestsContext } from "../../contexts/RequestsContext";
 import { RequestTypes } from "../../enums/RequestTypes";
 
 const RequestsSent = () => {
-  const { requestsSent } = useRequestsContext();
+  const { requestsSent, onLoadPrev, onLoadNext } = useRequestsContext();
 
   return (
     <ScrollingTable>
@@ -33,7 +33,12 @@ const RequestsSent = () => {
             requestType={RequestTypes.OUTGOING}
           />
         ))}
-      <RequestFooter />
+      <RequestFooter
+        currentPage={requestsSent.data?.page}
+        totalPages={requestsSent.data?.totalPages}
+        onLoadPrev={() => onLoadPrev(RequestTypes.OUTGOING)}
+        onLoadNext={() => onLoadNext(RequestTypes.OUTGOING)}
+      />
     </ScrollingTable>
   );
 };
