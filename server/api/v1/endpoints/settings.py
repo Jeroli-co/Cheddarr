@@ -19,10 +19,19 @@ from server.repositories.settings import (
     SonarrSettingRepository,
 )
 from server.schemas.core import ResponseMessage
-from server.schemas.settings import (ExternalServiceSettingBase, PlexLibrarySection, PlexServer,
-                                     PlexSettingCreateUpdate, PlexSettingSchema, RadarrInstanceInfo,
-                                     RadarrSettingCreateUpdate, RadarrSettingSchema, SonarrInstanceInfo,
-                                     SonarrSettingCreateUpdate, SonarrSettingSchema)
+from server.schemas.settings import (
+    ExternalServiceSettingBase,
+    PlexLibrarySection,
+    PlexServer,
+    PlexSettingCreateUpdate,
+    PlexSettingSchema,
+    RadarrInstanceInfo,
+    RadarrSettingCreateUpdate,
+    RadarrSettingSchema,
+    SonarrInstanceInfo,
+    SonarrSettingCreateUpdate,
+    SonarrSettingSchema,
+)
 from server.services import plex, radarr, sonarr
 
 router = APIRouter()
@@ -79,7 +88,7 @@ def get_plex_account_servers(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_plex_library_sections(
+def get_plex_libraries(
     server_id: str,
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
@@ -150,7 +159,8 @@ def add_plex_setting(
     setting.user_id = current_user.id
     libraries = []
     for library in setting_in.libraries:
-        libraries.append(library.to_orm(MediaServerLibrary))
+        if library.enabled:
+            libraries.append(library.to_orm(MediaServerLibrary))
     setting.libraries = libraries
 
     setting = plex_setting_repo.save(setting)
@@ -190,7 +200,7 @@ def update_plex_setting(
     ):
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
-            "Failed to connect to  the Plex server.",
+            "Failed to connect to               the Plex server.",
         )
 
     for library in setting_in.libraries:
@@ -228,6 +238,34 @@ def delete_plex_setting(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
     plex_setting_repo.remove(setting)
     return {"detail": "Plex setting removed."}
+
+
+@router.put(
+    "/plex/{setting_id}/libraries",
+    response_model=List[PlexLibrarySection],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
+    },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
+)
+def update_plex_setting_libraries(
+    setting_id: str,
+    libraries_in: List[PlexLibrarySection],
+    current_user: User = Depends(deps.get_current_user),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
+):
+    setting = plex_setting_repo.find_by(id=setting_id)
+    if setting is None or setting.user_id != current_user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
+
+    updated_libraries = []
+    for library in libraries_in:
+        if library.enabled:
+            updated_libraries.append(library.to_orm(MediaServerLibrary))
+    setting.libraries = updated_libraries
+
+    plex_setting_repo.save(setting)
+    return setting.libraries
 
 
 ##########################################

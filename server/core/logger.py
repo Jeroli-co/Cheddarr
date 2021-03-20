@@ -55,7 +55,7 @@ def log_setup():
 
     log = logging.getLogger()
     log.handlers = [file_handler, stream_handler]
-    log.setLevel(config.LOG_LEVEL)
+    log.setLevel(config.LOG_LEVEL.upper())
 
     for logger_name in log.root.manager.loggerDict.keys():
         override_logger = logging.getLogger(logger_name)
