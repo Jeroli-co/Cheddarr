@@ -1,6 +1,6 @@
 import React from "react";
 import { useSession } from "./contexts/SessionContext";
-import { default as LoggedInHome } from "../logged-in-app/pages/home/Home";
+import { default as LoggedInHome } from "../logged-in-app/pages/Home";
 import { Redirect } from "react-router-dom";
 import { routes } from "../router/routes";
 
