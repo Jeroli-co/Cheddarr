@@ -154,8 +154,8 @@ def update_plex_setting(
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
-    setting = plex_setting_repo.find_by(id=setting_id)
-    if setting is None or setting.user_id != current_user.id:
+    setting = plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
     if (
         plex.get_server(
@@ -168,7 +168,7 @@ def update_plex_setting(
     ):
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
-            "Failed to connect to               the Plex server.",
+            "Failed to connect to connect the Plex server.",
         )
 
     for library in setting_in.libraries:
@@ -201,8 +201,8 @@ def delete_plex_setting(
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
-    setting = plex_setting_repo.find_by(id=setting_id)
-    if setting is None or setting.user_id != current_user.id:
+    setting = plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
     plex_setting_repo.remove(setting)
     return {"detail": "Plex setting removed."}
@@ -223,7 +223,7 @@ def get_plex_libraries(
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
 
-    setting = plex_setting_repo.find_by(user_id=current_user.id, server_id=setting_id)
+    setting = plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex setting for this server.")
     libraries = plex.get_plex_server_library_sections(
@@ -254,8 +254,8 @@ def update_plex_setting_libraries(
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
-    setting = plex_setting_repo.find_by(id=setting_id)
-    if setting is None or setting.user_id != current_user.id:
+    setting = plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
 
     updated_libraries = []
