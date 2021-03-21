@@ -40,7 +40,6 @@ export const Season = (props: SeasonProps) => {
   return (
     <>
       <Media mediaRef={seasonRef} media={season.data} />
-      <PrimaryDivider />
       <H2>Episodes</H2>
       <Row>
         {season.data &&
@@ -51,7 +50,6 @@ export const Season = (props: SeasonProps) => {
       </Row>
       {season.data && props.episodeNumber && (
         <>
-          <PrimaryDivider />
           <Episode
             seriesId={props.seriesId}
             seasonNumber={props.seasonNumber}

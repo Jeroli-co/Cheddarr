@@ -4,33 +4,30 @@ import { APIRoutes } from "../enums/APIRoutes";
 
 import { createContext, useContext } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
-import { IPlexSettings } from "../models/IPlexSettings";
-import { DefaultAsyncData, IAsyncData } from "../models/IAsyncData";
 import { useAlert } from "./AlertContext";
+import { IMediaServerConfig } from "../models/IMediaServerConfig";
 
 interface PlexConfigContextInterface {
-  configs: IAsyncCall<IPlexSettings[] | null>;
-  currentConfig: IAsyncData<IPlexSettings | null>;
-  createConfig: (_: IPlexSettings) => Promise<IAsyncCall>;
-  updateConfig: (_: IPlexSettings) => Promise<IAsyncCall>;
+  configs: IAsyncCall<IMediaServerConfig[] | null>;
+  createConfig: (_: IMediaServerConfig) => Promise<IAsyncCall>;
+  updateConfig: (_: IMediaServerConfig) => Promise<IAsyncCall>;
   deleteConfig: (_: string) => Promise<IAsyncCall>;
-  addConfig: (_: IPlexSettings) => void;
+  addConfig: (_: IMediaServerConfig) => void;
   hasPlexConfigs: () => boolean;
 }
 
 export const PlexConfigContextDefaultImpl: PlexConfigContextInterface = {
-  createConfig(_: IPlexSettings): Promise<IAsyncCall> {
+  createConfig(_: IMediaServerConfig): Promise<IAsyncCall> {
     return Promise.resolve(DefaultAsyncCall);
   },
-  updateConfig(_: IPlexSettings): Promise<IAsyncCall> {
+  updateConfig(_: IMediaServerConfig): Promise<IAsyncCall> {
     return Promise.resolve(DefaultAsyncCall);
   },
   configs: DefaultAsyncCall,
-  currentConfig: DefaultAsyncData,
   deleteConfig(_: string): Promise<IAsyncCall> {
     return Promise.resolve(DefaultAsyncCall);
   },
-  addConfig(_: IPlexSettings): void {},
+  addConfig(_: IMediaServerConfig): void {},
   hasPlexConfigs(): boolean {
     return false;
   },
@@ -43,33 +40,22 @@ export const PlexConfigContext = createContext<PlexConfigContextInterface>(
 export const usePlexConfig = () => useContext(PlexConfigContext);
 
 export default function PlexConfigContextProvider(props: any) {
-  const [configs, setConfigs] = useState<IAsyncCall<IPlexSettings[] | null>>(
-    DefaultAsyncCall
-  );
-  const [currentConfig, setCurrentConfig] = useState<
-    IAsyncData<IPlexSettings | null>
-  >(DefaultAsyncData);
+  const [configs, setConfigs] = useState<
+    IAsyncCall<IMediaServerConfig[] | null>
+  >(DefaultAsyncCall);
 
   const { get, put, remove, post } = useAPI();
 
   const { pushSuccess, pushDanger } = useAlert();
 
   useEffect(() => {
-    get<IPlexSettings[]>(APIRoutes.GET_PLEX_CONFIGS).then((res) => {
+    get<IMediaServerConfig[]>(APIRoutes.GET_PLEX_CONFIGS).then((res) => {
       if (res) setConfigs(res);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!configs.isLoading && configs.data && configs.data?.length > 0) {
-      setCurrentConfig({ data: configs.data[0], isLoading: false });
-    } else {
-      setCurrentConfig({ ...DefaultAsyncData, isLoading: false });
-    }
-  }, [configs]);
-
-  const addConfig = (newConfig: IPlexSettings) => {
+  const addConfig = (newConfig: IMediaServerConfig) => {
     if (configs.data) {
       let configurations = configs.data;
       configurations.push(newConfig);
@@ -77,8 +63,8 @@ export default function PlexConfigContextProvider(props: any) {
     }
   };
 
-  const createConfig = (config: IPlexSettings) => {
-    return post<IPlexSettings>(APIRoutes.CREATE_PLEX_CONFIG, config).then(
+  const createConfig = (config: IMediaServerConfig) => {
+    return post<IMediaServerConfig>(APIRoutes.CREATE_PLEX_CONFIG, config).then(
       (res) => {
         if (res.data && res.status === 201) {
           addConfig(res.data);
@@ -93,8 +79,8 @@ export default function PlexConfigContextProvider(props: any) {
     );
   };
 
-  const updateConfig = (newConfig: IPlexSettings) => {
-    return put<IPlexSettings>(
+  const updateConfig = (newConfig: IMediaServerConfig) => {
+    return put<IMediaServerConfig>(
       APIRoutes.UPDATE_PLEX_CONFIG(newConfig.id),
       newConfig
     ).then((res) => {
@@ -138,7 +124,6 @@ export default function PlexConfigContextProvider(props: any) {
     <PlexConfigContext.Provider
       value={{
         configs,
-        currentConfig,
         createConfig,
         updateConfig,
         deleteConfig,

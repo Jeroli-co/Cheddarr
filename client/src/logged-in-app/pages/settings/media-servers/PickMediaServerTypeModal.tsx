@@ -6,7 +6,7 @@ import { Button, SecondaryButton } from "../../../../shared/components/Button";
 import { MediaServerTypes } from "../../../../shared/enums/MediaServersTypes";
 import { AddPlexSettings } from "./plex/AddPlexSettings";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
-import { IPlexSettings } from "../../../../shared/models/IPlexSettings";
+import { IMediaServerConfig } from "../../../../shared/models/IMediaServerConfig";
 import { PlexConfigContext } from "../../../../shared/contexts/PlexConfigContext";
 import { ItemBox } from "../../../../shared/components/ItemBox";
 
@@ -30,8 +30,8 @@ export const PickMediaServerTypeModal = (
   const formsMethods = useForm();
   const { createConfig } = useContext(PlexConfigContext);
 
-  const onAddPlexSettings: SubmitHandler<IPlexSettings> = (
-    data: IPlexSettings
+  const onAddPlexSettings: SubmitHandler<IMediaServerConfig> = (
+    data: IMediaServerConfig
   ) => {
     if (data.port === "") {
       data.port = null;

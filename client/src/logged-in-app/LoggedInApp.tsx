@@ -66,12 +66,6 @@ export const LoggedInApp = () => {
     setIsOpen(!isOpen);
   };
 
-  const { currentConfig } = usePlexConfig();
-
-  if (currentConfig.isLoading) {
-    return <PageLoader />;
-  }
-
   if (width <= STATIC_STYLES.TABLET_MAX_WIDTH) {
     return (
       <Layout>

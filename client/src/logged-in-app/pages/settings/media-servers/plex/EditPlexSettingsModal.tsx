@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "../../../../../shared/components/layout/Modal";
 import { H2 } from "../../../../../shared/components/Titles";
-import { IPlexSettings } from "../../../../../shared/models/IPlexSettings";
+import { IMediaServerConfig } from "../../../../../shared/models/IMediaServerConfig";
 import { PlexSettingsForm } from "./PlexSettingsForm";
 import { Buttons } from "../../../../../shared/components/layout/Buttons";
 import {
@@ -15,15 +15,15 @@ import { Row } from "../../../../../shared/components/layout/Row";
 
 type EditPlexSettingsModalProps = {
   closeModal: () => void;
-  plexSettings: IPlexSettings;
+  plexSettings: IMediaServerConfig;
 };
 
 export const EditPlexSettingsModal = (props: EditPlexSettingsModalProps) => {
   const formsMethods = useForm();
   const { updateConfig, deleteConfig } = usePlexConfig();
 
-  const onEditPlexSettings: SubmitHandler<IPlexSettings> = (
-    data: IPlexSettings
+  const onEditPlexSettings: SubmitHandler<IMediaServerConfig> = (
+    data: IMediaServerConfig
   ) => {
     if (data.port === "") {
       data.port = null;

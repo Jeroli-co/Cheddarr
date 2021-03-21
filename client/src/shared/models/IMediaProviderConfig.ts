@@ -11,13 +11,3 @@ export interface IMediaProviderConfig extends IProviderSettingsBase {
   qualityProfileId: number;
   version: number;
 }
-
-export interface IRadarrConfig extends IMediaProviderConfig {}
-
-export interface ISonarrConfig extends IMediaProviderConfig {
-  animeRootFolder: string | null;
-  animeQualityProfileId: string | null;
-  languageProfileId: number | null;
-  animeLanguageProfileId: number | null;
-  version: number;
-}

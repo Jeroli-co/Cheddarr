@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent, MouseEvent } from "react";
 import styled from "styled-components";
 import classNames from "classnames";
 import { ComponentSizes } from "../../enums/ComponentSizes";
@@ -76,6 +76,8 @@ type CheckboxProps = {
   size?: ComponentSizes;
   register?: any;
   name?: string;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  checked?: boolean;
 };
 
 export const Checkbox = (props: CheckboxProps) => {
@@ -96,7 +98,13 @@ export const Checkbox = (props: CheckboxProps) => {
 
   return (
     <Container color={props.color} size={calcSize()}>
-      <input type="checkbox" name={props.name} ref={props.register} />
+      <input
+        type="checkbox"
+        name={props.name}
+        ref={props.register}
+        onChange={props.onChange}
+        checked={props.checked}
+      />
       <span className={classNames("slider", { round: props.round })} />
     </Container>
   );

@@ -6,6 +6,8 @@ import { PlexSettingsBoxPreview } from "./plex/PlexSettingsBoxPreview";
 import { AddItemBox } from "../../../../shared/components/ItemBox";
 import { PickMediaServerTypeModal } from "./PickMediaServerTypeModal";
 import { FullWidthTag } from "../../../../shared/components/FullWidthTag";
+import { PrimaryDivider } from "../../../../shared/components/Divider";
+import { MediaServersInfo } from "./MediaServersInfo";
 
 export const MediaServersSettings = () => {
   const [
@@ -33,6 +35,10 @@ export const MediaServersSettings = () => {
         <PickMediaServerTypeModal
           closeModal={() => setIsPickMediaServersTypeModalOpen(false)}
         />
+      )}
+      <PrimaryDivider />
+      {plexSettingsList.data && (
+        <MediaServersInfo config={plexSettingsList.data} />
       )}
     </div>
   );

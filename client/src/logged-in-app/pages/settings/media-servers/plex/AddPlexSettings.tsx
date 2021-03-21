@@ -4,7 +4,7 @@ import { Spinner } from "../../../../../shared/components/Spinner";
 import { ComponentSizes } from "../../../../../shared/enums/ComponentSizes";
 import { Divider } from "../../../../../shared/components/Divider";
 import { PlexSettingsForm } from "./PlexSettingsForm";
-import { IPlexSettings } from "../../../../../shared/models/IPlexSettings";
+import { IMediaServerConfig } from "../../../../../shared/models/IMediaServerConfig";
 import { LinkPlexAccount } from "../../../../../shared/components/LinkPlexAccount";
 import { useLocation } from "react-router-dom";
 import { InputField } from "../../../../../shared/components/inputs/InputField";
@@ -22,7 +22,7 @@ export const AddPlexSettings = (props: AddPlexSettingsProps) => {
   const [
     selectedServerConfig,
     setSelectedServerConfig,
-  ] = useState<IPlexSettings | null>(null);
+  ] = useState<IMediaServerConfig | null>(null);
   const location = useLocation();
 
   useEffect(() => {

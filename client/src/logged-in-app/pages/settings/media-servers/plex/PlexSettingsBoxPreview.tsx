@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { IPlexSettings } from "../../../../../shared/models/IPlexSettings";
+import { IMediaServerConfig } from "../../../../../shared/models/IMediaServerConfig";
 import { EditPlexSettingsModal } from "./EditPlexSettingsModal";
 import { ItemBox } from "../../../../../shared/components/ItemBox";
 import { isEmpty } from "../../../../../utils/strings";
 
 type PlexSettingsBoxPreview = {
-  plexSettings: IPlexSettings;
+  plexSettings: IMediaServerConfig;
 };
 
 export const PlexSettingsBoxPreview = (props: PlexSettingsBoxPreview) => {

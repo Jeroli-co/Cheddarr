@@ -5,11 +5,10 @@ import { APIRoutes } from "../../shared/enums/APIRoutes";
 import { MediaTypes } from "../../shared/enums/MediaTypes";
 
 export default function Home() {
-  const { currentConfig } = usePlexConfig();
-
+  const { configs } = usePlexConfig();
   return (
     <div className="noselect">
-      {!currentConfig.isLoading && currentConfig.data && (
+      {!configs.isLoading && configs.data && (
         <>
           <MediaCarouselWidget
             title="Movies recently added"

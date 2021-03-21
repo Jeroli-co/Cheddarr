@@ -1,6 +1,7 @@
 import { MediaTypes } from "./MediaTypes";
 import { RequestTypes } from "./RequestTypes";
 import { SearchFilters } from "./SearchFilters";
+import { MediaServerTypes } from "./MediaServersTypes";
 
 export const APIRoutes = {
   // AUTH
@@ -30,9 +31,13 @@ export const APIRoutes = {
     "/user/password" + token,
   RESET_PASSWORD: (token: string) => "/user/password" + token,
 
+  // MEDIA SERVERS
+  GET_MEDIA_SERVERS_LIBRARIES: (
+    mediaServerType: MediaServerTypes,
+    serverId: string
+  ) => "/settings/" + mediaServerType + "/" + serverId + "/libraries",
+
   // PLEX
-  GET_PLEX_LIBRARIES: (serverId: string) =>
-    "/settings/plex/" + serverId + "/libraries",
   GET_PLEX_CONFIGS: "/settings/plex",
   CREATE_PLEX_CONFIG: "/settings/plex",
   UPDATE_PLEX_CONFIG: (plexConfigId: string) =>
