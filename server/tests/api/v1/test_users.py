@@ -13,13 +13,12 @@ def test_get_current_user(client: TestClient, normal_user_token_headers):
     )
     assert r.status_code == 200
     current_user = r.json()
-    from server.models.users import UserRole
 
     assert current_user["email"] == datasets["users"][0]["email"]
     assert current_user["username"] == datasets["users"][0]["username"]
     assert current_user["avatar"] == datasets["users"][0]["avatar"]
     assert current_user["confirmed"] is True
-    assert current_user["roles"] == UserRole.none
+    assert current_user["roles"]
 
 
 def test_get_user_by_id(client: TestClient, normal_user_token_headers):

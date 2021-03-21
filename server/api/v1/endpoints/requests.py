@@ -175,7 +175,7 @@ def update_movie_request(
                 raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
             request.selected_provider = selected_provider
 
-        elif request.selected_provider is not None:
+        elif request.selected_provider is None:
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
                 "provider_id must be set or a provider must be set to default to accept a request.",
@@ -391,7 +391,7 @@ def update_series_request(
                 raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
             request.selected_provider = selected_provider
 
-        elif request.selected_provider is not None:
+        elif request.selected_provider is None:
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
                 "provider_id must be set or a provider must be set to default to accept a request.",
