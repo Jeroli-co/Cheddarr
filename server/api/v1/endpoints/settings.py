@@ -218,9 +218,7 @@ def get_plex_libraries(
         setting.host, setting.port, setting.ssl, setting.api_key
     )
     for library in libraries:
-        library.enabled = next(
-            (l.library_id == library.library_id for l in setting.libraries), False
-        )
+        library.enabled = any(l.library_id == library.library_id for l in setting.libraries)
     if libraries is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Plex server."
