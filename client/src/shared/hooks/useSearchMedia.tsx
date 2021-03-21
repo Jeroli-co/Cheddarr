@@ -34,7 +34,7 @@ export const useSearchMedia = (
     // @ts-ignore
     const timer = setTimeout(() => {
       setMedia(DefaultAsyncCall);
-    }, 1000);
+    }, 800);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);
