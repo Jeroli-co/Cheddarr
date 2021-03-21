@@ -1,6 +1,6 @@
 import { RequestStatus } from "../enums/RequestStatus";
 import { IPublicUser } from "./IPublicUser";
-import { IMedia, IMovie, ISeries } from "./IMedia";
+import { IMedia } from "./IMedia";
 
 export interface IMediaRequest {
   id: number;

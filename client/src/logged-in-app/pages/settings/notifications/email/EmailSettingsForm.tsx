@@ -57,8 +57,7 @@ export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
             type="number"
             placeholder="Port"
             ref={register({ minLength: 3, maxLength: 5 })}
-            minLength={1000}
-            maxLength={99999}
+            maxLength={65535}
           />
         </InputField>
       </Row>

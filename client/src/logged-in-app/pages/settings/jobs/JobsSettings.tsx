@@ -8,7 +8,6 @@ import { PrimaryButton } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import {
   faPause,
-  faPlay,
   faPlayCircle,
   faSync,
 } from "@fortawesome/free-solid-svg-icons";

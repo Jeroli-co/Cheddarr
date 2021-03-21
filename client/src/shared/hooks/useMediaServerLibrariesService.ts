@@ -48,6 +48,7 @@ export const useMediaServerLibraries = (
         pushDanger("Cannot sync libraries");
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateLibrary = (library: IMediaServerLibrary) => {

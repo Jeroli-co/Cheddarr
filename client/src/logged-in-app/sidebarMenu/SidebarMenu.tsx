@@ -1,7 +1,12 @@
 import styled from "styled-components";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Icon } from "../../shared/components/Icon";
-import { faBars, faCog, faRegistered } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faCog,
+  faHome,
+  faRegistered,
+} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { routes } from "../../router/routes";
@@ -41,6 +46,17 @@ export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
           <Icon icon={faBars} />
         </SidebarMenuElementIcon>
       </SidebarMenuElement>
+
+      <SidebarMenuElement
+        onClick={() => navigate(routes.HOME.url)}
+        isActive={location.pathname === routes.HOME.url}
+      >
+        <SidebarMenuElementIcon>
+          <Icon icon={faHome} />
+        </SidebarMenuElementIcon>
+        <p>Dashboard</p>
+      </SidebarMenuElement>
+
       <SidebarMenuElement
         onClick={() => navigate(routes.REQUESTS.url)}
         isActive={location.pathname.startsWith(routes.REQUESTS.url)}
@@ -50,6 +66,7 @@ export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
         </SidebarMenuElementIcon>
         <p>Requests</p>
       </SidebarMenuElement>
+
       <SidebarMenuElement
         onClick={() => navigate(routes.SETTINGS.url)}
         isActive={location.pathname.startsWith(routes.SETTINGS.url)}

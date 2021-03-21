@@ -3,7 +3,6 @@ import { useSeason } from "../../hooks/useSeason";
 import { Media } from "./Media";
 import { Spinner } from "../Spinner";
 import { SwitchErrors } from "../errors/SwitchErrors";
-import { PrimaryDivider } from "../Divider";
 import { H2 } from "../Titles";
 import { Row } from "../layout/Row";
 import { MediaPreviewCard } from "./MediaPreviewCard";

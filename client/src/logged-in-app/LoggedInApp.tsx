@@ -7,8 +7,6 @@ import { NavbarMobile } from "./navbar/NavbarMobile";
 import { Navbar } from "./navbar/Navbar";
 import { SidebarMenuMobile } from "./sidebarMenu/SidebarMenuMobile";
 import { Footer } from "../shared/components/Footer";
-import { usePlexConfig } from "../shared/contexts/PlexConfigContext";
-import { PageLoader } from "../shared/components/PageLoader";
 const SwitchRoutes = React.lazy(() => import("../router/SwitchRoutes"));
 
 const Layout = styled.div`

@@ -48,7 +48,7 @@ export default function AuthenticationContextProvider(props: any) {
 
   const signUp = async (data: ISignUpFormData) => {
     return await post<IUser>(APIRoutes.SIGN_UP, data).then((res) => {
-      if (res.data) {
+      if (res.status === 201) {
         pushSuccess("Account created");
       }
       return res;

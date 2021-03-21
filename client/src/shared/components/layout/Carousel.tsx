@@ -3,7 +3,6 @@ import styled, { css } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import smoothscroll from "smoothscroll-polyfill";
-import { Simulate } from "react-dom/test-utils";
 
 const CarouselStyle = styled.div`
   position: relative;

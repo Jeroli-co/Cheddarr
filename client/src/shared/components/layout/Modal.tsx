@@ -75,6 +75,7 @@ type ModalProps = {
 export const Modal = (props: ModalProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
   useOutsideAlerter([contentRef], () => props.close());
+
   return (
     <Container>
       <div className="modal-content" ref={contentRef}>

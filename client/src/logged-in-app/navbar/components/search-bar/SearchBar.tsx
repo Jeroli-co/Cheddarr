@@ -117,6 +117,8 @@ export const SearchBar = () => {
   useEffect(() => {
     if (!isEmpty(searchValue)) {
       history.push(routes.SEARCH.url(searchType, searchValue));
+    } else {
+      history.push(routes.HOME.url);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchType, searchValue]);

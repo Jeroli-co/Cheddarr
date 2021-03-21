@@ -12,6 +12,7 @@ export const useJobs = () => {
 
   useEffect(() => {
     get<IJob[]>(APIRoutes.GET_JOBS).then((res) => setJobs(res));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const patchJob = (id: string, action: JobActionsEnum) => {

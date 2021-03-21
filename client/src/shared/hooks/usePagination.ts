@@ -62,12 +62,14 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
     if (loadDirection) {
       setData({ ...data, isLoading: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadDirection]);
 
   useEffect(() => {
     if (data.isLoading) {
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.isLoading]);
 
   const loadPrev = () => {

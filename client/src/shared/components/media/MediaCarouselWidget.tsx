@@ -28,10 +28,7 @@ type MediaCarouselWidgetProps = {
 export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   const [media, setMedia] = useState<IMedia[]>([]);
   const [hidden, setHidden] = useState(false);
-  const { data, loadPrev, loadNext, isFirstPage, isLastPage } = usePagination(
-    props.url,
-    false
-  );
+  const { data, loadPrev, loadNext } = usePagination(props.url, false);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,6 +46,7 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
         inline: "nearest",
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.isLoading]);
 
   if (data.status >= 400) {
