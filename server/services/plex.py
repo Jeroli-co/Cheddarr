@@ -38,9 +38,7 @@ def get_plex_server_library_sections(
         return None
     sections = []
     for library in server.library.sections():
-        sections.append(
-            PlexLibrarySection(library_id=library.key, name=library.title)
-        )
+        sections.append(PlexLibrarySection(library_id=library.key, name=library.title))
 
     return sections
 
