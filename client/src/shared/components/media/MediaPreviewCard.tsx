@@ -1,18 +1,25 @@
-import React, {MouseEvent, useState} from "react";
-import styled, {css} from "styled-components";
-import {MediaTypes} from "../../enums/MediaTypes";
-import {MediaTag, SuccessIconTag} from "../Tag";
-import {IMedia, isEpisode, isMovie, isOnServers, isSeason, isSeries,} from "../../models/IMedia";
-import {PlayButton, PrimaryButton} from "../Button";
-import {Icon} from "../Icon";
-import {faCheck} from "@fortawesome/free-solid-svg-icons";
-import {RequestMediaModal} from "../requests/RequestMediaModal";
-import {SeriesRequestOptionsContextProvider} from "../../contexts/SeriesRequestOptionsContext";
-import {STATIC_STYLES} from "../../enums/StaticStyles";
-import {useHistory, useLocation} from "react-router-dom";
-import {routes} from "../../../router/routes";
-import {useImage} from "../../hooks/useImage";
-import {Image} from "../Image";
+import React, { MouseEvent, useState } from "react";
+import styled, { css } from "styled-components";
+import { MediaTypes } from "../../enums/MediaTypes";
+import { MediaTag, SuccessIconTag } from "../Tag";
+import {
+  IMedia,
+  isEpisode,
+  isMovie,
+  isOnServers,
+  isSeason,
+  isSeries,
+} from "../../models/IMedia";
+import { PlayButton, PrimaryButton } from "../Button";
+import { Icon } from "../Icon";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { RequestMediaModal } from "../requests/RequestMediaModal";
+import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
+import { STATIC_STYLES } from "../../enums/StaticStyles";
+import { useHistory, useLocation } from "react-router-dom";
+import { routes } from "../../../router/routes";
+import { useImage } from "../../hooks/useImage";
+import { Image } from "../Image";
 
 const logo = require("../../../assets/cheddarr-min.svg");
 
@@ -27,8 +34,7 @@ export const MediaPreviewCardContainer = styled.div`
   }
 
   @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
-    flex: 0 0 100%;
-    margin: 0 0 10px 0;
+    flex: 0 0 45%;
   }
 
   .media-poster {

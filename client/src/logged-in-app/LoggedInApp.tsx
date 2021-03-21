@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import { STATIC_STYLES } from "../shared/enums/StaticStyles";
 import { SidebarMenu } from "./sidebarMenu/SidebarMenu";
@@ -7,6 +7,7 @@ import { NavbarMobile } from "./navbar/NavbarMobile";
 import { Navbar } from "./navbar/Navbar";
 import { SidebarMenuMobile } from "./sidebarMenu/SidebarMenuMobile";
 import { Footer } from "../shared/components/Footer";
+import { useLocation } from "react-router-dom";
 const SwitchRoutes = React.lazy(() => import("../router/SwitchRoutes"));
 
 const Layout = styled.div`

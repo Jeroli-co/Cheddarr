@@ -4,7 +4,7 @@ import { useAlert } from "../contexts/AlertContext";
 import { IMedia } from "../models/IMedia";
 import { SearchFilters } from "../enums/SearchFilters";
 import { IPaginated } from "../models/IPaginated";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 
 export const useSearchMedia = (
@@ -17,8 +17,6 @@ export const useSearchMedia = (
   );
   const { get } = useAPI();
   const { pushDanger } = useAlert();
-
-  const timer = useRef(null);
 
   const fetchMedia = () => {
     get<IPaginated<IMedia>>(
@@ -33,17 +31,11 @@ export const useSearchMedia = (
   };
 
   useEffect(() => {
-    if (timer.current) {
-      // @ts-ignore
-      clearTimeout(timer.current);
-    }
-
-    if (!media.isLoading) {
-      // @ts-ignore
-      timer.current = setTimeout(() => {
-        setMedia(DefaultAsyncCall);
-      }, 800);
-    }
+    // @ts-ignore
+    const timer = setTimeout(() => {
+      setMedia(DefaultAsyncCall);
+    }, 1000);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);
 

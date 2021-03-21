@@ -66,17 +66,15 @@ const MediaServerInfo = (props: MediaServerInfoProps) => {
         {libraries.isLoading && <Spinner />}
         {!libraries.isLoading &&
           libraries.data &&
-          libraries.data.map((l) => (
-            <>
-              <InputField isInline>
-                <Checkbox
-                  round
-                  checked={l.enabled}
-                  onChange={() => updateLibrary(l)}
-                />
-                <label>{l.name}</label>
-              </InputField>
-            </>
+          libraries.data.map((l, index) => (
+            <InputField isInline key={index}>
+              <Checkbox
+                round
+                checked={l.enabled}
+                onChange={() => updateLibrary(l)}
+              />
+              <label>{l.name}</label>
+            </InputField>
           ))}
       </Libraries>
     </Item>
@@ -95,14 +93,15 @@ export const MediaServersInfo = (props: MediaServersInfoProps) => {
         <p>Actions</p>
       </Header>
       {props.config.map((c, index) => (
-        <>
+        <span key={index}>
           <MediaServerInfo
+            key={index}
             configId={c.id}
             serverName={c.name}
             mediaServerType={MediaServerTypes.PLEX}
           />
           {index !== props.config.length - 1 && <PrimaryDivider />}
-        </>
+        </span>
       ))}
     </div>
   );

@@ -6,7 +6,7 @@ import { SonarrConfigsContextProvider } from "../../../shared/contexts/SonarrCon
 import { RadarrConfigsContextProvider } from "../../../shared/contexts/RadarrConfigsContext";
 import { NotificationsServicesContextProvider } from "../../../shared/contexts/NotificationsServicesContext";
 
-const Settings = () => {
+export const Settings = () => {
   return (
     <TabsContextProvider
       tabs={[
@@ -23,6 +23,11 @@ const Settings = () => {
             <Switch>
               <Route
                 exact
+                path={routes.SETTINGS_MEDIA_SERVERS.url}
+                component={routes.SETTINGS_MEDIA_SERVERS.component}
+              />
+              <Route
+                exact
                 path={routes.SETTINGS_MEDIA_PROVIDERS.url}
                 component={routes.SETTINGS_MEDIA_PROVIDERS.component}
               />
@@ -37,7 +42,7 @@ const Settings = () => {
                 component={routes.SETTINGS_JOBS.component}
               />
               <Route
-                path={[routes.SETTINGS.url, routes.SETTINGS_MEDIA_SERVERS.url]}
+                path={routes.SETTINGS.url}
                 component={routes.SETTINGS_MEDIA_SERVERS.component}
               />
             </Switch>
@@ -47,5 +52,3 @@ const Settings = () => {
     </TabsContextProvider>
   );
 };
-
-export { Settings };

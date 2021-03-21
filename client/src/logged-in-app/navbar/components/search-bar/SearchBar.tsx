@@ -1,4 +1,10 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  KeyboardEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styled, { css } from "styled-components";
 import { SearchDropdownType } from "./SearchDropdownType";
 import { useHistory } from "react-router";
@@ -91,13 +97,18 @@ export const SearchBar = () => {
   const [searchType, setSearchType] = useState<SearchFilters>(
     SearchFilters.ALL
   );
+  const [inputValue, setInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const history = useHistory();
   const inputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
+    setInputValue(e.target.value);
+  };
+
+  const onKeyUp = () => {
+    setSearchValue(inputValue);
   };
 
   const onSearchTypeChange = (type: SearchFilters) => {
@@ -117,7 +128,10 @@ export const SearchBar = () => {
   useEffect(() => {
     if (!isEmpty(searchValue)) {
       history.push(routes.SEARCH.url(searchType, searchValue));
-    } else {
+    } else if (
+      location.pathname.startsWith("/search") &&
+      isEmpty(searchValue)
+    ) {
       history.push(routes.HOME.url);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,6 +146,7 @@ export const SearchBar = () => {
       <input
         ref={inputRef}
         value={searchValue}
+        onKeyUp={() => onKeyUp()}
         onChange={onInputChange}
         onFocus={() => setIsInputFocus(true)}
         onBlur={() => setIsInputFocus(false)}
