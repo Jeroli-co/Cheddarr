@@ -118,9 +118,9 @@ def get_episode(
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
 )
-def get_recent_series(
+def get_recently_added_series(
     page: int = 1,
-    per_page: int = 20,
+    per_page: int = 10,
     current_user: User = Depends(deps.get_current_user),
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     server_media_repo: MediaServerMediaRepository = Depends(

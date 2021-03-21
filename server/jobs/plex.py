@@ -49,7 +49,10 @@ def sync_plex_servers_library(server_id=None):
         )
         for section in setting.libraries:
             process_plex_media_list(
-                server.library.section(section.name).all(), setting.server_id, db_session
+                server.library.section(section.name).all(),
+                setting.server_id,
+                section.id,
+                db_session,
             )
 
 
@@ -73,23 +76,33 @@ def sync_plex_servers_recently_added(server_id=None):
             process_plex_media_list(
                 server.library.section(section.name).recentlyAdded(),
                 setting.server_id,
+                section.id,
                 db_session,
             )
 
 
-def process_plex_media_list(plex_media_list: List[PlexVideo], server_id, db_session: Session):
+def process_plex_media_list(
+    plex_media_list: List[PlexVideo], server_id: str, library_id: int, db_session: Session
+):
     media_repo = MediaRepository(db_session)
     server_media_repo = MediaServerMediaRepository(db_session)
     server_season_repo = MediaServerSeasonRepository(db_session)
     server_episode_repo = MediaServerEpisodeRepository(db_session)
     for plex_media in plex_media_list:
         if isinstance(plex_media, PlexMovie):
-            process_plex_media(plex_media, server_id, media_repo, server_media_repo)
+            process_plex_media(
+                server_id,
+                library_id,
+                plex_media,
+                media_repo=media_repo,
+                server_media_repo=server_media_repo,
+            )
 
         elif isinstance(plex_media, PlexSeries):
             process_plex_series(
+                server_id,
+                library_id,
                 plex_media,
-                server_id=server_id,
                 media_repo=media_repo,
                 server_media_repo=server_media_repo,
                 server_season_repo=server_season_repo,
@@ -98,8 +111,9 @@ def process_plex_media_list(plex_media_list: List[PlexVideo], server_id, db_sess
 
         elif isinstance(plex_media, PlexSeason):
             process_plex_season_and_episodes(
+                server_id,
+                library_id,
                 plex_media,
-                server_id=server_id,
                 media_repo=media_repo,
                 server_media_repo=server_media_repo,
                 server_season_repo=server_season_repo,
@@ -108,8 +122,9 @@ def process_plex_media_list(plex_media_list: List[PlexVideo], server_id, db_sess
 
         elif isinstance(plex_media, PlexEpisode):
             process_plex_episode(
+                server_id,
+                library_id,
                 plex_media,
-                server_id=server_id,
                 media_repo=media_repo,
                 server_media_repo=server_media_repo,
                 server_season_repo=server_season_repo,
@@ -121,8 +136,10 @@ def process_plex_media_list(plex_media_list: List[PlexVideo], server_id, db_sess
 
 
 def process_plex_media(
-    plex_media: Union[PlexMovie, PlexSeries],
     server_id: str,
+    library_id: int,
+    plex_media: Union[PlexMovie, PlexSeries],
+    *,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
 ) -> MediaServerMedia:
@@ -145,7 +162,7 @@ def process_plex_media(
     if server_media is None:
         server_media = MediaServerMedia(
             server_id=server_id,
-            server_library_id=plex_media.section().key,
+            server_library_id=library_id,
             media=media,
             server_media_id=plex_media.ratingKey,
             added_at=plex_media.addedAt,
@@ -155,20 +172,29 @@ def process_plex_media(
 
 
 def process_plex_series(
-    plex_media: Union[PlexMovie, PlexSeries],
     server_id: str,
+    library_id: int,
+    plex_media: Union[PlexMovie, PlexSeries],
+    *,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
     server_season_repo: MediaServerSeasonRepository,
     server_episode_repo: MediaServerEpisodeRepository,
 ) -> MediaServerMedia:
-    server_series = process_plex_media(plex_media, server_id, media_repo, server_media_repo)
+    server_series = process_plex_media(
+        server_id,
+        library_id,
+        plex_media,
+        media_repo=media_repo,
+        server_media_repo=server_media_repo,
+    )
 
     for plex_season in plex_media.seasons():
         process_plex_season_and_episodes(
+            server_id,
+            library_id,
             plex_season,
             server_series=server_series,
-            server_id=server_id,
             media_repo=media_repo,
             server_media_repo=server_media_repo,
             server_season_repo=server_season_repo,
@@ -179,10 +205,11 @@ def process_plex_series(
 
 
 def process_plex_season(
+    server_id: str,
+    library_id: int,
     plex_season: PlexSeason,
     *,
     server_series: MediaServerMedia = None,
-    server_id: str,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
     server_season_repo: MediaServerSeasonRepository,
@@ -204,8 +231,9 @@ def process_plex_season(
             season.media = server_series
         else:
             season.media = process_plex_media(
+                server_id,
+                library_id,
                 plex_season.show(),
-                server_id=server_id,
                 media_repo=media_repo,
                 server_media_repo=server_media_repo,
             )
@@ -213,29 +241,32 @@ def process_plex_season(
 
 
 def process_plex_season_and_episodes(
+    server_id: str,
+    library_id: int,
     plex_season: PlexSeason,
     *,
     server_series: MediaServerMedia = None,
-    server_id: str,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
     server_season_repo: MediaServerSeasonRepository,
     server_episode_repo: MediaServerEpisodeRepository,
 ) -> MediaServerSeason:
     server_season = process_plex_season(
+        server_id,
+        library_id,
         plex_season,
         server_series=server_series,
-        server_id=server_id,
         media_repo=media_repo,
         server_media_repo=server_media_repo,
         server_season_repo=server_season_repo,
     )
     for plex_episode in plex_season.episodes():
         process_plex_episode(
+            server_id,
+            library_id,
             plex_episode,
             server_series=server_series,
             server_season=server_season,
-            server_id=server_id,
             media_repo=media_repo,
             server_media_repo=server_media_repo,
             server_season_repo=server_season_repo,
@@ -246,11 +277,12 @@ def process_plex_season_and_episodes(
 
 
 def process_plex_episode(
+    server_id: str,
+    library_id: int,
     plex_episode: PlexEpisode,
     *,
     server_series: MediaServerMedia = None,
     server_season: MediaServerSeason = None,
-    server_id: str,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
     server_season_repo: MediaServerSeasonRepository,
@@ -273,9 +305,10 @@ def process_plex_episode(
             episode.season = server_season
         else:
             episode.season = process_plex_season(
+                server_id,
+                library_id,
                 plex_episode.season(),
                 server_series=server_series,
-                server_id=server_id,
                 media_repo=media_repo,
                 server_media_repo=server_media_repo,
                 server_season_repo=server_season_repo,

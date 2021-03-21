@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -217,12 +218,10 @@ def get_plex_libraries(
     libraries = plex.get_plex_server_library_sections(
         setting.host, setting.port, setting.ssl, setting.api_key
     )
+    if libraries is None:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to get Plex libraries.")
     for library in libraries:
         library.enabled = any(l.library_id == library.library_id for l in setting.libraries)
-    if libraries is None:
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Plex server."
-        )
     return libraries
 
 
@@ -256,7 +255,14 @@ def update_plex_setting_libraries(
     plex_setting_repo.save(setting)
 
     if setting.libraries:
-        scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
+        scheduler.add_job(
+            sync_plex_servers_recently_added,
+            id="manual_plex_sync",
+            run_date=datetime.now() + timedelta(seconds=10),
+            args=[setting.server_id],
+            max_instances=1,
+            replace_existing=True,
+        )
 
     return setting.libraries
 

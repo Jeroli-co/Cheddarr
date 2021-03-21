@@ -48,7 +48,7 @@ class MediaServerLibrary(Model):
     __repr_props__ = ("name",)
 
     id = Column(Integer, primary_key=True)
-    library_id = Column(Integer, nullable=False)
+    library_id = Column(String, nullable=False)
     name = Column(String, nullable=False)
     setting_id = Column(ForeignKey("mediaserversetting.id"))
 
