@@ -171,19 +171,7 @@ def update_plex_setting(
             "Failed to connect to connect the Plex server.",
         )
 
-    for library in setting_in.libraries:
-        setting_library = next(
-            (l for l in setting.libraries if l.library_id == library.library_id), None
-        )
-        if setting_library is None and library.enabled:
-            setting.libraries.append(library.to_orm(MediaServerLibrary))
-        elif setting_library is not None and not library.enabled:
-            setting.libraries.remove(setting_library)
-
     setting = plex_setting_repo.update(setting, setting_in)
-
-    if setting.libraries:
-        scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
 
     return setting
 
@@ -240,7 +228,7 @@ def get_plex_libraries(
     return libraries
 
 
-@router.put(
+@router.patch(
     "/plex/{setting_id}/libraries",
     response_model=List[PlexLibrarySection],
     responses={
@@ -258,13 +246,20 @@ def update_plex_setting_libraries(
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
 
-    updated_libraries = []
     for library in libraries_in:
-        if library.enabled:
-            updated_libraries.append(library.to_orm(MediaServerLibrary))
-    setting.libraries = updated_libraries
+        setting_library = next(
+            (l for l in setting.libraries if l.library_id == library.library_id), None
+        )
+        if setting_library is None and library.enabled:
+            setting.libraries.append(library.to_orm(MediaServerLibrary))
+        elif setting_library is not None and not library.enabled:
+            setting.libraries.remove(setting_library)
 
     plex_setting_repo.save(setting)
+
+    if setting.libraries:
+        scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
+
     return setting.libraries
 
 
