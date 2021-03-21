@@ -97,18 +97,13 @@ export const SearchBar = () => {
   const [searchType, setSearchType] = useState<SearchFilters>(
     SearchFilters.ALL
   );
-  const [inputValue, setInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const history = useHistory();
   const inputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
-
-  const onKeyUp = () => {
-    setSearchValue(inputValue);
+    setSearchValue(e.target.value);
   };
 
   const onSearchTypeChange = (type: SearchFilters) => {
@@ -117,13 +112,6 @@ export const SearchBar = () => {
       inputRef.current.focus();
     }
   };
-
-  useEffect(() => {
-    if (!location.pathname.startsWith("/search") && !isEmpty(searchValue)) {
-      setSearchValue("");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
 
   useEffect(() => {
     if (!isEmpty(searchValue)) {
@@ -146,7 +134,6 @@ export const SearchBar = () => {
       <input
         ref={inputRef}
         value={searchValue}
-        onKeyUp={() => onKeyUp()}
         onChange={onInputChange}
         onFocus={() => setIsInputFocus(true)}
         onBlur={() => setIsInputFocus(false)}
