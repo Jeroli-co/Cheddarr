@@ -354,8 +354,11 @@ const RequestsFooterContainer = styled.header`
   background: ${(props) => props.theme.primaryLight};
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
-  color: ${(props) => props.theme.primary};
   min-width: 1500px;
+
+  p {
+    padding: 20px;
+  }
 `;
 
 type RequestFooterProps = {
@@ -474,6 +477,7 @@ export const RequestLayout = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
     return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onProviderChange = (e: ChangeEvent<HTMLSelectElement>) => {

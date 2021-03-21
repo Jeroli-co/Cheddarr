@@ -1,10 +1,4 @@
-import React, {
-  ChangeEvent,
-  KeyboardEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import { SearchDropdownType } from "./SearchDropdownType";
 import { useHistory } from "react-router";
