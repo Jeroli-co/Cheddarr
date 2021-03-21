@@ -1,97 +1,56 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Optional
 
-from server import schemas
-from server.helpers import search
+from fastapi import APIRouter, Depends
+
+from server.api import dependencies as deps
+from server.models.media import MediaType
+from server.models.users import User
+from server.repositories.media import MediaServerMediaRepository
+from server.schemas.external_services import PlexMediaInfo
+from server.schemas.media import MediaSearchResult
+from server.services import tmdb
 
 router = APIRouter()
 
 
 @router.get(
     "",
-    response_model=schemas.SearchResult,
+    response_model=MediaSearchResult,
     response_model_exclude_none=True,
+    dependencies=[Depends(deps.get_current_user)],
 )
-def search_media(value, page=1):
-    return search.search_tmdb_media(value, page)
+def search_media(
+    value: str,
+    page: int = 1,
+    media_type: Optional[MediaType] = None,
+    current_user: User = Depends(deps.get_current_user),
+    server_media_repo: MediaServerMediaRepository = Depends(
+        deps.get_repository(MediaServerMediaRepository)
+    ),
+):
+    if media_type == MediaType.series:
+        media_results, total_pages, total_results = tmdb.search_tmdb_series(value, page)
+    elif media_type == MediaType.movies:
+        media_results, total_pages, total_results = tmdb.search_tmdb_movies(value, page)
+    else:
+        media_results, total_pages, total_results = tmdb.search_tmdb_media(value, page)
 
+    server_ids = [server.server_id for server in current_user.media_servers]
+    for media in media_results:
+        db_media = server_media_repo.find_by_external_id_and_server_ids(
+            tmdb_id=media.tmdb_id,
+            imdb_id=media.imdb_id,
+            tvdb_id=media.tvdb_id,
+            server_ids=server_ids,
+        )
+        media.media_servers_info = [
+            PlexMediaInfo(**server_media.as_dict()) for server_media in db_media
+        ]
 
-@router.get(
-    "/movies",
-    response_model=schemas.SearchResult,
-    response_model_exclude_none=True,
-)
-def search_movies(value, page=1):
-    return search.search_tmdb_movies(value, page)
-
-
-@router.get(
-    "/series",
-    response_model=schemas.SearchResult,
-    response_model_exclude_none=True,
-)
-def search_series(value, page=1):
-    return search.search_tmdb_series(value, page)
-
-
-@router.get(
-    "/movies/{provider_id}",
-    response_model=schemas.Movie,
-    response_model_exclude_none=True,
-    responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No movie found"},
-    },
-)
-def find_movie(provider_id: int):
-    """ Find a movie with  an external search provider id (TMDB) """
-    movie = search.find_tmdb_movie(provider_id)
-    if movie is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Movie not found.")
-    return movie
-
-
-@router.get(
-    "/series/{provider_id}",
-    response_model=schemas.Series,
-    response_model_exclude_none=True,
-    responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No series found"},
-    },
-)
-def find_series(provider_id: int):
-    """ Find a TV series with an external search provider id (TVDB) """
-    series = search.find_tmdb_series_by_tvdb_id(provider_id)
-    if series is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Series not found.")
-    return series
-
-
-@router.get(
-    "/series/{provider_id}/seasons/{season_number}",
-    response_model=schemas.Season,
-    response_model_exclude_none=True,
-    responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No season found"},
-    },
-)
-def find_season(provider_id: int, season_number: int):
-    """ Find a TV season with  an external search provider id (TVDB) and a season number """
-    season = search.find_tmdb_season_by_tvdb_id(provider_id, season_number)
-    if season is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Season not found.")
-    return season
-
-
-@router.get(
-    "/series/{provider_id}/seasons/{season_number}/episodes/{episode_number}",
-    response_model=schemas.Episode,
-    response_model_exclude_none=True,
-    responses={
-        status.HTTP_404_NOT_FOUND: {"description": "No episode found"},
-    },
-)
-def find_episode(provider_id: int, season_number: int, episode_number: int):
-    """ Find a TV episode with an external search provider id (TVDB), a season number and an episode number """
-    episode = search.find_tmdb_episode_by_tvdb_id(provider_id, season_number, episode_number)
-    if episode is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Episode not found.")
-    return episode
+    search_result = MediaSearchResult(
+        results=[m.dict() for m in media_results],
+        page=page,
+        total_pages=total_pages,
+        total_results=total_results,
+    )
+    return search_result

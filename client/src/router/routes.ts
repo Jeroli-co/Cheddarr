@@ -1,30 +1,23 @@
 import { NotFound } from "../shared/components/errors/NotFound";
 import { PageLoader } from "../shared/components/PageLoader";
-import { ConfirmEmail } from "../logged-out-app/pages/ConfirmEmail";
-import { ResetPassword } from "../logged-out-app/pages/reset-password/ResetPassword";
-import { InitResetPasswordModal } from "../logged-out-app/pages/sign-in/components/InitResetPasswordModal";
-import { SignInForm } from "../logged-out-app/pages/sign-in/SignInForm";
-import { SignUpForm } from "../logged-out-app/pages/sign-up/SignUpForm";
+import { ConfirmEmail } from "../logged-out-app/elements/ConfirmEmail";
+import { ResetPassword } from "../logged-out-app/elements/ResetPassword";
+import { SignInForm } from "../logged-out-app/SignInForm";
+import { SignUpForm } from "../logged-out-app/SignUpForm";
 import { PublicUser } from "../logged-in-app/pages/PublicUser";
-import { Friends } from "../logged-in-app/pages/user-profile/friends/Friends";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
-import { ChangeEmailModal } from "../logged-in-app/pages/settings/components/account/components/ChangeEmailModal";
-import { ChangePasswordModal } from "../logged-in-app/pages/settings/components/account/components/ChangePasswordModal";
-import { ChangeUsernameModal } from "../logged-in-app/pages/settings/components/account/components/ChangeUsernameModal";
-import { DeleteAccountModal } from "../logged-in-app/pages/settings/components/account/components/DeleteAccountModal";
-import { SettingsAccount } from "../logged-in-app/pages/settings/components/account/SettingsAccount";
-import { PlexConfig } from "../logged-in-app/pages/settings/components/plex/PlexConfig";
-import { RadarrConfig } from "../logged-in-app/pages/settings/components/RadarrConfig";
-import { SonarrConfig } from "../logged-in-app/pages/settings/components/SonarrConfig";
-import { Search } from "../logged-in-app/pages/search/Search";
-import { Requests } from "../logged-in-app/pages/requests/Requests";
-import { UserProfile } from "../logged-in-app/pages/user-profile/UserProfile";
-import { RequestsSentDashboard } from "../logged-in-app/pages/requests/components/requests-sent/RequestsSentDashboard";
-import { RequestsReceivedDashboard } from "../logged-in-app/pages/requests/components/requests-received/RequestsReceivedDashboard";
-import { PlexMovie } from "../logged-in-app/pages/plex-media/PlexMovie";
-import { PlexSeries } from "../logged-in-app/pages/plex-media/PlexSeries";
-import { PlexSeason } from "../logged-in-app/pages/plex-media/PlexSeason";
+import { Requests } from "../logged-in-app/pages/Requests";
 import { Home } from "../shared/Home";
+import { RequestsSent } from "../shared/components/requests/RequestsSent";
+import { RequestsReceived } from "../shared/components/requests/RequestsReceived";
+import { Profile } from "../logged-in-app/pages/user-profile/Profile";
+import { MediaServersSettings } from "../logged-in-app/pages/settings/media-servers/MediaServersSettings";
+import { MediaProvidersSettings } from "../logged-in-app/pages/settings/media-providers/MediaProvidersSettings";
+import { NotificationsServicesSettings } from "../logged-in-app/pages/settings/notifications/NotificationsServicesSettings";
+import { Search } from "../logged-in-app/pages/Search";
+import { Movie } from "../shared/components/media/Movie";
+import { Series } from "../shared/components/media/Series";
+import { JobsSettings } from "../logged-in-app/pages/settings/jobs/JobsSettings";
 
 const routes = {
   HOME: {
@@ -39,10 +32,6 @@ const routes = {
     component: SignInForm,
   },
   CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm", component: PageLoader },
-  INIT_RESET_PASSWORD: {
-    url: "/sign-in/init-reset-password",
-    component: InitResetPasswordModal,
-  },
   SIGN_UP: { url: "/sign-up", component: SignUpForm },
   CONFIRM_EMAIL: {
     url: (token: string) => "/sign-up/" + token,
@@ -54,8 +43,7 @@ const routes = {
   },
 
   /** USERS **/
-  USER_PROFILE: { url: "/user", component: UserProfile },
-  USER_FRIENDS: { url: "/user/friends", component: Friends },
+  PROFILE: { url: "/user", component: Profile },
   PUBLIC_USER: {
     url: (username: string) => "/users/" + username,
     component: PublicUser,
@@ -63,43 +51,41 @@ const routes = {
 
   /** SETTINGS **/
   SETTINGS: { url: "/settings", component: Settings },
-  SETTINGS_ACCOUNT: {
-    url: "/settings/account",
-    component: SettingsAccount,
+  SETTINGS_MEDIA_SERVERS: {
+    url: "/settings/media-servers",
+    component: MediaServersSettings,
   },
-  SETTINGS_PLEX: {
-    url: "/settings/plex",
-    component: PlexConfig,
+  SETTINGS_MEDIA_PROVIDERS: {
+    url: "/settings/media-providers",
+    component: MediaProvidersSettings,
   },
-  SETTINGS_RADARR: {
-    url: "/settings/radarr",
-    component: RadarrConfig,
+  SETTINGS_NOTIFICATIONS: {
+    url: "/settings/notifications",
+    component: NotificationsServicesSettings,
   },
-  SETTINGS_SONARR: {
-    url: "/settings/sonarr",
-    component: SonarrConfig,
-  },
-  CHANGE_PASSWORD_MODAL: {
-    url: "/settings/account/change-password",
-    component: ChangePasswordModal,
-  },
-  CHANGE_USERNAME_MODAL: {
-    url: "/settings/account/change-username",
-    component: ChangeUsernameModal,
-  },
-  CHANGE_EMAIL_MODAL: {
-    url: "/settings/account/change-email",
-    component: ChangeEmailModal,
-  },
-  DELETE_ACCOUNT_MODAL: {
-    url: "/settings/account/delete",
-    component: DeleteAccountModal,
+  SETTINGS_JOBS: {
+    url: "/settings/jobs",
+    component: JobsSettings,
   },
 
-  /** PLEX **/
-  MOVIE: { url: (id: string) => "/movie/" + id, component: PlexMovie },
-  SERIES: { url: (id: string) => "/series/" + id, component: PlexSeries },
-  SEASON: { url: (id: string) => "/seasons/" + id, component: PlexSeason },
+  /** MEDIA **/
+  MOVIE: { url: (id: string) => "/movies/" + id, component: Movie },
+  SERIES: { url: (id: string) => "/series/" + id, component: Series },
+  SEASON: {
+    url: (id: string, seasonNumber: string) =>
+      "/series/" + id + "/seasons/" + seasonNumber,
+    component: Series,
+  },
+  EPISODE: {
+    url: (id: string, seasonNumber: string, episodeNumber: string) =>
+      "/series/" +
+      id +
+      "/seasons/" +
+      seasonNumber +
+      "/episodes/" +
+      episodeNumber,
+    component: Series,
+  },
 
   /** SEARCH **/
   SEARCH: {
@@ -113,12 +99,12 @@ const routes = {
     component: Requests,
   },
   REQUESTS_SENT: {
-    url: "/requests/sent",
-    component: RequestsSentDashboard,
+    url: "/requests/outgoing",
+    component: RequestsSent,
   },
   REQUESTS_RECEIVED: {
-    url: "/requests/received",
-    component: RequestsReceivedDashboard,
+    url: "/requests/incoming",
+    component: RequestsReceived,
   },
 
   /** OTHERS **/

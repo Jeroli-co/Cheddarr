@@ -1,12 +1,25 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { PrimaryIconButton } from "../../../../shared/components/Button";
+import { InputField } from "../../../../shared/components/inputs/InputField";
+import styled from "styled-components";
+import { Icon } from "../../../../shared/components/Icon";
+
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  button {
+    margin-left: 20px;
+  }
+`;
 
 type AddFriendsInputProp = {
   sendFriendRequest: (username: string) => void;
 };
 
-const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
+export const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
   const [searchFriends, setSearchFriends] = useState("");
 
   const _onAddFriend = async () => {
@@ -23,36 +36,25 @@ const AddFriendsInput = ({ sendFriendRequest }: AddFriendsInputProp) => {
   };
 
   return (
-    <div className="level">
-      <div className="level-left">
-        <div className="level-item">
-          <div className="field has-addons">
-            <div className="control has-icons-left">
-              <input
-                className="input"
-                type="search"
-                placeholder="Add friends"
-                autoComplete="off"
-                onKeyPress={_onKeyPressed}
-                value={searchFriends}
-                onChange={(e) => setSearchFriends(e.target.value)}
-              />
-              <span className="icon is-small is-left">
-                <FontAwesomeIcon icon={faSearch} />
-              </span>
-            </div>
-            <div className="control">
-              <button className="button is-success" onClick={_onAddFriend}>
-                <span className="icon is-small">
-                  <FontAwesomeIcon icon={faPlus} />
-                </span>
-              </button>
-            </div>
-          </div>
+    <Container>
+      <InputField withIcon>
+        <div className="with-left-icon">
+          <input
+            type="search"
+            placeholder="Add friends"
+            autoComplete="off"
+            onKeyPress={_onKeyPressed}
+            value={searchFriends}
+            onChange={(e) => setSearchFriends(e.target.value)}
+          />
+          <span className="icon">
+            <Icon icon={faSearch} />
+          </span>
         </div>
-      </div>
-    </div>
+      </InputField>
+      <PrimaryIconButton onClick={_onAddFriend}>
+        <Icon icon={faPlus} />
+      </PrimaryIconButton>
+    </Container>
   );
 };
-
-export { AddFriendsInput };

@@ -1,44 +1,26 @@
-from typing import List, Optional
+from typing import List, Type
 
-from server.models import Movie, MovieRequest, Series, SeriesRequest
+from server.models.media import Media
+from server.models.requests import MediaRequest
 from server.repositories.base import BaseRepository
 
 
-class MovieRepository(BaseRepository[Movie]):
-    pass
+class MediaRequestRepository(BaseRepository[MediaRequest]):
+    def find_all_by_tmdb_id(self, tmdb_id: int) -> List[Type[MediaRequest]]:
+        return self.session.query(self.model).join(Media).filter(Media.tmdb_id == tmdb_id).all()
 
-
-class SeriesRepository(BaseRepository[Series]):
-    pass
-
-
-class MovieRequestRepository(BaseRepository[MovieRequest]):
-    def find_by_user_ids_and_tmdb_id(
-        self, tmdb_id: int, requesting_user_id: int, requested_user_id: int
-    ) -> Optional[MovieRequest]:
+    def find_all_by_user_ids_and_tmdb_id(
+        self, tmdb_id: int, requesting_user_id: int = None, requested_user_id: int = None
+    ) -> List[Type[MediaRequest]]:
+        filters = []
+        if requesting_user_id is not None:
+            filters.append(MediaRequest.requesting_user_id == requesting_user_id)
+        if requested_user_id is not None:
+            filters.append(MediaRequest.requested_user_id == requested_user_id)
         return (
-            self.session.query(MovieRequest)
-            .join(MovieRequest.movie)
-            .filter(
-                Movie.tmdb_id == tmdb_id,
-                MovieRequest.requesting_user_id == requesting_user_id,
-                MovieRequest.requested_user_id == requested_user_id,
-            )
-            .one_or_none()
-        )
-
-
-class SeriesRequestRepository(BaseRepository[SeriesRequest]):
-    def find_all_by_user_ids_and_tvdb_id(
-        self, tvdb_id: int, requesting_user_id: int, requested_user_id: int
-    ) -> List[SeriesRequest]:
-        return (
-            self.session.query(SeriesRequest)
-            .join(SeriesRequest.series)
-            .filter(
-                Series.tvdb_id == tvdb_id,
-                SeriesRequest.requesting_user_id == requesting_user_id,
-                SeriesRequest.requested_user_id == requested_user_id,
-            )
+            self.session.query(self.model)
+            .join(Media)
+            .filter(Media.tmdb_id == tmdb_id)
+            .filter(*filters)
             .all()
         )

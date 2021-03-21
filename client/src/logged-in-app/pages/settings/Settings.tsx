@@ -1,57 +1,54 @@
 import React from "react";
+import { Route, Switch } from "react-router";
 import { routes } from "../../../router/routes";
-import { Redirect, Route, Switch, useLocation } from "react-router-dom";
-import { Tabs } from "../../../experimentals/Tabs";
-import { PageLayout } from "../../../experimentals/PageLayout";
+import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
+import { SonarrConfigsContextProvider } from "../../../shared/contexts/SonarrConfigContext";
+import { RadarrConfigsContextProvider } from "../../../shared/contexts/RadarrConfigsContext";
+import { NotificationsServicesContextProvider } from "../../../shared/contexts/NotificationsServicesContext";
 
-const tabs = ["Account", "Plex", "Radarr", "Sonarr"];
-
-const Settings = () => {
-  const url = routes.SETTINGS.url;
-  const location = useLocation();
-
-  if (location.pathname === url || location.pathname === url + "/") {
-    return <Redirect to={routes.SETTINGS_ACCOUNT.url} />;
-  }
-
-  const isActiveTab = (name: string) => {
-    return (
-      location.pathname === url + "/" + name.toLowerCase() ||
-      location.pathname === url + "/" + name.toLowerCase() + "/"
-    );
-  };
-
-  const getActiveTab = () => {
-    const activeTab = tabs.find((t) => isActiveTab(t));
-    return activeTab ? activeTab : tabs[0];
-  };
-
+export const Settings = () => {
   return (
-    <PageLayout>
-      <Tabs tabs={tabs} activeTab={getActiveTab()} />
-      <Switch>
-        <Route
-          path={routes.SETTINGS_ACCOUNT.url}
-          component={routes.SETTINGS_ACCOUNT.component}
-        />
-        <Route
-          exact
-          path={routes.SETTINGS_PLEX.url}
-          component={routes.SETTINGS_PLEX.component}
-        />
-        <Route
-          exact
-          path={routes.SETTINGS_RADARR.url}
-          component={routes.SETTINGS_RADARR.component}
-        />
-        <Route
-          exact
-          path={routes.SETTINGS_SONARR.url}
-          component={routes.SETTINGS_SONARR.component}
-        />
-      </Switch>
-    </PageLayout>
+    <TabsContextProvider
+      tabs={[
+        { label: "Media servers", uri: "media-servers" },
+        { label: "Media providers", uri: "media-providers" },
+        { label: "Notifications", uri: "notifications" },
+        { label: "Jobs", uri: "jobs" },
+      ]}
+      url={routes.SETTINGS.url}
+    >
+      <SonarrConfigsContextProvider>
+        <RadarrConfigsContextProvider>
+          <NotificationsServicesContextProvider>
+            <Switch>
+              <Route
+                exact
+                path={routes.SETTINGS_MEDIA_SERVERS.url}
+                component={routes.SETTINGS_MEDIA_SERVERS.component}
+              />
+              <Route
+                exact
+                path={routes.SETTINGS_MEDIA_PROVIDERS.url}
+                component={routes.SETTINGS_MEDIA_PROVIDERS.component}
+              />
+              <Route
+                exact
+                path={routes.SETTINGS_NOTIFICATIONS.url}
+                component={routes.SETTINGS_NOTIFICATIONS.component}
+              />
+              <Route
+                exact
+                path={routes.SETTINGS_JOBS.url}
+                component={routes.SETTINGS_JOBS.component}
+              />
+              <Route
+                path={routes.SETTINGS.url}
+                component={routes.SETTINGS_MEDIA_SERVERS.component}
+              />
+            </Switch>
+          </NotificationsServicesContextProvider>
+        </RadarrConfigsContextProvider>
+      </SonarrConfigsContextProvider>
+    </TabsContextProvider>
   );
 };
-
-export { Settings };

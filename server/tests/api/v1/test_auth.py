@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from server.core.security import generate_timed_token
-from server.repositories import UserRepository
+from server.repositories.users import UserRepository
 from server.tests.utils import datasets
 
 

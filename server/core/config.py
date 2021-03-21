@@ -8,6 +8,7 @@ from pydantic import (
     BaseSettings,
     DirectoryPath,
 )
+from tzlocal import get_localzone
 
 
 class Config(BaseSettings):
@@ -19,6 +20,7 @@ class Config(BaseSettings):
     DOMAIN: str = "localhost:9090"
     SERVER_HOST: str = f"http://{DOMAIN}"
     LOG_LEVEL: str = "INFO"
+    TIMEZONE: str = get_localzone().zone
 
     ##########################################################################
     # folders/files                                                          #
@@ -30,6 +32,8 @@ class Config(BaseSettings):
     IMAGES_FOLDER: DirectoryPath = PROJECT_ROOT / "server" / "static" / "images"
     CONFIG_FOLDER: Path = PROJECT_ROOT / "config"
     LOGS_FOLDER: Path = CONFIG_FOLDER / "logs"
+    LOGS_FILENAME = "cheddarr.log"
+    LOGS_MAX_FILES = 10
     DB_FOLDER: Path = CONFIG_FOLDER / "db"
     CONFIG_FILE: Path = CONFIG_FOLDER / "config.json"
 
@@ -94,11 +98,7 @@ class Config(BaseSettings):
                 config_file,
             )
 
-    _config_file_fields = {
-        "SECRET_KEY",
-        "LOG_LEVEL",
-        "MAIL_ENABLED",
-    }
+    _config_file_fields = {"SECRET_KEY", "LOG_LEVEL", "MAIL_ENABLED", "TIMEZONE"}
 
 
 config = Config()

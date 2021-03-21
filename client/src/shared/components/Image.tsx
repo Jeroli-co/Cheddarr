@@ -1,26 +1,30 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 type ImageProps = {
   width?: string;
   height?: string;
-  borderRadius?: string;
-  border?: string;
-  opacity?: string;
   cursor?: string;
-  hoverOpacity?: string;
+  borderRadius?: string;
+  loaded: boolean;
 };
 
-const Image = styled.img<ImageProps>`
+export const Image = styled.img<ImageProps>`
   width: ${(props) => (props.width ? props.width : "100%")};
-  height: ${(props) => (props.height ? props.height : "auto")};
-  border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
-  border: ${(props) => (props.border ? props.border : "none")};
-  opacity: ${(props) => (props.opacity ? props.opacity : "1")};
+  height: ${(props) => (props.height ? props.height : "100%")};
   cursor: ${(props) => (props.cursor ? props.cursor : "default")};
+  border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
 
-  &:hover {
-    opacity: ${(props) => (props.hoverOpacity ? props.hoverOpacity : "1")};
-  }
+  -webkit-transition-property: opacity;
+  transition-property: opacity;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-timing-function: cubic-bezier(0.3, 0, 0.4, 1);
+  transition-timing-function: cubic-bezier(0.3, 0, 0.4, 1);
+  opacity: 0;
+
+  ${(props) =>
+    props.loaded &&
+    css`
+      opacity: 1;
+    `}
 `;
-
-export { Image };

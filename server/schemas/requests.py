@@ -1,49 +1,59 @@
 from abc import ABC
-from datetime import date
-from typing import List, Optional
+from datetime import datetime
+from typing import List, Optional, Union
 
-from server.models import RequestStatus
-from server.schemas import APIModel, Movie, Series, UserPublic
+from server.models.requests import RequestStatus
+from server.schemas.media import MovieSchema, SeriesSchema
+from server.schemas.users import UserPublicSchema
+from .core import APIModel, PaginatedResult
+from ..models.media import MediaType
 
 
-class Request(APIModel, ABC):
+class MediaRequest(APIModel, ABC):
     id: int
     status: RequestStatus
-    requested_user: UserPublic
-    requesting_user: UserPublic
-    created_at: date
-    updated_at: date
+    requested_user: UserPublicSchema
+    requesting_user: UserPublicSchema
+    created_at: datetime
+    updated_at: datetime
+    media_type: MediaType
 
 
-class RequestUpdate(APIModel):
-    status: RequestStatus
-    provider_id: Optional[str]
-
-
-class MovieRequest(Request):
-    movie: Movie
-
-
-class MovieRequestCreate(APIModel):
+class MediaRequestCreate(APIModel):
     tmdb_id: int
     requested_username: str
 
 
-class EpisodeRequest(APIModel):
+class MediaRequestUpdate(APIModel):
+    status: RequestStatus
+    provider_id: Optional[str]
+
+
+class MovieRequestSchema(MediaRequest):
+    media: MovieSchema
+
+
+class MovieRequestCreate(MediaRequestCreate):
+    pass
+
+
+class EpisodeRequestSchema(APIModel):
     episode_number: int
 
 
-class SeasonRequest(APIModel):
+class SeasonRequestSchema(APIModel):
     season_number: int
-    episodes: Optional[List[EpisodeRequest]]
+    episodes: Optional[List[EpisodeRequestSchema]]
 
 
-class SeriesRequest(Request):
-    series: Series
-    seasons: Optional[List[SeasonRequest]]
+class SeriesRequestSchema(MediaRequest):
+    media: SeriesSchema
+    seasons: Optional[List[SeasonRequestSchema]]
 
 
-class SeriesRequestCreate(APIModel):
-    tvdb_id: int
-    requested_username: str
-    seasons: Optional[List[SeasonRequest]]
+class SeriesRequestCreate(MediaRequestCreate):
+    seasons: Optional[List[SeasonRequestSchema]]
+
+
+class MediaRequestSearchResult(PaginatedResult):
+    results: List[Union[SeriesRequestSchema, MovieRequestSchema]]

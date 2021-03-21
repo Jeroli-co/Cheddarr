@@ -1,16 +1,28 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from pydantic import EmailStr
 
-from server import models, schemas, tasks
 from server.api import dependencies as deps
-from server.core import config, security
+from server.core import config, security, utils
 from server.core.scheduler import scheduler
-from server.repositories import (
+from server.models.notifications import Agent
+from server.models.settings import MediaProviderType
+from server.models.users import Friendship, User
+from server.repositories.notifications import NotificationAgentRepository
+from server.repositories.users import (
     FriendshipRepository,
-    PlexAccountRepository,
-    PlexSettingRepository,
     UserRepository,
+)
+from server.schemas.auth import EmailConfirm
+from server.schemas.core import ResponseMessage
+from server.schemas.users import (
+    FriendshipCreate,
+    PasswordResetConfirm,
+    PasswordResetCreate,
+    UserPublicSchema,
+    UserSchema,
+    UserUpdate,
 )
 
 users_router = APIRouter()
@@ -25,7 +37,7 @@ current_user_router = APIRouter()
 @users_router.get(
     "/{id:int}",
     dependencies=([Depends(deps.get_current_user)]),
-    response_model=schemas.UserPublic,
+    response_model=UserPublicSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     },
@@ -43,7 +55,7 @@ def get_user_by_id(
 @users_router.get(
     "/{username:str}",
     dependencies=([Depends(deps.get_current_user)]),
-    response_model=schemas.UserPublic,
+    response_model=UserPublicSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "User not found",
@@ -65,47 +77,39 @@ def get_user_by_username(
 ##########################################
 
 
-@current_user_router.get("", response_model=schemas.User)
-async def get_current_user(current_user: models.User = Depends(deps.get_current_user)):
+@current_user_router.get("", response_model=UserSchema)
+async def get_current_user(current_user: User = Depends(deps.get_current_user)):
     return current_user
 
 
-@current_user_router.delete("")
+@current_user_router.delete("", response_model=ResponseMessage)
 def delete_user(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     user_repo.remove(current_user)
     return {"detail": "User deleted."}
 
 
-@current_user_router.delete("/plex-account")
-def unlink_plex_account(
-    current_user: models.User = Depends(deps.get_current_user),
-    plex_account_repo: PlexAccountRepository = Depends(deps.get_repository(PlexAccountRepository)),
-    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
-):
-    settings = plex_setting_repo.find_all_by(user_id=current_user.id)
-    for setting in settings:
-        plex_setting_repo.remove(setting)
-    plex_account_repo.remove(current_user.plex_account)
-    return {"detail": "Plex account unlinked."}
-
-
 @current_user_router.patch(
     "",
-    response_model=schemas.User,
+    response_model=UserSchema,
     responses={
         status.HTTP_401_UNAUTHORIZED: {"description": "Passwords mismatch"},
         status.HTTP_409_CONFLICT: {"description": "Username or email not available"},
     },
 )
 def update_user(
-    user_in: schemas.UserUpdate,
+    user_in: UserUpdate,
     request: Request,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
 ):
+    email_agent = notif_agent_repo.find_by(name=Agent.email)
+
     if user_in.username is not None:
         if user_repo.find_by_username(user_in.username):
             raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
@@ -122,9 +126,13 @@ def update_user(
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The passwords don't match.")
         current_user.password = user_in.password
         if config.MAIL_ENABLED:
+            if email_agent is None or not email_agent.enabled:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
             scheduler.add_job(
-                tasks.send_email_task,
+                utils.send_email,
                 kwargs=dict(
+                    email_settings=email_agent.settings,
                     to_email=current_user.email,
                     subject="Your password has been changed",
                     html_template_name="email/change_password_notice.html",
@@ -135,13 +143,17 @@ def update_user(
         if user_repo.find_by_email(user_in.email):
             raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
         if config.MAIL_ENABLED:
-            email_data = schemas.EmailConfirm(
-                email=user_in.email, old_email=current_user.email
+            if email_agent is None or not email_agent.enabled:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
+            email_data = EmailConfirm(
+                email=user_in.email, old_email=EmailStr(current_user.email)
             ).dict()
             token = security.generate_timed_token(email_data)
             scheduler.add_job(
-                tasks.send_email_task,
+                utils.send_email,
                 kwargs=dict(
+                    email_settings=email_agent.settings,
                     to_email=user_in.email,
                     subject="Please confirm your new email",
                     html_template_name="email/email_confirmation.html",
@@ -157,25 +169,36 @@ def update_user(
 
 @current_user_router.put(
     "/password",
+    response_model=ResponseMessage,
     responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
         status.HTTP_404_NOT_FOUND: {
             "description": "User not found",
-        }
+        },
     },
 )
 def reset_password(
-    email_data: schemas.PasswordResetCreate,
+    email_data: PasswordResetCreate,
     request: Request,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
 ):
+    email_agent = notif_agent_repo.find_by(name=Agent.email)
+    if email_agent is None or not email_agent.enabled:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
     email = email_data.email
     user = user_repo.find_by_email(email_data.email)
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user registered with this email.")
+
     token = security.generate_timed_token(user.email)
     scheduler.add_job(
-        tasks.send_email_task,
+        utils.send_email,
         kwargs=dict(
+            email_settings=email_agent.settings,
             to_email=email,
             subject="Reset your password",
             html_template_name="email/reset_password_instructions.html",
@@ -188,6 +211,7 @@ def reset_password(
 @current_user_router.get(
     "/password/{token}",
     status_code=status.HTTP_202_ACCEPTED,
+    response_model=ResponseMessage,
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "User not found",
@@ -213,18 +237,27 @@ def check_reset_password(
 
 @current_user_router.post(
     "/password/{token}",
+    response_model=ResponseMessage,
     responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
         status.HTTP_404_NOT_FOUND: {
             "description": "User not found",
         },
-        status.HTTP_410_GONE: {"description": "Invalid or expired link "},
+        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
     },
 )
 def confirm_reset_password(
     token: str,
-    password: schemas.PasswordResetConfirm,
+    password: PasswordResetConfirm,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
 ):
+    email_agent = notif_agent_repo.find_by(name=Agent.email)
+    if email_agent is None or not email_agent.enabled:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
     try:
         email = security.confirm_timed_token(token)
     except Exception:
@@ -237,8 +270,9 @@ def confirm_reset_password(
     user.password = password
     user_repo.save(user)
     scheduler.add_job(
-        tasks.send_email_task,
+        utils.send_email,
         kwargs=dict(
+            email_settings=email_agent.settings,
             to_email=user.email,
             subject="Your password has been reset",
             html_template_name="email/reset_password_notice.html",
@@ -252,10 +286,10 @@ def confirm_reset_password(
 ##########################################
 
 
-@current_user_router.get("/friends", response_model=List[schemas.UserPublic], tags=["friends"])
+@current_user_router.get("/friends", response_model=List[UserPublicSchema], tags=["friends"])
 def get_friends(
-    providers_type: Optional[models.ProviderType] = None,
-    current_user: models.User = Depends(deps.get_current_user),
+    provider_type: Optional[MediaProviderType] = None,
+    current_user: User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
     friendships = friendship_repo.find_all_by_user_id(current_user.id, pending=False)
@@ -265,7 +299,7 @@ def get_friends(
         else friendship.requested_user
         for friendship in friendships
     ]
-    if providers_type is not None:
+    if provider_type is not None:
         friends.append(current_user)
         return [
             friend
@@ -273,8 +307,8 @@ def get_friends(
             if next(
                 (
                     provider
-                    for provider in friend.providers
-                    if provider.provider_type == providers_type and provider.enabled is True
+                    for provider in friend.media_providers
+                    if provider.provider_type == provider_type and provider.enabled is True
                 ),
                 None,
             )
@@ -284,10 +318,10 @@ def get_friends(
 
 
 @current_user_router.get(
-    "/friends/incoming", response_model=List[schemas.UserPublic], tags=["friends"]
+    "/friends/incoming", response_model=List[UserPublicSchema], tags=["friends"]
 )
 def get_pending_incoming_friends(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
     friendships = friendship_repo.find_all_by(requested_user_id=current_user.id, pending=True)
@@ -295,10 +329,10 @@ def get_pending_incoming_friends(
 
 
 @current_user_router.get(
-    "/friends/outgoing", response_model=List[schemas.UserPublic], tags=["friends"]
+    "/friends/outgoing", response_model=List[UserPublicSchema], tags=["friends"]
 )
 def get_pending_outgoing_friends(
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
     friendships = friendship_repo.find_all_by(requesting_user_id=current_user.id, pending=True)
@@ -308,7 +342,7 @@ def get_pending_outgoing_friends(
 @current_user_router.post(
     "/friends",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.UserPublic,
+    response_model=UserPublicSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
         status.HTTP_409_CONFLICT: {"description": "Already friends"},
@@ -316,8 +350,8 @@ def get_pending_outgoing_friends(
     tags=["friends"],
 )
 def add_friend(
-    friend: schemas.FriendshipCreate,
-    current_user: models.User = Depends(deps.get_current_user),
+    friend: FriendshipCreate,
+    current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
@@ -328,14 +362,14 @@ def add_friend(
     if friendship_repo.find_by_user_ids(current_user.id, friend.id) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This user is already a friend.")
 
-    friendship = models.Friendship(requesting_user_id=current_user.id, requested_user_id=friend.id)
+    friendship = Friendship(requesting_user_id=current_user.id, requested_user_id=friend.id)
     friendship_repo.save(friendship)
     return friendship.requested_user
 
 
 @current_user_router.patch(
     "/friends/{username}",
-    response_model=schemas.UserPublic,
+    response_model=UserPublicSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
         status.HTTP_403_FORBIDDEN: {"description": "Not friends"},
@@ -344,7 +378,7 @@ def add_friend(
 )
 def accept_friend(
     username,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
@@ -370,7 +404,7 @@ def accept_friend(
 )
 def remove_friend(
     username: str,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     friendship_repo: FriendshipRepository = Depends(deps.get_repository(FriendshipRepository)),
 ):
@@ -387,11 +421,11 @@ def remove_friend(
 
 
 @current_user_router.get(
-    "/friends/search", response_model=List[schemas.UserPublic], tags=["friends"]
+    "/friends/search", response_model=List[UserPublicSchema], tags=["friends"]
 )
 def search_friends(
     value: str,
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     search = user_repo.search_by("username", value)

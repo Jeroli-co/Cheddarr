@@ -1,15 +1,29 @@
 import React from "react";
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAngleDown,
   faAngleRight,
   faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FriendItemContainer } from "./FriendItemContainer";
-import { IPublicUser } from "../../../models/IPublicUser";
+import { IPublicUser } from "../../../../shared/models/IPublicUser";
 import { IAsyncCall } from "../../../../shared/models/IAsyncCall";
-import Spinner from "../../../../shared/components/Spinner";
+import { Spinner } from "../../../../shared/components/Spinner";
+import styled from "styled-components";
+import { ClosableTitle } from "../../../../shared/components/ClosableTitle";
+import { H3 } from "../../../../shared/components/Titles";
+import { DangerIconButton } from "../../../../shared/components/Button";
+import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
+import { Icon } from "../../../../shared/components/Icon";
+
+const Container = styled.div`
+  padding: 0 20px 0 0;
+  width: 49%;
+  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
+    width: 100%;
+    padding: 0;
+  }
+`;
 
 type FriendsListProps = {
   friends: IAsyncCall<IPublicUser[] | null>;
@@ -21,37 +35,20 @@ const FriendsList = ({ friends, removeFriend }: FriendsListProps) => {
 
   const Actions = (friend: IPublicUser) => {
     return (
-      <button
-        className="button is-danger is-small"
-        type="button"
-        onClick={() => removeFriend(friend)}
-      >
-        <span className="icon">
-          <FontAwesomeIcon icon={faMinus} />
-        </span>
-      </button>
+      <DangerIconButton type="button" onClick={() => removeFriend(friend)}>
+        <Icon icon={faMinus} />
+      </DangerIconButton>
     );
   };
 
   return (
-    <div className="FriendsList" data-testid="FriendsList">
-      <div
-        className="level is-pointed"
-        onClick={() => setShowFriendsList(!showFriendsList)}
-      >
-        <div className="level-left">
-          <div className="level-item">
-            Friends ({friends.data ? friends.data.length : 0})
-          </div>
-        </div>
-        <div className="level-right">
-          <div className="level-item">
-            {(showFriendsList && (
-              <FontAwesomeIcon icon={faAngleDown} size="lg" />
-            )) || <FontAwesomeIcon icon={faAngleRight} size="lg" />}
-          </div>
-        </div>
-      </div>
+    <Container>
+      <ClosableTitle onClick={() => setShowFriendsList(!showFriendsList)}>
+        <H3>Friends ({friends.data ? friends.data.length : 0})</H3>
+        {(showFriendsList && <Icon icon={faAngleDown} size="lg" />) || (
+          <Icon icon={faAngleRight} size="lg" />
+        )}
+      </ClosableTitle>
 
       {friends.isLoading && <Spinner />}
       {!friends.isLoading &&
@@ -64,7 +61,7 @@ const FriendsList = ({ friends, removeFriend }: FriendsListProps) => {
             isShow={showFriendsList}
           />
         ))}
-    </div>
+    </Container>
   );
 };
 

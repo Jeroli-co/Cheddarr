@@ -1,41 +1,34 @@
 import React, { Suspense } from "react";
 import { useSession } from "./shared/contexts/SessionContext";
 import { PageLoader } from "./shared/components/PageLoader";
+import { LoggedInApp } from "./logged-in-app/LoggedInApp";
 
 const AuthenticationContextProvider = React.lazy(() =>
-  import("./logged-out-app/contexts/AuthenticationContext")
-);
-const LoggedOutNavbar = React.lazy(() =>
-  import("./logged-out-app/LoggedOutNavbar")
-);
-const LoggedInNavbar = React.lazy(() =>
-  import("./logged-in-app/navbar/LoggedInNavbar")
+  import("./shared/contexts/AuthenticationContext")
 );
 const PlexConfigContextProvider = React.lazy(() =>
-  import("./logged-in-app/contexts/PlexConfigContext")
+  import("./shared/contexts/PlexConfigContext")
 );
 const SwitchRoutes = React.lazy(() => import("./router/SwitchRoutes"));
 
 export const DynamicApp = () => {
   const {
-    session: { isAuthenticated },
+    session: { isAuthenticated, isLoading },
   } = useSession();
 
-  // TODO: Move signinwithplex then remove authcontext from authenticated app
+  if (isLoading) {
+    return <PageLoader />;
+  }
 
   return isAuthenticated ? (
     <Suspense fallback={<PageLoader />}>
-      <AuthenticationContextProvider>
-        <PlexConfigContextProvider>
-          <LoggedInNavbar />
-          <SwitchRoutes />
-        </PlexConfigContextProvider>
-      </AuthenticationContextProvider>
+      <PlexConfigContextProvider>
+        <LoggedInApp />
+      </PlexConfigContextProvider>
     </Suspense>
   ) : (
     <Suspense fallback={<PageLoader />}>
       <AuthenticationContextProvider>
-        <LoggedOutNavbar />
         <SwitchRoutes />
       </AuthenticationContextProvider>
     </Suspense>

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAngleDown,
   faAngleRight,
@@ -7,9 +6,22 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FriendItemContainer } from "./FriendItemContainer";
-import { IPublicUser } from "../../../models/IPublicUser";
+import { IPublicUser } from "../../../../shared/models/IPublicUser";
 import { IAsyncCall } from "../../../../shared/models/IAsyncCall";
-import Spinner from "../../../../shared/components/Spinner";
+import { Spinner } from "../../../../shared/components/Spinner";
+import styled from "styled-components";
+import { Buttons } from "../../../../shared/components/layout/Buttons";
+import {
+  DangerIconButton,
+  SuccessIconButton,
+} from "../../../../shared/components/Button";
+import { ClosableTitle } from "../../../../shared/components/ClosableTitle";
+import { H3 } from "../../../../shared/components/Titles";
+import { Icon } from "../../../../shared/components/Icon";
+
+const Container = styled.div`
+  width: 100%;
+`;
 
 type FriendsReceivedListProps = {
   received: IAsyncCall<IPublicUser[] | null>;
@@ -26,48 +38,25 @@ const ReceivedList = ({
 
   const Actions = (friend: IPublicUser) => {
     return (
-      <div className="buttons">
-        <button
-          className="button is-success is-small"
-          type="button"
-          onClick={() => acceptRequest(friend)}
-        >
-          <span className="icon">
-            <FontAwesomeIcon icon={faCheck} />
-          </span>
-        </button>
-        <button
-          className="button is-danger is-small"
-          type="button"
-          onClick={() => refuseRequest(friend)}
-        >
-          <span className="icon">
-            <FontAwesomeIcon icon={faTimes} />
-          </span>
-        </button>
-      </div>
+      <Buttons>
+        <SuccessIconButton type="button" onClick={() => acceptRequest(friend)}>
+          <Icon icon={faCheck} />
+        </SuccessIconButton>
+        <DangerIconButton type="button" onClick={() => refuseRequest(friend)}>
+          <Icon icon={faTimes} />
+        </DangerIconButton>
+      </Buttons>
     );
   };
 
   return (
-    <div className="ReceivedList" data-testid="ReceivedList">
-      <div
-        className="level is-pointed"
-        onClick={() => setShowReceivedList(!showReceivedList)}
-      >
-        <div className="level-left">
-          <div className="level-item">
-            Received ({received.data ? received.data.length : 0})
-          </div>
-        </div>
-        <div className="level-right">
-          <div className="level-item">
-            {(showReceivedList && (
-              <FontAwesomeIcon icon={faAngleDown} size="lg" />
-            )) || <FontAwesomeIcon icon={faAngleRight} size="lg" />}
-          </div>
-        </div>
-      </div>
+    <Container>
+      <ClosableTitle onClick={() => setShowReceivedList(!showReceivedList)}>
+        <H3>Received ({received.data ? received.data.length : 0})</H3>
+        {(showReceivedList && <Icon icon={faAngleDown} size="lg" />) || (
+          <Icon icon={faAngleRight} size="lg" />
+        )}
+      </ClosableTitle>
 
       {showReceivedList && received.isLoading && <Spinner />}
       {!received.isLoading &&
@@ -80,7 +69,7 @@ const ReceivedList = ({
             isShow={showReceivedList}
           />
         ))}
-    </div>
+    </Container>
   );
 };
 

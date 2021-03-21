@@ -2,8 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
-from .base import APIModel
-from ..models import UserRole
+from .core import APIModel
 
 
 class Token(BaseModel):
@@ -15,8 +14,7 @@ class TokenPayload(BaseModel):
     sub: str
     username: str
     avatar: str
-    role: UserRole
-    plex: bool
+    roles: int
 
 
 class EmailConfirm(APIModel):

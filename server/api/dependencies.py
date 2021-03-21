@@ -1,4 +1,4 @@
-from typing import Callable, Generator, Type
+from typing import Callable, Generator, List, Literal, Type
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -7,10 +7,10 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from server.core import config
-from server.models import User, UserRole
-from server.repositories import PlexSettingRepository, UserRepository
+from server.models.users import User, UserRole
 from server.repositories.base import BaseRepository
-from server.schemas import TokenPayload
+from server.repositories.users import UserRepository
+from server.schemas.auth import TokenPayload
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 
@@ -59,29 +59,13 @@ def get_current_user(
     return user
 
 
-def get_current_superuser(
-    current_user: User = Depends(get_current_user),
-) -> User:
-    if current_user.role != UserRole.superuser:
-        raise HTTPException(status_code=403, detail="Not enough privileges.")
-    return current_user
+def has_user_permissions(
+    permissions: List[UserRole], options: Literal["and", "or"] = "and"
+) -> Callable[[User], None]:
+    def _has_permissions(current_user: User = Depends(get_current_user)):
+        from server.core.security import check_permissions
 
+        if not check_permissions(current_user.roles, permissions, options):
+            raise HTTPException(status_code=403, detail="Not enough privileges.")
 
-def get_current_poweruser(
-    current_user: User = Depends(get_current_user),
-) -> User:
-    if current_user.role != UserRole.superuser and current_user.role != UserRole.poweruser:
-        raise HTTPException(status_code=403, detail="Not enough privileges.")
-    return current_user
-
-
-def get_current_user_plex_settings(
-    cur_user: User = Depends(get_current_user),
-    plex_setting_repository: PlexSettingRepository = Depends(
-        get_repository(PlexSettingRepository)
-    ),
-):
-    settings = plex_setting_repository.find_all_by(user_id=cur_user.id, enabled=True)
-    if settings is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex settings found for the user.")
-    return settings
+    return _has_permissions

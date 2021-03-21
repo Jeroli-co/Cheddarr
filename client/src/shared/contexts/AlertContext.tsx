@@ -1,36 +1,36 @@
 import React, { createContext, useContext, useState } from "react";
 import { Alert } from "../components/Alert";
 
-interface INotificationLevel {
+interface IAlertLevel {
   duration: number;
   color: string;
   bgColor: string;
 }
 
-class NotificationLevel {
-  static readonly DANGER: INotificationLevel = {
+class AlertLevel {
+  static readonly DANGER: IAlertLevel = {
     duration: 8000,
     color: "#800000",
     bgColor: "#ff9290",
   };
-  static readonly WARNING: INotificationLevel = {
+  static readonly WARNING: IAlertLevel = {
     duration: 4000,
     color: "#805500",
     bgColor: "#ffe8a3",
   };
-  static readonly SUCCESS: INotificationLevel = {
+  static readonly SUCCESS: IAlertLevel = {
     duration: 5000,
     color: "#006500",
     bgColor: "#bcffb7",
   };
-  static readonly INFO: INotificationLevel = {
+  static readonly INFO: IAlertLevel = {
     duration: 5000,
     color: "#4667ae",
     bgColor: "#a8cbff",
   };
 }
 
-interface INotificationContext {
+interface IAlertContext {
   readonly pushSuccess: (message: string) => void;
   readonly pushWarning: (message: string) => void;
   readonly pushInfo: (message: string) => void;
@@ -38,12 +38,12 @@ interface INotificationContext {
   readonly removeNotification: () => void;
 }
 
-export interface INotification {
+export interface IAlert {
   readonly message: string;
-  readonly level: INotificationLevel;
+  readonly level: IAlertLevel;
 }
 
-const NotificationContextDefaultImpl: INotificationContext = {
+const AlertContextDefaultImpl: IAlertContext = {
   pushDanger(_: string): void {},
   pushInfo(_: string): void {},
   pushSuccess(_: string): void {},
@@ -51,22 +51,22 @@ const NotificationContextDefaultImpl: INotificationContext = {
   removeNotification(): void {},
 };
 
-export const AlertContext = createContext<INotificationContext>(
-  NotificationContextDefaultImpl
+export const AlertContext = createContext<IAlertContext>(
+  AlertContextDefaultImpl
 );
 
-type NotificationState = {
-  notification: INotification | null;
+type AlertState = {
+  notification: IAlert | null;
   timer: any;
 };
 
-export const NotificationContextProvider = (props: any) => {
-  const [state, setState] = useState<NotificationState>({
+export const AlertContextProvider = (props: any) => {
+  const [state, setState] = useState<AlertState>({
     notification: null,
     timer: 0,
   });
 
-  const pushNotification = (n: INotification) => {
+  const pushNotification = (n: IAlert) => {
     if (state.timer) clearTimeout(state.timer);
     setState({
       notification: n,
@@ -75,33 +75,33 @@ export const NotificationContextProvider = (props: any) => {
   };
 
   const pushSuccess = (message: string) => {
-    const notification: INotification = {
+    const notification: IAlert = {
       message: message,
-      level: NotificationLevel.SUCCESS,
+      level: AlertLevel.SUCCESS,
     };
     pushNotification(notification);
   };
 
   const pushWarning = (message: string) => {
-    const notification: INotification = {
+    const notification: IAlert = {
       message: message,
-      level: NotificationLevel.WARNING,
+      level: AlertLevel.WARNING,
     };
     pushNotification(notification);
   };
 
   const pushDanger = (message: string) => {
-    const notification: INotification = {
+    const notification: IAlert = {
       message: message,
-      level: NotificationLevel.DANGER,
+      level: AlertLevel.DANGER,
     };
     pushNotification(notification);
   };
 
   const pushInfo = (message: string) => {
-    const notification: INotification = {
+    const notification: IAlert = {
       message: message,
-      level: NotificationLevel.INFO,
+      level: AlertLevel.INFO,
     };
     pushNotification(notification);
   };

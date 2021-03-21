@@ -21,7 +21,6 @@ COPY cheddarr.py .
 # Copy poetry.lock* in case it doesn't exist in the repo
 COPY /pyproject.toml /poetry.lock* /app/
 
-
 # Install Poetry and backend dependencies
 RUN pip3 install --upgrade pip && pip3 install poetry \
     && poetry config virtualenvs.create false \

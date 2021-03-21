@@ -2,8 +2,7 @@ from typing import Optional
 
 from pydantic import AnyHttpUrl, EmailStr
 
-from . import APIModel
-from ..models import UserRole
+from .core import APIModel
 
 
 class UserBase(APIModel):
@@ -11,10 +10,10 @@ class UserBase(APIModel):
     email: EmailStr
 
 
-class User(UserBase):
+class UserSchema(UserBase):
     avatar: Optional[AnyHttpUrl]
     confirmed: bool
-    role: UserRole
+    roles: int
 
 
 class UserCreate(UserBase):
@@ -28,7 +27,7 @@ class UserUpdate(UserBase):
     password: Optional[str]
 
 
-class UserPublic(UserBase):
+class UserPublicSchema(UserBase):
     avatar: Optional[AnyHttpUrl]
 
 

@@ -1,14 +1,15 @@
 from datetime import datetime
-from typing import Any, Dict, TypeVar, Union
+from typing import TypeVar
 
-from pydantic import BaseModel
-from sqlalchemy import Column, DateTime, func
+import pytz
+from sqlalchemy import Column, DateTime as DBDateTime, TypeDecorator
 from sqlalchemy.ext.declarative import (
     declarative_base,
     declared_attr,
 )
 from sqlalchemy.orm import class_mapper
 
+from server.core import config
 
 Base = declarative_base()
 
@@ -31,25 +32,6 @@ class Model(Base):
         ]
         return f"<{self.__class__.__name__} {' '.join(properties)}>"
 
-    def update(
-        self,
-        obj_in: Union[BaseModel, Dict[str, Any]],
-    ):
-        """
-        Update an object's attributes
-
-        :param obj_in: The schema or dict of attributes to update the object
-        :return: The updated object
-        """
-        obj_data = self.as_dict()
-        if isinstance(obj_in, dict):
-            update_data = obj_in
-        else:
-            update_data = obj_in.dict(exclude_unset=True)
-        for field in obj_data:
-            if field in update_data:
-                setattr(self, field, update_data[field])
-
     def as_dict(self, found=None):
         if found is None:
             found = set()
@@ -71,10 +53,22 @@ class Model(Base):
         return out
 
 
+class DateTime(TypeDecorator):
+    impl = DBDateTime
+
+    def process_bind_param(self, value, engine):
+        return value
+
+    def process_result_value(self, value, engine):
+        return value.replace(tzinfo=pytz.timezone(config.TIMEZONE)).astimezone(
+            pytz.timezone(config.TIMEZONE)
+        )
+
+
 class Timestamp(object):
     """Mixin that define timestamp columns."""
 
-    __datetime_func__ = func.now()
+    __datetime_func__ = datetime.now()
 
     created_at = Column(DateTime, default=__datetime_func__, nullable=False)
 

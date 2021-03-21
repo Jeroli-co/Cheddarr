@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Literal
 
 from itsdangerous import URLSafeSerializer, URLSafeTimedSerializer
 from jose import jwt
@@ -55,3 +56,17 @@ def confirm_timed_token(token: str, expiration_minutes: int = 30):
     except Exception:
         raise Exception
     return data
+
+
+def check_permissions(
+    user_roles: int, permissions: list, options: Literal["and", "or"] = "and"
+) -> bool:
+    from server.models.users import UserRole
+
+    if user_roles & UserRole.admin:
+        return True
+    elif options == "and":
+        return all(user_roles & permission for permission in permissions)
+    elif options == "or":
+        return any(user_roles & permission for permission in permissions)
+    return False

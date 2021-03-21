@@ -1,7 +1,9 @@
-from datetime import datetime
 from typing import Dict
 
 from fastapi.testclient import TestClient
+
+from server.models.media import MediaType
+from server.models.requests import RequestStatus
 
 
 def user_authentication_headers(
@@ -54,13 +56,9 @@ datasets = {
         {
             "id": 1,
             "title": "Star Wars: The Clone Wars",
-            "release_date": datetime.strptime("2008-10-03", "%Y-%m-%d"),
-            "status": "Ended",
-            "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
-            "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+            "tmdb_id": 4194,
             "tvdb_id": 83268,
-            "number_of_seasons": 7,
-            "series_type": "anime",
+            "media_type": MediaType.series,
         }
     ],
     "series_requests": [
@@ -68,42 +66,43 @@ datasets = {
             "id": 1,
             "requesting_user_id": 3,
             "requested_user_id": 1,
-            "status": "pending",
-            "series_id": 1,
+            "status": RequestStatus.pending,
+            "media_id": 1,
+            "media_type": MediaType.series,
         },
         {
             "id": 2,
             "requesting_user_id": 1,
             "requested_user_id": 3,
-            "status": "approved",
-            "series_id": 1,
+            "status": RequestStatus.approved,
+            "media_id": 1,
+            "media_type": MediaType.series,
         },
     ],
     "movies": [
         {
-            "id": 1,
-            "title": "Star Wars: The Clone Wars",
-            "release_date": datetime.strptime("1977-10-18", "%Y-%m-%d"),
-            "status": "Ended",
-            "poster_url": "https://image.tmdb.org/t/p/w500//e1nWfnnCVqxS2LeTO3dwGyAsG2V.jpg",
-            "art_url": "https://image.tmdb.org/t/p/w1280//m6eRgkR1KC6Mr6gKx6gKCzSn6vD.jpg",
+            "id": 2,
+            "title": "Star Wars",
             "tmdb_id": 11,
+            "media_type": MediaType.movies,
         }
     ],
     "movies_requests": [
         {
-            "id": 1,
+            "id": 3,
             "requesting_user_id": 3,
             "requested_user_id": 1,
-            "status": "pending",
-            "movie_id": 1,
+            "status": RequestStatus.pending,
+            "media_id": 2,
+            "media_type": MediaType.movies,
         },
         {
-            "id": 2,
+            "id": 4,
             "requesting_user_id": 1,
             "requested_user_id": 3,
-            "status": "approved",
-            "movie_id": 1,
+            "status": RequestStatus.approved,
+            "media_id": 2,
+            "media_type": MediaType.movies,
         },
     ],
 }

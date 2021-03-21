@@ -1,9 +1,8 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from server import models
 from server.core.security import verify_password
-from server.repositories import FriendshipRepository, UserRepository
+from server.repositories.users import FriendshipRepository, UserRepository
 from server.tests.utils import datasets
 
 
@@ -14,11 +13,12 @@ def test_get_current_user(client: TestClient, normal_user_token_headers):
     )
     assert r.status_code == 200
     current_user = r.json()
+
     assert current_user["email"] == datasets["users"][0]["email"]
     assert current_user["username"] == datasets["users"][0]["username"]
     assert current_user["avatar"] == datasets["users"][0]["avatar"]
     assert current_user["confirmed"] is True
-    assert current_user["role"] == models.UserRole.user
+    assert current_user["roles"]
 
 
 def test_get_user_by_id(client: TestClient, normal_user_token_headers):
@@ -141,15 +141,6 @@ def test_update_email_not_available(client: TestClient, normal_user_token_header
         json={"email": datasets["users"][1]["email"]},
     )
     assert r.status_code == 409
-
-
-def test_reset_password_wrong_email(client: TestClient, normal_user_token_headers):
-    r = client.put(
-        client.app.url_path_for("reset_password"),
-        headers=normal_user_token_headers,
-        json={"email": "non_existing@email.fake"},
-    )
-    assert r.status_code == 404
 
 
 def test_get_friends(client: TestClient, normal_user_token_headers):

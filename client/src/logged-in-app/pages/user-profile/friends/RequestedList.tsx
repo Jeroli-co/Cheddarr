@@ -1,14 +1,22 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAngleDown,
   faAngleRight,
   faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FriendItemContainer } from "./FriendItemContainer";
-import { IPublicUser } from "../../../models/IPublicUser";
+import { IPublicUser } from "../../../../shared/models/IPublicUser";
 import { IAsyncCall } from "../../../../shared/models/IAsyncCall";
-import Spinner from "../../../../shared/components/Spinner";
+import { Spinner } from "../../../../shared/components/Spinner";
+import styled from "styled-components";
+import { ClosableTitle } from "../../../../shared/components/ClosableTitle";
+import { H3 } from "../../../../shared/components/Titles";
+import { DangerIconButton } from "../../../../shared/components/Button";
+import { Icon } from "../../../../shared/components/Icon";
+
+const Container = styled.div`
+  width: 100%;
+`;
 
 type FriendsRequestedListProps = {
   requested: IAsyncCall<IPublicUser[] | null>;
@@ -23,37 +31,20 @@ const RequestedList = ({
 
   const Actions = (friend: IPublicUser) => {
     return (
-      <button
-        className="button is-danger is-small"
-        type="button"
-        onClick={() => cancelRequest(friend)}
-      >
-        <span className="icon">
-          <FontAwesomeIcon icon={faMinus} />
-        </span>
-      </button>
+      <DangerIconButton type="button" onClick={() => cancelRequest(friend)}>
+        <Icon icon={faMinus} />
+      </DangerIconButton>
     );
   };
 
   return (
-    <div className="RequestedList" data-testid="RequestedList">
-      <div
-        className="level is-pointed"
-        onClick={() => setShowRequestedList(!showRequestedList)}
-      >
-        <div className="level-left">
-          <div className="level-item">
-            Requested ({requested.data ? requested.data.length : 0})
-          </div>
-        </div>
-        <div className="level-right">
-          <div className="level-item">
-            {(showRequestedList && (
-              <FontAwesomeIcon icon={faAngleDown} size="lg" />
-            )) || <FontAwesomeIcon icon={faAngleRight} size="lg" />}
-          </div>
-        </div>
-      </div>
+    <Container>
+      <ClosableTitle onClick={() => setShowRequestedList(!showRequestedList)}>
+        <H3>Requested ({requested.data ? requested.data.length : 0})</H3>
+        {(showRequestedList && <Icon icon={faAngleDown} size="lg" />) || (
+          <Icon icon={faAngleRight} size="lg" />
+        )}
+      </ClosableTitle>
 
       {showRequestedList && requested.isLoading && <Spinner />}
       {!requested.isLoading &&
@@ -66,7 +57,7 @@ const RequestedList = ({
             isShow={showRequestedList}
           />
         ))}
-    </div>
+    </Container>
   );
 };
 

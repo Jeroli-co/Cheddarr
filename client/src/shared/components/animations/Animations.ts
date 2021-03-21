@@ -1,5 +1,19 @@
 import { keyframes } from "styled-components";
 
+export const Flip = () => {
+  return keyframes`
+    0% {
+      transform: scaleX(0);
+    }
+    50% {
+      transform: scaleX(-1);
+    }
+    100% {
+      transform: scaleX(0);;
+    }
+  `;
+};
+
 export const Spin = () => {
   return keyframes`
     from {
