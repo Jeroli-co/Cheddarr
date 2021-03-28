@@ -1,10 +1,8 @@
-import logging
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.api.v1 import router
-from server.core import config, logger
+from server.core import config
 from server.core.scheduler import scheduler
 from server.site import site
 
@@ -27,7 +25,6 @@ def setup_app() -> FastAPI:
 
     scheduler.start()
 
-    logger.log(logging.INFO, "Starting Cheddarr")
     return application
 
 
