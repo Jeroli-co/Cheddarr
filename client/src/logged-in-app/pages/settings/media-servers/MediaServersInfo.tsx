@@ -11,6 +11,10 @@ import { IMediaServerConfig } from "../../../../shared/models/IMediaServerConfig
 import { useMediaServerLibraries } from "../../../../shared/hooks/useMediaServerLibrariesService";
 import { PrimaryDivider } from "../../../../shared/components/Divider";
 import { H2, H3 } from "../../../../shared/components/Titles";
+import { IJob, JobActionsEnum } from "../../../../shared/models/IJob";
+import { APIRoutes } from "../../../../shared/enums/APIRoutes";
+import { useAPI } from "../../../../shared/hooks/useAPI";
+import { useAlert } from "../../../../shared/contexts/AlertContext";
 
 const Header = styled.div`
   border-top-left-radius: 6px;
@@ -52,12 +56,26 @@ const MediaServerInfo = (props: MediaServerInfoProps) => {
     props.mediaServerType,
     props.configId
   );
+  const { patch } = useAPI();
+  const { pushInfo, pushDanger } = useAlert();
+
+  const fullSync = () => {
+    patch<IJob>(APIRoutes.PATCH_JOB("plex-full-sync"), {
+      action: JobActionsEnum.RUN,
+    }).then((res) => {
+      if (res.status === 200) {
+        pushInfo("Full sync is running");
+      } else {
+        pushDanger("Cannot run full sync");
+      }
+    });
+  };
 
   return (
     <Item>
       <ItemHeader>
         <H2>{props.serverName}</H2>
-        <PrimaryIconButton type="button">
+        <PrimaryIconButton type="button" onClick={() => fullSync()}>
           <Icon icon={faSync} />
         </PrimaryIconButton>
       </ItemHeader>

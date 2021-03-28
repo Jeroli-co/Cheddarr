@@ -15,7 +15,7 @@ export const THEMES: DefaultTheme = {
   grey: "#a1978a",
   plex: "#282a2d",
   movie: "hsl(223,81%,62%)",
-  series: "hsl(259, 50%, 50%)",
+  series: "hsl(259,50%,50%)",
   season: "hsl(17,71%,51%)",
   episode: "hsl(174,78%,32%)",
 };
