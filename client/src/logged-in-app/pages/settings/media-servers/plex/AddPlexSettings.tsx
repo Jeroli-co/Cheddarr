@@ -16,9 +16,7 @@ type AddPlexSettingsProps = {
 
 export const AddPlexSettings = (props: AddPlexSettingsProps) => {
   const servers = usePlexServers();
-  const [selectedServerName, setSelectedServerName] = useState<string | null>(
-    null
-  );
+  const [selectedServerName, setSelectedServerName] = useState<string>("");
   const [
     selectedServerConfig,
     setSelectedServerConfig,
@@ -54,7 +52,10 @@ export const AddPlexSettings = (props: AddPlexSettingsProps) => {
           <>
             <H3>Account servers</H3>
             <InputField>
-              <select onChange={(e) => setSelectedServerName(e.target.value)}>
+              <select
+                value={selectedServerName}
+                onChange={(e) => setSelectedServerName(e.target.value)}
+              >
                 {servers.data.map((server, index) => {
                   return (
                     <option key={index} value={server.serverName}>
