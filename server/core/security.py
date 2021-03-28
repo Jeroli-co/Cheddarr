@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Literal
 
+import jwt
 from itsdangerous import URLSafeSerializer, URLSafeTimedSerializer
-from jose import jwt
 from passlib import pwd
 from passlib.context import CryptContext
 

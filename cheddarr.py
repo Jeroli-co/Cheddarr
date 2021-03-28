@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import click
 
+from server.core.logger import LOGGING_CONFIG
 
 """USAGE:
 python cheddarr.py [OPTIONS] COMMAND
@@ -53,6 +54,7 @@ def run(ctx):
         reload=debug,
         debug=debug,
         log_level=log_level,
+        log_config=LOGGING_CONFIG,
     )
 
 

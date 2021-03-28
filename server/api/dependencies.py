@@ -1,8 +1,8 @@
 from typing import Callable, Generator, List, Literal, Type
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
@@ -51,7 +51,7 @@ def get_current_user(
     try:
         payload = jwt.decode(token, config.SECRET_KEY, algorithms=config.SIGNING_ALGORITHM)
         token_data = TokenPayload.parse_obj(payload)
-    except (jwt.JWTError, ValidationError):
+    except (jwt.InvalidTokenError, ValidationError):
         raise credentials_exception
     user = user_repository.find_by(id=int(token_data.sub))
     if not user:
