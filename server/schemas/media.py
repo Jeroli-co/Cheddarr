@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import date
 from typing import List, Optional, Union
 
-from pydantic import AnyHttpUrl, Field, validator
+from pydantic import AnyHttpUrl, Field, root_validator, validator
 
 from server.models.media import MediaType, SeriesType
 from server.schemas.external_services import MediaServerInfo
@@ -141,8 +141,7 @@ class TmdbVideo(Video):
 
 class TmdbMedia(MediaSchema, ABC):
     tmdb_id: int = Field(alias="id")
-    imdb_id: Optional[str] = Field(alias="external_ids.imdb_id")
-    tvdb_id: Optional[int] = Field(alias="external_ids.tvdb_id")
+    external_ids: Optional[dict]
     title: str = Field(alias="name")
     summary: Optional[str] = Field(alias="overview")
     status: Optional[str] = Field(alias="status")
@@ -153,6 +152,12 @@ class TmdbMedia(MediaSchema, ABC):
     trailers: Optional[List[TmdbVideo]] = Field(alias="videos")
     _poster_validator = validator("poster_url", allow_reuse=True, pre=True)(get_image_url)
     _art_validator = validator("art_url", allow_reuse=True, pre=True)(get_image_url)
+
+    @root_validator(pre=True)
+    def get_external_ids(cls, values):
+        values["tvdb_id"] = values.get("external_ids", {}).get("tvdb_id")
+        values["imdb_id"] = values.get("external_ids", {}).get("imdb_id")
+        return values
 
 
 class TmdbMovie(TmdbMedia, MovieSchema):

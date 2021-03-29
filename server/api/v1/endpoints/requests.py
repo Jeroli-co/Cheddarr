@@ -124,7 +124,7 @@ def add_movie_request(
 
     if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
         default_provider = media_provider_repo.find_by(
-            provider_type=MediaProviderType.series_provider, is_default=True
+            provider_type=MediaProviderType.movie_provider, is_default=True
         )
         if default_provider is not None:
             movie_request.status = RequestStatus.approved

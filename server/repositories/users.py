@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 from server.models.users import Friendship, User
 from .base import BaseRepository
@@ -48,11 +48,9 @@ class FriendshipRepository(BaseRepository[Friendship]):
         )
 
     def find_all_by_user_id(self, user_id: int, pending: bool = None) -> List[Friendship]:
-        query = (
-            self.session.query(self.model)
-            .filter_by(requesting_user_id=user_id)
-            .union(self.session.query(Friendship).filter_by(requested_user_id=user_id))
+        query = self.session.query(self.model).filter(
+            or_(self.model.requesting_user_id == user_id, self.model.requested_user_id == user_id)
         )
         if pending is not None:
-            query = query.filter_by(pending=pending)
+            query = query.filter(self.model.pending == pending)
         return query.all()

@@ -120,6 +120,10 @@ def find_tmdb_id_from_external_id(imdb_id=None, tvdb_id=None) -> int:
     return tmdb_media.get("id")
 
 
+def find_external_ids_from_tmdb_id(tmdb_id: int) -> dict:
+    return tmdb.TV(tmdb_id).external_ids()
+
+
 def get_tmdb_popular_movies(page: int = 1) -> (List[TmdbMovie], int, int):
     search = tmdb.Movies().popular(page=page)
     results = []

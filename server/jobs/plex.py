@@ -26,8 +26,7 @@ from server.repositories.media import (
     MediaServerSeasonRepository,
 )
 from server.repositories.settings import PlexSettingRepository
-from server.services import plex
-from server.services.tmdb import find_tmdb_id_from_external_id
+from server.services import plex, tmdb
 
 TMDB_REGEX = "tmdb|themoviedb"
 IMDB_REGEX = "imdb"
@@ -317,7 +316,7 @@ def process_plex_episode(
     return episode
 
 
-def find_guids(media: Union[PlexMovie, PlexSeries, PlexSeason, PlexEpisode]):
+def find_guids(media: Union[PlexMovie, PlexSeries]):
     guids = [media.guid]
     if hasattr(media, "guids") and media.guids is not None:
         guids.extend(guid.id for guid in media.guids)
@@ -338,6 +337,8 @@ def find_guids(media: Union[PlexMovie, PlexSeries, PlexSeason, PlexEpisode]):
     tmdb_id, imdb_id, tvdb_id = find_guid(TMDB_REGEX), find_guid(IMDB_REGEX), find_guid(TVDB_REGEX)
 
     if tmdb_id is None:
-        tmdb_id = find_tmdb_id_from_external_id(imdb_id, tvdb_id)
+        tmdb_id = tmdb.find_tmdb_id_from_external_id(imdb_id, tvdb_id)
+    if isinstance(media, PlexSeries) and tvdb_id is None:
+        tvdb_id = tmdb.find_external_ids_from_tmdb_id(tmdb_id).get("tvdb_id")
 
     return tmdb_id, imdb_id, tvdb_id
