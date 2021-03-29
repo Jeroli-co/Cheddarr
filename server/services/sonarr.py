@@ -217,9 +217,9 @@ def send_request(request: SeriesRequest):
         if setting.version == 3:
             series.language_profile_id = language_profile_id
         series.add_options = SonarrAddOptions(
-            ignore_episodes_with_files=False,
+            ignore_episodes_with_files=True,
             ignore_episodes_without_files=False,
-            search_for_missing_episodes=False,
+            search_for_missing_episodes=True,
         )
         for season in series.seasons:
             season.monitored = False

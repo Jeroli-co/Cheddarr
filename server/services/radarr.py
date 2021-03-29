@@ -136,5 +136,5 @@ def send_request(request: MovieRequest):
         return
     movie.root_folder_path = setting.root_folder
     movie.quality_profile_id = setting.quality_profile_id
-    movie.add_options = RadarrAddOptions(search_for_movie=False)
+    movie.add_options = RadarrAddOptions(search_for_movie=True)
     add_movie(setting, movie)
