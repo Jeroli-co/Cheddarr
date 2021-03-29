@@ -84,7 +84,7 @@ datasets = {
             "id": 2,
             "title": "Star Wars",
             "tmdb_id": 11,
-            "media_type": MediaType.movies,
+            "media_type": MediaType.movie,
         }
     ],
     "movies_requests": [
@@ -94,7 +94,7 @@ datasets = {
             "requested_user_id": 1,
             "status": RequestStatus.pending,
             "media_id": 2,
-            "media_type": MediaType.movies,
+            "media_type": MediaType.movie,
         },
         {
             "id": 4,
@@ -102,7 +102,7 @@ datasets = {
             "requested_user_id": 3,
             "status": RequestStatus.approved,
             "media_id": 2,
-            "media_type": MediaType.movies,
+            "media_type": MediaType.movie,
         },
     ],
 }

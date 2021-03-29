@@ -64,7 +64,7 @@ class MediaRequest(Model, Timestamp):
 
 class MovieRequest(MediaRequest):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": MediaType.movies}
+    __mapper_args__ = {"polymorphic_identity": MediaType.movie}
     __repr_props__ = ("media", "requested_user", "requesting_user")
 
 

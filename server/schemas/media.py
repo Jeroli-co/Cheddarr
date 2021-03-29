@@ -53,7 +53,7 @@ class MediaSchema(APIModel, ABC):
 
 
 class MovieSchema(MediaSchema):
-    media_type: MediaType = Field(default=MediaType.movies, const=True)
+    media_type: MediaType = Field(default=MediaType.movie, const=True)
     requests: List = []
 
 

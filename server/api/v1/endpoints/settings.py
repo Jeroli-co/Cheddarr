@@ -221,7 +221,7 @@ def get_plex_libraries(
     if libraries is None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to get Plex libraries.")
     for library in libraries:
-        library.enabled = any(l.library_id == library.library_id for l in setting.libraries)
+        library.enabled = any(int(l.library_id) == library.library_id for l in setting.libraries)
     return libraries
 
 
@@ -243,13 +243,13 @@ def update_plex_setting_libraries(
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
 
-    for library in libraries_in:
+    for library_in in libraries_in:
         setting_library = next(
-            (l for l in setting.libraries if l.library_id == library.library_id), None
+            (l for l in setting.libraries if int(l.library_id) == library_in.library_id), None
         )
-        if setting_library is None and library.enabled:
-            setting.libraries.append(library.to_orm(MediaServerLibrary))
-        elif setting_library is not None and not library.enabled:
+        if setting_library is None and library_in.enabled:
+            setting.libraries.append(library_in.to_orm(MediaServerLibrary))
+        elif setting_library is not None and not library_in.enabled:
             setting.libraries.remove(setting_library)
 
     plex_setting_repo.save(setting)

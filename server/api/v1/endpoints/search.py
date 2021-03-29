@@ -30,7 +30,7 @@ def search_media(
 ):
     if media_type == MediaType.series:
         media_results, total_pages, total_results = tmdb.search_tmdb_series(value, page)
-    elif media_type == MediaType.movies:
+    elif media_type == MediaType.movie:
         media_results, total_pages, total_results = tmdb.search_tmdb_movies(value, page)
     else:
         media_results, total_pages, total_results = tmdb.search_tmdb_media(value, page)

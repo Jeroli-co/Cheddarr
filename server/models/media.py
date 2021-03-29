@@ -15,7 +15,7 @@ from server.database import Model
 
 
 class MediaType(str, Enum):
-    movies = "movies"
+    movie = "movies"
     series = "series"
 
 

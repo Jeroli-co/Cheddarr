@@ -151,7 +151,7 @@ def process_plex_media(
             imdb_id=imdb_id,
             tvdb_id=tvdb_id,
             title=plex_media.title,
-            media_type=MediaType.movies if isinstance(plex_media, PlexMovie) else MediaType.series,
+            media_type=MediaType.movie if isinstance(plex_media, PlexMovie) else MediaType.series,
         )
 
     server_media = server_media_repo.find_by(

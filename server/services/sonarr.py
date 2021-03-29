@@ -121,7 +121,7 @@ def get_instance_info(
 def lookup(
     setting: SonarrSetting,
     tvdb_id: int,
-) -> SonarrSeries:
+) -> Optional[SonarrSeries]:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -131,8 +131,10 @@ def lookup(
         resource_path="/series/lookup",
         queries={"term": f"tvdb:{tvdb_id}"},
     )
-    lookup_result = requests.get(url).json()[0]
-    return SonarrSeries.parse_obj(lookup_result)
+    lookup_result = requests.get(url).json()
+    if not isinstance(lookup_result, list):
+        return None
+    return SonarrSeries.parse_obj(lookup_result[0])
 
 
 def get_series(setting: SonarrSetting, series_id: int) -> SonarrSeries:
@@ -204,6 +206,8 @@ def update_episode(setting: SonarrSetting, episode: SonarrEpisode) -> SonarrEpis
 def send_request(request: SeriesRequest):
     setting: SonarrSetting = request.selected_provider
     series = lookup(setting, request.media.tvdb_id)
+    if series is None:
+        return
     if series.id is None:  # series is not added to sonarr yet.
         root_folder_path = setting.root_folder
         quality_profile_id = setting.quality_profile_id
