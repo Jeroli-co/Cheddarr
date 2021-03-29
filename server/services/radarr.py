@@ -102,7 +102,7 @@ def get_instance_info(
     )
 
 
-def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> RadarrMovie:
+def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> Optional[RadarrMovie]:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -113,6 +113,8 @@ def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> RadarrMovie:
         queries={"term": title},
     )
     lookup_result = requests.get(url).json()
+    if not isinstance(lookup_result, list):
+        return None
     movie = next(res for res in lookup_result if res["tmdbId"] == tmdb_id)
     return RadarrMovie.parse_obj(movie)
 
@@ -132,7 +134,7 @@ def add_movie(setting: RadarrSetting, movie: RadarrMovie):
 def send_request(request: MovieRequest):
     setting = request.selected_provider
     movie = lookup(setting, tmdb_id=request.media.tmdb_id, title=request.media.title)
-    if movie.id is not None:
+    if movie is None or movie.id is not None:
         return
     movie.root_folder_path = setting.root_folder
     movie.quality_profile_id = setting.quality_profile_id

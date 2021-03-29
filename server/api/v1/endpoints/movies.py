@@ -51,7 +51,7 @@ def get_recently_added_movies(
 ):
 
     db_recent_movies, total_results, total_pages = media_repo.find_all_recently_added(
-        media_type=MediaType.movies, page=page, per_page=per_page
+        media_type=MediaType.movie, page=page, per_page=per_page
     )
     server_ids = [server.server_id for server in current_user.media_servers]
     recent_movies = []

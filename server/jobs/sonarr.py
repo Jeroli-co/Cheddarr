@@ -1,5 +1,6 @@
 from server.api.dependencies import get_db
 from server.core import scheduler
+from server.models.media import MediaType
 from server.models.requests import RequestStatus
 from server.repositories.requests import MediaRequestRepository
 from server.services import sonarr
@@ -8,10 +9,14 @@ from server.services import sonarr
 @scheduler.scheduled_job("interval", name="Sonarr Sync", minutes=10)
 def sonarr_sync():
     media_request_repo = MediaRequestRepository(next(get_db()))
-    requests = media_request_repo.find_all_by(status=RequestStatus.approved)
+    requests = media_request_repo.find_all_by(
+        status=RequestStatus.approved, media_type=MediaType.series
+    )
     for request in requests:
         setting = request.selected_provider
         series_lookup = sonarr.lookup(setting, tvdb_id=request.media.tvdb_id)
+        if series_lookup is None:
+            continue
         series = sonarr.get_series(setting, series_lookup.id)
         req_seasons_available = 0
         for req_season in request.seasons:
