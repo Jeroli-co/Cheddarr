@@ -20,7 +20,7 @@ class Config(BaseSettings):
     DOMAIN: str = "localhost:9090"
     SERVER_HOST: str = f"http://{DOMAIN}"
     LOG_LEVEL: str = "INFO"
-    TIMEZONE: str = get_localzone().zone
+    TZ: str = get_localzone().zone
 
     ##########################################################################
     # folders/files                                                          #
@@ -96,6 +96,8 @@ class Config(BaseSettings):
                     if item in self._config_file_fields
                 },
                 config_file,
+                indent=2,
+                sort_keys=True,
             )
 
     _config_file_fields = {"SECRET_KEY", "LOG_LEVEL", "MAIL_ENABLED", "TIMEZONE"}

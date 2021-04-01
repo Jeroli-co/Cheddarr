@@ -60,9 +60,7 @@ class DateTime(TypeDecorator):
         return value
 
     def process_result_value(self, value, engine):
-        return value.replace(tzinfo=pytz.timezone(config.TIMEZONE)).astimezone(
-            pytz.timezone(config.TIMEZONE)
-        )
+        return value.replace(tzinfo=pytz.timezone(config.TZ)).astimezone(pytz.timezone(config.TZ))
 
 
 class Timestamp(object):

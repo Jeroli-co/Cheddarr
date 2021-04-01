@@ -13,11 +13,6 @@ class ExternalServiceName(str, Enum):
     sonarr = "Sonarr"
 
 
-class MediaProviderType(str, Enum):
-    movie_provider = "movies_provider"
-    series_provider = "series_provider"
-
-
 class ExternalServiceSetting(object):
     __mapper_args__ = {"polymorphic_on": "service_name"}
 
@@ -59,10 +54,16 @@ class PlexSetting(MediaServerSetting):
     __repr_props__ = ("host", "port", "ssl", "server_name", "name")
 
 
+class MediaProviderType(str, Enum):
+    movie_provider = "movies_provider"
+    series_provider = "series_provider"
+
+
 class MediaProviderSetting(Model, ExternalServiceSetting):
     provider_type = Column(DBEnum(MediaProviderType), nullable=False)
     root_folder = Column(String, nullable=False)
     quality_profile_id = Column(Integer)
+    language_profile_id = Column(Integer)
     version = Column(Integer)
     is_default = Column(Boolean, default=False)
     user_id = Column(ForeignKey("user.id"), nullable=False)
@@ -86,7 +87,6 @@ class SonarrSetting(MediaProviderSetting):
 
     anime_root_folder = Column(String(128))
     anime_quality_profile_id = Column(Integer)
-    language_profile_id = Column(Integer)
     anime_language_profile_id = Column(Integer)
 
     def __init__(self, **kwargs):

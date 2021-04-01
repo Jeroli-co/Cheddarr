@@ -3,17 +3,14 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server.api import dependencies as deps
-from server.core.scheduler import scheduler
 from server.core.security import check_permissions
-from server.jobs.radarr import send_radarr_request_task
-from server.jobs.sonarr import send_sonarr_request_task
 from server.models.media import Media
 from server.models.requests import (
     MovieRequest,
     RequestStatus,
     SeriesRequest,
 )
-from server.models.settings import MediaProviderType, RadarrSetting, SonarrSetting
+from server.models.settings import MediaProviderType
 from server.models.users import User, UserRole
 from server.repositories.media import MediaRepository
 from server.repositories.requests import MediaRequestRepository
@@ -30,7 +27,7 @@ from server.schemas.requests import (
     SeriesRequestSchema,
 )
 from server.services import tmdb
-from server.services.core import unify_series_request
+from server.services.core import send_movie_request, send_series_request, unify_series_request
 
 router = APIRouter()
 
@@ -85,7 +82,7 @@ def get_sent_requests(
     },
 )
 def add_movie_request(
-    request: MovieRequestCreate,
+    request_in: MovieRequestCreate,
     current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
@@ -97,21 +94,21 @@ def add_movie_request(
     ),
 ):
 
-    requested_user = user_repo.find_by_username(request.requested_username)
+    requested_user = user_repo.find_by_username(request_in.requested_username)
     if requested_user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
     existing_request = media_request_repo.find_all_by_user_ids_and_tmdb_id(
-        tmdb_id=request.tmdb_id,
+        tmdb_id=request_in.tmdb_id,
         requesting_user_id=current_user.id,
         requested_user_id=requested_user.id,
     )
     if existing_request:
         raise HTTPException(status.HTTP_409_CONFLICT, "This movie has already been requested.")
 
-    movie = media_repo.find_by(tmdb_id=request.tmdb_id)
+    movie = media_repo.find_by(tmdb_id=request_in.tmdb_id)
     if movie is None:
-        searched_movie = tmdb.get_tmdb_movie(request.tmdb_id)
+        searched_movie = tmdb.get_tmdb_movie(request_in.tmdb_id)
         if searched_movie is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested movie was not found")
         movie = MovieSchema.parse_obj(searched_movie).to_orm(Media)
@@ -120,6 +117,9 @@ def add_movie_request(
         requested_user=requested_user,
         requesting_user=current_user,
         media=movie,
+        root_folder=request_in.root_folder,
+        quality_profile_id=request_in.quality_profile_id,
+        language_profile_id=request_in.quality_profile_id,
     )
 
     if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
@@ -129,8 +129,7 @@ def add_movie_request(
         if default_provider is not None:
             movie_request.status = RequestStatus.approved
             movie_request.selected_provider = default_provider
-            movie_request = media_request_repo.save(movie_request)
-            scheduler.add_job(send_radarr_request_task, args=[movie_request.id])
+            send_movie_request(movie_request, default_provider)
 
     movie_request = media_request_repo.save(movie_request)
     return movie_request
@@ -147,7 +146,7 @@ def add_movie_request(
 )
 def update_movie_request(
     request_id: int,
-    update: MediaRequestUpdate,
+    request_update: MediaRequestUpdate,
     current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
@@ -156,7 +155,10 @@ def update_movie_request(
         deps.get_repository(MediaProviderSettingRepository)
     ),
 ):
-    if update.status != RequestStatus.approved and update.status != RequestStatus.refused:
+    if (
+        request_update.status != RequestStatus.approved
+        and request_update.status != RequestStatus.refused
+    ):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             "Request status can only be updated to approved or refused.",
@@ -166,10 +168,10 @@ def update_movie_request(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != RequestStatus.pending:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
-    if update.status == RequestStatus.approved:
-        if update.provider_id is not None:
+    if request_update.status == RequestStatus.approved:
+        if request_update.provider_id is not None:
             selected_provider = media_provider_repo.find_by(
-                provider_type=MediaProviderType.movie_provider, id=update.provider_id
+                provider_type=MediaProviderType.movie_provider, id=request_update.provider_id
             )
             if selected_provider is None:
                 raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
@@ -182,7 +184,7 @@ def update_movie_request(
             )
         request.status = RequestStatus.approved
 
-    elif update.status == RequestStatus.refused:
+    elif request_update.status == RequestStatus.refused:
         request.status = RequestStatus.refused
 
     current_movie_requests = media_request_repo.find_all_by(media_id=request.media_id)
@@ -191,8 +193,7 @@ def update_movie_request(
         media_request_repo.save(r)
 
     if request.status == RequestStatus.approved:
-        if isinstance(request.selected_provider, RadarrSetting):
-            scheduler.add_job(send_radarr_request_task, args=[request.id])
+        send_movie_request(request, request.selected_provider)
 
     return request
 
@@ -273,6 +274,9 @@ def add_series_request(
             requested_user=requested_user,
             requesting_user=current_user,
             media=series,
+            root_folder=request_in.root_folder,
+            quality_profile_id=request_in.quality_profile_id,
+            language_profile_id=request_in.quality_profile_id,
         )
         unify_series_request(series_request, request_in)
 
@@ -283,8 +287,8 @@ def add_series_request(
             if default_provider is not None:
                 series_request.status = RequestStatus.approved
                 series_request.selected_provider = default_provider
-                media_request_repo.save(series_request)
-                scheduler.add_job(send_sonarr_request_task, args=[series_request.id])
+                send_series_request(series_request, default_provider)
+
         media_request_repo.save(series_request)
         return series_request
 
@@ -344,9 +348,7 @@ def add_series_request(
         if default_provider is not None:
             series_request.status = RequestStatus.approved
             series_request.selected_provider = default_provider
-            media_request_repo.save(series_request)
-            scheduler.add_job(send_sonarr_request_task, args=[series_request.id])
-            return series_request
+            send_series_request(series_request, default_provider)
 
     media_request_repo.save(series_request)
     return series_request
@@ -363,7 +365,7 @@ def add_series_request(
 )
 def update_series_request(
     request_id: int,
-    update: MediaRequestUpdate,
+    request_update: MediaRequestUpdate,
     current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
@@ -372,7 +374,10 @@ def update_series_request(
         deps.get_repository(MediaProviderSettingRepository)
     ),
 ):
-    if update.status != RequestStatus.approved and update.status != RequestStatus.refused:
+    if (
+        request_update.status != RequestStatus.approved
+        and request_update.status != RequestStatus.refused
+    ):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             "Request status can only be updated to approved or refused.",
@@ -382,10 +387,10 @@ def update_series_request(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != RequestStatus.pending:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
-    if update.status == RequestStatus.approved:
-        if update.provider_id is not None:
+    if request_update.status == RequestStatus.approved:
+        if request_update.provider_id is not None:
             selected_provider = media_provider_repo.find_by(
-                provider_type=MediaProviderType.series_provider, id=update.provider_id
+                provider_type=MediaProviderType.series_provider, id=request_update.provider_id
             )
             if selected_provider is None:
                 raise HTTPException(status.HTTP_404_NOT_FOUND, "No matching provider.")
@@ -403,14 +408,13 @@ def update_series_request(
             for episode in season.episodes:
                 episode.status = RequestStatus.approved
 
-    elif update.status == RequestStatus.refused:
+    elif request_update.status == RequestStatus.refused:
         request.status = RequestStatus.refused
 
     media_request_repo.save(request)
 
     if request.status == RequestStatus.approved:
-        if isinstance(request.selected_provider, SonarrSetting):
-            scheduler.add_job(send_sonarr_request_task, args=[request.id])
+        send_series_request(request, request.selected_provider)
 
     return request
 

@@ -22,6 +22,9 @@ class MediaRequest(APIModel, ABC):
 class MediaRequestCreate(APIModel):
     tmdb_id: int
     requested_username: str
+    root_folder: Optional[str]
+    quality_profile_id: Optional[int]
+    language_profile_id: Optional[int]
 
 
 class MediaRequestUpdate(APIModel):

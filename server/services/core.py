@@ -2,7 +2,8 @@ from typing import List, Union
 
 from pydantic import parse_obj_as
 
-from server.models.requests import EpisodeRequest, SeasonRequest, SeriesRequest
+from server.models.requests import EpisodeRequest, MovieRequest, SeasonRequest, SeriesRequest
+from server.models.settings import MediaProviderSetting, RadarrSetting, SonarrSetting
 from server.repositories.media import (
     MediaServerEpisodeRepository,
     MediaServerMediaRepository,
@@ -16,6 +17,7 @@ from server.schemas.media import (
     SeasonSchema,
 )
 from server.schemas.requests import MovieRequestSchema, SeriesRequestCreate, SeriesRequestSchema
+from server.services import radarr, sonarr
 
 
 def unify_series_request(series_request: SeriesRequest, request_in: SeriesRequestCreate):
@@ -42,6 +44,16 @@ def unify_series_request(series_request: SeriesRequest, request_in: SeriesReques
                 already_added_season.episodes.extend(season.episodes)
             else:
                 already_added_season.episodes = season.episodes
+
+
+def send_series_request(request: SeriesRequest, provider: MediaProviderSetting):
+    if isinstance(provider, SonarrSetting):
+        sonarr.send_request(request)
+
+
+def send_movie_request(request: MovieRequest, provider: MediaProviderSetting):
+    if isinstance(provider, RadarrSetting):
+        radarr.send_request(request)
 
 
 def set_media_db_info(
