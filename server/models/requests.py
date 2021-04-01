@@ -5,6 +5,7 @@ from sqlalchemy import (
     Enum as DBEnum,
     ForeignKey,
     Integer,
+    String,
     Text,
 )
 from sqlalchemy.ext.declarative import declared_attr
@@ -28,6 +29,9 @@ class MediaRequest(Model, Timestamp):
     media_type = Column(DBEnum(MediaType), nullable=False)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
     comment = Column(Text)
+    root_folder = Column(String)
+    quality_profile_id = Column(Integer)
+    language_profile_id = Column(Integer)
 
     @declared_attr
     def selected_provider_id(cls):
