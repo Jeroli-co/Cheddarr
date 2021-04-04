@@ -50,12 +50,14 @@ class MediaServerMedia(Model, MediaServerContent):
 
     media_id = Column(ForeignKey("media.id"), nullable=False)
     server_library_id = Column(ForeignKey("mediaserverlibrary.id"))
-    media = relationship("Media", backref=backref("media", cascade="all,delete,delete-orphan"))
+    media = relationship(
+        "Media", backref=backref("server_media", cascade="all,delete,delete-orphan")
+    )
     server = relationship(
-        "MediaServerSetting", backref=backref("media", cascade="all,delete,delete-orphan")
+        "MediaServerSetting", backref=backref("server_media", cascade="all,delete,delete-orphan")
     )
     library = relationship(
-        "MediaServerLibrary", backref=backref("media", cascade="all,delete,delete-orphan")
+        "MediaServerLibrary", backref=backref("server_media", cascade="all,delete,delete-orphan")
     )
 
 

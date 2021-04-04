@@ -136,7 +136,8 @@ def send_request(request: MovieRequest):
     movie = lookup(setting, tmdb_id=request.media.tmdb_id, title=request.media.title)
     if movie is None or movie.id is not None:
         return
-    movie.root_folder_path = setting.root_folder
-    movie.quality_profile_id = setting.quality_profile_id
+    movie.root_folder_path = request.root_folder or setting.root_folder
+    movie.quality_profile_id = request.quality_profile_id or setting.quality_profile_id
+    movie.monitored = True
     movie.add_options = RadarrAddOptions(search_for_movie=True)
     add_movie(setting, movie)

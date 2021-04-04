@@ -27,12 +27,15 @@ class MediaRepository(BaseRepository[Media]):
         return query.one_or_none()
 
     def find_all_recently_added(
-        self, media_type: MediaType, page: int = None, per_page: int = None
+        self, media_type: MediaType, server_ids: List[str], page: int = None, per_page: int = None
     ):
         query = (
             self.session.query(self.model)
             .join(MediaServerMedia)
-            .filter(Media.media_type == media_type)
+            .filter(
+                self.model.media_type == media_type, MediaServerMedia.server_id.in_(server_ids)
+            )
+            .distinct()
             .order_by(desc(MediaServerMedia.added_at))
         )
         if page is not None:
