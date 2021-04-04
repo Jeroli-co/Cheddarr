@@ -34,7 +34,7 @@ TVDB_REGEX = "tvdb|thetvdb"
 
 
 @scheduler.scheduled_job("interval", id="plex-full-sync", name="Plex Full Library Sync", hours=5)
-def sync_plex_servers_library(server_id=None):
+def sync_plex_servers_libraries(server_id=None):
     db_session = next(get_db())
     plex_setting_repo = PlexSettingRepository(db_session)
 

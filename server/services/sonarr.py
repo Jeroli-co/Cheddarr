@@ -209,13 +209,13 @@ def send_request(request: SeriesRequest):
     if series is None:
         return
     if series.id is None:  # series is not added to sonarr yet.
-        root_folder_path = setting.root_folder
-        quality_profile_id = setting.quality_profile_id
-        language_profile_id = setting.language_profile_id
+        root_folder_path = request.root_folder or setting.root_folder
+        quality_profile_id = request.quality_profile_id or setting.quality_profile_id
+        language_profile_id = request.language_profile_id or setting.language_profile_id
         if series.series_type == SeriesType.anime:
-            series.root_folder_path = setting.anime_root_folder or root_folder_path
-            series.quality_profile_id = setting.anime_quality_profile_id or quality_profile_id
-            series.language_profile_id = setting.anime_language_profile_id or language_profile_id
+            root_folder_path = setting.anime_root_folder or root_folder_path
+            quality_profile_id = setting.anime_quality_profile_id or quality_profile_id
+            language_profile_id = setting.anime_language_profile_id or language_profile_id
         series.root_folder_path = root_folder_path
         series.quality_profile_id = quality_profile_id
         if setting.version == 3:
@@ -228,6 +228,7 @@ def send_request(request: SeriesRequest):
         for season in series.seasons:
             season.monitored = False
         series = add_series(setting, series)
+        # Wait for Sonarr to precess the newly added series
         time.sleep(2)
     else:
         series = get_series(setting, series.id)

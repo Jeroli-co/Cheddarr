@@ -11,6 +11,7 @@ from server.repositories.media import (
     MediaServerSeasonRepository,
 )
 from server.repositories.requests import MediaRequestRepository
+from server.schemas.external_services import PlexMediaInfo
 from server.schemas.media import EpisodeSchema, MediaSearchResult, SeasonSchema, SeriesSchema
 from server.services import tmdb
 from server.services.core import (
@@ -26,6 +27,7 @@ router = APIRouter()
     "/{tmdb_id:int}",
     response_model=SeriesSchema,
     response_model_exclude_none=True,
+    response_model_exclude={"requests": {"__all__": {"media"}}},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No series found"},
     },
@@ -51,7 +53,7 @@ def get_series(
         for season in series.seasons:
             set_season_db_info(season, tmdb_id, server_ids, server_season_repo)
 
-    return series.dict(exclude={"requests": {"__all__": {"media"}}})
+    return series
 
 
 @router.get(
@@ -83,7 +85,7 @@ def get_season(
         for episode in season.episodes:
             set_episode_db_info(episode, tmdb_id, season_number, server_ids, server_episode_repo)
 
-    return season.dict()
+    return season
 
 
 @router.get(
@@ -110,7 +112,7 @@ def get_episode(
     server_ids = [server.server_id for server in current_user.media_servers]
     set_episode_db_info(episode, tmdb_id, season_number, server_ids, server_episode_repo)
 
-    return episode.dict()
+    return episode
 
 
 @router.get(
@@ -123,20 +125,19 @@ def get_recently_added_series(
     per_page: int = 10,
     current_user: User = Depends(deps.get_current_user),
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
-    server_media_repo: MediaServerMediaRepository = Depends(
-        deps.get_repository(MediaServerMediaRepository)
-    ),
 ):
-
-    db_recent_series, total_results, total_pages = media_repo.find_all_recently_added(
-        media_type=MediaType.series, per_page=per_page, page=page
-    )
     server_ids = [server.server_id for server in current_user.media_servers]
+    db_recent_series, total_results, total_pages = media_repo.find_all_recently_added(
+        media_type=MediaType.series, server_ids=server_ids, per_page=per_page, page=page
+    )
     recent_series = []
     for series in db_recent_series:
         tmdb_series = tmdb.get_tmdb_series(series.tmdb_id)
-        set_media_db_info(tmdb_series, current_user.id, server_ids, server_media_repo)
-        recent_series.append(tmdb_series.dict())
+        tmdb_series.media_servers_info = [
+            PlexMediaInfo(**m.as_dict()) for m in series.server_media if m.server_id in server_ids
+        ]
+        recent_series.append(tmdb_series)
+
     return MediaSearchResult(
         page=page, total_pages=total_pages, total_results=total_results, results=recent_series
     )
@@ -155,14 +156,12 @@ def get_popular_series(
     for series in popular_series:
         set_media_db_info(series, current_user.id, server_ids, server_media_repo)
 
-    search_result = MediaSearchResult(
-        results=[m.dict() for m in popular_series],
+    return MediaSearchResult(
+        results=popular_series,
         page=page,
         total_pages=total_pages,
         total_results=total_results,
     )
-
-    return search_result
 
 
 @router.get(
@@ -183,14 +182,12 @@ def get_similar_series(
     for series in similar_series:
         set_media_db_info(series, current_user.id, server_ids, server_media_repo)
 
-    search_result = MediaSearchResult(
-        results=[m.dict() for m in similar_series],
+    return MediaSearchResult(
+        results=similar_series,
         page=page,
         total_pages=total_pages,
         total_results=total_results,
     )
-
-    return search_result
 
 
 @router.get(
@@ -213,11 +210,9 @@ def get_recommended_series(
     for series in recommended_series:
         set_media_db_info(series, current_user.id, server_ids, server_media_repo)
 
-    search_result = MediaSearchResult(
-        results=[m.dict() for m in recommended_series],
+    return MediaSearchResult(
+        results=recommended_series,
         page=page,
         total_pages=total_pages,
         total_results=total_results,
     )
-
-    return search_result

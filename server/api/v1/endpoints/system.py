@@ -1,5 +1,4 @@
 import math
-from datetime import datetime
 from typing import List, Literal
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
@@ -65,7 +64,7 @@ def modify_job(job_id: str, action: Literal["run", "pause", "resume"] = Body(...
     if job is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This job does not exist.")
     if action == "run":
-        job.modify(next_run_time=datetime.now())
+        job.reschedule()
     elif action == "pause":
         job.pause()
     elif action == "resume":
