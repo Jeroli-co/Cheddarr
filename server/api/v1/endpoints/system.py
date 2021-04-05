@@ -64,7 +64,7 @@ def modify_job(job_id: str, action: Literal["run", "pause", "resume"] = Body(...
     if job is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This job does not exist.")
     if action == "run":
-        job.reschedule()
+        job.reschedule(trigger=None)
     elif action == "pause":
         job.pause()
     elif action == "resume":
