@@ -88,7 +88,7 @@ export const SessionContextProvider = (props: any) => {
       isAuthenticated: true,
       username: decodedToken.username,
       avatar: decodedToken.avatar,
-      admin: decodedToken.admin,
+      roles: decodedToken.roles,
       isLoading: false,
     });
   };

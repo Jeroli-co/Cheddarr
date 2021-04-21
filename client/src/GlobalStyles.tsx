@@ -18,9 +18,9 @@ export const GlobalStyle = createGlobalStyle`
   
   a {
     color: ${(props) => props.theme.color};
-    &:hover{
+    text-decoration: none;
+    &:hover {
       color: ${(props) => props.theme.grey};
     }
-    text-decoration: none;
   }
 `;

@@ -20,6 +20,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { routes } from "../../../router/routes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
+import { RequestButton } from "../requests/RequestButton";
 
 const logo = require("../../../assets/cheddarr-min.svg");
 
@@ -106,7 +107,6 @@ type MediaPreviewCardProps = {
 };
 
 export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
-  const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
   const history = useHistory();
   const location = useLocation();
   const poster = useImage(media.posterUrl);
@@ -164,11 +164,6 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
     }
   };
 
-  const onRequestClick = (e: MouseEvent<HTMLButtonElement>) => {
-    setIsRequestMediaModalOpen(true);
-    e.stopPropagation();
-  };
-
   return (
     <>
       <Container hasPoster={!!media.posterUrl} onClick={() => onCardClick()}>
@@ -192,14 +187,7 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
             <p>{new Date(media.releaseDate).getFullYear()}</p>
           )}
           {((isMovie(media) && !isOnServers(media)) || isSeries(media)) && (
-            <PrimaryButton
-              className="request-button"
-              type="button"
-              width="100%"
-              onClick={(e) => onRequestClick(e)}
-            >
-              Request
-            </PrimaryButton>
+            <RequestButton media={media} />
           )}
           {isOnServers(media) &&
             (isMovie(media) || isEpisode(media)) &&
@@ -210,14 +198,6 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
             )}
         </div>
       </Container>
-      {isRequestMediaModalOpen && (
-        <SeriesRequestOptionsContextProvider>
-          <RequestMediaModal
-            media={media}
-            closeModal={() => setIsRequestMediaModalOpen(false)}
-          />
-        </SeriesRequestOptionsContextProvider>
-      )}
     </>
   );
 };

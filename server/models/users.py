@@ -1,4 +1,4 @@
-from enum import auto, Enum
+from enum import Enum
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -12,9 +12,9 @@ from server.database import Model, Timestamp
 class UserRole(int, Enum):
     none = 0
     admin = 2
-    request = auto()
-    manage_settings = auto()
-    auto_approve = auto()
+    request = 4
+    manage_settings = 8
+    auto_approve = 16
 
 
 class User(Model, Timestamp):

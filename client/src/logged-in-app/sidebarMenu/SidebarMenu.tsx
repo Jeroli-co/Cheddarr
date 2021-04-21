@@ -17,6 +17,9 @@ import {
   SidebarMenuElementIcon,
   SidebarMenuProps,
 } from "./SidebarMenuCommon";
+import { useSession } from "../../shared/contexts/SessionContext";
+import { checkRole } from "../../utils/roles";
+import { Roles } from "../../shared/enums/Roles";
 
 const Container = styled(SidebarMenuContainer)<{ isOpen: boolean }>`
   width: ${(props) =>
@@ -28,6 +31,9 @@ const Container = styled(SidebarMenuContainer)<{ isOpen: boolean }>`
 `;
 
 export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
+  const {
+    session: { roles },
+  } = useSession();
   const history = useHistory();
   const { width } = useWindowSize();
   const location = useLocation();
@@ -57,25 +63,29 @@ export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
         <p>Dashboard</p>
       </SidebarMenuElement>
 
-      <SidebarMenuElement
-        onClick={() => navigate(routes.REQUESTS.url)}
-        isActive={location.pathname.startsWith(routes.REQUESTS.url)}
-      >
-        <SidebarMenuElementIcon>
-          <Icon icon={faRegistered} />
-        </SidebarMenuElementIcon>
-        <p>Requests</p>
-      </SidebarMenuElement>
+      {checkRole(roles, [Roles.REQUEST]) && (
+        <SidebarMenuElement
+          onClick={() => navigate(routes.REQUESTS.url)}
+          isActive={location.pathname.startsWith(routes.REQUESTS.url)}
+        >
+          <SidebarMenuElementIcon>
+            <Icon icon={faRegistered} />
+          </SidebarMenuElementIcon>
+          <p>Requests</p>
+        </SidebarMenuElement>
+      )}
 
-      <SidebarMenuElement
-        onClick={() => navigate(routes.SETTINGS.url)}
-        isActive={location.pathname.startsWith(routes.SETTINGS.url)}
-      >
-        <SidebarMenuElementIcon>
-          <Icon icon={faCog} />
-        </SidebarMenuElementIcon>
-        <p>Settings</p>
-      </SidebarMenuElement>
+      {checkRole(roles, [Roles.MANAGE_SETTINGS]) && (
+        <SidebarMenuElement
+          onClick={() => navigate(routes.SETTINGS.url)}
+          isActive={location.pathname.startsWith(routes.SETTINGS.url)}
+        >
+          <SidebarMenuElementIcon>
+            <Icon icon={faCog} />
+          </SidebarMenuElementIcon>
+          <p>Settings</p>
+        </SidebarMenuElement>
+      )}
     </Container>
   );
 };

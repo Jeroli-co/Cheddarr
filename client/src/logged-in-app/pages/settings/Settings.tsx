@@ -5,8 +5,12 @@ import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
 import { SonarrConfigsContextProvider } from "../../../shared/contexts/SonarrConfigContext";
 import { RadarrConfigsContextProvider } from "../../../shared/contexts/RadarrConfigsContext";
 import { NotificationsServicesContextProvider } from "../../../shared/contexts/NotificationsServicesContext";
+import { useRoleGuard } from "../../../shared/hooks/useRoleGuard";
+import { Roles } from "../../../shared/enums/Roles";
 
 export const Settings = () => {
+  useRoleGuard([Roles.MANAGE_SETTINGS]);
+
   return (
     <TabsContextProvider
       tabs={[

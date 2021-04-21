@@ -1,8 +1,10 @@
+import { Roles } from "../enums/Roles";
+
 export interface ISession {
   isAuthenticated: boolean;
   username: string;
-  readonly avatar: string;
-  readonly admin: boolean;
+  avatar: string;
+  roles: Roles;
   isLoading: boolean;
 }
 
@@ -10,6 +12,6 @@ export const SessionDefaultImpl: ISession = {
   isAuthenticated: false,
   username: "",
   avatar: "",
-  admin: false,
+  roles: Roles.NONE,
   isLoading: true,
 };
