@@ -1,16 +1,16 @@
 from typing import Dict
 
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from server.models.media import MediaType
 from server.models.requests import RequestStatus
 
 
-def user_authentication_headers(
-    *, client: TestClient, email: str, password: str
+async def user_authentication_headers(
+    *, client: AsyncClient, email: str, password: str
 ) -> Dict[str, str]:
     data = {"username": email, "password": password}
-    r = client.post("/sign-in", data=data)
+    r = await client.post("/sign-in", data=data)
     response = r.json()
     auth_token = response["access_token"]
     headers = {"Authorization": f"Bearer {auth_token}"}

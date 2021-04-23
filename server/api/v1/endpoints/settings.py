@@ -44,7 +44,7 @@ router = APIRouter()
 
 
 @router.get("")
-def get_user_media_providers(
+async def get_user_media_providers(
     provider_type: Optional[MediaProviderType] = None,
     current_user: User = Depends(deps.get_current_user),
 ):
@@ -71,12 +71,12 @@ def get_user_media_providers(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_plex_account_servers(
+async def get_plex_account_servers(
     current_user: User = Depends(deps.get_current_user),
 ):
     if current_user.plex_api_key is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex account linked to the user.")
-    servers = plex.get_plex_account_servers(current_user.plex_api_key)
+    servers = await plex.get_plex_account_servers(current_user.plex_api_key)
     return servers
 
 
@@ -85,11 +85,11 @@ def get_plex_account_servers(
     response_model=List[PlexSettingSchema],
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_plex_settings(
+async def get_plex_settings(
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
-    settings = plex_setting_repo.find_all_by(user_id=current_user.id)
+    settings = await plex_setting_repo.find_all_by(user_id=current_user.id)
     return settings
 
 
@@ -103,13 +103,13 @@ def get_plex_settings(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def add_plex_setting(
+async def add_plex_setting(
     setting_in: PlexSettingCreateUpdate,
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     if (
-        plex.get_server(
+        await plex.get_server(
             base_url=setting_in.host,
             port=setting_in.port,
             ssl=setting_in.ssl,
@@ -121,7 +121,9 @@ def add_plex_setting(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             "Failed to connect to  the Plex server.",
         )
-    setting = plex_setting_repo.find_by(user_id=current_user.id, server_id=setting_in.server_id)
+    setting = await plex_setting_repo.find_by(
+        user_id=current_user.id, server_id=setting_in.server_id
+    )
     if setting is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This server is already added.")
     setting = setting_in.to_orm(PlexSetting)
@@ -132,7 +134,7 @@ def add_plex_setting(
             libraries.append(library.to_orm(MediaServerLibrary))
     setting.libraries = libraries
 
-    setting = plex_setting_repo.save(setting)
+    await plex_setting_repo.save(setting)
 
     if setting.libraries:
         scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
@@ -149,17 +151,17 @@ def add_plex_setting(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def update_plex_setting(
+async def update_plex_setting(
     setting_id: str,
     setting_in: PlexSettingCreateUpdate,
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
-    setting = plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    setting = await plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
     if (
-        plex.get_server(
+        await plex.get_server(
             base_url=setting_in.host,
             port=setting_in.port,
             ssl=setting_in.ssl,
@@ -172,7 +174,7 @@ def update_plex_setting(
             "Failed to connect to connect the Plex server.",
         )
 
-    setting = plex_setting_repo.update(setting, setting_in)
+    setting = await plex_setting_repo.update(setting, setting_in)
 
     return setting
 
@@ -185,15 +187,15 @@ def update_plex_setting(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def delete_plex_setting(
+async def delete_plex_setting(
     setting_id: str,
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
-    setting = plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    setting = await plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
-    plex_setting_repo.remove(setting)
+    await plex_setting_repo.remove(setting)
     return {"detail": "Plex setting removed."}
 
 
@@ -206,16 +208,16 @@ def delete_plex_setting(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_plex_libraries(
+async def get_plex_libraries(
     setting_id: str,
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
 
-    setting = plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    setting = await plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex setting for this server.")
-    libraries = plex.get_plex_server_library_sections(
+    libraries = await plex.get_plex_server_library_sections(
         setting.host, setting.port, setting.ssl, setting.api_key
     )
     if libraries is None:
@@ -233,13 +235,13 @@ def get_plex_libraries(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def update_plex_setting_libraries(
+async def update_plex_setting_libraries(
     setting_id: str,
     libraries_in: List[PlexLibrarySection],
     current_user: User = Depends(deps.get_current_user),
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
-    setting = plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    setting = await plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
 
@@ -252,8 +254,7 @@ def update_plex_setting_libraries(
         elif setting_library is not None and not library_in.enabled:
             setting.libraries.remove(setting_library)
 
-    plex_setting_repo.save(setting)
-
+    await plex_setting_repo.save(setting)
     if setting.libraries:
         scheduler.add_job(
             sync_plex_servers_recently_added,
@@ -278,10 +279,10 @@ def update_plex_setting_libraries(
     responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_radarr_instance_info(
+async def get_radarr_instance_info(
     setting_in: ExternalServiceSettingBase,
 ):
-    instance_info = radarr.get_instance_info(
+    instance_info = await radarr.get_instance_info(
         setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
     )
     if instance_info is None:
@@ -298,17 +299,17 @@ def get_radarr_instance_info(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_radarr_setting_instance_info(
+async def get_radarr_setting_instance_info(
     setting_id: str,
     radarr_setting_repo: RadarrSettingRepository = Depends(
         deps.get_repository(RadarrSettingRepository)
     ),
 ):
-    setting = radarr_setting_repo.find_by(id=setting_id)
+    setting = await radarr_setting_repo.find_by(id=setting_id)
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Radarr setting not found.")
 
-    instance_info = radarr.get_instance_info(
+    instance_info = await radarr.get_instance_info(
         setting.api_key, setting.host, setting.port, setting.ssl
     )
     if instance_info is None:
@@ -321,13 +322,13 @@ def get_radarr_setting_instance_info(
     response_model=List[RadarrSettingSchema],
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_radarr_settings(
+async def get_radarr_settings(
     current_user: User = Depends(deps.get_current_user),
     radarr_setting_repo: RadarrSettingRepository = Depends(
         deps.get_repository(RadarrSettingRepository)
     ),
 ):
-    settings = radarr_setting_repo.find_all_by(user_id=current_user.id)
+    settings = await radarr_setting_repo.find_all_by(user_id=current_user.id)
     return settings
 
 
@@ -338,14 +339,14 @@ def get_radarr_settings(
     responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def add_radarr_setting(
+async def add_radarr_setting(
     setting_in: RadarrSettingCreateUpdate,
     current_user: User = Depends(deps.get_current_user),
     radarr_setting_repo: RadarrSettingRepository = Depends(
         deps.get_repository(RadarrSettingRepository)
     ),
 ):
-    if not radarr.check_instance_status(
+    if not await radarr.check_instance_status(
         api_key=setting_in.api_key,
         host=setting_in.host,
         port=setting_in.port,
@@ -354,7 +355,7 @@ def add_radarr_setting(
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
     setting = setting_in.to_orm(RadarrSetting)
     setting.user_id = current_user.id
-    setting = radarr_setting_repo.save(setting)
+    await radarr_setting_repo.save(setting)
     return setting
 
 
@@ -367,7 +368,7 @@ def add_radarr_setting(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def update_radarr_setting(
+async def update_radarr_setting(
     setting_id: str,
     setting_in: RadarrSettingCreateUpdate,
     current_user: User = Depends(deps.get_current_user),
@@ -375,18 +376,18 @@ def update_radarr_setting(
         deps.get_repository(RadarrSettingRepository)
     ),
 ):
-    setting = radarr_setting_repo.find_by(id=setting_id)
+    setting = await radarr_setting_repo.find_by(id=setting_id)
     if setting is None or setting.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No existing Radarr setting.")
 
-    if not radarr.check_instance_status(
+    if not await radarr.check_instance_status(
         api_key=setting_in.api_key,
         host=setting_in.host,
         port=setting_in.port,
         ssl=setting_in.ssl,
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
-    setting = radarr_setting_repo.update(setting, setting_in)
+    setting = await radarr_setting_repo.update(setting, setting_in)
     return setting
 
 
@@ -396,17 +397,17 @@ def update_radarr_setting(
     responses={status.HTTP_404_NOT_FOUND: {"description": "No Radarr setting"}},
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def delete_radarr_setting(
+async def delete_radarr_setting(
     setting_id: str,
     current_user: User = Depends(deps.get_current_user),
     radarr_setting_repo: RadarrSettingRepository = Depends(
         deps.get_repository(RadarrSettingRepository)
     ),
 ):
-    setting = radarr_setting_repo.find_by(id=setting_id)
+    setting = await radarr_setting_repo.find_by(id=setting_id)
     if setting is None or setting.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Radarr setting not found.")
-    radarr_setting_repo.remove(setting)
+    await radarr_setting_repo.remove(setting)
     return {"detail": "Radarr setting removed."}
 
 
@@ -421,10 +422,10 @@ def delete_radarr_setting(
     responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_sonarr_instance_info(
+async def get_sonarr_instance_info(
     setting_in: ExternalServiceSettingBase,
 ):
-    instance_info = sonarr.get_instance_info(
+    instance_info = await sonarr.get_instance_info(
         setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
     )
     if instance_info is None:
@@ -441,16 +442,16 @@ def get_sonarr_instance_info(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_sonarr_setting_instance_info(
+async def get_sonarr_setting_instance_info(
     setting_id: str,
     sonarr_setting_repo: SonarrSettingRepository = Depends(
         deps.get_repository(SonarrSettingRepository)
     ),
 ):
-    setting = sonarr_setting_repo.find_by(id=setting_id)
+    setting = await sonarr_setting_repo.find_by(id=setting_id)
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Setting not found.")
-    instance_info = sonarr.get_instance_info(
+    instance_info = await sonarr.get_instance_info(
         setting.api_key, setting.host, setting.port, setting.ssl
     )
     if instance_info is None:
@@ -463,13 +464,13 @@ def get_sonarr_setting_instance_info(
     response_model=List[SonarrSettingSchema],
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def get_sonarr_settings(
+async def get_sonarr_settings(
     current_user: User = Depends(deps.get_current_user),
     sonarr_setting_repo: SonarrSettingRepository = Depends(
         deps.get_repository(SonarrSettingRepository)
     ),
 ):
-    settings = sonarr_setting_repo.find_all_by(user_id=current_user.id)
+    settings = await sonarr_setting_repo.find_all_by(user_id=current_user.id)
     return settings
 
 
@@ -480,14 +481,14 @@ def get_sonarr_settings(
     responses={status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Instance connection fail"}},
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def add_sonarr_setting(
+async def add_sonarr_setting(
     setting_in: SonarrSettingCreateUpdate,
     current_user: User = Depends(deps.get_current_user),
     sonarr_setting_repo: SonarrSettingRepository = Depends(
         deps.get_repository(SonarrSettingRepository)
     ),
 ):
-    if not sonarr.check_instance_status(
+    if not await sonarr.check_instance_status(
         api_key=setting_in.api_key,
         host=setting_in.host,
         port=setting_in.port,
@@ -496,7 +497,7 @@ def add_sonarr_setting(
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
     setting = setting_in.to_orm(SonarrSetting)
     setting.user_id = current_user.id
-    sonarr_setting_repo.save(setting)
+    await sonarr_setting_repo.save(setting)
     return setting
 
 
@@ -509,7 +510,7 @@ def add_sonarr_setting(
     },
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def update_sonarr_setting(
+async def update_sonarr_setting(
     setting_id: str,
     setting_in: SonarrSettingCreateUpdate,
     current_user: User = Depends(deps.get_current_user),
@@ -517,11 +518,11 @@ def update_sonarr_setting(
         deps.get_repository(SonarrSettingRepository)
     ),
 ):
-    setting = sonarr_setting_repo.find_by(id=setting_id)
+    setting = await sonarr_setting_repo.find_by(id=setting_id)
     if setting is None or setting.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No existing Sonarr setting.")
 
-    if not sonarr.check_instance_status(
+    if not await sonarr.check_instance_status(
         api_key=setting_in.api_key,
         host=setting_in.host,
         port=setting_in.port,
@@ -529,7 +530,7 @@ def update_sonarr_setting(
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
 
-    setting = sonarr_setting_repo.update(setting, setting_in)
+    setting = await sonarr_setting_repo.update(setting, setting_in)
     return setting
 
 
@@ -539,15 +540,15 @@ def update_sonarr_setting(
     responses={status.HTTP_404_NOT_FOUND: {"description": "No Sonarr setting"}},
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
-def delete_sonarr_setting(
+async def delete_sonarr_setting(
     setting_id: str,
     current_user: User = Depends(deps.get_current_user),
     sonarr_setting_repo: SonarrSettingRepository = Depends(
         deps.get_repository(SonarrSettingRepository)
     ),
 ):
-    setting = sonarr_setting_repo.find_by(id=setting_id)
+    setting = await sonarr_setting_repo.find_by(id=setting_id)
     if setting is None or setting.user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Sonarr setting not found.")
-    sonarr_setting_repo.remove(setting)
+    await sonarr_setting_repo.remove(setting)
     return {"detail": "Sonarr setting removed."}

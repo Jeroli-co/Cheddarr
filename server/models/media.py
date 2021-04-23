@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 from sqlalchemy import (
     Column,
@@ -8,8 +9,7 @@ from sqlalchemy import (
     Integer,
     String,
 )
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, declared_attr, relationship
 
 from server.database import Model
 
@@ -37,7 +37,7 @@ class Media(Model):
 
 class MediaServerContent(object):
     id = Column(Integer, primary_key=True)
-    server_media_id = Column(String, nullable=False)
+    external_id = Column(String, nullable=False)
     added_at = Column(Date)
 
     @declared_attr
@@ -51,13 +51,21 @@ class MediaServerMedia(Model, MediaServerContent):
     media_id = Column(ForeignKey("media.id"), nullable=False)
     server_library_id = Column(ForeignKey("mediaserverlibrary.id"))
     media = relationship(
-        "Media", backref=backref("server_media", cascade="all,delete,delete-orphan")
+        "Media",
+        lazy="joined",
+        innerjoin=True,
+        backref=backref("server_media", lazy="selectin", cascade="all,delete,delete-orphan"),
     )
     server = relationship(
-        "MediaServerSetting", backref=backref("server_media", cascade="all,delete,delete-orphan")
+        "MediaServerSetting",
+        lazy="joined",
+        innerjoin=True,
+        backref=backref("server_media", cascade="all,delete,delete-orphan"),
     )
     library = relationship(
-        "MediaServerLibrary", backref=backref("server_media", cascade="all,delete,delete-orphan")
+        "MediaServerLibrary",
+        lazy="joined",
+        backref=backref("server_media", cascade="all,delete,delete-orphan"),
     )
 
 
@@ -65,15 +73,18 @@ class MediaServerSeason(Model, MediaServerContent):
     __repr_props__ = ("season_number",)
 
     season_number = Column(Integer, nullable=False)
-    media_id = Column(ForeignKey("mediaservermedia.id"), nullable=False)
-    media = relationship(
-        "MediaServerMedia", backref=backref("seasons", cascade="all,delete,delete-orphan")
+    server_media_id = Column(ForeignKey("mediaservermedia.id"), nullable=False)
+    server_media = relationship(
+        "MediaServerMedia",
+        lazy="joined",
+        innerjoin=True,
+        backref=backref("seasons", cascade="all,delete,delete-orphan"),
     )
-    episodes: list = relationship(
-        "MediaServerEpisode", back_populates="season", cascade="all,delete,delete-orphan"
-    )
-    server = relationship(
-        "MediaServerSetting", backref=backref("seasons", cascade="all,delete,delete-orphan")
+    episodes: List["MediaServerEpisode"] = relationship(
+        "MediaServerEpisode",
+        lazy="selectin",
+        back_populates="season",
+        cascade="all,delete,delete-orphan",
     )
 
 
@@ -82,7 +93,6 @@ class MediaServerEpisode(Model, MediaServerContent):
 
     episode_number = Column(Integer, nullable=False)
     season_id = Column(ForeignKey("mediaserverseason.id"), nullable=False)
-    season = relationship("MediaServerSeason", back_populates="episodes")
-    server = relationship(
-        "MediaServerSetting", backref=backref("episodes", cascade="all,delete,delete-orphan")
+    season = relationship(
+        "MediaServerSeason", lazy="joined", innerjoin=True, back_populates="episodes"
     )

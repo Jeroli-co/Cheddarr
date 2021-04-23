@@ -19,7 +19,7 @@ router = APIRouter()
     response_model_exclude_none=True,
     dependencies=[Depends(deps.get_current_user)],
 )
-def search_media(
+async def search_media(
     value: str,
     page: int = 1,
     media_type: Optional[MediaType] = None,
@@ -29,15 +29,15 @@ def search_media(
     ),
 ):
     if media_type == MediaType.series:
-        media_results, total_pages, total_results = tmdb.search_tmdb_series(value, page)
+        media_results, total_pages, total_results = await tmdb.search_tmdb_series(value, page)
     elif media_type == MediaType.movie:
-        media_results, total_pages, total_results = tmdb.search_tmdb_movies(value, page)
+        media_results, total_pages, total_results = await tmdb.search_tmdb_movies(value, page)
     else:
-        media_results, total_pages, total_results = tmdb.search_tmdb_media(value, page)
+        media_results, total_pages, total_results = await tmdb.search_tmdb_media(value, page)
 
     server_ids = [server.server_id for server in current_user.media_servers]
     for media in media_results:
-        db_media = server_media_repo.find_by_external_id_and_server_ids(
+        db_media = await server_media_repo.find_by_external_id_and_server_ids(
             tmdb_id=media.tmdb_id,
             imdb_id=media.imdb_id,
             tvdb_id=media.tvdb_id,

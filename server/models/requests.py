@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 from sqlalchemy import (
     Column,
@@ -8,11 +9,13 @@ from sqlalchemy import (
     String,
     Text,
 )
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declared_attr, relationship
 
 from server.database import Model, Timestamp
-from server.models.media import MediaType
+from server.database.base import mapper_args
+from server.models.media import Media, MediaType
+from server.models.settings import MediaProviderSetting
+from server.models.users import User
 
 
 class RequestStatus(str, Enum):
@@ -23,7 +26,7 @@ class RequestStatus(str, Enum):
 
 
 class MediaRequest(Model, Timestamp):
-    __mapper_args__ = {"polymorphic_on": "media_type"}
+    __mapper_args__ = mapper_args({"polymorphic_on": "media_type", "with_polymorphic": "*"})
 
     id = Column(Integer, primary_key=True)
     media_type = Column(DBEnum(MediaType), nullable=False)
@@ -38,47 +41,47 @@ class MediaRequest(Model, Timestamp):
         return Column(ForeignKey("mediaprovidersetting.id"))
 
     @declared_attr
-    def selected_provider(cls):
-        return relationship("MediaProviderSetting")
+    def selected_provider(cls) -> MediaProviderSetting:
+        return relationship("MediaProviderSetting", lazy="joined")
 
     @declared_attr
     def requesting_user_id(cls):
         return Column(ForeignKey("user.id"), nullable=False)
 
     @declared_attr
-    def requesting_user(cls):
-        return relationship("User", foreign_keys=cls.requesting_user_id)
+    def requesting_user(cls) -> User:
+        return relationship("User", lazy="joined", foreign_keys=cls.requesting_user_id)
 
     @declared_attr
     def requested_user_id(cls):
         return Column(ForeignKey("user.id"), nullable=False)
 
     @declared_attr
-    def requested_user(cls):
-        return relationship("User", foreign_keys=cls.requested_user_id)
+    def requested_user(cls) -> User:
+        return relationship("User", lazy="joined", foreign_keys=cls.requested_user_id)
 
     @declared_attr
     def media_id(cls):
         return Column(ForeignKey("media.id"), nullable=False)
 
     @declared_attr
-    def media(cls):
-        return relationship("Media")
+    def media(cls) -> Media:
+        return relationship("Media", lazy="joined")
 
 
 class MovieRequest(MediaRequest):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": MediaType.movie}
+    __mapper_args__ = mapper_args({"polymorphic_identity": MediaType.movie})
     __repr_props__ = ("media", "requested_user", "requesting_user")
 
 
 class SeriesRequest(MediaRequest):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": MediaType.series}
+    __mapper_args__ = mapper_args({"polymorphic_identity": MediaType.series})
     __repr_props__ = ("media", "requested_user", "requesting_user")
 
-    seasons: list = relationship(
-        "SeasonRequest", cascade="all,delete,delete-orphan", backref="request"
+    seasons: List["SeasonRequest"] = relationship(
+        "SeasonRequest", cascade="all,delete,delete-orphan", lazy="selectin", backref="request"
     )
 
 
@@ -89,9 +92,8 @@ class SeasonRequest(Model):
     season_number = Column(Integer, nullable=False)
     series_request_id = Column(ForeignKey("mediarequest.id"), nullable=False)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
-
-    episodes: list = relationship(
-        "EpisodeRequest", cascade="all,delete,delete-orphan", backref="season"
+    episodes: List["EpisodeRequest"] = relationship(
+        "EpisodeRequest", cascade="all,delete,delete-orphan", lazy="selectin", backref="season"
     )
 
 
