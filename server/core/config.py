@@ -58,7 +58,7 @@ class Config(BaseSettings):
     # database                                                               #
     ##########################################################################
     DB_NAME: str = "cheddarr.sqlite"
-    DB_URL: str = "sqlite:///" + str(DB_FOLDER / DB_NAME)
+    DB_URL: str = "sqlite+aiosqlite:///" + str(DB_FOLDER / DB_NAME)
     DB_OPTIONS: dict = {"check_same_thread": False}
 
     ##########################################################################

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import click
+import asyncclick as click
 
 from server.core.logger import LOGGING_CONFIG
 
@@ -23,11 +23,11 @@ def cli(ctx, debug):
 
 
 @cli.command("init-db")
-def init_db():
+async def init_db():
     """Initialize the database."""
     from server.database.init_db import init_db
 
-    init_db()
+    await init_db()
     click.echo("Database initialized.")
 
 

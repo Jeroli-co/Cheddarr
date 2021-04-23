@@ -1,10 +1,12 @@
 from enum import Enum
+from typing import List
 from uuid import uuid4
 
 from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from server.database import Model
+from server.database.base import mapper_args
 
 
 class ExternalServiceName(str, Enum):
@@ -14,8 +16,6 @@ class ExternalServiceName(str, Enum):
 
 
 class ExternalServiceSetting(object):
-    __mapper_args__ = {"polymorphic_on": "service_name"}
-
     def default_name(context):
         return context.get_current_parameters()["service_name"]
 
@@ -30,11 +30,15 @@ class ExternalServiceSetting(object):
 
 
 class MediaServerSetting(Model, ExternalServiceSetting):
+    __mapper_args__ = mapper_args({"polymorphic_on": "service_name", "with_polymorphic": "*"})
+
     server_id = Column(String, primary_key=True)
     server_name = Column(String)
     user_id = Column(ForeignKey("user.id"), nullable=False)
     user = relationship("User", back_populates="media_servers")
-    libraries: list = relationship("MediaServerLibrary", cascade="all,delete,delete-orphan")
+    libraries: List["MediaServerLibrary"] = relationship(
+        "MediaServerLibrary", lazy="selectin", cascade="all,delete,delete-orphan"
+    )
 
 
 class MediaServerLibrary(Model):
@@ -48,7 +52,7 @@ class MediaServerLibrary(Model):
 
 class PlexSetting(MediaServerSetting):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": ExternalServiceName.plex}
+    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.plex})
     __repr_props__ = ("host", "port", "ssl", "server_name", "name")
 
 
@@ -58,6 +62,8 @@ class MediaProviderType(str, Enum):
 
 
 class MediaProviderSetting(Model, ExternalServiceSetting):
+    __mapper_args__ = mapper_args({"polymorphic_on": "service_name", "with_polymorphic": "*"})
+
     provider_type = Column(DBEnum(MediaProviderType), nullable=False)
     root_folder = Column(String, nullable=False)
     quality_profile_id = Column(Integer)
@@ -65,12 +71,11 @@ class MediaProviderSetting(Model, ExternalServiceSetting):
     version = Column(Integer)
     is_default = Column(Boolean, default=False)
     user_id = Column(ForeignKey("user.id"), nullable=False)
-    user = relationship("User", back_populates="media_providers")
 
 
 class RadarrSetting(MediaProviderSetting):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": ExternalServiceName.radarr}
+    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.radarr})
     __repr_props__ = ("host", "port", "ssl", "version", "name")
 
     def __init__(self, **kwargs):
@@ -80,7 +85,7 @@ class RadarrSetting(MediaProviderSetting):
 
 class SonarrSetting(MediaProviderSetting):
     __tablename__ = None
-    __mapper_args__ = {"polymorphic_identity": ExternalServiceName.sonarr}
+    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.sonarr})
     __repr_props__ = ("host", "port", "ssl", "version", "name")
 
     anime_root_folder = Column(String(128))

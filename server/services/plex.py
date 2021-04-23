@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from asgiref.sync import sync_to_async
 from plexapi.exceptions import PlexApiException
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer as PlexAPIServer
@@ -7,6 +8,7 @@ from plexapi.server import PlexServer as PlexAPIServer
 from server.schemas.settings import PlexLibrarySection, PlexServer
 
 
+@sync_to_async
 def get_plex_account_servers(api_key: str) -> List[PlexServer]:
     plex_account = MyPlexAccount(api_key)
     servers = []
@@ -30,27 +32,23 @@ def get_plex_account_servers(api_key: str) -> List[PlexServer]:
     return servers
 
 
-def get_plex_server_library_sections(
+async def get_plex_server_library_sections(
     base_url: str, port: int, ssl: bool, api_key: str
 ) -> Optional[List[PlexLibrarySection]]:
-    server = get_server(base_url, port, ssl, api_key)
+    server = await get_server(base_url, port, ssl, api_key)
     if server is None:
         return None
     sections = []
-    for library in server.library.sections():
+    for library in await sync_to_async(server.library.sections)():
         sections.append(PlexLibrarySection(library_id=library.key, name=library.title))
 
     return sections
 
 
-def get_plex_library_section(server: PlexAPIServer, section_name: str):
-    return server.library.section(section_name)
-
-
-def get_server(base_url: str, port: int, ssl: bool, api_key: str) -> Optional[PlexAPIServer]:
+async def get_server(base_url: str, port: int, ssl: bool, api_key: str) -> Optional[PlexAPIServer]:
     url = f"{'https' if ssl else 'http'}://{base_url}{':' + str(port) if port else ''}"
     try:
-        server = PlexAPIServer(url, api_key, timeout=10)
+        server = await sync_to_async(PlexAPIServer)(url, api_key)
     except PlexApiException:
         return None
     return server

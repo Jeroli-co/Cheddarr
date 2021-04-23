@@ -1,10 +1,10 @@
-from typing import Callable, Generator, List, Literal, Type
+from typing import Callable, Iterator, List, Literal, Type
 
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.core import config
 from server.models.users import User, UserRole
@@ -15,31 +15,31 @@ from server.schemas.auth import TokenPayload
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 
 
-def get_db() -> Generator:
-    from server.database.session import SessionLocal
+async def get_db() -> Iterator[AsyncSession]:
+    from server.database.session import Session
 
-    session = SessionLocal()
+    session = Session()
     try:
         yield session
     except Exception as exc:
-        session.rollback()
+        await session.rollback()
         raise exc
     finally:
-        session.close()
+        await session.rollback()
 
 
 def get_repository(
     repo_type: Type[BaseRepository],
-) -> Callable[[Session], BaseRepository]:
+) -> Callable[[AsyncSession], BaseRepository]:
     def _get_repo(
-        session: Session = Depends(get_db),
+        session: AsyncSession = Depends(get_db),
     ) -> BaseRepository:
         return repo_type(session)
 
     return _get_repo
 
 
-def get_current_user(
+async def get_current_user(
     token: str = Depends(oauth2_scheme),
     user_repository: UserRepository = Depends(get_repository(UserRepository)),
 ) -> User:
@@ -53,7 +53,7 @@ def get_current_user(
         token_data = TokenPayload.parse_obj(payload)
     except (jwt.InvalidTokenError, ValidationError):
         raise credentials_exception
-    user = user_repository.find_by(id=int(token_data.sub))
+    user = await user_repository.find_by(id=int(token_data.sub))
     if not user:
         raise credentials_exception
     return user
