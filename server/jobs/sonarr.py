@@ -15,10 +15,10 @@ async def sonarr_sync():
         )
         for request in requests:
             setting = request.selected_provider
-            series_lookup = sonarr.lookup(setting, tvdb_id=request.media.tvdb_id)
+            series_lookup = await sonarr.lookup(setting, tvdb_id=request.media.tvdb_id)
             if series_lookup is None:
                 continue
-            series = sonarr.get_series(setting, series_lookup.id)
+            series = await sonarr.get_series(setting, series_lookup.id)
             req_seasons_available = 0
             for req_season in request.seasons:
                 if not req_season.episodes:
@@ -29,7 +29,7 @@ async def sonarr_sync():
                         req_season.status = RequestStatus.available
                         req_seasons_available += 1
                 else:
-                    episodes = sonarr.get_episodes(setting, series.id)
+                    episodes = await sonarr.get_episodes(setting, series.id)
                     req_episodes_available = 0
                     for req_episode in req_season.episodes:
                         matched_episode = next(
