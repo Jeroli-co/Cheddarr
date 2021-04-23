@@ -86,9 +86,7 @@ async def get_instance_info(
             api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/profile"
         )
 
-    root_folders = [
-        folder["path"] for folder in await HttpClient.request("GET", root_folders_url)
-    ]
+    root_folders = [folder["path"] for folder in await HttpClient.request("GET", root_folders_url)]
     quality_profiles = [
         {"id": profile["id"], "name": profile["name"]}
         for profile in await HttpClient.request("GET", quality_profiles_url)
@@ -124,9 +122,7 @@ async def add_movie(setting: RadarrSetting, movie: RadarrMovie) -> RadarrMovie:
         version=setting.version,
         resource_path="/movie",
     )
-    resp = await HttpClient.request(
-        "POST", url, data=movie.json(by_alias=True, exclude_none=True)
-    )
+    resp = await HttpClient.request("POST", url, data=movie.json(by_alias=True, exclude_none=True))
     return RadarrMovie.parse_obj(resp)
 
 

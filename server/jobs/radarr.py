@@ -15,7 +15,7 @@ async def sync_radarr():
         )
         for request in requests:
             setting = request.selected_provider
-            movie_lookup = radarr.lookup(
+            movie_lookup = await radarr.lookup(
                 setting, tmdb_id=request.media.tmdb_id, title=request.media.title
             )
             if movie_lookup is None:
