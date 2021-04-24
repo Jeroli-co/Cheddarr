@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import AnyHttpUrl, EmailStr
@@ -14,6 +15,8 @@ class UserSchema(UserBase):
     avatar: Optional[AnyHttpUrl]
     confirmed: bool
     roles: int
+    created_at: datetime
+    updated_at: datetime
 
 
 class UserCreate(UserBase):

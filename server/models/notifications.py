@@ -1,7 +1,6 @@
 from enum import Enum
 
 from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, JSON, Text
-from sqlalchemy.orm import relationship
 
 from server.database import Model, Timestamp
 
@@ -21,4 +20,3 @@ class Notification(Model, Timestamp):
     message = Column(Text, nullable=False)
     read = Column(Boolean, nullable=False, default=False)
     user_id = Column(ForeignKey("user.id"), nullable=False)
-    user = relationship("User", back_populates="notifications")

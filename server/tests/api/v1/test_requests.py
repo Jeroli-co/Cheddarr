@@ -1,25 +1,25 @@
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+import pytest
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.models.requests import MediaRequest, MovieRequest, SeriesRequest
+from server.models.media import MediaType
 from server.repositories.requests import MediaRequestRepository
 from server.tests.utils import datasets
 
+pytestmark = pytest.mark.asyncio
 
-def test_add_series_never_requested_without_seasons(
-    client: TestClient, db: Session, normal_user_token_headers
-):
-    r = client.post(
+
+async def test_add_series_never_requested_without_seasons(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
+
+    resp = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
-    assert r.status_code == 201
+    assert resp.status_code == 201
 
-    actual = r.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    actual = resp.json()
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -30,12 +30,11 @@ def test_add_series_never_requested_without_seasons(
     assert actual["seasons"] == expected.seasons
 
 
-def test_add_series_never_requested_with_all_seasons(
-    client: TestClient, db: Session, normal_user_token_headers
-):
-    r = client.post(
+async def test_add_series_never_requested_with_all_seasons(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
+
+    resp = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -50,12 +49,10 @@ def test_add_series_never_requested_with_all_seasons(
             ],
         },
     )
-    assert r.status_code == 201
+    assert resp.status_code == 201
 
-    actual = r.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    actual = resp.json()
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["id"] == expected.id
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -67,10 +64,9 @@ def test_add_series_never_requested_with_all_seasons(
     assert len(actual["seasons"]) == len(expected.seasons) == 7
 
 
-def test_add_series_already_requested_with_seasons(client: TestClient, normal_user_token_headers):
-    r1 = client.post(
+async def test_add_series_already_requested_with_seasons(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -85,26 +81,21 @@ def test_add_series_already_requested_with_seasons(client: TestClient, normal_us
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
     assert r1.status_code == 201
     assert r2.status_code == 201
 
 
-def test_add_series_already_requested_without_seasons(
-    client: TestClient, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_series_already_requested_without_seasons(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -123,22 +114,21 @@ def test_add_series_already_requested_without_seasons(
     assert r2.status_code == 409
 
 
-def test_add_season_never_requested(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.post(
+async def test_add_season_never_requested(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
+
+    resp = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
     )
-    assert r.status_code == 201
+    assert resp.status_code == 201
 
-    actual = r.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    actual = resp.json()
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -151,21 +141,17 @@ def test_add_season_never_requested(client: TestClient, db: Session, normal_user
     assert actual["seasons"][1]["season_number"] == expected.seasons[1].season_number == 4
 
 
-def test_add_season_already_requested_conflict_with_seasons(
-    client: TestClient, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_season_already_requested_conflict_with_seasons(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -176,21 +162,21 @@ def test_add_season_already_requested_conflict_with_seasons(
     assert r2.status_code == 409
 
 
-def test_add_season_already_requested_some_season_conflict(
-    client: TestClient, db: Session, normal_user_token_headers
+async def test_add_season_already_requested_some_season_conflict(
+    client: AsyncClient, db: AsyncSession
 ):
-    r1 = client.post(
+    media_request_repo = MediaRequestRepository(db)
+
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -205,9 +191,7 @@ def test_add_season_already_requested_some_season_conflict(
     assert r2.status_code == 201
 
     actual = r2.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -222,17 +206,13 @@ def test_add_season_already_requested_some_season_conflict(
     assert actual["seasons"][3]["season_number"] == expected.seasons[3].season_number == 3
 
 
-def test_add_season_whereas_all_series_requested_without_seasons(
-    client: TestClient, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_season_whereas_all_series_requested_without_seasons(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -243,12 +223,9 @@ def test_add_season_whereas_all_series_requested_without_seasons(
     assert r2.status_code == 409
 
 
-def test_add_season_whereas_all_series_requested_with_all_seasons(
-    client: TestClient, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_season_whereas_all_series_requested_with_all_seasons(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -263,9 +240,8 @@ def test_add_season_whereas_all_series_requested_with_all_seasons(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -276,30 +252,26 @@ def test_add_season_whereas_all_series_requested_with_all_seasons(
     assert r2.status_code == 409
 
 
-def test_add_series_with_seasons_already_requested(
-    client: TestClient, db: Session, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_series_with_seasons_already_requested(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
+
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={"tmdb_id": 4194, "requested_username": datasets["users"][1]["username"]},
     )
     assert r1.status_code == 201
     assert r2.status_code == 201
 
     actual = r2.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -310,21 +282,21 @@ def test_add_series_with_seasons_already_requested(
     assert len(actual["seasons"]) == len(expected.seasons) == 0
 
 
-def test_add_series_with_seasons_already_requested_with_all_seasons(
-    client: TestClient, db: Session, normal_user_token_headers
+async def test_add_series_with_seasons_already_requested_with_all_seasons(
+    client: AsyncClient, db: AsyncSession
 ):
-    r1 = client.post(
+    media_request_repo = MediaRequestRepository(db)
+
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
             "seasons": [{"season_number": 1}, {"season_number": 4}],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -343,9 +315,7 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
     assert r2.status_code == 201
 
     actual = r2.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -363,10 +333,11 @@ def test_add_series_with_seasons_already_requested_with_all_seasons(
     assert actual["seasons"][6]["season_number"] == expected.seasons[6].season_number == 7
 
 
-def test_add_episode_never_requested(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.post(
+async def test_add_episode_never_requested(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
+
+    resp = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -383,12 +354,10 @@ def test_add_episode_never_requested(client: TestClient, db: Session, normal_use
             ],
         },
     )
-    assert r.status_code == 201
+    assert resp.status_code == 201
 
-    actual = r.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    actual = resp.json()
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -423,10 +392,9 @@ def test_add_episode_never_requested(client: TestClient, db: Session, normal_use
     )
 
 
-def test_add_episode_already_requested_conflict(client: TestClient, normal_user_token_headers):
-    r1 = client.post(
+async def test_add_episode_already_requested_conflict(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -443,9 +411,8 @@ def test_add_episode_already_requested_conflict(client: TestClient, normal_user_
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -466,12 +433,13 @@ def test_add_episode_already_requested_conflict(client: TestClient, normal_user_
     assert r2.status_code == 409
 
 
-def test_add_episode_already_requested_some_episodes_conflict(
-    client: TestClient, db: Session, normal_user_token_headers
+async def test_add_episode_already_requested_some_episodes_conflict(
+    client: AsyncClient, db: AsyncSession
 ):
-    r1 = client.post(
+    media_request_repo = MediaRequestRepository(db)
+
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -488,9 +456,8 @@ def test_add_episode_already_requested_some_episodes_conflict(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -515,9 +482,7 @@ def test_add_episode_already_requested_some_episodes_conflict(
     assert r2.status_code == 201
 
     actual = r2.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -574,20 +539,16 @@ def test_add_episode_already_requested_some_episodes_conflict(
     )
 
 
-def test_add_episode_whereas_all_series_is_requested_without_seasons(
-    client: TestClient, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_episode_whereas_all_series_is_requested_without_seasons(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -600,12 +561,9 @@ def test_add_episode_whereas_all_series_is_requested_without_seasons(
     assert r2.status_code == 409
 
 
-def test_add_episode_whereas_all_series_is_requested_with_seasons(
-    client: TestClient, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_episode_whereas_all_series_is_requested_with_seasons(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -620,9 +578,8 @@ def test_add_episode_whereas_all_series_is_requested_with_seasons(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -635,12 +592,13 @@ def test_add_episode_whereas_all_series_is_requested_with_seasons(
     assert r2.status_code == 409
 
 
-def test_add_series_without_seasons_whereas_episodes_requested(
-    client: TestClient, db: Session, normal_user_token_headers
+async def test_add_series_without_seasons_whereas_episodes_requested(
+    client: AsyncClient, db: AsyncSession
 ):
-    r1 = client.post(
+    media_request_repo = MediaRequestRepository(db)
+
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -649,9 +607,8 @@ def test_add_series_without_seasons_whereas_episodes_requested(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -661,9 +618,7 @@ def test_add_series_without_seasons_whereas_episodes_requested(
     assert r2.status_code == 201
 
     actual = r2.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -674,12 +629,13 @@ def test_add_series_without_seasons_whereas_episodes_requested(
     assert len(actual["seasons"]) == len(expected.seasons) == 0
 
 
-def test_add_series_with_all_seasons_whereas_episodes_requested(
-    client: TestClient, db: Session, normal_user_token_headers
+async def test_add_series_with_all_seasons_whereas_episodes_requested(
+    client: AsyncClient, db: AsyncSession
 ):
-    r1 = client.post(
+    media_request_repo = MediaRequestRepository(db)
+
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -688,9 +644,8 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -709,9 +664,7 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
     assert r2.status_code == 201
 
     actual = r2.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -722,12 +675,13 @@ def test_add_series_with_all_seasons_whereas_episodes_requested(
     assert len(actual["seasons"]) == len(expected.seasons) == 7
 
 
-def test_add_seasons_with_all_episodes_whereas_episodes_requested(
-    client: TestClient, db: Session, normal_user_token_headers
+async def test_add_seasons_with_all_episodes_whereas_episodes_requested(
+    client: AsyncClient, db: AsyncSession
 ):
-    r1 = client.post(
+    media_request_repo = MediaRequestRepository(db)
+
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -743,9 +697,8 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -828,9 +781,7 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
     assert r2.status_code == 201
 
     actual = r2.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
-    )
+    expected = await media_request_repo.find_by(requested_user_id=datasets["users"][1]["id"])
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -843,12 +794,13 @@ def test_add_seasons_with_all_episodes_whereas_episodes_requested(
     assert len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 2
 
 
-def test_add_seasons_without_episodes_whereas_episodes_requested(
-    client: TestClient, db: Session, normal_user_token_headers
+async def test_add_seasons_without_episodes_whereas_episodes_requested(
+    client: AsyncClient, db: AsyncSession
 ):
-    r1 = client.post(
+    media_request_repo = MediaRequestRepository(db)
+
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -864,9 +816,8 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -881,8 +832,8 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
     assert r2.status_code == 201
 
     actual = r2.json()
-    expected = (
-        db.query(SeriesRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
+    expected = await media_request_repo.find_by(
+        media_type=MediaType.series, requested_user_id=datasets["users"][1]["id"]
     )
 
     assert actual["requested_user"]["username"] == expected.requested_user.username
@@ -896,12 +847,9 @@ def test_add_seasons_without_episodes_whereas_episodes_requested(
     assert len(actual["seasons"][1]["episodes"]) == len(expected.seasons[1].episodes) == 2
 
 
-def test_add_episodes_whereas_all_season_requested_with_all_episodes(
-    client: TestClient, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_episodes_whereas_all_season_requested_with_all_episodes(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -980,9 +928,8 @@ def test_add_episodes_whereas_all_season_requested_with_all_episodes(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -998,12 +945,9 @@ def test_add_episodes_whereas_all_season_requested_with_all_episodes(
     assert r2.status_code == 409
 
 
-def test_add_episodes_whereas_all_season_requested_without_episodes(
-    client: TestClient, normal_user_token_headers
-):
-    r1 = client.post(
+async def test_add_episodes_whereas_all_season_requested_without_episodes(client: AsyncClient):
+    r1 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -1014,9 +958,8 @@ def test_add_episodes_whereas_all_season_requested_without_episodes(
             ],
         },
     )
-    r2 = client.post(
+    r2 = await client.post(
         client.app.url_path_for("add_series_request"),
-        headers=normal_user_token_headers,
         json={
             "tmdb_id": 4194,
             "requested_username": datasets["users"][1]["username"],
@@ -1032,83 +975,68 @@ def test_add_episodes_whereas_all_season_requested_without_episodes(
     assert r2.status_code == 409
 
 
-def test_update_series_request_wrong_status(client: TestClient, normal_user_token_headers):
-    r = client.patch(
+async def test_update_series_request_wrong_status(client: AsyncClient):
+    resp = await client.patch(
         client.app.url_path_for("update_series_request", request_id="1"),
-        headers=normal_user_token_headers,
         json={"status": "available"},
     )
-    assert r.status_code == 422
+    assert resp.status_code == 422
 
 
-def test_update_series_request_not_existing(client: TestClient, normal_user_token_headers):
-    r = client.patch(
+async def test_update_series_request_not_existing(client: AsyncClient):
+    resp = await client.patch(
         client.app.url_path_for("update_series_request", request_id="0"),
-        headers=normal_user_token_headers,
         json={"status": "approved"},
     )
-    assert r.status_code == 404
+    assert resp.status_code == 404
 
 
-def test_update_series_request_not_requested_user(client: TestClient, normal_user_token_headers):
-    r = client.patch(
+async def test_update_series_request_not_requested_user(client: AsyncClient):
+    resp = await client.patch(
         client.app.url_path_for("update_series_request", request_id="2"),
-        headers=normal_user_token_headers,
         json={"status": "approved"},
     )
-    assert r.status_code == 404
+    assert resp.status_code == 404
 
 
-def test_update_series_request_approved_no_provider(client: TestClient, normal_user_token_headers):
-    r = client.patch(
+async def test_update_series_request_approved_no_provider(client: AsyncClient):
+    resp = await client.patch(
         client.app.url_path_for("update_series_request", request_id="1"),
-        headers=normal_user_token_headers,
         json={"status": "approved"},
     )
-    assert r.status_code == 400
+    assert resp.status_code == 400
 
 
-def test_delete_series_request(client: TestClient, db: Session, normal_user_token_headers):
+async def test_delete_series_request(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
 
-    series_request_repo = MediaRequestRepository(db)
-
-    r = client.delete(
-        client.app.url_path_for("delete_series_request", request_id="1"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 200
-    assert series_request_repo.find_by(id=1) is None
+    resp = await client.delete(client.app.url_path_for("delete_series_request", request_id="1"))
+    assert resp.status_code == 200
+    assert await media_request_repo.find_by(id=1) is None
 
 
-def test_delete_series_request_not_existing(client: TestClient, normal_user_token_headers):
-    r = client.delete(
-        client.app.url_path_for("delete_series_request", request_id="0"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 404
+async def test_delete_series_request_not_existing(client: AsyncClient):
+    resp = await client.delete(client.app.url_path_for("delete_series_request", request_id="0"))
+    assert resp.status_code == 404
 
 
-def test_delete_series_request_not_pending_not_requested_user(
-    client: TestClient, normal_user_token_headers
-):
-    r = client.delete(
-        client.app.url_path_for("delete_series_request", request_id="2"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 403
+async def test_delete_series_request_not_pending_not_requested_user(client: AsyncClient):
+    resp = await client.delete(client.app.url_path_for("delete_series_request", request_id="2"))
+    assert resp.status_code == 403
 
 
-def test_add_movie_never_requested(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.post(
+async def test_add_movie_never_requested(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
+
+    resp = await client.post(
         client.app.url_path_for("add_movie_request"),
-        headers=normal_user_token_headers,
         json={"tmdb_id": 11, "requested_username": datasets["users"][1]["username"]},
     )
-    assert r.status_code == 201
-    actual = r.json()
+    assert resp.status_code == 201
+    actual = resp.json()
 
-    expected = (
-        db.query(MovieRequest).filter_by(requested_user_id=datasets["users"][1]["id"]).first()
+    expected = await media_request_repo.find_by(
+        media_type=MediaType.movie, requested_user_id=datasets["users"][1]["id"]
     )
     assert actual["requested_user"]["username"] == expected.requested_user.username
     assert actual["requesting_user"]["username"] == expected.requesting_user.username
@@ -1118,35 +1046,32 @@ def test_add_movie_never_requested(client: TestClient, db: Session, normal_user_
     assert actual["media"]
 
 
-def test_add_movie_not_existing_user(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.post(
+async def test_add_movie_not_existing_user(client: AsyncClient):
+    resp = await client.post(
         client.app.url_path_for("add_movie_request"),
-        headers=normal_user_token_headers,
         json={"tmdb_id": 11, "requested_username": "wrongusername"},
     )
-    assert r.status_code == 404
+    assert resp.status_code == 404
 
 
-def test_add_movie_already_requested(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.post(
+async def test_add_movie_already_requested(client: AsyncClient):
+    resp = await client.post(
         client.app.url_path_for("add_movie_request"),
-        headers=normal_user_token_headers,
         json={"tmdb_id": 4194, "requested_username": datasets["users"][2]["username"]},
     )
-    assert r.status_code == 409
+    assert resp.status_code == 409
 
 
-def test_get_incoming_requests(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.get(
-        client.app.url_path_for("get_received_requests"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 200
+async def test_get_incoming_requests(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
 
-    actual = r.json()["results"]
-    expected = db.query(MediaRequest).filter_by(requested_user_id=datasets["users"][0]["id"]).all()
+    resp = await client.get(client.app.url_path_for("get_received_requests"))
+    assert resp.status_code == 200
 
-    assert len(actual) == 2
+    actual = resp.json()["results"]
+    expected = await media_request_repo.find_all_by(requested_user_id=datasets["users"][0]["id"])
+
+    assert len(actual) == len(expected)
     assert actual[0]["id"] == expected[0].id
     assert actual[0]["requested_user"]["username"] == expected[0].requested_user.username
     assert actual[0]["requesting_user"]["username"] == expected[0].requesting_user.username
@@ -1164,19 +1089,16 @@ def test_get_incoming_requests(client: TestClient, db: Session, normal_user_toke
     assert actual[1]["media"]
 
 
-def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_user_token_headers):
-    r = client.get(
-        client.app.url_path_for("get_sent_requests"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 200
+async def test_get_outgoing_requests(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
 
-    actual = r.json()["results"]
-    expected = (
-        db.query(MediaRequest).filter_by(requesting_user_id=datasets["users"][0]["id"]).all()
-    )
+    resp = await client.get(client.app.url_path_for("get_sent_requests"))
+    assert resp.status_code == 200
 
-    assert len(actual) == 2
+    actual = resp.json()["results"]
+    expected = await media_request_repo.find_all_by(requesting_user_id=datasets["users"][0]["id"])
+
+    assert len(actual) == len(expected)
     assert actual[0]["id"] == expected[0].id
     assert actual[0]["requested_user"]["username"] == expected[0].requested_user.username
     assert actual[0]["requesting_user"]["username"] == expected[0].requesting_user.username
@@ -1194,67 +1116,51 @@ def test_get_outgoing_movies_requests(client: TestClient, db: Session, normal_us
     assert actual[1]["media"]
 
 
-def test_update_movie_request_wrong_status(client: TestClient, normal_user_token_headers):
-    r = client.patch(
+async def test_update_movie_request_wrong_status(client: AsyncClient):
+    resp = await client.patch(
         client.app.url_path_for("update_movie_request", request_id="1"),
-        headers=normal_user_token_headers,
         json={"status": "available"},
     )
-    assert r.status_code == 422
+    assert resp.status_code == 422
 
 
-def test_update_movie_request_not_existing(client: TestClient, normal_user_token_headers):
-    r = client.patch(
+async def test_update_movie_request_not_existing(client: AsyncClient):
+    resp = await client.patch(
         client.app.url_path_for("update_movie_request", request_id="0"),
-        headers=normal_user_token_headers,
         json={"status": "approved"},
     )
-    assert r.status_code == 404
+    assert resp.status_code == 404
 
 
-def test_update_movie_request_not_requested_user(client: TestClient, normal_user_token_headers):
-    r = client.patch(
+async def test_update_movie_request_not_requested_user(client: AsyncClient):
+    resp = await client.patch(
         client.app.url_path_for("update_movie_request", request_id="2"),
-        headers=normal_user_token_headers,
         json={"status": "approved"},
     )
-    assert r.status_code == 404
+    assert resp.status_code == 404
 
 
-def test_update_movie_request_approved_no_provider(client: TestClient, normal_user_token_headers):
-    r = client.patch(
+async def test_update_movie_request_approved_no_provider(client: AsyncClient):
+    resp = await client.patch(
         client.app.url_path_for("update_movie_request", request_id="1"),
-        headers=normal_user_token_headers,
         json={"status": "approved"},
     )
-    assert r.status_code == 400
+    assert resp.status_code == 400
 
 
-def test_delete_movie_request(client: TestClient, db: Session, normal_user_token_headers):
+async def test_delete_movie_request(client: AsyncClient, db: AsyncSession):
+    media_request_repo = MediaRequestRepository(db)
 
-    movies_request_repo = MediaRequestRepository(db)
-
-    r = client.delete(
-        client.app.url_path_for("delete_movie_request", request_id="1"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 200
-    assert movies_request_repo.find_by(id=1) is None
+    resp = await client.delete(client.app.url_path_for("delete_movie_request", request_id="1"))
+    assert resp.status_code == 200
+    assert await media_request_repo.find_by(media_type=MediaType.movie, id=1) is None
 
 
-def test_delete_movie_request_not_existing(client: TestClient, normal_user_token_headers):
-    r = client.delete(
-        client.app.url_path_for("delete_movie_request", request_id="0"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 404
+async def test_delete_movie_request_not_existing(client: AsyncClient):
+    resp = await client.delete(client.app.url_path_for("delete_movie_request", request_id="0"))
+    assert resp.status_code == 404
 
 
-def test_delete_movie_request_not_pending_not_requested_user(
-    client: TestClient, normal_user_token_headers
-):
-    r = client.delete(
-        client.app.url_path_for("delete_movie_request", request_id="2"),
-        headers=normal_user_token_headers,
-    )
-    assert r.status_code == 403
+async def test_delete_movie_request_not_pending_not_requested_user(client: AsyncClient):
+    resp = await client.delete(client.app.url_path_for("delete_movie_request", request_id="2"))
+    assert resp.status_code == 403

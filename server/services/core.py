@@ -46,24 +46,24 @@ def unify_series_request(series_request: SeriesRequest, request_in: SeriesReques
                 already_added_season.episodes = season.episodes
 
 
-def send_series_request(request: SeriesRequest, provider: MediaProviderSetting):
+async def send_series_request(request: SeriesRequest, provider: MediaProviderSetting):
     if isinstance(provider, SonarrSetting):
-        sonarr.send_request(request)
+        await sonarr.send_request(request)
 
 
-def send_movie_request(request: MovieRequest, provider: MediaProviderSetting):
+async def send_movie_request(request: MovieRequest, provider: MediaProviderSetting):
     if isinstance(provider, RadarrSetting):
-        radarr.send_request(request)
+        await radarr.send_request(request)
 
 
-def set_media_db_info(
+async def set_media_db_info(
     media: MediaSchema,
     current_user_id: int,
     current_user_server_ids: List[str],
     server_media_repo: MediaServerMediaRepository,
     request_repo: MediaRequestRepository = None,
 ):
-    db_media = server_media_repo.find_by_external_id_and_server_ids(
+    db_media = await server_media_repo.find_by_external_id_and_server_ids(
         tmdb_id=media.tmdb_id,
         imdb_id=media.imdb_id,
         tvdb_id=media.tvdb_id,
@@ -76,19 +76,19 @@ def set_media_db_info(
     if request_repo is not None:
         media.requests = parse_obj_as(
             List[Union[SeriesRequestSchema, MovieRequestSchema]],
-            request_repo.find_all_by_user_ids_and_tmdb_id(
+            await request_repo.find_all_by_tmdb_id(
                 requesting_user_id=current_user_id, tmdb_id=media.tmdb_id
             ),
         )
 
 
-def set_season_db_info(
+async def set_season_db_info(
     season: SeasonSchema,
     series_tmdb_id: int,
     current_user_server_ids: List[str],
     server_season_repo: MediaServerSeasonRepository,
 ):
-    db_seasons = server_season_repo.find_by_external_id_and_season_number_and_server_ids(
+    db_seasons = await server_season_repo.find_by_external_id_and_season_number_and_server_ids(
         tmdb_id=series_tmdb_id,
         season_number=season.season_number,
         server_ids=current_user_server_ids,
@@ -98,7 +98,7 @@ def set_season_db_info(
     ]
 
 
-def set_episode_db_info(
+async def set_episode_db_info(
     episode: EpisodeSchema,
     series_tmdb_id: int,
     season_number,
@@ -107,7 +107,7 @@ def set_episode_db_info(
 ):
 
     db_episode = (
-        episode_repo.find_by_external_id_and_season_number_and_episode_number_and_server_ids(
+        await episode_repo.find_by_external_id_and_season_number_and_episode_number_and_server_ids(
             tmdb_id=series_tmdb_id,
             season_number=season_number,
             episode_number=episode.episode_number,

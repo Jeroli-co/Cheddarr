@@ -33,7 +33,7 @@ router = APIRouter()
 
 
 @router.get("/incoming", response_model=MediaRequestSearchResult)
-def get_received_requests(
+async def get_received_requests(
     page: int = 1,
     per_page: int = 20,
     current_user: User = Depends(deps.get_current_user),
@@ -41,7 +41,7 @@ def get_received_requests(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests, total_results, total_pages = media_request_repo.find_all_by(
+    requests, total_results, total_pages = await media_request_repo.find_all_by(
         per_page=per_page,
         page=page,
         requested_user_id=current_user.id,
@@ -53,7 +53,7 @@ def get_received_requests(
 
 
 @router.get("/outgoing", response_model=MediaRequestSearchResult)
-def get_sent_requests(
+async def get_sent_requests(
     page: int = 1,
     per_page: int = 20,
     current_user: User = Depends(deps.get_current_user),
@@ -61,7 +61,7 @@ def get_sent_requests(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    requests, total_results, total_pages = media_request_repo.find_all_by(
+    requests, total_results, total_pages = await media_request_repo.find_all_by(
         per_page=per_page,
         page=page,
         requesting_user_id=current_user.id,
@@ -81,7 +81,7 @@ def get_sent_requests(
         status.HTTP_409_CONFLICT: {"description": "Movie already requested"},
     },
 )
-def add_movie_request(
+async def add_movie_request(
     request_in: MovieRequestCreate,
     current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
@@ -94,11 +94,11 @@ def add_movie_request(
     ),
 ):
 
-    requested_user = user_repo.find_by_username(request_in.requested_username)
+    requested_user = await user_repo.find_by_username(request_in.requested_username)
     if requested_user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
-    existing_request = media_request_repo.find_all_by_user_ids_and_tmdb_id(
+    existing_request = await media_request_repo.find_all_by_tmdb_id(
         tmdb_id=request_in.tmdb_id,
         requesting_user_id=current_user.id,
         requested_user_id=requested_user.id,
@@ -106,9 +106,9 @@ def add_movie_request(
     if existing_request:
         raise HTTPException(status.HTTP_409_CONFLICT, "This movie has already been requested.")
 
-    movie = media_repo.find_by(tmdb_id=request_in.tmdb_id)
+    movie = await media_repo.find_by(tmdb_id=request_in.tmdb_id)
     if movie is None:
-        searched_movie = tmdb.get_tmdb_movie(request_in.tmdb_id)
+        searched_movie = await tmdb.get_tmdb_movie(request_in.tmdb_id)
         if searched_movie is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested movie was not found")
         movie = MovieSchema.parse_obj(searched_movie).to_orm(Media)
@@ -123,15 +123,15 @@ def add_movie_request(
     )
 
     if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
-        default_provider = media_provider_repo.find_by(
+        default_provider = await media_provider_repo.find_by(
             provider_type=MediaProviderType.movie_provider, is_default=True
         )
         if default_provider is not None:
             movie_request.status = RequestStatus.approved
             movie_request.selected_provider = default_provider
-            send_movie_request(movie_request, default_provider)
+            await send_movie_request(movie_request, default_provider)
 
-    movie_request = media_request_repo.save(movie_request)
+    await media_request_repo.save(movie_request)
     return movie_request
 
 
@@ -144,7 +144,7 @@ def add_movie_request(
         status.HTTP_404_NOT_FOUND: {"description": "Request or provider not found"},
     },
 )
-def update_movie_request(
+async def update_movie_request(
     request_id: int,
     request_update: MediaRequestUpdate,
     current_user: User = Depends(deps.get_current_user),
@@ -163,14 +163,14 @@ def update_movie_request(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             "Request status can only be updated to approved or refused.",
         )
-    request = media_request_repo.find_by(id=request_id)
+    request = await media_request_repo.find_by(id=request_id)
     if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != RequestStatus.pending:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
     if request_update.status == RequestStatus.approved:
         if request_update.provider_id is not None:
-            selected_provider = media_provider_repo.find_by(
+            selected_provider = await media_provider_repo.find_by(
                 provider_type=MediaProviderType.movie_provider, id=request_update.provider_id
             )
             if selected_provider is None:
@@ -187,13 +187,13 @@ def update_movie_request(
     elif request_update.status == RequestStatus.refused:
         request.status = RequestStatus.refused
 
-    current_movie_requests = media_request_repo.find_all_by(media_id=request.media_id)
+    current_movie_requests = await media_request_repo.find_all_by(media_id=request.media_id)
     for r in current_movie_requests:
         r.status = request.status
-        media_request_repo.save(r)
+        await media_request_repo.save(r)
 
     if request.status == RequestStatus.approved:
-        send_movie_request(request, request.selected_provider)
+        await send_movie_request(request, request.selected_provider)
 
     return request
 
@@ -206,14 +206,14 @@ def update_movie_request(
         status.HTTP_404_NOT_FOUND: {"description": "Request not found"},
     },
 )
-def delete_movie_request(
+async def delete_movie_request(
     request_id: int,
     current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    request = media_request_repo.find_by(id=request_id)
+    request = await media_request_repo.find_by(id=request_id)
     if request is None or (
         request.requesting_user_id != current_user.id
         and request.requested_user_id != current_user.id
@@ -221,7 +221,7 @@ def delete_movie_request(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
     if request.status != RequestStatus.pending and request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
-    media_request_repo.remove(request)
+    await media_request_repo.remove(request)
     return {"detail": "Request deleted."}
 
 
@@ -234,7 +234,7 @@ def delete_movie_request(
         status.HTTP_409_CONFLICT: {"description": "Content already requested"},
     },
 )
-def add_series_request(
+async def add_series_request(
     request_in: SeriesRequestCreate,
     current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
@@ -246,30 +246,27 @@ def add_series_request(
         deps.get_repository(MediaProviderSettingRepository)
     ),
 ):
-    requested_user = user_repo.find_by_username(request_in.requested_username)
+    requested_user = await user_repo.find_by_username(request_in.requested_username)
     if requested_user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
 
-    series = media_repo.find_by(tmdb_id=request_in.tmdb_id)
+    series = await media_repo.find_by(tmdb_id=request_in.tmdb_id)
     if series is None:
-        searched_series = tmdb.get_tmdb_series(request_in.tmdb_id)
+        searched_series = await tmdb.get_tmdb_series(request_in.tmdb_id)
         if searched_series is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested series was not found")
         series = SeriesSchema.parse_obj(searched_series).to_orm(Media, exclude={"seasons"})
 
-    series_requests = media_request_repo.find_all_by_user_ids_and_tmdb_id(
+    series_requests = await media_request_repo.find_all_by_tmdb_id(
         tmdb_id=series.tmdb_id,
         requesting_user_id=current_user.id,
         requested_user_id=requested_user.id,
+        status=RequestStatus.pending,
     )
 
-    series_request: Optional[SeriesRequest] = None
+    series_request = next(iter(series_requests), None)
 
-    for r in series_requests:
-        if isinstance(r, SeriesRequest) and r.status == RequestStatus.pending:
-            series_request = r
-
-    if not series_request:
+    if series_request is None:
         series_request = SeriesRequest(
             requested_user=requested_user,
             requesting_user=current_user,
@@ -277,19 +274,19 @@ def add_series_request(
             root_folder=request_in.root_folder,
             quality_profile_id=request_in.quality_profile_id,
             language_profile_id=request_in.quality_profile_id,
+            seasons=[],
         )
         unify_series_request(series_request, request_in)
 
         if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
-            default_provider = media_provider_repo.find_by(
+            default_provider = await media_provider_repo.find_by(
                 provider_type=MediaProviderType.series_provider, is_default=True
             )
             if default_provider is not None:
                 series_request.status = RequestStatus.approved
                 series_request.selected_provider = default_provider
-                send_series_request(series_request, default_provider)
-
-        media_request_repo.save(series_request)
+                await send_series_request(series_request, default_provider)
+        await media_request_repo.save(series_request)
         return series_request
 
     if request_in.seasons:
@@ -342,15 +339,15 @@ def add_series_request(
         series_request.seasons = []
 
     if check_permissions(current_user.roles, permissions=[UserRole.auto_approve]):
-        default_provider = media_provider_repo.find_by(
+        default_provider = await media_provider_repo.find_by(
             provider_type=MediaProviderType.series_provider, is_default=True
         )
         if default_provider is not None:
             series_request.status = RequestStatus.approved
             series_request.selected_provider = default_provider
-            send_series_request(series_request, default_provider)
+            await send_series_request(series_request, default_provider)
 
-    media_request_repo.save(series_request)
+    await media_request_repo.save(series_request)
     return series_request
 
 
@@ -363,7 +360,7 @@ def add_series_request(
         status.HTTP_404_NOT_FOUND: {"description": "Request or provider not found"},
     },
 )
-def update_series_request(
+async def update_series_request(
     request_id: int,
     request_update: MediaRequestUpdate,
     current_user: User = Depends(deps.get_current_user),
@@ -382,14 +379,14 @@ def update_series_request(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             "Request status can only be updated to approved or refused.",
         )
-    request: Optional[SeriesRequest] = media_request_repo.find_by(id=request_id)
+    request: Optional[SeriesRequest] = await media_request_repo.find_by(id=request_id)
     if request is None or request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != RequestStatus.pending:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
     if request_update.status == RequestStatus.approved:
         if request_update.provider_id is not None:
-            selected_provider = media_provider_repo.find_by(
+            selected_provider = await media_provider_repo.find_by(
                 provider_type=MediaProviderType.series_provider, id=request_update.provider_id
             )
             if selected_provider is None:
@@ -411,10 +408,10 @@ def update_series_request(
     elif request_update.status == RequestStatus.refused:
         request.status = RequestStatus.refused
 
-    media_request_repo.save(request)
+    await media_request_repo.save(request)
 
     if request.status == RequestStatus.approved:
-        send_series_request(request, request.selected_provider)
+        await send_series_request(request, request.selected_provider)
 
     return request
 
@@ -427,14 +424,14 @@ def update_series_request(
         status.HTTP_404_NOT_FOUND: {"description": "Request not found"},
     },
 )
-def delete_series_request(
+async def delete_series_request(
     request_id: int,
     current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
 ):
-    request = media_request_repo.find_by(id=request_id)
+    request = await media_request_repo.find_by(id=request_id)
     if request is None or (
         request.requesting_user_id != current_user.id
         and request.requested_user_id != current_user.id
@@ -442,5 +439,5 @@ def delete_series_request(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
     if request.status != RequestStatus.pending and request.requested_user_id != current_user.id:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
-    media_request_repo.remove(request)
+    await media_request_repo.remove(request)
     return {"detail": "Request deleted."}

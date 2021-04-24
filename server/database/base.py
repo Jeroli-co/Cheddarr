@@ -1,13 +1,9 @@
-from datetime import datetime
+from datetime import timezone
 from typing import TypeVar
 
 import pytz
-from sqlalchemy import Column, DateTime as DBDateTime, TypeDecorator
-from sqlalchemy.ext.declarative import (
-    declarative_base,
-    declared_attr,
-)
-from sqlalchemy.orm import class_mapper
+from sqlalchemy import Column, DateTime as DBDateTime, func, inspect, TypeDecorator
+from sqlalchemy.orm import declarative_base, declared_attr
 
 from server.core import config
 
@@ -17,6 +13,7 @@ Base = declarative_base()
 class Model(Base):
     """Base Model class."""
 
+    __mapper_args__ = {"eager_defaults": True, "always_refresh": True}
     __abstract__ = True
     __repr_props__ = ()
 
@@ -32,50 +29,43 @@ class Model(Base):
         ]
         return f"<{self.__class__.__name__} {' '.join(properties)}>"
 
-    def as_dict(self, found=None):
-        if found is None:
-            found = set()
-        mapper = class_mapper(self.__class__)
-        columns = [column.key for column in mapper.columns]
-        get_key_value = (
-            lambda c: (c, getattr(self, c).isoformat())
-            if isinstance(getattr(self, c), datetime)
-            else (c, getattr(self, c))
-        )
-        out = dict(map(get_key_value, columns))
-        for name, relation in mapper.relationships.items():
-            if relation not in found:
-                found.add(relation)
-                related_obj = getattr(self, name)
-                if related_obj is not None:
-                    if not relation.uselist:
-                        out[name] = related_obj.as_dict(found)
-        return out
+    def as_dict(self) -> dict:
+        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
 
 
 class DateTime(TypeDecorator):
     impl = DBDateTime
 
     def process_bind_param(self, value, engine):
+        if value is not None:
+            if not value.tzinfo:
+                raise TypeError("tzinfo is required")
+            value = value.astimezone(timezone.utc).replace(tzinfo=None)
         return value
 
     def process_result_value(self, value, engine):
-        return value.replace(tzinfo=pytz.timezone(config.TZ)).astimezone(pytz.timezone(config.TZ))
+        if value is not None:
+            value = value.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(config.TZ))
+        return value
 
 
 class Timestamp(object):
     """Mixin that define timestamp columns."""
 
-    __datetime_func__ = datetime.now()
+    __datetime_func__ = func.now()
 
-    created_at = Column(DateTime, default=__datetime_func__, nullable=False)
+    created_at = Column(DateTime, server_default=__datetime_func__, nullable=False)
 
     updated_at = Column(
         DateTime,
-        default=__datetime_func__,
+        server_default=__datetime_func__,
         onupdate=__datetime_func__,
         nullable=False,
     )
+
+
+def mapper_args(mapper_args_dict: dict) -> dict:
+    return {**Model.__mapper_args__, **mapper_args_dict}
 
 
 ModelType = TypeVar("ModelType", bound=Model)

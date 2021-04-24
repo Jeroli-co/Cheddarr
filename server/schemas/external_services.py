@@ -12,7 +12,7 @@ from .core import APIModel
 
 
 class MediaServerInfo(APIModel):
-    server_media_id: str
+    external_id: str
     added_at: date
     server_id: str
     web_url: Optional[AnyHttpUrl]
@@ -23,7 +23,7 @@ class PlexMediaInfo(MediaServerInfo):
     def get_web_url(cls, web_url, values):
         return "https://app.plex.tv/desktop#!/server/%s/details?key=library/metadata/%s" % (
             values["server_id"],
-            values["server_media_id"],
+            values["external_id"],
         )
 
 

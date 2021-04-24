@@ -1,4 +1,5 @@
 from enum import auto, Enum
+from typing import List
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -7,6 +8,7 @@ from sqlalchemy.orm import backref, relationship
 from server.core.security import hash_password
 from server.core.utils import get_random_avatar
 from server.database import Model, Timestamp
+from server.models.settings import MediaProviderSetting, MediaServerSetting
 
 
 class UserRole(int, Enum):
@@ -26,23 +28,18 @@ class User(Model, Timestamp):
     password_hash = Column(String, nullable=False)
     avatar = Column(String)
     confirmed = Column(Boolean, nullable=False, default=False)
-    roles = Column(Integer, default=UserRole.admin)  # TODO: change to UserRole.none
+    roles = Column(Integer, default=UserRole.admin)  # FIXME: change to UserRole.none
     plex_user_id = Column(Integer)
     plex_api_key = Column(String)
 
-    notifications = relationship(
-        "Notification",
-        back_populates="user",
-        cascade="all,delete,delete-orphan",
-    )
-    media_servers = relationship(
+    media_servers: List[MediaServerSetting] = relationship(
         "MediaServerSetting",
-        back_populates="user",
+        lazy="selectin",
         cascade="all,delete,delete-orphan",
     )
-    media_providers = relationship(
+    media_providers: List[MediaProviderSetting] = relationship(
         "MediaProviderSetting",
-        back_populates="user",
+        lazy="selectin",
         cascade="all,delete,delete-orphan",
     )
 
@@ -70,10 +67,14 @@ class Friendship(Model):
     requesting_user = relationship(
         "User",
         foreign_keys=[requesting_user_id],
+        lazy="joined",
+        innerjoin=True,
         backref=backref("outgoing_friendships", cascade="all,delete,delete-orphan"),
     )
     requested_user = relationship(
         "User",
         foreign_keys=[requested_user_id],
+        lazy="joined",
+        innerjoin=True,
         backref=backref("incoming_friendships", cascade="all,delete,delete-orphan"),
     )
