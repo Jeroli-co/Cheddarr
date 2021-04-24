@@ -1,3 +1,4 @@
+from datetime import timezone
 from typing import TypeVar
 
 import pytz
@@ -36,10 +37,16 @@ class DateTime(TypeDecorator):
     impl = DBDateTime
 
     def process_bind_param(self, value, engine):
+        if value is not None:
+            if not value.tzinfo:
+                raise TypeError("tzinfo is required")
+            value = value.astimezone(timezone.utc).replace(tzinfo=None)
         return value
 
     def process_result_value(self, value, engine):
-        return value.replace(tzinfo=pytz.timezone(config.TZ)).astimezone(pytz.timezone(config.TZ))
+        if value is not None:
+            value = value.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(config.TZ))
+        return value
 
 
 class Timestamp(object):
@@ -52,7 +59,7 @@ class Timestamp(object):
     updated_at = Column(
         DateTime,
         server_default=__datetime_func__,
-        server_onupdate=__datetime_func__,
+        onupdate=__datetime_func__,
         nullable=False,
     )
 

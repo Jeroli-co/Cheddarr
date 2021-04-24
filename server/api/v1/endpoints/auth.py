@@ -199,6 +199,7 @@ async def signin(
         token_type="Bearer",
     )
 
+    await user_repo.save(user)
     return token
 
 
