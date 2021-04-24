@@ -17,8 +17,9 @@ class Config(BaseSettings):
     # server                                                                 #
     ##########################################################################
     API_PREFIX: str = "/api"
-    DOMAIN: str = "localhost:9090"
-    SERVER_HOST: str = f"http://{DOMAIN}"
+    SERVER_DOMAIN: str = "localhost"
+    SERVER_PORT: int = 9090
+    SERVER_HOST: str = f"http://{SERVER_DOMAIN}:{SERVER_PORT}"
     LOG_LEVEL: str = "INFO"
     TZ: str = get_localzone().zone
 
@@ -32,8 +33,8 @@ class Config(BaseSettings):
     IMAGES_FOLDER: DirectoryPath = PROJECT_ROOT / "server" / "static" / "images"
     CONFIG_FOLDER: Path = PROJECT_ROOT / "config"
     LOGS_FOLDER: Path = CONFIG_FOLDER / "logs"
-    LOGS_FILENAME = "cheddarr.log"
-    LOGS_MAX_FILES = 10
+    LOGS_FILENAME: str = "cheddarr.log"
+    LOGS_MAX_FILES: int = 10
     DB_FOLDER: Path = CONFIG_FOLDER / "db"
     CONFIG_FILE: Path = CONFIG_FOLDER / "config.json"
 
@@ -52,14 +53,13 @@ class Config(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     SIGNING_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 3
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [SERVER_HOST]
 
     ##########################################################################
     # database                                                               #
     ##########################################################################
     DB_NAME: str = "cheddarr.sqlite"
     DB_URL: str = "sqlite+aiosqlite:///" + str(DB_FOLDER / DB_NAME)
-    DB_OPTIONS: dict = {"check_same_thread": False}
 
     ##########################################################################
     # notifications                                                          #
@@ -100,7 +100,7 @@ class Config(BaseSettings):
                 sort_keys=True,
             )
 
-    _config_file_fields = {"SECRET_KEY", "LOG_LEVEL", "MAIL_ENABLED", "TIMEZONE"}
+    _config_file_fields = {"SECRET_KEY", "LOG_LEVEL", "MAIL_ENABLED"}
 
 
 config = Config()
