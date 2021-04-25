@@ -53,7 +53,7 @@ async def get_users(
 
 
 @users_router.get(
-    "/{id:int}",
+    "/{user_id}",
     dependencies=([Depends(deps.get_current_user)]),
     response_model=UserPublicSchema,
     responses={
@@ -61,10 +61,10 @@ async def get_users(
     },
 )
 async def get_user_by_id(
-    id: int,
+    user_id: int,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
-    user = await user_repo.find_by(id=id)
+    user = await user_repo.find_by(id=user_id)
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this id exists.")
     return user
@@ -168,8 +168,8 @@ async def update_user(
     return user
 
 
-@current_user_router.get(
-    "/users/search",
+@users_router.get(
+    "/search",
     response_model=List[UserPublicSchema],
     dependencies=[Depends(deps.get_current_user)],
 )
