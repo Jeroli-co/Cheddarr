@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import AnyHttpUrl, EmailStr
 
-from .core import APIModel
+from .core import APIModel, PaginatedResult
 
 
 class UserBase(APIModel):
@@ -35,8 +35,8 @@ class UserPublicSchema(UserBase):
     avatar: Optional[AnyHttpUrl]
 
 
-class FriendshipCreate(APIModel):
-    username_or_email: str
+class UserSearchResult(PaginatedResult):
+    results: List[UserPublicSchema]
 
 
 class PasswordResetCreate(APIModel):

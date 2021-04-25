@@ -20,6 +20,7 @@ from server.schemas.users import (
     PasswordResetCreate,
     UserPublicSchema,
     UserSchema,
+    UserSearchResult,
     UserUpdate,
 )
 
@@ -30,6 +31,25 @@ current_user_router = APIRouter()
 ##########################################
 # Users                                  #
 ##########################################
+
+
+@users_router.get(
+    "",
+    dependencies=[
+        Depends(deps.get_current_user),
+        Depends(deps.has_user_permissions([UserRole.manage_users])),
+    ],
+    response_model=UserSearchResult,
+)
+async def get_users(
+    page: int = 1,
+    per_page: int = 10,
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+):
+    users, total_results, total_pages = await user_repo.find_all_by(page=page, per_page=per_page)
+    return UserSearchResult(
+        page=page, total_results=total_results, total_pages=total_pages, results=users
+    )
 
 
 @users_router.get(
