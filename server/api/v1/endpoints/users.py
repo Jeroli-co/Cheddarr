@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import EmailStr
 
@@ -45,26 +47,6 @@ async def get_user_by_id(
     user = await user_repo.find_by(id=id)
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this id exists.")
-    return user
-
-
-@users_router.get(
-    "/{username:str}",
-    dependencies=([Depends(deps.get_current_user)]),
-    response_model=UserPublicSchema,
-    responses={
-        status.HTTP_404_NOT_FOUND: {
-            "description": "User not found",
-        },
-    },
-)
-async def get_user_by_username(
-    username: str,
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    user = await user_repo.find_by_username(username)
-    if user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this username exists.")
     return user
 
 
@@ -164,6 +146,19 @@ async def update_user(
 
     await user_repo.save(user)
     return user
+
+
+@current_user_router.get(
+    "/users/search",
+    response_model=List[UserPublicSchema],
+    dependencies=[Depends(deps.get_current_user)],
+)
+async def search_users(
+    value: str,
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+):
+    search = await user_repo.search_by("username", value)
+    return search
 
 
 ##########################################
