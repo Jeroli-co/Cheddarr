@@ -99,9 +99,9 @@ async def update_email_agent(
         await notif_agent_repo.update(agent, agent_in)
 
     if agent.enabled:
-        config.set(MAIL_ENABLED=True)
+        config.set_fields(MAIL_ENABLED=True)
     else:
-        config.set(MAIL_ENABLED=False)
+        config.set_fields(MAIL_ENABLED=False)
     return agent
 
 
@@ -122,5 +122,5 @@ async def delete_email_agent(
     if agent is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No email agent is configured.")
     await notif_agent_repo.remove(agent)
-    config.set(MAIL_ENABLED=False)
+    config.set_fields(MAIL_ENABLED=False)
     return {"detail": "Email agent deleted."}

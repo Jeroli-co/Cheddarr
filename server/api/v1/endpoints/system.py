@@ -5,6 +5,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
 from server.core import config, scheduler
+from server.core.config import PublicConfig
 from server.models.users import UserRole
 from server.schemas.core import Job, Log, LogResult
 
@@ -70,3 +71,28 @@ def modify_job(job_id: str, action: Literal["run", "pause", "resume"] = Body(...
     elif action == "resume":
         job.resume()
     return Job(id=job.id, name=job.name, next_run_time=job.next_run_time)
+
+
+@router.get(
+    "/config",
+    response_model=PublicConfig,
+    dependencies=[
+        Depends(deps.get_current_user),
+        Depends(deps.has_user_permissions([UserRole.admin])),
+    ],
+)
+def get_server_config():
+    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))
+
+
+@router.patch(
+    "/config",
+    response_model=PublicConfig,
+    dependencies=[
+        Depends(deps.get_current_user),
+        Depends(deps.has_user_permissions([UserRole.admin])),
+    ],
+)
+def update_server_config(config_in: PublicConfig):
+    config.set_fields(**config_in.dict())
+    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))

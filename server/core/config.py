@@ -1,7 +1,7 @@
 import secrets
 from json import dump, load
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from pydantic import (
     AnyHttpUrl,
@@ -9,6 +9,12 @@ from pydantic import (
     DirectoryPath,
 )
 from tzlocal import get_localzone
+
+
+class PublicConfig(BaseSettings):
+    LOG_LEVEL: Optional[str]
+    MAIL_ENABLED: Optional[bool]
+    DEFAULT_ROLES: Optional[int]
 
 
 class Config(BaseSettings):
@@ -54,6 +60,7 @@ class Config(BaseSettings):
     SIGNING_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 3
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [SERVER_HOST]
+    DEFAULT_ROLES: int = 2
 
     ##########################################################################
     # database                                                               #
@@ -67,6 +74,10 @@ class Config(BaseSettings):
     MAIL_ENABLED: bool = False
 
     ##########################################################################
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.DB_FOLDER.mkdir(parents=True, exist_ok=True)
+        self.LOGS_FOLDER.mkdir(parents=True, exist_ok=True)
 
     def setup(self):
         try:
@@ -81,9 +92,9 @@ class Config(BaseSettings):
         except OSError:
             raise
 
-    def set(self, **config_kwargs):
+    def set_fields(self, **config_kwargs):
         for field_k, field_v in config_kwargs.items():
-            if field_k in self.__fields__:
+            if field_k in self.__fields__ and field_v is not None:
                 setattr(self, field_k, field_v)
         self.write_file()
 
@@ -93,14 +104,14 @@ class Config(BaseSettings):
                 {
                     item.lower(): getattr(self, item)
                     for item in self.__fields__
-                    if item in self._config_file_fields
+                    if item in self._file_config_fields
                 },
                 config_file,
                 indent=2,
                 sort_keys=True,
             )
 
-    _config_file_fields = {"SECRET_KEY", "LOG_LEVEL", "MAIL_ENABLED"}
+    _file_config_fields = {"SECRET_KEY", *list(PublicConfig.__fields__.keys())}
 
 
 config = Config()

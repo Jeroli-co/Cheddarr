@@ -66,6 +66,8 @@ def has_user_permissions(
         from server.core.security import check_permissions
 
         if not check_permissions(current_user.roles, permissions, options):
-            raise HTTPException(status_code=403, detail="Not enough privileges.")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Not enough privileges."
+            )
 
     return _has_permissions

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, TYPE_CHECKING
 from uuid import uuid4
 
 from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
@@ -7,6 +7,9 @@ from sqlalchemy.orm import relationship
 
 from server.database import Model
 from server.database.base import mapper_args
+
+if TYPE_CHECKING:
+    from .users import User
 
 
 class ExternalServiceName(str, Enum):
@@ -35,7 +38,12 @@ class MediaServerSetting(Model, ExternalServiceSetting):
     server_id = Column(String, primary_key=True)
     server_name = Column(String)
     user_id = Column(ForeignKey("user.id"), nullable=False)
-    user = relationship("User", back_populates="media_servers")
+    users: List["User"] = relationship(
+        "User",
+        secondary="usermediaserver",
+        lazy="selectin",
+        back_populates="media_servers",
+    )
     libraries: List["MediaServerLibrary"] = relationship(
         "MediaServerLibrary", lazy="selectin", cascade="all,delete,delete-orphan"
     )

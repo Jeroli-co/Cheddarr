@@ -54,17 +54,12 @@ class MediaServerMedia(Model, MediaServerContent):
         "Media",
         lazy="joined",
         innerjoin=True,
-        backref=backref("server_media", lazy="selectin", cascade="all,delete,delete-orphan"),
+        backref=backref("media_servers", lazy="selectin", cascade="all,delete,delete-orphan"),
     )
     server = relationship(
         "MediaServerSetting",
         lazy="joined",
         innerjoin=True,
-        backref=backref("server_media", cascade="all,delete,delete-orphan"),
-    )
-    library = relationship(
-        "MediaServerLibrary",
-        lazy="joined",
         backref=backref("server_media", cascade="all,delete,delete-orphan"),
     )
 

@@ -28,6 +28,7 @@ class UserUpdate(UserBase):
     email: Optional[EmailStr]
     old_password: Optional[str]
     password: Optional[str]
+    roles: Optional[int]
 
 
 class UserPublicSchema(UserBase):

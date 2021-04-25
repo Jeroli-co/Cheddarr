@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, TYPE_CHECKING
 
 from sqlalchemy import (
     Column,
@@ -13,9 +13,12 @@ from sqlalchemy.orm import declared_attr, relationship
 
 from server.database import Model, Timestamp
 from server.database.base import mapper_args
-from server.models.media import Media, MediaType
-from server.models.settings import MediaProviderSetting
-from server.models.users import User
+from server.models.media import MediaType
+
+if TYPE_CHECKING:
+    from .media import Media
+    from .settings import MediaProviderSetting
+    from .users import User
 
 
 class RequestStatus(str, Enum):
@@ -41,7 +44,7 @@ class MediaRequest(Model, Timestamp):
         return Column(ForeignKey("mediaprovidersetting.id"))
 
     @declared_attr
-    def selected_provider(cls) -> MediaProviderSetting:
+    def selected_provider(cls) -> "MediaProviderSetting":
         return relationship("MediaProviderSetting", lazy="joined")
 
     @declared_attr
@@ -49,7 +52,7 @@ class MediaRequest(Model, Timestamp):
         return Column(ForeignKey("user.id"), nullable=False)
 
     @declared_attr
-    def requesting_user(cls) -> User:
+    def requesting_user(cls) -> "User":
         return relationship("User", lazy="joined", foreign_keys=cls.requesting_user_id)
 
     @declared_attr
@@ -57,7 +60,7 @@ class MediaRequest(Model, Timestamp):
         return Column(ForeignKey("user.id"), nullable=False)
 
     @declared_attr
-    def requested_user(cls) -> User:
+    def requested_user(cls) -> "User":
         return relationship("User", lazy="joined", foreign_keys=cls.requested_user_id)
 
     @declared_attr
@@ -65,7 +68,7 @@ class MediaRequest(Model, Timestamp):
         return Column(ForeignKey("media.id"), nullable=False)
 
     @declared_attr
-    def media(cls) -> Media:
+    def media(cls) -> "Media":
         return relationship("Media", lazy="joined")
 
 

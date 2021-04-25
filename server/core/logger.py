@@ -78,4 +78,3 @@ class LogFormatter(logging.Formatter):
         return formatted_record
 
 
-config.LOGS_FOLDER.mkdir(parents=True, exist_ok=True)

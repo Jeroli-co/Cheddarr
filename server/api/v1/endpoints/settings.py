@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
 from server.core import scheduler
@@ -19,6 +19,7 @@ from server.repositories.settings import (
     RadarrSettingRepository,
     SonarrSettingRepository,
 )
+from server.repositories.users import UserRepository
 from server.schemas.core import ResponseMessage
 from server.schemas.settings import (
     ExternalServiceSettingBase,
@@ -33,6 +34,7 @@ from server.schemas.settings import (
     SonarrSettingCreateUpdate,
     SonarrSettingSchema,
 )
+from server.schemas.users import UserPublicSchema
 from server.services import plex, radarr, sonarr
 
 router = APIRouter()
@@ -133,8 +135,8 @@ async def add_plex_setting(
         if library.enabled:
             libraries.append(library.to_orm(MediaServerLibrary))
     setting.libraries = libraries
-
-    await plex_setting_repo.save(setting)
+    setting.users.append(current_user)
+    await plex_setting_repo.save(current_user)
 
     if setting.libraries:
         scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
@@ -197,6 +199,55 @@ async def delete_plex_setting(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plex setting not found.")
     await plex_setting_repo.remove(setting)
     return {"detail": "Plex setting removed."}
+
+
+@router.post(
+    "/plex/{setting_id}/users",
+    response_model=List[UserPublicSchema],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "No Plex setting or user not found"},
+    },
+)
+async def add_plex_setting_user(
+    setting_id: str,
+    user_id: int = Body(..., embed=True),
+    current_user: User = Depends(deps.get_current_user),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
+):
+    setting = await plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex setting for this server.")
+
+    user = await user_repo.find_by(id=user_id)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this id exist.")
+
+    setting.users.append(user)
+    return setting.users
+
+
+@router.delete(
+    "/plex/{setting_id}/users",
+    response_model=List[UserPublicSchema],
+)
+async def delete_plex_setting_user(
+    setting_id: str,
+    user_id: int = Body(..., embed=True),
+    current_user: User = Depends(deps.get_current_user),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
+):
+    setting = await plex_setting_repo.find_by(user_id=current_user.id, id=setting_id)
+    if setting is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No Plex setting for this server.")
+
+    user = await user_repo.find_by(id=user_id)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this id exist.")
+
+    setting.users.remove(user)
+    return setting.users
 
 
 @router.get(

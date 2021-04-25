@@ -43,7 +43,7 @@ async def setup(db):
 
     from server.models.media import Media
     from server.models.requests import MovieRequest, SeriesRequest
-    from server.models.users import Friendship, User
+    from server.models.users import User
     from server.database import Base
 
     async with _db_conn.begin() as conn:
@@ -55,9 +55,6 @@ async def setup(db):
     user3 = User(**datasets["users"][2])
     user4 = User(**datasets["users"][3])
     db.add_all((user1, user2, user3))
-    friendship1 = Friendship(requesting_user=user1, requested_user=user2, pending=False)
-    friendship2 = Friendship(requesting_user=user1, requested_user=user4, pending=True)
-    db.add_all((friendship1, friendship2))
     series1 = Media(**datasets["series"][0])
     movie1 = Media(**datasets["movies"][0])
     db.add_all((movie1, series1))
