@@ -12,7 +12,6 @@ from ..models.media import MediaType
 class MediaRequest(APIModel, ABC):
     id: int
     status: RequestStatus
-    requested_user: UserPublicSchema
     requesting_user: UserPublicSchema
     created_at: datetime
     updated_at: datetime
@@ -21,7 +20,6 @@ class MediaRequest(APIModel, ABC):
 
 class MediaRequestCreate(APIModel):
     tmdb_id: int
-    requested_username: str
     root_folder: Optional[str]
     quality_profile_id: Optional[int]
     language_profile_id: Optional[int]

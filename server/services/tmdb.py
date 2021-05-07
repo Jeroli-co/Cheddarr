@@ -5,7 +5,7 @@ import tmdbsimple as tmdb
 from asgiref.sync import sync_to_async
 
 from server.core import config
-from server.models.media import SeriesType
+from server.models.media import MediaType, SeriesType
 from server.schemas.media import (
     EpisodeSchema,
     MovieSchema,
@@ -104,9 +104,9 @@ async def get_tmdb_episode(
 
 async def find_tmdb_id_from_external_id(imdb_id=None, tvdb_id=None) -> int:
     find = {}
-    if imdb_id is not None:
+    if not find and imdb_id is not None:
         find = await sync_to_async(tmdb.Find(imdb_id).info)(external_source="imdb_id")
-    if tvdb_id is not None:
+    elif not find and tvdb_id is not None:
         find = await sync_to_async(tmdb.Find(tvdb_id).info)(external_source="tvdb_id")
     tmdb_media = next((m[0] for m in find.values() if m), {})
     return tmdb_media.get("id")
@@ -121,6 +121,7 @@ async def get_tmdb_popular_movies(page: int = 1) -> (List[MovieSchema], int, int
     results = []
 
     for movie in search["results"]:
+        set_tmdb_movie_info(movie)
         parsed_movie = MovieSchema(**TmdbMovie.parse_obj(movie).dict())
         results.append(parsed_movie)
     return results, search["total_pages"], search["total_results"]
@@ -131,6 +132,7 @@ async def get_tmdb_upcoming_movies(page: int = 1) -> (List[MovieSchema], int, in
     results = []
 
     for movie in search["results"]:
+        set_tmdb_movie_info(movie)
         parsed_movie = MovieSchema(**TmdbMovie.parse_obj(movie).dict())
         results.append(parsed_movie)
     return results, search["total_pages"], search["total_results"]
@@ -141,6 +143,7 @@ async def get_tmdb_similar_movies(tmdb_id: int, page: int = 1) -> (List[MovieSch
     results = []
 
     for movie in search["results"]:
+        set_tmdb_movie_info(movie)
         parsed_movie = MovieSchema(**TmdbMovie.parse_obj(movie).dict())
         results.append(parsed_movie)
     return results, search["total_pages"], search["total_results"]
@@ -153,6 +156,7 @@ async def get_tmdb_recommended_movies(
     results = []
 
     for movie in search["results"]:
+        set_tmdb_movie_info(movie)
         parsed_movie = MovieSchema(**TmdbMovie.parse_obj(movie).dict())
         results.append(parsed_movie)
     return results, search["total_pages"], search["total_results"]
@@ -163,6 +167,7 @@ async def get_tmdb_popular_series(page: int = 1) -> (List[SeriesSchema], int, in
     results = []
 
     for series in search["results"]:
+        set_tmdb_series_info(series)
         parsed_series = SeriesSchema(**TmdbSeries.parse_obj(series).dict())
         results.append(parsed_series)
     return results, search["total_pages"], search["total_results"]
@@ -173,6 +178,7 @@ async def get_tmdb_similar_series(tmdb_id: int, page: int = 1) -> (List[SeriesSc
     results = []
 
     for series in search["results"]:
+        set_tmdb_series_info(series)
         parsed_series = SeriesSchema(**TmdbSeries.parse_obj(series).dict())
         results.append(parsed_series)
     return results, search["total_pages"], search["total_results"]
@@ -185,25 +191,28 @@ async def get_tmdb_recommended_series(
     results = []
 
     for series in search["results"]:
+        set_tmdb_series_info(series)
         parsed_series = SeriesSchema(**TmdbSeries.parse_obj(series).dict())
         results.append(parsed_series)
     return results, search["total_pages"], search["total_results"]
 
 
 def set_tmdb_movie_info(movie: dict):
-    genres = [genre["name"] for genre in movie["genres"]]
+    movie["media_type"] = MediaType.movie
+    genres = [genre["name"] for genre in movie.get("genres", [])]
     movie["genres"] = genres
     movie["videos"] = [
         video
-        for video in movie["videos"]["results"]
+        for video in movie.get("videos", {}).get("results", [])
         if video["type"] == "Trailer" and video["site"] == "YouTube"
     ]
 
 
 def set_tmdb_series_info(series: dict):
+    series["media_type"] = MediaType.series
     series["series_type"] = SeriesType.standard
     anime_pattern = re.compile("(?i)anim(e|ation)")
-    genres = [genre["name"] for genre in series["genres"]]
+    genres = [genre["name"] for genre in series.get("genres", [])]
     for genre in genres:
         if anime_pattern.match(genre):
             series["series_type"] = SeriesType.anime
@@ -211,6 +220,6 @@ def set_tmdb_series_info(series: dict):
     series["genres"] = genres
     series["videos"] = [
         video
-        for video in series["videos"]["results"]
+        for video in series.get("videos", {}).get("results", [])
         if video["type"] == "Trailer" and video["site"] == "YouTube"
     ]

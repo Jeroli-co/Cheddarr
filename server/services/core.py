@@ -59,15 +59,13 @@ async def send_movie_request(request: MovieRequest, provider: MediaProviderSetti
 async def set_media_db_info(
     media: MediaSchema,
     current_user_id: int,
-    current_user_server_ids: List[str],
     server_media_repo: MediaServerMediaRepository,
     request_repo: MediaRequestRepository = None,
 ):
-    db_media = await server_media_repo.find_by_external_id_and_server_ids(
+    db_media = await server_media_repo.find_by_media_external_id(
         tmdb_id=media.tmdb_id,
         imdb_id=media.imdb_id,
         tvdb_id=media.tvdb_id,
-        server_ids=current_user_server_ids,
     )
     media.media_servers_info = [
         PlexMediaInfo(**server_media.as_dict()) for server_media in db_media
@@ -85,13 +83,11 @@ async def set_media_db_info(
 async def set_season_db_info(
     season: SeasonSchema,
     series_tmdb_id: int,
-    current_user_server_ids: List[str],
     server_season_repo: MediaServerSeasonRepository,
 ):
-    db_seasons = await server_season_repo.find_by_external_id_and_season_number_and_server_ids(
+    db_seasons = await server_season_repo.find_by_external_id_and_season_number(
         tmdb_id=series_tmdb_id,
         season_number=season.season_number,
-        server_ids=current_user_server_ids,
     )
     season.media_servers_info = [
         PlexMediaInfo(**server_media.as_dict()) for server_media in db_seasons
@@ -102,16 +98,14 @@ async def set_episode_db_info(
     episode: EpisodeSchema,
     series_tmdb_id: int,
     season_number,
-    current_user_server_ids: List[str],
     episode_repo: MediaServerEpisodeRepository,
 ):
 
     db_episode = (
-        await episode_repo.find_by_external_id_and_season_number_and_episode_number_and_server_ids(
+        await episode_repo.find_by_external_id_and_season_number_and_episode_number(
             tmdb_id=series_tmdb_id,
             season_number=season_number,
             episode_number=episode.episode_number,
-            server_ids=current_user_server_ids,
         )
     )
     if db_episode is not None:

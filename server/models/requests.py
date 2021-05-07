@@ -56,14 +56,6 @@ class MediaRequest(Model, Timestamp):
         return relationship("User", lazy="joined", foreign_keys=cls.requesting_user_id)
 
     @declared_attr
-    def requested_user_id(cls):
-        return Column(ForeignKey("user.id"), nullable=False)
-
-    @declared_attr
-    def requested_user(cls) -> "User":
-        return relationship("User", lazy="joined", foreign_keys=cls.requested_user_id)
-
-    @declared_attr
     def media_id(cls):
         return Column(ForeignKey("media.id"), nullable=False)
 

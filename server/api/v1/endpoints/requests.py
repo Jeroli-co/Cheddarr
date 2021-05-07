@@ -15,7 +15,6 @@ from server.models.users import User, UserRole
 from server.repositories.media import MediaRepository
 from server.repositories.requests import MediaRequestRepository
 from server.repositories.settings import MediaProviderSettingRepository
-from server.repositories.users import UserRepository
 from server.schemas.core import ResponseMessage
 from server.schemas.media import MovieSchema, SeriesSchema
 from server.schemas.requests import (
@@ -32,11 +31,14 @@ from server.services.core import send_movie_request, send_series_request, unify_
 router = APIRouter()
 
 
-@router.get("/incoming", response_model=MediaRequestSearchResult)
+@router.get(
+    "/incoming",
+    response_model=MediaRequestSearchResult,
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_requests]))],
+)
 async def get_received_requests(
     page: int = 1,
     per_page: int = 20,
-    current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
@@ -44,7 +46,6 @@ async def get_received_requests(
     requests, total_results, total_pages = await media_request_repo.find_all_by(
         per_page=per_page,
         page=page,
-        requested_user_id=current_user.id,
     )
 
     return MediaRequestSearchResult(
@@ -52,7 +53,15 @@ async def get_received_requests(
     )
 
 
-@router.get("/outgoing", response_model=MediaRequestSearchResult)
+@router.get(
+    "/outgoing",
+    response_model=MediaRequestSearchResult,
+    dependencies=[
+        Depends(
+            deps.has_user_permissions([UserRole.request, UserRole.request_movies], options="or")
+        )
+    ],
+)
 async def get_sent_requests(
     page: int = 1,
     per_page: int = 20,
@@ -77,14 +86,18 @@ async def get_sent_requests(
     status_code=status.HTTP_201_CREATED,
     response_model=MovieRequestSchema,
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "Requested user or movie not found"},
+        status.HTTP_404_NOT_FOUND: {"description": "Movie not found"},
         status.HTTP_409_CONFLICT: {"description": "Movie already requested"},
     },
+    dependencies=[
+        Depends(
+            deps.has_user_permissions([UserRole.request, UserRole.request_movies], options="or")
+        )
+    ],
 )
 async def add_movie_request(
     request_in: MovieRequestCreate,
     current_user: User = Depends(deps.get_current_user),
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
@@ -93,15 +106,9 @@ async def add_movie_request(
         deps.get_repository(MediaProviderSettingRepository)
     ),
 ):
-
-    requested_user = await user_repo.find_by_username(request_in.requested_username)
-    if requested_user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
-
     existing_request = await media_request_repo.find_all_by_tmdb_id(
         tmdb_id=request_in.tmdb_id,
         requesting_user_id=current_user.id,
-        requested_user_id=requested_user.id,
     )
     if existing_request:
         raise HTTPException(status.HTTP_409_CONFLICT, "This movie has already been requested.")
@@ -114,7 +121,6 @@ async def add_movie_request(
         movie = MovieSchema.parse_obj(searched_movie).to_orm(Media)
 
     movie_request = MovieRequest(
-        requested_user=requested_user,
         requesting_user=current_user,
         media=movie,
         root_folder=request_in.root_folder,
@@ -143,11 +149,11 @@ async def add_movie_request(
         status.HTTP_403_FORBIDDEN: {"description": "Wrong request status"},
         status.HTTP_404_NOT_FOUND: {"description": "Request or provider not found"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_requests]))],
 )
 async def update_movie_request(
     request_id: int,
     request_update: MediaRequestUpdate,
-    current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
@@ -164,7 +170,7 @@ async def update_movie_request(
             "Request status can only be updated to approved or refused.",
         )
     request = await media_request_repo.find_by(id=request_id)
-    if request is None or request.requested_user_id != current_user.id:
+    if request is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != RequestStatus.pending:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
@@ -205,6 +211,13 @@ async def update_movie_request(
         status.HTTP_403_FORBIDDEN: {"description": "Wrong request status"},
         status.HTTP_404_NOT_FOUND: {"description": "Request not found"},
     },
+    dependencies=[
+        Depends(
+            deps.has_user_permissions(
+                [UserRole.manage_requests, UserRole.request, UserRole.request_movies], options="or"
+            )
+        )
+    ],
 )
 async def delete_movie_request(
     request_id: int,
@@ -215,11 +228,11 @@ async def delete_movie_request(
 ):
     request = await media_request_repo.find_by(id=request_id)
     if request is None or (
-        request.requesting_user_id != current_user.id
-        and request.requested_user_id != current_user.id
+        request.requesting_user_id != current_user
+        and not check_permissions(current_user.roles, [UserRole.manage_requests])
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
-    if request.status != RequestStatus.pending and request.requested_user_id != current_user.id:
+    if request.status != RequestStatus.pending and request.requesting_user_id == current_user.id:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
     await media_request_repo.remove(request)
     return {"detail": "Request deleted."}
@@ -233,11 +246,15 @@ async def delete_movie_request(
         status.HTTP_404_NOT_FOUND: {"description": "User or series not found"},
         status.HTTP_409_CONFLICT: {"description": "Content already requested"},
     },
+    dependencies=[
+        Depends(
+            deps.has_user_permissions([UserRole.request, UserRole.request_series], options="or")
+        )
+    ],
 )
 async def add_series_request(
     request_in: SeriesRequestCreate,
     current_user: User = Depends(deps.get_current_user),
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
@@ -246,10 +263,6 @@ async def add_series_request(
         deps.get_repository(MediaProviderSettingRepository)
     ),
 ):
-    requested_user = await user_repo.find_by_username(request_in.requested_username)
-    if requested_user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "The requested user does not exist.")
-
     series = await media_repo.find_by(tmdb_id=request_in.tmdb_id)
     if series is None:
         searched_series = await tmdb.get_tmdb_series(request_in.tmdb_id)
@@ -260,7 +273,6 @@ async def add_series_request(
     series_requests = await media_request_repo.find_all_by_tmdb_id(
         tmdb_id=series.tmdb_id,
         requesting_user_id=current_user.id,
-        requested_user_id=requested_user.id,
         status=RequestStatus.pending,
     )
 
@@ -268,7 +280,6 @@ async def add_series_request(
 
     if series_request is None:
         series_request = SeriesRequest(
-            requested_user=requested_user,
             requesting_user=current_user,
             media=series,
             root_folder=request_in.root_folder,
@@ -359,11 +370,11 @@ async def add_series_request(
         status.HTTP_403_FORBIDDEN: {"description": "Wrong request status"},
         status.HTTP_404_NOT_FOUND: {"description": "Request or provider not found"},
     },
+    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_requests]))],
 )
 async def update_series_request(
     request_id: int,
     request_update: MediaRequestUpdate,
-    current_user: User = Depends(deps.get_current_user),
     media_request_repo: MediaRequestRepository = Depends(
         deps.get_repository(MediaRequestRepository)
     ),
@@ -380,7 +391,7 @@ async def update_series_request(
             "Request status can only be updated to approved or refused.",
         )
     request: Optional[SeriesRequest] = await media_request_repo.find_by(id=request_id)
-    if request is None or request.requested_user_id != current_user.id:
+    if request is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != RequestStatus.pending:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
@@ -423,6 +434,13 @@ async def update_series_request(
         status.HTTP_403_FORBIDDEN: {"description": "Wrong request status"},
         status.HTTP_404_NOT_FOUND: {"description": "Request not found"},
     },
+    dependencies=[
+        Depends(
+            deps.has_user_permissions(
+                [UserRole.manage_requests, UserRole.request, UserRole.request_series], options="or"
+            )
+        )
+    ],
 )
 async def delete_series_request(
     request_id: int,
@@ -433,11 +451,11 @@ async def delete_series_request(
 ):
     request = await media_request_repo.find_by(id=request_id)
     if request is None or (
-        request.requesting_user_id != current_user.id
-        and request.requested_user_id != current_user.id
+        request.requesting_user_id != current_user
+        and not check_permissions(current_user.roles, [UserRole.manage_requests])
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
-    if request.status != RequestStatus.pending and request.requested_user_id != current_user.id:
+    if request.status != RequestStatus.pending and request.requesting_user_id == current_user.id:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
     await media_request_repo.remove(request)
     return {"detail": "Request deleted."}

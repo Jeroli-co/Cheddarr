@@ -2,7 +2,6 @@ from typing import List, Optional
 
 from server.models.settings import MediaProviderType
 from .core import APIModel
-from .users import UserPublicSchema
 
 
 class ExternalServiceSettingBase(APIModel):
@@ -44,7 +43,6 @@ class PlexLibrarySection(APIModel):
 
 class PlexSettingSchema(MediaServerSettingBase):
     id: str
-    users: List[UserPublicSchema] = []
     libraries: List[PlexLibrarySection] = []
 
 

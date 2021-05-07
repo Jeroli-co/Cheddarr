@@ -6,7 +6,7 @@ from server.repositories.requests import MediaRequestRepository
 from server.services import sonarr
 
 
-@scheduler.scheduled_job("interval", name="Sonarr Sync", minutes=10)
+@scheduler.scheduled_job("interval", name="Sonarr Sync", coalesce=True, minutes=10)
 async def sonarr_sync():
     async with Session() as db_session:
         media_request_repo = MediaRequestRepository(db_session)

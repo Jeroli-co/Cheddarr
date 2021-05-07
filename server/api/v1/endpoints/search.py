@@ -37,7 +37,7 @@ async def search_media(
 
     server_ids = [server.server_id for server in current_user.media_servers]
     for media in media_results:
-        db_media = await server_media_repo.find_by_external_id_and_server_ids(
+        db_media = await server_media_repo.find_by_media_external_id(
             tmdb_id=media.tmdb_id,
             imdb_id=media.imdb_id,
             tvdb_id=media.tvdb_id,

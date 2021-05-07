@@ -25,7 +25,7 @@ class SeriesType(str, Enum):
 
 
 class Media(Model):
-    __repr_props__ = ("title", "media_type", "tmdb_id")
+    __repr_props__ = ("title", "media_type", "tmdb_id", "imdb_id", "tvdb_id")
 
     id = Column(Integer, primary_key=True)
     tmdb_id = Column(Integer, unique=True, index=True)

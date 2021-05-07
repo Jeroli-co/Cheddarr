@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from server.api import dependencies as deps
 from server.models.media import MediaType
 from server.models.users import User
-from server.repositories.media import MediaRepository, MediaServerMediaRepository
+from server.repositories.media import MediaServerMediaRepository
 from server.repositories.requests import MediaRequestRepository
 from server.schemas.external_services import PlexMediaInfo
 from server.schemas.media import MediaSearchResult, MovieSchema
@@ -33,8 +33,7 @@ async def get_movie(
     movie = await tmdb.get_tmdb_movie(tmdb_id)
     if movie is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Movie not found.")
-    server_ids = [server.server_id for server in current_user.media_servers]
-    await set_media_db_info(movie, current_user.id, server_ids, server_media_repo, request_repo)
+    await set_media_db_info(movie, current_user.id, server_media_repo, request_repo)
 
     return movie
 
@@ -45,19 +44,21 @@ async def get_movie(
 async def get_recently_added_movies(
     page: int = 1,
     per_page: int = 10,
-    current_user: User = Depends(deps.get_current_user),
-    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
+    server_media_repo: MediaServerMediaRepository = Depends(
+        deps.get_repository(MediaServerMediaRepository)
+    ),
 ):
-    server_ids = [server.server_id for server in current_user.media_servers]
-    db_recent_movies, total_results, total_pages = await media_repo.find_all_recently_added(
-        media_type=MediaType.movie, server_ids=server_ids, page=page, per_page=per_page
+    (
+        servers_recent_movies,
+        total_results,
+        total_pages,
+    ) = await server_media_repo.find_all_recently_added(
+        media_type=MediaType.movie, page=page, per_page=per_page
     )
     recent_movies = []
-    for movie in db_recent_movies:
-        tmdb_movie = await tmdb.get_tmdb_movie(movie.tmdb_id)
-        tmdb_movie.media_servers_info = [
-            PlexMediaInfo(**m.as_dict()) for m in movie.server_media if m.server_id in server_ids
-        ]
+    for movie in servers_recent_movies:
+        tmdb_movie = await tmdb.get_tmdb_movie(movie.media.tmdb_id)
+        tmdb_movie.media_servers_info = [PlexMediaInfo(**movie.as_dict())]
         recent_movies.append(tmdb_movie)
 
     return MediaSearchResult(
@@ -74,9 +75,8 @@ async def get_popular_movies(
     ),
 ):
     popular_movies, total_pages, total_results = await tmdb.get_tmdb_popular_movies(page=page)
-    server_ids = [server.server_id for server in current_user.media_servers]
     for movie in popular_movies:
-        await set_media_db_info(movie, current_user.id, server_ids, server_media_repo)
+        await set_media_db_info(movie, current_user.id, server_media_repo)
 
     return MediaSearchResult(
         results=popular_movies,
@@ -95,9 +95,8 @@ async def get_upcoming_movies(
     ),
 ):
     upcoming_movies, total_pages, total_results = await tmdb.get_tmdb_upcoming_movies(page=page)
-    server_ids = [server.server_id for server in current_user.media_servers]
     for movie in upcoming_movies:
-        await set_media_db_info(movie, current_user.id, server_ids, server_media_repo)
+        await set_media_db_info(movie, current_user.id, server_media_repo)
 
     return MediaSearchResult(
         results=upcoming_movies,
@@ -121,9 +120,8 @@ async def get_similar_movies(
     similar_movies, total_pages, total_results = await tmdb.get_tmdb_similar_movies(
         tmdb_id=tmdb_id, page=page
     )
-    server_ids = [server.server_id for server in current_user.media_servers]
     for movie in similar_movies:
-        await set_media_db_info(movie, current_user.id, server_ids, server_media_repo)
+        await set_media_db_info(movie, current_user.id, server_media_repo)
 
     return MediaSearchResult(
         results=similar_movies,
@@ -149,9 +147,8 @@ async def get_recommended_movies(
     recommended_movies, total_pages, total_results = await tmdb.get_tmdb_recommended_movies(
         tmdb_id=tmdb_id, page=page
     )
-    server_ids = [server.server_id for server in current_user.media_servers]
     for movie in recommended_movies:
-        await set_media_db_info(movie, current_user.id, server_ids, server_media_repo)
+        await set_media_db_info(movie, current_user.id, server_media_repo)
 
     return MediaSearchResult(
         results=recommended_movies,

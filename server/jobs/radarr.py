@@ -6,7 +6,7 @@ from server.repositories.requests import MediaRequestRepository
 from server.services import radarr
 
 
-@scheduler.scheduled_job("interval", name="Radarr Sync", minutes=10)
+@scheduler.scheduled_job("interval", name="Radarr Sync", coalesce=True, minutes=10)
 async def sync_radarr():
     async with Session() as db_session:
         media_request_repo = MediaRequestRepository(db_session)

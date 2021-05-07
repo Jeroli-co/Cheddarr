@@ -1,17 +1,12 @@
 from enum import Enum
-from typing import List, TYPE_CHECKING
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
 
 from server.core import config
 from server.core.security import hash_password
 from server.core.utils import get_random_avatar
 from server.database import Model, Timestamp
-
-if TYPE_CHECKING:
-    from .settings import MediaProviderSetting, MediaServerSetting
 
 
 class UserRole(int, Enum):
@@ -22,6 +17,8 @@ class UserRole(int, Enum):
     manage_requests = 16
     manage_users = 32
     auto_approve = 64
+    request_movies = 128
+    request_series = 256
 
 
 class User(Model, Timestamp):
@@ -44,34 +41,3 @@ class User(Model, Timestamp):
     @password.setter
     def password(self, plain):
         self.password_hash = hash_password(plain)
-
-    media_servers: List["MediaServerSetting"] = relationship(
-        "MediaServerSetting",
-        secondary="usermediaserver",
-        lazy="selectin",
-        back_populates="users",
-        cascade="all,delete",
-    )
-    media_providers: List["MediaProviderSetting"] = relationship(
-        "MediaProviderSetting",
-        lazy="selectin",
-        cascade="all,delete,delete-orphan",
-    )
-
-
-class UserMediaServer(Model):
-    __repr_props__ = ("user", "media_server")
-
-    user_id = Column(ForeignKey("user.id"), primary_key=True)
-    media_server_setting_id = Column(ForeignKey("mediaserversetting.id"), primary_key=True)
-
-    user = relationship(
-        "User", lazy="joined", innerjoin=True, backref="media_server_associations", viewonly=True
-    )
-    media_server = relationship(
-        "MediaServerSetting",
-        lazy="joined",
-        innerjoin=True,
-        backref="user_associations",
-        viewonly=True,
-    )

@@ -5,7 +5,6 @@ from server.api import dependencies as deps
 from server.models.media import MediaType
 from server.models.users import User
 from server.repositories.media import (
-    MediaRepository,
     MediaServerEpisodeRepository,
     MediaServerMediaRepository,
     MediaServerSeasonRepository,
@@ -47,11 +46,10 @@ async def get_series(
     if series is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Series not found.")
 
-    server_ids = [server.server_id for server in current_user.media_servers]
-    await set_media_db_info(series, current_user.id, server_ids, server_media_repo, request_repo)
+    await set_media_db_info(series, current_user.id, server_media_repo, request_repo)
     if series.media_servers_info:
         for season in series.seasons:
-            await set_season_db_info(season, tmdb_id, server_ids, server_season_repo)
+            await set_season_db_info(season, tmdb_id, server_season_repo)
 
     return series
 
@@ -79,12 +77,11 @@ async def get_season(
     if season is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Season not found.")
 
-    server_ids = [server.server_id for server in current_user.media_servers]
-    await set_season_db_info(season, tmdb_id, server_ids, server_season_repo)
+    await set_season_db_info(season, tmdb_id, server_season_repo)
     if season.media_servers_info:
         for episode in season.episodes:
             await set_episode_db_info(
-                episode, tmdb_id, season_number, server_ids, server_episode_repo
+                episode, tmdb_id, season_number, server_episode_repo
             )
 
     return season
@@ -111,8 +108,7 @@ async def get_episode(
     if episode is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Episode not found.")
 
-    server_ids = [server.server_id for server in current_user.media_servers]
-    await set_episode_db_info(episode, tmdb_id, season_number, server_ids, server_episode_repo)
+    await set_episode_db_info(episode, tmdb_id, season_number, server_episode_repo)
 
     return episode
 
@@ -126,18 +122,21 @@ async def get_recently_added_series(
     page: int = 1,
     per_page: int = 10,
     current_user: User = Depends(deps.get_current_user),
-    media_repo: MediaRepository = Depends(deps.get_repository(MediaRepository)),
+    server_media_repo: MediaServerMediaRepository = Depends(
+        deps.get_repository(MediaServerMediaRepository)
+    ),
 ):
-    server_ids = [server.server_id for server in current_user.media_servers]
-    db_recent_series, total_results, total_pages = await media_repo.find_all_recently_added(
-        media_type=MediaType.series, server_ids=server_ids, per_page=per_page, page=page
+    (
+        servers_recent_series,
+        total_results,
+        total_pages,
+    ) = await server_media_repo.find_all_recently_added(
+        media_type=MediaType.series, per_page=per_page, page=page
     )
     recent_series = []
-    for series in db_recent_series:
-        tmdb_series = await tmdb.get_tmdb_series(series.tmdb_id)
-        tmdb_series.media_servers_info = [
-            PlexMediaInfo(**m.as_dict()) for m in series.server_media if m.server_id in server_ids
-        ]
+    for series in servers_recent_series:
+        tmdb_series = await tmdb.get_tmdb_series(series.media.tmdb_id)
+        tmdb_series.media_servers_info = [PlexMediaInfo(**series.as_dict())]
         recent_series.append(tmdb_series)
 
     return MediaSearchResult(
@@ -154,9 +153,8 @@ async def get_popular_series(
     ),
 ):
     popular_series, total_pages, total_results = await tmdb.get_tmdb_popular_series(page=page)
-    server_ids = [server.server_id for server in current_user.media_servers]
     for series in popular_series:
-        await set_media_db_info(series, current_user.id, server_ids, server_media_repo)
+        await set_media_db_info(series, current_user.id, server_media_repo)
 
     return MediaSearchResult(
         results=popular_series,
@@ -180,9 +178,8 @@ async def get_similar_series(
     similar_series, total_pages, total_results = await tmdb.get_tmdb_similar_series(
         tmdb_id=tmdb_id, page=page
     )
-    server_ids = [server.server_id for server in current_user.media_servers]
     for series in similar_series:
-        await set_media_db_info(series, current_user.id, server_ids, server_media_repo)
+        await set_media_db_info(series, current_user.id, server_media_repo)
 
     return MediaSearchResult(
         results=similar_series,
@@ -208,9 +205,8 @@ async def get_recommended_series(
     recommended_series, total_pages, total_results = await tmdb.get_tmdb_recommended_series(
         tmdb_id=tmdb_id, page=page
     )
-    server_ids = [server.server_id for server in current_user.media_servers]
     for series in recommended_series:
-        await set_media_db_info(series, current_user.id, server_ids, server_media_repo)
+        await set_media_db_info(series, current_user.id, server_media_repo)
 
     return MediaSearchResult(
         results=recommended_series,
