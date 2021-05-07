@@ -74,8 +74,6 @@ async def signup(
                 ),
             ),
         )
-    else:
-        user.confirmed = True
     await user_repo.save(user)
 
     return user

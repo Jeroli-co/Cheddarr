@@ -32,13 +32,8 @@ class UserUpdate(UserBase):
     roles: Optional[int]
 
 
-class UserPublicSchema(UserBase):
-    id: int
-    avatar: Optional[AnyHttpUrl]
-
-
 class UserSearchResult(PaginatedResult):
-    results: List[UserPublicSchema]
+    results: List[UserSchema]
 
 
 class PasswordResetCreate(APIModel):

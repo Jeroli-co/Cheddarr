@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 
 from server.models.requests import RequestStatus
 from server.schemas.media import MovieSchema, SeriesSchema
-from server.schemas.users import UserPublicSchema
+from server.schemas.users import UserSchema
 from .core import APIModel, PaginatedResult
 from ..models.media import MediaType
 
@@ -12,7 +12,7 @@ from ..models.media import MediaType
 class MediaRequest(APIModel, ABC):
     id: int
     status: RequestStatus
-    requesting_user: UserPublicSchema
+    requesting_user: UserSchema
     created_at: datetime
     updated_at: datetime
     media_type: MediaType

@@ -35,7 +35,7 @@ from server.schemas.settings import (
     SonarrSettingCreateUpdate,
     SonarrSettingSchema,
 )
-from server.schemas.users import UserPublicSchema
+from server.schemas.users import UserSchema
 from server.services import plex, radarr, sonarr
 
 router = APIRouter()
@@ -176,7 +176,7 @@ async def delete_plex_setting(
 
 @router.post(
     "/plex/{setting_id}/users",
-    response_model=List[UserPublicSchema],
+    response_model=List[UserSchema],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex setting or user not found"},
     },
@@ -201,7 +201,7 @@ async def add_plex_setting_user(
 
 @router.delete(
     "/plex/{setting_id}/users",
-    response_model=List[UserPublicSchema],
+    response_model=List[UserSchema],
 )
 async def delete_plex_setting_user(
     setting_id: str,

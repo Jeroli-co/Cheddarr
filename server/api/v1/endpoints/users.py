@@ -18,7 +18,6 @@ from server.schemas.core import ResponseMessage
 from server.schemas.users import (
     PasswordResetConfirm,
     PasswordResetCreate,
-    UserPublicSchema,
     UserSchema,
     UserSearchResult,
     UserUpdate,
@@ -55,7 +54,7 @@ async def get_users(
 @users_router.get(
     "/{user_id}",
     dependencies=([Depends(deps.get_current_user)]),
-    response_model=UserPublicSchema,
+    response_model=UserSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     },
@@ -170,7 +169,7 @@ async def update_user(
 
 @users_router.get(
     "/search",
-    response_model=List[UserPublicSchema],
+    response_model=List[UserSchema],
     dependencies=[Depends(deps.get_current_user)],
 )
 async def search_users(
