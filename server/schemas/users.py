@@ -12,6 +12,7 @@ class UserBase(APIModel):
 
 
 class UserSchema(UserBase):
+    id: int
     avatar: Optional[AnyHttpUrl]
     confirmed: bool
     roles: int
@@ -32,6 +33,7 @@ class UserUpdate(UserBase):
 
 
 class UserPublicSchema(UserBase):
+    id: int
     avatar: Optional[AnyHttpUrl]
 
 
