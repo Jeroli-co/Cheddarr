@@ -19,7 +19,6 @@ def send_email(
     html_template_name: str,
     environment: dict = None,
 ):
-    assert config.MAIL_ENABLED, "Emails are disabled."
     environment = environment or {}
     for k, v in environment.items():
         environment[k] = re.sub(f"{config.API_PREFIX}/v[0-9]+", "", v)

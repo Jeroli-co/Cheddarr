@@ -13,7 +13,6 @@ from tzlocal import get_localzone
 
 class PublicConfig(BaseSettings):
     LOG_LEVEL: Optional[str]
-    MAIL_ENABLED: Optional[bool]
     DEFAULT_ROLES: Optional[int]
 
 
@@ -67,11 +66,6 @@ class Config(BaseSettings):
     ##########################################################################
     DB_NAME: str = "cheddarr.sqlite"
     DB_URL: str = "sqlite+aiosqlite:///" + str(DB_FOLDER / DB_NAME)
-
-    ##########################################################################
-    # notifications                                                          #
-    ##########################################################################
-    MAIL_ENABLED: bool = False
 
     ##########################################################################
     def __init__(self, **kwargs):

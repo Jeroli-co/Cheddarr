@@ -28,6 +28,7 @@ class MediaRequestCreate(APIModel):
 class MediaRequestUpdate(APIModel):
     status: RequestStatus
     provider_id: Optional[str]
+    comment: Optional[str]
 
 
 class MovieRequestSchema(MediaRequest):

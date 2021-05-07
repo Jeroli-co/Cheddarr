@@ -11,18 +11,13 @@ from fastapi import (
 )
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import EmailStr
 
 from server.api import dependencies as deps
 from server.core import config, security, utils
 from server.core.http_client import HttpClient
-from server.core.scheduler import scheduler
-from server.models.notifications import Agent
 from server.models.users import User, UserRole
-from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import UserRepository
-from server.schemas.auth import EmailConfirm, PlexAuthorizeSignin, Token, TokenPayload
-from server.schemas.core import ResponseMessage
+from server.schemas.auth import PlexAuthorizeSignin, Token, TokenPayload
 from server.schemas.users import UserCreate, UserSchema
 
 router = APIRouter()
@@ -36,11 +31,7 @@ router = APIRouter()
 )
 async def signup(
     user_in: UserCreate,
-    request: Request,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
 ):
     existing_email = await user_repo.find_by_email(email=user_in.email)
     if existing_email:
@@ -55,108 +46,9 @@ async def signup(
     if await user_repo.count() == 0:
         user.roles = UserRole.admin
 
-    if config.MAIL_ENABLED:
-        email_agent = await notif_agent_repo.find_by(name=Agent.email)
-        if email_agent is None or not email_agent.enabled:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
-        email_data = EmailConfirm(email=EmailStr(user.email)).dict()
-        token = security.generate_timed_token(email_data)
-        scheduler.add_job(
-            utils.send_email,
-            kwargs=dict(
-                email_settings=email_agent.settings,
-                to_email=user.email,
-                subject="Welcome!",
-                html_template_name="email/welcome.html",
-                environment=dict(
-                    username=user.username,
-                    confirm_url=request.url_for("confirm_email", token=token),
-                ),
-            ),
-        )
     await user_repo.save(user)
 
     return user
-
-
-@router.get(
-    "/sign-up/{token}",
-    response_model=ResponseMessage,
-    responses={
-        status.HTTP_403_FORBIDDEN: {"description": "Email already confirmed"},
-        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
-        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
-    },
-)
-async def confirm_email(
-    token: str,
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    try:
-        email_data = EmailConfirm.parse_obj(security.confirm_timed_token(token))
-    except Exception:
-        raise HTTPException(
-            status.HTTP_410_GONE, "The confirmation link is invalid or has expired."
-        )
-    if email_data.old_email is not None:
-        user = await user_repo.find_by_email(email_data.old_email)
-        if user is None:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email was found.")
-        user.email = email_data.email
-    else:
-        user = await user_repo.find_by_email(email_data.email)
-        if user is None:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email was found.")
-
-        if user.confirmed:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, "This email is already confirmed.")
-        user.confirmed = True
-    await user_repo.save(user)
-
-    return {"detail": "This email is now confirmed."}
-
-
-@router.patch(
-    "/sign-up",
-    response_model=ResponseMessage,
-    responses={
-        status.HTTP_403_FORBIDDEN: {"description": "Email already confirmed"},
-        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
-    },
-)
-async def resend_confirmation(
-    body: EmailConfirm,
-    request: Request,
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
-):
-    email = body.email
-    existing_user = await user_repo.find_by_email(email)
-    if existing_user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this email exists.")
-    if existing_user.confirmed:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "This email is already confirmed.")
-
-    email_agent = await notif_agent_repo.find_by(name=Agent.email)
-    if email_agent is None or not email_agent.enabled:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
-
-    email_data = EmailConfirm(email=email).dict()
-    token = security.generate_timed_token(email_data)
-    scheduler.add_job(
-        utils.send_email,
-        kwargs=dict(
-            email_settings=email_agent.settings,
-            to_email=email,
-            subject="Please confirm your email",
-            html_template_name="email/email_confirmation.html",
-            environment=dict(confirm_url=request.url_for("confirm_email", token=token)),
-        ),
-    )
-
-    return {"detail": "Confirmation email sent."}
 
 
 @router.post(

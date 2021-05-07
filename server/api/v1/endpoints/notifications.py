@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from server.api import (
     dependencies as deps,
 )
-from server.core import config
 from server.models.notifications import Agent, NotificationAgent
 from server.models.users import User
 from server.repositories.notifications import NotificationAgentRepository, NotificationRepository
@@ -98,10 +97,6 @@ async def update_email_agent(
     else:
         await notif_agent_repo.update(agent, agent_in)
 
-    if agent.enabled:
-        config.set_fields(MAIL_ENABLED=True)
-    else:
-        config.set_fields(MAIL_ENABLED=False)
     return agent
 
 
@@ -122,5 +117,4 @@ async def delete_email_agent(
     if agent is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No email agent is configured.")
     await notif_agent_repo.remove(agent)
-    config.set_fields(MAIL_ENABLED=False)
     return {"detail": "Email agent deleted."}

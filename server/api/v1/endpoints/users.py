@@ -1,10 +1,9 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from pydantic import EmailStr
 
 from server.api import dependencies as deps
-from server.core import config, security, utils
+from server.core import security, utils
 from server.core.scheduler import scheduler
 from server.core.security import check_permissions
 from server.models.notifications import Agent
@@ -13,7 +12,6 @@ from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import (
     UserRepository,
 )
-from server.schemas.auth import EmailConfirm
 from server.schemas.core import ResponseMessage
 from server.schemas.users import (
     PasswordResetConfirm,
@@ -43,9 +41,12 @@ current_user_router = APIRouter()
 async def get_users(
     page: int = 1,
     per_page: int = 10,
+    confirmed: Optional[bool] = True,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
-    users, total_results, total_pages = await user_repo.find_all_by(page=page, per_page=per_page)
+    users, total_results, total_pages = await user_repo.find_all_by(
+        page=page, per_page=per_page, confirmed=confirmed
+    )
     return UserSearchResult(
         page=page, total_results=total_results, total_pages=total_pages, results=users
     )
@@ -92,7 +93,6 @@ async def delete_user(
 async def update_user(
     user_id: int,
     user_in: UserUpdate,
-    request: Request,
     current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
@@ -120,39 +120,11 @@ async def update_user(
         if not security.verify_password(user_in.old_password, user.password):
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The passwords don't match.")
         user.password = user_in.password
-        if config.MAIL_ENABLED:
-            if email_agent is None or not email_agent.enabled:
-                raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
-
-            scheduler.add_job(
-                utils.send_email,
-                kwargs=dict(
-                    email_settings=email_agent.settings,
-                    to_email=user.email,
-                    subject="Your password has been changed",
-                    html_template_name="email/change_password_notice.html",
-                ),
-            )
 
     if user_in.email is not None:
         if await user_repo.find_by_email(user_in.email):
             raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
-        if config.MAIL_ENABLED:
-            if email_agent is None or not email_agent.enabled:
-                raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
 
-            email_data = EmailConfirm(email=user_in.email, old_email=EmailStr(user.email)).dict()
-            token = security.generate_timed_token(email_data)
-            scheduler.add_job(
-                utils.send_email,
-                kwargs=dict(
-                    email_settings=email_agent.settings,
-                    to_email=user_in.email,
-                    subject="Please confirm your new email",
-                    html_template_name="email/email_confirmation.html",
-                    environment=dict(confirm_url=request.url_for("confirm_email", token=token)),
-                ),
-            )
         else:
             user.email = user_in.email
 
