@@ -18,6 +18,8 @@ import { Search } from "../logged-in-app/pages/Search";
 import { Movie } from "../shared/components/media/Movie";
 import { Series } from "../shared/components/media/Series";
 import { JobsSettings } from "../logged-in-app/pages/settings/jobs/JobsSettings";
+import { UsersSettings } from "../logged-in-app/pages/settings/users/UsersSettings";
+import { UserSettingsModal } from "../logged-in-app/pages/settings/users/UserSettingsModal";
 
 const routes = {
   HOME: {
@@ -66,6 +68,10 @@ const routes = {
   SETTINGS_JOBS: {
     url: "/settings/jobs",
     component: JobsSettings,
+  },
+  SETTINGS_USERS: {
+    url: "/settings/users",
+    component: UsersSettings,
   },
 
   /** MEDIA **/

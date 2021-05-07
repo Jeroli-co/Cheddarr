@@ -16,6 +16,7 @@ export const Settings = () => {
       tabs={[
         { label: "Media servers", uri: "media-servers" },
         { label: "Media providers", uri: "media-providers" },
+        { label: "Users", uri: "users" },
         { label: "Notifications", uri: "notifications" },
         { label: "Jobs", uri: "jobs" },
       ]}
@@ -34,6 +35,11 @@ export const Settings = () => {
                 exact
                 path={routes.SETTINGS_MEDIA_PROVIDERS.url}
                 component={routes.SETTINGS_MEDIA_PROVIDERS.component}
+              />
+              <Route
+                exact
+                path={routes.SETTINGS_USERS.url}
+                component={routes.SETTINGS_USERS.component}
               />
               <Route
                 exact

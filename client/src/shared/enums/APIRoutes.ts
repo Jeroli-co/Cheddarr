@@ -30,6 +30,8 @@ export const APIRoutes = {
   GET_RESET_PASSWORD_TOKEN_VALIDITY: (token: string) =>
     "/user/password" + token,
   RESET_PASSWORD: (token: string) => "/user/password" + token,
+  GET_USERS: "/users",
+  UPDATE_USER_BY_ID: (id: number) => "/users/" + id.toString(10),
 
   // MEDIA SERVERS
   GET_MEDIA_SERVERS_LIBRARIES: (
