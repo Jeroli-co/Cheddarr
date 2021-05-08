@@ -1,6 +1,5 @@
 export interface ISignUpFormData {
-  readonly username: string;
-  readonly email: string;
-  readonly password: string;
-  readonly passwordConfirmation: string;
+  username: string;
+  password: string;
+  passwordConfirmation: string;
 }

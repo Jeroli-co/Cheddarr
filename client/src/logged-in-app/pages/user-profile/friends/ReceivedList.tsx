@@ -6,7 +6,7 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FriendItemContainer } from "./FriendItemContainer";
-import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { IUser } from "../../../../shared/models/IUser";
 import { IAsyncCall } from "../../../../shared/models/IAsyncCall";
 import { Spinner } from "../../../../shared/components/Spinner";
 import styled from "styled-components";
@@ -24,9 +24,9 @@ const Container = styled.div`
 `;
 
 type FriendsReceivedListProps = {
-  received: IAsyncCall<IPublicUser[] | null>;
-  acceptRequest: (friend: IPublicUser) => void;
-  refuseRequest: (friend: IPublicUser) => void;
+  received: IAsyncCall<IUser[] | null>;
+  acceptRequest: (friend: IUser) => void;
+  refuseRequest: (friend: IUser) => void;
 };
 
 const ReceivedList = ({
@@ -36,7 +36,7 @@ const ReceivedList = ({
 }: FriendsReceivedListProps) => {
   const [showReceivedList, setShowReceivedList] = useState(false);
 
-  const Actions = (friend: IPublicUser) => {
+  const Actions = (friend: IUser) => {
     return (
       <Buttons>
         <SuccessIconButton type="button" onClick={() => acceptRequest(friend)}>

@@ -1,12 +1,12 @@
 import { RequestStatus } from "../enums/RequestStatus";
-import { IPublicUser } from "./IPublicUser";
+import { IUser } from "./IUser";
 import { IMedia } from "./IMedia";
 
 export interface IMediaRequest {
   id: number;
   status: RequestStatus;
-  requestedUser: IPublicUser;
-  requestingUser: IPublicUser;
+  requestedUser: IUser;
+  requestingUser: IUser;
   createdAt: Date;
   updatedAt: Date;
   media: IMedia;

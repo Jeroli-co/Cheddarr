@@ -1,5 +1,5 @@
 import React from "react";
-import { IPublicUser } from "../models/IPublicUser";
+import { IUser } from "../models/IUser";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { routes } from "../../router/routes";
@@ -17,7 +17,7 @@ const Image = styled.img`
 `;
 
 type UserSmallCardProps = {
-  user: IPublicUser;
+  user: IUser;
 };
 
 export const UserSmallCard = ({ user }: UserSmallCardProps) => {

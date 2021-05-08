@@ -1,10 +1,10 @@
 import React from "react";
-import { IPublicUser } from "../../models/IPublicUser";
+import { IUser } from "../../models/IUser";
 import { InputField } from "../inputs/InputField";
 import { useFormContext } from "react-hook-form";
 
 type FriendsProvidersDropdownProps = {
-  users: IPublicUser[];
+  users: IUser[];
 };
 
 export const FriendsProvidersDropdown = (

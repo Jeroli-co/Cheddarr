@@ -99,7 +99,7 @@ async def update_user(
         deps.get_repository(NotificationAgentRepository)
     ),
 ):
-    if current_user.id != user_id or not check_permissions(current_user.roles, [UserRole.admin]):
+    if current_user.id != user_id and not check_permissions(current_user.roles, [UserRole.admin]):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Not enough privileges to update the user.")
     user = await user_repo.find_by(id=user_id)
 

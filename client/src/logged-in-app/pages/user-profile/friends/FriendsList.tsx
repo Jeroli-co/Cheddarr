@@ -6,7 +6,7 @@ import {
   faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FriendItemContainer } from "./FriendItemContainer";
-import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { IUser } from "../../../../shared/models/IUser";
 import { IAsyncCall } from "../../../../shared/models/IAsyncCall";
 import { Spinner } from "../../../../shared/components/Spinner";
 import styled from "styled-components";
@@ -26,14 +26,14 @@ const Container = styled.div`
 `;
 
 type FriendsListProps = {
-  friends: IAsyncCall<IPublicUser[] | null>;
-  removeFriend: (friend: IPublicUser) => void;
+  friends: IAsyncCall<IUser[] | null>;
+  removeFriend: (friend: IUser) => void;
 };
 
 const FriendsList = ({ friends, removeFriend }: FriendsListProps) => {
   const [showFriendsList, setShowFriendsList] = useState(true);
 
-  const Actions = (friend: IPublicUser) => {
+  const Actions = (friend: IUser) => {
     return (
       <DangerIconButton type="button" onClick={() => removeFriend(friend)}>
         <Icon icon={faMinus} />
@@ -53,7 +53,7 @@ const FriendsList = ({ friends, removeFriend }: FriendsListProps) => {
       {friends.isLoading && <Spinner />}
       {!friends.isLoading &&
         friends.data &&
-        friends.data.map((user: IPublicUser) => (
+        friends.data.map((user: IUser) => (
           <FriendItemContainer
             key={user.username}
             user={user}

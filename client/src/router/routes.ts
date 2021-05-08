@@ -1,6 +1,5 @@
 import { NotFound } from "../shared/components/errors/NotFound";
 import { PageLoader } from "../shared/components/PageLoader";
-import { ConfirmEmail } from "../logged-out-app/elements/ConfirmEmail";
 import { ResetPassword } from "../logged-out-app/elements/ResetPassword";
 import { SignInForm } from "../logged-out-app/SignInForm";
 import { SignUpForm } from "../logged-out-app/SignUpForm";
@@ -19,7 +18,6 @@ import { Movie } from "../shared/components/media/Movie";
 import { Series } from "../shared/components/media/Series";
 import { JobsSettings } from "../logged-in-app/pages/settings/jobs/JobsSettings";
 import { UsersSettings } from "../logged-in-app/pages/settings/users/UsersSettings";
-import { UserSettingsModal } from "../logged-in-app/pages/settings/users/UserSettingsModal";
 
 const routes = {
   HOME: {
@@ -35,10 +33,6 @@ const routes = {
   },
   CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm", component: PageLoader },
   SIGN_UP: { url: "/sign-up", component: SignUpForm },
-  CONFIRM_EMAIL: {
-    url: (token: string) => "/sign-up/" + token,
-    component: ConfirmEmail,
-  },
   RESET_PASSWORD: {
     url: (token: string) => "/me/password/" + token,
     component: ResetPassword,

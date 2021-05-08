@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
 import { routes } from "../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../shared/enums/FormDefaultValidators";
-import { WaitingEmailConfirmation } from "./elements/WaitingEmailConfirmation";
 import { ISignUpFormData } from "../shared/models/ISignUpFormData";
-import { IUser } from "../shared/models/IUser";
 import { useAuthentication } from "../shared/contexts/AuthenticationContext";
 import { Redirect } from "react-router";
 import { PrimaryHero } from "../shared/components/layout/Hero";
@@ -19,6 +17,7 @@ import { Row } from "../shared/components/layout/Row";
 import { InputField } from "../shared/components/inputs/InputField";
 import { HelpDanger } from "../shared/components/Help";
 import { CenteredContent } from "../shared/components/layout/CenteredContent";
+import { IUser } from "../shared/models/IUser";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();
@@ -31,10 +30,6 @@ const SignUpForm = () => {
       if (res.data) setUser(res.data);
     });
   };
-
-  if (user && !user.confirmed) {
-    return <WaitingEmailConfirmation />;
-  }
 
   if (user && user.confirmed) {
     return <Redirect to={routes.SIGN_IN.url()} />;
@@ -85,41 +80,6 @@ const SignUpForm = () => {
               {errors.username && errors.username.type === "pattern" && (
                 <HelpDanger>
                   {FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message}
-                </HelpDanger>
-              )}
-            </InputField>
-
-            {/* EMAIL */}
-            <InputField withIcon>
-              <label>Email</label>
-              <div className="with-left-icon">
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Valid email"
-                  ref={register({
-                    required: true,
-                    maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
-                    pattern: FORM_DEFAULT_VALIDATOR.EMAIL_PATTERN.value,
-                  })}
-                />
-                <span className="icon">
-                  <FontAwesomeIcon icon={faEnvelope} />
-                </span>
-              </div>
-              {errors.email && errors.email.type === "required" && (
-                <HelpDanger>
-                  {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                </HelpDanger>
-              )}
-              {errors.email && errors.email.type === "maxLength" && (
-                <HelpDanger>
-                  {FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}
-                </HelpDanger>
-              )}
-              {errors.email && errors.email.type === "pattern" && (
-                <HelpDanger>
-                  {FORM_DEFAULT_VALIDATOR.EMAIL_PATTERN.message}
                 </HelpDanger>
               )}
             </InputField>

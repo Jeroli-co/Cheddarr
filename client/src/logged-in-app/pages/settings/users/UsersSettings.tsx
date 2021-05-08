@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Spinner } from "../../../../shared/components/Spinner";
 import { usePagination } from "../../../../shared/hooks/usePagination";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
-import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { IUser } from "../../../../shared/models/IUser";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import {
   DangerIconButton,
@@ -13,6 +13,8 @@ import { Icon } from "../../../../shared/components/Icon";
 import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { H1 } from "../../../../shared/components/Titles";
 import { UserSettingsModal } from "./UserSettingsModal";
+import { useRoles } from "../../../../shared/hooks/useRoles";
+import { Roles } from "../../../../shared/enums/Roles";
 
 const Container = styled.div`
   background: ${(props) => props.theme.primary};
@@ -27,13 +29,16 @@ const Item = styled.div`
 `;
 
 export const UsersSettings = () => {
+  const { updateRoles } = useRoles();
+
   const [editUserModalState, setEditUserModalState] = useState<{
     isOpen: boolean;
-    publicUser: IPublicUser | null;
+    publicUser: IUser | null;
   }>({
     isOpen: false,
     publicUser: null,
   });
+
   const {
     data,
     loadPrev,
@@ -41,10 +46,22 @@ export const UsersSettings = () => {
     updateData,
     deleteData,
     sortData,
-  } = usePagination<IPublicUser>(APIRoutes.GET_USERS, true);
+  } = usePagination<IUser>(APIRoutes.GET_USERS, true);
 
-  const onUserEditClick = (user: IPublicUser) => {
+  const onUserEditClick = (user: IUser) => {
     setEditUserModalState({ isOpen: true, publicUser: user });
+  };
+
+  const onRoleChange = (id: number, role: Roles) => {
+    updateRoles(id, role).then((res) => {
+      if (res.status === 200 && res.data) {
+        const newRoles = res.data.roles;
+        updateData(
+          (u) => u.id === id,
+          (u) => (u.roles = newRoles)
+        );
+      }
+    });
   };
 
   if (data.isLoading) return <Spinner />;
@@ -77,6 +94,7 @@ export const UsersSettings = () => {
           closeModal={() =>
             setEditUserModalState({ isOpen: false, publicUser: null })
           }
+          onRoleChange={onRoleChange}
           publicUser={editUserModalState.publicUser}
         />
       )}

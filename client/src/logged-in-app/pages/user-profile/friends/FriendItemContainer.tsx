@@ -5,7 +5,7 @@ import {
   FadeOutDown,
 } from "../../../../shared/components/animations/Animations";
 import { Animate } from "../../../../shared/components/animations/Animate";
-import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { IUser } from "../../../../shared/models/IUser";
 import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
 import { Row } from "../../../../shared/components/layout/Row";
 
@@ -15,7 +15,7 @@ const FriendItemContainerStyle = styled.div`
 `;
 
 type FriendItemContainerProps = {
-  user: IPublicUser;
+  user: IUser;
   actions: React.ReactNode;
   isShow: boolean;
 };

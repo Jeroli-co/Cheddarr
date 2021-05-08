@@ -3,10 +3,10 @@ import { useAlert } from "../contexts/AlertContext";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { MESSAGES } from "../enums/Messages";
 import { useSession } from "../contexts/SessionContext";
-import { IUser } from "../models/IUser";
 import { APIRoutes } from "../enums/APIRoutes";
 import { routes } from "../../router/routes";
 import { useHistory } from "react-router";
+import { IUser } from "../models/IUser";
 
 export interface IChangePasswordModel {
   readonly oldPassword: string;

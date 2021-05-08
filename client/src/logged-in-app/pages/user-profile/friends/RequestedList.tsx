@@ -5,7 +5,7 @@ import {
   faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FriendItemContainer } from "./FriendItemContainer";
-import { IPublicUser } from "../../../../shared/models/IPublicUser";
+import { IUser } from "../../../../shared/models/IUser";
 import { IAsyncCall } from "../../../../shared/models/IAsyncCall";
 import { Spinner } from "../../../../shared/components/Spinner";
 import styled from "styled-components";
@@ -19,8 +19,8 @@ const Container = styled.div`
 `;
 
 type FriendsRequestedListProps = {
-  requested: IAsyncCall<IPublicUser[] | null>;
-  cancelRequest: (friend: IPublicUser) => void;
+  requested: IAsyncCall<IUser[] | null>;
+  cancelRequest: (friend: IUser) => void;
 };
 
 const RequestedList = ({
@@ -29,7 +29,7 @@ const RequestedList = ({
 }: FriendsRequestedListProps) => {
   const [showRequestedList, setShowRequestedList] = useState(false);
 
-  const Actions = (friend: IPublicUser) => {
+  const Actions = (friend: IUser) => {
     return (
       <DangerIconButton type="button" onClick={() => cancelRequest(friend)}>
         <Icon icon={faMinus} />

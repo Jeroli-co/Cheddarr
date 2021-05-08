@@ -1,21 +1,21 @@
 import { useContext, useEffect, useState } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../../shared/models/IAsyncCall";
-import { IPublicUser } from "../models/IPublicUser";
+import { IUser } from "../models/IUser";
 import { AlertContext } from "../../shared/contexts/AlertContext";
 import { useAPI } from "../../shared/hooks/useAPI";
 import { APIRoutes } from "../../shared/enums/APIRoutes";
 
 export const useFriends = () => {
-  const [friends, setFriends] = useState<IAsyncCall<IPublicUser[] | null>>(
+  const [friends, setFriends] = useState<IAsyncCall<IUser[] | null>>(
     DefaultAsyncCall
   );
 
   const [friendsRequestReceived, setFriendsRequestReceived] = useState<
-    IAsyncCall<IPublicUser[] | null>
+    IAsyncCall<IUser[] | null>
   >(DefaultAsyncCall);
 
   const [friendsRequestSent, setFriendsRequestSent] = useState<
-    IAsyncCall<IPublicUser[] | null>
+    IAsyncCall<IUser[] | null>
   >(DefaultAsyncCall);
 
   const { get, remove, patch, post } = useAPI();
@@ -29,9 +29,9 @@ export const useFriends = () => {
         incomingFriendsRequests,
         outgoingFriendsRequests,
       ] = await Promise.all([
-        get<IPublicUser[]>(APIRoutes.GET_FRIENDS),
-        get<IPublicUser[]>(APIRoutes.GET_INCOMING_FRIEND_REQUESTS),
-        get<IPublicUser[]>(APIRoutes.GET_OUTGOING_FRIEND_REQUESTS),
+        get<IUser[]>(APIRoutes.GET_FRIENDS),
+        get<IUser[]>(APIRoutes.GET_INCOMING_FRIEND_REQUESTS),
+        get<IUser[]>(APIRoutes.GET_OUTGOING_FRIEND_REQUESTS),
       ]);
 
       setFriends(friendsRequests);
@@ -43,7 +43,7 @@ export const useFriends = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const addFriend = (friend: IPublicUser) => {
+  const addFriend = (friend: IUser) => {
     if (friends.data) {
       const data = friends.data;
       data.push(friend);
@@ -51,7 +51,7 @@ export const useFriends = () => {
     }
   };
 
-  const removeFriend = (friend: IPublicUser) => {
+  const removeFriend = (friend: IUser) => {
     remove(APIRoutes.DELETE_FRIEND(friend.username)).then((res) => {
       if (res.status === 200 && friends.data) {
         let data = friends.data;
@@ -64,8 +64,8 @@ export const useFriends = () => {
     });
   };
 
-  const acceptFriendRequest = (friend: IPublicUser) => {
-    patch<IPublicUser>(APIRoutes.ACCEPT_FRIEND_REQUEST(friend.username)).then(
+  const acceptFriendRequest = (friend: IUser) => {
+    patch<IUser>(APIRoutes.ACCEPT_FRIEND_REQUEST(friend.username)).then(
       (res) => {
         if (res.status === 200 && friendsRequestReceived.data) {
           let data = friendsRequestReceived.data;
@@ -80,7 +80,7 @@ export const useFriends = () => {
     );
   };
 
-  const refuseFriendRequest = (friend: IPublicUser) => {
+  const refuseFriendRequest = (friend: IUser) => {
     remove(APIRoutes.DELETE_FRIEND(friend.username)).then((res) => {
       if (res.status === 200 && friendsRequestReceived.data) {
         let data = friendsRequestReceived.data;
@@ -94,7 +94,7 @@ export const useFriends = () => {
   };
 
   const sendFriendRequest = (usernameOrEmail: string) => {
-    post<IPublicUser>(APIRoutes.SEND_FRIEND_REQUEST, {
+    post<IUser>(APIRoutes.SEND_FRIEND_REQUEST, {
       usernameOrEmail: usernameOrEmail,
     }).then((res) => {
       if (res.status === 201 && res.data && friendsRequestSent.data) {
@@ -110,7 +110,7 @@ export const useFriends = () => {
     });
   };
 
-  const cancelFriendRequest = (friend: IPublicUser) => {
+  const cancelFriendRequest = (friend: IUser) => {
     remove(APIRoutes.DELETE_FRIEND(friend.username)).then((res) => {
       if (res.status === 200 && friendsRequestSent.data) {
         let data = friendsRequestSent.data;
