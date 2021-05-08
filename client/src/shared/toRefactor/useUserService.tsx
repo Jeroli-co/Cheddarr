@@ -62,6 +62,39 @@ export const useUserService = () => {
     });
   };
 
+  const updateUserById = (
+    id: number,
+    payload: object,
+    errorMessage?: string,
+    successMessage?: string
+  ) => {
+    return patch<IUser>(APIRoutes.UPDATE_USER_BY_ID(id), payload).then(
+      (res) => {
+        if (res.status === 200) {
+          pushSuccess(
+            successMessage !== undefined ? successMessage : "User updated"
+          );
+        } else {
+          pushDanger(
+            errorMessage !== undefined ? errorMessage : "Cannot update user"
+          );
+        }
+        return res;
+      }
+    );
+  };
+
+  const deleteUser = (id: number) => {
+    return remove(APIRoutes.UPDATE_USER_BY_ID(id)).then((res) => {
+      if (res.status === 200) {
+        pushSuccess("User deleted");
+      } else {
+        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
+      }
+      return res;
+    });
+  };
+
   const deleteAccount = () => {
     return remove(APIRoutes.DELETE_ACCOUNT).then((res) => {
       if (res.status === 200) {
@@ -79,6 +112,8 @@ export const useUserService = () => {
     updateUsername,
     updateEmail,
     updatePassword,
+    updateUserById,
     deleteAccount,
+    deleteUser,
   };
 };

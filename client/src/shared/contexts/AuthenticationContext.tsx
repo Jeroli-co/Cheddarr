@@ -61,6 +61,8 @@ export default function AuthenticationContextProvider(props: any) {
         }
       } else if (res.status === 401) {
         pushDanger("Wrong credentials");
+      } else if (res.status === 400) {
+        pushDanger("Account needs to be confirmed");
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }

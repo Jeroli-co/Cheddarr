@@ -33,9 +33,10 @@ async def signup(
     user_in: UserCreate,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
-    existing_email = await user_repo.find_by_email(email=user_in.email)
-    if existing_email:
-        raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
+    if user_in.email is not None:
+        existing_email = await user_repo.find_by_email(email=user_in.email)
+        if existing_email:
+            raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
 
     existing_username = await user_repo.find_by_username(user_in.username)
     if existing_username:
@@ -45,6 +46,7 @@ async def signup(
     # First signed-up user
     if await user_repo.count() == 0:
         user.roles = UserRole.admin
+        user.confirmed = True
 
     await user_repo.save(user)
 

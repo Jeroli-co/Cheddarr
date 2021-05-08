@@ -76,9 +76,12 @@ async def delete_user(
     current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
-    if current_user.id != user_id or not check_permissions(current_user.roles, [UserRole.admin]):
+    if current_user.id != user_id and not check_permissions(current_user.roles, [UserRole.admin]):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Not enough privileges to update the user.")
-    await user_repo.remove(current_user)
+    user = await user_repo.find_by(id=user_id)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found.")
+    await user_repo.remove(user)
     return {"detail": "User deleted."}
 
 

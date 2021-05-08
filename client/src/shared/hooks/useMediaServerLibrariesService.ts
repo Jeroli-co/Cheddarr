@@ -6,27 +6,6 @@ import { useEffect, useState } from "react";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { MediaServerTypes } from "../enums/MediaServersTypes";
 
-export const useMediaServerLibrariesService = (
-  serverType: MediaServerTypes
-) => {
-  const { get } = useAPI();
-  const { pushDanger } = useAlert();
-
-  const fetchLibraries = (serverId: string) => {
-    return get<IMediaServerLibrary[]>(
-      APIRoutes.GET_MEDIA_SERVERS_LIBRARIES(serverType, serverId)
-    ).then((res) => {
-      if (res.status === 200) {
-      } else {
-        pushDanger("Cannot sync libraries");
-      }
-      return res;
-    });
-  };
-
-  return { fetchLibraries };
-};
-
 export const useMediaServerLibraries = (
   mediaServerType: MediaServerTypes,
   configId: string

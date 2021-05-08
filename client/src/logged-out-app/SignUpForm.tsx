@@ -31,7 +31,7 @@ const SignUpForm = () => {
     });
   };
 
-  if (user && user.confirmed) {
+  if (user) {
     return <Redirect to={routes.SIGN_IN.url()} />;
   }
 

@@ -37,7 +37,6 @@ export const Settings = () => {
                 component={routes.SETTINGS_MEDIA_PROVIDERS.component}
               />
               <Route
-                exact
                 path={routes.SETTINGS_USERS.url}
                 component={routes.SETTINGS_USERS.component}
               />

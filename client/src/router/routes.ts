@@ -18,6 +18,8 @@ import { Movie } from "../shared/components/media/Movie";
 import { Series } from "../shared/components/media/Series";
 import { JobsSettings } from "../logged-in-app/pages/settings/jobs/JobsSettings";
 import { UsersSettings } from "../logged-in-app/pages/settings/users/UsersSettings";
+import { UsersPending } from "../logged-in-app/pages/settings/users/UsersPending";
+import { UsersConfirmed } from "../logged-in-app/pages/settings/users/UsersConfirmed";
 
 const routes = {
   HOME: {
