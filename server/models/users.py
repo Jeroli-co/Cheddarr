@@ -26,7 +26,7 @@ class User(Model, Timestamp):
 
     id = Column(Integer, primary_key=True)
     username = Column(String, nullable=False, unique=True, index=True)
-    email = Column(String, nullable=False, unique=True, index=True)
+    email = Column(String, unique=True, index=True)
     password_hash = Column(String, nullable=False)
     avatar = Column(String, default=get_random_avatar())
     confirmed = Column(Boolean, nullable=False, default=False)
