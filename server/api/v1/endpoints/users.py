@@ -95,15 +95,10 @@ async def update_user(
     user_in: UserUpdate,
     current_user: User = Depends(deps.get_current_user),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
 ):
     if current_user.id != user_id and not check_permissions(current_user.roles, [UserRole.admin]):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Not enough privileges to update the user.")
     user = await user_repo.find_by(id=user_id)
-
-    email_agent = await notif_agent_repo.find_by(name=Agent.email)
 
     if user_in.username is not None:
         if await user_repo.find_by_username(user_in.username):
@@ -134,6 +129,14 @@ async def update_user(
                 status.HTTP_403_FORBIDDEN, "Not enough privileges to change the user's roles."
             )
         user.roles = user_in.roles
+
+    if user_in.confirmed is not None:
+        if not check_permissions(current_user.roles, [UserRole.admin]):
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN,
+                "Not enough privileges to change the user's confirmed status.",
+            )
+        user.confirmed = user_in.confirmed
 
     await user_repo.save(user)
     return user

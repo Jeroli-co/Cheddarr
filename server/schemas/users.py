@@ -30,6 +30,7 @@ class UserUpdate(UserBase):
     old_password: Optional[str]
     password: Optional[str]
     roles: Optional[int]
+    confirmed: Optional[bool]
 
 
 class UserSearchResult(PaginatedResult):

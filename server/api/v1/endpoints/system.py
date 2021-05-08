@@ -1,5 +1,5 @@
 import math
-from typing import List, Literal
+from typing import Dict, List, Literal, Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
@@ -60,12 +60,16 @@ def get_jobs():
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def modify_job(job_id: str, action: Literal["run", "pause", "resume"] = Body(..., embed=True)):
+def modify_job(
+    job_id: str,
+    action: Literal["run", "pause", "resume"] = Body(...),
+    params: Optional[Dict] = Body(None),
+):
     job = scheduler.get_job(job_id)
     if job is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This job does not exist.")
     if action == "run":
-        scheduler.add_job(job.func, replace_existing=True)
+        scheduler.add_job(job.func, replace_existing=True, kwargs=params)
     elif action == "pause":
         job.pause()
     elif action == "resume":
