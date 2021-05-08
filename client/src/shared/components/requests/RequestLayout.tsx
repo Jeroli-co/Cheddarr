@@ -346,7 +346,7 @@ export const RequestHeader = ({ requestType }: RequestHeaderProps) => {
 };
 
 /* FOOTER */
-const RequestsFooterContainer = styled.header`
+const RequestsFooterContainer = styled.footer`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -369,17 +369,25 @@ type RequestFooterProps = {
 };
 
 export const RequestFooter = (props: RequestFooterProps) => {
+  if (props.totalPages === undefined) {
+    return <div />;
+  }
+
   return (
     <RequestsFooterContainer>
-      <PrimaryButton type="button" onClick={() => props.onLoadPrev()}>
-        <Icon icon={faArrowLeft} />
-      </PrimaryButton>
-      <p>
-        {props.currentPage} ... {props.totalPages}
-      </p>
-      <PrimaryButton type="button" onClick={() => props.onLoadNext()}>
-        <Icon icon={faArrowRight} />
-      </PrimaryButton>
+      {props.totalPages > 0 && (
+        <>
+          <PrimaryButton type="button" onClick={() => props.onLoadPrev()}>
+            <Icon icon={faArrowLeft} />
+          </PrimaryButton>
+          <p>
+            {props.currentPage} ... {props.totalPages}
+          </p>
+          <PrimaryButton type="button" onClick={() => props.onLoadNext()}>
+            <Icon icon={faArrowRight} />
+          </PrimaryButton>
+        </>
+      )}
     </RequestsFooterContainer>
   );
 };
