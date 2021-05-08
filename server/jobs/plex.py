@@ -12,7 +12,7 @@ from plexapi.video import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.core import scheduler
-from server.database.session import Session
+from server.database.session import get_db_session
 from server.models.media import (
     Media,
     MediaServerEpisode,
@@ -42,7 +42,7 @@ TVDB_REGEX = "tvdb|thetvdb"
     hours=5,
 )
 async def sync_plex_servers_libraries(server_id=None):
-    async with Session() as db_session:
+    async with get_db_session()() as db_session:
         plex_setting_repo = PlexSettingRepository(db_session)
 
         if server_id is not None:
@@ -71,7 +71,7 @@ async def sync_plex_servers_libraries(server_id=None):
     minutes=10,
 )
 async def sync_plex_servers_recently_added(server_id=None):
-    async with Session() as db_session:
+    async with get_db_session()() as db_session:
         plex_setting_repo = PlexSettingRepository(db_session)
 
         if server_id is not None:
@@ -170,7 +170,6 @@ async def process_plex_media(
             title=plex_media.title,
             media_type=MediaType.movie if isinstance(plex_media, PlexMovie) else MediaType.series,
         )
-    print(media)
     server_media = await server_media_repo.find_by(
         external_id=plex_media.ratingKey, server_id=server_id
     )

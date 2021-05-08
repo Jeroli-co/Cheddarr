@@ -8,7 +8,7 @@ from .core import APIModel, PaginatedResult
 
 class UserBase(APIModel):
     username: str
-    email: EmailStr
+    email: Optional[EmailStr]
 
 
 class UserSchema(UserBase):
