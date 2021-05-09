@@ -13,7 +13,7 @@ type RequestButtonProps = {
 
 export const RequestButton = (props: RequestButtonProps) => {
   const {
-    session: { roles },
+    session: { user },
   } = useSession();
   const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
 
@@ -22,7 +22,7 @@ export const RequestButton = (props: RequestButtonProps) => {
     e.stopPropagation();
   };
 
-  if (!checkRole(roles, [Roles.REQUEST])) {
+  if (!user || (user && !checkRole(user.roles, [Roles.REQUEST]))) {
     return <></>;
   }
 

@@ -100,4 +100,5 @@ export const APIRoutes = {
   GET_LOGS: "/system/logs",
   GET_JOBS: "/system/jobs",
   PATCH_JOB: (id: string) => "/system/jobs/" + id,
+  CONFIG: "/system/config",
 };

@@ -17,14 +17,20 @@ export interface IChangePasswordModel {
 export const useUserService = () => {
   const { patch, remove } = useAPI();
   const { pushDanger, pushSuccess } = useAlert();
-  const { updateUsername: updateSession, invalidSession } = useSession();
+  const {
+    session: { user },
+    updateUser,
+    invalidSession,
+  } = useSession();
   const history = useHistory();
 
   const updateUsername = (username: string) => {
     return patch<IUser>(APIRoutes.UPDATE_USER, { username: username }).then(
       (res) => {
-        if (res.status === 200) {
-          updateSession(username);
+        if (res.status === 200 && user) {
+          let userTmp = user;
+          userTmp.username = username;
+          updateUser(userTmp);
           pushSuccess(MESSAGES.USERNAME_CHANGED);
         } else if (res.status === 409) {
           pushDanger(ERRORS_MESSAGE.USER_ALREADY_EXIST);

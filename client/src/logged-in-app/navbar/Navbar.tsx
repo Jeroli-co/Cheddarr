@@ -61,7 +61,7 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
   const avatarRef = useRef<HTMLImageElement>(null);
 
   const {
-    session: { avatar },
+    session: { user },
   } = useSession();
   const history = useHistory();
 
@@ -78,17 +78,21 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
       </NavbarAppLogo>
       <SearchBar />
       <GitHubButton />
-      <UserAvatar
-        src={avatar}
-        alt="User"
-        onClick={() => toggleDropdown()}
-        ref={avatarRef}
-      />
-      <UserDropdown
-        isVisible={isDropdownOpen}
-        hideDropdown={() => setIsDropdownOpen(false)}
-        avatarRef={avatarRef}
-      />
+      {user && (
+        <>
+          <UserAvatar
+            src={user.avatar}
+            alt="User"
+            onClick={() => toggleDropdown()}
+            ref={avatarRef}
+          />
+          <UserDropdown
+            isVisible={isDropdownOpen}
+            hideDropdown={() => setIsDropdownOpen(false)}
+            avatarRef={avatarRef}
+          />
+        </>
+      )}
     </Container>
   );
 };

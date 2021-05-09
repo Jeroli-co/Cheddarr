@@ -63,6 +63,10 @@ export const UsersPending = () => {
 
   if (data.isLoading) return <Spinner />;
 
+  if (data.data && data.data.results.length === 0) {
+    return <p>No user is waiting for confirmation</p>;
+  }
+
   return (
     <>
       <Container>

@@ -30,7 +30,6 @@
     "cross-env": "^7.0.3",
     "humps": "^2.0.1",
     "js-cookie": "^2.2.1",
-    "jwt-decode": "^3.1.2",
     "mutationobserver-shim": "^0.3.7",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",

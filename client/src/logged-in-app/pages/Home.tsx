@@ -8,7 +8,7 @@ export default function Home() {
   const { configs } = usePlexConfig();
   return (
     <div className="noselect">
-      {!configs.isLoading && configs.data && (
+      {!configs.isLoading && configs.data && configs.data.length > 0 && (
         <>
           <MediaCarouselWidget
             title="Movies recently added"

@@ -5,16 +5,17 @@ import { Roles } from "../enums/Roles";
 import { routes } from "../../router/routes";
 import { useEffect } from "react";
 
-export const useRoleGuard = (neededRoles: Roles[], hasOne?: boolean) => {
+export const useRoleGuard = (neededRoles: Roles[]) => {
   const {
-    session: { roles },
+    session: { user },
   } = useSession();
 
   const history = useHistory();
 
   useEffect(() => {
-    if (!checkRole(roles, neededRoles, hasOne)) {
-      history.push(routes.NOT_FOUND.url); // TODO: Replace with 403
+    if (!user || !checkRole(user.roles, neededRoles)) {
+      history.push(routes.HOME.url);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 };

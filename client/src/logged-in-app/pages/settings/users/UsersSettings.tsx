@@ -7,6 +7,8 @@ import {
 } from "../../../../shared/components/layout/Tabs";
 import { UsersConfirmed } from "./UsersConfirmed";
 import { UsersPending } from "./UsersPending";
+import { useRoleGuard } from "../../../../shared/hooks/useRoleGuard";
+import { Roles } from "../../../../shared/enums/Roles";
 
 export const UsersSettings = () => {
   const tabs = [
@@ -17,6 +19,8 @@ export const UsersSettings = () => {
   const [activeTab, setActiveTab] = useState<"confirmed" | "pending">(
     "confirmed"
   );
+
+  useRoleGuard([Roles.MANAGE_USERS]);
 
   return (
     <>

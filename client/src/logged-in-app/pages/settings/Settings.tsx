@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Switch } from "react-router";
 import { routes } from "../../../router/routes";
 import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
@@ -7,21 +7,32 @@ import { RadarrConfigsContextProvider } from "../../../shared/contexts/RadarrCon
 import { NotificationsServicesContextProvider } from "../../../shared/contexts/NotificationsServicesContext";
 import { useRoleGuard } from "../../../shared/hooks/useRoleGuard";
 import { Roles } from "../../../shared/enums/Roles";
+import { useSession } from "../../../shared/contexts/SessionContext";
+import { checkRole } from "../../../utils/roles";
 
 export const Settings = () => {
+  const {
+    session: { user },
+  } = useSession();
+
   useRoleGuard([Roles.MANAGE_SETTINGS]);
 
+  const [tabs, setTabs] = useState([
+    { label: "Media servers", uri: "media-servers" },
+    { label: "Media providers", uri: "media-providers" },
+    { label: "Notifications", uri: "notifications" },
+    { label: "Jobs", uri: "jobs" },
+  ]);
+
+  useEffect(() => {
+    if (user && checkRole(user.roles, [Roles.ADMIN])) {
+      setTabs([...tabs, { label: "General", uri: "general" }]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   return (
-    <TabsContextProvider
-      tabs={[
-        { label: "Media servers", uri: "media-servers" },
-        { label: "Media providers", uri: "media-providers" },
-        { label: "Users", uri: "users" },
-        { label: "Notifications", uri: "notifications" },
-        { label: "Jobs", uri: "jobs" },
-      ]}
-      url={routes.SETTINGS.url}
-    >
+    <TabsContextProvider tabs={tabs} url={routes.SETTINGS.url}>
       <SonarrConfigsContextProvider>
         <RadarrConfigsContextProvider>
           <NotificationsServicesContextProvider>
@@ -37,10 +48,6 @@ export const Settings = () => {
                 component={routes.SETTINGS_MEDIA_PROVIDERS.component}
               />
               <Route
-                path={routes.SETTINGS_USERS.url}
-                component={routes.SETTINGS_USERS.component}
-              />
-              <Route
                 exact
                 path={routes.SETTINGS_NOTIFICATIONS.url}
                 component={routes.SETTINGS_NOTIFICATIONS.component}
@@ -50,6 +57,12 @@ export const Settings = () => {
                 path={routes.SETTINGS_JOBS.url}
                 component={routes.SETTINGS_JOBS.component}
               />
+              {user && checkRole(user.roles, [Roles.ADMIN]) && (
+                <Route
+                  path={routes.SETTINGS_GENERAL.url}
+                  component={routes.SETTINGS_GENERAL.component}
+                />
+              )}
               <Route
                 path={routes.SETTINGS.url}
                 component={routes.SETTINGS_MEDIA_SERVERS.component}

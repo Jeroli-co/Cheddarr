@@ -28,7 +28,7 @@ type UserSettingsModalProps = {
 
 export const UserSettingsModal = (props: UserSettingsModalProps) => {
   const {
-    session: { roles },
+    session: { user },
   } = useSession();
 
   useEffect(() => {
@@ -48,10 +48,10 @@ export const UserSettingsModal = (props: UserSettingsModalProps) => {
   const onRoleChange = (id: number, r: Roles) => {
     let newRole = props.publicUser.roles;
     if (r === Roles.ADMIN) {
-      newRole = !checkRole(props.publicUser.roles, [Roles.ADMIN], true)
+      newRole = !checkRole(props.publicUser.roles, [Roles.ADMIN])
         ? Roles.ADMIN
         : calcRolesSumExceptAdmin();
-    } else if (checkRole(props.publicUser.roles, [r], true)) {
+    } else if (checkRole(props.publicUser.roles, [r])) {
       newRole -= r;
     } else {
       newRole += r;
@@ -69,12 +69,12 @@ export const UserSettingsModal = (props: UserSettingsModalProps) => {
       <section>
         <div>
           <H2>Roles</H2>
-          {checkRole(roles, [Roles.ADMIN], true) && (
+          {user && checkRole(user.roles, [Roles.ADMIN]) && (
             <RoleCheckboxContainer>
               <input
                 type="checkbox"
                 onChange={() => onRoleChange(props.publicUser.id, Roles.ADMIN)}
-                checked={checkRole(props.publicUser.roles, [Roles.ADMIN], true)}
+                checked={checkRole(props.publicUser.roles, [Roles.ADMIN])}
               />
               <p>Admin</p>
             </RoleCheckboxContainer>
@@ -83,8 +83,8 @@ export const UserSettingsModal = (props: UserSettingsModalProps) => {
             <input
               type="checkbox"
               onChange={() => onRoleChange(props.publicUser.id, Roles.REQUEST)}
-              checked={checkRole(props.publicUser.roles, [Roles.REQUEST], true)}
-              disabled={checkRole(props.publicUser.roles, [Roles.ADMIN], true)}
+              checked={checkRole(props.publicUser.roles, [Roles.REQUEST])}
+              disabled={checkRole(props.publicUser.roles, [Roles.ADMIN])}
             />
             <p>Request</p>
           </RoleCheckboxContainer>
@@ -94,12 +94,10 @@ export const UserSettingsModal = (props: UserSettingsModalProps) => {
               onChange={() =>
                 onRoleChange(props.publicUser.id, Roles.MANAGE_SETTINGS)
               }
-              checked={checkRole(
-                props.publicUser.roles,
-                [Roles.MANAGE_SETTINGS],
-                true
-              )}
-              disabled={checkRole(props.publicUser.roles, [Roles.ADMIN], true)}
+              checked={checkRole(props.publicUser.roles, [
+                Roles.MANAGE_SETTINGS,
+              ])}
+              disabled={checkRole(props.publicUser.roles, [Roles.ADMIN])}
             />
             <p>Manage settings</p>
           </RoleCheckboxContainer>
@@ -109,12 +107,10 @@ export const UserSettingsModal = (props: UserSettingsModalProps) => {
               onChange={() =>
                 onRoleChange(props.publicUser.id, Roles.MANAGE_REQUEST)
               }
-              checked={checkRole(
-                props.publicUser.roles,
-                [Roles.MANAGE_REQUEST],
-                true
-              )}
-              disabled={checkRole(props.publicUser.roles, [Roles.ADMIN], true)}
+              checked={checkRole(props.publicUser.roles, [
+                Roles.MANAGE_REQUEST,
+              ])}
+              disabled={checkRole(props.publicUser.roles, [Roles.ADMIN])}
             />
             <p>Manage request</p>
           </RoleCheckboxContainer>
@@ -124,12 +120,8 @@ export const UserSettingsModal = (props: UserSettingsModalProps) => {
               onChange={() =>
                 onRoleChange(props.publicUser.id, Roles.MANAGE_USERS)
               }
-              checked={checkRole(
-                props.publicUser.roles,
-                [Roles.MANAGE_USERS],
-                true
-              )}
-              disabled={checkRole(props.publicUser.roles, [Roles.ADMIN], true)}
+              checked={checkRole(props.publicUser.roles, [Roles.MANAGE_USERS])}
+              disabled={checkRole(props.publicUser.roles, [Roles.ADMIN])}
             />
             <p>Manage users</p>
           </RoleCheckboxContainer>

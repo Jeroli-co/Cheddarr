@@ -18,8 +18,7 @@ import { Movie } from "../shared/components/media/Movie";
 import { Series } from "../shared/components/media/Series";
 import { JobsSettings } from "../logged-in-app/pages/settings/jobs/JobsSettings";
 import { UsersSettings } from "../logged-in-app/pages/settings/users/UsersSettings";
-import { UsersPending } from "../logged-in-app/pages/settings/users/UsersPending";
-import { UsersConfirmed } from "../logged-in-app/pages/settings/users/UsersConfirmed";
+import { GeneralSettings } from "../logged-in-app/pages/settings/general/GeneralSettings";
 
 const routes = {
   HOME: {
@@ -41,6 +40,7 @@ const routes = {
   },
 
   /** USERS **/
+  USERS: { url: "/users", component: UsersSettings },
   PROFILE: { url: "/user", component: Profile },
   PUBLIC_USER: {
     url: (username: string) => "/users/" + username,
@@ -65,9 +65,9 @@ const routes = {
     url: "/settings/jobs",
     component: JobsSettings,
   },
-  SETTINGS_USERS: {
-    url: "/settings/users",
-    component: UsersSettings,
+  SETTINGS_GENERAL: {
+    url: "/settings/general",
+    component: GeneralSettings,
   },
 
   /** MEDIA **/

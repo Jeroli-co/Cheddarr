@@ -5,12 +5,7 @@ import {
   PrimaryIconButton,
 } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
-import {
-  faArrowLeft,
-  faArrowRight,
-  faEdit,
-  faTimes,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { UserSettingsModal } from "./UserSettingsModal";
 import { IUser } from "../../../../shared/models/IUser";
 import { usePagination } from "../../../../shared/hooks/usePagination";
@@ -21,6 +16,7 @@ import styled from "styled-components";
 import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { PaginationArrows } from "../../../../shared/components/PaginationArrows";
 import { DeleteDataModal } from "../../../../shared/components/DeleteDataModal";
+import { useSession } from "../../../../shared/contexts/SessionContext";
 
 const Container = styled.div`
   background: ${(props) => props.theme.primary};
@@ -41,6 +37,9 @@ const Item = styled.div`
 
 export const UsersConfirmed = () => {
   const { updateUserById, deleteUser } = useUserService();
+  const {
+    session: { user },
+  } = useSession();
 
   const [editUserModalState, setEditUserModalState] = useState<{
     isOpen: boolean;
@@ -95,32 +94,42 @@ export const UsersConfirmed = () => {
 
   if (data.isLoading) return <Spinner />;
 
+  if (data.data && data.data.results.length <= 1) {
+    return <p>No user to confirm yet</p>;
+  }
+
   return (
     <>
       <Container>
-        {data.data &&
+        {user &&
+          data.data &&
           data.data.results &&
-          data.data.results.map((u) => (
-            <div key={u.username}>
-              <Item>
-                {u.username}
-                <Buttons>
-                  <PrimaryIconButton onClick={() => onUserEditClick(u)}>
-                    <Icon icon={faEdit} />
-                  </PrimaryIconButton>
-                  <DangerIconButton onClick={() => onDeleteUserClick(u)}>
-                    <Icon icon={faTimes} />
-                  </DangerIconButton>
-                </Buttons>
-              </Item>
-            </div>
-          ))}
-        <PaginationArrows
-          currentPage={data.data?.page}
-          totalPages={data.data?.totalPages}
-          onLoadPrev={() => loadPrev()}
-          onLoadNext={() => loadNext()}
-        />
+          data.data.results.map(
+            (u) =>
+              u.id !== user.id && (
+                <div key={u.username}>
+                  <Item>
+                    {u.username}
+                    <Buttons>
+                      <PrimaryIconButton onClick={() => onUserEditClick(u)}>
+                        <Icon icon={faEdit} />
+                      </PrimaryIconButton>
+                      <DangerIconButton onClick={() => onDeleteUserClick(u)}>
+                        <Icon icon={faTimes} />
+                      </DangerIconButton>
+                    </Buttons>
+                  </Item>
+                </div>
+              )
+          )}
+        {data.data && data.data.results && data.data.results.length > 1 && (
+          <PaginationArrows
+            currentPage={data.data?.page}
+            totalPages={data.data?.totalPages}
+            onLoadPrev={() => loadPrev()}
+            onLoadNext={() => loadNext()}
+          />
+        )}
       </Container>
       {editUserModalState.isOpen && editUserModalState.user && (
         <UserSettingsModal

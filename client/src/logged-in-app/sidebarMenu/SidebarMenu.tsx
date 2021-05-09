@@ -6,6 +6,7 @@ import {
   faCog,
   faHome,
   faRegistered,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
@@ -32,7 +33,7 @@ const Container = styled(SidebarMenuContainer)<{ isOpen: boolean }>`
 
 export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
   const {
-    session: { roles },
+    session: { user },
   } = useSession();
   const history = useHistory();
   const { width } = useWindowSize();
@@ -63,7 +64,7 @@ export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
         <p>Dashboard</p>
       </SidebarMenuElement>
 
-      {checkRole(roles, [Roles.REQUEST]) && (
+      {user && checkRole(user.roles, [Roles.REQUEST]) && (
         <SidebarMenuElement
           onClick={() => navigate(routes.REQUESTS.url)}
           isActive={location.pathname.startsWith(routes.REQUESTS.url)}
@@ -75,7 +76,19 @@ export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
         </SidebarMenuElement>
       )}
 
-      {checkRole(roles, [Roles.MANAGE_SETTINGS]) && (
+      {user && checkRole(user.roles, [Roles.MANAGE_USERS]) && (
+        <SidebarMenuElement
+          onClick={() => navigate(routes.USERS.url)}
+          isActive={location.pathname === routes.USERS.url}
+        >
+          <SidebarMenuElementIcon>
+            <Icon icon={faUsers} />
+          </SidebarMenuElementIcon>
+          <p>Users</p>
+        </SidebarMenuElement>
+      )}
+
+      {user && checkRole(user.roles, [Roles.MANAGE_SETTINGS]) && (
         <SidebarMenuElement
           onClick={() => navigate(routes.SETTINGS.url)}
           isActive={location.pathname.startsWith(routes.SETTINGS.url)}

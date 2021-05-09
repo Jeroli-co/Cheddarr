@@ -50,6 +50,7 @@ export default function PlexConfigContextProvider(props: any) {
 
   useEffect(() => {
     get<IMediaServerConfig[]>(APIRoutes.GET_PLEX_CONFIGS).then((res) => {
+      console.log(res);
       if (res) setConfigs(res);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
