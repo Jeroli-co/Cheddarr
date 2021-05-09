@@ -26,7 +26,12 @@ export default function SwitchRoutes(props: any) {
         {...props}
       />
       <LoggedInRoute
-        path={routes.PROFILE.url}
+        path={routes.PROFILE.url(":id")}
+        component={routes.PROFILE.component}
+        {...props}
+      />
+      <LoggedInRoute
+        path={routes.PROFILE.url("")}
         component={routes.PROFILE.component}
         {...props}
       />

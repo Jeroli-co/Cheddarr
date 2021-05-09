@@ -13,19 +13,29 @@ import { H2 } from "../../../../shared/components/Titles";
 import { InputField } from "../../../../shared/components/inputs/InputField";
 import { Icon } from "../../../../shared/components/Icon";
 import { HelpDanger } from "../../../../shared/components/Help";
+import { useAlert } from "../../../../shared/contexts/AlertContext";
 
 type ChangePasswordModalProps = {
   closeModal: () => void;
+  id: number;
 };
 
 const ChangePasswordModal = (props: ChangePasswordModalProps) => {
   const { register, handleSubmit, errors, watch } = useForm<
     IChangePasswordModel
   >();
-  const { updatePassword } = useUserService();
+  const { updateUserById } = useUserService();
+  const { pushSuccess, pushDanger } = useAlert();
 
   const onSubmit = (data: IChangePasswordModel) => {
-    updatePassword(data);
+    updateUserById(props.id, { ...data }).then((res) => {
+      if (res.status === 200) {
+        pushSuccess("Password changed");
+        props.closeModal();
+      } else {
+        pushDanger("Cannot update password");
+      }
+    });
   };
 
   return (

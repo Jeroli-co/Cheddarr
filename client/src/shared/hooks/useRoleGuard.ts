@@ -13,7 +13,7 @@ export const useRoleGuard = (neededRoles: Roles[]) => {
   const history = useHistory();
 
   useEffect(() => {
-    if (!user || !checkRole(user.roles, neededRoles)) {
+    if (user && !checkRole(user.roles, neededRoles)) {
       history.push(routes.HOME.url);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

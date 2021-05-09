@@ -5,7 +5,7 @@ import humps from "humps";
 
 const JSON_TYPE = "application/json";
 const FORM_URL_ENCODED_TYPE = "application/x-www-form-urlencoded";
-const API_VERSION = "v1"
+const API_VERSION = "v1";
 
 const instance = axios.create({
   baseURL: "/api/" + API_VERSION,
@@ -33,6 +33,7 @@ instance.interceptors.request.use(
     } else if (!request.url?.startsWith(routes.CONFIRM_PLEX_SIGNIN.url)) {
       if (request.data) {
         request.data = humps.decamelizeKeys(request.data);
+        console.log(request.data);
       }
     }
 

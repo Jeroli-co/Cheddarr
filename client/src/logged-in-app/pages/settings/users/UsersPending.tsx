@@ -15,9 +15,16 @@ import { DeleteDataModal } from "../../../../shared/components/DeleteDataModal";
 import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { PaginationArrows } from "../../../../shared/components/PaginationArrows";
 
+const Header = styled.div`
+  background: ${(props) => props.theme.primaryLight};
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 30px;
+  font-size: 20px;
+`;
+
 const Container = styled.div`
   background: ${(props) => props.theme.primary};
-  border-radius: 24px;
 `;
 
 const Item = styled.div`
@@ -69,6 +76,9 @@ export const UsersPending = () => {
 
   return (
     <>
+      <Header>
+        <p>Username</p>
+      </Header>
       <Container>
         {data.data &&
           data.data.results &&
@@ -87,13 +97,13 @@ export const UsersPending = () => {
               </Item>
             </div>
           ))}
-        <PaginationArrows
-          currentPage={data.data?.page}
-          totalPages={data.data?.totalPages}
-          onLoadPrev={() => loadPrev()}
-          onLoadNext={() => loadNext()}
-        />
       </Container>
+      <PaginationArrows
+        currentPage={data.data?.page}
+        totalPages={data.data?.totalPages}
+        onLoadPrev={() => loadPrev()}
+        onLoadNext={() => loadNext()}
+      />
       {deleteUserModalState.isOpen && deleteUserModalState.user && (
         <DeleteDataModal
           closeModal={() =>

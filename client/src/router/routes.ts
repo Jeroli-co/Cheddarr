@@ -41,7 +41,10 @@ const routes = {
 
   /** USERS **/
   USERS: { url: "/users", component: UsersSettings },
-  PROFILE: { url: "/user", component: Profile },
+  PROFILE: {
+    url: (id: string) => "/profile" + (id.length > 0 ? `/${id}` : ""),
+    component: Profile,
+  },
   PUBLIC_USER: {
     url: (username: string) => "/users/" + username,
     component: PublicUser,

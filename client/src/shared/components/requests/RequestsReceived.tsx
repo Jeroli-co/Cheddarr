@@ -14,6 +14,7 @@ import { useRadarrConfigs } from "../../hooks/useRadarrConfigs";
 import { useSonarrConfigs } from "../../hooks/useSonarrConfigs";
 import { IMediaRequest } from "../../models/IMediaRequest";
 import { MediaTypes } from "../../enums/MediaTypes";
+import { FullWidthTag } from "../FullWidthTag";
 
 const RequestsReceived = () => {
   const { requestsReceived, onLoadPrev, onLoadNext } = useRequestsContext();
@@ -45,6 +46,12 @@ const RequestsReceived = () => {
             requestType={RequestTypes.INCOMING}
           />
         ))}
+      {!requestsReceived.isLoading &&
+        requestsReceived.data &&
+        requestsReceived.data.results &&
+        requestsReceived.data.results.length === 0 && (
+          <FullWidthTag>No requests received</FullWidthTag>
+        )}
       <RequestFooter
         currentPage={requestsReceived.data?.page}
         totalPages={requestsReceived.data?.totalPages}

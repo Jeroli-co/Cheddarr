@@ -1,7 +1,6 @@
 import { useAPI } from "../hooks/useAPI";
 import { useAlert } from "../contexts/AlertContext";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
-import { MESSAGES } from "../enums/Messages";
 import { useSession } from "../contexts/SessionContext";
 import { APIRoutes } from "../enums/APIRoutes";
 import { routes } from "../../router/routes";
@@ -15,7 +14,7 @@ export interface IChangePasswordModel {
 }
 
 export const useUserService = () => {
-  const { patch, remove } = useAPI();
+  const { get, patch, remove } = useAPI();
   const { pushDanger, pushSuccess } = useAlert();
   const {
     session: { user },
@@ -24,48 +23,8 @@ export const useUserService = () => {
   } = useSession();
   const history = useHistory();
 
-  const updateUsername = (username: string) => {
-    return patch<IUser>(APIRoutes.UPDATE_USER, { username: username }).then(
-      (res) => {
-        if (res.status === 200 && user) {
-          let userTmp = user;
-          userTmp.username = username;
-          updateUser(userTmp);
-          pushSuccess(MESSAGES.USERNAME_CHANGED);
-        } else if (res.status === 409) {
-          pushDanger(ERRORS_MESSAGE.USER_ALREADY_EXIST);
-        } else {
-          pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
-        }
-        return res;
-      }
-    );
-  };
-
-  const updateEmail = (email: string) => {
-    return patch<IUser>(APIRoutes.UPDATE_USER, { email: email }).then((res) => {
-      if (res.status === 200) {
-        pushSuccess("Email changed");
-      } else if (res.status === 409) {
-        pushDanger("Email already exist");
-      } else {
-        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
-      }
-      return res;
-    });
-  };
-
-  const updatePassword = (password: IChangePasswordModel) => {
-    patch<IUser>(APIRoutes.UPDATE_USER, password).then((res) => {
-      if (res.status === 200) {
-        pushSuccess("Password changed");
-        invalidSession();
-        history.push(routes.SIGN_IN.url(routes.PROFILE.url));
-      } else {
-        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
-      }
-      return res;
-    });
+  const getUserById = (id: number) => {
+    return get<IUser>(APIRoutes.USER_BY_ID(id)).then((res) => res);
   };
 
   const updateUserById = (
@@ -74,24 +33,25 @@ export const useUserService = () => {
     errorMessage?: string,
     successMessage?: string
   ) => {
-    return patch<IUser>(APIRoutes.UPDATE_USER_BY_ID(id), payload).then(
-      (res) => {
-        if (res.status === 200) {
-          pushSuccess(
-            successMessage !== undefined ? successMessage : "User updated"
-          );
-        } else {
-          pushDanger(
-            errorMessage !== undefined ? errorMessage : "Cannot update user"
-          );
+    return patch<IUser>(APIRoutes.USER_BY_ID(id), payload).then((res) => {
+      if (res.status === 200 && res.data) {
+        if (user && user.id === id) {
+          updateUser(res.data);
         }
-        return res;
+        pushSuccess(
+          successMessage !== undefined ? successMessage : "User updated"
+        );
+      } else {
+        pushDanger(
+          errorMessage !== undefined ? errorMessage : "Cannot update user"
+        );
       }
-    );
+      return res;
+    });
   };
 
   const deleteUser = (id: number) => {
-    return remove(APIRoutes.UPDATE_USER_BY_ID(id)).then((res) => {
+    return remove(APIRoutes.USER_BY_ID(id)).then((res) => {
       if (res.status === 200) {
         pushSuccess("User deleted");
       } else {
@@ -115,9 +75,7 @@ export const useUserService = () => {
   };
 
   return {
-    updateUsername,
-    updateEmail,
-    updatePassword,
+    getUserById,
     updateUserById,
     deleteAccount,
     deleteUser,

@@ -31,7 +31,7 @@ export const APIRoutes = {
     "/user/password" + token,
   RESET_PASSWORD: (token: string) => "/user/password" + token,
   GET_USERS: (confirmed: boolean) => "/users?confirmed=" + confirmed,
-  UPDATE_USER_BY_ID: (id: number) => "/users/" + id.toString(10),
+  USER_BY_ID: (id: number) => "/users/" + id.toString(10),
 
   // MEDIA SERVERS
   GET_MEDIA_SERVERS_LIBRARIES: (

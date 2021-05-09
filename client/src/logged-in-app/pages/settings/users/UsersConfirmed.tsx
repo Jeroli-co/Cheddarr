@@ -6,7 +6,6 @@ import {
 } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { UserSettingsModal } from "./UserSettingsModal";
 import { IUser } from "../../../../shared/models/IUser";
 import { usePagination } from "../../../../shared/hooks/usePagination";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
@@ -17,15 +16,19 @@ import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { PaginationArrows } from "../../../../shared/components/PaginationArrows";
 import { DeleteDataModal } from "../../../../shared/components/DeleteDataModal";
 import { useSession } from "../../../../shared/contexts/SessionContext";
+import { useHistory } from "react-router-dom";
+import { routes } from "../../../../router/routes";
+
+const Header = styled.div`
+  background: ${(props) => props.theme.primaryLight};
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 30px;
+  font-size: 20px;
+`;
 
 const Container = styled.div`
   background: ${(props) => props.theme.primary};
-  border-radius: 24px;
-
-  .footer {
-    display: flex;
-    justify-content: flex-end;
-  }
 `;
 
 const Item = styled.div`
@@ -36,51 +39,29 @@ const Item = styled.div`
 `;
 
 export const UsersConfirmed = () => {
-  const { updateUserById, deleteUser } = useUserService();
+  const { deleteUser } = useUserService();
   const {
     session: { user },
   } = useSession();
-
-  const [editUserModalState, setEditUserModalState] = useState<{
-    isOpen: boolean;
-    user: IUser | null;
-  }>({
-    isOpen: false,
-    user: null,
-  });
+  const history = useHistory();
 
   const [deleteUserModalState, setDeleteUserModalState] = useState<{
     isOpen: boolean;
     user: IUser | null;
   }>({ isOpen: false, user: null });
 
-  const { data, loadPrev, loadNext, updateData, deleteData } = usePagination<
-    IUser
-  >(APIRoutes.GET_USERS(true), true);
+  const { data, loadPrev, loadNext, deleteData } = usePagination<IUser>(
+    APIRoutes.GET_USERS(true),
+    true
+  );
 
-  const onUserEditClick = (user: IUser) => {
-    setEditUserModalState({ isOpen: true, user: user });
+  const onUserEditClick = (clickedUser: IUser) => {
+    history.push(routes.PROFILE.url(clickedUser.id.toString(10)));
+    // setEditUserModalState({ isOpen: true, user: user });
   };
 
-  const onRoleChange = (id: number, role: Roles) => {
-    updateUserById(
-      id,
-      { roles: role },
-      "Cannot update roles",
-      "Roles updated"
-    ).then((res) => {
-      if (res.status === 200 && res.data) {
-        const newRoles = res.data.roles;
-        updateData(
-          (u) => u.id === id,
-          (u) => (u.roles = newRoles)
-        );
-      }
-    });
-  };
-
-  const onDeleteUserClick = (user: IUser) => {
-    setDeleteUserModalState({ isOpen: true, user: user });
+  const onDeleteUserClick = (clickedUser: IUser) => {
+    setDeleteUserModalState({ isOpen: true, user: clickedUser });
   };
 
   const onDeleteUser = (id: number) => {
@@ -100,6 +81,9 @@ export const UsersConfirmed = () => {
 
   return (
     <>
+      <Header>
+        <p>Username</p>
+      </Header>
       <Container>
         {user &&
           data.data &&
@@ -122,22 +106,13 @@ export const UsersConfirmed = () => {
                 </div>
               )
           )}
-        {data.data && data.data.results && data.data.results.length > 1 && (
-          <PaginationArrows
-            currentPage={data.data?.page}
-            totalPages={data.data?.totalPages}
-            onLoadPrev={() => loadPrev()}
-            onLoadNext={() => loadNext()}
-          />
-        )}
       </Container>
-      {editUserModalState.isOpen && editUserModalState.user && (
-        <UserSettingsModal
-          closeModal={() =>
-            setEditUserModalState({ isOpen: false, user: null })
-          }
-          onRoleChange={onRoleChange}
-          publicUser={editUserModalState.user}
+      {data.data && data.data.results && data.data.results.length > 1 && (
+        <PaginationArrows
+          currentPage={data.data?.page}
+          totalPages={data.data?.totalPages}
+          onLoadPrev={() => loadPrev()}
+          onLoadNext={() => loadNext()}
         />
       )}
       {deleteUserModalState.isOpen && deleteUserModalState.user && (
