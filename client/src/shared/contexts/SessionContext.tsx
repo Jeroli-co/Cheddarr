@@ -1,16 +1,16 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import Cookies from "js-cookie";
-import { ISession, SessionDefaultImpl } from "../models/ISession";
-import { IEncodedToken } from "../models/IEncodedToken";
-import { routes } from "../../router/routes";
-import { instance } from "../../axiosInstance";
-import { APIRoutes } from "../enums/APIRoutes";
-import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
-import { useLocation } from "react-router-dom";
-import { useHistory } from "react-router";
-import { useAlert } from "./AlertContext";
-import { useAPI } from "../hooks/useAPI";
-import { IUser } from "../models/IUser";
+import {ISession, SessionDefaultImpl} from "../models/ISession";
+import {IEncodedToken} from "../models/IEncodedToken";
+import {routes} from "../../router/routes";
+import {instance} from "../../axiosInstance";
+import {APIRoutes} from "../enums/APIRoutes";
+import {ERRORS_MESSAGE} from "../enums/ErrorsMessage";
+import {useLocation} from "react-router-dom";
+import {useHistory} from "react-router";
+import {useAlert} from "./AlertContext";
+import {useAPI} from "../hooks/useAPI";
+import {IUser} from "../models/IUser";
 
 interface ISessionContextInterface {
   session: ISession;
@@ -34,7 +34,7 @@ export const SessionContextProvider = (props: any) => {
   const [session, setSession] = useState(SessionDefaultImpl);
   const location = useLocation();
   const history = useHistory();
-  const { pushDanger } = useAlert();
+  const { pushDanger, pushSuccess } = useAlert();
   const { get } = useAPI();
 
   useEffect(() => {
@@ -44,10 +44,16 @@ export const SessionContextProvider = (props: any) => {
           .get<IEncodedToken>(APIRoutes.CONFIRM_PLEX_SIGN_IN(location.search))
           .then(
             (res) => {
-              initSession(res.data);
-              let redirectURI = res.headers["redirect-uri"];
-              if (redirectURI && redirectURI.length > 0) {
-                history.push(redirectURI);
+              if (res.status === 200) {
+                initSession(res.data);
+                let redirectURI = res.headers["redirect-uri"];
+                if (redirectURI && redirectURI.length > 0) {
+                  history.push(redirectURI);
+                }
+              } else if (res.status === 201) {
+                pushSuccess("Account created");
+                setSession({ ...session, isLoading: false });
+                history.push(routes.SIGN_IN.url(""));
               }
             },
             (error) => {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
+import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
 import { routes } from "../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../shared/enums/FormDefaultValidators";
@@ -157,7 +157,7 @@ const SignUpForm = () => {
 
             <CenteredContent>
               <PlexButton
-                text="Sign in with Plex"
+                text="Sign up with Plex"
                 onClick={() => signInWithPlex()}
               />
             </CenteredContent>

@@ -30,10 +30,9 @@ instance.interceptors.request.use(
 
     if (request.url?.startsWith(routes.SIGN_IN.url())) {
       request.headers.post["Content-Type"] = FORM_URL_ENCODED_TYPE;
-    } else if (!request.url?.startsWith(routes.CONFIRM_PLEX_SIGNIN.url)) {
+    } else {
       if (request.data) {
         request.data = humps.decamelizeKeys(request.data);
-        console.log(request.data);
       }
     }
 
