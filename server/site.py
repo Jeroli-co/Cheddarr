@@ -7,29 +7,29 @@ from fastapi.templating import Jinja2Templates
 from server.core.config import config
 
 site_routes = [
-    Mount("/images", StaticFiles(directory=str(config.IMAGES_FOLDER)), name="images"),
+    Mount("/images", StaticFiles(directory=str(config.images_folder)), name="images"),
     Mount(
         "/static",
-        StaticFiles(directory=str(config.REACT_STATIC_FOLDER)),
+        StaticFiles(directory=str(config.react_static_folder)),
         name="static",
     ),
 ]
 site = FastAPI(routes=site_routes, docs_url=None, redoc_url=None)
-site_templates = Jinja2Templates(str(config.REACT_BUILD_FOLDER))
+site_templates = Jinja2Templates(str(config.react_build_folder))
 
 
 @site.get("/favicon.ico")
 async def favicon():
-    return FileResponse(str(config.REACT_BUILD_FOLDER / "favicon.ico"))
+    return FileResponse(str(config.react_build_folder / "favicon.ico"))
 
 
 @site.get("/manifest.json")
 async def manifest():
-    return FileResponse(str(config.REACT_BUILD_FOLDER / "manifest.json"))
+    return FileResponse(str(config.react_build_folder / "manifest.json"))
 
 
 @site.get("{path:path}")
 async def index(request: Request, path: str):
-    if path.startswith(config.API_PREFIX):
+    if path.startswith(config.api_prefix):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     return site_templates.TemplateResponse("index.html", {"request": request})

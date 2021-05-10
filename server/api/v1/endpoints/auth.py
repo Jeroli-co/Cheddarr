@@ -93,11 +93,11 @@ async def signin(
 @router.get("/sign-in/plex")
 async def start_signin_plex():
     request_pin_url = utils.make_url(
-        config.PLEX_TOKEN_URL,
+        config.plex_token_url,
         queries_dict={
             "strong": "true",
             "X-Plex-Product": "Cheddarr",
-            "X-Plex-Client-Identifier": config.PLEX_CLIENT_IDENTIFIER,
+            "X-Plex-Client-Identifier": config.plex_client_identifier,
         },
     )
     return request_pin_url
@@ -106,7 +106,7 @@ async def start_signin_plex():
 @router.post("/sign-in/plex/authorize")
 async def authorize_signin_plex(request: Request, auth_data: PlexAuthorizeSignin):
     forward_url = re.sub(
-        f"{config.API_PREFIX}/v[0-9]+", "", request.url_for("confirm_signin_plex")
+        f"{config.api_prefix}/v[0-9]+", "", request.url_for("confirm_signin_plex")
     )
     token = security.generate_token(
         {
@@ -118,10 +118,10 @@ async def authorize_signin_plex(request: Request, auth_data: PlexAuthorizeSignin
     )
     authorize_url = (
         utils.make_url(
-            config.PLEX_AUTHORIZE_URL,
+            config.plex_authorize_url,
             queries_dict={
                 "context[device][product]": "Cheddarr",
-                "clientID": config.PLEX_CLIENT_IDENTIFIER,
+                "clientID": config.plex_client_identifier,
                 "code": auth_data.code,
                 "forwardUrl": forward_url,
             },
@@ -153,10 +153,10 @@ async def confirm_signin_plex(
     user_id = token.get("user_id", None)
 
     access_url = utils.make_url(
-        config.PLEX_TOKEN_URL + state,
+        config.plex_token_url + state,
         queries_dict={
             "code": code,
-            "X-Plex-Client-Identifier": config.PLEX_CLIENT_IDENTIFIER,
+            "X-Plex-Client-Identifier": config.plex_client_identifier,
         },
     )
 
@@ -167,7 +167,7 @@ async def confirm_signin_plex(
 
         resp = await HttpClient.request(
             "GET",
-            config.PLEX_USER_RESOURCE_URL,
+            config.plex_user_resource_url,
             headers={"X-Plex-Token": auth_token, "Accept": "application/json"},
         )
     except HTTPException as e:

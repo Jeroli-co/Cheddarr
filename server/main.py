@@ -15,11 +15,11 @@ def setup_app() -> FastAPI:
         on_startup=[on_start_up],
         on_shutdown=[on_shutdown],
     )
-    application.mount(f"{config.API_PREFIX}/{router.version}", router.application)
+    application.mount(f"{config.api_prefix}/{router.version}", router.application)
     application.mount("/", site)
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in config.BACKEND_CORS_ORIGINS],
+        allow_origins=[str(origin) for origin in config.backend_cors_origin],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

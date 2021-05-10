@@ -27,23 +27,23 @@ LOGGING_CONFIG = {
         "file": {
             "formatter": "file",
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": config.LOGS_FOLDER / config.LOGS_FILENAME,
+            "filename": config.logs_folder / config.logs_filename,
             "when": "midnight",
             "interval": 1,
             "utc": True,
             "encoding": "utf-8",
-            "backupCount": config.LOGS_MAX_FILES,
+            "backupCount": config.logs_max_files,
         },
     },
     "loggers": {
         "gunicorn.error": {
             "handlers": ["console", "file"],
-            "level": config.LOG_LEVEL,
+            "level": config.log_level,
         },
     },
     "root": {
         "handlers": ["console", "file"],
-        "level": config.LOG_LEVEL,
+        "level": config.log_level,
     },
 }
 

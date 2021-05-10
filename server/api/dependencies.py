@@ -49,7 +49,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, config.SECRET_KEY, algorithms=config.SIGNING_ALGORITHM)
+        payload = jwt.decode(token, config.secret_key, algorithms=config.signing_algorithm)
         token_data = TokenPayload.parse_obj(payload)
     except (jwt.InvalidTokenError, ValidationError):
         raise credentials_exception

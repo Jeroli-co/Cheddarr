@@ -22,7 +22,7 @@ router = APIRouter()
 )
 def get_logs(page: int = 1, per_page: int = 50):
     logs = []
-    with open(config.LOGS_FOLDER / config.LOGS_FILENAME) as logfile:
+    with open(config.logs_folder / config.logs_filename) as logfile:
         start = (page - 1) * per_page
         end = page * per_page
         lines = logfile.readlines()

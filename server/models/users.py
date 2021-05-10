@@ -30,7 +30,7 @@ class User(Model, Timestamp):
     password_hash = Column(String, nullable=False)
     avatar = Column(String, default=get_random_avatar())
     confirmed = Column(Boolean, nullable=False, default=False)
-    roles = Column(Integer, default=config.DEFAULT_ROLES)
+    roles = Column(Integer, default=config.default_roles)
     plex_user_id = Column(Integer)
     plex_api_key = Column(String)
 

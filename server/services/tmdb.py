@@ -17,7 +17,7 @@ from server.schemas.media import (
     TmdbSeries,
 )
 
-tmdb.API_KEY = config.TMDB_API_KEY
+tmdb.API_KEY = config.tmdb_api_key
 
 
 async def search_tmdb_media(

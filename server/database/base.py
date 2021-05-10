@@ -45,7 +45,7 @@ class DateTime(TypeDecorator):
 
     def process_result_value(self, value, engine):
         if value is not None:
-            value = value.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(config.TZ))
+            value = value.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(config.tz))
         return value
 
 
