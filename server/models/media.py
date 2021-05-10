@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import backref, declared_attr, relationship
 
@@ -47,6 +48,7 @@ class MediaServerContent(object):
 
 class MediaServerMedia(Model, MediaServerContent):
     __repr_props__ = ("media", "server")
+    __table_args__ = (UniqueConstraint("media_id", "server_library_id"),)
 
     media_id = Column(ForeignKey("media.id"), nullable=False)
     server_library_id = Column(ForeignKey("mediaserverlibrary.id"))
@@ -66,6 +68,7 @@ class MediaServerMedia(Model, MediaServerContent):
 
 class MediaServerSeason(Model, MediaServerContent):
     __repr_props__ = ("season_number",)
+    __table_args__ = (UniqueConstraint("server_media_id", "season_number"),)
 
     season_number = Column(Integer, nullable=False)
     server_media_id = Column(ForeignKey("mediaservermedia.id"), nullable=False)
@@ -85,6 +88,7 @@ class MediaServerSeason(Model, MediaServerContent):
 
 class MediaServerEpisode(Model, MediaServerContent):
     __repr_props__ = ("episode_number",)
+    __table_args__ = (UniqueConstraint("season_id", "episode_number"),)
 
     episode_number = Column(Integer, nullable=False)
     season_id = Column(ForeignKey("mediaserverseason.id"), nullable=False)

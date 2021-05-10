@@ -16,7 +16,7 @@ router = APIRouter()
 @router.get(
     "/{tmdb_id:int}",
     response_model=MovieSchema,
-    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
     response_model_exclude={"requests": {"__all__": {"media"}}},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No movie found"},
@@ -33,13 +33,16 @@ async def get_movie(
     movie = await tmdb.get_tmdb_movie(tmdb_id)
     if movie is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Movie not found.")
-    await set_media_db_info(movie, current_user.id, server_media_repo, request_repo)
+    await set_media_db_info(movie, server_media_repo, current_user.id, request_repo)
 
     return movie
 
 
 @router.get(
-    "/recent", dependencies=[Depends(deps.get_current_user)], response_model=MediaSearchResult
+    "/recent",
+    dependencies=[Depends(deps.get_current_user)],
+    response_model=MediaSearchResult,
+    response_model_exclude_unset=True,
 )
 async def get_recently_added_movies(
     page: int = 1,
@@ -56,27 +59,31 @@ async def get_recently_added_movies(
         media_type=MediaType.movie, page=page, per_page=per_page
     )
     recent_movies = []
-    for movie in servers_recent_movies:
-        tmdb_movie = await tmdb.get_tmdb_movie(movie.media.tmdb_id)
-        tmdb_movie.media_servers_info = [PlexMediaInfo(**movie.as_dict())]
-        recent_movies.append(tmdb_movie)
+    for server_movie in servers_recent_movies:
+        movie = server_movie.media
+        movie.media_servers_info = [PlexMediaInfo(**server_movie.as_dict())]
+        recent_movies.append(movie)
 
     return MediaSearchResult(
         page=page, total_pages=total_pages, total_results=total_results, results=recent_movies
     )
 
 
-@router.get("/popular", response_model=MediaSearchResult, response_model_exclude_none=True)
+@router.get(
+    "/popular",
+    dependencies=[Depends(deps.get_current_user)],
+    response_model=MediaSearchResult,
+    response_model_exclude_unset=True,
+)
 async def get_popular_movies(
     page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
     server_media_repo: MediaServerMediaRepository = Depends(
         deps.get_repository(MediaServerMediaRepository)
     ),
 ):
     popular_movies, total_pages, total_results = await tmdb.get_tmdb_popular_movies(page=page)
     for movie in popular_movies:
-        await set_media_db_info(movie, current_user.id, server_media_repo)
+        await set_media_db_info(movie, server_media_repo)
 
     return MediaSearchResult(
         results=popular_movies,
@@ -86,17 +93,21 @@ async def get_popular_movies(
     )
 
 
-@router.get("/upcoming", response_model=MediaSearchResult, response_model_exclude_none=True)
+@router.get(
+    "/upcoming",
+    dependencies=[Depends(deps.get_current_user)],
+    response_model=MediaSearchResult,
+    response_model_exclude_unset=True,
+)
 async def get_upcoming_movies(
     page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
     server_media_repo: MediaServerMediaRepository = Depends(
         deps.get_repository(MediaServerMediaRepository)
     ),
 ):
     upcoming_movies, total_pages, total_results = await tmdb.get_tmdb_upcoming_movies(page=page)
     for movie in upcoming_movies:
-        await set_media_db_info(movie, current_user.id, server_media_repo)
+        await set_media_db_info(movie, server_media_repo)
 
     return MediaSearchResult(
         results=upcoming_movies,
@@ -107,12 +118,14 @@ async def get_upcoming_movies(
 
 
 @router.get(
-    "/{tmdb_id:int}/similar", response_model=MediaSearchResult, response_model_exclude_none=True
+    "/{tmdb_id:int}/similar",
+    dependencies=[Depends(deps.get_current_user)],
+    response_model=MediaSearchResult,
+    response_model_exclude_unset=True,
 )
 async def get_similar_movies(
     tmdb_id: int,
     page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
     server_media_repo: MediaServerMediaRepository = Depends(
         deps.get_repository(MediaServerMediaRepository)
     ),
@@ -121,7 +134,7 @@ async def get_similar_movies(
         tmdb_id=tmdb_id, page=page
     )
     for movie in similar_movies:
-        await set_media_db_info(movie, current_user.id, server_media_repo)
+        await set_media_db_info(movie, server_media_repo)
 
     return MediaSearchResult(
         results=similar_movies,
@@ -133,13 +146,13 @@ async def get_similar_movies(
 
 @router.get(
     "/{tmdb_id:int}/recommended",
+    dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
 )
 async def get_recommended_movies(
     tmdb_id: int,
     page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
     server_media_repo: MediaServerMediaRepository = Depends(
         deps.get_repository(MediaServerMediaRepository)
     ),
@@ -148,7 +161,7 @@ async def get_recommended_movies(
         tmdb_id=tmdb_id, page=page
     )
     for movie in recommended_movies:
-        await set_media_db_info(movie, current_user.id, server_media_repo)
+        await set_media_db_info(movie, server_media_repo)
 
     return MediaSearchResult(
         results=recommended_movies,

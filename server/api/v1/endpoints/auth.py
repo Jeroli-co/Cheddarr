@@ -9,7 +9,7 @@ from fastapi import (
     Response,
     status,
 )
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
 from server.api import dependencies as deps
@@ -79,12 +79,7 @@ async def signin(
             "This account's email needs to be confirmed.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    payload = TokenPayload(
-        sub=str(user.id),
-        username=user.username,
-        avatar=user.avatar,
-        roles=user.roles,
-    )
+    payload = TokenPayload(sub=str(user.id))
     access_token = security.create_jwt_access_token(payload)
     token = Token(
         access_token=access_token,
@@ -117,7 +112,8 @@ async def authorize_signin_plex(request: Request, auth_data: PlexAuthorizeSignin
         {
             "id": auth_data.key,
             "code": auth_data.code,
-            "redirectUri": auth_data.redirect_uri,
+            "redirect_uri": auth_data.redirect_uri,
+            "user_id": auth_data.user_id,
         }
     )
     authorize_url = (
@@ -142,6 +138,7 @@ async def authorize_signin_plex(request: Request, auth_data: PlexAuthorizeSignin
     response_model=Token,
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Plex authorization error"},
+        status.HTTP_201_CREATED: {"model": UserSchema, "decription": "User created"},
     },
 )
 async def confirm_signin_plex(
@@ -152,7 +149,9 @@ async def confirm_signin_plex(
     token = security.confirm_token(token)
     state = token.get("id")
     code = token.get("code")
-    redirect_uri = token.get("redirectUri", "")
+    redirect_uri = token.get("redirect_uri", "")
+    user_id = token.get("user_id", None)
+
     access_url = utils.make_url(
         config.PLEX_TOKEN_URL + state,
         queries_dict={
@@ -186,26 +185,42 @@ async def confirm_signin_plex(
     # Find this plex account in the database, or create it with the corresponding user
     user = await user_repo.find_by(plex_user_id=plex_user_id)
     if user is None:
-        user = await user_repo.find_by_email(plex_email)
-        if user is None:
-            if await user_repo.find_by_username(plex_username) is not None:
-                plex_username = "{}{}".format(plex_username, randrange(1, 999))
-            user = User(
-                username=plex_username,
-                email=plex_email,
-                password=security.get_random_password(),
-                plex_user_id=plex_user_id,
-                plex_api_key=auth_token,
-                avatar=plex_avatar,
-                confirmed=True,
-            )
-            # First signed-up user
-            if await user_repo.count() == 0:
-                user.roles = UserRole.admin
+        if user_id is not None:
+            user = await user_repo.find_by(id=user_id)
+            if user is None:
+                raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this id exist")
+        else:
+            user = await user_repo.find_by_email(plex_email)
+            if user is None:
+                if await user_repo.find_by_username(plex_username) is not None:
+                    plex_username = "{}{}".format(plex_username, randrange(1, 999))
+                user = User(
+                    username=plex_username,
+                    email=plex_email,
+                    password=security.get_random_password(),
+                    plex_user_id=plex_user_id,
+                    plex_api_key=auth_token,
+                    avatar=plex_avatar,
+                )
+                # First signed-up user
+                if await user_repo.count() == 0:
+                    user.roles = UserRole.admin
+                    user.confirmed = True
+                await user_repo.save(user)
+                return JSONResponse(
+                    UserSchema.from_orm(user).json(),
+                    status.HTTP_201_CREATED,
+                    headers={"redirect-uri": redirect_uri},
+                )
 
     # Update the Plex account with the API key (possibly different at each login)
-    user.plex_user_id = plex_user_id
+    if user.plex_user_id is None:
+        user.plex_user_id = plex_user_id
+    if user.email is None:
+        user.email = plex_email
+    user.avatar = plex_avatar
     user.plex_api_key = auth_token
+
     await user_repo.save(user)
 
     payload = TokenPayload(

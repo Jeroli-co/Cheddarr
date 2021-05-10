@@ -7,11 +7,12 @@ from passlib import pwd
 from passlib.context import CryptContext
 
 from server.core.config import config
+from server.schemas.auth import TokenPayload
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_jwt_access_token(payload, expires_delta: timedelta = None) -> str:
+def create_jwt_access_token(payload: TokenPayload, expires_delta: timedelta = None) -> str:
     to_encode = payload.dict()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta

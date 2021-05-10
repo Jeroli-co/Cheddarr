@@ -58,8 +58,8 @@ async def send_movie_request(request: MovieRequest, provider: MediaProviderSetti
 
 async def set_media_db_info(
     media: MediaSchema,
-    current_user_id: int,
     server_media_repo: MediaServerMediaRepository,
+    current_user_id: int = None,
     request_repo: MediaRequestRepository = None,
 ):
     db_media = await server_media_repo.find_by_media_external_id(
@@ -101,12 +101,10 @@ async def set_episode_db_info(
     episode_repo: MediaServerEpisodeRepository,
 ):
 
-    db_episode = (
-        await episode_repo.find_by_external_id_and_season_number_and_episode_number(
-            tmdb_id=series_tmdb_id,
-            season_number=season_number,
-            episode_number=episode.episode_number,
-        )
+    db_episode = await episode_repo.find_by_external_id_and_season_number_and_episode_number(
+        tmdb_id=series_tmdb_id,
+        season_number=season_number,
+        episode_number=episode.episode_number,
     )
     if db_episode is not None:
         episode.media_servers_info = [

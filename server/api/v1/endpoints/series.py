@@ -25,7 +25,7 @@ router = APIRouter()
 @router.get(
     "/{tmdb_id:int}",
     response_model=SeriesSchema,
-    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
     response_model_exclude={"requests": {"__all__": {"media"}}},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No series found"},
@@ -46,7 +46,7 @@ async def get_series(
     if series is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Series not found.")
 
-    await set_media_db_info(series, current_user.id, server_media_repo, request_repo)
+    await set_media_db_info(series, server_media_repo, current_user.id, request_repo)
     if series.media_servers_info:
         for season in series.seasons:
             await set_season_db_info(season, tmdb_id, server_season_repo)
@@ -56,8 +56,9 @@ async def get_series(
 
 @router.get(
     "/{tmdb_id:int}/seasons/{season_number}",
+    dependencies=[Depends(deps.get_current_user)],
     response_model=SeasonSchema,
-    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No season found"},
     },
@@ -65,7 +66,6 @@ async def get_series(
 async def get_season(
     tmdb_id: int,
     season_number: int,
-    current_user: User = Depends(deps.get_current_user),
     server_season_repo: MediaServerSeasonRepository = Depends(
         deps.get_repository(MediaServerSeasonRepository)
     ),
@@ -80,17 +80,16 @@ async def get_season(
     await set_season_db_info(season, tmdb_id, server_season_repo)
     if season.media_servers_info:
         for episode in season.episodes:
-            await set_episode_db_info(
-                episode, tmdb_id, season_number, server_episode_repo
-            )
+            await set_episode_db_info(episode, tmdb_id, season_number, server_episode_repo)
 
     return season
 
 
 @router.get(
     "/{tmdb_id:int}/seasons/{season_number}/episodes/{episode_number}",
+    dependencies=[Depends(deps.get_current_user)],
     response_model=EpisodeSchema,
-    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No episode found"},
     },
@@ -99,7 +98,6 @@ async def get_episode(
     tmdb_id: int,
     season_number: int,
     episode_number: int,
-    current_user: User = Depends(deps.get_current_user),
     server_episode_repo: MediaServerEpisodeRepository = Depends(
         deps.get_repository(MediaServerEpisodeRepository)
     ),
@@ -117,11 +115,11 @@ async def get_episode(
     "/recent",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
+    response_model_exclude_unset=True,
 )
 async def get_recently_added_series(
     page: int = 1,
     per_page: int = 10,
-    current_user: User = Depends(deps.get_current_user),
     server_media_repo: MediaServerMediaRepository = Depends(
         deps.get_repository(MediaServerMediaRepository)
     ),
@@ -134,27 +132,31 @@ async def get_recently_added_series(
         media_type=MediaType.series, per_page=per_page, page=page
     )
     recent_series = []
-    for series in servers_recent_series:
-        tmdb_series = await tmdb.get_tmdb_series(series.media.tmdb_id)
-        tmdb_series.media_servers_info = [PlexMediaInfo(**series.as_dict())]
-        recent_series.append(tmdb_series)
+    for server_series in servers_recent_series:
+        series = server_series.media
+        series.media_servers_info = [PlexMediaInfo(**server_series.as_dict())]
+        recent_series.append(series)
 
     return MediaSearchResult(
         page=page, total_pages=total_pages, total_results=total_results, results=recent_series
     )
 
 
-@router.get("/popular", response_model=MediaSearchResult, response_model_exclude_none=True)
+@router.get(
+    "/popular",
+    dependencies=[Depends(deps.get_current_user)],
+    response_model=MediaSearchResult,
+    response_model_exclude_unset=True,
+)
 async def get_popular_series(
     page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
     server_media_repo: MediaServerMediaRepository = Depends(
         deps.get_repository(MediaServerMediaRepository)
     ),
 ):
     popular_series, total_pages, total_results = await tmdb.get_tmdb_popular_series(page=page)
     for series in popular_series:
-        await set_media_db_info(series, current_user.id, server_media_repo)
+        await set_media_db_info(series, server_media_repo)
 
     return MediaSearchResult(
         results=popular_series,
@@ -165,12 +167,14 @@ async def get_popular_series(
 
 
 @router.get(
-    "/{tmdb_id:int}/similar", response_model=MediaSearchResult, response_model_exclude_none=True
+    "/{tmdb_id:int}/similar",
+    dependencies=[Depends(deps.get_current_user)],
+    response_model=MediaSearchResult,
+    response_model_exclude_unset=True,
 )
 async def get_similar_series(
     tmdb_id: int,
     page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
     server_media_repo: MediaServerMediaRepository = Depends(
         deps.get_repository(MediaServerMediaRepository)
     ),
@@ -179,7 +183,7 @@ async def get_similar_series(
         tmdb_id=tmdb_id, page=page
     )
     for series in similar_series:
-        await set_media_db_info(series, current_user.id, server_media_repo)
+        await set_media_db_info(series, server_media_repo)
 
     return MediaSearchResult(
         results=similar_series,
@@ -191,13 +195,13 @@ async def get_similar_series(
 
 @router.get(
     "/{tmdb_id:int}/recommended",
+    dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_none=True,
+    response_model_exclude_unset=True,
 )
 async def get_recommended_series(
     tmdb_id: int,
     page: int = 1,
-    current_user: User = Depends(deps.get_current_user),
     server_media_repo: MediaServerMediaRepository = Depends(
         deps.get_repository(MediaServerMediaRepository)
     ),
@@ -206,7 +210,7 @@ async def get_recommended_series(
         tmdb_id=tmdb_id, page=page
     )
     for series in recommended_series:
-        await set_media_db_info(series, current_user.id, server_media_repo)
+        await set_media_db_info(series, server_media_repo)
 
     return MediaSearchResult(
         results=recommended_series,
