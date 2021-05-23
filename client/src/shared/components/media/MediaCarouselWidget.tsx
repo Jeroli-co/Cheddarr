@@ -31,6 +31,7 @@ type MediaCarouselWidgetProps = {
 
 export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   const [media, setMedia] = useState<IMedia[]>([]);
+  const [mediaTmp, setMediaTmp] = useState<IMedia[]>([]);
   const [hidden, setHidden] = useState(false);
   const { data, loadPrev, loadNext } = usePagination<IMedia>(props.url, false);
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -38,30 +39,41 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
 
   useEffect(() => {
     if (data.data && data.data.results) {
-      const mediaCopy = media;
       setMedia([...media, ...data.data.results]);
       if (props.hasToGetFullMedia) {
-        const paginatedDataCopy = [];
-        data.data.results.forEach((m, index) => {
+        let dataTmp: IMedia[] = [];
+        data.data.results.forEach((m) => {
           if (m.mediaType === MediaTypes.MOVIES) {
             get<IMedia>(APIRoutes.GET_MOVIE(m.tmdbId)).then((r) => {
               if (r.data) {
-                paginatedDataCopy.push(r.data);
+                dataTmp.push(r.data);
               }
             });
           } else if (m.mediaType === MediaTypes.SERIES) {
             get<IMedia>(APIRoutes.GET_SERIES(m.tmdbId)).then((r) => {
               if (r.data) {
-                paginatedDataCopy.push(r.data);
+                dataTmp.push(r.data);
               }
             });
           }
         });
-        setMedia([...mediaCopy, ...paginatedDataCopy]);
+        setMediaTmp(dataTmp);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.data]);
+
+  useEffect(() => {
+    if (mediaTmp.length) {
+      let mediaCopy = media;
+      mediaCopy.splice(
+        mediaCopy.length - (mediaTmp.length + 1),
+        mediaTmp.length,
+        ...mediaTmp
+      );
+      setMedia(mediaCopy);
+    }
+  }, [mediaTmp]);
 
   useEffect(() => {
     if (loaderRef.current && media.length > 0) {
