@@ -109,10 +109,6 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
   const location = useLocation();
   const poster = useImage(media.posterUrl);
 
-  useEffect(() => {
-    console.log(media);
-  }, [media]);
-
   const onCardClick = () => {
     const getSeasonUrl = () => {
       let url = null;

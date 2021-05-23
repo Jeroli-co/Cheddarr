@@ -42,10 +42,15 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
       setMedia([...media, ...data.data.results]);
       if (props.hasToGetFullMedia) {
         let dataTmp: IMedia[] = [];
+        console.log(data.data.results);
         data.data.results.forEach((m) => {
+          console.log("1");
           if (m.mediaType === MediaTypes.MOVIES) {
+            console.log("2");
             get<IMedia>(APIRoutes.GET_MOVIE(m.tmdbId)).then((r) => {
+              console.log("3");
               if (r.data) {
+                console.log("4");
                 dataTmp.push(r.data);
               }
             });
@@ -57,13 +62,17 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
             });
           }
         });
+        console.log("5");
+        console.log(dataTmp);
         setMediaTmp(dataTmp);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.data]);
+  }, [data]);
 
   useEffect(() => {
+    console.log(mediaTmp);
+    /*
     if (mediaTmp.length) {
       let mediaCopy = media;
       mediaCopy.splice(
@@ -73,6 +82,8 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
       );
       setMedia(mediaCopy);
     }
+
+     */
   }, [mediaTmp]);
 
   useEffect(() => {
