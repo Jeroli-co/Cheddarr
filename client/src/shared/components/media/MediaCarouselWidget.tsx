@@ -32,64 +32,36 @@ type MediaCarouselWidgetProps = {
 export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   const [media, setMedia] = useState<IMedia[]>([]);
   const [hidden, setHidden] = useState(false);
-  const { data, loadPrev, loadNext, updateData } = usePagination<IMedia>(
-    props.url,
-    false
-  );
+  const { data, loadPrev, loadNext } = usePagination<IMedia>(props.url, false);
   const loaderRef = useRef<HTMLDivElement>(null);
   const { get } = useAPI();
-  const [hasMissingImage, setHasMissingImage] = useState(false);
 
   useEffect(() => {
     if (data.data && data.data.results) {
+      const mediaCopy = media;
       setMedia([...media, ...data.data.results]);
+      if (props.hasToGetFullMedia) {
+        const paginatedDataCopy = data.data.results;
+        paginatedDataCopy.forEach((m) => {
+          if (m.mediaType === MediaTypes.MOVIES) {
+            get<IMedia>(APIRoutes.GET_MOVIE(m.tmdbId)).then((r) => {
+              if (r.data) {
+                m = r.data;
+              }
+            });
+          } else if (m.mediaType === MediaTypes.SERIES) {
+            get<IMedia>(APIRoutes.GET_SERIES(m.tmdbId)).then((r) => {
+              if (r.data) {
+                m = r.data;
+              }
+            });
+          }
+        });
+        setMedia([...mediaCopy, ...paginatedDataCopy]);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.data]);
-
-  useEffect(() => {
-    if (
-      !hasMissingImage &&
-      props.hasToGetFullMedia &&
-      data.data &&
-      data.data.results &&
-      media
-    ) {
-      data.data.results.forEach((m) => {
-        if (m.mediaType === MediaTypes.MOVIES) {
-          get<IMedia>(APIRoutes.GET_MOVIE(m.tmdbId)).then((r) =>
-            updateData(
-              (e) => e.id === r.data.id,
-              (e) => (e = r.data)
-            )
-          );
-        } else if (m.mediaType === MediaTypes.SERIES) {
-          get<IMedia>(APIRoutes.GET_SERIES(m.tmdbId)).then((r) =>
-            updateData(
-              (e) => e.id === r.data.id,
-              (e) => (e = r.data)
-            )
-          );
-        }
-      });
-      setHasMissingImage(true);
-    } else if (hasMissingImage) {
-      setHasMissingImage(false);
-    }
-  }, [media]);
-
-  useEffect(() => {
-    if (hasMissingImage && data && data.data && data.data.results) {
-      const mediaCopy = [...media];
-      const dataLength = data.data.results.length;
-      mediaCopy.splice(
-        mediaCopy.length - (dataLength + 1),
-        dataLength,
-        data.data.results
-      );
-      setMedia(mediaCopy);
-    }
-  }, [hasMissingImage]);
 
   useEffect(() => {
     if (loaderRef.current && media.length > 0) {
