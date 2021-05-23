@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
 import { MediaTag, SuccessIconTag } from "../Tag";
@@ -19,6 +19,8 @@ import { routes } from "../../../router/routes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
 import { RequestButton } from "../requests/RequestButton";
+import { APIRoutes } from "../../enums/APIRoutes";
+import { useAPI } from "../../hooks/useAPI";
 
 const logo = require("../../../assets/cheddarr-min.svg");
 
@@ -105,26 +107,51 @@ type MediaPreviewCardProps = {
 };
 
 export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
+  const [fullyLoadedMedia, setFullyLoadedMedia] = useState<IMedia | null>(null);
   const history = useHistory();
   const location = useLocation();
-  const poster = useImage(media.posterUrl);
+  const poster = useImage(fullyLoadedMedia && fullyLoadedMedia.posterUrl);
+  const { get } = useAPI();
+
+  useEffect(() => {
+    setFullyLoadedMedia(media);
+  }, [media]);
+
+  useEffect(() => {
+    if (fullyLoadedMedia && !fullyLoadedMedia.posterUrl) {
+      if (fullyLoadedMedia.mediaType === MediaTypes.MOVIES) {
+        get<IMedia>(APIRoutes.GET_MOVIE(fullyLoadedMedia.tmdbId)).then((r) => {
+          if (r.data) {
+            setFullyLoadedMedia(r.data);
+          }
+        });
+      } else if (fullyLoadedMedia.mediaType === MediaTypes.SERIES) {
+        get<IMedia>(APIRoutes.GET_SERIES(fullyLoadedMedia.tmdbId)).then((r) => {
+          if (r.data) {
+            setFullyLoadedMedia(r.data);
+          }
+        });
+      }
+    }
+  }, [fullyLoadedMedia]);
 
   const onCardClick = () => {
     const getSeasonUrl = () => {
       let url = null;
-      if (isSeason(media)) {
+      if (isSeason(fullyLoadedMedia)) {
         const splitUrl = location.pathname.split("/");
         if (splitUrl.length > 3) {
           const index = splitUrl.findIndex((s) => s === MediaTypes.SEASONS);
           if (index !== -1 && index + 1 < splitUrl.length) {
-            splitUrl[index + 1] = media.seasonNumber.toString();
+            splitUrl[index + 1] = fullyLoadedMedia.seasonNumber.toString();
             if (index + 1 < splitUrl.length - 1) {
               splitUrl.splice(index + 2, splitUrl.length - index + 1);
             }
             url = splitUrl.join("/");
           }
         } else {
-          url = splitUrl.join("/") + "/seasons/" + media.seasonNumber;
+          url =
+            splitUrl.join("/") + "/seasons/" + fullyLoadedMedia.seasonNumber;
         }
       }
       return url;
@@ -132,67 +159,80 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
 
     const getEpisodeUrl = () => {
       let url = null;
-      if (isEpisode(media)) {
+      if (isEpisode(fullyLoadedMedia)) {
         const splitUrl = location.pathname.split("/");
         if (splitUrl.length > 5) {
           const index = splitUrl.findIndex((s) => s === MediaTypes.EPISODES);
           if (index !== -1 && index + 1 < splitUrl.length) {
-            splitUrl[index + 1] = media.episodeNumber.toString();
+            splitUrl[index + 1] = fullyLoadedMedia.episodeNumber.toString();
             url = splitUrl.join("/");
           }
         } else {
-          url = splitUrl.join("/") + "/episodes/" + media.episodeNumber;
+          url =
+            splitUrl.join("/") + "/episodes/" + fullyLoadedMedia.episodeNumber;
         }
       }
       return url;
     };
 
-    const uri =
-      media.mediaType === MediaTypes.MOVIES
-        ? routes.MOVIE.url(media.tmdbId)
-        : media.mediaType === MediaTypes.SERIES
-        ? routes.SERIES.url(media.tmdbId)
-        : isSeason(media)
+    const uri = fullyLoadedMedia
+      ? fullyLoadedMedia.mediaType === MediaTypes.MOVIES
+        ? routes.MOVIE.url(fullyLoadedMedia.tmdbId)
+        : fullyLoadedMedia.mediaType === MediaTypes.SERIES
+        ? routes.SERIES.url(fullyLoadedMedia.tmdbId)
+        : isSeason(fullyLoadedMedia)
         ? getSeasonUrl()
-        : isEpisode(media)
+        : isEpisode(fullyLoadedMedia)
         ? getEpisodeUrl()
-        : null;
+        : null
+      : null;
+
     if (uri) {
       history.push(uri);
     }
   };
 
+  if (!fullyLoadedMedia) {
+    return <div />;
+  }
+
   return (
     <>
-      <Container hasPoster={!!media.posterUrl} onClick={() => onCardClick()}>
+      <Container
+        hasPoster={!!fullyLoadedMedia.posterUrl}
+        onClick={() => onCardClick()}
+      >
         <Image
           className="media-poster"
-          src={media.posterUrl ? media.posterUrl : logo}
+          src={fullyLoadedMedia.posterUrl ? fullyLoadedMedia.posterUrl : logo}
           alt=""
           loaded={poster.loaded}
         />
         <HeadContainer>
-          <MediaTag media={media} />
-          {isOnServers(media) && (
+          <MediaTag media={fullyLoadedMedia} />
+          {isOnServers(fullyLoadedMedia) && (
             <SuccessIconTag>
               <Icon icon={faCheck} />
             </SuccessIconTag>
           )}
         </HeadContainer>
         <div className="media-hover-info">
-          <p>{media.title}</p>
-          {media.releaseDate && (
-            <p>{new Date(media.releaseDate).getFullYear()}</p>
+          <p>{fullyLoadedMedia.title}</p>
+          {fullyLoadedMedia.releaseDate && (
+            <p>{new Date(fullyLoadedMedia.releaseDate).getFullYear()}</p>
           )}
-          {((isMovie(media) && !isOnServers(media)) || isSeries(media)) && (
-            <RequestButton media={media} />
+          {((isMovie(fullyLoadedMedia) && !isOnServers(fullyLoadedMedia)) ||
+            isSeries(fullyLoadedMedia)) && (
+            <RequestButton media={fullyLoadedMedia} />
           )}
-          {isOnServers(media) &&
-            (isMovie(media) || isEpisode(media)) &&
-            media.mediaServersInfo &&
-            media.mediaServersInfo.length > 0 &&
-            media.mediaServersInfo[0].webUrl && (
-              <PlayButton webUrl={media.mediaServersInfo[0].webUrl} />
+          {isOnServers(fullyLoadedMedia) &&
+            (isMovie(fullyLoadedMedia) || isEpisode(fullyLoadedMedia)) &&
+            fullyLoadedMedia.mediaServersInfo &&
+            fullyLoadedMedia.mediaServersInfo.length > 0 &&
+            fullyLoadedMedia.mediaServersInfo[0].webUrl && (
+              <PlayButton
+                webUrl={fullyLoadedMedia.mediaServersInfo[0].webUrl}
+              />
             )}
         </div>
       </Container>

@@ -10,8 +10,6 @@ import { MediaPreviewCard } from "./MediaPreviewCard";
 import { usePagination } from "../../hooks/usePagination";
 import { MediaCardsLoader } from "./MediaCardsLoader";
 import { useAPI } from "../../hooks/useAPI";
-import { APIRoutes } from "../../enums/APIRoutes";
-import { MediaTypes } from "../../enums/MediaTypes";
 
 const Container = styled(H2)`
   display: flex;
@@ -31,60 +29,16 @@ type MediaCarouselWidgetProps = {
 
 export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   const [media, setMedia] = useState<IMedia[]>([]);
-  const [mediaTmp, setMediaTmp] = useState<IMedia[]>([]);
   const [hidden, setHidden] = useState(false);
   const { data, loadPrev, loadNext } = usePagination<IMedia>(props.url, false);
   const loaderRef = useRef<HTMLDivElement>(null);
-  const { get } = useAPI();
 
   useEffect(() => {
     if (data.data && data.data.results) {
       setMedia([...media, ...data.data.results]);
-      if (props.hasToGetFullMedia) {
-        let dataTmp: IMedia[] = [];
-        console.log(data.data.results);
-        data.data.results.forEach((m) => {
-          console.log("1");
-          if (m.mediaType === MediaTypes.MOVIES) {
-            console.log("2");
-            get<IMedia>(APIRoutes.GET_MOVIE(m.tmdbId)).then((r) => {
-              console.log("3");
-              if (r.data) {
-                console.log("4");
-                dataTmp.push(r.data);
-              }
-            });
-          } else if (m.mediaType === MediaTypes.SERIES) {
-            get<IMedia>(APIRoutes.GET_SERIES(m.tmdbId)).then((r) => {
-              if (r.data) {
-                dataTmp.push(r.data);
-              }
-            });
-          }
-        });
-        console.log("5");
-        console.log(dataTmp);
-        setMediaTmp(dataTmp);
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
-
-  useEffect(() => {
-    console.log(mediaTmp);
-    /*
-    if (mediaTmp.length) {
-      let mediaCopy = media;
-      mediaCopy.splice(
-        mediaCopy.length - (mediaTmp.length + 1),
-        mediaTmp.length,
-        ...mediaTmp
-      );
-      setMedia(mediaCopy);
-    }
-
-     */
-  }, [mediaTmp]);
 
   useEffect(() => {
     if (loaderRef.current && media.length > 0) {
