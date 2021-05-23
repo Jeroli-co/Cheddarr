@@ -42,17 +42,17 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
       setMedia([...media, ...data.data.results]);
       if (props.hasToGetFullMedia) {
         const paginatedDataCopy = data.data.results;
-        paginatedDataCopy.forEach((m, index) => {
+        paginatedDataCopy.forEach((m, index, array) => {
           if (m.mediaType === MediaTypes.MOVIES) {
             get<IMedia>(APIRoutes.GET_MOVIE(m.tmdbId)).then((r) => {
               if (r.data) {
-                paginatedDataCopy[index] = r.data;
+                array[index] = r.data;
               }
             });
           } else if (m.mediaType === MediaTypes.SERIES) {
             get<IMedia>(APIRoutes.GET_SERIES(m.tmdbId)).then((r) => {
               if (r.data) {
-                paginatedDataCopy[index] = r.data;
+                array[index] = r.data;
               }
             });
           }
