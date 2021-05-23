@@ -64,6 +64,10 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   }, [data.data]);
 
   useEffect(() => {
+    console.log(media);
+  }, [media]);
+
+  useEffect(() => {
     if (loaderRef.current && media.length > 0) {
       loaderRef.current.scrollIntoView({
         behavior: "smooth",
