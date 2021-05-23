@@ -13,11 +13,13 @@ export default function Home() {
           <MediaCarouselWidget
             title="Movies recently added"
             url={APIRoutes.GET_MEDIA_RECENTLY_ADDED(MediaTypes.MOVIES)}
+            hasToGetFullMedia
           />
           <br />
           <MediaCarouselWidget
             title="Series recently added"
             url={APIRoutes.GET_MEDIA_RECENTLY_ADDED(MediaTypes.SERIES)}
+            hasToGetFullMedia
           />
           <br />
         </>

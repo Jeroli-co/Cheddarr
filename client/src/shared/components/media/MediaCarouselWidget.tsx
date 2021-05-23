@@ -9,6 +9,9 @@ import { Carousel } from "../layout/Carousel";
 import { MediaPreviewCard } from "./MediaPreviewCard";
 import { usePagination } from "../../hooks/usePagination";
 import { MediaCardsLoader } from "./MediaCardsLoader";
+import { useAPI } from "../../hooks/useAPI";
+import { APIRoutes } from "../../enums/APIRoutes";
+import { MediaTypes } from "../../enums/MediaTypes";
 
 const Container = styled(H2)`
   display: flex;
@@ -23,20 +26,49 @@ const Container = styled(H2)`
 type MediaCarouselWidgetProps = {
   title: string;
   url: string;
+  hasToGetFullMedia?: boolean;
 };
 
 export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   const [media, setMedia] = useState<IMedia[]>([]);
   const [hidden, setHidden] = useState(false);
-  const { data, loadPrev, loadNext } = usePagination(props.url, false);
+  const { data, loadPrev, loadNext } = usePagination<IMedia>(props.url, false);
   const loaderRef = useRef<HTMLDivElement>(null);
+  const { get } = useAPI();
 
   useEffect(() => {
-    if (data.data && data.data?.results) {
-      setMedia([...media, ...data.data?.results]);
+    if (data.data && data.data.results) {
+      setMedia([...media, ...data.data.results]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.data]);
+
+  useEffect(() => {
+    const updateMedia = (m: IMedia | null) => {
+      if (m) {
+        let mediaCopy = media;
+        const index = mediaCopy.findIndex((e) => m.tmdbId === e.tmdbId);
+        if (index !== -1) {
+          mediaCopy[index] = m;
+          setMedia([...mediaCopy]);
+        }
+      }
+    };
+
+    if (props.hasToGetFullMedia && data.data && data.data.results && media) {
+      data.data.results.forEach((m) => {
+        if (m.mediaType === MediaTypes.MOVIES) {
+          get<IMedia>(APIRoutes.GET_MOVIE(m.tmdbId)).then((r) => {
+            updateMedia(r.data);
+          });
+        } else if (m.mediaType === MediaTypes.SERIES) {
+          get<IMedia>(APIRoutes.GET_SERIES(m.tmdbId)).then((r) =>
+            updateMedia(r.data)
+          );
+        }
+      });
+    }
+  }, [media]);
 
   useEffect(() => {
     if (loaderRef.current && media.length > 0) {

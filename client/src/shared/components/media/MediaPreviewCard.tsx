@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
 import { MediaTag, SuccessIconTag } from "../Tag";
@@ -108,6 +108,10 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
   const history = useHistory();
   const location = useLocation();
   const poster = useImage(media.posterUrl);
+
+  useEffect(() => {
+    console.log(media);
+  }, [media]);
 
   const onCardClick = () => {
     const getSeasonUrl = () => {
