@@ -46,11 +46,11 @@ export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   useEffect(() => {
     const updateMedia = (m: IMedia | null) => {
       if (m) {
-        let mediaCopy = media;
-        const index = mediaCopy.findIndex((e) => m.tmdbId === e.tmdbId);
+        const index = media.findIndex((e) => m.tmdbId === e.tmdbId);
         if (index !== -1) {
+          let mediaCopy = [...media];
           mediaCopy[index] = m;
-          setMedia([...mediaCopy]);
+          setMedia(mediaCopy);
         }
       }
     };
