@@ -64,17 +64,18 @@ export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
         <p>Dashboard</p>
       </SidebarMenuElement>
 
-      {user && checkRole(user.roles, [Roles.REQUEST]) && (
-        <SidebarMenuElement
-          onClick={() => navigate(routes.REQUESTS.url)}
-          isActive={location.pathname.startsWith(routes.REQUESTS.url)}
-        >
-          <SidebarMenuElementIcon>
-            <Icon icon={faRegistered} />
-          </SidebarMenuElementIcon>
-          <p>Requests</p>
-        </SidebarMenuElement>
-      )}
+      {user &&
+        checkRole(user.roles, [Roles.REQUEST, Roles.MANAGE_REQUEST], true) && (
+          <SidebarMenuElement
+            onClick={() => navigate(routes.REQUESTS.url)}
+            isActive={location.pathname.startsWith(routes.REQUESTS.url)}
+          >
+            <SidebarMenuElementIcon>
+              <Icon icon={faRegistered} />
+            </SidebarMenuElementIcon>
+            <p>Requests</p>
+          </SidebarMenuElement>
+        )}
 
       {user && checkRole(user.roles, [Roles.MANAGE_USERS]) && (
         <SidebarMenuElement

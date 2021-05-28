@@ -5,4 +5,5 @@ export enum Roles {
   MANAGE_SETTINGS = 8,
   MANAGE_REQUEST = 16,
   MANAGE_USERS = 32,
+  AUTO_APPROVE = 64,
 }

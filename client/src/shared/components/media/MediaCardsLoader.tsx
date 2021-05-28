@@ -50,11 +50,7 @@ export const MediaCardsLoader = React.forwardRef<
           index={index}
           n={props.n}
         >
-          {props.refIndex && props.refIndex === index ? (
-            <svg viewBox="0 0 2 3" />
-          ) : (
-            <svg viewBox="0 0 2 3" />
-          )}
+          <svg viewBox="0 0 2 3" />
         </MediaLoadingCardContainer>
       ))}
     </>

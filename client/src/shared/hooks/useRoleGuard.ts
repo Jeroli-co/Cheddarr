@@ -5,7 +5,7 @@ import { Roles } from "../enums/Roles";
 import { routes } from "../../router/routes";
 import { useEffect } from "react";
 
-export const useRoleGuard = (neededRoles: Roles[]) => {
+export const useRoleGuard = (neededRoles: Roles[], hasOne?: boolean) => {
   const {
     session: { user },
   } = useSession();
@@ -13,7 +13,7 @@ export const useRoleGuard = (neededRoles: Roles[]) => {
   const history = useHistory();
 
   useEffect(() => {
-    if (user && !checkRole(user.roles, neededRoles)) {
+    if (user && !checkRole(user.roles, neededRoles, hasOne)) {
       history.push(routes.HOME.url);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

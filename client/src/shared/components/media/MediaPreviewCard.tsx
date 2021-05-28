@@ -202,12 +202,16 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
         hasPoster={!!fullyLoadedMedia.posterUrl}
         onClick={() => onCardClick()}
       >
-        <Image
-          className="media-poster"
-          src={fullyLoadedMedia.posterUrl ? fullyLoadedMedia.posterUrl : logo}
-          alt=""
-          loaded={poster.loaded}
-        />
+        {fullyLoadedMedia.posterUrl && (
+          <Image
+            className="media-poster"
+            src={fullyLoadedMedia.posterUrl}
+            alt=""
+            loaded={poster.loaded}
+          />
+        )}
+        {!fullyLoadedMedia.posterUrl && <svg viewBox="0 0 2 3" />}
+
         <HeadContainer>
           <MediaTag media={fullyLoadedMedia} />
           {isOnServers(fullyLoadedMedia) && (
