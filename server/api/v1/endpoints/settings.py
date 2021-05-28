@@ -64,7 +64,7 @@ async def get_plex_account_servers(
 @router.get(
     "/plex",
     response_model=List[PlexSettingSchema],
-    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
+    dependencies=[Depends(deps.get_current_user)],
 )
 async def get_plex_settings(
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
@@ -291,7 +291,7 @@ async def get_radarr_setting_instance_info(
 @router.get(
     "/radarr",
     response_model=List[RadarrSettingSchema],
-    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
+    dependencies=[Depends(deps.get_current_user)],
 )
 async def get_radarr_settings(
     radarr_setting_repo: RadarrSettingRepository = Depends(
@@ -428,7 +428,7 @@ async def get_sonarr_setting_instance_info(
 @router.get(
     "/sonarr",
     response_model=List[SonarrSettingSchema],
-    dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
+    dependencies=[Depends(deps.get_current_user)],
 )
 async def get_sonarr_settings(
     sonarr_setting_repo: SonarrSettingRepository = Depends(
