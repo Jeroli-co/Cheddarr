@@ -9,7 +9,6 @@ import { Carousel } from "../layout/Carousel";
 import { MediaPreviewCard } from "./MediaPreviewCard";
 import { usePagination } from "../../hooks/usePagination";
 import { MediaCardsLoader } from "./MediaCardsLoader";
-import { useAPI } from "../../hooks/useAPI";
 
 const Container = styled(H2)`
   display: flex;
