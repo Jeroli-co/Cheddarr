@@ -9,7 +9,6 @@ import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { IUser } from "../../../../shared/models/IUser";
 import { usePagination } from "../../../../shared/hooks/usePagination";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
-import { Roles } from "../../../../shared/enums/Roles";
 import { Spinner } from "../../../../shared/components/Spinner";
 import styled from "styled-components";
 import { useUserService } from "../../../../shared/toRefactor/useUserService";
@@ -25,6 +24,21 @@ const Header = styled.div`
   border-top-right-radius: 24px;
   padding: 30px;
   font-size: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  > p {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    &:not(:first-child) {
+      justify-content: center;
+    }
+    &:last-child {
+      justify-content: flex-end;
+    }
+  }
 `;
 
 const Container = styled.div`
@@ -36,6 +50,18 @@ const Item = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 30px;
+
+  > span {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    &:not(:first-child) {
+      justify-content: center;
+    }
+    &:last-child {
+      justify-content: flex-end;
+    }
+  }
 `;
 
 export const UsersConfirmed = () => {
@@ -75,37 +101,33 @@ export const UsersConfirmed = () => {
 
   if (data.isLoading) return <Spinner />;
 
-  if (data.data && data.data.results.length <= 1) {
-    return <p>No user to confirm yet</p>;
-  }
-
   return (
     <>
       <Header>
         <p>Username</p>
+        <p />
       </Header>
       <Container>
         {user &&
           data.data &&
           data.data.results &&
-          data.data.results.map(
-            (u) =>
-              u.id !== user.id && (
-                <div key={u.username}>
-                  <Item>
-                    {u.username}
-                    <Buttons>
-                      <PrimaryIconButton onClick={() => onUserEditClick(u)}>
-                        <Icon icon={faEdit} />
-                      </PrimaryIconButton>
-                      <DangerIconButton onClick={() => onDeleteUserClick(u)}>
-                        <Icon icon={faTimes} />
-                      </DangerIconButton>
-                    </Buttons>
-                  </Item>
-                </div>
-              )
-          )}
+          data.data.results.map((u) => (
+            <div key={u.username}>
+              <Item>
+                <span>{u.username}</span>
+                <span>
+                  <Buttons>
+                    <PrimaryIconButton onClick={() => onUserEditClick(u)}>
+                      <Icon icon={faEdit} />
+                    </PrimaryIconButton>
+                    <DangerIconButton onClick={() => onDeleteUserClick(u)}>
+                      <Icon icon={faTimes} />
+                    </DangerIconButton>
+                  </Buttons>
+                </span>
+              </Item>
+            </div>
+          ))}
       </Container>
       {data.data && data.data.results && data.data.results.length > 1 && (
         <PaginationArrows

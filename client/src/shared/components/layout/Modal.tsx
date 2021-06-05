@@ -77,7 +77,7 @@ export const Modal = (props: ModalProps) => {
   useOutsideAlerter([contentRef], () => props.close());
 
   return (
-    <Container>
+    <Container onClick={(e) => e.stopPropagation()}>
       <div className="modal-content" ref={contentRef}>
         <Icon className="close" icon={faTimes} onClick={() => props.close()} />
         {props.children}

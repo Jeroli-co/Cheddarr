@@ -220,6 +220,7 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
             </SuccessIconTag>
           )}
         </HeadContainer>
+
         <div className="media-hover-info">
           <p>{fullyLoadedMedia.title}</p>
           {fullyLoadedMedia.releaseDate && (
