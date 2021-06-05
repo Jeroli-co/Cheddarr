@@ -1,19 +1,7 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-import { H2 } from "./Titles";
+import { H3 } from "./Titles";
 import { PrimaryButton } from "./Button";
 import { LogLevels } from "../enums/LogLevels";
-
-const LogLevelCheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-
-  input {
-    &:first-child {
-      margin-right: 1em;
-    }
-  }
-`;
 
 type ManageLogLevelsProps = {
   defaultValue: LogLevels;
@@ -33,18 +21,16 @@ export const ManageLogLevels = (props: ManageLogLevelsProps) => {
 
   return (
     <div>
-      <H2>Log level</H2>
+      <H3>Log level</H3>
       <br />
-      {Object.values(LogLevels).map((value) => (
-        <LogLevelCheckboxContainer>
-          <input
-            type="checkbox"
-            onChange={() => onLogLevelChange(value)}
-            checked={logLevel === value}
-          />
-          <p>{value}</p>
-        </LogLevelCheckboxContainer>
-      ))}
+      <select onChange={(e) => onLogLevelChange(e.target.value as LogLevels)}>
+        {Object.values(LogLevels).map((value) => (
+          <option value={value} selected={logLevel === value}>
+            {value}
+          </option>
+        ))}
+      </select>
+      <br />
       <br />
       <PrimaryButton type="button" onClick={() => onSave()}>
         Save

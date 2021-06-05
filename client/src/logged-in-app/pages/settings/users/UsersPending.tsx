@@ -14,6 +14,7 @@ import styled from "styled-components";
 import { DeleteDataModal } from "../../../../shared/components/DeleteDataModal";
 import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { PaginationArrows } from "../../../../shared/components/PaginationArrows";
+import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
 
 const Header = styled.div`
   background: ${(props) => props.theme.primaryLight};
@@ -85,7 +86,7 @@ export const UsersPending = () => {
           data.data.results.map((u) => (
             <div key={u.username}>
               <Item>
-                {u.username}
+                <UserSmallCard user={u} />
                 <Buttons>
                   <SuccessIconButton onClick={() => onConfirmUser(u.id)}>
                     <Icon icon={faCheck} />

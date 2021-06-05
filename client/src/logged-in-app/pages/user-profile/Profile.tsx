@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { Spinner } from "../../../shared/components/Spinner";
 import { UpdateProfile } from "./account/UpdateProfile";
-import { H1 } from "../../../shared/components/Titles";
+import { H1, H2 } from "../../../shared/components/Titles";
 import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
 import { PrimaryDivider } from "../../../shared/components/Divider";
 import { useParams } from "react-router";
@@ -86,12 +86,15 @@ const Profile = () => {
             </p>
             <p>{profileOwner.data.email}</p>
           </InfosContainer>
-          {profileOwner.data && profileOwner.data.roles && (
-            <RolesTree
-              defaultValue={profileOwner.data.roles}
-              onSave={onRoleChange}
-            />
-          )}
+          <div>
+            <H2>User roles</H2>
+            {profileOwner.data && profileOwner.data.roles && (
+              <RolesTree
+                defaultValue={profileOwner.data.roles}
+                onSave={onRoleChange}
+              />
+            )}
+          </div>
         </SubContainer>
         <PrimaryDivider />
         <UpdateProfile id={profileOwner.data.id} />

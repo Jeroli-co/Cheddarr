@@ -17,6 +17,7 @@ import { DeleteDataModal } from "../../../../shared/components/DeleteDataModal";
 import { useSession } from "../../../../shared/contexts/SessionContext";
 import { useHistory } from "react-router-dom";
 import { routes } from "../../../../router/routes";
+import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
 
 const Header = styled.div`
   background: ${(props) => props.theme.primaryLight};
@@ -114,7 +115,7 @@ export const UsersConfirmed = () => {
           data.data.results.map((u) => (
             <div key={u.username}>
               <Item>
-                <span>{u.username}</span>
+                <UserSmallCard user={u} />
                 <span>
                   <Buttons>
                     <PrimaryIconButton onClick={() => onUserEditClick(u)}>

@@ -1,7 +1,7 @@
 import React from "react";
 import { useRoleGuard } from "../../../../shared/hooks/useRoleGuard";
 import { Roles } from "../../../../shared/enums/Roles";
-import { H2 } from "../../../../shared/components/Titles";
+import { H2, H3 } from "../../../../shared/components/Titles";
 import {
   PrimaryDivider,
   PrimaryLightDivider,
@@ -38,6 +38,7 @@ export const GeneralSettings = () => {
     <>
       <H2>Users</H2>
       <PrimaryLightDivider />
+      <H3>Default user roles</H3>
       {config.data && config.data.defaultRoles && (
         <RolesTree
           defaultValue={config.data.defaultRoles}

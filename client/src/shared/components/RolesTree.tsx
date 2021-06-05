@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Roles } from "../enums/Roles";
 import { calcRolesSumExceptAdmin, checkRole } from "../../utils/roles";
-import { H2 } from "./Titles";
 import { PrimaryButton } from "./Button";
 
 const ChildElement = styled.div`
@@ -44,8 +43,6 @@ export const RolesTree = (props: DefaultRolesTreeProps) => {
 
   return (
     <div>
-      <H2>Roles</H2>
-      <br />
       <RoleCheckboxContainer>
         <input
           type="checkbox"
