@@ -6,11 +6,8 @@ import {
   PrimaryDivider,
   PrimaryLightDivider,
 } from "../../../../shared/components/Divider";
-import { useConfig } from "../../../../shared/hooks/useConfig";
 
 export const GeneralSettings = () => {
-  const { config, updateConfig } = useConfig();
-
   useRoleGuard([Roles.ADMIN]);
 
   return (

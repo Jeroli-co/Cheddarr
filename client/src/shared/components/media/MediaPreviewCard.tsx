@@ -22,8 +22,6 @@ import { RequestButton } from "../requests/RequestButton";
 import { APIRoutes } from "../../enums/APIRoutes";
 import { useAPI } from "../../hooks/useAPI";
 
-const logo = require("../../../assets/cheddarr-min.svg");
-
 export const MediaPreviewCardContainer = styled.div`
   position: relative;
   flex: 0 0 calc(16.66% - 10px);
@@ -133,6 +131,7 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
         });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullyLoadedMedia]);
 
   const onCardClick = () => {
