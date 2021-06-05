@@ -28,7 +28,7 @@ export const useUserService = () => {
   };
 
   const updateUserById = (
-    id: number,
+    id: number | string,
     payload: object,
     errorMessage?: string,
     successMessage?: string

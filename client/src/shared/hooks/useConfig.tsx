@@ -25,13 +25,14 @@ export const useConfig = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateConfig = (payload: IConfig) => {
+  const updateConfig = (payload: Partial<IConfig>) => {
     return patch<IConfig>(APIRoutes.CONFIG, payload).then((res) => {
       if (res.status === 200) {
         setConfig(res);
       } else {
         pushDanger("Cannot update config");
       }
+      return res;
     });
   };
 

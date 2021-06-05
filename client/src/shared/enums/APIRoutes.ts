@@ -22,7 +22,7 @@ export const APIRoutes = {
     "/user/password" + token,
   RESET_PASSWORD: (token: string) => "/user/password" + token,
   GET_USERS: (confirmed: boolean) => "/users?confirmed=" + confirmed,
-  USER_BY_ID: (id: number) => "/users/" + id.toString(10),
+  USER_BY_ID: (id: number | string) => "/users/" + id,
 
   // MEDIA SERVERS
   GET_MEDIA_SERVERS_LIBRARIES: (
@@ -88,8 +88,7 @@ export const APIRoutes = {
   DELETE_EMAIL_SETTINGS: "/notifications/agents/email",
 
   // SYSTEM
-  GET_LOGS: "/system/logs",
-  GET_JOBS: "/system/jobs",
-  PATCH_JOB: (id: string) => "/system/jobs/" + id,
+  LOGS: "/system/logs",
+  JOBS: (id?: string) => `/system/jobs${id ? `/${id}` : ""}`,
   CONFIG: "/system/config",
 };

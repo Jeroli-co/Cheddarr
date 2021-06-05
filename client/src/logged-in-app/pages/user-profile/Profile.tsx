@@ -8,9 +8,9 @@ import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
 import { PrimaryDivider } from "../../../shared/components/Divider";
 import { useParams } from "react-router";
 import { useUser } from "../../../shared/hooks/useUser";
-import { UserRolesTree } from "../../../shared/components/UserRolesTree";
 import { Roles } from "../../../shared/enums/Roles";
 import { useUserService } from "../../../shared/toRefactor/useUserService";
+import { RolesTree } from "../../../shared/components/RolesTree";
 
 const SubContainer = styled.div`
   display: flex;
@@ -53,17 +53,19 @@ const Profile = () => {
   const { currentUser: profileOwner, updateUser } = useUser(id);
   const { updateUserById } = useUserService();
 
-  const onRoleChange = (id: number, role: Roles) => {
-    updateUserById(
-      id,
-      { roles: role },
-      "Cannot update roles",
-      "Roles updated"
-    ).then((res) => {
-      if (res.status === 200 && res.data) {
-        updateUser(res.data);
-      }
-    });
+  const onRoleChange = (role: Roles) => {
+    if (profileOwner.data && profileOwner.data.id) {
+      updateUserById(
+        profileOwner.data.id,
+        { roles: role },
+        "Cannot update roles",
+        "Roles updated"
+      ).then((res) => {
+        if (res.status === 200 && res.data) {
+          updateUser(res.data);
+        }
+      });
+    }
   };
 
   if (profileOwner.isLoading) return <Spinner />;
@@ -84,10 +86,12 @@ const Profile = () => {
             </p>
             <p>{profileOwner.data.email}</p>
           </InfosContainer>
-          <UserRolesTree
-            profileOwner={profileOwner.data}
-            onRoleChange={onRoleChange}
-          />
+          {profileOwner.data && profileOwner.data.roles && (
+            <RolesTree
+              defaultValue={profileOwner.data.roles}
+              onSave={onRoleChange}
+            />
+          )}
         </SubContainer>
         <PrimaryDivider />
         <UpdateProfile id={profileOwner.data.id} />

@@ -1,4 +1,6 @@
+import { LogLevels } from "../enums/LogLevels";
+
 export interface IConfig {
-  logLevel: string;
+  logLevel: LogLevels;
   defaultRoles: number;
 }

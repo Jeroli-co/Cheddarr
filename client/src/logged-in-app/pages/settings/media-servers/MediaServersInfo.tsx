@@ -61,7 +61,7 @@ const MediaServerInfo = (props: MediaServerInfoProps) => {
   const { pushInfo, pushDanger } = useAlert();
 
   const fullSync = (serverId: string) => {
-    patch<IJob>(APIRoutes.PATCH_JOB("plex-full-sync"), {
+    patch<IJob>(APIRoutes.JOBS("plex-full-sync"), {
       action: JobActionsEnum.RUN,
       params: { serverId: serverId },
     }).then((res) => {

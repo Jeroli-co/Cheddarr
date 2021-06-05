@@ -18,3 +18,13 @@ export const checkRole = (
     return roles.some((r) => userRole & r);
   }
 };
+
+export const calcRolesSumExceptAdmin = () => {
+  let sum = 0;
+  Object.values(Roles).forEach((r) => {
+    if (typeof r == "number" && r > Roles.ADMIN) {
+      sum += r;
+    }
+  });
+  return sum;
+};
