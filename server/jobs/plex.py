@@ -234,7 +234,6 @@ async def process_plex_season(
 ) -> Optional[MediaServerSeason]:
 
     season = await server_season_repo.find_by(
-        season_number=plex_season.index,
         external_id=plex_season.ratingKey,
         server_id=server_id,
     )
@@ -312,7 +311,6 @@ async def process_plex_episode(
 ) -> Optional[MediaServerEpisode]:
 
     episode = await server_episode_repo.find_by(
-        episode_number=plex_episode.index,
         external_id=plex_episode.ratingKey,
         server_id=server_id,
     )
