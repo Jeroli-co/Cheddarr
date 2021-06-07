@@ -72,6 +72,7 @@ class Config(BaseSettings):
         super().__init__(**kwargs)
         self.db_folder.mkdir(parents=True, exist_ok=True)
         self.logs_folder.mkdir(parents=True, exist_ok=True)
+        self.setup()
 
     def setup(self):
         try:
@@ -86,7 +87,7 @@ class Config(BaseSettings):
         except OSError:
             raise
 
-    def set_fields(self, **config_kwargs):
+    def update(self, **config_kwargs):
         for field_k, field_v in config_kwargs.items():
             if field_k in self.__fields__ and field_v is not None:
                 setattr(self, field_k, field_v)

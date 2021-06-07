@@ -33,8 +33,8 @@ target_metadata = Base.metadata
 
 
 def get_url():
-    server_config.DB_FOLDER.mkdir(parents=True, exist_ok=True)
-    return server_config.DB_URL
+    server_config.db_folder.mkdir(parents=True, exist_ok=True)
+    return "sqlite:///" + str(server_config.db_folder / server_config.db_filename)
 
 
 def run_migrations_offline():
@@ -56,6 +56,7 @@ def run_migrations_offline():
         literal_binds=True,
         compare_type=True,
         dialect_opts={"paramstyle": "named"},
+        render_as_batch=True
     )
 
     with context.begin_transaction():
@@ -79,7 +80,10 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata, compare_type=True
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
+            render_as_batch=True
         )
 
         with context.begin_transaction():

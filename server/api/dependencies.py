@@ -16,9 +16,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 
 
 async def get_db() -> Iterator[AsyncSession]:
-    from server.database.session import get_db_session
+    from server.database.session import DBSession
 
-    session = get_db_session()()
+    session = DBSession.get_session()
     try:
         yield session
     except Exception as exc:
