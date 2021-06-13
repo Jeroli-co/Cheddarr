@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from server.api.v1 import router
 from server.core import config, scheduler
 from server.core.http_client import HttpClient
+from server.core.logger import Logger
 from server.site import site
 
 
@@ -24,8 +25,7 @@ def setup_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-    config.setup()
+    application.logger = Logger.make_logger()
 
     from server import jobs  # noqa
 
