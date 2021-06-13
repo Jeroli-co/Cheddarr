@@ -10,12 +10,6 @@ export default function SwitchRoutes(props: any) {
       <Route exact path={routes.HOME.url} component={routes.HOME.component} />
       <LoggedOutRoute
         exact
-        path={routes.CONFIRM_EMAIL.url(":token")}
-        component={routes.CONFIRM_EMAIL.component}
-        {...props}
-      />
-      <LoggedOutRoute
-        exact
         path={routes.RESET_PASSWORD.url(":token")}
         component={routes.RESET_PASSWORD.component}
         {...props}
@@ -32,14 +26,19 @@ export default function SwitchRoutes(props: any) {
         {...props}
       />
       <LoggedInRoute
-        path={routes.PROFILE.url}
+        path={routes.PROFILE.url(":id")}
+        component={routes.PROFILE.component}
+        {...props}
+      />
+      <LoggedInRoute
+        path={routes.PROFILE.url("")}
         component={routes.PROFILE.component}
         {...props}
       />
       <LoggedInRoute
         exact
-        path={routes.PUBLIC_USER.url(":username")}
-        component={routes.PUBLIC_USER.component}
+        path={routes.USERS.url}
+        component={routes.USERS.component}
         {...props}
       />
       <LoggedInRoute

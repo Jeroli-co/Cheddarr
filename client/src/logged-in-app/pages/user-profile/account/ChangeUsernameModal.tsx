@@ -13,14 +13,15 @@ import { HelpDanger } from "../../../../shared/components/Help";
 
 type ChangeUsernameModalProps = {
   closeModal: () => void;
+  id: number;
 };
 
 const ChangeUsernameModal = (props: ChangeUsernameModalProps) => {
   const { register, handleSubmit, errors } = useForm<{ username: string }>();
-  const { updateUsername } = useUserService();
+  const { updateUserById } = useUserService();
 
   const onSubmit = handleSubmit((data) => {
-    updateUsername(data.username).then((res) => {
+    updateUserById(props.id, { username: data.username }).then((res) => {
       if (res.status === 200) props.closeModal();
     });
   });

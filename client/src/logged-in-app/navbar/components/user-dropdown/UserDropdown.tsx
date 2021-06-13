@@ -74,7 +74,7 @@ const UserDropdown = ({
 
   return (
     <Container isVisible={isVisible} ref={dropdownRef}>
-      <Item onClick={() => history.push(routes.PROFILE.url)}>
+      <Item onClick={() => history.push(routes.PROFILE.url(""))}>
         <DropdownMenuItemIcon>
           <Icon icon={faUserCircle} />
         </DropdownMenuItemIcon>

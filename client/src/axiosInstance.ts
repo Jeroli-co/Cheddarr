@@ -5,7 +5,7 @@ import humps from "humps";
 
 const JSON_TYPE = "application/json";
 const FORM_URL_ENCODED_TYPE = "application/x-www-form-urlencoded";
-const API_VERSION = "v1"
+const API_VERSION = "v1";
 
 const instance = axios.create({
   baseURL: "/api/" + API_VERSION,

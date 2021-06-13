@@ -1,10 +1,8 @@
 import { NotFound } from "../shared/components/errors/NotFound";
 import { PageLoader } from "../shared/components/PageLoader";
-import { ConfirmEmail } from "../logged-out-app/elements/ConfirmEmail";
 import { ResetPassword } from "../logged-out-app/elements/ResetPassword";
 import { SignInForm } from "../logged-out-app/SignInForm";
 import { SignUpForm } from "../logged-out-app/SignUpForm";
-import { PublicUser } from "../logged-in-app/pages/PublicUser";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
 import { Requests } from "../logged-in-app/pages/Requests";
 import { Home } from "../shared/Home";
@@ -18,6 +16,8 @@ import { Search } from "../logged-in-app/pages/Search";
 import { Movie } from "../shared/components/media/Movie";
 import { Series } from "../shared/components/media/Series";
 import { JobsSettings } from "../logged-in-app/pages/settings/jobs/JobsSettings";
+import { UsersSettings } from "../logged-in-app/pages/settings/users/UsersSettings";
+import { GeneralSettings } from "../logged-in-app/pages/settings/general/GeneralSettings";
 
 const routes = {
   HOME: {
@@ -33,20 +33,17 @@ const routes = {
   },
   CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm", component: PageLoader },
   SIGN_UP: { url: "/sign-up", component: SignUpForm },
-  CONFIRM_EMAIL: {
-    url: (token: string) => "/sign-up/" + token,
-    component: ConfirmEmail,
-  },
   RESET_PASSWORD: {
     url: (token: string) => "/me/password/" + token,
     component: ResetPassword,
   },
 
   /** USERS **/
-  PROFILE: { url: "/user", component: Profile },
-  PUBLIC_USER: {
-    url: (username: string) => "/users/" + username,
-    component: PublicUser,
+  USERS: { url: "/users", component: UsersSettings },
+  PROFILE: {
+    url: (id: number | string) =>
+      "/profile" + (id.toString().length > 0 ? `/${id}` : ""),
+    component: Profile,
   },
 
   /** SETTINGS **/
@@ -66,6 +63,10 @@ const routes = {
   SETTINGS_JOBS: {
     url: "/settings/jobs",
     component: JobsSettings,
+  },
+  SETTINGS_GENERAL: {
+    url: "/settings/general",
+    component: GeneralSettings,
   },
 
   /** MEDIA **/

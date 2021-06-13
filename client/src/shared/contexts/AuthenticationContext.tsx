@@ -2,23 +2,19 @@ import React, { createContext, useContext } from "react";
 import { ISignInFormData } from "../models/ISignInFormData";
 import { ISignUpFormData } from "../models/ISignUpFormData";
 import { useHistory } from "react-router";
-import { routes } from "../../router/routes";
 import { useAPI } from "../hooks/useAPI";
 import { useSession } from "./SessionContext";
 import { IEncodedToken } from "../models/IEncodedToken";
 import { useAlert } from "./AlertContext";
-import { IUser } from "../models/IUser";
-import { MESSAGES } from "../enums/Messages";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { APIRoutes } from "../enums/APIRoutes";
+import { IUser } from "../models/IUser";
 
 interface IAuthenticationContextInterface {
   readonly signUp: (
     data: ISignUpFormData
   ) => Promise<IAsyncCall<IUser> | IAsyncCall<null>>;
-  readonly confirmEmail: (token: string) => void;
-  readonly resendEmailConfirmation: (email: string) => void;
   readonly signIn: (
     data: ISignInFormData,
     redirectURI?: string
@@ -29,8 +25,6 @@ const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
   signUp(_: ISignUpFormData): Promise<IAsyncCall<IUser> | IAsyncCall<null>> {
     return Promise.resolve(DefaultAsyncCall);
   },
-  confirmEmail(): void {},
-  resendEmailConfirmation(): void {},
   signIn(): Promise<IAsyncCall | IAsyncCall<null>> {
     return Promise.resolve(DefaultAsyncCall);
   },
@@ -42,7 +36,7 @@ const AuthenticationContext = createContext<IAuthenticationContextInterface>(
 
 export default function AuthenticationContextProvider(props: any) {
   const history = useHistory();
-  const { get, post, patch } = useAPI();
+  const { post } = useAPI();
   const { initSession } = useSession();
   const { pushSuccess, pushDanger } = useAlert();
 
@@ -52,28 +46,6 @@ export default function AuthenticationContextProvider(props: any) {
         pushSuccess("Account created");
       }
       return res;
-    });
-  };
-
-  const confirmEmail = (token: string) => {
-    get(APIRoutes.CONFIRM_EMAIL(token)).then((res) => {
-      if (res.status === 200) {
-        pushSuccess(MESSAGES.EMAIL_CONFIRMED);
-        history.push(routes.SIGN_IN.url());
-      } else {
-        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
-        history.push(routes.HOME.url);
-      }
-    });
-  };
-
-  const resendEmailConfirmation = (email: string) => {
-    patch(APIRoutes.SIGN_UP, { email: email }).then((res) => {
-      if (res.status === 200) {
-        pushSuccess(MESSAGES.EMAIL_CONFIRMATION_RESENT);
-      } else {
-        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
-      }
     });
   };
 
@@ -89,6 +61,8 @@ export default function AuthenticationContextProvider(props: any) {
         }
       } else if (res.status === 401) {
         pushDanger("Wrong credentials");
+      } else if (res.status === 400) {
+        pushDanger("Account needs to be confirmed");
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }
@@ -100,8 +74,6 @@ export default function AuthenticationContextProvider(props: any) {
     <AuthenticationContext.Provider
       value={{
         signUp,
-        confirmEmail,
-        resendEmailConfirmation,
         signIn,
       }}
     >

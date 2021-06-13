@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 import { useHistory } from "react-router-dom";
 import { Tab } from "../../contexts/TabsContext";
 
-const TabsStyle = styled.div`
+export const TabsStyle = styled.div`
   overflow: hidden;
   overflow-x: auto;
   user-select: none;
@@ -14,12 +14,12 @@ const TabsStyle = styled.div`
   margin-bottom: 10px;
 `;
 
-const TabSide = styled.div`
+export const TabSide = styled.div`
   border-bottom: 1px solid ${(props) => props.theme.primaryLighter};
   width: 100%;
 `;
 
-const TabStyle = styled.div<{ isActive: boolean }>`
+export const TabStyle = styled.div<{ isActive: boolean }>`
   border-top: 1px solid
     ${(props) => (props.isActive ? props.theme.primaryLighter : "none")};
   border-left: 1px solid

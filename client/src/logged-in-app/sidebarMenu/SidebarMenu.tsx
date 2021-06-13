@@ -6,6 +6,7 @@ import {
   faCog,
   faHome,
   faRegistered,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
@@ -17,6 +18,9 @@ import {
   SidebarMenuElementIcon,
   SidebarMenuProps,
 } from "./SidebarMenuCommon";
+import { useSession } from "../../shared/contexts/SessionContext";
+import { checkRole } from "../../utils/roles";
+import { Roles } from "../../shared/enums/Roles";
 
 const Container = styled(SidebarMenuContainer)<{ isOpen: boolean }>`
   width: ${(props) =>
@@ -28,6 +32,9 @@ const Container = styled(SidebarMenuContainer)<{ isOpen: boolean }>`
 `;
 
 export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
+  const {
+    session: { user },
+  } = useSession();
   const history = useHistory();
   const { width } = useWindowSize();
   const location = useLocation();
@@ -57,25 +64,42 @@ export const SidebarMenu = ({ isOpen, toggle }: SidebarMenuProps) => {
         <p>Dashboard</p>
       </SidebarMenuElement>
 
-      <SidebarMenuElement
-        onClick={() => navigate(routes.REQUESTS.url)}
-        isActive={location.pathname.startsWith(routes.REQUESTS.url)}
-      >
-        <SidebarMenuElementIcon>
-          <Icon icon={faRegistered} />
-        </SidebarMenuElementIcon>
-        <p>Requests</p>
-      </SidebarMenuElement>
+      {user &&
+        checkRole(user.roles, [Roles.REQUEST, Roles.MANAGE_REQUEST], true) && (
+          <SidebarMenuElement
+            onClick={() => navigate(routes.REQUESTS.url)}
+            isActive={location.pathname.startsWith(routes.REQUESTS.url)}
+          >
+            <SidebarMenuElementIcon>
+              <Icon icon={faRegistered} />
+            </SidebarMenuElementIcon>
+            <p>Requests</p>
+          </SidebarMenuElement>
+        )}
 
-      <SidebarMenuElement
-        onClick={() => navigate(routes.SETTINGS.url)}
-        isActive={location.pathname.startsWith(routes.SETTINGS.url)}
-      >
-        <SidebarMenuElementIcon>
-          <Icon icon={faCog} />
-        </SidebarMenuElementIcon>
-        <p>Settings</p>
-      </SidebarMenuElement>
+      {user && checkRole(user.roles, [Roles.MANAGE_USERS]) && (
+        <SidebarMenuElement
+          onClick={() => navigate(routes.USERS.url)}
+          isActive={location.pathname === routes.USERS.url}
+        >
+          <SidebarMenuElementIcon>
+            <Icon icon={faUsers} />
+          </SidebarMenuElementIcon>
+          <p>Users</p>
+        </SidebarMenuElement>
+      )}
+
+      {user && checkRole(user.roles, [Roles.MANAGE_SETTINGS]) && (
+        <SidebarMenuElement
+          onClick={() => navigate(routes.SETTINGS.url)}
+          isActive={location.pathname.startsWith(routes.SETTINGS.url)}
+        >
+          <SidebarMenuElementIcon>
+            <Icon icon={faCog} />
+          </SidebarMenuElementIcon>
+          <p>Settings</p>
+        </SidebarMenuElement>
+      )}
     </Container>
   );
 };

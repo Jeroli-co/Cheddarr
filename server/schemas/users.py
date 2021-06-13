@@ -1,17 +1,18 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import AnyHttpUrl, EmailStr
 
-from .core import APIModel
+from .core import APIModel, PaginatedResult
 
 
 class UserBase(APIModel):
     username: str
-    email: EmailStr
+    email: Optional[EmailStr]
 
 
 class UserSchema(UserBase):
+    id: int
     avatar: Optional[AnyHttpUrl]
     confirmed: bool
     roles: int
@@ -28,14 +29,12 @@ class UserUpdate(UserBase):
     email: Optional[EmailStr]
     old_password: Optional[str]
     password: Optional[str]
+    roles: Optional[int]
+    confirmed: Optional[bool]
 
 
-class UserPublicSchema(UserBase):
-    avatar: Optional[AnyHttpUrl]
-
-
-class FriendshipCreate(APIModel):
-    username_or_email: str
+class UserSearchResult(PaginatedResult):
+    results: List[UserSchema]
 
 
 class PasswordResetCreate(APIModel):

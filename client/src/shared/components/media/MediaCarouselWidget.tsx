@@ -23,20 +23,21 @@ const Container = styled(H2)`
 type MediaCarouselWidgetProps = {
   title: string;
   url: string;
+  hasToGetFullMedia?: boolean;
 };
 
 export const MediaCarouselWidget = (props: MediaCarouselWidgetProps) => {
   const [media, setMedia] = useState<IMedia[]>([]);
   const [hidden, setHidden] = useState(false);
-  const { data, loadPrev, loadNext } = usePagination(props.url, false);
+  const { data, loadPrev, loadNext } = usePagination<IMedia>(props.url, false);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (data.data && data.data?.results) {
-      setMedia([...media, ...data.data?.results]);
+    if (data.data && data.data.results) {
+      setMedia([...media, ...data.data.results]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.data]);
+  }, [data]);
 
   useEffect(() => {
     if (loaderRef.current && media.length > 0) {

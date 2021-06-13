@@ -1,10 +1,11 @@
 import math
-from typing import List, Literal
+from typing import Dict, List, Literal, Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
 from server.core import config, scheduler
+from server.core.config import PublicConfig
 from server.models.users import UserRole
 from server.schemas.core import Job, Log, LogResult
 
@@ -21,17 +22,22 @@ router = APIRouter()
 )
 def get_logs(page: int = 1, per_page: int = 50):
     logs = []
-    with open(config.LOGS_FOLDER / config.LOGS_FILENAME) as logfile:
-        start = (page - 1) * per_page
-        end = page * per_page
-        lines = logfile.readlines()
-        for line in lines[start:end]:
-            time, level, message = line.strip().split(" | ")
-            logs.append(Log(time=time, level=level, message=message))
+    with open(config.logs_folder / config.logs_filename) as logfile:
+        lines = logfile.read().replace("\n", "").split(" | ")
+        start = (page - 1) * per_page * len(LogResult.__fields__)
+        end = page * per_page * len(LogResult.__fields__)
+        total_results = math.ceil(len(lines) / len(LogResult.__fields__))
+        total_pages = math.ceil(total_results / per_page)
+        for time, level, process, message in zip(
+            *[iter(lines[start:end])] * len(LogResult.__fields__)
+        ):
+
+            logs.append(Log(time=time, level=level, process=process, message=message))
+
     return LogResult(
         page=page,
-        total_results=len(lines),
-        total_pages=math.ceil(len(lines) / per_page),
+        total_results=total_results,
+        total_pages=total_pages,
         results=logs,
     )
 
@@ -59,14 +65,43 @@ def get_jobs():
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def modify_job(job_id: str, action: Literal["run", "pause", "resume"] = Body(..., embed=True)):
+def modify_job(
+    job_id: str,
+    action: Literal["run", "pause", "resume"] = Body(...),
+    params: Optional[Dict] = Body(None),
+):
     job = scheduler.get_job(job_id)
     if job is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This job does not exist.")
     if action == "run":
-        job.reschedule(trigger=None)
+        scheduler.add_job(job.func, replace_existing=True, kwargs=params)
     elif action == "pause":
         job.pause()
     elif action == "resume":
         job.resume()
     return Job(id=job.id, name=job.name, next_run_time=job.next_run_time)
+
+
+@router.get(
+    "/config",
+    response_model=PublicConfig,
+    dependencies=[
+        Depends(deps.get_current_user),
+        Depends(deps.has_user_permissions([UserRole.admin])),
+    ],
+)
+def get_server_config():
+    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))
+
+
+@router.patch(
+    "/config",
+    response_model=PublicConfig,
+    dependencies=[
+        Depends(deps.get_current_user),
+        Depends(deps.has_user_permissions([UserRole.admin])),
+    ],
+)
+def update_server_config(config_in: PublicConfig):
+    config.update(**config_in.dict())
+    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))

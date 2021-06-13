@@ -7,18 +7,19 @@ from passlib import pwd
 from passlib.context import CryptContext
 
 from server.core.config import config
+from server.schemas.auth import TokenPayload
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_jwt_access_token(payload, expires_delta: timedelta = None) -> str:
+def create_jwt_access_token(payload: TokenPayload, expires_delta: timedelta = None) -> str:
     to_encode = payload.dict()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.utcnow() + timedelta(minutes=config.access_token_expire_minutes)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.SIGNING_ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, config.secret_key, algorithm=config.signing_algorithm)
     return encoded_jwt
 
 
@@ -35,22 +36,22 @@ def get_random_password() -> str:
 
 
 def generate_token(data):
-    serializer = URLSafeSerializer(config.SECRET_KEY)
+    serializer = URLSafeSerializer(config.secret_key)
     return serializer.dumps(data)
 
 
 def confirm_token(data):
-    serializer = URLSafeSerializer(config.SECRET_KEY)
+    serializer = URLSafeSerializer(config.secret_key)
     return serializer.loads(data)
 
 
 def generate_timed_token(data):
-    serializer = URLSafeTimedSerializer(config.SECRET_KEY)
+    serializer = URLSafeTimedSerializer(config.secret_key)
     return serializer.dumps(data)
 
 
 def confirm_timed_token(token: str, expiration_minutes: int = 30):
-    serializer = URLSafeTimedSerializer(config.SECRET_KEY)
+    serializer = URLSafeTimedSerializer(config.secret_key)
     try:
         data = serializer.loads(token, max_age=expiration_minutes * 60)
     except Exception:

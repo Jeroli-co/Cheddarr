@@ -48,6 +48,7 @@ const Libraries = styled.div`
 type MediaServerInfoProps = {
   configId: string;
   serverName: string;
+  serverId: string;
   mediaServerType: MediaServerTypes;
 };
 
@@ -59,9 +60,10 @@ const MediaServerInfo = (props: MediaServerInfoProps) => {
   const { patch } = useAPI();
   const { pushInfo, pushDanger } = useAlert();
 
-  const fullSync = () => {
-    patch<IJob>(APIRoutes.PATCH_JOB("plex-full-sync"), {
+  const fullSync = (serverId: string) => {
+    patch<IJob>(APIRoutes.JOBS("plex-full-sync"), {
       action: JobActionsEnum.RUN,
+      params: { serverId: serverId },
     }).then((res) => {
       if (res.status === 200) {
         pushInfo("Full sync is running");
@@ -75,7 +77,10 @@ const MediaServerInfo = (props: MediaServerInfoProps) => {
     <Item>
       <ItemHeader>
         <H2>{props.serverName}</H2>
-        <PrimaryIconButton type="button" onClick={() => fullSync()}>
+        <PrimaryIconButton
+          type="button"
+          onClick={() => fullSync(props.serverId)}
+        >
           <Icon icon={faSync} />
         </PrimaryIconButton>
       </ItemHeader>
@@ -116,6 +121,7 @@ export const MediaServersInfo = (props: MediaServersInfoProps) => {
             key={index}
             configId={c.id}
             serverName={c.name}
+            serverId={c.serverId}
             mediaServerType={MediaServerTypes.PLEX}
           />
           {index !== props.config.length - 1 && <PrimaryDivider />}

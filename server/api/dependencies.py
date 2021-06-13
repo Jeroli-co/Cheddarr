@@ -16,9 +16,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 
 
 async def get_db() -> Iterator[AsyncSession]:
-    from server.database.session import Session
+    from server.database.session import DBSession
 
-    session = Session()
+    session = DBSession.get_session()
     try:
         yield session
     except Exception as exc:
@@ -49,7 +49,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, config.SECRET_KEY, algorithms=config.SIGNING_ALGORITHM)
+        payload = jwt.decode(token, config.secret_key, algorithms=config.signing_algorithm)
         token_data = TokenPayload.parse_obj(payload)
     except (jwt.InvalidTokenError, ValidationError):
         raise credentials_exception
@@ -66,6 +66,8 @@ def has_user_permissions(
         from server.core.security import check_permissions
 
         if not check_permissions(current_user.roles, permissions, options):
-            raise HTTPException(status_code=403, detail="Not enough privileges.")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Not enough privileges."
+            )
 
     return _has_permissions

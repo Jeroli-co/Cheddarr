@@ -2,7 +2,6 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.core.security import generate_timed_token
 from server.repositories.users import UserRepository
 from server.tests.utils import datasets
 
@@ -35,43 +34,6 @@ async def test_signup_user_already_exist(client: AsyncClient):
         },
     )
     assert resp.status_code == 409
-
-
-@pytest.mark.asyncio
-async def test_confirm_email_invalid_link(client: AsyncClient):
-
-    resp = await client.get(client.app.url_path_for("confirm_email", token="invalid"))
-    assert resp.status_code == 410
-
-
-@pytest.mark.asyncio
-async def test_confirm_email_not_existing(client: AsyncClient):
-    token = generate_timed_token({"email": "not_existing_email@fake.com"})
-    resp = await client.get(
-        client.app.url_path_for("confirm_email", token=token),
-    )
-    assert resp.status_code == 404
-
-
-@pytest.mark.asyncio
-async def test_confirm_email_already_confirmed(client: AsyncClient):
-    token = generate_timed_token({"email": datasets["users"][0]["email"]})
-    resp = await client.get(
-        client.app.url_path_for("confirm_email", token=token),
-    )
-    assert resp.status_code == 403
-
-
-@pytest.mark.asyncio
-async def test_confirm_email(db: AsyncSession, client: AsyncClient):
-    user_repo = UserRepository(db)
-    token = generate_timed_token({"email": datasets["users"][3]["email"]})
-    resp = await client.get(
-        client.app.url_path_for("confirm_email", token=token),
-    )
-    assert resp.status_code == 200
-    user = await user_repo.find_by(id=datasets["users"][3]["id"])
-    assert user.confirmed
 
 
 @pytest.mark.asyncio

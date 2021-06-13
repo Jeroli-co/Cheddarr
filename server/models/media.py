@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import backref, declared_attr, relationship
 
@@ -25,7 +26,7 @@ class SeriesType(str, Enum):
 
 
 class Media(Model):
-    __repr_props__ = ("title", "media_type", "tmdb_id")
+    __repr_props__ = ("title", "media_type", "tmdb_id", "imdb_id", "tvdb_id")
 
     id = Column(Integer, primary_key=True)
     tmdb_id = Column(Integer, unique=True, index=True)
@@ -36,6 +37,8 @@ class Media(Model):
 
 
 class MediaServerContent(object):
+    __table_args__ = (UniqueConstraint("external_id", "server_id"),)
+
     id = Column(Integer, primary_key=True)
     external_id = Column(String, nullable=False)
     added_at = Column(Date)
@@ -54,17 +57,12 @@ class MediaServerMedia(Model, MediaServerContent):
         "Media",
         lazy="joined",
         innerjoin=True,
-        backref=backref("server_media", lazy="selectin", cascade="all,delete,delete-orphan"),
+        backref=backref("media_servers", lazy="selectin", cascade="all,delete,delete-orphan"),
     )
     server = relationship(
         "MediaServerSetting",
         lazy="joined",
         innerjoin=True,
-        backref=backref("server_media", cascade="all,delete,delete-orphan"),
-    )
-    library = relationship(
-        "MediaServerLibrary",
-        lazy="joined",
         backref=backref("server_media", cascade="all,delete,delete-orphan"),
     )
 

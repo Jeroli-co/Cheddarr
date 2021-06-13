@@ -12,9 +12,6 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     sub: str
-    username: str
-    avatar: str
-    roles: int
 
 
 class EmailConfirm(APIModel):
@@ -26,3 +23,4 @@ class PlexAuthorizeSignin(APIModel):
     key: str
     code: str
     redirect_uri: str = ""
+    user_id: Optional[int]

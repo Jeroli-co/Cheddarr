@@ -1,29 +1,29 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import Cookies from "js-cookie";
-import jwt_decode from "jwt-decode";
-import { ISession, SessionDefaultImpl } from "../models/ISession";
-import { IEncodedToken } from "../models/IEncodedToken";
-import { IDecodedToken } from "../models/IDecodedToken";
-import { routes } from "../../router/routes";
-import { instance } from "../../axiosInstance";
-import { APIRoutes } from "../enums/APIRoutes";
-import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
-import { useLocation } from "react-router-dom";
-import { useHistory } from "react-router";
-import { useAlert } from "./AlertContext";
+import {ISession, SessionDefaultImpl} from "../models/ISession";
+import {IEncodedToken} from "../models/IEncodedToken";
+import {routes} from "../../router/routes";
+import {instance} from "../../axiosInstance";
+import {APIRoutes} from "../enums/APIRoutes";
+import {ERRORS_MESSAGE} from "../enums/ErrorsMessage";
+import {useLocation} from "react-router-dom";
+import {useHistory} from "react-router";
+import {useAlert} from "./AlertContext";
+import {useAPI} from "../hooks/useAPI";
+import {IUser} from "../models/IUser";
 
 interface ISessionContextInterface {
   session: ISession;
-  readonly updateUsername: (username: string) => void;
-  readonly initSession: (encodedToken: IEncodedToken) => void;
-  readonly invalidSession: () => void;
+  initSession: (encodedToken: IEncodedToken) => void;
+  invalidSession: () => void;
+  updateUser: (user: IUser) => void;
 }
 
 const SessionContextDefaultImpl: ISessionContextInterface = {
   session: SessionDefaultImpl,
   invalidSession(): void {},
   initSession(): void {},
-  updateUsername(): void {},
+  updateUser(): void {},
 };
 
 const SessionContext = createContext<ISessionContextInterface>(
@@ -34,7 +34,8 @@ export const SessionContextProvider = (props: any) => {
   const [session, setSession] = useState(SessionDefaultImpl);
   const location = useLocation();
   const history = useHistory();
-  const { pushDanger } = useAlert();
+  const { pushDanger, pushSuccess } = useAlert();
+  const { get } = useAPI();
 
   useEffect(() => {
     if (session.isLoading) {
@@ -43,10 +44,16 @@ export const SessionContextProvider = (props: any) => {
           .get<IEncodedToken>(APIRoutes.CONFIRM_PLEX_SIGN_IN(location.search))
           .then(
             (res) => {
-              initSession(res.data);
-              let redirectURI = res.headers["redirect-uri"];
-              if (redirectURI && redirectURI.length > 0) {
-                history.push(redirectURI);
+              if (res.status === 200) {
+                initSession(res.data);
+                let redirectURI = res.headers["redirect-uri"];
+                if (redirectURI && redirectURI.length > 0) {
+                  history.push(redirectURI);
+                }
+              } else if (res.status === 201) {
+                pushSuccess("Account created");
+                setSession({ ...session, isLoading: false });
+                history.push(routes.SIGN_IN.url(""));
               }
             },
             (error) => {
@@ -67,6 +74,19 @@ export const SessionContextProvider = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session.isLoading]);
 
+  useEffect(() => {
+    if (session.isAuthenticated) {
+      get<IUser>(APIRoutes.GET_CURRENT_USER).then((res) => {
+        if (res.status === 200) {
+          setSession({ ...session, user: res.data });
+        } else {
+          invalidSession();
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.isAuthenticated]);
+
   const getEncodedSession = (): IEncodedToken | null => {
     const tokenType = Cookies.get("token_type");
     const accessToken = Cookies.get("access_token");
@@ -83,12 +103,9 @@ export const SessionContextProvider = (props: any) => {
   const initSession = (encodedToken: IEncodedToken) => {
     Cookies.set("token_type", encodedToken.token_type);
     Cookies.set("access_token", encodedToken.access_token);
-    const decodedToken = jwt_decode<IDecodedToken>(encodedToken.access_token);
     setSession({
       isAuthenticated: true,
-      username: decodedToken.username,
-      avatar: decodedToken.avatar,
-      admin: decodedToken.admin,
+      user: null,
       isLoading: false,
     });
   };
@@ -102,8 +119,10 @@ export const SessionContextProvider = (props: any) => {
     });
   };
 
-  const updateUsername = (username: string) => {
-    setSession({ ...session, username: username });
+  const updateUser = (user: IUser) => {
+    if (session.isAuthenticated && session.user) {
+      setSession({ ...session, user: user });
+    }
   };
 
   return (
@@ -112,7 +131,7 @@ export const SessionContextProvider = (props: any) => {
         session,
         initSession,
         invalidSession,
-        updateUsername,
+        updateUser,
       }}
     >
       {props.children}

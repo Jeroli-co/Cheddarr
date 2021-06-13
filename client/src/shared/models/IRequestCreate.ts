@@ -1,5 +1,4 @@
 export interface IRequestCreate {
-  requestedUsername: string;
   tmdbId: string;
 }
 

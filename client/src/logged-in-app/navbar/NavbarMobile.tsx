@@ -36,7 +36,7 @@ export const NavbarMobile = ({ toggle }: NavbarMobileProps) => {
   const avatarRef = useRef<HTMLImageElement>(null);
 
   const {
-    session: { avatar },
+    session: { user },
   } = useSession();
   const history = useHistory();
 
@@ -57,21 +57,25 @@ export const NavbarMobile = ({ toggle }: NavbarMobileProps) => {
             onClick={() => history.push("/")}
           />
         </Item>
-        <Item>
-          <NavbarUserAvatar
-            src={avatar}
-            alt="User"
-            onClick={() => toggleDropdown()}
-            ref={avatarRef}
-          />
-        </Item>
+        {user && (
+          <Item>
+            <NavbarUserAvatar
+              src={user.avatar}
+              alt="User"
+              onClick={() => toggleDropdown()}
+              ref={avatarRef}
+            />
+          </Item>
+        )}
       </Row>
       <SearchBar />
-      <UserDropdown
-        isVisible={isDropdownOpen}
-        hideDropdown={() => setIsDropdownOpen(false)}
-        avatarRef={avatarRef}
-      />
+      {user && (
+        <UserDropdown
+          isVisible={isDropdownOpen}
+          hideDropdown={() => setIsDropdownOpen(false)}
+          avatarRef={avatarRef}
+        />
+      )}
     </NavbarContainer>
   );
 };

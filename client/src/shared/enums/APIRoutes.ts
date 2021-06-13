@@ -15,21 +15,14 @@ export const APIRoutes = {
   // USER
   GET_PUBLIC_USER: (username: string) => "/users/" + username,
   GET_CURRENT_USER: "/user",
-  GET_FRIENDS: "/user/friends",
-  GET_INCOMING_FRIEND_REQUESTS: "/user/friends/incoming",
-  GET_OUTGOING_FRIEND_REQUESTS: "/user/friends/outgoing",
-  DELETE_FRIEND: (username: string) => "/user/friends/" + username,
-  ACCEPT_FRIEND_REQUEST: (username: string) => "/user/friends/" + username,
-  SEND_FRIEND_REQUEST: "/user/friends",
-  SEARCH_FRIENDS: (value: string) => "/user/friends/search?value=" + value,
-  GET_FRIENDS_MOVIES_PROVIDERS: "/user/friends?provider_type=movies_provider",
-  GET_FRIENDS_SERIES_PROVIDERS: "/user/friends?provider_type=series_provider",
   UPDATE_USER: "/user",
   DELETE_ACCOUNT: "/user",
   INIT_RESET_PASSWORD: "/user/password",
   GET_RESET_PASSWORD_TOKEN_VALIDITY: (token: string) =>
     "/user/password" + token,
   RESET_PASSWORD: (token: string) => "/user/password" + token,
+  GET_USERS: (confirmed: boolean) => "/users?confirmed=" + confirmed,
+  USER_BY_ID: (id: number | string) => "/users/" + id,
 
   // MEDIA SERVERS
   GET_MEDIA_SERVERS_LIBRARIES: (
@@ -95,7 +88,7 @@ export const APIRoutes = {
   DELETE_EMAIL_SETTINGS: "/notifications/agents/email",
 
   // SYSTEM
-  GET_LOGS: "/system/logs",
-  GET_JOBS: "/system/jobs",
-  PATCH_JOB: (id: string) => "/system/jobs/" + id,
+  LOGS: "/system/logs",
+  JOBS: (id?: string) => `/system/jobs${id ? `/${id}` : ""}`,
+  CONFIG: "/system/config",
 };

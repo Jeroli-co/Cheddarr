@@ -29,6 +29,7 @@ class PaginatedResult(BaseModel):
 class Log(BaseModel):
     time: str
     level: str
+    process: str
     message: str
 
 

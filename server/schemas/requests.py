@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 
 from server.models.requests import RequestStatus
 from server.schemas.media import MovieSchema, SeriesSchema
-from server.schemas.users import UserPublicSchema
+from server.schemas.users import UserSchema
 from .core import APIModel, PaginatedResult
 from ..models.media import MediaType
 
@@ -12,8 +12,7 @@ from ..models.media import MediaType
 class MediaRequest(APIModel, ABC):
     id: int
     status: RequestStatus
-    requested_user: UserPublicSchema
-    requesting_user: UserPublicSchema
+    requesting_user: UserSchema
     created_at: datetime
     updated_at: datetime
     media_type: MediaType
@@ -21,7 +20,6 @@ class MediaRequest(APIModel, ABC):
 
 class MediaRequestCreate(APIModel):
     tmdb_id: int
-    requested_username: str
     root_folder: Optional[str]
     quality_profile_id: Optional[int]
     language_profile_id: Optional[int]
@@ -30,6 +28,7 @@ class MediaRequestCreate(APIModel):
 class MediaRequestUpdate(APIModel):
     status: RequestStatus
     provider_id: Optional[str]
+    comment: Optional[str]
 
 
 class MovieRequestSchema(MediaRequest):

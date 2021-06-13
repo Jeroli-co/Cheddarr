@@ -1,13 +1,13 @@
 from typing import Any
 
-from server.schemas.users import UserPublicSchema
+from server.schemas.users import UserSchema
 from .core import APIModel
 
 
 class NotificationSchema(APIModel):
     message: str
     read: bool
-    user: UserPublicSchema
+    user: UserSchema
 
 
 class NotificationAgentSchema(APIModel):

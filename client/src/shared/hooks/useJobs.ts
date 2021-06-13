@@ -11,12 +11,12 @@ export const useJobs = () => {
   const { pushInfo, pushDanger } = useAlert();
 
   useEffect(() => {
-    get<IJob[]>(APIRoutes.GET_JOBS).then((res) => setJobs(res));
+    get<IJob[]>(APIRoutes.JOBS()).then((res) => setJobs(res));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const patchJob = (id: string, action: JobActionsEnum) => {
-    patch<IJob>(APIRoutes.PATCH_JOB(id), { action: action }).then((res) => {
+    patch<IJob>(APIRoutes.JOBS(id), { action: action }).then((res) => {
       if (res.status === 200) {
         pushInfo("Job state: " + action);
         const jobsTmp = jobs.data;

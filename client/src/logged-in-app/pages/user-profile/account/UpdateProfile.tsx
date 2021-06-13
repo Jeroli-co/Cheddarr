@@ -32,7 +32,11 @@ const PrimaryButtonContainer = styled.div`
   }
 `;
 
-export const UpdateProfile = () => {
+type UpdateProfileProps = {
+  id: number;
+};
+
+export const UpdateProfile = (props: UpdateProfileProps) => {
   const [isChangeUsernameModalOpen, setIsChangeUsernameModalOpen] = useState(
     false
   );
@@ -122,14 +126,19 @@ export const UpdateProfile = () => {
 
       {isChangeUsernameModalOpen && (
         <ChangeUsernameModal
+          id={props.id}
           closeModal={() => setIsChangeUsernameModalOpen(false)}
         />
       )}
       {isChangeEmailModalOpen && (
-        <ChangeEmailModal closeModal={() => setIsChangeEmailModalOpen(false)} />
+        <ChangeEmailModal
+          id={props.id}
+          closeModal={() => setIsChangeEmailModalOpen(false)}
+        />
       )}
       {isChangePasswordModalOpen && (
         <ChangePasswordModal
+          id={props.id}
           closeModal={() => setIsChangePasswordModalOpen(false)}
         />
       )}

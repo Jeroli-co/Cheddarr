@@ -12,6 +12,31 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
   );
   const { get } = useAPI();
 
+  useEffect(() => {
+    if (loadDirection) {
+      triggerDataLoading();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadDirection]);
+
+  useEffect(() => {
+    if (data.isLoading) {
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.isLoading]);
+
+  const triggerDataLoading = () => {
+    const defaultValue: IPaginated<T> = {
+      page: data.data && data.data.page ? data.data.page : 0,
+      results: [],
+      totalPages: data.data && data.data.totalPages ? data.data.totalPages : 0,
+      totalResults:
+        data.data && data.data.totalResults ? data.data.totalResults : 0,
+    };
+    setData({ ...DefaultAsyncCall, data: defaultValue });
+  };
+
   const isFirstPage = () => {
     return data && data.data && data.data.page && data.data.page <= 1;
   };
@@ -58,20 +83,6 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
     });
   };
 
-  useEffect(() => {
-    if (loadDirection) {
-      setData({ ...data, isLoading: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadDirection]);
-
-  useEffect(() => {
-    if (data.isLoading) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.isLoading]);
-
   const loadPrev = () => {
     let isNewPageLoaded = true;
     const totalPage = data.data && data.data.totalPages;
@@ -80,7 +91,7 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
         setLoadDirection("prev");
       } else {
         if (!isFirstPage() || infiniteLoad) {
-          setData({ ...data, isLoading: true });
+          triggerDataLoading();
         } else {
           isNewPageLoaded = false;
         }
@@ -97,7 +108,7 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
         setLoadDirection("next");
       } else {
         if (!isLastPage() || infiniteLoad) {
-          setData({ ...data, isLoading: true });
+          triggerDataLoading();
         } else {
           isNewPageLoaded = false;
         }

@@ -5,8 +5,6 @@ import {
   compareRequestCreationDateAsc,
   compareRequestCreationDateDesc,
   compareRequestDefault,
-  compareRequestedUserAsc,
-  compareRequestedUserDesc,
   compareRequestingUserAsc,
   compareRequestingUserDesc,
   compareRequestMediaTypeAsc,
@@ -200,13 +198,9 @@ export const RequestHeader = ({ requestType }: RequestHeaderProps) => {
     let nextDir = nextFilterDir(filters.user);
     let compare =
       nextDir === FilterDir.DESC
-        ? requestType === RequestTypes.INCOMING
-          ? compareRequestingUserDesc
-          : compareRequestedUserDesc
+        ? compareRequestingUserDesc
         : nextDir === FilterDir.ASC
-        ? requestType === RequestTypes.INCOMING
-          ? compareRequestingUserAsc
-          : compareRequestedUserAsc
+        ? compareRequestingUserAsc
         : compareRequestDefault;
     setFilters({ ...defaultFilter, user: nextDir });
     sortRequests(requestType, compare);
@@ -282,11 +276,7 @@ export const RequestHeader = ({ requestType }: RequestHeaderProps) => {
         </span>
       </RequestsHeaderElement>
       <RequestsHeaderElement cursor="pointer" onClick={() => onUserClick()}>
-        <p>
-          {requestType === RequestTypes.INCOMING
-            ? "REQUESTING USER"
-            : "REQUESTED USER"}
-        </p>
+        <p>REQUESTING USER</p>
         <span className="filters-direction-icon">
           {filters.user && filters.user === FilterDir.ASC && (
             <Icon icon={faArrowUp} size="xs" />
@@ -346,7 +336,7 @@ export const RequestHeader = ({ requestType }: RequestHeaderProps) => {
 };
 
 /* FOOTER */
-const RequestsFooterContainer = styled.header`
+const RequestsFooterContainer = styled.footer`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -369,17 +359,25 @@ type RequestFooterProps = {
 };
 
 export const RequestFooter = (props: RequestFooterProps) => {
+  if (props.totalPages === undefined) {
+    return <div />;
+  }
+
   return (
     <RequestsFooterContainer>
-      <PrimaryButton type="button" onClick={() => props.onLoadPrev()}>
-        <Icon icon={faArrowLeft} />
-      </PrimaryButton>
-      <p>
-        {props.currentPage} ... {props.totalPages}
-      </p>
-      <PrimaryButton type="button" onClick={() => props.onLoadNext()}>
-        <Icon icon={faArrowRight} />
-      </PrimaryButton>
+      {props.totalPages > 0 && (
+        <>
+          <PrimaryButton type="button" onClick={() => props.onLoadPrev()}>
+            <Icon icon={faArrowLeft} />
+          </PrimaryButton>
+          <p>
+            {props.currentPage} ... {props.totalPages}
+          </p>
+          <PrimaryButton type="button" onClick={() => props.onLoadNext()}>
+            <Icon icon={faArrowRight} />
+          </PrimaryButton>
+        </>
+      )}
     </RequestsFooterContainer>
   );
 };
@@ -509,13 +507,7 @@ export const RequestLayout = ({
         <MediaTag media={request.media} />
       </RequestElement>
       <RequestElement>
-        <UserSmallCard
-          user={
-            requestType === RequestTypes.INCOMING
-              ? request.requestingUser
-              : request.requestedUser
-          }
-        />
+        <UserSmallCard user={request.requestingUser} />
       </RequestElement>
       <RequestElement>
         {new Date(request.createdAt).toLocaleDateString()}

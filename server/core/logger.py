@@ -1,81 +1,104 @@
 import logging
+import logging.config
 import logging.handlers
-from copy import copy
+import sys
+from pathlib import Path
+
+from loguru import logger
 
 from server.core import config
 
-LOGGING_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "console": {
-            "()": "server.core.logger.LogFormatter",
-            "fmt": "%(asctime)s | %(levelname)s | [%(process)d] - %(message)s ",
-            "colored": True,
-        },
-        "file": {
-            "()": "server.core.logger.LogFormatter",
-            "fmt": "%(asctime)s | %(levelname)s | [%(process)d] - %(message)s ",
-            "colored": False,
-        },
-    },
-    "handlers": {
-        "console": {
-            "formatter": "console",
-            "class": "logging.StreamHandler",
-        },
-        "file": {
-            "formatter": "file",
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": config.LOGS_FOLDER / config.LOGS_FILENAME,
-            "when": "midnight",
-            "interval": 1,
-            "utc": True,
-            "encoding": "utf-8",
-            "backupCount": config.LOGS_MAX_FILES,
-        },
-    },
-    "loggers": {
-        "gunicorn.error": {
-            "handlers": ["console", "file"],
-            "level": config.LOG_LEVEL,
-        },
-    },
-    "root": {
-        "handlers": ["console", "file"],
-        "level": config.LOG_LEVEL,
-    },
-}
 
-
-class LogFormatter(logging.Formatter):
-    MAPPING = {
-        "DEBUG": 37,  # white
-        "INFO": 32,  # cyan
-        "WARNING": 33,  # yellow
-        "ERROR": 31,  # red
-        "CRITICAL": 41,  # white on red bg
+class InterceptHandler(logging.Handler):
+    loglevel_mapping = {
+        50: "CRITICAL",
+        40: "ERROR",
+        30: "WARNING",
+        20: "INFO",
+        10: "DEBUG",
+        0: "NOTSET",
     }
 
-    PREFIX = "\033["
-    SUFFIX = "\033[0m"
+    def emit(self, record):
+        try:
+            level = logger.level(record.levelname).name
+        except AttributeError:
+            level = self.loglevel_mapping[record.levelno]
 
-    def __init__(self, fmt: str, colored: bool = True):
-        logging.Formatter.__init__(self, fmt)
-        self.colored = colored
+        frame, depth = logging.currentframe(), 2
+        while frame.f_code.co_filename == logging.__file__:
+            frame = frame.f_back
+            depth += 1
 
-    def format(self, record):
-        record_ = copy(record)
-        if self.colored:
-            levelname = record_.levelname
-            seq = self.MAPPING.get(levelname, 37)  # default white
-            colored_levelname = ("{0}{1}m{2}{3}").format(self.PREFIX, seq, levelname, self.SUFFIX)
-            record_.levelname = colored_levelname
-
-        formatted_record = logging.Formatter.format(self, record_)
-        if not self.colored and record.exc_info:
-            formatted_record = formatted_record.replace("\n", "")
-        return formatted_record
+        logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-config.LOGS_FOLDER.mkdir(parents=True, exist_ok=True)
+class LogLevelFilter:
+    def __call__(self, record):
+        levelno = logger.level(config.log_level).no
+        return record["level"].no >= levelno
+
+
+class Formatter:
+    fmt = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>{extra[padding]} | <level>{message}</level>\n{exception}"
+    padding = 0
+
+    @classmethod
+    def format(cls, record):
+        length = len("{name}:{function}:{line}".format(**record))
+        cls.padding = max(cls.padding, length)
+        record["extra"]["padding"] = " " * (cls.padding - length)
+        return cls.fmt
+
+
+class Logger:
+    @classmethod
+    def make_logger(cls):
+        log = cls.customize_logging(
+            config.logs_folder / config.logs_filename,
+            level=config.log_level,
+            rotation="1 day",
+            retention="1 week",
+        )
+        return log
+
+    @classmethod
+    def customize_logging(cls, filepath: Path, level: str, rotation: str, retention: str):
+        logger.remove()
+        logger.add(
+            sys.stdout,
+            enqueue=True,
+            backtrace=True,
+            diagnose=True,
+            level=0,
+            filter=LogLevelFilter(),
+            format=Formatter.format,
+        )
+        logger.add(
+            str(filepath),
+            rotation=rotation,
+            retention=retention,
+            enqueue=True,
+            backtrace=False,
+            diagnose=False,
+            level=level.upper(),
+            filter=LogLevelFilter(),
+            format=Formatter.format,
+        )
+
+        logging.basicConfig(handlers=[InterceptHandler()], level=0)
+
+        for _log in [
+            *logging.root.manager.loggerDict.keys(),
+            "gunicorn",
+            "gunicorn.access",
+            "gunicorn.error",
+            "uvicorn",
+            "uvicorn.access",
+            "uvicorn.error",
+        ]:
+            _logger = logging.getLogger(_log)
+            _logger.propagate = False
+            _logger.handlers = [InterceptHandler()]
+
+        return logger

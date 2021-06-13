@@ -10,6 +10,7 @@ import { CenteredContent } from "../layout/CenteredContent";
 import { ComponentSizes } from "../../enums/ComponentSizes";
 import { useRequestsContext } from "../../contexts/RequestsContext";
 import { RequestTypes } from "../../enums/RequestTypes";
+import { FullWidthTag } from "../FullWidthTag";
 
 const RequestsSent = () => {
   const { requestsSent, onLoadPrev, onLoadNext } = useRequestsContext();
@@ -33,6 +34,12 @@ const RequestsSent = () => {
             requestType={RequestTypes.OUTGOING}
           />
         ))}
+      {!requestsSent.isLoading &&
+        requestsSent.data &&
+        requestsSent.data.results &&
+        requestsSent.data.results.length === 0 && (
+          <FullWidthTag>No requests sent</FullWidthTag>
+        )}
       <RequestFooter
         currentPage={requestsSent.data?.page}
         totalPages={requestsSent.data?.totalPages}

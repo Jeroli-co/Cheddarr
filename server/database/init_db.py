@@ -3,9 +3,9 @@ from server import models  # noqa
 from .base import Base
 
 
-async def init_db():
-    from server.database.session import engine
+def init_db():
+    from server.database.session import DBSession
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+    with DBSession.create_sync_engine().begin() as conn:
+        Base.metadata.drop_all(bind=conn)
+        Base.metadata.create_all(bind=conn)

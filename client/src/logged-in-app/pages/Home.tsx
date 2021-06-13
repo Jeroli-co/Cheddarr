@@ -8,16 +8,18 @@ export default function Home() {
   const { configs } = usePlexConfig();
   return (
     <div className="noselect">
-      {!configs.isLoading && configs.data && (
+      {!configs.isLoading && configs.data && configs.data.length > 0 && (
         <>
           <MediaCarouselWidget
             title="Movies recently added"
             url={APIRoutes.GET_MEDIA_RECENTLY_ADDED(MediaTypes.MOVIES)}
+            hasToGetFullMedia
           />
           <br />
           <MediaCarouselWidget
             title="Series recently added"
             url={APIRoutes.GET_MEDIA_RECENTLY_ADDED(MediaTypes.SERIES)}
+            hasToGetFullMedia
           />
           <br />
         </>

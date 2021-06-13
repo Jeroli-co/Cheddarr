@@ -6,9 +6,7 @@ import { minToHoursMinutes } from "../../../utils/media-utils";
 import { MediaRating } from "./MediaRating";
 import { MediaTag, SuccessTag, Tag } from "../Tag";
 import { MediaPersonCarousel } from "./MediaPersonCarousel";
-import { PlayButton, PrimaryButton, PrimaryLinkButton } from "../Button";
-import { SeriesRequestOptionsContextProvider } from "../../contexts/SeriesRequestOptionsContext";
-import { RequestMediaModal } from "../requests/RequestMediaModal";
+import { PlayButton, PrimaryLinkButton } from "../Button";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
 import { PrimaryDivider } from "../Divider";
 import { Row } from "../layout/Row";
@@ -19,6 +17,7 @@ import { MediaCarouselWidget } from "./MediaCarouselWidget";
 import { APIRoutes } from "../../enums/APIRoutes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
+import { RequestButton } from "../requests/RequestButton";
 
 const BackgroundContainer = styled.div`
   position: relative;
@@ -141,7 +140,6 @@ export const Media = (props: MediaProps) => {
   const [directors, setDirectors] = useState<string[] | null>(null);
   const [producers, setProducers] = useState<string[] | null>(null);
   const [screenplay, setScreenplay] = useState<string[] | null>(null);
-  const [isRequestMediaModalOpen, setIsRequestMediaModalOpen] = useState(false);
   const poster = useImage(props.media.posterUrl);
 
   useEffect(() => {
@@ -253,12 +251,7 @@ export const Media = (props: MediaProps) => {
                   <Buttons>
                     {((isMovie(props.media) && !isOnServers(props.media)) ||
                       isSeries(props.media)) && (
-                      <PrimaryButton
-                        type="button"
-                        onClick={() => setIsRequestMediaModalOpen(true)}
-                      >
-                        Request
-                      </PrimaryButton>
+                      <RequestButton media={props.media} />
                     )}
                     {props.media.mediaServersInfo &&
                       props.media.mediaServersInfo.length > 0 &&
@@ -352,15 +345,6 @@ export const Media = (props: MediaProps) => {
           title="Similar"
           url={APIRoutes.GET_SIMILAR_SERIES(props.media.tmdbId)}
         />
-      )}
-
-      {isRequestMediaModalOpen && (
-        <SeriesRequestOptionsContextProvider>
-          <RequestMediaModal
-            media={props.media}
-            closeModal={() => setIsRequestMediaModalOpen(false)}
-          />
-        </SeriesRequestOptionsContextProvider>
       )}
     </span>
   );

@@ -13,14 +13,15 @@ import { Icon } from "../../../../shared/components/Icon";
 
 type ChangeEmailModalProps = {
   closeModal: () => void;
+  id: number;
 };
 
 const ChangeEmailModal = (props: ChangeEmailModalProps) => {
   const { register, handleSubmit, errors } = useForm<{ email: string }>();
-  const { updateEmail } = useUserService();
+  const { updateUserById } = useUserService();
 
   const onSubmit = async (data: { email: string }) => {
-    updateEmail(data.email).then((res) => {
+    updateUserById(props.id, { email: data.email }).then((res) => {
       if (res.status === 200) props.closeModal();
     });
   };

@@ -15,6 +15,8 @@ import { Tooltiped } from "../../../../shared/components/Tooltiped";
 import { JobActionsEnum } from "../../../../shared/models/IJob";
 import { PrimaryLightDivider } from "../../../../shared/components/Divider";
 import { H1 } from "../../../../shared/components/Titles";
+import { useRoleGuard } from "../../../../shared/hooks/useRoleGuard";
+import { Roles } from "../../../../shared/enums/Roles";
 
 const JobContainer = styled.div`
   display: flex;
@@ -33,6 +35,8 @@ const JobContainer = styled.div`
 
 export const JobsSettings = () => {
   const { jobs, patchJob } = useJobs();
+
+  useRoleGuard([Roles.ADMIN]);
 
   if (jobs.isLoading) return <Spinner />;
   if (jobs.status >= 400) return <SwitchErrors status={jobs.status} />;

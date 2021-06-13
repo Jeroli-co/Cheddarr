@@ -1,23 +1,29 @@
 import React from "react";
 import styled from "styled-components";
-import { useCurrentUser } from "../../../shared/hooks/useCurrentUser";
 import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
 import { Spinner } from "../../../shared/components/Spinner";
 import { UpdateProfile } from "./account/UpdateProfile";
-import { H1 } from "../../../shared/components/Titles";
+import { H1, H2 } from "../../../shared/components/Titles";
 import { STATIC_STYLES } from "../../../shared/enums/StaticStyles";
 import { PrimaryDivider } from "../../../shared/components/Divider";
-import { Friends } from "./friends/Friends";
-import { useWindowSize } from "../../../shared/hooks/useWindowSize";
+import { useParams } from "react-router";
+import { useUser } from "../../../shared/hooks/useUser";
+import { Roles } from "../../../shared/enums/Roles";
+import { useUserService } from "../../../shared/toRefactor/useUserService";
+import { RolesTree } from "../../../shared/components/RolesTree";
+import { checkRole } from "../../../utils/roles";
+import { useSession } from "../../../shared/contexts/SessionContext";
 
 const SubContainer = styled.div`
   display: flex;
-  text-align: center;
+  justify-content: space-around;
   width: 100%;
   flex-wrap: wrap;
 `;
 
 const InfosContainer = styled.div`
+  text-align: center;
+
   p {
     margin-top: 10px;
   }
@@ -32,15 +38,6 @@ const InfosContainer = styled.div`
   }
 `;
 
-const UserFriends = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  @media screen and (min-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    width: 80%;
-  }
-`;
-
 const UserPictureStyle = styled.img`
   width: 75%;
   @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
@@ -48,13 +45,38 @@ const UserPictureStyle = styled.img`
   }
 `;
 
+type RouteParams = {
+  id?: string;
+};
+
 const Profile = () => {
-  const user = useCurrentUser();
-  const { width } = useWindowSize();
+  const { id } = useParams<RouteParams>();
 
-  if (user.isLoading) return <Spinner />;
+  const { currentUser: profileOwner, updateUser } = useUser(id);
+  const { updateUserById } = useUserService();
+  const {
+    session: { user },
+  } = useSession();
 
-  if (user.data === null) return <SwitchErrors status={user.status} />;
+  const onRoleChange = (role: Roles) => {
+    if (profileOwner.data && profileOwner.data.id) {
+      updateUserById(
+        profileOwner.data.id,
+        { roles: role },
+        "Cannot update roles",
+        "Roles updated"
+      ).then((res) => {
+        if (res.status === 200 && res.data) {
+          updateUser(res.data);
+        }
+      });
+    }
+  };
+
+  if (profileOwner.isLoading) return <Spinner />;
+
+  if (profileOwner.data === null)
+    return <SwitchErrors status={profileOwner.status} />;
 
   return (
     <>
@@ -63,19 +85,43 @@ const Profile = () => {
       <div>
         <SubContainer>
           <InfosContainer>
-            <UserPictureStyle src={user.data.avatar} alt="User" />
+            <UserPictureStyle src={profileOwner.data.avatar} alt="User" />
             <p className="username">
-              <i>{"@" + user.data.username}</i>
+              <i>{"@" + profileOwner.data.username}</i>
             </p>
-            <p>{user.data.email}</p>
+            {user &&
+              profileOwner.data &&
+              profileOwner.data.roles &&
+              checkRole(
+                user.roles,
+                [Roles.ADMIN, Roles.MANAGE_USERS],
+                true
+              ) && <p>{profileOwner.data.email}</p>}
           </InfosContainer>
-          {width <= STATIC_STYLES.TABLET_MAX_WIDTH && <PrimaryDivider />}
-          <UserFriends>
-            <Friends />
-          </UserFriends>
+          <div>
+            {user &&
+              profileOwner.data &&
+              profileOwner.data.roles &&
+              checkRole(
+                user.roles,
+                [Roles.ADMIN, Roles.MANAGE_USERS],
+                true
+              ) && (
+                <>
+                  <H2>User roles</H2>
+                  <RolesTree
+                    defaultValue={profileOwner.data.roles}
+                    onSave={onRoleChange}
+                  />
+                </>
+              )}
+          </div>
         </SubContainer>
         <PrimaryDivider />
-        <UpdateProfile />
+        {user &&
+          checkRole(user.roles, [Roles.ADMIN, Roles.MANAGE_USERS], true) && (
+            <UpdateProfile id={profileOwner.data.id} />
+          )}
       </div>
     </>
   );

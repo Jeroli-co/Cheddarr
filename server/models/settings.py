@@ -34,8 +34,6 @@ class MediaServerSetting(Model, ExternalServiceSetting):
 
     server_id = Column(String, primary_key=True)
     server_name = Column(String)
-    user_id = Column(ForeignKey("user.id"), nullable=False)
-    user = relationship("User", back_populates="media_servers")
     libraries: List["MediaServerLibrary"] = relationship(
         "MediaServerLibrary", lazy="selectin", cascade="all,delete,delete-orphan"
     )
@@ -70,7 +68,6 @@ class MediaProviderSetting(Model, ExternalServiceSetting):
     language_profile_id = Column(Integer)
     version = Column(Integer)
     is_default = Column(Boolean, default=False)
-    user_id = Column(ForeignKey("user.id"), nullable=False)
 
 
 class RadarrSetting(MediaProviderSetting):

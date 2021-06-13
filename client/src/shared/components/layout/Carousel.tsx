@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import styled, { css } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
@@ -13,10 +13,12 @@ const CarouselStyle = styled.div`
     opacity: 0;
   }
 
-  &:hover .pagination-button {
-    @media only screen and (min-width: 768px) {
-      visibility: visible;
-      opacity: 0.8;
+  &:hover {
+    .pagination-button {
+      @media only screen and (min-width: 768px) {
+        visibility: visible;
+        opacity: 0.8;
+      }
     }
   }
 `;
@@ -37,7 +39,6 @@ const CarouselItems = styled.div`
 
 type PaginationButtonProps = {
   direction: string;
-  isNeeded: boolean;
 };
 
 const PaginationButton = styled.button<PaginationButtonProps>`
@@ -54,7 +55,6 @@ const PaginationButton = styled.button<PaginationButtonProps>`
     css`
       right: 0;
     `}
-  display: ${(props) => (props.isNeeded ? "flex" : "none")};
   justify-content: center;
   align-items: center;
   margin: 1em;
@@ -67,7 +67,7 @@ const PaginationButton = styled.button<PaginationButtonProps>`
   border-radius: 50%;
   cursor: pointer;
   z-index: 1;
-  
+
   &:focus {
     outline: none;
   }
@@ -83,14 +83,6 @@ const Carousel = (props: CarouselProps) => {
   smoothscroll.polyfill();
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isButtonsNeeded, setIsButtonNeeded] = useState(false);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      setIsButtonNeeded(scrollRef.current.scrollWidth > window.innerWidth);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.children]);
 
   const _onSlideLeft = () => {
     let scrollLeft;
@@ -138,7 +130,6 @@ const Carousel = (props: CarouselProps) => {
     <CarouselStyle>
       <PaginationButton
         className="pagination-button"
-        isNeeded={isButtonsNeeded}
         direction="left"
         onClick={() => _onSlideLeft()}
       >
@@ -146,7 +137,6 @@ const Carousel = (props: CarouselProps) => {
       </PaginationButton>
       <PaginationButton
         className="pagination-button"
-        isNeeded={isButtonsNeeded}
         direction="right"
         onClick={() => _onSlideRight()}
       >
