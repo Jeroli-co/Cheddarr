@@ -11,6 +11,8 @@ import { useUser } from "../../../shared/hooks/useUser";
 import { Roles } from "../../../shared/enums/Roles";
 import { useUserService } from "../../../shared/toRefactor/useUserService";
 import { RolesTree } from "../../../shared/components/RolesTree";
+import { checkRole } from "../../../utils/roles";
+import { useSession } from "../../../shared/contexts/SessionContext";
 
 const SubContainer = styled.div`
   display: flex;
@@ -52,6 +54,9 @@ const Profile = () => {
 
   const { currentUser: profileOwner, updateUser } = useUser(id);
   const { updateUserById } = useUserService();
+  const {
+    session: { user },
+  } = useSession();
 
   const onRoleChange = (role: Roles) => {
     if (profileOwner.data && profileOwner.data.id) {
@@ -84,20 +89,39 @@ const Profile = () => {
             <p className="username">
               <i>{"@" + profileOwner.data.username}</i>
             </p>
-            <p>{profileOwner.data.email}</p>
+            {user &&
+              profileOwner.data &&
+              profileOwner.data.roles &&
+              checkRole(
+                user.roles,
+                [Roles.ADMIN, Roles.MANAGE_USERS],
+                true
+              ) && <p>{profileOwner.data.email}</p>}
           </InfosContainer>
           <div>
-            <H2>User roles</H2>
-            {profileOwner.data && profileOwner.data.roles && (
-              <RolesTree
-                defaultValue={profileOwner.data.roles}
-                onSave={onRoleChange}
-              />
-            )}
+            {user &&
+              profileOwner.data &&
+              profileOwner.data.roles &&
+              checkRole(
+                user.roles,
+                [Roles.ADMIN, Roles.MANAGE_USERS],
+                true
+              ) && (
+                <>
+                  <H2>User roles</H2>
+                  <RolesTree
+                    defaultValue={profileOwner.data.roles}
+                    onSave={onRoleChange}
+                  />
+                </>
+              )}
           </div>
         </SubContainer>
         <PrimaryDivider />
-        <UpdateProfile id={profileOwner.data.id} />
+        {user &&
+          checkRole(user.roles, [Roles.ADMIN, Roles.MANAGE_USERS], true) && (
+            <UpdateProfile id={profileOwner.data.id} />
+          )}
       </div>
     </>
   );

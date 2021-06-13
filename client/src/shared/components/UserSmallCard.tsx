@@ -23,9 +23,7 @@ type UserSmallCardProps = {
 export const UserSmallCard = ({ user }: UserSmallCardProps) => {
   const history = useHistory();
   return (
-    <Container
-      onClick={() => history.push(routes.PUBLIC_USER.url(user.username))}
-    >
+    <Container onClick={() => history.push(routes.PROFILE.url(user.id))}>
       <Image src={user.avatar} alt="User" />
       <div>{user.username}</div>
     </Container>

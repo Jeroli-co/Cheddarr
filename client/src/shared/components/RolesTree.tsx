@@ -88,6 +88,15 @@ export const RolesTree = (props: DefaultRolesTreeProps) => {
           />
           <p>Manage users</p>
         </RoleCheckboxContainer>
+        <RoleCheckboxContainer>
+          <input
+            type="checkbox"
+            onChange={() => onRoleChange(Roles.AUTO_APPROVE)}
+            checked={checkRole(roles, [Roles.AUTO_APPROVE])}
+            disabled={checkRole(roles, [Roles.ADMIN])}
+          />
+          <p>Auto approve request</p>
+        </RoleCheckboxContainer>
       </ChildElement>
       <br />
       <PrimaryButton type="button" onClick={() => onSave()}>

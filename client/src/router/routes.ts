@@ -3,7 +3,6 @@ import { PageLoader } from "../shared/components/PageLoader";
 import { ResetPassword } from "../logged-out-app/elements/ResetPassword";
 import { SignInForm } from "../logged-out-app/SignInForm";
 import { SignUpForm } from "../logged-out-app/SignUpForm";
-import { PublicUser } from "../logged-in-app/pages/PublicUser";
 import { Settings } from "../logged-in-app/pages/settings/Settings";
 import { Requests } from "../logged-in-app/pages/Requests";
 import { Home } from "../shared/Home";
@@ -42,12 +41,9 @@ const routes = {
   /** USERS **/
   USERS: { url: "/users", component: UsersSettings },
   PROFILE: {
-    url: (id: string) => "/profile" + (id.length > 0 ? `/${id}` : ""),
+    url: (id: number | string) =>
+      "/profile" + (id.toString().length > 0 ? `/${id}` : ""),
     component: Profile,
-  },
-  PUBLIC_USER: {
-    url: (username: string) => "/users/" + username,
-    component: PublicUser,
   },
 
   /** SETTINGS **/

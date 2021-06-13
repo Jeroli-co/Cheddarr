@@ -37,12 +37,6 @@ export default function SwitchRoutes(props: any) {
       />
       <LoggedInRoute
         exact
-        path={routes.PUBLIC_USER.url(":username")}
-        component={routes.PUBLIC_USER.component}
-        {...props}
-      />
-      <LoggedInRoute
-        exact
         path={routes.USERS.url}
         component={routes.USERS.component}
         {...props}
