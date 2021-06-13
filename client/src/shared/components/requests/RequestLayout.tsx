@@ -5,8 +5,6 @@ import {
   compareRequestCreationDateAsc,
   compareRequestCreationDateDesc,
   compareRequestDefault,
-  compareRequestedUserAsc,
-  compareRequestedUserDesc,
   compareRequestingUserAsc,
   compareRequestingUserDesc,
   compareRequestMediaTypeAsc,
@@ -200,13 +198,9 @@ export const RequestHeader = ({ requestType }: RequestHeaderProps) => {
     let nextDir = nextFilterDir(filters.user);
     let compare =
       nextDir === FilterDir.DESC
-        ? requestType === RequestTypes.INCOMING
-          ? compareRequestingUserDesc
-          : compareRequestedUserDesc
+        ? compareRequestingUserDesc
         : nextDir === FilterDir.ASC
-        ? requestType === RequestTypes.INCOMING
-          ? compareRequestingUserAsc
-          : compareRequestedUserAsc
+        ? compareRequestingUserAsc
         : compareRequestDefault;
     setFilters({ ...defaultFilter, user: nextDir });
     sortRequests(requestType, compare);
@@ -282,11 +276,7 @@ export const RequestHeader = ({ requestType }: RequestHeaderProps) => {
         </span>
       </RequestsHeaderElement>
       <RequestsHeaderElement cursor="pointer" onClick={() => onUserClick()}>
-        <p>
-          {requestType === RequestTypes.INCOMING
-            ? "REQUESTING USER"
-            : "REQUESTED USER"}
-        </p>
+        <p>REQUESTING USER</p>
         <span className="filters-direction-icon">
           {filters.user && filters.user === FilterDir.ASC && (
             <Icon icon={faArrowUp} size="xs" />
@@ -517,13 +507,7 @@ export const RequestLayout = ({
         <MediaTag media={request.media} />
       </RequestElement>
       <RequestElement>
-        <UserSmallCard
-          user={
-            requestType === RequestTypes.INCOMING
-              ? request.requestingUser
-              : request.requestedUser
-          }
-        />
+        <UserSmallCard user={request.requestingUser} />
       </RequestElement>
       <RequestElement>
         {new Date(request.createdAt).toLocaleDateString()}

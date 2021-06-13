@@ -5,7 +5,6 @@ import { IMedia } from "./IMedia";
 export interface IMediaRequest {
   id: number;
   status: RequestStatus;
-  requestedUser: IUser;
   requestingUser: IUser;
   createdAt: Date;
   updatedAt: Date;
@@ -151,42 +150,6 @@ export const compareRequestingUserAsc = (
 ) => {
   const userFirst = first.requestingUser.username;
   const userSecond = second.requestingUser.username;
-  if (userFirst && userSecond) {
-    if (userFirst > userSecond) {
-      return -1;
-    } else if (userFirst < userSecond) {
-      return 1;
-    } else {
-      return compareRequestDefault(first, second);
-    }
-  }
-  return 0;
-};
-
-export const compareRequestedUserDesc = (
-  first: IMediaRequest,
-  second: IMediaRequest
-) => {
-  const userFirst = first.requestedUser.username;
-  const userSecond = second.requestedUser.username;
-  if (userFirst && userSecond) {
-    if (userFirst < userSecond) {
-      return -1;
-    } else if (userFirst > userSecond) {
-      return 1;
-    } else {
-      return compareRequestDefault(first, second);
-    }
-  }
-  return 0;
-};
-
-export const compareRequestedUserAsc = (
-  first: IMediaRequest,
-  second: IMediaRequest
-) => {
-  const userFirst = first.requestedUser.username;
-  const userSecond = second.requestedUser.username;
   if (userFirst && userSecond) {
     if (userFirst > userSecond) {
       return -1;
