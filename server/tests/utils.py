@@ -59,13 +59,19 @@ datasets = {
             "tmdb_id": 4194,
             "tvdb_id": 83268,
             "media_type": MediaType.series,
-        }
+        },
+        {
+            "id": 2,
+            "title": "Star Wars Rebels",
+            "tmdb_id": 60554,
+            "tvdb_id": 283468,
+            "media_type": MediaType.series,
+        },
     ],
     "series_requests": [
         {
             "id": 1,
             "requesting_user_id": 3,
-            "requested_user_id": 1,
             "status": RequestStatus.pending,
             "media_id": 1,
             "media_type": MediaType.series,
@@ -73,7 +79,6 @@ datasets = {
         {
             "id": 2,
             "requesting_user_id": 1,
-            "requested_user_id": 3,
             "status": RequestStatus.approved,
             "media_id": 1,
             "media_type": MediaType.series,
@@ -81,17 +86,22 @@ datasets = {
     ],
     "movies": [
         {
-            "id": 2,
+            "id": 3,
             "title": "Star Wars",
             "tmdb_id": 11,
             "media_type": MediaType.movie,
-        }
+        },
+        {
+            "id": 4,
+            "title": "Star Trek",
+            "tmdb_id": 13475,
+            "media_type": MediaType.movie,
+        },
     ],
     "movies_requests": [
         {
             "id": 3,
             "requesting_user_id": 3,
-            "requested_user_id": 1,
             "status": RequestStatus.pending,
             "media_id": 2,
             "media_type": MediaType.movie,
@@ -99,7 +109,6 @@ datasets = {
         {
             "id": 4,
             "requesting_user_id": 1,
-            "requested_user_id": 3,
             "status": RequestStatus.approved,
             "media_id": 2,
             "media_type": MediaType.movie,
