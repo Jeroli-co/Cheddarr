@@ -6,6 +6,7 @@ Create Date: 2021-03-21 23:38:26.280622
 
 """
 import sqlalchemy as sa
+from sqlalchemy import func
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -41,8 +42,8 @@ def upgrade():
     )
     op.create_table(
         "user",
-        sa.Column("created_at", DateTime(), nullable=False),
-        sa.Column("updated_at", DateTime(), nullable=False),
+        sa.Column("created_at", DateTime(),  server_default=func.now(), nullable=False),
+        sa.Column("updated_at", DateTime(),  server_default=func.now(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("username", sa.String(), nullable=False),
         sa.Column("email", sa.String(), nullable=False),
@@ -122,8 +123,8 @@ def upgrade():
     )
     op.create_table(
         "notification",
-        sa.Column("created_at", DateTime(), nullable=False),
-        sa.Column("updated_at", DateTime(), nullable=False),
+        sa.Column("created_at", DateTime(), server_default=func.now(), nullable=False),
+        sa.Column("updated_at", DateTime(),  server_default=func.now(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("message", sa.Text(), nullable=False),
         sa.Column("read", sa.Boolean(), nullable=False),
@@ -136,8 +137,8 @@ def upgrade():
     )
     op.create_table(
         "mediarequest",
-        sa.Column("created_at", DateTime(), nullable=False),
-        sa.Column("updated_at", DateTime(), nullable=False),
+        sa.Column("created_at", DateTime(),  server_default=func.now(), nullable=False),
+        sa.Column("updated_at", DateTime(),  server_default=func.now(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("media_type", sa.Enum("movies", "series", name="mediatype"), nullable=False),
         sa.Column(
