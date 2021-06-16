@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 import tmdbsimple as tmdb
 from asgiref.sync import sync_to_async
 
-from server.core import config
+from server.core.config import get_config
 from server.models.media import MediaType, SeriesType
 from server.schemas.media import (
     EpisodeSchema,
@@ -17,7 +17,7 @@ from server.schemas.media import (
     TmdbSeries,
 )
 
-tmdb.API_KEY = config.tmdb_api_key
+tmdb.API_KEY = get_config().tmdb_api_key
 
 
 async def search_tmdb_media(

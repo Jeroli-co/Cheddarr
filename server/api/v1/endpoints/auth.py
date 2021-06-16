@@ -13,7 +13,8 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
 from server.api import dependencies as deps
-from server.core import config, security, utils
+from server.core import security, utils
+from server.core.config import Config, get_config
 from server.core.http_client import HttpClient
 from server.models.users import User, UserRole
 from server.repositories.users import UserRepository
@@ -91,7 +92,7 @@ async def signin(
 
 
 @router.get("/sign-in/plex")
-async def start_signin_plex():
+async def start_signin_plex(config: Config = Depends(get_config)):
     request_pin_url = utils.make_url(
         config.plex_token_url,
         queries_dict={
@@ -104,7 +105,9 @@ async def start_signin_plex():
 
 
 @router.post("/sign-in/plex/authorize")
-async def authorize_signin_plex(request: Request, auth_data: PlexAuthorizeSignin):
+async def authorize_signin_plex(
+    request: Request, auth_data: PlexAuthorizeSignin, config: Config = Depends(get_config)
+):
     forward_url = re.sub(
         f"{config.api_prefix}/v[0-9]+", "", request.url_for("confirm_signin_plex")
     )
@@ -145,6 +148,7 @@ async def confirm_signin_plex(
     token: str,
     response: Response,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    config: Config = Depends(get_config),
 ):
     token = security.confirm_token(token)
     state = token.get("id")

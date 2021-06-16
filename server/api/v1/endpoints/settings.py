@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server.api import dependencies as deps
-from server.core import scheduler
+from server.core.scheduler import scheduler
 from server.jobs.plex import sync_plex_servers_recently_added
 from server.models.settings import (
     MediaProviderType,

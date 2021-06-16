@@ -5,7 +5,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from server.core import config as server_config
+from server.core.config import get_config
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -33,8 +33,8 @@ target_metadata = Base.metadata
 
 
 def get_url():
-    server_config.db_folder.mkdir(parents=True, exist_ok=True)
-    return "sqlite:///" + str(server_config.db_folder / server_config.db_filename)
+    get_config().db_folder.mkdir(parents=True, exist_ok=True)
+    return "sqlite:///" + str(get_config().db_folder / get_config().db_filename)
 
 
 def run_migrations_offline():

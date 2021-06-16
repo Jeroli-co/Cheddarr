@@ -11,7 +11,7 @@ from plexapi.video import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.core import scheduler
+from server.core.scheduler import scheduler
 from server.database.session import DBSession
 from server.models.media import (
     Media,

@@ -5,7 +5,7 @@ import pytz
 from sqlalchemy import Column, DateTime as DBDateTime, func, inspect, TypeDecorator
 from sqlalchemy.orm import declarative_base, declared_attr
 
-from server.core import config
+from server.core.config import get_config
 
 Base = declarative_base()
 Base.metadata.naming_convention = {
@@ -52,7 +52,7 @@ class DateTime(TypeDecorator):
 
     def process_result_value(self, value, engine):
         if value is not None:
-            value = value.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(config.tz))
+            value = value.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(get_config().tz))
         return value
 
 

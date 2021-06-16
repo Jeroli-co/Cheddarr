@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.core import config
+from server.core.config import get_config
 from server.models.users import User, UserRole
 from server.repositories.base import BaseRepository
 from server.repositories.users import UserRepository
@@ -49,7 +49,9 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, config.secret_key, algorithms=config.signing_algorithm)
+        payload = jwt.decode(
+            token, get_config().secret_key, algorithms=get_config().signing_algorithm
+        )
         token_data = TokenPayload.parse_obj(payload)
     except (jwt.InvalidTokenError, ValidationError):
         raise credentials_exception

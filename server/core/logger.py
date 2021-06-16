@@ -6,7 +6,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from server.core import config
+from server.core.config import get_config
 
 
 class InterceptHandler(logging.Handler):
@@ -35,7 +35,7 @@ class InterceptHandler(logging.Handler):
 
 class LogLevelFilter:
     def __call__(self, record):
-        levelno = logger.level(config.log_level).no
+        levelno = logger.level(get_config().log_level).no
         return record["level"].no >= levelno
 
 
@@ -55,8 +55,8 @@ class Logger:
     @classmethod
     def make_logger(cls):
         log = cls.customize_logging(
-            config.logs_folder / config.logs_filename,
-            level=config.log_level,
+            get_config().logs_folder / get_config().logs_filename,
+            level=get_config().log_level,
             rotation="1 day",
             retention="1 week",
         )

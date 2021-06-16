@@ -9,7 +9,7 @@ import emails
 from emails.template import JinjaTemplate
 from jinja2 import Environment, FileSystemLoader
 
-from server.core.config import config
+from server.core.config import get_config
 
 
 def send_email(
@@ -21,15 +21,15 @@ def send_email(
 ):
     environment = environment or {}
     for k, v in environment.items():
-        environment[k] = re.sub(f"{config.api_prefix}/v[0-9]+", "", v)
-    with open(Path(config.mail_templates_folder) / html_template_name) as f:
+        environment[k] = re.sub(f"{get_config().api_prefix}/v[0-9]+", "", v)
+    with open(Path(get_config().mail_templates_folder) / html_template_name) as f:
         template_str = f.read()
     message = emails.Message(
         mail_from=(email_options["sender_name"], email_options["sender_address"]),
         subject=subject,
         html=JinjaTemplate(
             template_str,
-            environment=Environment(loader=FileSystemLoader(config.mail_templates_folder)),
+            environment=Environment(loader=FileSystemLoader(get_config().mail_templates_folder)),
         ),
     )
 
@@ -48,9 +48,9 @@ def send_email(
 
 
 def get_random_avatar():
-    profile_images_path = os.path.join(config.images_folder, "users")
+    profile_images_path = os.path.join(get_config().images_folder, "users")
     avatar = choice(listdir(profile_images_path))
-    return f"{config.server_host}/images/users/{avatar}"
+    return f"{get_config().server_host}/images/users/{avatar}"
 
 
 def make_url(url: str, queries_dict: dict = None):

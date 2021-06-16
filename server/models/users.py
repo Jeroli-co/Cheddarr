@@ -3,7 +3,7 @@ from enum import Enum
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from server.core import config
+from server.core.config import get_config
 from server.core.security import hash_password
 from server.core.utils import get_random_avatar
 from server.database import Model, Timestamp
@@ -30,7 +30,7 @@ class User(Model, Timestamp):
     password_hash = Column(String, nullable=False)
     avatar = Column(String, default=get_random_avatar())
     confirmed = Column(Boolean, nullable=False, default=False)
-    roles = Column(Integer, default=config.default_roles)
+    roles = Column(Integer, default=get_config().default_roles)
     plex_user_id = Column(Integer)
     plex_api_key = Column(String)
 

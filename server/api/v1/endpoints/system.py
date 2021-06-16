@@ -4,8 +4,8 @@ from typing import Dict, List, Literal, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
-from server.core import config, scheduler
-from server.core.config import PublicConfig
+from server.core.config import Config, get_config, PublicConfig
+from server.core.scheduler import scheduler
 from server.models.users import UserRole
 from server.schemas.core import Job, Log, LogResult
 
@@ -20,7 +20,7 @@ router = APIRouter()
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def get_logs(page: int = 1, per_page: int = 50):
+def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_config)):
     logs = []
     with open(config.logs_folder / config.logs_filename) as logfile:
         lines = logfile.read().replace("\n", "").split(" | ")
@@ -90,7 +90,7 @@ def modify_job(
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def get_server_config():
+def get_server_config(config: Config = Depends(get_config)):
     return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))
 
 
@@ -102,6 +102,6 @@ def get_server_config():
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def update_server_config(config_in: PublicConfig):
+def update_server_config(config_in: PublicConfig, config: Config = Depends(get_config)):
     config.update(**config_in.dict())
     return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))

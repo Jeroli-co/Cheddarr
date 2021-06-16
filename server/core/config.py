@@ -3,6 +3,7 @@ from json import dump, load
 from pathlib import Path
 from typing import List, Optional
 
+from cachetools.func import lru_cache
 from pydantic import (
     AnyHttpUrl,
     BaseSettings,
@@ -41,7 +42,7 @@ class Config(BaseSettings):
     logs_filename: str = "cheddarr.log"
     logs_max_files: int = 10
     db_folder: Path = config_folder / "db"
-    config_filename: Path = config_folder / "config.json"
+    config_filename: Path = config_folder / "get_config().json"
 
     ##########################################################################
     # external services                                                      #
@@ -76,10 +77,8 @@ class Config(BaseSettings):
 
     def setup(self):
         try:
-            with open(self.config_filename, "r") as existing_config_file:
-                existing_config = load(existing_config_file)
-                for k, v in existing_config.items():
-                    setattr(self, k, v)
+            for k, v in self.read_file():
+                setattr(self, k, v)
         except FileNotFoundError:
             pass
         try:
@@ -87,11 +86,17 @@ class Config(BaseSettings):
         except OSError:
             raise
 
+    def read_file(self) -> dict:
+        with open(self.config_filename, "r") as config_file:
+            config = load(config_file)
+            return config.items()
+
     def update(self, **config_kwargs):
         for field_k, field_v in config_kwargs.items():
             if field_k in self.__fields__ and field_v is not None:
                 setattr(self, field_k, field_v)
         self.write_file()
+        get_config.cache_clear()
 
     def write_file(self):
         with open(self.config_filename, "w+") as config_file:
@@ -109,4 +114,6 @@ class Config(BaseSettings):
     _file_config_fields = {"secret_key", *list(PublicConfig.__fields__.keys())}
 
 
-config = Config()
+@lru_cache()
+def get_config():
+    return Config()

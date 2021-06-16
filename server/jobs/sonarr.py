@@ -1,4 +1,4 @@
-from server.core import scheduler
+from server.core.scheduler import scheduler
 from server.database.session import DBSession
 from server.models.media import MediaType
 from server.models.requests import RequestStatus

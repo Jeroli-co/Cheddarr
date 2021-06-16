@@ -3,7 +3,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from server.core.config import config
+from server.core.config import get_config
 
 
 class DBSession:
@@ -17,11 +17,11 @@ class DBSession:
 
     @classmethod
     def create_engine(cls) -> AsyncEngine:
-        return create_async_engine(config.db_url, connect_args={"check_same_thread": False})
+        return create_async_engine(get_config().db_url, connect_args={"check_same_thread": False})
 
     @classmethod
     def create_sync_engine(cls) -> Engine:
-        url = "sqlite:///" + str(config.db_folder / config.db_filename)
+        url = "sqlite:///" + str(get_config().db_folder / get_config().db_filename)
         return create_engine(url, connect_args={"check_same_thread": False})
 
     @classmethod
