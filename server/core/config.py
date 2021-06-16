@@ -42,7 +42,7 @@ class Config(BaseSettings):
     logs_filename: str = "cheddarr.log"
     logs_max_files: int = 10
     db_folder: Path = config_folder / "db"
-    config_filename: Path = config_folder / "get_config().json"
+    config_filename: Path = config_folder / "config.json"
 
     ##########################################################################
     # external services                                                      #
