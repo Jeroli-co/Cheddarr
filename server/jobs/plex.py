@@ -242,6 +242,7 @@ async def process_plex_season(
             season_number=plex_season.seasonNumber,
             external_id=plex_season.ratingKey,
             added_at=plex_season.addedAt,
+            server_id=server_id,
         )
         if server_series is not None:
             season.server_media = server_series

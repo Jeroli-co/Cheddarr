@@ -45,7 +45,7 @@ class MediaServerContent(object):
 
     @declared_attr
     def server_id(cls):
-        return Column(ForeignKey("mediaserversetting.server_id"))
+        return Column(ForeignKey("mediaserversetting.server_id"), nullable=False)
 
 
 class MediaServerMedia(Model, MediaServerContent):
