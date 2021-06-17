@@ -23,16 +23,23 @@ router = APIRouter()
 def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_config)):
     logs = []
     with open(config.logs_folder / config.logs_filename) as logfile:
-        lines = logfile.read().replace("\n", "").split(" | ")
+        lines = logfile.read().replace("\n", " | ").split(" | ")
         start = (page - 1) * per_page * len(LogResult.__fields__)
         end = page * per_page * len(LogResult.__fields__)
         total_results = math.ceil(len(lines) / len(LogResult.__fields__))
         total_pages = math.ceil(total_results / per_page)
+
         for time, level, process, message in zip(
             *[iter(lines[start:end])] * len(LogResult.__fields__)
         ):
-
-            logs.append(Log(time=time, level=level, process=process, message=message))
+            logs.append(
+                Log(
+                    time=time.strip(),
+                    level=level.strip(),
+                    process=process.strip(),
+                    message=message.strip(),
+                )
+            )
 
     return LogResult(
         page=page,

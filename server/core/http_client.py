@@ -2,6 +2,7 @@ from typing import Any, Mapping, Optional
 
 import httpx
 from fastapi import HTTPException
+from loguru import logger
 
 
 class HttpClient:
@@ -36,5 +37,6 @@ class HttpClient:
                 raise HTTPException(resp.status_code, resp.text)
             json_result = resp.json()
         except Exception as e:
-            raise Exception(f"An error occurred: {str(e)}")
+            logger.error(f"An error occurred when calling {url}: {str(e)}")
+            raise
         return json_result
