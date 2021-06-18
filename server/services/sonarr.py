@@ -38,8 +38,17 @@ def make_url(
     )
 
 
-async def check_instance_status(api_key: str, host: str, port: int, ssl: bool) -> Optional[Dict]:
-    url = make_url(api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/system/status")
+async def check_instance_status(
+    api_key: str, host: str, port: int, ssl: bool, version: int = None
+) -> Optional[Dict]:
+    url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        version=version,
+        resource_path="/system/status",
+    )
     try:
         resp = await HttpClient.request("GET", url)
     except HTTPException:
@@ -48,27 +57,24 @@ async def check_instance_status(api_key: str, host: str, port: int, ssl: bool) -
 
 
 async def get_instance_info(
-    api_key: str, host: str, port: int, ssl: bool
+    api_key: str, host: str, port: int, ssl: bool, version: int = None
 ) -> Optional[SonarrInstanceInfo]:
     test = await check_instance_status(
-        api_key=api_key,
-        host=host,
-        port=port,
-        ssl=ssl,
+        api_key=api_key, host=host, port=port, ssl=ssl, version=version
     )
     if not test:
         return None
 
-    version = int(test["version"][0])
+    root_folder_url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        version=3,
+        resource_path="/rootFolder",
+    )
+
     if version == 3:
-        root_folder_url = make_url(
-            api_key=api_key,
-            host=host,
-            port=port,
-            ssl=ssl,
-            version=3,
-            resource_path="/rootFolder",
-        )
         quality_profile_url = make_url(
             api_key=api_key,
             host=host,
@@ -90,9 +96,6 @@ async def get_instance_info(
             for profile in await HttpClient.request("GET", language_profile_url)
         ]
     else:
-        root_folder_url = make_url(
-            api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/rootFolder"
-        )
         quality_profile_url = make_url(
             api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/profile"
         )

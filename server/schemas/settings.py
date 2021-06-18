@@ -11,6 +11,7 @@ class ExternalServiceSettingBase(APIModel):
     api_key: str
     name: Optional[str]
     enabled: Optional[bool] = True
+    version: Optional[int]
 
 
 class MediaServerSettingBase(ExternalServiceSettingBase):

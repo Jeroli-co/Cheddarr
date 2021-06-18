@@ -254,7 +254,7 @@ async def get_radarr_instance_info(
     setting_in: ExternalServiceSettingBase,
 ):
     instance_info = await radarr.get_instance_info(
-        setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
+        setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl, setting_in.version
     )
     if instance_info is None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
@@ -281,7 +281,7 @@ async def get_radarr_setting_instance_info(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Radarr setting not found.")
 
     instance_info = await radarr.get_instance_info(
-        setting.api_key, setting.host, setting.port, setting.ssl
+        setting.api_key, setting.host, setting.port, setting.ssl, setting.version
     )
     if instance_info is None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
@@ -320,6 +320,7 @@ async def add_radarr_setting(
         host=setting_in.host,
         port=setting_in.port,
         ssl=setting_in.ssl,
+        version=setting_in.version,
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
     setting = setting_in.to_orm(RadarrSetting)
@@ -352,6 +353,7 @@ async def update_radarr_setting(
         host=setting_in.host,
         port=setting_in.port,
         ssl=setting_in.ssl,
+        version=setting_in.version,
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Radarr.")
     setting = await radarr_setting_repo.update(setting, setting_in)
@@ -392,7 +394,7 @@ async def get_sonarr_instance_info(
     setting_in: ExternalServiceSettingBase,
 ):
     instance_info = await sonarr.get_instance_info(
-        setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl
+        setting_in.api_key, setting_in.host, setting_in.port, setting_in.ssl, setting_in.version
     )
     if instance_info is None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
@@ -418,7 +420,7 @@ async def get_sonarr_setting_instance_info(
     if setting is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Setting not found.")
     instance_info = await sonarr.get_instance_info(
-        setting.api_key, setting.host, setting.port, setting.ssl
+        setting.api_key, setting.host, setting.port, setting.ssl, setting.version
     )
     if instance_info is None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
@@ -457,6 +459,7 @@ async def add_sonarr_setting(
         host=setting_in.host,
         port=setting_in.port,
         ssl=setting_in.ssl,
+        version=setting_in.version,
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
     setting = setting_in.to_orm(SonarrSetting)
@@ -489,6 +492,7 @@ async def update_sonarr_setting(
         host=setting_in.host,
         port=setting_in.port,
         ssl=setting_in.ssl,
+        version=setting_in.version,
     ):
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Failed to connect to Sonarr.")
 
