@@ -58,7 +58,7 @@ async def signup(
     "/sign-in",
     response_model=Token,
     responses={
-        status.HTTP_400_BAD_REQUEST: {"description": "Email needs to be confirmed"},
+        status.HTTP_400_BAD_REQUEST: {"description": "Account needs to be confirmed"},
         status.HTTP_401_UNAUTHORIZED: {"description": "Wrong credentials"},
     },
 )
@@ -77,7 +77,7 @@ async def signin(
     if not user.confirmed:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
-            "This account's email needs to be confirmed.",
+            "This account needs to be confirmed.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     payload = TokenPayload(sub=str(user.id))
@@ -216,6 +216,13 @@ async def confirm_signin_plex(
                     status.HTTP_201_CREATED,
                     headers={"redirect-uri": redirect_uri},
                 )
+
+    if not user.confirmed:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "This account needs to be confirmed.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     # Update the Plex account with the API key (possibly different at each login)
     if user.plex_user_id is None:
