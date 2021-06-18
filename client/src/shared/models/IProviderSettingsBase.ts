@@ -3,4 +3,5 @@ export interface IProviderSettingsBase {
   port: number | string | null;
   ssl: boolean;
   apiKey: string;
+  version: number;
 }

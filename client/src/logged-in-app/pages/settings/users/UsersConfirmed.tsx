@@ -78,7 +78,7 @@ export const UsersConfirmed = () => {
   }>({ isOpen: false, user: null });
 
   const { data, loadPrev, loadNext, deleteData } = usePagination<IUser>(
-    APIRoutes.GET_USERS(true),
+    APIRoutes.USERS(true),
     true
   );
 

@@ -146,6 +146,16 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
           </InputField>
         </Row>
 
+        <InputField>
+          <label>Version</label>
+          <select name="version" ref={register}>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
+          </select>
+        </InputField>
+
+        <br />
+
         <InputField isInline={true}>
           <label>SSL</label>
           <Checkbox name="ssl" register={register} round />
@@ -161,19 +171,9 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
         </PrimaryButton>
       </div>
 
-      <PrimaryLightDivider />
-
       {instanceInfo.data && (
         <div>
-          <InputField hidden>
-            <label>Version</label>
-            <input
-              name="version"
-              type="text"
-              ref={register}
-              value={instanceInfo.data ? instanceInfo.data.version : ""}
-            />
-          </InputField>
+          <PrimaryLightDivider />
 
           <InputField>
             <label>Default Root Folder</label>

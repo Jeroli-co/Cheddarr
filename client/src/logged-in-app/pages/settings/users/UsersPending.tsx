@@ -39,7 +39,7 @@ export const UsersPending = () => {
   const { updateUserById, deleteUser } = useUserService();
 
   const { data, loadPrev, loadNext, deleteData } = usePagination<IUser>(
-    APIRoutes.GET_USERS(false),
+    APIRoutes.USERS(false),
     true
   );
 

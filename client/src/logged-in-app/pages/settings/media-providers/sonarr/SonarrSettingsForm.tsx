@@ -27,9 +27,16 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
   const { getSonarrInstanceInfo } = useSonarrConfigs();
   const [usePort, setUsePort] = useState<boolean>(false);
 
-  const { register, getValues, errors, reset, setValue } = useFormContext<
-    ISonarrConfig
-  >();
+  const {
+    register,
+    getValues,
+    errors,
+    reset,
+    setValue,
+    watch,
+  } = useFormContext<ISonarrConfig>();
+
+  const versionSelected = watch("version");
 
   const getInstanceInfo = (data: IProviderSettingsBase, withAlert: boolean) => {
     if (data.port === "") {
@@ -39,9 +46,7 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
   };
 
   const isVersionThree = () => {
-    return (
-      instanceInfo.data && instanceInfo.data.version.toString().startsWith("3")
-    );
+    return versionSelected && versionSelected.toString().startsWith("3");
   };
 
   useEffect(() => {
@@ -151,6 +156,16 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
         </InputField>
       </Row>
 
+      <InputField>
+        <label>Version</label>
+        <select name="version" ref={register}>
+          <option value={2}>2</option>
+          <option value={3}>3</option>
+        </select>
+      </InputField>
+
+      <br />
+
       <InputField isInline>
         <label>SSL</label>
         <Checkbox name="ssl" register={register} round />
@@ -165,19 +180,9 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
         Get instance info
       </PrimaryButton>
 
-      <PrimaryLightDivider />
-
       {instanceInfo.data && (
         <div>
-          <InputField hidden>
-            <label>Version</label>
-            <input
-              name="version"
-              type="text"
-              ref={register}
-              value={instanceInfo.data ? instanceInfo.data.version : ""}
-            />
-          </InputField>
+          <PrimaryLightDivider />
 
           <InputField>
             <label>Default Root Folder</label>

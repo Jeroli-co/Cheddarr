@@ -62,7 +62,7 @@ export const useUserService = () => {
   };
 
   const deleteAccount = () => {
-    return remove(APIRoutes.DELETE_ACCOUNT).then((res) => {
+    return remove(APIRoutes.USER).then((res) => {
       if (res.status === 200) {
         pushSuccess("Account deleted");
         invalidSession();

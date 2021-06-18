@@ -7,21 +7,17 @@ export const APIRoutes = {
   // AUTH
   CONFIRM_PLEX_SIGN_IN: (query: string) => "/sign-in/plex/confirm" + query,
   SIGN_UP: "/sign-up",
-  CONFIRM_EMAIL: (token: string) => "/sign-up/" + token,
   SIGN_IN: "/sign-in",
   INIT_PLEX_SIGN_IN: "/sign-in/plex",
   AUTHORIZE_PLEX_SIGN_IN: "/sign-in/plex/authorize",
 
   // USER
-  GET_PUBLIC_USER: (username: string) => "/users/" + username,
-  GET_CURRENT_USER: "/user",
-  UPDATE_USER: "/user",
-  DELETE_ACCOUNT: "/user",
+  USER: "/user",
   INIT_RESET_PASSWORD: "/user/password",
   GET_RESET_PASSWORD_TOKEN_VALIDITY: (token: string) =>
     "/user/password" + token,
   RESET_PASSWORD: (token: string) => "/user/password" + token,
-  GET_USERS: (confirmed: boolean) => "/users?confirmed=" + confirmed,
+  USERS: (confirmed: boolean) => "/users?confirmed=" + confirmed,
   USER_BY_ID: (id: number | string) => "/users/" + id,
 
   // MEDIA SERVERS
@@ -79,7 +75,6 @@ export const APIRoutes = {
   CREATE_REQUEST_SERIES: "/requests/series",
   UPDATE_REQUEST_MOVIE: (id: number) => "/requests/movies/" + id,
   UPDATE_REQUEST_SERIES: (id: number) => "/requests/series/" + id,
-  // TODO REMOVE MediaTypes & RequestTypes DEPENDENCIES
   GET_REQUESTS: (requestType: RequestTypes) => "/requests/" + requestType,
 
   // NOTIFICATIONS

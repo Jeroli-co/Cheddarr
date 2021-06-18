@@ -18,6 +18,7 @@ import { Series } from "../shared/components/media/Series";
 import { JobsSettings } from "../logged-in-app/pages/settings/jobs/JobsSettings";
 import { UsersSettings } from "../logged-in-app/pages/settings/users/UsersSettings";
 import { GeneralSettings } from "../logged-in-app/pages/settings/general/GeneralSettings";
+import { ServerLogs } from "../logged-in-app/pages/settings/server-logs/ServerLogs";
 
 const routes = {
   HOME: {
@@ -67,6 +68,10 @@ const routes = {
   SETTINGS_GENERAL: {
     url: "/settings/general",
     component: GeneralSettings,
+  },
+  SETTINGS_SERVER_LOGS: {
+    url: "/settings/logs",
+    component: ServerLogs,
   },
 
   /** MEDIA **/

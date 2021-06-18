@@ -9,6 +9,8 @@ import {
 import { EmailSettingsBoxPreview } from "./email/EmailSettingsBoxPreview";
 import { PickNotificationsServiceTypeModal } from "./PickNotificationsServiceTypeModal";
 import { useNotificationsServicesContext } from "../../../../shared/contexts/NotificationsServicesContext";
+import { useRoleGuard } from "../../../../shared/hooks/useRoleGuard";
+import { Roles } from "../../../../shared/enums/Roles";
 
 export const NotificationsServicesSettings = () => {
   const [
@@ -17,6 +19,7 @@ export const NotificationsServicesSettings = () => {
   ] = useState(false);
 
   const { emailConfig } = useNotificationsServicesContext();
+  useRoleGuard([Roles.ADMIN]);
 
   return (
     <div>

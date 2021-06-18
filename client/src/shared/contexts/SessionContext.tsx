@@ -1,16 +1,16 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import {ISession, SessionDefaultImpl} from "../models/ISession";
-import {IEncodedToken} from "../models/IEncodedToken";
-import {routes} from "../../router/routes";
-import {instance} from "../../axiosInstance";
-import {APIRoutes} from "../enums/APIRoutes";
-import {ERRORS_MESSAGE} from "../enums/ErrorsMessage";
-import {useLocation} from "react-router-dom";
-import {useHistory} from "react-router";
-import {useAlert} from "./AlertContext";
-import {useAPI} from "../hooks/useAPI";
-import {IUser} from "../models/IUser";
+import { ISession, SessionDefaultImpl } from "../models/ISession";
+import { IEncodedToken } from "../models/IEncodedToken";
+import { routes } from "../../router/routes";
+import { instance } from "../../axiosInstance";
+import { APIRoutes } from "../enums/APIRoutes";
+import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
+import { useLocation } from "react-router-dom";
+import { useHistory } from "react-router";
+import { useAlert } from "./AlertContext";
+import { useAPI } from "../hooks/useAPI";
+import { IUser } from "../models/IUser";
 
 interface ISessionContextInterface {
   session: ISession;
@@ -76,7 +76,7 @@ export const SessionContextProvider = (props: any) => {
 
   useEffect(() => {
     if (session.isAuthenticated) {
-      get<IUser>(APIRoutes.GET_CURRENT_USER).then((res) => {
+      get<IUser>(APIRoutes.USER).then((res) => {
         if (res.status === 200) {
           setSession({ ...session, user: res.data });
         } else {

@@ -20,13 +20,17 @@ export const Settings = () => {
   const [tabs, setTabs] = useState([
     { label: "Media servers", uri: "media-servers" },
     { label: "Media providers", uri: "media-providers" },
-    { label: "Notifications", uri: "notifications" },
-    { label: "Jobs", uri: "jobs" },
   ]);
 
   useEffect(() => {
     if (user && checkRole(user.roles, [Roles.ADMIN])) {
-      setTabs([...tabs, { label: "General", uri: "general" }]);
+      setTabs([
+        ...tabs,
+        { label: "Notifications", uri: "notifications" },
+        { label: "Jobs", uri: "jobs" },
+        { label: "General", uri: "general" },
+        { label: "Logs", uri: "logs" },
+      ]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -47,20 +51,30 @@ export const Settings = () => {
                 path={routes.SETTINGS_MEDIA_PROVIDERS.url}
                 component={routes.SETTINGS_MEDIA_PROVIDERS.component}
               />
-              <Route
-                exact
-                path={routes.SETTINGS_NOTIFICATIONS.url}
-                component={routes.SETTINGS_NOTIFICATIONS.component}
-              />
-              <Route
-                exact
-                path={routes.SETTINGS_JOBS.url}
-                component={routes.SETTINGS_JOBS.component}
-              />
+              {user && checkRole(user.roles, [Roles.ADMIN]) && (
+                <Route
+                  exact
+                  path={routes.SETTINGS_NOTIFICATIONS.url}
+                  component={routes.SETTINGS_NOTIFICATIONS.component}
+                />
+              )}
+              {user && checkRole(user.roles, [Roles.ADMIN]) && (
+                <Route
+                  exact
+                  path={routes.SETTINGS_JOBS.url}
+                  component={routes.SETTINGS_JOBS.component}
+                />
+              )}
               {user && checkRole(user.roles, [Roles.ADMIN]) && (
                 <Route
                   path={routes.SETTINGS_GENERAL.url}
                   component={routes.SETTINGS_GENERAL.component}
+                />
+              )}
+              {user && checkRole(user.roles, [Roles.ADMIN]) && (
+                <Route
+                  path={routes.SETTINGS_SERVER_LOGS.url}
+                  component={routes.SETTINGS_SERVER_LOGS.component}
                 />
               )}
               <Route
