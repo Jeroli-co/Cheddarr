@@ -87,7 +87,7 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
     let isNewPageLoaded = true;
     const totalPage = data.data && data.data.totalPages;
     if (totalPage && totalPage > 1) {
-      if (!loadDirection) {
+      if (!loadDirection || loadDirection === "next") {
         setLoadDirection("prev");
       } else {
         if (!isFirstPage() || infiniteLoad) {
@@ -104,7 +104,7 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
     let isNewPageLoaded = true;
     const totalPage = data.data && data.data.totalPages;
     if (totalPage && totalPage > 1) {
-      if (!loadDirection) {
+      if (!loadDirection || loadDirection === "prev") {
         setLoadDirection("next");
       } else {
         if (!isLastPage() || infiniteLoad) {

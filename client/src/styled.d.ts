@@ -10,7 +10,9 @@ declare module "styled-components" {
     secondary: string;
     success: string;
     danger: string;
+    dangerLight: string;
     warning: string;
+    warningLight: string;
     black: string;
     white: string;
     grey: string;

@@ -7,19 +7,33 @@ import { ILog } from "../../../../shared/models/ILog";
 import { Spinner } from "../../../../shared/components/Spinner";
 import { SwitchErrors } from "../../../../shared/components/errors/SwitchErrors";
 import styled from "styled-components";
+import { LogLevels } from "../../../../shared/enums/LogLevels";
+import { PaginationArrows } from "../../../../shared/components/PaginationArrows";
+import { log } from "util";
 
 const Container = styled.div`
   padding: 20px;
 `;
 
-const Line = styled.div`
+const Line = styled.div<{ level: LogLevels }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 0;
-  margin: 5px 0;
+  padding: 10px 10px;
+  margin: 10px 0;
   border: 1px solid ${(props) => props.theme.white};
   cursor: pointer;
+  border-radius: 2px;
+  background: ${(props) => {
+    switch (props.level) {
+      case LogLevels.ERROR:
+        return props.theme.danger;
+      case LogLevels.WARNING:
+        return props.theme.warning;
+      default:
+        return props.theme.primaryLight;
+    }
+  }};
 `;
 
 const Item = styled.div<{ grow?: number }>`
@@ -37,27 +51,36 @@ const Item = styled.div<{ grow?: number }>`
 export const ServerLogs = () => {
   useRoleGuard([Roles.ADMIN]);
 
-  const logs = usePagination<ILog>(APIRoutes.LOGS, false);
+  const { data: logs, loadNext, loadPrev } = usePagination<ILog>(
+    APIRoutes.LOGS,
+    false
+  );
 
-  if (logs.data.isLoading) {
+  if (logs.isLoading) {
     return <Spinner />;
   }
 
-  if (logs.data.data === null) {
-    return <SwitchErrors status={logs.data.status} />;
+  if (logs.data === null) {
+    return <SwitchErrors status={logs.status} />;
   }
 
   return (
     <Container>
-      {logs.data.data &&
-        logs.data.data.results &&
-        logs.data.data.results.map((log) => (
-          <Line key={log.time}>
+      {logs.data &&
+        logs.data.results &&
+        logs.data.results.map((log, index) => (
+          <Line key={index} level={log.level}>
             <Item grow={2}>{log.time}</Item>
             <Item>{log.level}</Item>
             <Item grow={3}>{log.process}</Item>
           </Line>
         ))}
+      <PaginationArrows
+        currentPage={logs.data?.page}
+        totalPages={logs.data?.totalPages}
+        onLoadPrev={() => loadPrev()}
+        onLoadNext={() => loadNext()}
+      />
     </Container>
   );
 };
