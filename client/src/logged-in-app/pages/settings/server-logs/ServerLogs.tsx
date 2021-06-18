@@ -17,6 +17,9 @@ const Line = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 5px 0;
+  margin: 5px 0;
+  border: 1px solid ${(props) => props.theme.white};
+  cursor: pointer;
 `;
 
 const Item = styled.div<{ grow?: number }>`
@@ -53,7 +56,6 @@ export const ServerLogs = () => {
             <Item grow={2}>{log.time}</Item>
             <Item>{log.level}</Item>
             <Item grow={3}>{log.process}</Item>
-            <Item grow={3}>{log.message}</Item>
           </Line>
         ))}
     </Container>

@@ -238,6 +238,7 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
                 <label>Default Language Profile</label>
                 <select name="languageProfileId" ref={register}>
                   {instanceInfo.data &&
+                    instanceInfo.data.languageProfiles &&
                     instanceInfo.data.languageProfiles.map((l, index) => (
                       <option key={index} value={l.id}>
                         {l.name}
@@ -249,6 +250,7 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
                 <label>Default Language Profile (Anime)</label>
                 <select name="animeLanguageProfileId" ref={register}>
                   {instanceInfo.data &&
+                    instanceInfo.data.languageProfiles &&
                     instanceInfo.data.languageProfiles.map((l, index) => (
                       <option key={index} value={l.id}>
                         {l.name}
