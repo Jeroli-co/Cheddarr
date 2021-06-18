@@ -12,9 +12,6 @@ export const checkRole = (
   if (!hasOne) {
     return roles.every((r) => userRole & r);
   } else {
-    console.log(roles);
-    console.log(userRole);
-    console.log(roles.some((r) => userRole & r));
     return roles.some((r) => userRole & r);
   }
 };

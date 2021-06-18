@@ -476,7 +476,7 @@ export const RequestLayout = ({
 
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [providers]);
 
   const onProviderChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setProviderId(e.target.value);
