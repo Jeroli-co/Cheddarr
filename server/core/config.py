@@ -60,7 +60,7 @@ class Config(BaseSettings):
     signing_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 3
     backend_cors_origin: List[AnyHttpUrl] = [server_host]
-    default_roles: int = 2
+    default_roles: int = 4
 
     ##########################################################################
     # database                                                               #
