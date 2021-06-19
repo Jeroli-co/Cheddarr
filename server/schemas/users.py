@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import List, Optional
+from pathlib import Path
+from typing import List, Optional, Union
 
 from pydantic import AnyHttpUrl, EmailStr
 
@@ -13,7 +14,7 @@ class UserBase(APIModel):
 
 class UserSchema(UserBase):
     id: int
-    avatar: Optional[AnyHttpUrl]
+    avatar: Optional[Union[Path, AnyHttpUrl]]
     confirmed: bool
     roles: int
     created_at: datetime

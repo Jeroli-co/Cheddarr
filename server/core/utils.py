@@ -50,7 +50,7 @@ def send_email(
 def get_random_avatar():
     profile_images_path = os.path.join(get_config().images_folder, "users")
     avatar = choice(listdir(profile_images_path))
-    return f"{get_config().server_host}/images/users/{avatar}"
+    return f"/images/users/{avatar}"
 
 
 def make_url(url: str, queries_dict: dict = None):
