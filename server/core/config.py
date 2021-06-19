@@ -1,7 +1,8 @@
 import json
 import secrets
 from pathlib import Path
-from typing import List, Optional
+from typing import List
+from uuid import uuid4
 
 from cachetools.func import lru_cache
 from pydantic import (
@@ -12,11 +13,6 @@ from pydantic import (
 from tzlocal import get_localzone
 
 from server.core.logger import Logger
-
-
-class PublicConfig(BaseSettings):
-    log_level: Optional[str]
-    default_roles: Optional[int]
 
 
 class Config(BaseSettings):
@@ -49,7 +45,6 @@ class Config(BaseSettings):
     ##########################################################################
     # external services                                                      #
     ##########################################################################
-    plex_client_identifier: str = secrets.token_urlsafe(16)
     plex_token_url: AnyHttpUrl = "https://plex.tv/api/v2/pins/"
     plex_authorize_url: AnyHttpUrl = "https://app.plex.tv/auth#/"
     plex_user_resource_url: AnyHttpUrl = "https://plex.tv/api/v2/user/"
@@ -58,6 +53,7 @@ class Config(BaseSettings):
     ##########################################################################
     # security                                                               #
     ##########################################################################
+    client_id: str = uuid4().hex
     secret_key: str = secrets.token_urlsafe(32)
     signing_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 3
@@ -115,7 +111,12 @@ class Config(BaseSettings):
                 sort_keys=True,
             )
 
-    _file_config_fields = {"secret_key", *list(PublicConfig.__fields__.keys())}
+    _file_config_fields = {
+        "secret_key",
+        "client_id",
+        "log_level",
+        "default_roles",
+    }
 
 
 @lru_cache()

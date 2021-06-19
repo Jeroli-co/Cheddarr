@@ -5,10 +5,10 @@ from typing import Dict, List, Literal, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
-from server.core.config import Config, get_config, PublicConfig
+from server.core.config import Config, get_config
 from server.core.scheduler import scheduler
 from server.models.users import UserRole
-from server.schemas.core import Job, Log, LogResult
+from server.schemas.system import Job, Log, LogResult, PublicConfig
 
 router = APIRouter()
 

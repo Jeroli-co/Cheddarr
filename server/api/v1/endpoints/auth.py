@@ -98,7 +98,7 @@ async def start_signin_plex(config: Config = Depends(get_config)):
         queries_dict={
             "strong": "true",
             "X-Plex-Product": "Cheddarr",
-            "X-Plex-Client-Identifier": config.plex_client_identifier,
+            "X-Plex-Client-Identifier": config.client_id,
         },
     )
     return request_pin_url
@@ -124,7 +124,7 @@ async def authorize_signin_plex(
             config.plex_authorize_url,
             queries_dict={
                 "context[device][product]": "Cheddarr",
-                "clientID": config.plex_client_identifier,
+                "clientID": config.client_id,
                 "code": auth_data.code,
                 "forwardUrl": forward_url,
             },
@@ -160,7 +160,7 @@ async def confirm_signin_plex(
         config.plex_token_url + state,
         queries_dict={
             "code": code,
-            "X-Plex-Client-Identifier": config.plex_client_identifier,
+            "X-Plex-Client-Identifier": config.client_id,
         },
     )
 
