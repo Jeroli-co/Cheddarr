@@ -1,5 +1,5 @@
+import json
 import secrets
-from json import dump, load
 from pathlib import Path
 from typing import List, Optional
 
@@ -88,7 +88,7 @@ class Config(BaseSettings):
 
     def read_file(self) -> dict:
         with open(self.config_filename, "r") as config_file:
-            config = load(config_file)
+            config = json.load(config_file)
             return config.items()
 
     def update(self, **config_kwargs):
@@ -100,7 +100,7 @@ class Config(BaseSettings):
 
     def write_file(self):
         with open(self.config_filename, "w+") as config_file:
-            dump(
+            json.dump(
                 {
                     item: getattr(self, item)
                     for item in self.__fields__

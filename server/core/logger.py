@@ -70,6 +70,7 @@ class Logger:
             enqueue=True,
             backtrace=True,
             diagnose=True,
+            colorize=True,
             level=0,
             filter=LogLevelFilter(),
             format=Formatter.format,
@@ -81,9 +82,11 @@ class Logger:
             enqueue=True,
             backtrace=False,
             diagnose=False,
+            colorize=False,
             level=level.upper(),
             filter=LogLevelFilter(),
-            format=Formatter.format,
+            serialize=True,
+            format="{message}",
         )
 
         logging.basicConfig(handlers=[InterceptHandler()], level=0)
@@ -91,7 +94,6 @@ class Logger:
         for _log in [
             *logging.root.manager.loggerDict.keys(),
             "gunicorn",
-            "gunicorn.access",
             "gunicorn.error",
             "uvicorn",
             "uvicorn.access",
@@ -100,5 +102,6 @@ class Logger:
             _logger = logging.getLogger(_log)
             _logger.propagate = False
             _logger.handlers = [InterceptHandler()]
+        logging.getLogger("gunicorn.access").handlers = []
 
         return logger
