@@ -183,9 +183,10 @@ export const Media = (props: MediaProps) => {
               <MediaHeaderTags>
                 <MediaTag media={props.media} />
                 {props.media.status && <Tag>{props.media.status}</Tag>}
-                {props.media.mediaServersInfo && (
-                  <SuccessTag>Available</SuccessTag>
-                )}
+                {props.media.mediaServersInfo &&
+                  props.media.mediaServersInfo.length > 0 && (
+                    <SuccessTag>Available</SuccessTag>
+                  )}
               </MediaHeaderTags>
               <br />
               <MediaHeaderTitle>
