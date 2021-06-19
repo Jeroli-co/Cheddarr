@@ -17,13 +17,14 @@ class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
     async def save(self, db_obj: MediaProviderSetting) -> MediaProviderSetting:
         await super().save(db_obj)
         if db_obj.is_default:
-            await self.execute(
+            await self.session.execute(
                 update(self.model)
                 .where(
                     self.model.provider_type == db_obj.provider_type, self.model.id != db_obj.id
                 )
                 .values(is_default=False)
             )
+            db_obj.is_default = True
             await super().save(db_obj)
         return db_obj
 
@@ -35,11 +36,12 @@ class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
 
         db_obj = await super().update(db_obj, obj_in)
         if db_obj.is_default:
-            await self.execute(
+            await self.session.execute(
                 update(self.model)
-                .where(self.model.provider_type == db_obj.provider_type, id != db_obj.id)
+                .where(self.model.provider_type == db_obj.provider_type)
                 .values(is_default=False)
             )
+            db_obj.is_default = True
             await super().save(db_obj)
         return db_obj
 
