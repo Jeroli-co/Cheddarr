@@ -26,7 +26,9 @@ def setup_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    application.logger = Logger.make_logger()
+    Logger.make_logger(
+        get_config().logs_folder / get_config().logs_filename, get_config().log_level
+    )
 
     from server import jobs  # noqa
 

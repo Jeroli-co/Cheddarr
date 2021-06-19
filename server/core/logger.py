@@ -6,8 +6,6 @@ from pathlib import Path
 
 from loguru import logger
 
-from server.core.config import get_config
-
 
 class InterceptHandler(logging.Handler):
     loglevel_mapping = {
@@ -33,12 +31,6 @@ class InterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-class LogLevelFilter:
-    def __call__(self, record):
-        levelno = logger.level(get_config().log_level).no
-        return record["level"].no >= levelno
-
-
 class Formatter:
     fmt = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>{extra[padding]} | <level>{message}</level>\n{exception}"
     padding = 0
@@ -53,10 +45,11 @@ class Formatter:
 
 class Logger:
     @classmethod
-    def make_logger(cls):
+    def make_logger(cls, log_path: Path, log_level: str):
+        logger.remove()
         log = cls.customize_logging(
-            get_config().logs_folder / get_config().logs_filename,
-            level=get_config().log_level,
+            filepath=log_path,
+            level=log_level,
             rotation="1 day",
             retention="1 week",
         )
@@ -71,8 +64,7 @@ class Logger:
             backtrace=True,
             diagnose=True,
             colorize=True,
-            level=0,
-            filter=LogLevelFilter(),
+            level=level.upper(),
             format=Formatter.format,
         )
         logger.add(
@@ -84,7 +76,6 @@ class Logger:
             diagnose=False,
             colorize=False,
             level=level.upper(),
-            filter=LogLevelFilter(),
             serialize=True,
             format="{message}",
         )
@@ -93,15 +84,12 @@ class Logger:
 
         for _log in [
             *logging.root.manager.loggerDict.keys(),
-            "gunicorn",
-            "gunicorn.error",
-            "uvicorn",
-            "uvicorn.access",
-            "uvicorn.error",
         ]:
             _logger = logging.getLogger(_log)
+            if "access" in _logger.name and not _logger.handlers:
+                _logger.handlers = []
+                continue
             _logger.propagate = False
             _logger.handlers = [InterceptHandler()]
-        logging.getLogger("gunicorn.access").handlers = []
 
         return logger

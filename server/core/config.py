@@ -11,6 +11,8 @@ from pydantic import (
 )
 from tzlocal import get_localzone
 
+from server.core.logger import Logger
+
 
 class PublicConfig(BaseSettings):
     log_level: Optional[str]
@@ -95,6 +97,8 @@ class Config(BaseSettings):
         for field_k, field_v in config_kwargs.items():
             if field_k in self.__fields__ and field_v is not None:
                 setattr(self, field_k, field_v)
+                if field_k == "log_level":
+                    Logger.make_logger(self.logs_folder / self.logs_filename, self.log_level)
         self.write_file()
         get_config.cache_clear()
 

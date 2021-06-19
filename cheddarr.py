@@ -51,6 +51,7 @@ def run(ctx):
         port=9090,
         reload=debug,
         debug=debug,
+        access_log=debug,
     )
 
 
