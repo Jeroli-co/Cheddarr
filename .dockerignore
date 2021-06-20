@@ -1,0 +1,6 @@
+client/node_modules
+client/build
+client/.prettierignore
+client/..prettierrc
+.dockerignore
+Dockerfile

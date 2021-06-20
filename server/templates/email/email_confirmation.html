@@ -1,0 +1,6 @@
+{% extends 'email/layout.html' %}
+
+{% block body %}
+  <p>Please confirm your email through the link below to be able to login:</p>
+  <p><a href="{{ confirm_url }}">{{ confirm_url }}</a></p>
+{% endblock %}
