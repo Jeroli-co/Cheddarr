@@ -47,16 +47,16 @@ class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
 
 
 class MediaServerSettingRepository(BaseRepository[MediaServerSetting]):
-    pass
+    ...
 
 
 class PlexSettingRepository(MediaServerSettingRepository, BaseRepository[PlexSetting]):
-    pass
+    ...
 
 
 class RadarrSettingRepository(MediaProviderSettingRepository, BaseRepository[RadarrSetting]):
-    pass
+    ...
 
 
 class SonarrSettingRepository(MediaProviderSettingRepository, BaseRepository[SonarrSetting]):
-    pass
+    ...

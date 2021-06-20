@@ -104,15 +104,7 @@ async def add_plex_setting(
     if setting is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "This server is already added.")
     setting = setting_in.to_orm(PlexSetting)
-    libraries = []
-    for library in setting_in.libraries:
-        if library.enabled:
-            libraries.append(library.to_orm(MediaServerLibrary))
-    setting.libraries = libraries
     await plex_setting_repo.save(setting)
-
-    if setting.libraries:
-        scheduler.add_job(sync_plex_servers_recently_added, args=[setting.server_id])
 
     return setting
 

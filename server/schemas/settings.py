@@ -24,7 +24,7 @@ class MediaProviderSettingBase(ExternalServiceSettingBase):
     root_folder: str
     quality_profile_id: int
     version: int
-    is_default: bool = False
+    is_default: Optional[bool] = False
 
 
 #####################################
@@ -44,12 +44,10 @@ class PlexLibrarySection(APIModel):
 
 class PlexSettingSchema(MediaServerSettingBase):
     id: str
-    libraries: List[PlexLibrarySection] = []
 
 
 class PlexSettingCreateUpdate(MediaServerSettingBase):
-    enabled: Optional[bool] = True
-    libraries: Optional[List[PlexLibrarySection]] = []
+    ...
 
 
 #####################################
@@ -68,8 +66,7 @@ class RadarrSettingSchema(MediaProviderSettingBase):
 
 
 class RadarrSettingCreateUpdate(MediaProviderSettingBase):
-    enabled: Optional[bool] = True
-    is_default: Optional[bool] = False
+    ...
 
 
 #####################################
@@ -93,8 +90,6 @@ class SonarrSettingSchema(MediaProviderSettingBase):
 
 
 class SonarrSettingCreateUpdate(MediaProviderSettingBase):
-    enabled: Optional[bool] = True
-    is_default: Optional[bool] = False
     anime_root_folder: Optional[str]
     anime_quality_profile_id: Optional[int]
     language_profile_id: Optional[int]

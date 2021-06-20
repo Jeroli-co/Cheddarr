@@ -36,7 +36,7 @@ class MovieRequestSchema(MediaRequest):
 
 
 class MovieRequestCreate(MediaRequestCreate):
-    pass
+    ...
 
 
 class EpisodeRequestSchema(APIModel):
