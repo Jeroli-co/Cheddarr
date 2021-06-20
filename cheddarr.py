@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import asyncclick as click
+import click
 
 
 """USAGE:
