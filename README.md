@@ -23,18 +23,18 @@ Cheddarr is a companion application for your media server. It acts as a hub for 
   
 ## Features
 * Media servers integration to browse directly your media content in Cheddarr (currently supports Plex).
-* Secure authentication through media servers or with local accounts.
+* Secure authentication through Plex or with local accounts.
 * User management with granular permission system.
 * Comprehensive media request system that allows users to request movies and series (even individual seasons or episodes).
-* Automation of the request process with the relevant services (Sonarr, Radarr).
+* Automation of the request process with the relevant services (Sonarr and Radarr).
 * Simple, responsive and mobile friendly UI.
 * ... And more to come!
 
 ## Support
 #### Feature requests
-* To hear about the latest news, hop on our [Discord](https://discord.gg/Tj5HDUmFD6)
+* To hear about the latest news, hop on our [Discord](https://discord.gg/Tj5HDUmFD6).
 * If you need something that is not already in Cheddarr, you can create a [feature request](https://github.com/Jeroli-co/Cheddarr/discussions/new).
-* For any type of bug, you can submit an [issue](https://github.com/Jeroli-co/Cheddarr/issues/new?labels=bug&template=bug_report.md) 
+* For any type of bug, you can submit an [issue](https://github.com/Jeroli-co/Cheddarr/issues/new?labels=bug&template=bug_report.md).
   
   
 ## Contributing
