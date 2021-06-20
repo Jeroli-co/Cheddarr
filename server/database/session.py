@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from server.core.config import get_config
 
 
-class DBSession:
+class EngineMaker:
     engine: AsyncEngine = None
 
     @classmethod
@@ -24,9 +24,5 @@ class DBSession:
         url = "sqlite:///" + str(get_config().db_folder / get_config().db_filename)
         return create_engine(url, connect_args={"check_same_thread": False})
 
-    @classmethod
-    def get_session(cls, new_engine: bool = False):
-        engine = cls.get_engine()
-        if new_engine:
-            engine = cls.create_engine()
-        return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)()
+
+Session = sessionmaker(EngineMaker.get_engine(), expire_on_commit=False, class_=AsyncSession)

@@ -1,5 +1,5 @@
 from server.core.scheduler import scheduler
-from server.database.session import DBSession
+from server.database.session import Session
 from server.models.media import MediaType
 from server.models.requests import RequestStatus
 from server.repositories.requests import MediaRequestRepository
@@ -10,7 +10,7 @@ from server.services import sonarr
     "interval", id="sonarr-sync", name="Sonarr Sync", coalesce=True, minutes=10
 )
 async def sonarr_sync():
-    async with DBSession.get_session(new_engine=True) as db_session:
+    async with Session() as db_session:
         media_request_repo = MediaRequestRepository(db_session)
         requests = await media_request_repo.find_all_by(
             status=RequestStatus.approved, media_type=MediaType.series

@@ -16,16 +16,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="sign-in")
 
 
 async def get_db() -> Iterator[AsyncSession]:
-    from server.database.session import DBSession
+    from server.database.session import Session
 
-    session = DBSession.get_session()
-    try:
-        yield session
-    except Exception as exc:
-        await session.rollback()
-        raise exc
-    finally:
-        await session.rollback()
+    async with Session() as session:
+        try:
+            yield session
+        except Exception as exc:
+            await session.rollback()
+            raise exc
 
 
 def get_repository(
