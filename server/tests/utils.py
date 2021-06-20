@@ -4,6 +4,7 @@ from httpx import AsyncClient
 
 from server.models.media import MediaType
 from server.models.requests import RequestStatus
+from server.models.users import UserRole
 
 
 async def user_authentication_headers(
@@ -24,15 +25,16 @@ datasets = {
             "username": "user1",
             "email": "email1@test.com",
             "password": "password1",
-            "avatar": "http://avatar.fake",
+            "avatar": "/avatar.png",
             "confirmed": True,
+            "roles": UserRole.admin,
         },
         {
             "id": 2,
             "username": "user2",
             "email": "email2@test.com",
             "password": "password2",
-            "avatar": "http://avatar.fake",
+            "avatar": "/avatar.png",
             "confirmed": True,
         },
         {
@@ -40,7 +42,7 @@ datasets = {
             "username": "user3",
             "email": "email3@test.com",
             "password": "password3",
-            "avatar": "http://avatar.fake",
+            "avatar": "/avatar.png",
             "confirmed": True,
         },
         {
@@ -48,7 +50,7 @@ datasets = {
             "username": "user4",
             "email": "email4@test.com",
             "password": "password4",
-            "avatar": "http://avatar.fake",
+            "avatar": "/avatar.png",
             "confirmed": False,
         },
     ],

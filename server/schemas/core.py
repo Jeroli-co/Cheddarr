@@ -23,4 +23,3 @@ class PaginatedResult(BaseModel):
     total_pages: int
     total_results: int
     results: List
-
