@@ -30,6 +30,8 @@ export const SignInForm = () => {
   const redirectURI = useRedirectURI();
   const [isInitPasswordModalOpen, setIsInitPasswordModalOpen] = useState(false);
 
+  const cheddarrLogo = require("../assets/cheddarr.svg");
+
   const onSubmit = handleSubmit((data) => {
     redirectURI ? signIn(data, redirectURI) : signIn(data);
   });
@@ -40,7 +42,9 @@ export const SignInForm = () => {
 
   return (
     <div>
-      <PrimaryHero>Sign in to Cheddarr</PrimaryHero>
+      <PrimaryHero>
+        <img id="cheddarrLogo" src={cheddarrLogo} alt="Chedarr" width="350px" />
+      </PrimaryHero>
 
       <br />
 
