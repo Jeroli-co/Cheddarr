@@ -16,7 +16,6 @@ router = APIRouter()
 @router.get(
     "/{tmdb_id:int}",
     response_model=MovieSchema,
-    response_model_exclude_unset=True,
     response_model_exclude={"requests": {"__all__": {"media"}}},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No movie found"},
@@ -42,7 +41,6 @@ async def get_movie(
     "/recent",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_recently_added_movies(
     page: int = 1,
@@ -73,7 +71,6 @@ async def get_recently_added_movies(
     "/popular",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_popular_movies(
     page: int = 1,
@@ -97,7 +94,6 @@ async def get_popular_movies(
     "/upcoming",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_upcoming_movies(
     page: int = 1,
@@ -121,7 +117,6 @@ async def get_upcoming_movies(
     "/{tmdb_id:int}/similar",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_similar_movies(
     tmdb_id: int,
@@ -148,7 +143,6 @@ async def get_similar_movies(
     "/{tmdb_id:int}/recommended",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_recommended_movies(
     tmdb_id: int,

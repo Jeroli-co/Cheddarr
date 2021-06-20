@@ -25,7 +25,6 @@ router = APIRouter()
 @router.get(
     "/{tmdb_id:int}",
     response_model=SeriesSchema,
-    response_model_exclude_unset=True,
     response_model_exclude={"requests": {"__all__": {"media"}}},
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No series found"},
@@ -58,7 +57,6 @@ async def get_series(
     "/{tmdb_id:int}/seasons/{season_number}",
     dependencies=[Depends(deps.get_current_user)],
     response_model=SeasonSchema,
-    response_model_exclude_unset=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No season found"},
     },
@@ -89,7 +87,6 @@ async def get_season(
     "/{tmdb_id:int}/seasons/{season_number}/episodes/{episode_number}",
     dependencies=[Depends(deps.get_current_user)],
     response_model=EpisodeSchema,
-    response_model_exclude_unset=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No episode found"},
     },
@@ -115,7 +112,6 @@ async def get_episode(
     "/recent",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_recently_added_series(
     page: int = 1,
@@ -146,7 +142,6 @@ async def get_recently_added_series(
     "/popular",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_popular_series(
     page: int = 1,
@@ -170,7 +165,6 @@ async def get_popular_series(
     "/{tmdb_id:int}/similar",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_similar_series(
     tmdb_id: int,
@@ -197,7 +191,6 @@ async def get_similar_series(
     "/{tmdb_id:int}/recommended",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
 )
 async def get_recommended_series(
     tmdb_id: int,

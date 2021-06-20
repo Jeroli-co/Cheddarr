@@ -19,9 +19,9 @@ class MediaRepository(BaseRepository[Media]):
         filters = []
         if tmdb_id is not None:
             filters.append(self.model.tmdb_id == tmdb_id)
-        if imdb_id is not None:
+        elif imdb_id is not None:
             filters.append(self.model.imdb_id == imdb_id)
-        if tvdb_id is not None:
+        elif tvdb_id is not None:
             filters.append(self.model.tvdb_id == tvdb_id)
 
         result = await self.execute(select(self.model).where(or_(*filters)))
@@ -38,9 +38,9 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
         query = select(self.model).join(Media)
         if tmdb_id is not None:
             query = query.where(Media.tmdb_id == tmdb_id)
-        if imdb_id is not None:
+        elif imdb_id is not None:
             query = query.where(Media.imdb_id == imdb_id)
-        if tvdb_id is not None:
+        elif tvdb_id is not None:
             query = query.where(Media.tvdb_id == tvdb_id)
 
         result = await self.execute(query)

@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get(
     "",
     response_model=MediaSearchResult,
-    response_model_exclude_unset=True,
+    response_model_exclude_none=True,
     dependencies=[Depends(deps.get_current_user)],
 )
 async def search_media(

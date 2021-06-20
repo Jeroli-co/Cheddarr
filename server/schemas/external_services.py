@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from typing import List, Optional
+from urllib.parse import quote
 
 from pydantic import AnyHttpUrl, Field, validator
 
@@ -21,9 +22,9 @@ class MediaServerInfo(APIModel):
 class PlexMediaInfo(MediaServerInfo):
     @validator("web_url", pre=True, always=True)
     def get_web_url(cls, web_url, values):
-        return "https://app.plex.tv/desktop#!/server/%s/details?key=library/metadata/%s" % (
-            values["server_id"],
-            values["external_id"],
+        media_key = quote(f"/library/metadata/{values['external_id']}", safe="")
+        return (
+            f"https://app.plex.tv/desktop#!/server/{values['server_id']}/details?key={media_key}"
         )
 
 
