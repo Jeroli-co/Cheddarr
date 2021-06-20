@@ -70,8 +70,8 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
     return 1;
   };
 
-  const fetchData = () => {
-    const page = getPageToLoad();
+  const fetchData = (pageNumber?: number) => {
+    const page = pageNumber ? pageNumber : getPageToLoad();
     let urlWithPageQuery =
       url + ((url.includes("?") ? "&" : "?") + "page=" + page);
     get<IPaginated<T>>(urlWithPageQuery).then((res) => {
@@ -154,6 +154,7 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
     data,
     loadPrev,
     loadNext,
+    loadPage: fetchData,
     updateData,
     deleteData,
     sortData,

@@ -23,6 +23,7 @@ type PaginationArrowsProps = {
   totalPages?: number;
   onLoadNext: () => void;
   onLoadPrev: () => void;
+  onLoadPage?: (n: number) => void;
 };
 
 export const PaginationArrows = (props: PaginationArrowsProps) => {
@@ -41,6 +42,18 @@ export const PaginationArrows = (props: PaginationArrowsProps) => {
       <PrimaryButton type="button" onClick={() => props.onLoadNext()}>
         <Icon icon={faArrowRight} />
       </PrimaryButton>
+      {props.onLoadPage !== undefined && (
+        <input
+          type="number"
+          defaultValue={props.currentPage}
+          min={1}
+          max={props.totalPages}
+          step={1}
+          onChange={(e) =>
+            props.onLoadPage && props.onLoadPage(parseInt(e.target.value, 10))
+          }
+        />
+      )}
     </Container>
   );
 };

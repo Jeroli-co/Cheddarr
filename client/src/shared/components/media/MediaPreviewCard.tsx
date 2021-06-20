@@ -21,6 +21,7 @@ import { Image } from "../Image";
 import { RequestButton } from "../requests/RequestButton";
 import { APIRoutes } from "../../enums/APIRoutes";
 import { useAPI } from "../../hooks/useAPI";
+import { isEmpty } from "../../../utils/strings";
 
 export const MediaPreviewCardContainer = styled.div`
   position: relative;
@@ -112,27 +113,25 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
   const { get } = useAPI();
 
   useEffect(() => {
-    setFullyLoadedMedia(media);
-  }, [media]);
-
-  useEffect(() => {
-    if (fullyLoadedMedia && !fullyLoadedMedia.posterUrl) {
-      if (fullyLoadedMedia.mediaType === MediaTypes.MOVIES) {
-        get<IMedia>(APIRoutes.GET_MOVIE(fullyLoadedMedia.tmdbId)).then((r) => {
+    if (!media.posterUrl || isEmpty(media.posterUrl)) {
+      if (media.mediaType === MediaTypes.MOVIES) {
+        get<IMedia>(APIRoutes.GET_MOVIE(media.tmdbId)).then((r) => {
           if (r.data) {
             setFullyLoadedMedia(r.data);
           }
         });
-      } else if (fullyLoadedMedia.mediaType === MediaTypes.SERIES) {
-        get<IMedia>(APIRoutes.GET_SERIES(fullyLoadedMedia.tmdbId)).then((r) => {
+      } else if (media.mediaType === MediaTypes.SERIES) {
+        get<IMedia>(APIRoutes.GET_SERIES(media.tmdbId)).then((r) => {
           if (r.data) {
             setFullyLoadedMedia(r.data);
           }
         });
       }
+    } else {
+      setFullyLoadedMedia(media);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullyLoadedMedia]);
+  }, [media]);
 
   const onCardClick = () => {
     const getSeasonUrl = () => {

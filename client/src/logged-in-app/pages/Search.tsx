@@ -70,7 +70,7 @@ export const Search = () => {
   }, []);
 
   useEffect(() => {
-    if (mediaPage.data) {
+    if (mediaPage.data && mediaPage.data.results) {
       setMedia([...media, ...mediaPage.data.results]);
       // @ts-ignore
       pageRef.current = {

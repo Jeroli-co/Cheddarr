@@ -87,7 +87,7 @@ const LogComponent = ({ log }: LogComponentProps) => {
 export const ServerLogs = () => {
   useRoleGuard([Roles.ADMIN]);
 
-  const { data: logs, loadNext, loadPrev } = usePagination<ILog>(
+  const { data: logs, loadNext, loadPrev, loadPage } = usePagination<ILog>(
     APIRoutes.LOGS,
     false
   );
@@ -112,6 +112,7 @@ export const ServerLogs = () => {
         totalPages={logs.data?.totalPages}
         onLoadPrev={() => loadPrev()}
         onLoadNext={() => loadNext()}
+        onLoadPage={loadPage}
       />
     </Container>
   );

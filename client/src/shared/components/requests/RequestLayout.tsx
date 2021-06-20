@@ -18,12 +18,10 @@ import {
   IMediaRequest,
 } from "../../models/IMediaRequest";
 import { RequestStatus } from "../../enums/RequestStatus";
-import { DangerIconButton, PrimaryButton, SuccessButton } from "../Button";
+import { DangerIconButton, SuccessButton } from "../Button";
 import { Icon } from "../Icon";
 import {
   faArrowDown,
-  faArrowLeft,
-  faArrowRight,
   faArrowUp,
   faCheck,
   faTimes,
@@ -41,6 +39,7 @@ import { Image } from "../Image";
 import { Buttons } from "../layout/Buttons";
 import { IMediaProviderConfig } from "../../models/IMediaProviderConfig";
 import { InputField } from "../inputs/InputField";
+import { PaginationArrows } from "../PaginationArrows";
 
 export const ScrollingTable = styled.div`
   overflow-x: scroll;
@@ -366,17 +365,12 @@ export const RequestFooter = (props: RequestFooterProps) => {
   return (
     <RequestsFooterContainer>
       {props.totalPages > 0 && (
-        <>
-          <PrimaryButton type="button" onClick={() => props.onLoadPrev()}>
-            <Icon icon={faArrowLeft} />
-          </PrimaryButton>
-          <p>
-            {props.currentPage} ... {props.totalPages}
-          </p>
-          <PrimaryButton type="button" onClick={() => props.onLoadNext()}>
-            <Icon icon={faArrowRight} />
-          </PrimaryButton>
-        </>
+        <PaginationArrows
+          onLoadNext={() => props.onLoadNext()}
+          onLoadPrev={() => props.onLoadPrev()}
+          currentPage={props.currentPage}
+          totalPages={props.totalPages}
+        />
       )}
     </RequestsFooterContainer>
   );
