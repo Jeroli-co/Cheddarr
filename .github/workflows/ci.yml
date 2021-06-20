@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         node-version: [13.x]
-        python-version: [3.8]
+        python-version: [3.9.5]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -24,7 +24,7 @@ jobs:
         yarn test
       env:
         CI: true
-    - name: Set up Python 3.8
+    - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
