@@ -6,8 +6,8 @@ jobs:
   ci:
     strategy:
       matrix:
-        node-version: [13.x]
-        python-version: [3.9.5]
+        node-version: [16.x]
+        python-version: [3.9.x]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -25,7 +25,7 @@ jobs:
       env:
         CI: true
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Python Poetry Action
