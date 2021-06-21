@@ -3,7 +3,8 @@
 </p>
 
 <p align="center">
-  <a href=https://github.com/Jeroli-co/Cheddarr/actions/workflows/ci.yml><img src=https://github.com/Jeroli-co/Cheddarr/actions/workflows/ci.yml/badge.svg></a>
+  <a href=https://github.com/Jeroli-co/Cheddarr/actions/workflows/ci.yml><img src=https://github.com/Jeroli-co/Cheddarr/actions/workflows/ci.yml/badge.svg alt="CI"></a>
+  <a href=https://github.com/Jeroli-co/Cheddarr/actions/workflows/codeql-analysis.yml><img src=https://github.com/Jeroli-co/Cheddarr/actions/workflows/codeql-analysis.yml/badge.svg alt="Code quality"></a>
   <a href=https://github.com/Jeroli-co/Cheddarr/issues><img src=https://img.shields.io/github/issues/Jeroli-co/Cheddarr.svg?maxAge=60&style=flat alt="Issues"></a>
   <a href=https://github.com/Jeroli-co/Cheddarr/pulls><img src=https://img.shields.io/github/issues-pr/Jeroli-co/Cheddarr.svg?maxAge=60&style=flat alt="Pull requests"></a>
   <a href=https://hub.docker.com/repository/docker/jerolico/cheddarr><img src=https://img.shields.io/docker/pulls/jerolico/cheddarr alt="Docker pulls"></a>
