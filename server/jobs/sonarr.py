@@ -21,6 +21,8 @@ async def sonarr_sync():
             if series_lookup is None:
                 continue
             series = await sonarr.get_series(setting, series_lookup.id)
+            if series is None:
+                continue
             req_seasons_available = 0
             for req_season in request.seasons:
                 if not req_season.episodes:
