@@ -8,7 +8,7 @@ COPY /client ./client
 RUN cd client && yarn install && yarn cache clean && yarn build --production
 
 
-FROM jerolico/cheddarr-base-image
+FROM python:3.9.5-slim
 WORKDIR /app
 
 # Copy front build
@@ -18,7 +18,7 @@ COPY --from=FRONT_STAGE /app/client/build ./client/build
 COPY /pyproject.toml /poetry.lock* /app/
 
 # Install Poetry and backend dependencies
-RUN pip install poetry && \
+RUN pip install poetry alembic && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --no-dev
 
@@ -26,4 +26,9 @@ RUN pip install poetry && \
 COPY /server ./server
 COPY cheddarr.py .
 
+# Run migration
+RUN cd server && alembic upgrade head
+
 EXPOSE 9090
+ENTRYPOINT ["python", "cheddarr.py", "run"]
+
