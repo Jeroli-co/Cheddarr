@@ -133,7 +133,7 @@ async def lookup(
     return SonarrSeries.parse_obj(lookup_result[0])
 
 
-async def get_series(setting: SonarrSetting, series_id: int) -> SonarrSeries:
+async def get_series(setting: SonarrSetting, series_id: int) -> Optional[SonarrSeries]:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -142,7 +142,10 @@ async def get_series(setting: SonarrSetting, series_id: int) -> SonarrSeries:
         version=setting.version,
         resource_path=f"/series/{series_id}",
     )
-    resp = await HttpClient.request("GET", url)
+    try:
+        resp = await HttpClient.request("GET", url)
+    except HTTPException:
+        return None
     return SonarrSeries.parse_obj(resp)
 
 
@@ -232,6 +235,8 @@ async def send_request(request: SeriesRequest):
         await asyncio.sleep(2)
     else:
         series = await get_series(setting, series.id)
+        if series is None:
+            return
     # request seasons is empty so we are requesting all the series
     if not request.seasons:
         for season in series.seasons:

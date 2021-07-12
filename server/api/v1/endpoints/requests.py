@@ -394,7 +394,7 @@ async def update_series_request(
     if request is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The request was not found.")
     if request.status != RequestStatus.pending:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non pending request.")
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot update a non-pending request.")
     if request_update.status == RequestStatus.approved:
         if request_update.provider_id is not None:
             selected_provider = await media_provider_repo.find_by(
@@ -455,7 +455,5 @@ async def delete_series_request(
         and not check_permissions(current_user.roles, [UserRole.manage_requests])
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
-    if request.status != RequestStatus.pending and request.requesting_user_id == current_user.id:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
     await media_request_repo.remove(request)
     return {"detail": "Request deleted."}
