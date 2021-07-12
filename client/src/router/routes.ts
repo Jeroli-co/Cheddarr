@@ -42,8 +42,7 @@ const routes = {
   /** USERS **/
   USERS: { url: "/users", component: UsersSettings },
   PROFILE: {
-    url: (id: number | string) =>
-      "/profile" + (id.toString().length > 0 ? `/${id}` : ""),
+    url: (id?: number | string) => `/profile${id ? `/${id}` : ""}`,
     component: Profile,
   },
 

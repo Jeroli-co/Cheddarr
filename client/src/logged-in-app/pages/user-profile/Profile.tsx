@@ -118,10 +118,7 @@ const Profile = () => {
           </div>
         </SubContainer>
         <PrimaryDivider />
-        {user &&
-          checkRole(user.roles, [Roles.ADMIN, Roles.MANAGE_USERS], true) && (
-            <UpdateProfile id={profileOwner.data.id} />
-          )}
+        <UpdateProfile id={profileOwner.data.id} />
       </div>
     </>
   );
