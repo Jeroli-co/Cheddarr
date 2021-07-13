@@ -27,11 +27,16 @@ class SeriesType(str, Enum):
 
 class Media(Model):
     __repr_props__ = ("title", "media_type", "tmdb_id", "imdb_id", "tvdb_id")
+    __table_args__ = (
+        UniqueConstraint("tmdb_id", "media_type"),
+        UniqueConstraint("imdb_id", "media_type"),
+        UniqueConstraint("tvdb_id", "media_type"),
+    )
 
     id = Column(Integer, primary_key=True)
-    tmdb_id = Column(Integer, unique=True, index=True)
-    imdb_id = Column(String, unique=True, index=True)
-    tvdb_id = Column(Integer, unique=True, index=True)
+    tmdb_id = Column(Integer)
+    imdb_id = Column(String)
+    tvdb_id = Column(Integer)
     title = Column(String, nullable=False)
     media_type = Column(DBEnum(MediaType), nullable=False)
 

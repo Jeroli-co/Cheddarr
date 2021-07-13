@@ -232,8 +232,6 @@ async def delete_movie_request(
         and not check_permissions(current_user.roles, [UserRole.manage_requests])
     ):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This request does not exist.")
-    if request.status != RequestStatus.pending and request.requesting_user_id == current_user.id:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete a non pending request.")
     await media_request_repo.remove(request)
     return {"detail": "Request deleted."}
 
