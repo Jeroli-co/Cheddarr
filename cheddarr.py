@@ -47,9 +47,10 @@ def run(ctx):
 
     debug = ctx.obj["DEBUG"]
     if not debug:
-        import alembic.command, alembic.config
+        from alembic.command import upgrade
+        from alembic.config import Config
 
-        alembic.command.upgrade(alembic.config.Config(Path.cwd() / "server/alembic.ini"), "head")
+        upgrade(Config(Path.cwd() / "server/alembic.ini"), "head")
     uvicorn.run(
         "server.main:app",
         host="0.0.0.0",

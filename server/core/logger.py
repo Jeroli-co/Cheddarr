@@ -88,8 +88,7 @@ class Logger:
             serialize=True,
             format="{message}",
         )
-
-        logging.basicConfig(handlers=[InterceptHandler()], level=0)
+        logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
 
         for _log in [
             *logging.root.manager.loggerDict.keys(),
