@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-import click
+from pathlib import Path
 
+import click
 
 """USAGE:
 python cheddarr.py [OPTIONS] COMMAND
@@ -45,6 +46,10 @@ def run(ctx):
     import uvicorn
 
     debug = ctx.obj["DEBUG"]
+    if not debug:
+        import alembic.command, alembic.config
+
+        alembic.command.upgrade(alembic.config.Config(Path.cwd() / "server/alembic.ini"), "head")
     uvicorn.run(
         "server.main:app",
         host="0.0.0.0",

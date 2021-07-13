@@ -26,9 +26,6 @@ RUN pip install poetry alembic && \
 COPY /server ./server
 COPY cheddarr.py .
 
-# Run migration
-RUN cd server && alembic upgrade head
-
 EXPOSE 9090
 ENTRYPOINT ["python", "cheddarr.py", "run"]
 
