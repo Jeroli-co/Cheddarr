@@ -20,6 +20,11 @@ async def sonarr_sync():
             series_lookup = await sonarr.lookup(setting, tvdb_id=request.media.tvdb_id)
             if series_lookup is None:
                 continue
+            if series_lookup.id is None:
+                request.status = RequestStatus.refused
+                await media_request_repo.save(request)
+                continue
+
             series = await sonarr.get_series(setting, series_lookup.id)
             if series is None:
                 continue
