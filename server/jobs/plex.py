@@ -29,10 +29,6 @@ from server.repositories.media import (
 from server.repositories.settings import PlexSettingRepository
 from server.services import plex, tmdb
 
-TMDB_REGEX = "tmdb|themoviedb"
-IMDB_REGEX = "imdb"
-TVDB_REGEX = "tvdb|thetvdb"
-
 
 @scheduler.scheduled_job(
     "interval",
@@ -342,6 +338,10 @@ async def process_plex_episode(
 
 
 async def find_guids(media: Union[PlexMovie, PlexSeries]) -> (int, str, int):
+    tmdb_regex = "tmdb|themoviedb"
+    imdb_regex = "imdb"
+    tvdb_regex = "tvdb|thetvdb"
+
     try:
         guids = [media.guid]
         if hasattr(media, "guids") and media.guids is not None:
@@ -362,7 +362,7 @@ async def find_guids(media: Union[PlexMovie, PlexSeries]) -> (int, str, int):
             None,
         )
 
-    tmdb_id, imdb_id, tvdb_id = find_guid(TMDB_REGEX), find_guid(IMDB_REGEX), find_guid(TVDB_REGEX)
+    tmdb_id, imdb_id, tvdb_id = find_guid(tmdb_regex), find_guid(imdb_regex), find_guid(tvdb_regex)
 
     try:
         if tmdb_id is None:

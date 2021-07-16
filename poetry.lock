@@ -848,17 +848,6 @@ python-versions = ">=3.6"
 full = ["aiofiles", "graphene", "itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
 
 [[package]]
-name = "tmdbsimple"
-version = "2.8.0"
-description = "A Python wrapper for The Movie Database API v3"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-requests = "*"
-
-[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -927,8 +916,8 @@ dev = ["pytest (>=4.6.2)", "black (>=19.3b0)"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.8"
-content-hash = "e403d7f23a09f8c5dc5be4911a3eae71db1c96564ef2c9410d39c04680793974"
+python-versions = "^3.9.5"
+content-hash = "1476b7ce219c62f6adce0a4b4c5c034ca7b6fee425fdd33a6a732eefb7b74453"
 
 [metadata.files]
 aiofiles = [
@@ -1499,10 +1488,6 @@ sqlalchemy = [
 starlette = [
     {file = "starlette-0.14.2-py3-none-any.whl", hash = "sha256:3c8e48e52736b3161e34c9f0e8153b4f32ec5d8995a3ee1d59410d92f75162ed"},
     {file = "starlette-0.14.2.tar.gz", hash = "sha256:7d49f4a27f8742262ef1470608c59ddbc66baf37c148e938c7038e6bc7a998aa"},
-]
-tmdbsimple = [
-    {file = "tmdbsimple-2.8.0-py3-none-any.whl", hash = "sha256:c882112396634bc8d42689fdf347e4a230f6897e5c423fd4d3ab1411dcb4b98f"},
-    {file = "tmdbsimple-2.8.0.tar.gz", hash = "sha256:2f6f4b762e07e71e222b3200e3b83c4fce8ff61892402a60be925f79d49ab7fd"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
