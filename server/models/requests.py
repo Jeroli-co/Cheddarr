@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Column,
@@ -75,7 +75,7 @@ class SeriesRequest(MediaRequest):
     __mapper_args__ = mapper_args({"polymorphic_identity": MediaType.series})
     __repr_props__ = ("media", "requested_user", "requesting_user")
 
-    seasons: List["SeasonRequest"] = relationship(
+    seasons: list["SeasonRequest"] = relationship(
         "SeasonRequest", cascade="all,delete,delete-orphan", lazy="selectin", backref="request"
     )
 
@@ -87,7 +87,7 @@ class SeasonRequest(Model):
     season_number = Column(Integer, nullable=False)
     series_request_id = Column(ForeignKey("mediarequest.id"), nullable=False)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
-    episodes: List["EpisodeRequest"] = relationship(
+    episodes: list["EpisodeRequest"] = relationship(
         "EpisodeRequest", cascade="all,delete,delete-orphan", lazy="selectin", backref="season"
     )
 

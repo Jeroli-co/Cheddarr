@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from server.models.requests import RequestStatus
 from server.schemas.media import MovieSchema, SeriesSchema
@@ -45,17 +45,17 @@ class EpisodeRequestSchema(APIModel):
 
 class SeasonRequestSchema(APIModel):
     season_number: int
-    episodes: Optional[List[EpisodeRequestSchema]]
+    episodes: Optional[list[EpisodeRequestSchema]]
 
 
 class SeriesRequestSchema(MediaRequest):
     media: SeriesSchema
-    seasons: Optional[List[SeasonRequestSchema]]
+    seasons: Optional[list[SeasonRequestSchema]]
 
 
 class SeriesRequestCreate(MediaRequestCreate):
-    seasons: Optional[List[SeasonRequestSchema]]
+    seasons: Optional[list[SeasonRequestSchema]]
 
 
 class MediaRequestSearchResult(PaginatedResult):
-    results: List[Union[SeriesRequestSchema, MovieRequestSchema]]
+    results: list[Union[SeriesRequestSchema, MovieRequestSchema]]

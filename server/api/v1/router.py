@@ -4,6 +4,7 @@ from .endpoints import (
     auth,
     movies,
     notifications,
+    people,
     requests,
     search,
     series,
@@ -21,6 +22,7 @@ router.include_router(notifications.router, prefix="/notifications", tags=["noti
 router.include_router(requests.router, prefix="/requests", tags=["requests"])
 router.include_router(search.router, prefix="/search", tags=["search"])
 router.include_router(series.router, prefix="/series", tags=["series"])
+router.include_router(people.router, prefix="/people", tags=["people"])
 router.include_router(
     settings.router,
     prefix="/settings",

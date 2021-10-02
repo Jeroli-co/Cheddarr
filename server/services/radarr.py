@@ -1,15 +1,40 @@
 from typing import Dict, Optional
 
 from fastapi import HTTPException
+from pydantic import Field
 
 from server.core import utils
 from server.core.http_client import HttpClient
 from server.models.requests import MovieRequest
 from server.models.settings import RadarrSetting
-from server.schemas.external_services import RadarrAddOptions, RadarrMovie
+from server.schemas.core import APIModel
 from server.schemas.settings import RadarrInstanceInfo
 
 
+###################################
+# Schemas                         #
+###################################
+class RadarrAddOptions(APIModel):
+    search_for_movie: bool = Field(alias="searchForMovie")
+
+
+class RadarrMovie(APIModel):
+    id: Optional[int]
+    tmdb_id: int = Field(alias="tmdbId")
+    title: str = Field(alias="title")
+    title_slug: str = Field(alias="titleSlug")
+    year: int = Field(alias="year")
+    quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
+    root_folder_path: Optional[str] = Field(alias="rootFolderPath")
+    monitored: bool = Field(alias="monitored")
+    images: list[dict] = Field(alias="images")
+    has_file: bool = Field(alias="hasFile")
+    add_options: Optional[RadarrAddOptions] = Field(alias="addOptions")
+
+
+###################################
+# API calls                       #
+###################################
 def make_url(
     *,
     api_key: str,

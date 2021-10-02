@@ -1,6 +1,6 @@
 import json
 import math
-from typing import List, Literal
+from typing import Literal
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
@@ -49,7 +49,7 @@ def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_con
 
 @router.get(
     "/jobs",
-    response_model=List[Job],
+    response_model=list[Job],
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.manage_settings])),

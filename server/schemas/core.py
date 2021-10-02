@@ -1,4 +1,5 @@
-from typing import List, Type
+from datetime import date
+from typing import Type
 
 from pydantic import BaseModel
 
@@ -14,6 +15,18 @@ class APIModel(BaseModel):
         return orm_model(**self.dict(include=vars(orm_model).keys(), exclude=exclude))
 
 
+class Date(date):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if v == "":
+            return None
+        return v
+
+
 class ResponseMessage(BaseModel):
     detail: str
 
@@ -22,4 +35,4 @@ class PaginatedResult(BaseModel):
     page: int = 1
     total_pages: int
     total_results: int
-    results: List
+    results: list

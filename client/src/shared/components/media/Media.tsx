@@ -216,7 +216,7 @@ export const Media = (props: MediaProps) => {
                   {props.media.genres &&
                     props.media.genres.map((genre, index) => (
                       <span key={index}>
-                        {genre}
+                        {genre.name}
                         {props.media.genres &&
                         index !== props.media.genres.length - 1
                           ? ", "

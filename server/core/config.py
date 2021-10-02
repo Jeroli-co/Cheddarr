@@ -1,7 +1,6 @@
 import json
 import secrets
 from pathlib import Path
-from typing import List
 from uuid import uuid4
 
 from cachetools.func import lru_cache
@@ -55,7 +54,7 @@ class Config(BaseSettings):
     secret_key: str = secrets.token_urlsafe(32)
     signing_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 3
-    backend_cors_origin: List[AnyHttpUrl] = [server_host]
+    backend_cors_origin: list[AnyHttpUrl] = [server_host]
     default_roles: int = 4
 
     ##########################################################################

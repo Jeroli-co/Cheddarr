@@ -1,6 +1,6 @@
 import math
 from abc import ABC
-from typing import Any, Dict, Generic, get_args, List, Optional, Union
+from typing import Any, Dict, Generic, get_args, Optional, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -79,7 +79,7 @@ class BaseRepository(ABC, Generic[ModelType]):
 
     async def find_all_by(
         self, page: int = None, per_page=None, **filters
-    ) -> (List[ModelType], Optional[int], Optional[int]):
+    ) -> (list[ModelType], Optional[int], Optional[int]):
         query = select(self.model).filter_by(**filters)
         if page is not None:
             return await self.paginate(query, per_page, page)

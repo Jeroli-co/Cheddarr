@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from sqlalchemy import desc, or_, select
 
@@ -34,7 +34,7 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
         tmdb_id: int = None,
         tvdb_id: int = None,
         imdb_id=None,
-    ) -> List[MediaServerMedia]:
+    ) -> list[MediaServerMedia]:
         query = select(self.model).join(Media)
         if tmdb_id is not None:
             query = query.where(Media.tmdb_id == tmdb_id)
@@ -48,7 +48,7 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
 
     async def find_all_recently_added(
         self, media_type: MediaType, page: int = None, per_page: int = None
-    ) -> (List[Media], Optional[int], Optional[int]):
+    ) -> (list[Media], Optional[int], Optional[int]):
         query = (
             select(self.model)
             .join(Media)
@@ -67,7 +67,7 @@ class MediaServerSeasonRepository(BaseRepository[MediaServerSeason]):
         tmdb_id: int = None,
         tvdb_id: int = None,
         imdb_id=None,
-    ) -> List[MediaServerSeason]:
+    ) -> list[MediaServerSeason]:
         query = (
             select(self.model)
             .join(MediaServerMedia)
@@ -93,7 +93,7 @@ class MediaServerEpisodeRepository(BaseRepository[MediaServerEpisode]):
         tmdb_id: int = None,
         tvdb_id: int = None,
         imdb_id=None,
-    ) -> List[MediaServerEpisode]:
+    ) -> list[MediaServerEpisode]:
         query = (
             select(self.model)
             .join(MediaServerSeason)

@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 
 from pydantic import parse_obj_as
 
@@ -10,7 +10,6 @@ from server.repositories.media import (
     MediaServerSeasonRepository,
 )
 from server.repositories.requests import MediaRequestRepository
-from server.schemas.external_services import PlexMediaInfo
 from server.schemas.media import (
     EpisodeSchema,
     MediaSchema,
@@ -18,6 +17,7 @@ from server.schemas.media import (
 )
 from server.schemas.requests import MovieRequestSchema, SeriesRequestCreate, SeriesRequestSchema
 from server.services import radarr, sonarr
+from server.services.plex import PlexMediaInfo
 
 
 def unify_series_request(series_request: SeriesRequest, request_in: SeriesRequestCreate):
@@ -73,7 +73,7 @@ async def set_media_db_info(
 
     if request_repo is not None:
         media.requests = parse_obj_as(
-            List[Union[SeriesRequestSchema, MovieRequestSchema]],
+            list[Union[SeriesRequestSchema, MovieRequestSchema]],
             await request_repo.find_all_by_tmdb_id(
                 requesting_user_id=current_user_id, tmdb_id=media.tmdb_id
             ),

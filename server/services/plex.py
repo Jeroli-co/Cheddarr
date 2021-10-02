@@ -1,15 +1,33 @@
-from typing import List, Optional
+from typing import Optional
+from urllib.parse import quote
 
 from asgiref.sync import sync_to_async
 from plexapi.exceptions import PlexApiException
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer as PlexAPIServer
+from pydantic import validator
 
+from server.schemas.media import MediaServerInfo
 from server.schemas.settings import PlexLibrarySection, PlexServer
 
 
+###################################
+# Schemas                         #
+###################################
+class PlexMediaInfo(MediaServerInfo):
+    @validator("web_url", pre=True, always=True)
+    def get_web_url(cls, web_url, values):
+        media_key = quote(f"/library/metadata/{values['external_id']}", safe="")
+        return (
+            f"https://app.plex.tv/desktop#!/server/{values['server_id']}/details?key={media_key}"
+        )
+
+
+###################################
+# API calls                      #
+###################################
 @sync_to_async
-def get_plex_account_servers(api_key: str) -> List[PlexServer]:
+def get_plex_account_servers(api_key: str) -> list[PlexServer]:
     plex_account = MyPlexAccount(api_key)
     servers = []
     for resource in plex_account.resources():
@@ -34,7 +52,7 @@ def get_plex_account_servers(api_key: str) -> List[PlexServer]:
 
 async def get_plex_server_library_sections(
     base_url: str, port: int, ssl: bool, api_key: str
-) -> Optional[List[PlexLibrarySection]]:
+) -> Optional[list[PlexLibrarySection]]:
     server = await get_server(base_url, port, ssl, api_key)
     if server is None:
         return None

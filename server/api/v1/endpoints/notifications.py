@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server.api import (
@@ -20,7 +18,7 @@ router = APIRouter()
 
 @router.get(
     "",
-    response_model=List[NotificationSchema],
+    response_model=list[NotificationSchema],
 )
 async def get_all_notifications(
     current_user: User = Depends(deps.get_current_user),

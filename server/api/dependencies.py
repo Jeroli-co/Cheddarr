@@ -1,4 +1,4 @@
-from typing import Callable, Iterator, List, Literal, Type
+from typing import Callable, Iterator, Literal, Type
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -60,7 +60,7 @@ async def get_current_user(
 
 
 def has_user_permissions(
-    permissions: List[UserRole], options: Literal["and", "or"] = "and"
+    permissions: list[UserRole], options: Literal["and", "or"] = "and"
 ) -> Callable[[User], None]:
     def _has_permissions(current_user: User = Depends(get_current_user)):
         from server.core.security import check_permissions

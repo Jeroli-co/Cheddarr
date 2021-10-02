@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from pydantic import AnyHttpUrl, EmailStr
 
@@ -35,7 +35,7 @@ class UserUpdate(UserBase):
 
 
 class UserSearchResult(PaginatedResult):
-    results: List[UserSchema]
+    results: list[UserSchema]
 
 
 class PasswordResetCreate(APIModel):

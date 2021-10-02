@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
@@ -10,7 +12,6 @@ from server.repositories.media import (
     MediaServerSeasonRepository,
 )
 from server.repositories.requests import MediaRequestRepository
-from server.schemas.external_services import PlexMediaInfo
 from server.schemas.media import EpisodeSchema, MediaSearchResult, SeasonSchema, SeriesSchema
 from server.services import tmdb
 from server.services.core import (
@@ -18,6 +19,7 @@ from server.services.core import (
     set_media_db_info,
     set_season_db_info,
 )
+from server.services.plex import PlexMediaInfo
 
 router = APIRouter()
 
@@ -26,6 +28,7 @@ router = APIRouter()
     "/{tmdb_id:int}",
     response_model=SeriesSchema,
     response_model_exclude={"requests": {"__all__": {"media"}}},
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No series found"},
     },
@@ -57,6 +60,7 @@ async def get_series(
     "/{tmdb_id:int}/seasons/{season_number}",
     dependencies=[Depends(deps.get_current_user)],
     response_model=SeasonSchema,
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No season found"},
     },
@@ -87,6 +91,7 @@ async def get_season(
     "/{tmdb_id:int}/seasons/{season_number}/episodes/{episode_number}",
     dependencies=[Depends(deps.get_current_user)],
     response_model=EpisodeSchema,
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No episode found"},
     },
@@ -112,6 +117,7 @@ async def get_episode(
     "/recent",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
+    response_model_exclude_none=True,
 )
 async def get_recently_added_series(
     page: int = 1,
@@ -142,6 +148,7 @@ async def get_recently_added_series(
     "/popular",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
+    response_model_exclude_none=True,
 )
 async def get_popular_series(
     page: int = 1,
@@ -165,6 +172,7 @@ async def get_popular_series(
     "/{tmdb_id:int}/similar",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
+    response_model_exclude_none=True,
 )
 async def get_similar_series(
     tmdb_id: int,
@@ -191,6 +199,7 @@ async def get_similar_series(
     "/{tmdb_id:int}/recommended",
     dependencies=[Depends(deps.get_current_user)],
     response_model=MediaSearchResult,
+    response_model_exclude_none=True,
 )
 async def get_recommended_series(
     tmdb_id: int,
@@ -207,6 +216,33 @@ async def get_recommended_series(
 
     return MediaSearchResult(
         results=recommended_series,
+        page=page,
+        total_pages=total_pages,
+        total_results=total_results,
+    )
+
+
+@router.get(
+    "/discover",
+    dependencies=[Depends(deps.get_current_user)],
+    response_model=MediaSearchResult,
+    response_model_exclude_none=True,
+)
+async def get_series_discover(
+    genre_id: Optional[int] = None,
+    page: int = 1,
+    server_media_repo: MediaServerMediaRepository = Depends(
+        deps.get_repository(MediaServerMediaRepository)
+    ),
+):
+    series_discover, total_pages, total_results = await tmdb.get_tmdb_series_discover(
+        genre_id=genre_id, page=page
+    )
+    for series in series_discover:
+        await set_media_db_info(series, server_media_repo)
+
+    return MediaSearchResult(
+        results=series_discover,
         page=page,
         total_pages=total_pages,
         total_results=total_results,

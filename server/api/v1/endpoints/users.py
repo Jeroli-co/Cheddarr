@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
@@ -147,7 +147,7 @@ async def update_user(
 
 @users_router.get(
     "/search",
-    response_model=List[UserSchema],
+    response_model=list[UserSchema],
     dependencies=[Depends(deps.get_current_user)],
 )
 async def search_users(

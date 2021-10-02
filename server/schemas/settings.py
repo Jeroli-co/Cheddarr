@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from server.models.settings import MediaProviderType
 from .core import APIModel
@@ -56,8 +56,8 @@ class PlexSettingCreateUpdate(MediaServerSettingBase):
 
 
 class RadarrInstanceInfo(APIModel):
-    root_folders: List[str]
-    quality_profiles: List[dict]
+    root_folders: list[str]
+    quality_profiles: list[dict]
     version: int
 
 
@@ -75,9 +75,9 @@ class RadarrSettingCreateUpdate(MediaProviderSettingBase):
 
 
 class SonarrInstanceInfo(APIModel):
-    root_folders: List[str]
-    quality_profiles: List[dict]
-    language_profiles: Optional[List[dict]]
+    root_folders: list[str]
+    quality_profiles: list[dict]
+    language_profiles: Optional[list[dict]]
     version: int
 
 

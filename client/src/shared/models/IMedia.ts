@@ -1,4 +1,4 @@
-import {MediaTypes, SeriesTypes} from "../enums/MediaTypes";
+import { MediaTypes, SeriesTypes } from "../enums/MediaTypes";
 
 export interface IMedia {
   title: string;
@@ -14,7 +14,7 @@ export interface IMedia {
   rating?: number;
   duration?: number;
   studios?: { name: string }[];
-  genres?: string[];
+  genres?: IGenre[];
   credits?: {
     cast?: IPerson[];
     crew?: IPerson[];
@@ -41,9 +41,15 @@ export interface IEpisode extends IMedia {
 }
 
 export interface IPerson {
+  id: number;
   name: string;
   role?: string;
   pictureUrl?: string;
+}
+
+export interface IGenre {
+  id: number;
+  name: string;
 }
 
 export interface MediaServerInfo {
