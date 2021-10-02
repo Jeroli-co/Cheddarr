@@ -28,7 +28,7 @@ PlexAPI = "^4.6.1"
 pydantic = "^1.8.2"
 PyJWT = {version = "^2.1.0",  extras = ["crypto"]}
 python-multipart = "^0.0.5"
-SQLAlchemy = "^1.4.18"
+SQLAlchemy = {version = "1.4.22"}
 uvicorn = "^0.14.0"
 
 
