@@ -7,8 +7,8 @@ from server.schemas.core import PaginatedResult
 
 
 class PublicConfig(BaseModel):
-    log_level: str
-    default_roles: int
+    log_level: Optional[str]
+    default_roles: Optional[int]
 
 
 class Log(BaseModel):

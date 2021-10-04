@@ -4,8 +4,8 @@ from .base import Base
 
 
 def init_db():
-    from server.database.session import DBSession
+    from server.database.session import EngineMaker
 
-    with DBSession.create_sync_engine().begin() as conn:
+    with EngineMaker.create_sync_engine().begin() as conn:
         Base.metadata.drop_all(bind=conn)
         Base.metadata.create_all(bind=conn)

@@ -22,6 +22,10 @@ async def sync_radarr():
             )
             if movie_lookup is None:
                 continue
+            if movie_lookup.id is None:
+                request.status = RequestStatus.refused
+                await media_request_repo.save(request)
+                continue
             if movie_lookup.has_file:
                 request.status = RequestStatus.available
                 await media_request_repo.save(request)

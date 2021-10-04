@@ -29,7 +29,6 @@ pydantic = "^1.8.2"
 PyJWT = {version = "^2.1.0",  extras = ["crypto"]}
 python-multipart = "^0.0.5"
 SQLAlchemy = "^1.4.18"
-tmdbsimple = "^2.8.0"
 uvicorn = "^0.14.0"
 
 

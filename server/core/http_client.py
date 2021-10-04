@@ -26,8 +26,8 @@ class HttpClient:
         method: str,
         url: str,
         *,
-        params: Optional[Mapping[str, str]] = None,
-        headers: Optional[Mapping[str, str]] = None,
+        params: Optional[Mapping[str, Any]] = None,
+        headers: Optional[Mapping[str, Any]] = None,
         data: Any = None,
     ) -> Any:
         client = cls.get_http_client()
