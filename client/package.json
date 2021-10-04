@@ -24,7 +24,7 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/smoothscroll-polyfill": "^0.3.1",
     "@types/styled-components": "^5.1.7",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "bulma": "^0.9.2",
     "classnames": "^2.2.6",
     "cross-env": "^7.0.3",
