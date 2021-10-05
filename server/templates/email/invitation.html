@@ -1,0 +1,9 @@
+{% extends 'email/layout.html' %}
+
+{% block body %}
+  <p>You have been invited to Cheddarr.</p>
+
+<p>Please finish the sign-up process by clicking the link below to be able to login:</p>
+<p><a href="{{ invitation_url }}">Sign Up</a></p>
+<p>Or copy and paste it into your browser: {{ invitation_url }}</p>
+{% endblock %}

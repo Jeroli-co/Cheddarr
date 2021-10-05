@@ -5,10 +5,10 @@ from typing import List, Literal
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
-from server.core.config import Config, get_config
+from server.core.config import Config, get_config, get_public_config, public_config_model
 from server.core.scheduler import scheduler
 from server.models.users import UserRole
-from server.schemas.system import Job, Log, LogResult, PublicConfig
+from server.schemas.system import Job, Log, LogResult
 
 router = APIRouter()
 
@@ -88,24 +88,24 @@ def modify_job(
 
 @router.get(
     "/config",
-    response_model=PublicConfig,
+    response_model=public_config_model,
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def get_server_config(config: Config = Depends(get_config)):
-    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))
+def get_server_config(config: get_public_config = Depends()):
+    return config
 
 
 @router.patch(
     "/config",
-    response_model=PublicConfig,
+    response_model=public_config_model,
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def update_server_config(config_in: PublicConfig, config: Config = Depends(get_config)):
+def update_server_config(config_in: public_config_model, config: get_config = Depends()):
     config.update(**config_in.dict())
-    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))
+    return config

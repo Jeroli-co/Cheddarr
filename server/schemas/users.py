@@ -36,11 +36,3 @@ class UserUpdate(UserBase):
 
 class UserSearchResult(PaginatedResult):
     results: List[UserSchema]
-
-
-class PasswordResetCreate(APIModel):
-    email: EmailStr
-
-
-class PasswordResetConfirm(APIModel):
-    password: str

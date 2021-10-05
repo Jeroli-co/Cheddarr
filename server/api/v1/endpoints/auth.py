@@ -3,6 +3,7 @@ from random import randrange
 
 from fastapi import (
     APIRouter,
+    Body,
     Depends,
     HTTPException,
     Request,
@@ -11,14 +12,19 @@ from fastapi import (
 )
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import EmailStr
 
 from server.api import dependencies as deps
 from server.core import security, utils
 from server.core.config import Config, get_config
 from server.core.http_client import HttpClient
+from server.core.scheduler import scheduler
+from server.models.notifications import Agent
 from server.models.users import User, UserRole
+from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import UserRepository
 from server.schemas.auth import PlexAuthorizeSignin, Token, TokenPayload
+from server.schemas.core import ResponseMessage
 from server.schemas.users import UserCreate, UserSchema
 
 router = APIRouter()
@@ -28,12 +34,19 @@ router = APIRouter()
     "/sign-up",
     status_code=status.HTTP_201_CREATED,
     response_model=UserSchema,
-    responses={status.HTTP_409_CONFLICT: {"description": "Email or username not available"}},
+    responses={
+        status.HTTP_409_CONFLICT: {"description": "Email or username not available"},
+        status.HTTP_403_FORBIDDEN: {"description": "Sign-up disabled"},
+    },
 )
 async def signup(
     user_in: UserCreate,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    config: Config = Depends(get_config),
 ):
+    if not config.signup_enabled:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "The sign-up is disabled")
+
     if user_in.email is not None:
         existing_email = await user_repo.find_by_email(email=user_in.email)
         if existing_email:
@@ -55,17 +68,131 @@ async def signup(
 
 
 @router.post(
+    "/invite",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ResponseMessage,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
+        status.HTTP_409_CONFLICT: {"description": "Email already used"},
+    },
+    dependencies=[
+        Depends(deps.get_current_user),
+        Depends(deps.has_user_permissions([UserRole.manage_users])),
+    ],
+)
+async def invite_user(
+    request: Request,
+    email: EmailStr = Body(..., embed=True),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
+):
+    email_agent = await notif_agent_repo.find_by(name=Agent.email)
+    if email_agent is None or not email_agent.enabled:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
+    if await user_repo.find_by_email(email) is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "User already registered with this email.")
+
+    user = User(
+        username=email,
+        email=email,
+        password=security.get_random_password(),
+    )
+    await user_repo.save(user)
+    token = security.generate_timed_token(email)
+    scheduler.add_job(
+        utils.send_email,
+        kwargs=dict(
+            email_options=email_agent.settings,
+            to_email=email,
+            subject="Create your Cheddarr account",
+            html_template_name="email/invitation.html",
+            environment=dict(invitation_url=request.url_for("check_invite_user", token=token)),
+        ),
+    )
+    return {"detail": "Invitation sent."}
+
+
+@router.get(
+    "/invite/{token}",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=ResponseMessage,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
+    },
+)
+async def check_invite_user(
+    token: str,
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+):
+    try:
+        email = security.confirm_timed_token(token)
+    except Exception:
+        raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
+
+    user = await user_repo.find_by_email(email)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
+
+    return {"detail": "Able to reset."}
+
+
+@router.post(
+    "/invite/{token}",
+    response_model=ResponseMessage,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
+        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
+    },
+)
+async def confirm_invite_user(
+    token: str,
+    password: str = Body(..., embed=True),
+    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    notif_agent_repo: NotificationAgentRepository = Depends(
+        deps.get_repository(NotificationAgentRepository)
+    ),
+):
+    email_agent = await notif_agent_repo.find_by(name=Agent.email)
+    if email_agent is None or not email_agent.enabled:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+
+    try:
+        email = security.confirm_timed_token(token)
+    except Exception:
+        raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
+
+    user = await user_repo.find_by_email(email)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
+
+    user.password = password
+    user.confirmed = True
+    await user_repo.save(user)
+
+    return {"detail": "Invitation confirmed."}
+
+
+@router.post(
     "/sign-in",
     response_model=Token,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "Account needs to be confirmed"},
         status.HTTP_401_UNAUTHORIZED: {"description": "Wrong credentials"},
+        status.HTTP_403_FORBIDDEN: {"description": "Local accounts disabled"},
     },
 )
 async def signin(
     form: OAuth2PasswordRequestForm = Depends(),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    config: Config = Depends(get_config),
 ):
+    if not config.local_account_enabled:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Local accounts are disabled.")
     user = await user_repo.find_by_username_or_email(form.username)
     if user is None or not security.verify_password(form.password, user.password):
         raise HTTPException(
@@ -141,7 +268,7 @@ async def authorize_signin_plex(
     response_model=Token,
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Plex authorization error"},
-        status.HTTP_201_CREATED: {"model": UserSchema, "decription": "User created"},
+        status.HTTP_201_CREATED: {"model": UserSchema, "description": "User created"},
     },
 )
 async def confirm_signin_plex(
@@ -196,8 +323,11 @@ async def confirm_signin_plex(
         else:
             user = await user_repo.find_by_email(plex_email)
             if user is None:
+                if not config.signup_enabled:
+                    raise HTTPException(status.HTTP_403_FORBIDDEN, "The sign-up is disabled")
+
                 if await user_repo.find_by_username(plex_username) is not None:
-                    plex_username = "{}{}".format(plex_username, randrange(1, 999))
+                    plex_username = f"{plex_username}{randrange(1, 999)}"
                 user = User(
                     username=plex_username,
                     email=plex_email,

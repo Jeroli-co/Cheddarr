@@ -1,6 +1,7 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+from pydantic import EmailStr
 
 from server.api import dependencies as deps
 from server.core import security, utils
@@ -14,8 +15,6 @@ from server.repositories.users import (
 )
 from server.schemas.core import ResponseMessage
 from server.schemas.users import (
-    PasswordResetConfirm,
-    PasswordResetCreate,
     UserSchema,
     UserSearchResult,
     UserUpdate,
@@ -173,14 +172,12 @@ async def get_current_user(current_user: User = Depends(deps.get_current_user)):
     response_model=ResponseMessage,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
-        status.HTTP_404_NOT_FOUND: {
-            "description": "User not found",
-        },
+        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     },
 )
 async def reset_password(
-    email_data: PasswordResetCreate,
     request: Request,
+    email: EmailStr = Body(..., embed=True),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
         deps.get_repository(NotificationAgentRepository)
@@ -190,8 +187,8 @@ async def reset_password(
     if email_agent is None or not email_agent.enabled:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
 
-    email = email_data.email
-    user = await user_repo.find_by_email(email_data.email)
+    email = email
+    user = await user_repo.find_by_email(email)
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user registered with this email.")
 
@@ -199,7 +196,7 @@ async def reset_password(
     scheduler.add_job(
         utils.send_email,
         kwargs=dict(
-            email_settings=email_agent.settings,
+            email_options=email_agent.settings,
             to_email=email,
             subject="Reset your password",
             html_template_name="email/reset_password_instructions.html",
@@ -214,10 +211,8 @@ async def reset_password(
     status_code=status.HTTP_202_ACCEPTED,
     response_model=ResponseMessage,
     responses={
-        status.HTTP_404_NOT_FOUND: {
-            "description": "User not found",
-        },
-        status.HTTP_410_GONE: {"description": "Invalid or expired link "},
+        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
+        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
     },
 )
 async def check_reset_password(
@@ -241,15 +236,13 @@ async def check_reset_password(
     response_model=ResponseMessage,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
-        status.HTTP_404_NOT_FOUND: {
-            "description": "User not found",
-        },
+        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
         status.HTTP_410_GONE: {"description": "Invalid or expired link"},
     },
 )
 async def confirm_reset_password(
     token: str,
-    password: PasswordResetConfirm,
+    password: str = Body(..., embed=True),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
         deps.get_repository(NotificationAgentRepository)
@@ -273,7 +266,7 @@ async def confirm_reset_password(
     scheduler.add_job(
         utils.send_email,
         kwargs=dict(
-            email_settings=email_agent.settings,
+            email_options=email_agent.settings,
             to_email=user.email,
             subject="Your password has been reset",
             html_template_name="email/reset_password_notice.html",

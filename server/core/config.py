@@ -1,13 +1,14 @@
 import json
 import secrets
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from uuid import uuid4
 
 from cachetools.func import lru_cache
 from pydantic import (
     AnyHttpUrl,
     BaseSettings,
+    create_model,
     DirectoryPath,
 )
 from tzlocal import get_localzone
@@ -57,6 +58,8 @@ class Config(BaseSettings):
     access_token_expire_minutes: int = 60 * 24 * 3
     backend_cors_origin: List[AnyHttpUrl] = [server_host]
     default_roles: int = 4
+    signup_enabled: bool = True
+    local_account_enabled: bool = True
 
     ##########################################################################
     # database                                                               #
@@ -100,21 +103,38 @@ class Config(BaseSettings):
                 {
                     item: getattr(self, item)
                     for item in self.__fields__
-                    if item in self._file_config_fields
+                    if item in self.__public_fields__
                 },
                 config_file,
                 indent=2,
                 sort_keys=True,
             )
 
-    _file_config_fields = {
-        "secret_key",
+    @classmethod
+    @lru_cache()
+    def public_model(cls):
+        public_fields = {
+            key: (Optional[cls.__fields__.get(key).type_], None) for key in cls.__public_fields__
+        }
+        return create_model("PublicConfig", **public_fields)
+
+    __public_fields__ = {
         "client_id",
         "log_level",
         "default_roles",
+        "signup_enabled",
+        "local_account_enabled",
     }
 
 
 @lru_cache()
 def get_config():
     return Config()
+
+
+public_config_model = Config.public_model()
+
+
+def get_public_config():
+    get_config.cache_clear()
+    return public_config_model(**get_config().dict())
