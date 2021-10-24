@@ -1,3 +1,4 @@
+import os
 from typing import Iterator
 
 import pytest
@@ -6,12 +7,13 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from server.api.dependencies import get_db
 from .utils import datasets, user_authentication_headers
 
+os.environ["TESTING"] = "true"
+
 url = "sqlite+aiosqlite://"
-_db_conn = create_async_engine(url, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(_db_conn, expire_on_commit=False, class_=AsyncSession)
+engine = create_async_engine(url, connect_args={"check_same_thread": False})
+TestingSessionLocal = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 
 # Override dependency and db fixture
@@ -27,10 +29,12 @@ db = pytest.fixture(get_test_db, scope="function")
 
 
 def app_v1() -> FastAPI:
-    from server.api.v1.router import application as app_
+    from server.api.v1.router import application
+    from server.api.dependencies import get_db
 
-    app_.dependency_overrides[get_db] = get_test_db
-    return app_
+    application.dependency_overrides[get_db] = get_test_db
+
+    return application
 
 
 @pytest.fixture(scope="module")
@@ -38,22 +42,20 @@ def get_app():
     return {"v1": app_v1}
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function")
 async def setup(db):
-
     from server.models.media import Media
     from server.models.requests import MovieRequest, SeriesRequest
     from server.models.users import User
     from server.database import Base
 
-    async with _db_conn.begin() as conn:
+    async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
     user1 = User(**datasets["users"][0])
     user2 = User(**datasets["users"][1])
     user3 = User(**datasets["users"][2])
-    user4 = User(**datasets["users"][3])
     db.add_all((user1, user2, user3))
     series1 = Media(**datasets["series"][0])
     series2 = Media(**datasets["series"][1])
@@ -69,15 +71,15 @@ async def setup(db):
 
 
 @pytest.fixture(params=["v1"])
-async def client(request, get_app) -> Iterator[AsyncClient]:
-    app_ = get_app[request.param]()
-    async with AsyncClient(app=app_, base_url="http://test") as c:
+async def client(request, get_app, setup) -> Iterator[AsyncClient]:
+    app = get_app[request.param]()
+    async with AsyncClient(app=app, base_url="http://test") as c:
         c.headers = await user_authentication_headers(
             client=c,
             email=datasets["users"][0]["email"],
             password=datasets["users"][0]["password"],
         )
-        setattr(c, "app", app_)
+        setattr(c, "app", app)
         yield c
 
 

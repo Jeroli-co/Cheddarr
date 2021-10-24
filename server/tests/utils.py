@@ -36,6 +36,7 @@ datasets = {
             "password": "password2",
             "avatar": "/avatar.png",
             "confirmed": True,
+            "roles": UserRole.request,
         },
         {
             "id": 3,
@@ -44,14 +45,7 @@ datasets = {
             "password": "password3",
             "avatar": "/avatar.png",
             "confirmed": True,
-        },
-        {
-            "id": 4,
-            "username": "user4",
-            "email": "email4@test.com",
-            "password": "password4",
-            "avatar": "/avatar.png",
-            "confirmed": False,
+            "roles": UserRole.request,
         },
     ],
     "series": [

@@ -25,6 +25,7 @@ class Config(BaseSettings):
     server_host: str = f"http://{server_domain}:{server_port}"
     log_level: str = "INFO"
     tz: str = get_localzone().zone
+    testing: bool = False
 
     ##########################################################################
     # folders/files                                                          #
@@ -70,9 +71,10 @@ class Config(BaseSettings):
     ##########################################################################
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.db_folder.mkdir(parents=True, exist_ok=True)
-        self.logs_folder.mkdir(parents=True, exist_ok=True)
-        self.setup()
+        if not self.testing:
+            self.db_folder.mkdir(parents=True, exist_ok=True)
+            self.logs_folder.mkdir(parents=True, exist_ok=True)
+            self.setup()
 
     def setup(self):
         try:
@@ -119,6 +121,7 @@ class Config(BaseSettings):
         return create_model("PublicConfig", **public_fields)
 
     __public_fields__ = {
+        "secret_key",
         "client_id",
         "log_level",
         "default_roles",

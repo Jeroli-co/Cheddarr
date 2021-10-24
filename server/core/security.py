@@ -52,7 +52,7 @@ def generate_timed_token(data):
     return serializer.dumps(data)
 
 
-def confirm_timed_token(token: str, expiration_minutes: int = 30):
+def confirm_timed_token(token: str, expiration_minutes: int):
     serializer = URLSafeTimedSerializer(get_config().secret_key)
     try:
         data = serializer.loads(token, max_age=expiration_minutes * 60)
