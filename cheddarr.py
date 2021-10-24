@@ -1,7 +1,18 @@
 #!/usr/bin/env python
+import asyncio
+import functools
 from pathlib import Path
 
 import click
+
+
+def make_sync(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return asyncio.run(func(*args, **kwargs))
+
+    return wrapper
+
 
 """USAGE:
 python cheddarr.py [OPTIONS] COMMAND
@@ -23,11 +34,12 @@ def cli(ctx, debug):
 
 
 @cli.command("init-db")
-def init_db():
+@make_sync
+async def init_db():
     """Initialize the database."""
     from server.database.init_db import init_db
 
-    init_db()
+    await init_db()
     click.echo("Database initialized.")
 
 
@@ -50,7 +62,7 @@ def run(ctx):
         from alembic.command import upgrade
         from alembic.config import Config
 
-        upgrade(Config(Path.cwd() / "server/alembic.ini"), "head")
+        upgrade(Config(str(Path.cwd() / "server/alembic.ini")), "head")
     uvicorn.run(
         "server.main:app",
         host="0.0.0.0",
