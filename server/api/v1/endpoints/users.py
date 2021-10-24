@@ -8,9 +8,10 @@ from server.core import security, utils
 from server.core.scheduler import scheduler
 from server.core.security import check_permissions
 from server.models.notifications import Agent
-from server.models.users import User, UserRole
+from server.models.users import Token, TokenType, User, UserRole
 from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import (
+    TokenRepository,
     UserRepository,
 )
 from server.schemas.core import ResponseMessage
@@ -179,6 +180,7 @@ async def reset_password(
     request: Request,
     email: EmailStr = Body(..., embed=True),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
         deps.get_repository(NotificationAgentRepository)
     ),
@@ -192,7 +194,9 @@ async def reset_password(
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user registered with this email.")
 
-    token = security.generate_timed_token(user.email)
+    token = Token(dict(email=user.email), timed=True, type=TokenType.reset_password)
+    await token_repo.save(token)
+
     scheduler.add_job(
         utils.send_email,
         kwargs=dict(
@@ -200,7 +204,9 @@ async def reset_password(
             to_email=email,
             subject="Reset your password",
             html_template_name="email/reset_password_instructions.html",
-            environment=dict(reset_url=request.url_for("check_reset_password", token=token)),
+            environment=dict(
+                reset_url=request.url_for("check_reset_password", token=token.time_sign())
+            ),
         ),
     )
     return {"detail": "Reset instructions sent."}
@@ -220,11 +226,11 @@ async def check_reset_password(
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ):
     try:
-        email = security.confirm_timed_token(token)
+        data = Token.time_unsign(token)
     except Exception:
         raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
 
-    user = await user_repo.find_by_email(email)
+    user = await user_repo.find_by_email(data["email"])
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
 
@@ -244,32 +250,19 @@ async def confirm_reset_password(
     token: str,
     password: str = Body(..., embed=True),
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
+    token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
 ):
-    email_agent = await notif_agent_repo.find_by(name=Agent.email)
-    if email_agent is None or not email_agent.enabled:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
-
     try:
-        email = security.confirm_timed_token(token)
+        data = Token.time_unsign(token)
     except Exception:
         raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
 
-    user = await user_repo.find_by_email(email)
+    user = await user_repo.find_by_email(data["email"])
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
 
     user.password = password
     await user_repo.save(user)
-    scheduler.add_job(
-        utils.send_email,
-        kwargs=dict(
-            email_options=email_agent.settings,
-            to_email=user.email,
-            subject="Your password has been reset",
-            html_template_name="email/reset_password_notice.html",
-        ),
-    )
+    await token_repo.remove_by(id=data["id"])
+
     return {"detail": "Password reset."}

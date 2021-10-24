@@ -21,11 +21,7 @@ router.include_router(notifications.router, prefix="/notifications", tags=["noti
 router.include_router(requests.router, prefix="/requests", tags=["requests"])
 router.include_router(search.router, prefix="/search", tags=["search"])
 router.include_router(series.router, prefix="/series", tags=["series"])
-router.include_router(
-    settings.router,
-    prefix="/settings",
-    tags=["settings"],
-)
+router.include_router(settings.router, prefix="/settings", tags=["settings"])
 router.include_router(system.router, prefix="/system", tags=["system"])
 router.include_router(users.current_user_router, prefix="/user", tags=["current user"])
 router.include_router(users.users_router, prefix="/users", tags=["users"])

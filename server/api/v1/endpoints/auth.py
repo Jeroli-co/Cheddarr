@@ -1,9 +1,9 @@
 import re
 from random import randrange
+from typing import Optional
 
 from fastapi import (
     APIRouter,
-    Body,
     Depends,
     HTTPException,
     Request,
@@ -12,7 +12,6 @@ from fastapi import (
 )
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import EmailStr
 
 from server.api import dependencies as deps
 from server.core import security, utils
@@ -20,10 +19,10 @@ from server.core.config import Config, get_config
 from server.core.http_client import HttpClient
 from server.core.scheduler import scheduler
 from server.models.notifications import Agent
-from server.models.users import User, UserRole
+from server.models.users import Token, TokenType, User, UserRole
 from server.repositories.notifications import NotificationAgentRepository
-from server.repositories.users import UserRepository
-from server.schemas.auth import PlexAuthorizeSignin, Token, TokenPayload
+from server.repositories.users import TokenRepository, UserRepository
+from server.schemas.auth import AccessToken, Invitation, PlexAuthorizeSignin, TokenPayload
 from server.schemas.core import ResponseMessage
 from server.schemas.users import UserCreate, UserSchema
 
@@ -35,17 +34,33 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     response_model=UserSchema,
     responses={
+        status.HTTP_403_FORBIDDEN: {"description": "Sign-up disabled or invalid invitation"},
         status.HTTP_409_CONFLICT: {"description": "Email or username not available"},
-        status.HTTP_403_FORBIDDEN: {"description": "Sign-up disabled"},
     },
 )
 async def signup(
     user_in: UserCreate,
+    invitation_code: Optional[str] = None,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
     config: Config = Depends(get_config),
 ):
-    if not config.signup_enabled:
+    if not config.signup_enabled and invitation_code is None:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "The sign-up is disabled")
+
+    if invitation_code is not None:
+        invitation = await token_repo.find_by(id=invitation_code)
+        if invitation is None or (invitation.max_uses is not None and invitation.max_uses == 0):
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "This invitation is not valid.")
+        token_payload = Invitation(**Token.time_unsign(invitation.payload))
+        if user_in.email != token_payload.email:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Invalid user information.")
+
+        if invitation.max_uses is not None and invitation.max_uses > 0:
+            invitation.max_uses -= 1
+            await token_repo.save(invitation)
+            if invitation.max_uses == 0:
+                await token_repo.remove_by(id=invitation_code)
 
     if user_in.email is not None:
         existing_email = await user_repo.find_by_email(email=user_in.email)
@@ -82,37 +97,38 @@ async def signup(
 )
 async def invite_user(
     request: Request,
-    email: EmailStr = Body(..., embed=True),
+    invitation: Invitation,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
         deps.get_repository(NotificationAgentRepository)
     ),
 ):
-    email_agent = await notif_agent_repo.find_by(name=Agent.email)
-    if email_agent is None or not email_agent.enabled:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
-
-    if await user_repo.find_by_email(email) is not None:
-        raise HTTPException(status.HTTP_409_CONFLICT, "User already registered with this email.")
-
-    user = User(
-        username=email,
-        email=email,
-        password=security.get_random_password(),
+    token = Token(
+        invitation.dict(), timed=True, max_uses=invitation.max_uses, type=TokenType.invitation
     )
-    await user_repo.save(user)
-    token = security.generate_timed_token(email)
-    scheduler.add_job(
-        utils.send_email,
-        kwargs=dict(
-            email_options=email_agent.settings,
-            to_email=email,
-            subject="Create your Cheddarr account",
-            html_template_name="email/invitation.html",
-            environment=dict(invitation_url=request.url_for("check_invite_user", token=token)),
-        ),
-    )
-    return {"detail": "Invitation sent."}
+    await token_repo.save(token)
+    invitation_link = request.url_for("check_invite_user", token=token.payload)
+
+    if invitation.email is not None:
+        if await user_repo.find_by_email(invitation.email) is not None:
+            raise HTTPException(
+                status.HTTP_409_CONFLICT, "User already registered with this email."
+            )
+        email_agent = await notif_agent_repo.find_by(name=Agent.email)
+        if email_agent is not None and email_agent.enabled:
+            scheduler.add_job(
+                utils.send_email,
+                kwargs=dict(
+                    email_options=email_agent.settings,
+                    to_email=invitation.email,
+                    subject="Create your Cheddarr account",
+                    html_template_name="email/invitation.html",
+                    environment=dict(invitation_url=invitation_link),
+                ),
+            )
+
+    return {"detail": invitation_link}
 
 
 @router.get(
@@ -120,66 +136,29 @@ async def invite_user(
     status_code=status.HTTP_202_ACCEPTED,
     response_model=ResponseMessage,
     responses={
-        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
-        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
+        status.HTTP_404_NOT_FOUND: {"description": "Nonexistent invitation"},
+        status.HTTP_410_GONE: {"description": "Invalid or expired invitation link"},
     },
 )
 async def check_invite_user(
     token: str,
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
+    token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
 ):
     try:
-        email = security.confirm_timed_token(token)
+        data = Token.time_unsign(token)
     except Exception:
-        raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
+        raise HTTPException(status.HTTP_410_GONE, "The invitation link is invalid or has expired.")
 
-    user = await user_repo.find_by_email(email)
-    if user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
+    invitation = await token_repo.find_by(id=data["id"])
+    if invitation is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "This invitation does not exist.")
 
-    return {"detail": "Able to reset."}
-
-
-@router.post(
-    "/invite/{token}",
-    response_model=ResponseMessage,
-    responses={
-        status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
-        status.HTTP_404_NOT_FOUND: {"description": "User not found"},
-        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
-    },
-)
-async def confirm_invite_user(
-    token: str,
-    password: str = Body(..., embed=True),
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
-):
-    email_agent = await notif_agent_repo.find_by(name=Agent.email)
-    if email_agent is None or not email_agent.enabled:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
-
-    try:
-        email = security.confirm_timed_token(token)
-    except Exception:
-        raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
-
-    user = await user_repo.find_by_email(email)
-    if user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
-
-    user.password = password
-    user.confirmed = True
-    await user_repo.save(user)
-
-    return {"detail": "Invitation confirmed."}
+    return {"detail": data}
 
 
 @router.post(
     "/sign-in",
-    response_model=Token,
+    response_model=AccessToken,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "Account needs to be confirmed"},
         status.HTTP_401_UNAUTHORIZED: {"description": "Wrong credentials"},
@@ -209,7 +188,7 @@ async def signin(
         )
     payload = TokenPayload(sub=str(user.id))
     access_token = security.create_jwt_access_token(payload)
-    token = Token(
+    token = AccessToken(
         access_token=access_token,
         token_type="Bearer",
     )
@@ -238,7 +217,7 @@ async def authorize_signin_plex(
     forward_url = re.sub(
         f"{config.api_prefix}/v[0-9]+", "", request.url_for("confirm_signin_plex")
     )
-    token = security.generate_token(
+    token = Token(
         {
             "id": auth_data.key,
             "code": auth_data.code,
@@ -257,7 +236,7 @@ async def authorize_signin_plex(
             },
         )
         + "?token="
-        + token
+        + token.sign()
     )
 
     return RedirectResponse(url=authorize_url, status_code=200)
@@ -265,7 +244,7 @@ async def authorize_signin_plex(
 
 @router.get(
     "/sign-in/plex/confirm",
-    response_model=Token,
+    response_model=AccessToken,
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Plex authorization error"},
         status.HTTP_201_CREATED: {"model": UserSchema, "description": "User created"},
@@ -277,11 +256,11 @@ async def confirm_signin_plex(
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     config: Config = Depends(get_config),
 ):
-    token = security.confirm_token(token)
-    state = token.get("id")
-    code = token.get("code")
-    redirect_uri = token.get("redirect_uri", "")
-    user_id = token.get("user_id", None)
+    payload = Token.unsign(token)
+    state = payload.get("id")
+    code = payload.get("code")
+    redirect_uri = payload.get("redirect_uri", "")
+    user_id = payload.get("user_id", None)
 
     access_url = utils.make_url(
         config.plex_token_url + state,
@@ -304,8 +283,7 @@ async def confirm_signin_plex(
     except HTTPException as e:
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "Error while logging with Plex. Received: ",
-            e.detail,
+            f"Error while logging with Plex. Received: {e.detail}",
         )
 
     plex_user_id = resp["id"]
@@ -364,17 +342,8 @@ async def confirm_signin_plex(
 
     await user_repo.save(user)
 
-    payload = TokenPayload(
-        sub=str(user.id),
-        username=user.username,
-        avatar=user.avatar,
-        roles=user.roles,
-    )
+    payload = TokenPayload(sub=str(user.id))
     access_token = security.create_jwt_access_token(payload)
-    token = Token(
-        access_token=access_token,
-        token_type="bearer",
-    )
     response.headers["redirect-uri"] = redirect_uri
 
-    return token
+    return AccessToken(access_token=access_token, token_type="bearer")

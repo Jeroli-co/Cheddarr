@@ -1,8 +1,8 @@
-from typing import List, Type
+from typing import Any, List, Type
 
 from pydantic import BaseModel
 
-from server.repositories.base import ModelType
+from server.models.base import ModelType
 
 
 class APIModel(BaseModel):
@@ -15,7 +15,7 @@ class APIModel(BaseModel):
 
 
 class ResponseMessage(BaseModel):
-    detail: str
+    detail: Any
 
 
 class PaginatedResult(BaseModel):

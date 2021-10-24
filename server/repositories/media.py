@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional, Tuple
 
 from sqlalchemy import desc, or_, select
 
@@ -25,7 +25,7 @@ class MediaRepository(BaseRepository[Media]):
             filters.append(self.model.tvdb_id == tvdb_id)
 
         result = await self.execute(select(self.model).where(or_(*filters)))
-        return result.one_or_none()
+        return result.scalar_one_or_none()
 
 
 class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
@@ -34,7 +34,7 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
         tmdb_id: int = None,
         tvdb_id: int = None,
         imdb_id=None,
-    ) -> List[MediaServerMedia]:
+    ) -> list[MediaServerMedia]:
         query = select(self.model).join(Media)
         if tmdb_id is not None:
             query = query.where(Media.tmdb_id == tmdb_id)
@@ -44,11 +44,11 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
             query = query.where(Media.tvdb_id == tvdb_id)
 
         result = await self.execute(query)
-        return result.all()
+        return result.scalars().all()
 
     async def find_all_recently_added(
         self, media_type: MediaType, page: int = None, per_page: int = None
-    ) -> (List[Media], Optional[int], Optional[int]):
+    ) -> Tuple[list[Media], Optional[int], Optional[int]]:
         query = (
             select(self.model)
             .join(Media)
@@ -57,7 +57,8 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
         )
         if page is not None:
             return await self.paginate(query, per_page, page)
-        return query.all()
+        result = await self.execute(query)
+        return result.scalars().all()
 
 
 class MediaServerSeasonRepository(BaseRepository[MediaServerSeason]):
@@ -67,7 +68,7 @@ class MediaServerSeasonRepository(BaseRepository[MediaServerSeason]):
         tmdb_id: int = None,
         tvdb_id: int = None,
         imdb_id=None,
-    ) -> List[MediaServerSeason]:
+    ) -> list[MediaServerSeason]:
         query = (
             select(self.model)
             .join(MediaServerMedia)
@@ -82,7 +83,7 @@ class MediaServerSeasonRepository(BaseRepository[MediaServerSeason]):
             query = query.where(Media.tvdb_id == tvdb_id)
 
         result = await self.execute(query)
-        return result.all()
+        return result.scalars().all()
 
 
 class MediaServerEpisodeRepository(BaseRepository[MediaServerEpisode]):
@@ -93,7 +94,7 @@ class MediaServerEpisodeRepository(BaseRepository[MediaServerEpisode]):
         tmdb_id: int = None,
         tvdb_id: int = None,
         imdb_id=None,
-    ) -> List[MediaServerEpisode]:
+    ) -> list[MediaServerEpisode]:
         query = (
             select(self.model)
             .join(MediaServerSeason)
@@ -110,4 +111,4 @@ class MediaServerEpisodeRepository(BaseRepository[MediaServerEpisode]):
             query = query.where(Media.tvdb_id == tvdb_id)
 
         result = await self.execute(query)
-        return result.all()
+        return result.scalars().all()

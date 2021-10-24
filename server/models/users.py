@@ -1,12 +1,20 @@
 from enum import Enum
+from typing import TYPE_CHECKING
+from uuid import uuid4
 
-from sqlalchemy import Boolean, Column, Integer, String
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import Boolean, Column, Enum as DBEnum, Integer, String
 
+from server.core import security
 from server.core.config import get_config
 from server.core.security import hash_password
 from server.core.utils import get_random_avatar
-from server.database import Model, Timestamp
+from server.models.base import Model, Timestamp
+
+if TYPE_CHECKING:
+    # This makes hybrid_property's have the same typing as normal property until stubs are improved.
+    hybrid_property = property
+else:
+    from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class UserRole(int, Enum):
@@ -28,9 +36,9 @@ class User(Model, Timestamp):
     username = Column(String, nullable=False, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     password_hash = Column(String, nullable=False)
-    avatar = Column(String, default=get_random_avatar())
+    avatar = Column(String, default=get_random_avatar)
     confirmed = Column(Boolean, nullable=False, default=False)
-    roles = Column(Integer, default=get_config().default_roles)
+    roles = Column(Integer, default=lambda: get_config().default_roles)
     plex_user_id = Column(Integer)
     plex_api_key = Column(String)
 
@@ -41,3 +49,34 @@ class User(Model, Timestamp):
     @password.setter
     def password(self, plain):
         self.password_hash = hash_password(plain)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class TokenType(str, Enum):
+    invitation = "invitation"
+    reset_password = "reset_password"
+
+
+class Token(Model, Timestamp):
+    id = Column(String, primary_key=True)
+    max_uses = Column(Integer)
+    type = Column(DBEnum(TokenType), nullable=False)
+    payload = Column(String)
+
+    def __init__(self, data, timed=True, **kwargs):
+        super().__init__(**kwargs)
+        self.id = uuid4().hex
+        if timed is None:
+            self.payload = security.generate_token(data | dict(id=self.id))
+        else:
+            self.payload = security.generate_timed_token(data | dict(id=self.id))
+
+    @classmethod
+    def unsign(cls, signed_token: str):
+        return security.confirm_token(signed_token)
+
+    @classmethod
+    def time_unsign(cls, signed_token: str, max_age: int = 30):
+        return security.confirm_timed_token(signed_token, max_age)

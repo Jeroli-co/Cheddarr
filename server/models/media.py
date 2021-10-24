@@ -10,9 +10,9 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import backref, declared_attr, relationship
+from sqlalchemy.orm import backref, declared_attr, Mapped, relationship
 
-from server.database import Model
+from server.models.base import Model
 
 
 class MediaType(str, Enum):
@@ -40,6 +40,9 @@ class Media(Model):
     title = Column(String, nullable=False)
     media_type = Column(DBEnum(MediaType), nullable=False)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class MediaServerContent(object):
     __table_args__ = (UniqueConstraint("external_id", "server_id"),)
@@ -49,35 +52,38 @@ class MediaServerContent(object):
     added_at = Column(Date)
 
     @declared_attr
-    def server_id(cls):
+    def server_id(cls) -> Mapped[int]:
         return Column(ForeignKey("mediaserversetting.server_id"), nullable=False)
 
 
 class MediaServerMedia(Model, MediaServerContent):
     __repr_props__ = ("media", "server")
 
-    media_id = Column(ForeignKey("media.id"), nullable=False)
-    server_library_id = Column(ForeignKey("mediaserverlibrary.id"))
-    media = relationship(
+    media_id: int = Column(ForeignKey("media.id"), nullable=False)
+    server_library_id: int = Column(ForeignKey("mediaserverlibrary.id"))
+    media: Media = relationship(
         "Media",
         lazy="joined",
         innerjoin=True,
         backref=backref("media_servers", lazy="selectin", cascade="all,delete,delete-orphan"),
     )
-    server = relationship(
+    server: "MediaServerSetting" = relationship(
         "MediaServerSetting",
         lazy="joined",
         innerjoin=True,
         backref=backref("server_media", cascade="all,delete,delete-orphan"),
     )
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class MediaServerSeason(Model, MediaServerContent):
     __repr_props__ = ("season_number",)
 
     season_number = Column(Integer, nullable=False)
-    server_media_id = Column(ForeignKey("mediaservermedia.id"), nullable=False)
-    server_media = relationship(
+    server_media_id: int = Column(ForeignKey("mediaservermedia.id"), nullable=False)
+    server_media: MediaServerMedia = relationship(
         "MediaServerMedia",
         lazy="joined",
         innerjoin=True,
@@ -90,12 +96,18 @@ class MediaServerSeason(Model, MediaServerContent):
         cascade="all,delete,delete-orphan",
     )
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class MediaServerEpisode(Model, MediaServerContent):
     __repr_props__ = ("episode_number",)
 
     episode_number = Column(Integer, nullable=False)
-    season_id = Column(ForeignKey("mediaserverseason.id"), nullable=False)
-    season = relationship(
+    season_id: int = Column(ForeignKey("mediaserverseason.id"), nullable=False)
+    season: MediaServerSeason = relationship(
         "MediaServerSeason", lazy="joined", innerjoin=True, back_populates="episodes"
     )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)

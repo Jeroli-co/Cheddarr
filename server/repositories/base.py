@@ -1,16 +1,15 @@
 import math
 from abc import ABC
-from typing import Any, Dict, Generic, get_args, List, Optional, Union
+from typing import Any, Dict, Generic, get_args, Optional, Tuple, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Query
-from sqlalchemy.sql import Executable
+from sqlalchemy.sql import Executable, Select
 from sqlalchemy.sql.functions import count
 
-from server.database import ModelType
+from server.models.base import ModelType
 
 
 class BaseRepository(ABC, Generic[ModelType]):
@@ -28,7 +27,7 @@ class BaseRepository(ABC, Generic[ModelType]):
 
     async def execute(self, statement: Executable):
         db_execute = await self.session.execute(statement)
-        return db_execute.scalars()
+        return db_execute
 
     async def save(self, db_obj: ModelType) -> ModelType:
         """
@@ -73,39 +72,46 @@ class BaseRepository(ABC, Generic[ModelType]):
         await self.session.delete(db_obj)
         await self.session.commit()
 
+    async def remove_by(self, **filters):
+        result = await self.execute(
+            delete(self.model).filter_by(**filters).execution_options(synchronize_session="fetch")
+        )
+        await self.session.commit()
+        return result.rowcount
+
     async def find_by(self, **filters) -> Optional[ModelType]:
         result = await self.execute(select(self.model).filter_by(**filters))
-        return result.one_or_none()
+        return result.scalar_one_or_none()
 
     async def find_all_by(
         self, page: int = None, per_page=None, **filters
-    ) -> (List[ModelType], Optional[int], Optional[int]):
+    ) -> list[ModelType] | Tuple[list[ModelType], Optional[int], Optional[int]]:
         query = select(self.model).filter_by(**filters)
         if page is not None:
             return await self.paginate(query, per_page, page)
         result = await self.execute(query)
-        return result.all()
+        return result.scalars().all()
 
-    async def search_by(self, field: str, value: str, limit: int = 3):
+    async def search_by(self, field: str, value: str, limit: int = 3) -> list[ModelType]:
         results = await self.execute(
             select(self.model).where(getattr(self.model, field).contains(value)).limit(limit)
         )
-        return results.all()
+        return results.scalars().all()
 
-    async def count(self):
+    async def count(self) -> int:
         result = await self.execute(select(count()).select_from(self.model))
-        return result.first()
+        return result.scalar_one()
 
     async def paginate(
-        self, query: Query, per_page: int = None, page: int = None
-    ) -> (ModelType, int, int):
+        self, query: Select, per_page: int = None, page: int = None
+    ) -> Tuple[list[ModelType], int, int]:
         if page is None:
             page = 1
         if per_page is None:
             per_page = 20
 
         results = await self.execute(query.limit(per_page).offset((page - 1) * per_page))
-        results = results.all()
+        results = results.scalars().all()
         if page == 1 and len(results) < per_page:
             total_results = len(results)
         else:

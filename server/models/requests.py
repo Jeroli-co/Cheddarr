@@ -9,11 +9,10 @@ from sqlalchemy import (
     String,
     Text,
 )
-from sqlalchemy.orm import declared_attr, relationship
+from sqlalchemy.orm import declared_attr, Mapped, relationship
 
-from server.database import Model, Timestamp
-from server.database.base import mapper_args
 from server.models.media import MediaType
+from .base import mapper_args, Model, Timestamp
 
 if TYPE_CHECKING:
     from .media import Media
@@ -40,27 +39,27 @@ class MediaRequest(Model, Timestamp):
     language_profile_id = Column(Integer)
 
     @declared_attr
-    def selected_provider_id(cls):
+    def selected_provider_id(cls) -> Mapped[int]:
         return Column(ForeignKey("mediaprovidersetting.id"))
 
     @declared_attr
-    def selected_provider(cls) -> "MediaProviderSetting":
+    def selected_provider(cls) -> Mapped["MediaProviderSetting"]:
         return relationship("MediaProviderSetting", lazy="joined")
 
     @declared_attr
-    def requesting_user_id(cls):
+    def requesting_user_id(cls) -> Mapped[int]:
         return Column(ForeignKey("user.id"), nullable=False)
 
     @declared_attr
-    def requesting_user(cls) -> "User":
+    def requesting_user(cls) -> Mapped["User"]:
         return relationship("User", lazy="joined", foreign_keys=cls.requesting_user_id)
 
     @declared_attr
-    def media_id(cls):
+    def media_id(cls) -> Mapped[int]:
         return Column(ForeignKey("media.id"), nullable=False)
 
     @declared_attr
-    def media(cls) -> "Media":
+    def media(cls) -> Mapped["Media"]:
         return relationship("Media", lazy="joined")
 
 
@@ -68,6 +67,9 @@ class MovieRequest(MediaRequest):
     __tablename__ = None
     __mapper_args__ = mapper_args({"polymorphic_identity": MediaType.movie})
     __repr_props__ = ("media", "requested_user", "requesting_user")
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class SeriesRequest(MediaRequest):
@@ -79,17 +81,23 @@ class SeriesRequest(MediaRequest):
         "SeasonRequest", cascade="all,delete,delete-orphan", lazy="selectin", backref="request"
     )
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class SeasonRequest(Model):
     __repr_props__ = ("season_number", "episodes")
 
     id = Column(Integer, primary_key=True)
     season_number = Column(Integer, nullable=False)
-    series_request_id = Column(ForeignKey("mediarequest.id"), nullable=False)
+    series_request_id: int = Column(ForeignKey("mediarequest.id"), nullable=False)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
     episodes: List["EpisodeRequest"] = relationship(
         "EpisodeRequest", cascade="all,delete,delete-orphan", lazy="selectin", backref="season"
     )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class EpisodeRequest(Model):
@@ -97,5 +105,8 @@ class EpisodeRequest(Model):
 
     id = Column(Integer, primary_key=True)
     episode_number = Column(Integer, nullable=False)
-    season_request_id = Column(ForeignKey("seasonrequest.id"), nullable=False)
+    season_request_id: int = Column(ForeignKey("seasonrequest.id"), nullable=False)
     status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)

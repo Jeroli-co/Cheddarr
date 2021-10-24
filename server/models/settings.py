@@ -5,8 +5,7 @@ from uuid import uuid4
 from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from server.database import Model
-from server.database.base import mapper_args
+from server.models.base import mapper_args, Model
 
 
 class ExternalServiceName(str, Enum):
@@ -38,6 +37,9 @@ class MediaServerSetting(Model, ExternalServiceSetting):
         "MediaServerLibrary", lazy="selectin", cascade="all,delete,delete-orphan"
     )
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class MediaServerLibrary(Model):
     __repr_props__ = ("name",)
@@ -45,13 +47,19 @@ class MediaServerLibrary(Model):
     id = Column(Integer, primary_key=True)
     library_id = Column(String, nullable=False)
     name = Column(String, nullable=False)
-    setting_id = Column(ForeignKey("mediaserversetting.id"))
+    setting_id: int = Column(ForeignKey("mediaserversetting.id"))
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class PlexSetting(MediaServerSetting):
     __tablename__ = None
     __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.plex})
     __repr_props__ = ("host", "port", "ssl", "server_name", "name")
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class MediaProviderType(str, Enum):
