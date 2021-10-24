@@ -35,7 +35,7 @@ const routes = {
   CONFIRM_PLEX_SIGNIN: { url: "/sign-in/plex/confirm", component: PageLoader },
   SIGN_UP: { url: "/sign-up", component: SignUpForm },
   RESET_PASSWORD: {
-    url: (token: string) => "/me/password/" + token,
+    url: (token: string) => "/user/password/" + token,
     component: ResetPassword,
   },
 

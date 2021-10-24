@@ -15,8 +15,8 @@ export const APIRoutes = {
   USER: "/user",
   INIT_RESET_PASSWORD: "/user/password",
   GET_RESET_PASSWORD_TOKEN_VALIDITY: (token: string) =>
-    "/user/password" + token,
-  RESET_PASSWORD: (token: string) => "/user/password" + token,
+    "/user/password/" + token,
+  RESET_PASSWORD: (token: string) => "/user/password/" + token,
   USERS: (confirmed: boolean) => "/users?confirmed=" + confirmed,
   USER_BY_ID: (id: number | string) => "/users/" + id,
 
