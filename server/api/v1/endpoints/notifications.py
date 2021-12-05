@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server.api import (
@@ -20,7 +18,7 @@ router = APIRouter()
 
 @router.get(
     "",
-    response_model=List[NotificationSchema],
+    response_model=list[NotificationSchema],
 )
 async def get_all_notifications(
     current_user: User = Depends(deps.get_current_user),
@@ -32,7 +30,14 @@ async def get_all_notifications(
     return user_notifications
 
 
-@router.delete("/{id}", response_model=ResponseMessage)
+@router.delete(
+    "/{id}",
+    response_model=ResponseMessage,
+    responses={
+        status.HTTP_403_FORBIDDEN: {"description": "Notification not belonging to user"},
+        status.HTTP_404_NOT_FOUND: {"description": "Notification not found"},
+    },
+)
 async def delete_notification(
     id: int,
     current_user: User = Depends(deps.get_current_user),
@@ -41,6 +46,8 @@ async def delete_notification(
     ),
 ):
     notification = await notification_repository.find_by(id=id)
+    if notification is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
     if notification.user_id != current_user.id:
         raise HTTPException(status.HTTP_403_FORBIDDEN)
     await notification_repository.remove(notification)

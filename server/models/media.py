@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import List
 
 from sqlalchemy import (
     Column,
@@ -89,7 +88,7 @@ class MediaServerSeason(Model, MediaServerContent):
         innerjoin=True,
         backref=backref("seasons", cascade="all,delete,delete-orphan"),
     )
-    episodes: List["MediaServerEpisode"] = relationship(
+    episodes: list["MediaServerEpisode"] = relationship(
         "MediaServerEpisode",
         lazy="selectin",
         back_populates="season",

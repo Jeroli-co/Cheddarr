@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import List
 from uuid import uuid4
 
 from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
@@ -33,7 +32,7 @@ class MediaServerSetting(Model, ExternalServiceSetting):
 
     server_id = Column(String, primary_key=True)
     server_name = Column(String)
-    libraries: List["MediaServerLibrary"] = relationship(
+    libraries: list["MediaServerLibrary"] = relationship(
         "MediaServerLibrary", lazy="selectin", cascade="all,delete,delete-orphan"
     )
 

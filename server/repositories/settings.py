@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union
+from typing import Any, Union
 
 from pydantic import BaseModel
 from sqlalchemy import update
@@ -31,7 +31,7 @@ class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
     async def update(
         self,
         db_obj: MediaProviderSetting,
-        obj_in: Union[BaseModel, Dict[str, Any]],
+        obj_in: Union[BaseModel, dict[str, Any]],
     ) -> MediaProviderSetting:
 
         db_obj = await super().update(db_obj, obj_in)

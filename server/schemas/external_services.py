@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import List, Optional
+from typing import Optional
 from urllib.parse import quote
 
 from pydantic import AnyHttpUrl, Field, validator
@@ -46,7 +46,7 @@ class RadarrMovie(APIModel):
     quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
     root_folder_path: Optional[str] = Field(alias="rootFolderPath")
     monitored: bool = Field(alias="monitored")
-    images: List[dict] = Field(alias="images")
+    images: list[dict] = Field(alias="images")
     has_file: bool = Field(alias="hasFile")
     add_options: Optional[RadarrAddOptions] = Field(alias="addOptions")
 
@@ -76,8 +76,8 @@ class SonarrSeries(APIModel):
     id: Optional[int] = Field(alias="id")
     tvdb_id: int = Field(alias="tvdbId")
     title: str = Field(alias="title")
-    images: List[dict] = Field(alias="images")
-    seasons: List[SonarrSeason] = Field(alias="seasons")
+    images: list[dict] = Field(alias="images")
+    seasons: list[SonarrSeason] = Field(alias="seasons")
     year: int = Field(alias="year")
     path: Optional[str] = Field(alias="path")
     profile_id: Optional[int] = Field(alias="profileId")
@@ -87,8 +87,8 @@ class SonarrSeries(APIModel):
     monitored: bool = Field(alias="monitored")
     series_type: str = Field(alias="seriesType")
     title_slug: str = Field(alias="titleSlug")
-    genres: List[str] = Field(alias="genres")
-    tags: List[str] = Field(alias="tags")
+    genres: list[str] = Field(alias="genres")
+    tags: list[str] = Field(alias="tags")
     added: datetime = Field(alias="added")
     episode_file_count: Optional[int] = Field(alias="episodeFileCount")
     total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")

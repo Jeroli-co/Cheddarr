@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import date
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from pydantic import AnyHttpUrl, Field, root_validator, validator
 
@@ -21,8 +21,8 @@ class PersonSchema(APIModel):
 
 
 class CreditsSchema(APIModel):
-    cast: List[PersonSchema]
-    crew: List[PersonSchema]
+    cast: list[PersonSchema]
+    crew: list[PersonSchema]
 
 
 class CompanySchema(APIModel):
@@ -45,16 +45,16 @@ class MediaSchema(APIModel, ABC):
     art_url: Optional[str]
     rating: Optional[float]
     duration: Optional[int]
-    genres: Optional[List[str]]
-    studios: Optional[List[CompanySchema]]
+    genres: Optional[list[str]]
+    studios: Optional[list[CompanySchema]]
     credits: Optional[CreditsSchema]
-    trailers: Optional[List[Video]]
-    media_servers_info: List[MediaServerInfo] = []
+    trailers: Optional[list[Video]]
+    media_servers_info: list[MediaServerInfo] = []
 
 
 class MovieSchema(MediaSchema):
     media_type: MediaType = Field(default=MediaType.movie, const=True)
-    requests: List = []
+    requests: list = []
 
 
 class EpisodeSchema(MediaSchema):
@@ -63,19 +63,19 @@ class EpisodeSchema(MediaSchema):
 
 class SeasonSchema(MediaSchema):
     season_number: int
-    episodes: Optional[List[EpisodeSchema]]
+    episodes: Optional[list[EpisodeSchema]]
 
 
 class SeriesSchema(MediaSchema):
     number_of_seasons: Optional[int]
-    seasons: Optional[List[SeasonSchema]]
+    seasons: Optional[list[SeasonSchema]]
     media_type: MediaType = Field(default=MediaType.series, const=True)
     series_type: Optional[SeriesType]
-    requests: List = []
+    requests: list = []
 
 
 class MediaSearchResult(PaginatedResult):
-    results: List[Union[SeriesSchema, MovieSchema]]
+    results: Union[list[SeriesSchema], list[MovieSchema]]
 
 
 ###########################################
@@ -119,8 +119,8 @@ class TmdbCrew(PersonSchema):
 
 
 class TmdbCredits(CreditsSchema):
-    cast: List[TmdbCast] = Field(alias="cast")
-    crew: List[TmdbCrew] = Field(alias="crew")
+    cast: list[TmdbCast] = Field(alias="cast")
+    crew: list[TmdbCrew] = Field(alias="crew")
 
 
 class TmdbCompany(CompanySchema):
@@ -149,7 +149,7 @@ class TmdbMedia(MediaSchema, ABC):
     poster_url: Optional[AnyHttpUrl] = Field(alias="poster_path")
     art_url: Optional[AnyHttpUrl] = Field(alias="backdrop_path")
     credits: Optional[TmdbCredits] = Field(alias="credits")
-    trailers: Optional[List[TmdbVideo]] = Field(alias="videos")
+    trailers: Optional[list[TmdbVideo]] = Field(alias="videos")
     _poster_validator = validator("poster_url", allow_reuse=True, pre=True)(get_image_url)
     _art_validator = validator("art_url", allow_reuse=True, pre=True)(get_image_url)
 
@@ -162,7 +162,7 @@ class TmdbMedia(MediaSchema, ABC):
 
 class TmdbMovie(TmdbMedia, MovieSchema):
     duration: Optional[int] = Field(alias="runtime")
-    studios: Optional[List[TmdbCompany]] = Field(alias="production_companies")
+    studios: Optional[list[TmdbCompany]] = Field(alias="production_companies")
     release_date: Optional[date] = Field(alias="release_date")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
@@ -175,15 +175,15 @@ class TmdbEpisode(TmdbMedia, EpisodeSchema):
 
 class TmdbSeason(TmdbMedia, SeasonSchema):
     season_number: int = Field(alias="season_number")
-    episodes: Optional[List[TmdbEpisode]] = Field(alias="episodes")
+    episodes: Optional[list[TmdbEpisode]] = Field(alias="episodes")
     release_date: Optional[date] = Field(alias="air_date")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
 
 
 class TmdbSeries(TmdbMedia, SeriesSchema):
     number_of_seasons: Optional[int] = Field(alias="number_of_seasons")
-    seasons: Optional[List[TmdbSeason]] = Field(alias="seasons")
-    studios: Optional[List[TmdbCompany]] = Field(alias="networks")
+    seasons: Optional[list[TmdbSeason]] = Field(alias="seasons")
+    studios: Optional[list[TmdbCompany]] = Field(alias="networks")
     release_date: Optional[date] = Field(alias="first_air_date")
     _date_validator = validator("release_date", allow_reuse=True, pre=True)(empty_date)
     credits: Optional[TmdbCredits] = Field(alias="aggregate_credits")

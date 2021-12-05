@@ -58,7 +58,7 @@ async def get_recently_added_movies(
     )
     recent_movies = []
     for server_movie in servers_recent_movies:
-        movie = server_movie.media
+        movie = MovieSchema.from_orm(server_movie.media)
         movie.media_servers_info = [PlexMediaInfo(**server_movie.as_dict())]
         recent_movies.append(movie)
 

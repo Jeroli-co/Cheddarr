@@ -1,4 +1,4 @@
-from typing import Any, List, Type
+from typing import Any, Optional, Type
 
 from pydantic import BaseModel
 
@@ -20,6 +20,6 @@ class ResponseMessage(BaseModel):
 
 class PaginatedResult(BaseModel):
     page: int = 1
-    total_pages: int
-    total_results: int
-    results: List
+    total_pages: Optional[int]
+    total_results: Optional[int]
+    results: list[Any]

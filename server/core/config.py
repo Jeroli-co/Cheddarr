@@ -1,9 +1,10 @@
 import json
 import secrets
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 from uuid import uuid4
 
+import tzlocal
 from cachetools.func import lru_cache
 from pydantic import (
     AnyHttpUrl,
@@ -11,7 +12,6 @@ from pydantic import (
     create_model,
     DirectoryPath,
 )
-from tzlocal import get_localzone
 
 
 class Config(BaseSettings):
@@ -24,7 +24,7 @@ class Config(BaseSettings):
     server_port: int = 9090
     server_host: str = f"http://{server_domain}:{server_port}"
     log_level: str = "INFO"
-    tz: str = get_localzone().zone
+    tz: str = str(tzlocal.get_localzone())
     testing: bool = False
 
     ##########################################################################
@@ -57,7 +57,7 @@ class Config(BaseSettings):
     secret_key: str = secrets.token_urlsafe(32)
     signing_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 3
-    backend_cors_origin: List[AnyHttpUrl] = [server_host]
+    backend_cors_origin: list[AnyHttpUrl] = [server_host]
     default_roles: int = 4
     signup_enabled: bool = True
     local_account_enabled: bool = True

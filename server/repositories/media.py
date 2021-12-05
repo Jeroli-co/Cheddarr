@@ -48,7 +48,7 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
 
     async def find_all_recently_added(
         self, media_type: MediaType, page: int = None, per_page: int = None
-    ) -> Tuple[list[Media], Optional[int], Optional[int]]:
+    ) -> Tuple[list[MediaServerMedia], Optional[int], Optional[int]]:
         query = (
             select(self.model)
             .join(Media)

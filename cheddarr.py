@@ -55,6 +55,7 @@ def test():
 @cli.command("run")
 @click.pass_context
 def run(ctx):
+    """Run the application."""
     import uvicorn
 
     debug = ctx.obj["DEBUG"]

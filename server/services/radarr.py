@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Any, Optional
 
 from fastapi import HTTPException
 
@@ -37,7 +37,7 @@ def make_url(
 
 async def check_instance_status(
     api_key: str, host: str, port: int, ssl: bool, version: int = None
-) -> Optional[Dict]:
+) -> Optional[dict[str, Any]]:
     url = make_url(
         api_key=api_key,
         host=host,

@@ -52,7 +52,7 @@ async def signup(
         invitation = await token_repo.find_by(id=invitation_code)
         if invitation is None or (invitation.max_uses is not None and invitation.max_uses == 0):
             raise HTTPException(status.HTTP_403_FORBIDDEN, "This invitation is not valid.")
-        token_payload = Invitation(**Token.time_unsign(invitation.payload))
+        token_payload = Invitation(**Token.time_unsign(invitation.signed_data))
         if user_in.email != token_payload.email:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "Invalid user information.")
 
@@ -108,7 +108,7 @@ async def invite_user(
         invitation.dict(), timed=True, max_uses=invitation.max_uses, type=TokenType.invitation
     )
     await token_repo.save(token)
-    invitation_link = request.url_for("check_invite_user", token=token.payload)
+    invitation_link = request.url_for("check_invite_user", token=token.signed_data)
 
     if invitation.email is not None:
         if await user_repo.find_by_email(invitation.email) is not None:
@@ -236,7 +236,7 @@ async def authorize_signin_plex(
             },
         )
         + "?token="
-        + token.sign()
+        + token.signed_data
     )
 
     return RedirectResponse(url=authorize_url, status_code=200)

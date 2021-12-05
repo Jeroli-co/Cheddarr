@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from asgiref.sync import sync_to_async
 from plexapi.video import (
@@ -92,7 +92,7 @@ async def sync_plex_servers_recently_added(server_id=None):
 
 
 async def process_plex_media_list(
-    plex_media_list: List[PlexVideo], server_id: str, library_id: int, db_session: AsyncSession
+    plex_media_list: list[PlexVideo], server_id: str, library_id: int, db_session: AsyncSession
 ):
     media_repo = MediaRepository(db_session)
     server_media_repo = MediaServerMediaRepository(db_session)

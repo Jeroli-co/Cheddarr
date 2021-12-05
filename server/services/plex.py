@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from asgiref.sync import sync_to_async
 from plexapi.exceptions import PlexApiException
@@ -9,7 +9,7 @@ from server.schemas.settings import PlexLibrarySection, PlexServer
 
 
 @sync_to_async
-def get_plex_account_servers(api_key: str) -> List[PlexServer]:
+def get_plex_account_servers(api_key: str) -> list[PlexServer]:
     plex_account = MyPlexAccount(api_key)
     servers = []
     for resource in plex_account.resources():
@@ -34,7 +34,7 @@ def get_plex_account_servers(api_key: str) -> List[PlexServer]:
 
 async def get_plex_server_library_sections(
     base_url: str, port: int, ssl: bool, api_key: str
-) -> Optional[List[PlexLibrarySection]]:
+) -> Optional[list[PlexLibrarySection]]:
     server = await get_server(base_url, port, ssl, api_key)
     if server is None:
         return None

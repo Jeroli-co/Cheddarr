@@ -1,4 +1,3 @@
-from typing import List
 
 from sqlalchemy import select
 
@@ -8,7 +7,7 @@ from server.repositories.base import BaseRepository
 
 
 class MediaRequestRepository(BaseRepository[MediaRequest]):
-    async def find_all_by_tmdb_id(self, tmdb_id: int, **filters) -> List[MediaRequest]:
+    async def find_all_by_tmdb_id(self, tmdb_id: int, **filters) -> list[MediaRequest]:
         query = select(self.model).filter_by(**filters).join(Media).where(Media.tmdb_id == tmdb_id)
         result = await self.execute(query)
         return result.scalars().all()

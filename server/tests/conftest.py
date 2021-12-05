@@ -47,7 +47,7 @@ async def setup(db):
     from server.models.media import Media
     from server.models.requests import MovieRequest, SeriesRequest
     from server.models.users import User
-    from server.database import Base
+    from server.database.base import Base
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

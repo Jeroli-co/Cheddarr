@@ -1,12 +1,12 @@
+import zoneinfo
 from datetime import timezone
-from typing import Tuple, TypeVar
+from typing import Any, Tuple, TypeVar
 
-import pytz
 from sqlalchemy import Column, DateTime as DBDateTime, func, inspect, TypeDecorator
 from sqlalchemy.orm import declared_attr
 
 from server.core.config import get_config
-from server.database import Base
+from server.database.base import Base
 
 
 class Model(Base):
@@ -28,7 +28,7 @@ class Model(Base):
         ]
         return f"<{self.__class__.__name__} {' '.join(properties)}>"
 
-    def as_dict(self) -> dict:
+    def as_dict(self) -> dict[str, Any]:
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
 
 
@@ -44,7 +44,9 @@ class DateTime(TypeDecorator):
 
     def process_result_value(self, value, engine):
         if value is not None:
-            value = value.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(get_config().tz))
+            value = value.replace(tzinfo=timezone.utc).astimezone(
+                zoneinfo.ZoneInfo(get_config().tz)
+            )
         return value
 
 
@@ -63,7 +65,7 @@ class Timestamp(object):
     )
 
 
-def mapper_args(mapper_args_dict: dict) -> dict:
+def mapper_args(mapper_args_dict: dict[str, Any]) -> dict[str, Any]:
     return {**Model.__mapper_args__, **mapper_args_dict}
 
 

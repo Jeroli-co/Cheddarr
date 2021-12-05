@@ -1,4 +1,3 @@
-from typing import Dict
 
 from httpx import AsyncClient
 
@@ -9,7 +8,7 @@ from server.models.users import UserRole
 
 async def user_authentication_headers(
     *, client: AsyncClient, email: str, password: str
-) -> Dict[str, str]:
+) -> dict[str, str]:
     data = {"username": email, "password": password}
     r = await client.post("/sign-in", data=data)
     response = r.json()

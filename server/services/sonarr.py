@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, List, Optional
+from typing import Any, Optional
 
 from fastapi import HTTPException
 from pydantic.tools import parse_obj_as
@@ -40,7 +40,7 @@ def make_url(
 
 async def check_instance_status(
     api_key: str, host: str, port: int, ssl: bool, version: int = None
-) -> Optional[Dict]:
+) -> Optional[dict[str, Any]]:
     url = make_url(
         api_key=api_key,
         host=host,
@@ -177,7 +177,7 @@ async def update_series(setting: SonarrSetting, series: SonarrSeries) -> SonarrS
     return SonarrSeries.parse_obj(resp)
 
 
-async def get_episodes(setting: SonarrSetting, series_id: int) -> List[SonarrEpisode]:
+async def get_episodes(setting: SonarrSetting, series_id: int) -> list[SonarrEpisode]:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -188,7 +188,7 @@ async def get_episodes(setting: SonarrSetting, series_id: int) -> List[SonarrEpi
         queries={"seriesId": series_id},
     )
     resp = await HttpClient.request("GET", url)
-    return parse_obj_as(List[SonarrEpisode], resp)
+    return parse_obj_as(list[SonarrEpisode], resp)
 
 
 async def update_episode(setting: SonarrSetting, episode: SonarrEpisode) -> SonarrEpisode:

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
 from pydantic import EmailStr
@@ -147,7 +147,7 @@ async def update_user(
 
 @users_router.get(
     "/search",
-    response_model=List[UserSchema],
+    response_model=list[UserSchema],
     dependencies=[Depends(deps.get_current_user)],
 )
 async def search_users(
@@ -205,7 +205,7 @@ async def reset_password(
             subject="Reset your password",
             html_template_name="email/reset_password_instructions.html",
             environment=dict(
-                reset_url=request.url_for("check_reset_password", token=token.time_sign())
+                reset_url=request.url_for("check_reset_password", token=token.signed_data)
             ),
         ),
     )

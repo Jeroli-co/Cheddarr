@@ -63,15 +63,15 @@ class Token(Model, Timestamp):
     id = Column(String, primary_key=True)
     max_uses = Column(Integer)
     type = Column(DBEnum(TokenType), nullable=False)
-    payload = Column(String)
+    signed_data = Column(String)
 
     def __init__(self, data, timed=True, **kwargs):
         super().__init__(**kwargs)
         self.id = uuid4().hex
         if timed is None:
-            self.payload = security.generate_token(data | dict(id=self.id))
+            self.signed_data = security.generate_token(data | dict(id=self.id))
         else:
-            self.payload = security.generate_timed_token(data | dict(id=self.id))
+            self.signed_data = security.generate_timed_token(data | dict(id=self.id))
 
     @classmethod
     def unsign(cls, signed_token: str):

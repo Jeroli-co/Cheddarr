@@ -1,6 +1,6 @@
 import math
 from abc import ABC
-from typing import Any, Dict, Generic, get_args, Optional, Tuple, Union
+from typing import Any, Generic, get_args, Optional, Tuple, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -42,7 +42,7 @@ class BaseRepository(ABC, Generic[ModelType]):
     async def update(
         self,
         db_obj: ModelType,
-        obj_in: Union[BaseModel, Dict[str, Any]],
+        obj_in: Union[BaseModel, dict[str, Any]],
     ) -> ModelType:
         """
         Update an object's in the database
@@ -63,13 +63,17 @@ class BaseRepository(ABC, Generic[ModelType]):
         await self.save(db_obj)
         return db_obj
 
-    async def remove(self, db_obj: ModelType):
+    async def remove(self, db_obj: ModelType | list[ModelType]):
         """
         Delete objects from the database
 
         :param db_obj: Database object to be deleted
         """
-        await self.session.delete(db_obj)
+        if isinstance(db_obj, list):
+            for obj in db_obj:
+                await self.session.delete(obj)
+        else:
+            await self.session.delete(db_obj)
         await self.session.commit()
 
     async def remove_by(self, **filters):

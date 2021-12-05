@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -46,7 +46,7 @@ router = APIRouter()
 
 @router.get(
     "/plex/servers",
-    response_model=List[PlexServer],
+    response_model=list[PlexServer],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex account linked"},
     },
@@ -63,7 +63,7 @@ async def get_plex_account_servers(
 
 @router.get(
     "/plex",
-    response_model=List[PlexSettingSchema],
+    response_model=list[PlexSettingSchema],
     dependencies=[Depends(deps.get_current_user)],
 )
 async def get_plex_settings(
@@ -166,7 +166,7 @@ async def delete_plex_setting(
 
 @router.get(
     "/plex/{setting_id}/libraries",
-    response_model=List[PlexLibrarySection],
+    response_model=list[PlexLibrarySection],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Server connection fail"},
@@ -193,7 +193,7 @@ async def get_plex_libraries(
 
 @router.patch(
     "/plex/{setting_id}/libraries",
-    response_model=List[PlexLibrarySection],
+    response_model=list[PlexLibrarySection],
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No Plex setting"},
     },
@@ -201,7 +201,7 @@ async def get_plex_libraries(
 )
 async def update_plex_setting_libraries(
     setting_id: str,
-    libraries_in: List[PlexLibrarySection],
+    libraries_in: list[PlexLibrarySection],
     plex_setting_repo: PlexSettingRepository = Depends(deps.get_repository(PlexSettingRepository)),
 ):
     setting = await plex_setting_repo.find_by(id=setting_id)
@@ -282,7 +282,7 @@ async def get_radarr_setting_instance_info(
 
 @router.get(
     "/radarr",
-    response_model=List[RadarrSettingSchema],
+    response_model=list[RadarrSettingSchema],
     dependencies=[Depends(deps.get_current_user)],
 )
 async def get_radarr_settings(
@@ -421,7 +421,7 @@ async def get_sonarr_setting_instance_info(
 
 @router.get(
     "/sonarr",
-    response_model=List[SonarrSettingSchema],
+    response_model=list[SonarrSettingSchema],
     dependencies=[Depends(deps.get_current_user)],
 )
 async def get_sonarr_settings(
@@ -518,7 +518,7 @@ async def delete_sonarr_setting(
 
 @router.get(
     "",
-    response_model=List[Union[RadarrSettingSchema, SonarrSettingSchema]],
+    response_model=list[Union[RadarrSettingSchema, SonarrSettingSchema]],
     dependencies=[Depends(deps.has_user_permissions([UserRole.manage_settings]))],
 )
 async def get_media_providers(

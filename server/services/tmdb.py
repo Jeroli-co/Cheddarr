@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from server.core.config import get_config
 from server.core.http_client import HttpClient
@@ -21,7 +21,7 @@ TMDB_URL = "https://api.themoviedb.org/3"
 
 async def search_tmdb_media(
     term: str, page: int
-) -> (List[Union[MovieSchema, SeriesSchema]], int, int):
+) -> (list[Union[MovieSchema, SeriesSchema]], int, int):
     search = await HttpClient.request(
         "GET",
         f"{TMDB_URL}/search/multi",
@@ -43,7 +43,7 @@ async def search_tmdb_media(
     return results, search["total_pages"], search["total_results"]
 
 
-async def search_tmdb_movies(term: str, page: int) -> (List[MovieSchema], int, int):
+async def search_tmdb_movies(term: str, page: int) -> (list[MovieSchema], int, int):
     search = await HttpClient.request(
         "GET",
         f"{TMDB_URL}/search/movie",
@@ -58,7 +58,7 @@ async def search_tmdb_movies(term: str, page: int) -> (List[MovieSchema], int, i
     return results, search["total_pages"], search["total_results"]
 
 
-async def search_tmdb_series(term: str, page: int) -> (List[SeriesSchema], int, int):
+async def search_tmdb_series(term: str, page: int) -> (list[SeriesSchema], int, int):
     search = await HttpClient.request(
         "GET",
         f"{TMDB_URL}/search/tv",
@@ -141,7 +141,7 @@ async def find_external_ids_from_tmdb_id(tmdb_id: int) -> dict:
     )
 
 
-async def get_tmdb_popular_movies(page: int = 1) -> (List[MovieSchema], int, int):
+async def get_tmdb_popular_movies(page: int = 1) -> (list[MovieSchema], int, int):
     search = await HttpClient.request(
         "GET", f"{TMDB_URL}/movie/popular", params=dict(api_key=TMDB_API_KEY, page=page)
     )
@@ -154,7 +154,7 @@ async def get_tmdb_popular_movies(page: int = 1) -> (List[MovieSchema], int, int
     return results, search["total_pages"], search["total_results"]
 
 
-async def get_tmdb_upcoming_movies(page: int = 1) -> (List[MovieSchema], int, int):
+async def get_tmdb_upcoming_movies(page: int = 1) -> (list[MovieSchema], int, int):
     search = await HttpClient.request(
         "GET", f"{TMDB_URL}/movie/upcoming", params=dict(api_key=TMDB_API_KEY, page=page)
     )
@@ -167,7 +167,7 @@ async def get_tmdb_upcoming_movies(page: int = 1) -> (List[MovieSchema], int, in
     return results, search["total_pages"], search["total_results"]
 
 
-async def get_tmdb_similar_movies(tmdb_id: int, page: int = 1) -> (List[MovieSchema], int, int):
+async def get_tmdb_similar_movies(tmdb_id: int, page: int = 1) -> (list[MovieSchema], int, int):
     search = await HttpClient.request(
         "GET", f"{TMDB_URL}/movie/{tmdb_id}/similar", params=dict(api_key=TMDB_API_KEY, page=page)
     )
@@ -182,7 +182,7 @@ async def get_tmdb_similar_movies(tmdb_id: int, page: int = 1) -> (List[MovieSch
 
 async def get_tmdb_recommended_movies(
     tmdb_id: int, page: int = 1
-) -> (List[MovieSchema], int, int):
+) -> (list[MovieSchema], int, int):
     search = await HttpClient.request(
         "GET",
         f"{TMDB_URL}/movie/{tmdb_id}/recommendations",
@@ -197,7 +197,7 @@ async def get_tmdb_recommended_movies(
     return results, search["total_pages"], search["total_results"]
 
 
-async def get_tmdb_popular_series(page: int = 1) -> (List[SeriesSchema], int, int):
+async def get_tmdb_popular_series(page: int = 1) -> (list[SeriesSchema], int, int):
     search = await HttpClient.request(
         "GET", f"{TMDB_URL}/tv/popular", params=dict(api_key=TMDB_API_KEY, page=page)
     )
@@ -210,7 +210,7 @@ async def get_tmdb_popular_series(page: int = 1) -> (List[SeriesSchema], int, in
     return results, search["total_pages"], search["total_results"]
 
 
-async def get_tmdb_similar_series(tmdb_id: int, page: int = 1) -> (List[SeriesSchema], int, int):
+async def get_tmdb_similar_series(tmdb_id: int, page: int = 1) -> (list[SeriesSchema], int, int):
     search = await HttpClient.request(
         "GET", f"{TMDB_URL}/tv/{tmdb_id}/similar", params=dict(api_key=TMDB_API_KEY, page=page)
     )
@@ -225,7 +225,7 @@ async def get_tmdb_similar_series(tmdb_id: int, page: int = 1) -> (List[SeriesSc
 
 async def get_tmdb_recommended_series(
     tmdb_id: int, page: int = 1
-) -> (List[SeriesSchema], int, int):
+) -> (list[SeriesSchema], int, int):
     search = await HttpClient.request(
         "GET",
         f"{TMDB_URL}/tv/{tmdb_id}/recommendations",
