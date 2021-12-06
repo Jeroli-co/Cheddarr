@@ -12,6 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import backref, declared_attr, Mapped, relationship
 
 from server.models.base import Model
+from server.models.settings import MediaServerSetting
 
 
 class MediaType(str, Enum):
