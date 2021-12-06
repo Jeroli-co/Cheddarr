@@ -65,13 +65,13 @@ class Token(Model, Timestamp):
     type = Column(DBEnum(TokenType), nullable=False)
     signed_data = Column(String)
 
-    def __init__(self, data, timed=True, **kwargs):
+    def __init__(self, data, timed=False, **kwargs):
         super().__init__(**kwargs)
         self.id = uuid4().hex
-        if timed is None:
-            self.signed_data = security.generate_token(data | dict(id=self.id))
-        else:
+        if timed:
             self.signed_data = security.generate_timed_token(data | dict(id=self.id))
+        else:
+            self.signed_data = security.generate_token(data | dict(id=self.id))
 
     @classmethod
     def unsign(cls, signed_token: str):

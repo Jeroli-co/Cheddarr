@@ -219,7 +219,7 @@ async def authorize_signin_plex(
     )
     token = Token(
         {
-            "id": auth_data.key,
+            "key": auth_data.key,
             "code": auth_data.code,
             "redirect_uri": auth_data.redirect_uri,
             "user_id": auth_data.user_id,
@@ -257,7 +257,7 @@ async def confirm_signin_plex(
     config: Config = Depends(get_config),
 ):
     payload = Token.unsign(token)
-    state = payload.get("id")
+    state = payload.get("key")
     code = payload.get("code")
     redirect_uri = payload.get("redirect_uri", "")
     user_id = payload.get("user_id", None)
