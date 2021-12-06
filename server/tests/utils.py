@@ -1,4 +1,3 @@
-
 from httpx import AsyncClient
 
 from server.models.media import MediaType
