@@ -1,13 +1,31 @@
 from typing import Optional
+from urllib.parse import quote
 
 from asgiref.sync import sync_to_async
 from plexapi.exceptions import PlexApiException
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer as PlexAPIServer
+from pydantic import validator
 
+from server.schemas.media import MediaServerInfo
 from server.schemas.settings import PlexLibrarySection, PlexServer
 
 
+###################################
+# Schemas                         #
+###################################
+class PlexMediaInfo(MediaServerInfo):
+    @validator("web_url", pre=True, always=True)
+    def get_web_url(cls, web_url, values):
+        media_key = quote(f"/library/metadata/{values['external_id']}", safe="")
+        return (
+            f"https://app.plex.tv/desktop#!/server/{values['server_id']}/details?key={media_key}"
+        )
+
+
+###################################
+# API calls                      #
+###################################
 @sync_to_async
 def get_plex_account_servers(api_key: str) -> list[PlexServer]:
     plex_account = MyPlexAccount(api_key)

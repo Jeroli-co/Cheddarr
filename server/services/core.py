@@ -10,7 +10,6 @@ from server.repositories.media import (
     MediaServerSeasonRepository,
 )
 from server.repositories.requests import MediaRequestRepository
-from server.schemas.external_services import PlexMediaInfo
 from server.schemas.media import (
     EpisodeSchema,
     MediaSchema,
@@ -18,6 +17,7 @@ from server.schemas.media import (
 )
 from server.schemas.requests import MovieRequestSchema, SeriesRequestCreate, SeriesRequestSchema
 from server.services import radarr, sonarr
+from server.services.plex import PlexMediaInfo
 
 
 def unify_series_request(series_request: SeriesRequest, request_in: SeriesRequestCreate):

@@ -1,4 +1,6 @@
 from typing import Any, Optional, Type
+from datetime import date
+from typing import Type
 
 from pydantic import BaseModel
 
@@ -12,6 +14,18 @@ class APIModel(BaseModel):
 
     def to_orm(self, orm_model: Type[ModelType], exclude=None) -> ModelType:
         return orm_model(**self.dict(include=vars(orm_model).keys(), exclude=exclude))
+
+
+class Date(date):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if v == "":
+            return None
+        return v
 
 
 class ResponseMessage(BaseModel):

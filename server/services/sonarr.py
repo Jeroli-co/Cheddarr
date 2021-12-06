@@ -1,7 +1,9 @@
 import asyncio
-from typing import Any, Optional
+from datetime import datetime
+from typing import Dict, Optional
 
 from fastapi import HTTPException
+from pydantic import Field
 from pydantic.tools import parse_obj_as
 
 from server.core import utils
@@ -9,10 +11,60 @@ from server.core.http_client import HttpClient
 from server.models.media import SeriesType
 from server.models.requests import SeriesRequest
 from server.models.settings import SonarrSetting
-from server.schemas.external_services import SonarrAddOptions, SonarrEpisode, SonarrSeries
+from server.schemas.core import APIModel
 from server.schemas.settings import SonarrInstanceInfo
 
 
+###################################
+# Schemas                         #
+###################################
+class SonarrAddOptions(APIModel):
+    ignore_episodes_with_files: bool = Field(alias="ignoreEpisodesWithFiles")
+    ignore_episodes_without_files: bool = Field(alias="ignoreEpisodesWithoutFiles")
+    search_for_missing_episodes: bool = Field(alias="searchForMissingEpisodes")
+
+
+class SonarrEpisode(APIModel):
+    id: int
+    episode_number: int = Field(alias="episodeNumber")
+    season_number: int = Field(alias="seasonNumber")
+    monitored: bool = Field(alias="monitored")
+    has_file: bool = Field(alias="hasFile")
+
+
+class SonarrSeason(APIModel):
+    season_number: int = Field(alias="seasonNumber")
+    monitored: bool = Field(alias="monitored")
+    episode_file_count: Optional[int] = Field(alias="episodeFileCount")
+    total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")
+
+
+class SonarrSeries(APIModel):
+    id: Optional[int] = Field(alias="id")
+    tvdb_id: int = Field(alias="tvdbId")
+    title: str = Field(alias="title")
+    images: list[dict] = Field(alias="images")
+    seasons: list[SonarrSeason] = Field(alias="seasons")
+    year: int = Field(alias="year")
+    path: Optional[str] = Field(alias="path")
+    profile_id: Optional[int] = Field(alias="profileId")
+    root_folder_path: Optional[str] = Field(alias="rootFolderPath")
+    quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
+    language_profile_id: Optional[int] = Field(alias="languageProfileId")
+    monitored: bool = Field(alias="monitored")
+    series_type: str = Field(alias="seriesType")
+    title_slug: str = Field(alias="titleSlug")
+    genres: list[str] = Field(alias="genres")
+    tags: list[str] = Field(alias="tags")
+    added: datetime = Field(alias="added")
+    episode_file_count: Optional[int] = Field(alias="episodeFileCount")
+    total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")
+    add_options: Optional[SonarrAddOptions] = Field(alias="addOptions")
+
+
+###################################
+# API calls                       #
+###################################
 def make_url(
     *,
     api_key: str,
@@ -40,7 +92,7 @@ def make_url(
 
 async def check_instance_status(
     api_key: str, host: str, port: int, ssl: bool, version: int = None
-) -> Optional[dict[str, Any]]:
+) -> Optional[Dict]:
     url = make_url(
         api_key=api_key,
         host=host,

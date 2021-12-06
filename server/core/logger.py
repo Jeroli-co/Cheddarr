@@ -56,14 +56,13 @@ class Logger:
     def make_logger(cls):
         log = cls.customize_logging(
             get_config().logs_folder / get_config().logs_filename,
-            level=get_config().log_level,
             rotation="1 day",
             retention="1 week",
         )
         return log
 
     @classmethod
-    def customize_logging(cls, filepath: Path, level: str, rotation: str, retention: str):
+    def customize_logging(cls, filepath: Path, rotation: str, retention: str):
         logger.remove()
         logger.add(
             sys.stdout,
@@ -83,7 +82,7 @@ class Logger:
             backtrace=False,
             diagnose=False,
             colorize=False,
-            level=level.upper(),
+            level=0,
             filter=LogLevelFilter(),
             serialize=True,
             format="{message}",
