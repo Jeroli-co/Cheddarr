@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 from asgiref.sync import sync_to_async
 from plexapi.video import (
@@ -337,7 +337,7 @@ async def process_plex_episode(
     return episode
 
 
-async def find_guids(media: Union[PlexMovie, PlexSeries]) -> (int, str, int):
+async def find_guids(media: Union[PlexMovie, PlexSeries]) -> Tuple[int, str, int]:
     tmdb_regex = "tmdb|themoviedb"
     imdb_regex = "imdb"
     tvdb_regex = "tvdb|thetvdb"

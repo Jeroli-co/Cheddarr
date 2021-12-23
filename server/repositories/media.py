@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from sqlalchemy import desc, or_, select
 
@@ -48,7 +48,7 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
 
     async def find_all_recently_added(
         self, media_type: MediaType, page: int = None, per_page: int = None
-    ) -> (List[Media], Optional[int], Optional[int]):
+    ) -> Tuple[List[Media], Optional[int], Optional[int]]:
         query = (
             select(self.model)
             .join(Media)
