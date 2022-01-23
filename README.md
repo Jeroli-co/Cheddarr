@@ -28,7 +28,7 @@ Check out the [wiki](https://github.com/Jeroli-co/Cheddarr/wiki) for instruction
 
 
 ## Support
-* To hear about the latest news, hop on our [Discord](https://discord.gg/Tj5HDUmFD6).
+* To hear about the latest news, hop on our [Discord](https://discord.gg/xC3cSjwSVr).
 * If you need something that is not already in Cheddarr, you can create a [feature request](https://github.com/Jeroli-co/Cheddarr/discussions/new).
 * For any type of bug, you can submit an [issue](https://github.com/Jeroli-co/Cheddarr/issues/new?labels=bug&template=bug_report.md).
   
