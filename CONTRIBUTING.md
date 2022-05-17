@@ -41,10 +41,19 @@
 
 5. Create your patch and test your changes.
 
-   - Be sure to follow both the [code](#contributing-code) and [UI text](#ui-text-style) guidelines.
+   - Be sure to follow both the [code](#contributing-code) guidelines.
    - Should you need to update your fork, you can do so by rebasing from `upstream`:
      ```bash
      git fetch upstream
      git rebase upstream/develop
      git push origin BRANCH_NAME -f
      ```
+     
+### Contributing Code
+
+- If you are taking on an existing bug or feature, please comment on the [issue](https://github.com/Jeroli-co/Cheddarr/issues) to avoid multiple people working on the same thing.
+- Always rebase your commit to the latest `develop` branch. Do **not** merge `develop` into your branch.
+- You can create a "draft" pull request early to get feedback on your work.
+- Your code **must** be formatted correctly ([Prettier](https://prettier.io/docs/en/install.html) for frontend and [Black](https://black.readthedocs.io/en/stable/integrations/index.html) for backend), or the tests will fail.
+- If you have questions or need help, you can reach out via [Discussions](https://github.com/Jeroli-co/Cheddarr/discussions) or our [Discord server](https://discord.gg/xC3cSjwSVr).
+- Only open pull requests to `develop`, never `master`! Any pull requests opened to `master` will be closed.
