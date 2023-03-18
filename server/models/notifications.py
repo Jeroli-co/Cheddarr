@@ -1,8 +1,10 @@
 from enum import Enum
 
-from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, JSON, Text
+from sqlalchemy import JSON, ForeignKey, Text
+from sqlalchemy import Enum as DBEnum
+from sqlalchemy.orm import Mapped, mapped_column
 
-from server.models.base import Model, Timestamp
+from server.models.base import Model, Timestamp, intpk
 
 
 class Agent(str, Enum):
@@ -10,19 +12,13 @@ class Agent(str, Enum):
 
 
 class NotificationAgent(Model):
-    name = Column(DBEnum(Agent), primary_key=True)
-    enabled = Column(Boolean, default=True)
-    settings = Column(JSON)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    name: Mapped[Agent] = mapped_column(DBEnum(Agent), primary_key=True, repr=True)
+    enabled: Mapped[bool] = mapped_column(default=True, repr=True)
+    settings = mapped_column(JSON)
 
 
 class Notification(Model, Timestamp):
-    id = Column(Integer, primary_key=True)
-    message = Column(Text, nullable=False)
-    read = Column(Boolean, nullable=False, default=False)
-    user_id: int = Column(ForeignKey("user.id"), nullable=False)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    id: Mapped[intpk]
+    message: Mapped[str] = mapped_column(Text)
+    read: Mapped[bool] = mapped_column(default=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))

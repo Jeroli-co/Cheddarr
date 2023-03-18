@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-        python-version: [3.9.x]
+        python-version: [3.11.x]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:

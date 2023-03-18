@@ -1,20 +1,19 @@
+from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import Any
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Column, Enum as DBEnum, Integer, String
+from passlib.context import CryptContext
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, mapped_column
 
 from server.core import security
 from server.core.config import get_config
-from server.core.security import hash_password
 from server.core.utils import get_random_avatar
-from server.models.base import Model, Timestamp
 
-if TYPE_CHECKING:
-    # This makes hybrid_property's have the same typing as normal property until stubs are improved.
-    hybrid_property = property
-else:
-    from sqlalchemy.ext.hybrid import hybrid_property
+from .base import Model, Timestamp, intpk
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class UserRole(int, Enum):
@@ -30,53 +29,48 @@ class UserRole(int, Enum):
 
 
 class User(Model, Timestamp):
-    __repr_props__ = ("username", "email", "roles", "confirmed")
-
-    id = Column(Integer, primary_key=True)
-    username = Column(String, nullable=False, unique=True, index=True)
-    email = Column(String, unique=True, index=True)
-    password_hash = Column(String, nullable=False)
-    avatar = Column(String, default=get_random_avatar)
-    confirmed = Column(Boolean, nullable=False, default=False)
-    roles = Column(Integer, default=lambda: get_config().default_roles)
-    plex_user_id = Column(Integer)
-    plex_api_key = Column(String)
+    id: Mapped[intpk]
+    username: Mapped[str] = mapped_column(unique=True, index=True, repr=True)
+    email: Mapped[str | None] = mapped_column(unique=True, index=True, repr=True)
+    _password_hash: Mapped[str]
+    avatar: Mapped[str | None] = mapped_column(default=get_random_avatar())
+    confirmed: Mapped[bool] = mapped_column(default=False, repr=True)
+    roles: Mapped[int] = mapped_column(default=lambda: get_config().default_roles, repr=True)
+    plex_user_id: Mapped[int | None]
+    plex_api_key: Mapped[str | None]
 
     @hybrid_property
-    def password(self):
-        return self.password_hash
+    def password(self) -> str:
+        return self._password_hash
 
-    @password.setter
-    def password(self, plain):
-        self.password_hash = hash_password(plain)
+    @password.inplace.setter  # type: ignore
+    def _password_setter(self, plain: str) -> None:
+        self._password_hash = pwd_context.hash(plain)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class TokenType(str, Enum):
-    invitation = "invitation"
-    reset_password = "reset_password"
+    def verify_password(self, plain_password: str) -> bool:
+        return pwd_context.verify(plain_password, self._password_hash)
 
 
 class Token(Model, Timestamp):
-    id = Column(String, primary_key=True)
-    max_uses = Column(Integer)
-    type = Column(DBEnum(TokenType), nullable=False)
-    signed_data = Column(String)
+    id: Mapped[str] = mapped_column(primary_key=True, default=lambda: uuid4().hex)
+    max_uses: Mapped[int | None] = mapped_column(default=1)
+    max_age: Mapped[int | None] = mapped_column(default=30)
+    _signed_data: Mapped[str]
 
-    def __init__(self, data, timed=False, **kwargs):
-        super().__init__(**kwargs)
-        self.id = uuid4().hex
-        if timed:
-            self.signed_data = security.generate_timed_token(data | dict(id=self.id))
-        else:
-            self.signed_data = security.generate_token(data | dict(id=self.id))
+    @hybrid_property
+    def data(self) -> Any:
+        return self._signed_data
+
+    @data.inplace.setter  # type: ignore
+    def _data_setter(self, data: dict[str, Any]) -> None:
+        self._signed_data = security.generate_token(data | {"id": self.id})
+
+    @property
+    def is_expired(self) -> bool:
+        if self.max_age is None:
+            return False
+        return self.created_at + timedelta(minutes=self.max_age) < datetime.now(tz=timezone.utc)
 
     @classmethod
-    def unsign(cls, signed_token: str):
+    def unsign(cls, signed_token: str) -> Any:
         return security.confirm_token(signed_token)
-
-    @classmethod
-    def time_unsign(cls, signed_token: str, max_age: int = 30):
-        return security.confirm_timed_token(signed_token, max_age)

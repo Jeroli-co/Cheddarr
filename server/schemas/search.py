@@ -1,8 +1,8 @@
+from collections.abc import Sequence
 from enum import Enum
-from typing import Union
 
-from server.schemas.core import PaginatedResult
-from server.schemas.media import MovieSchema, Person, SeriesSchema
+from server.schemas.base import PaginatedResponse
+from server.schemas.media import MediaSearchResponse, Person
 
 
 class SearchType(str, Enum):
@@ -11,5 +11,9 @@ class SearchType(str, Enum):
     people = "people"
 
 
-class MultiSearchResult(PaginatedResult):
-    results: list[Union[Person, SeriesSchema, MovieSchema]]
+class PersonSearchResponse(PaginatedResponse):
+    items = Sequence[Person]
+
+
+class MultiSearchResponse(PaginatedResponse):
+    __root__ = MediaSearchResponse | PersonSearchResponse

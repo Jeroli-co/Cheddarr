@@ -1,14 +1,8 @@
 import re
-from typing import Optional, Union
+from typing import Any
 
+import plexapi.video as plex_video
 from asgiref.sync import sync_to_async
-from plexapi.video import (
-    Episode as PlexEpisode,
-    Movie as PlexMovie,
-    Season as PlexSeason,
-    Show as PlexSeries,
-    Video as PlexVideo,
-)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.core.scheduler import scheduler
@@ -37,18 +31,25 @@ from server.services import plex, tmdb
     coalesce=True,
     hours=5,
 )
-async def sync_plex_servers_libraries(server_id=None):
+async def sync_plex_servers_libraries(server_id: str | None = None) -> None:
     async with Session() as db_session:
         plex_setting_repo = PlexSettingRepository(db_session)
 
         if server_id is not None:
-            plex_settings = await plex_setting_repo.find_all_by(server_id=server_id)
+            plex_settings = await plex_setting_repo.find_by(server_id=server_id).all()
         else:
-            plex_settings = await plex_setting_repo.find_all_by()
+            plex_settings = await plex_setting_repo.find_by().all()
         for setting in plex_settings:
             server = await plex.get_server(
-                base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
+                base_url=setting.host,
+                port=setting.port,
+                ssl=setting.ssl,
+                api_key=setting.api_key,
             )
+
+            if server is None:
+                continue
+
             for section in setting.libraries:
                 library_media = await sync_to_async(server.library.section(section.name).all)()
                 await process_plex_media_list(
@@ -66,23 +67,27 @@ async def sync_plex_servers_libraries(server_id=None):
     coalesce=True,
     minutes=10,
 )
-async def sync_plex_servers_recently_added(server_id=None):
+async def sync_plex_servers_recently_added(server_id: str | None = None) -> None:
     async with Session() as db_session:
         plex_setting_repo = PlexSettingRepository(db_session)
 
         if server_id is not None:
-            plex_settings = await plex_setting_repo.find_all_by(server_id=server_id)
+            plex_settings = await plex_setting_repo.find_by(server_id=server_id).all()
         else:
-            plex_settings = await plex_setting_repo.find_all_by()
+            plex_settings = await plex_setting_repo.find_by().all()
         for setting in plex_settings:
             server = await plex.get_server(
-                base_url=setting.host, port=setting.port, ssl=setting.ssl, api_key=setting.api_key
+                base_url=setting.host,
+                port=setting.port,
+                ssl=setting.ssl,
+                api_key=setting.api_key,
             )
 
+            if server is None:
+                continue
+
             for section in setting.libraries:
-                recent_library_media = await sync_to_async(
-                    server.library.section(section.name).recentlyAdded
-                )()
+                recent_library_media = await sync_to_async(server.library.section(section.name).recentlyAdded)()
                 await process_plex_media_list(
                     recent_library_media,
                     setting.server_id,
@@ -92,14 +97,17 @@ async def sync_plex_servers_recently_added(server_id=None):
 
 
 async def process_plex_media_list(
-    plex_media_list: list[PlexVideo], server_id: str, library_id: int, db_session: AsyncSession
-):
+    plex_media_list: list[plex_video.Video],
+    server_id: str,
+    library_id: int,
+    db_session: AsyncSession,
+) -> None:
     media_repo = MediaRepository(db_session)
     server_media_repo = MediaServerMediaRepository(db_session)
     server_season_repo = MediaServerSeasonRepository(db_session)
     server_episode_repo = MediaServerEpisodeRepository(db_session)
     for plex_media in plex_media_list:
-        if isinstance(plex_media, PlexMovie):
+        if isinstance(plex_media, plex_video.Movie):
             await process_plex_media(
                 server_id,
                 library_id,
@@ -108,7 +116,7 @@ async def process_plex_media_list(
                 server_media_repo=server_media_repo,
             )
 
-        elif isinstance(plex_media, PlexSeries):
+        elif isinstance(plex_media, plex_video.Show):
             await process_plex_series(
                 server_id,
                 library_id,
@@ -119,7 +127,7 @@ async def process_plex_media_list(
                 server_episode_repo=server_episode_repo,
             )
 
-        elif isinstance(plex_media, PlexSeason):
+        elif isinstance(plex_media, plex_video.Season):
             await process_plex_season_and_episodes(
                 server_id,
                 library_id,
@@ -130,7 +138,7 @@ async def process_plex_media_list(
                 server_episode_repo=server_episode_repo,
             )
 
-        elif isinstance(plex_media, PlexEpisode):
+        elif isinstance(plex_media, plex_video.Episode):
             await process_plex_episode(
                 server_id,
                 library_id,
@@ -148,28 +156,26 @@ async def process_plex_media_list(
 async def process_plex_media(
     server_id: str,
     library_id: int,
-    plex_media: Union[PlexMovie, PlexSeries],
+    plex_media: plex_video.Movie | plex_video.Show,
     *,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
-) -> Optional[MediaServerMedia]:
+) -> MediaServerMedia | None:
     tmdb_id, imdb_id, tvdb_id = await find_guids(plex_media)
     if not any((tmdb_id, imdb_id, tvdb_id)):
-        return
+        return None
 
-    media = await media_repo.find_by_external_id(tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id)
+    media = await media_repo.find_by_external_id(tmdb_id=tmdb_id, imdb_id=imdb_id, tvdb_id=tvdb_id).one()
     if media is None:
         media = Media(
             tmdb_id=tmdb_id,
             imdb_id=imdb_id,
             tvdb_id=tvdb_id,
             title=plex_media.title,
-            media_type=MediaType.movie if isinstance(plex_media, PlexMovie) else MediaType.series,
+            media_type=MediaType.movie if isinstance(plex_media, plex_video.Movie) else MediaType.series,
         )
-    server_media = await server_media_repo.find_by(
-        external_id=plex_media.ratingKey, server_id=server_id
-    )
 
+    server_media = await server_media_repo.find_by(external_id=plex_media.ratingKey, server_id=server_id).one()
     if server_media is None:
         server_media = MediaServerMedia(
             server_id=server_id,
@@ -179,19 +185,20 @@ async def process_plex_media(
             added_at=plex_media.addedAt,
         )
         await server_media_repo.save(server_media)
+
     return server_media
 
 
 async def process_plex_series(
     server_id: str,
     library_id: int,
-    plex_media: Union[PlexMovie, PlexSeries],
+    plex_media: plex_video.Movie | plex_video.Show,
     *,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
     server_season_repo: MediaServerSeasonRepository,
     server_episode_repo: MediaServerEpisodeRepository,
-) -> Optional[MediaServerMedia]:
+) -> MediaServerMedia | None:
     server_series = await process_plex_media(
         server_id,
         library_id,
@@ -201,7 +208,7 @@ async def process_plex_series(
     )
 
     if server_series is None:
-        return
+        return None
 
     for plex_season in plex_media.seasons():
         await process_plex_season_and_episodes(
@@ -221,18 +228,17 @@ async def process_plex_series(
 async def process_plex_season(
     server_id: str,
     library_id: int,
-    plex_season: PlexSeason,
+    plex_season: plex_video.Season,
     *,
-    server_series: MediaServerMedia = None,
+    server_series: MediaServerMedia | None = None,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
     server_season_repo: MediaServerSeasonRepository,
-) -> Optional[MediaServerSeason]:
-
+) -> MediaServerSeason | None:
     season = await server_season_repo.find_by(
         external_id=plex_season.ratingKey,
         server_id=server_id,
-    )
+    ).one()
     if season is None:
         season = MediaServerSeason(
             season_number=plex_season.seasonNumber,
@@ -251,7 +257,7 @@ async def process_plex_season(
                 server_media_repo=server_media_repo,
             )
             if server_media is None:
-                return
+                return None
             season.server_media = server_media
     return season
 
@@ -259,14 +265,14 @@ async def process_plex_season(
 async def process_plex_season_and_episodes(
     server_id: str,
     library_id: int,
-    plex_season: PlexSeason,
+    plex_season: plex_video.Season,
     *,
-    server_series: MediaServerMedia = None,
+    server_series: MediaServerMedia | None = None,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
     server_season_repo: MediaServerSeasonRepository,
     server_episode_repo: MediaServerEpisodeRepository,
-) -> Optional[MediaServerSeason]:
+) -> MediaServerSeason | None:
     server_season = await process_plex_season(
         server_id,
         library_id,
@@ -277,7 +283,8 @@ async def process_plex_season_and_episodes(
         server_season_repo=server_season_repo,
     )
     if server_season is None:
-        return
+        return None
+
     for plex_episode in plex_season.episodes():
         await process_plex_episode(
             server_id,
@@ -297,20 +304,19 @@ async def process_plex_season_and_episodes(
 async def process_plex_episode(
     server_id: str,
     library_id: int,
-    plex_episode: PlexEpisode,
+    plex_episode: plex_video.Episode,
     *,
-    server_series: MediaServerMedia = None,
-    server_season: MediaServerSeason = None,
+    server_series: MediaServerMedia | None = None,
+    server_season: MediaServerSeason | None = None,
     media_repo: MediaRepository,
     server_media_repo: MediaServerMediaRepository,
     server_season_repo: MediaServerSeasonRepository,
     server_episode_repo: MediaServerEpisodeRepository,
-) -> Optional[MediaServerEpisode]:
-
+) -> MediaServerEpisode | None:
     episode = await server_episode_repo.find_by(
         external_id=plex_episode.ratingKey,
         server_id=server_id,
-    )
+    ).one()
     if episode is None:
         episode = MediaServerEpisode(
             episode_number=plex_episode.index,
@@ -331,13 +337,13 @@ async def process_plex_episode(
                 server_season_repo=server_season_repo,
             )
             if season is None:
-                return
+                return None
             episode.season = season
         await server_episode_repo.save(episode)
     return episode
 
 
-async def find_guids(media: Union[PlexMovie, PlexSeries]) -> (int, str, int):
+async def find_guids(media: plex_video.Movie | plex_video.Show) -> tuple[int | None, str | None, int | None]:
     tmdb_regex = "tmdb|themoviedb"
     imdb_regex = "imdb"
     tvdb_regex = "tvdb|thetvdb"
@@ -349,15 +355,13 @@ async def find_guids(media: Union[PlexMovie, PlexSeries]) -> (int, str, int):
     except Exception:
         return None, None, None
 
-    def find_guid(regex):
+    def find_guid(regex: str) -> Any:
         return next(
             iter(
                 re.findall(
                     r"\w+",
-                    next((guid for guid in guids if re.search(regex, guid)), "").partition("://")[
-                        -1
-                    ],
-                )
+                    next((guid for guid in guids if re.search(regex, guid)), "").partition("://")[-1],
+                ),
             ),
             None,
         )
@@ -366,10 +370,14 @@ async def find_guids(media: Union[PlexMovie, PlexSeries]) -> (int, str, int):
 
     try:
         if tmdb_id is None:
-            tmdb_id = await tmdb.find_tmdb_id_from_external_id(imdb_id, tvdb_id)
+            tmdb_id = await tmdb.find_tmdb_id_from_external_id(
+                MediaType.movie if isinstance(media, plex_video.Movie) else MediaType.series,
+                imdb_id,
+                tvdb_id,
+            )
             if tmdb_id is None:
                 return None, None, None
-        if isinstance(media, PlexSeries) and tvdb_id is None:
+        if isinstance(media, plex_video.Show) and tvdb_id is None:
             tvdb_id = (await tmdb.find_external_ids_from_tmdb_id(tmdb_id)).get("tvdb_id")
     except Exception:
         return None, None, None

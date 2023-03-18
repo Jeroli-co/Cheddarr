@@ -1,28 +1,29 @@
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel
-from sqlalchemy import update
+import sqlalchemy as sa
 
 from server.models.settings import (
     MediaProviderSetting,
-    MediaServerSetting,
     PlexSetting,
     RadarrSetting,
     SonarrSetting,
 )
 from server.repositories.base import BaseRepository
 
+if TYPE_CHECKING:
+    from pydantic import BaseModel
+
 
 class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
+    """Repository for MediaProviderSetting model."""
+
     async def save(self, db_obj: MediaProviderSetting) -> MediaProviderSetting:
         await super().save(db_obj)
         if db_obj.is_default:
             await self.session.execute(
-                update(self.model)
-                .where(
-                    self.model.provider_type == db_obj.provider_type, self.model.id != db_obj.id
-                )
-                .values(is_default=False)
+                sa.update(self.model)
+                .where(self.model.provider_type == db_obj.provider_type, self.model.id != db_obj.id)
+                .values(is_default=False),
             )
             db_obj.is_default = True
             await super().save(db_obj)
@@ -31,32 +32,31 @@ class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
     async def update(
         self,
         db_obj: MediaProviderSetting,
-        obj_in: Union[BaseModel, dict[str, Any]],
+        obj_in: BaseModel | dict[str, Any],
     ) -> MediaProviderSetting:
-
-        db_obj = await super().update(db_obj, obj_in)
+        await super().update(db_obj, obj_in)
         if db_obj.is_default:
             await self.session.execute(
-                update(self.model)
-                .where(self.model.provider_type == db_obj.provider_type)
-                .values(is_default=False)
+                sa.update(self.model).where(self.model.provider_type == db_obj.provider_type).values(is_default=False),
             )
             db_obj.is_default = True
             await super().save(db_obj)
         return db_obj
 
 
-class MediaServerSettingRepository(BaseRepository[MediaServerSetting]):
+class PlexSettingRepository(BaseRepository[PlexSetting]):
+    """Repository for PlexSetting model."""
+
     ...
 
 
-class PlexSettingRepository(MediaServerSettingRepository, BaseRepository[PlexSetting]):
+class RadarrSettingRepository(BaseRepository[RadarrSetting]):
+    """Repository for RadarrSetting model."""
+
     ...
 
 
-class RadarrSettingRepository(MediaProviderSettingRepository, BaseRepository[RadarrSetting]):
-    ...
+class SonarrSettingRepository(BaseRepository[SonarrSetting]):
+    """Repository for SonarrSetting model."""
 
-
-class SonarrSettingRepository(MediaProviderSettingRepository, BaseRepository[SonarrSetting]):
     ...

@@ -144,6 +144,7 @@ export const UpdateProfile = (props: UpdateProfileProps) => {
       )}
       {isDeleteAccountModalOpen && (
         <DeleteAccountModal
+          id={props.id}
           closeModal={() => setIsDeleteAccountModalOpen(false)}
         />
       )}

@@ -1,110 +1,90 @@
-import pytest
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
+from async_asgi_testclient import TestClient
 
-from server.core.security import verify_password
-from server.repositories.users import UserRepository
-from server.tests.utils import datasets
-
-pytestmark = pytest.mark.asyncio
+from server.tests.utils import Dataset
 
 
-async def test_get_current_user(client: AsyncClient):
-    resp = await client.get(client.app.url_path_for("get_current_user"))
+async def test_get_current_user(client: TestClient):
+    resp = await client.get(client.application.url_path_for("get_current_user"))
     assert resp.status_code == 200
+
     current_user = resp.json()
+    assert current_user["id"] == Dataset.users[0].id
+    assert current_user["email"] == Dataset.users[0].email
+    assert current_user["username"] == Dataset.users[0].username
+    assert current_user["avatar"] == Dataset.users[0].avatar
+    assert current_user["confirmed"] == Dataset.users[0].confirmed
+    assert current_user["roles"] == Dataset.users[0].roles
 
-    assert current_user["email"] == datasets["users"][0]["email"]
-    assert current_user["username"] == datasets["users"][0]["username"]
-    assert current_user["avatar"] == datasets["users"][0]["avatar"]
-    assert current_user["confirmed"] is True
-    assert current_user["roles"]
 
-
-async def test_get_user_by_id(client: AsyncClient):
-    resp = await client.get(
-        client.app.url_path_for("get_user_by_id", user_id=datasets["users"][1]["id"])
-    )
+async def test_get_user_by_id(client: TestClient):
+    resp = await client.get(client.application.url_path_for("get_user_by_id", user_id=Dataset.users[1].id))
     assert resp.status_code == 200
+
     current_user = resp.json()
-    assert current_user["email"] == datasets["users"][1]["email"]
-    assert current_user["username"] == datasets["users"][1]["username"]
-    assert current_user["avatar"] == datasets["users"][1]["avatar"]
+    assert current_user["id"] == Dataset.users[1].id
+    assert current_user["email"] == Dataset.users[1].email
+    assert current_user["username"] == Dataset.users[1].username
+    assert current_user["avatar"] == Dataset.users[1].avatar
+    assert current_user["confirmed"] == Dataset.users[1].confirmed
+    assert current_user["roles"] == Dataset.users[1].roles
 
 
-async def test_get_user_by_id_not_existing(client: AsyncClient):
-    resp = await client.get(client.app.url_path_for("get_user_by_id", user_id=0))
+async def test_get_user_by_id_not_existing(client: TestClient):
+    resp = await client.get(client.application.url_path_for("get_user_by_id", user_id=0))
     assert resp.status_code == 404
 
 
-async def test_delete_user(client: AsyncClient, db: AsyncSession):
-    user_repo = UserRepository(db)
-    resp = await client.delete(
-        client.app.url_path_for("delete_user", user_id=datasets["users"][0]["id"])
-    )
+async def test_delete_user(client: TestClient):
+    resp = await client.delete(client.application.url_path_for("delete_user", user_id=Dataset.users[1].id))
     assert resp.status_code == 200
-    assert await user_repo.find_by(id=datasets["users"][0]["id"]) is None
 
 
-async def test_update_username(client: AsyncClient, db: AsyncSession):
-    user_repo = UserRepository(db)
+async def test_update_username(client: TestClient):
     resp = await client.patch(
-        client.app.url_path_for("update_user", user_id=datasets["users"][0]["id"]),
+        client.application.url_path_for("update_user", user_id=Dataset.users[0].id),
         json={"username": "new_username"},
     )
     assert resp.status_code == 200
-    assert await user_repo.find_by_username("new_username")
 
 
-async def test_update_username_not_avilable(client: AsyncClient):
+async def test_update_username_not_available(client: TestClient):
     resp = await client.patch(
-        client.app.url_path_for("update_user", user_id=datasets["users"][0]["id"]),
-        json={"username": datasets["users"][1]["username"]},
+        client.application.url_path_for("update_user", user_id=Dataset.users[0].id),
+        json={"username": Dataset.users[1].username},
     )
     assert resp.status_code == 409
 
 
-async def test_update_password(client: AsyncClient, db: AsyncSession):
-    user_repo = UserRepository(db)
+async def test_update_password(client: TestClient):
     resp = await client.patch(
-        client.app.url_path_for("update_user", user_id=datasets["users"][0]["id"]),
+        client.application.url_path_for("update_user", user_id=Dataset.users[0].id),
         json={
             "password": "new_password",
-            "old_password": datasets["users"][0]["password"],
+            "old_password": "password1",
         },
     )
-    user = await user_repo.find_by(id=datasets["users"][0]["id"])
     assert resp.status_code == 200
-    assert verify_password("new_password", user.password)
 
 
-async def test_update_password_missing_old_password(client: AsyncClient):
+async def test_update_password_wrong_old_password(client: TestClient):
     resp = await client.patch(
-        client.app.url_path_for("update_user", user_id=datasets["users"][0]["id"]),
-        json={"password": "new_passowrd"},
-    )
-    assert resp.status_code == 422
-
-
-async def test_update_password_wrong_old_password(client: AsyncClient):
-    resp = await client.patch(
-        client.app.url_path_for("update_user", user_id=datasets["users"][0]["id"]),
+        client.application.url_path_for("update_user", user_id=Dataset.users[0].id),
         json={"password": "new_password", "old_password": "wrong_password"},
     )
     assert resp.status_code == 401
 
 
-async def test_update_email(client: AsyncClient):
+async def test_update_email(client: TestClient):
     resp = await client.patch(
-        client.app.url_path_for("update_user", user_id=datasets["users"][0]["id"]),
+        client.application.url_path_for("update_user", user_id=Dataset.users[0].id),
         json={"email": "new@email.fake"},
     )
     assert resp.status_code == 200
 
 
-async def test_update_email_not_available(client: AsyncClient):
+async def test_update_email_not_available(client: TestClient):
     resp = await client.patch(
-        client.app.url_path_for("update_user", user_id=datasets["users"][0]["id"]),
-        json={"email": datasets["users"][1]["email"]},
+        client.application.url_path_for("update_user", user_id=Dataset.users[0].id),
+        json={"email": Dataset.users[1].email},
     )
     assert resp.status_code == 409

@@ -2,24 +2,19 @@ from server.core.scheduler import scheduler
 from server.database.session import Session
 from server.models.media import MediaType
 from server.models.requests import RequestStatus
+from server.models.settings import RadarrSetting
 from server.repositories.requests import MediaRequestRepository
 from server.services import radarr
 
 
-@scheduler.scheduled_job(
-    "interval", id="radarr-sync", name="Radarr Sync", coalesce=True, minutes=10
-)
-async def sync_radarr():
+@scheduler.scheduled_job("interval", id="radarr-sync", name="Radarr Sync", coalesce=True, minutes=10)
+async def sync_radarr() -> None:
     async with Session() as db_session:
         media_request_repo = MediaRequestRepository(db_session)
-        requests = await media_request_repo.find_all_by(
-            status=RequestStatus.approved, media_type=MediaType.movie
-        )
+        requests = await media_request_repo.find_by(status=RequestStatus.approved, media_type=MediaType.movie).all()
         for request in requests:
-            setting = request.selected_provider
-            movie_lookup = await radarr.lookup(
-                setting, tmdb_id=request.media.tmdb_id, title=request.media.title
-            )
+            setting = RadarrSetting(**request.selected_provider.dict())
+            movie_lookup = await radarr.lookup(setting, tmdb_id=request.media.tmdb_id, imdb_id=request.media.imdb_id)
             if movie_lookup is None:
                 continue
             if movie_lookup.id is None:

@@ -1,38 +1,49 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Union
 
 from pydantic import AnyHttpUrl, EmailStr
 
-from .core import APIModel, PaginatedResult
+from .base import APIModel, PaginatedResponse
 
 
-class UserBase(APIModel):
+class UserSchema(APIModel):
     username: str
-    email: Optional[EmailStr]
-
-
-class UserSchema(UserBase):
+    email: EmailStr | None
     id: int
-    avatar: Optional[Union[Path, AnyHttpUrl]]
+    avatar: Path | AnyHttpUrl | None
     confirmed: bool
     roles: int
     created_at: datetime
     updated_at: datetime
 
 
-class UserCreate(UserBase):
+class UserProfile(APIModel):
+    username: str
+    avatar: Path | AnyHttpUrl | None
+
+
+class UserCreate(APIModel):
+    username: str
+    email: EmailStr | None
     password: str
 
 
-class UserUpdate(UserBase):
-    username: Optional[str]
-    email: Optional[EmailStr]
-    old_password: Optional[str]
-    password: Optional[str]
-    roles: Optional[int]
-    confirmed: Optional[bool]
+class UserUpdate(APIModel):
+    username: str | None
+    email: EmailStr | None
+    old_password: str | None
+    password: str | None
+    roles: int | None
+    confirmed: bool | None
 
 
-class UserSearchResult(PaginatedResult):
-    results: list[UserSchema]
+class UserSearchResponse(PaginatedResponse):
+    items: list[UserProfile]
+
+
+class PasswordResetCreate(APIModel):
+    email: EmailStr
+
+
+class PasswordResetConfirm(APIModel):
+    password: str

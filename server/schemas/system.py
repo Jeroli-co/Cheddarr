@@ -1,9 +1,13 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
-from server.schemas.core import PaginatedResult
+from server.schemas.base import PaginatedResponse
+
+
+class PublicConfig(BaseModel):
+    log_level: str | None
+    default_roles: int | None
 
 
 class Log(BaseModel):
@@ -13,11 +17,11 @@ class Log(BaseModel):
     message: str
 
 
-class LogResult(PaginatedResult):
-    results: list[Log]
+class LogResponse(PaginatedResponse):
+    items: list[Log]
 
 
 class Job(BaseModel):
     id: str
     name: str
-    next_run_time: Optional[datetime]
+    next_run_time: datetime | None

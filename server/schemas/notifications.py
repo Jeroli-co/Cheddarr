@@ -1,13 +1,19 @@
+from collections.abc import Sequence
 from typing import Any
 
 from server.schemas.users import UserSchema
-from .core import APIModel
+
+from .base import APIModel, PaginatedResponse
 
 
 class NotificationSchema(APIModel):
     message: str
     read: bool
     user: UserSchema
+
+
+class NotificationsResponse(PaginatedResponse):
+    items: Sequence[NotificationSchema]
 
 
 class NotificationAgentSchema(APIModel):

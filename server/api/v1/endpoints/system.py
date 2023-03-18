@@ -1,29 +1,30 @@
 import json
 import math
+from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
-from server.core.config import Config, get_config, get_public_config, public_config_model
+from server.core.config import Config, get_config
 from server.core.scheduler import scheduler
 from server.models.users import UserRole
-from server.schemas.system import Job, Log, LogResult
+from server.schemas.system import Job, Log, LogResponse, PublicConfig
 
 router = APIRouter()
 
 
 @router.get(
     "/logs",
-    response_model=LogResult,
+    response_model=LogResponse,
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_config)):
+def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_config)) -> LogResponse:
     logs = []
-    with open(config.logs_folder / config.logs_filename) as logfile:
+    with Path(config.logs_folder / config.logs_filename).open() as logfile:
         lines = json.loads("[" + logfile.read().replace("\n", ",").rstrip(",") + "]")
         start = (page - 1) * per_page
         end = page * per_page
@@ -36,14 +37,14 @@ def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_con
                     level=line["record"]["level"]["name"],
                     process=line["record"]["name"],
                     message=line["text"],
-                )
+                ),
             )
 
-    return LogResult(
+    return LogResponse(
         page=page,
-        total_results=total_results,
-        total_pages=total_pages,
-        results=logs,
+        total=total_results,
+        pages=total_pages,
+        items=logs,
     )
 
 
@@ -55,11 +56,8 @@ def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_con
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def get_jobs():
-    return [
-        Job(id=job.id, name=job.name, next_run_time=job.next_run_time)
-        for job in scheduler.get_jobs()
-    ]
+def get_jobs() -> list[Job]:
+    return [Job(id=job.id, name=job.name, next_run_time=job.next_run_time) for job in scheduler.get_jobs()]
 
 
 @router.patch(
@@ -73,7 +71,7 @@ def get_jobs():
 def modify_job(
     job_id: str,
     action: Literal["run", "pause", "resume"] = Body(..., embed=True),
-):
+) -> Job:
     job = scheduler.get_job(job_id)
     if job is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This job does not exist.")
@@ -88,24 +86,24 @@ def modify_job(
 
 @router.get(
     "/config",
-    response_model=public_config_model,
+    response_model=PublicConfig,
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def get_server_config(config: get_public_config = Depends()):
-    return config
+def get_server_config(config: Config = Depends(get_config)) -> PublicConfig:
+    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))
 
 
 @router.patch(
     "/config",
-    response_model=public_config_model,
+    response_model=PublicConfig,
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def update_server_config(config_in: public_config_model, config: get_config = Depends()):
+def update_server_config(config_in: PublicConfig, config: Config = Depends(get_config)) -> PublicConfig:
     config.update(**config_in.dict())
-    return config
+    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))

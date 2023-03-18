@@ -1,12 +1,19 @@
-from abc import ABC
-from datetime import date
-from typing import Optional, Union
+from __future__ import annotations
 
-from pydantic import AnyHttpUrl, Field
+from abc import ABC
+from typing import TYPE_CHECKING
+
+from pydantic import AnyHttpUrl, BaseModel, Field
 
 from server.models.media import MediaType, SeriesType
-from .core import APIModel, PaginatedResult
 
+from .base import APIModel, PaginatedResponse
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from datetime import date
+
+    from .requests import MovieRequestSchema, SeriesRequestSchema
 
 ###########################################
 # Base                                    #
@@ -17,36 +24,36 @@ class MediaServerInfo(APIModel):
     external_id: str
     added_at: date
     server_id: str
-    web_url: Optional[AnyHttpUrl]
+    web_url: AnyHttpUrl | None
 
 
 class PersonCredits(APIModel):
-    cast: "list[Union[SeriesSchema, MovieSchema]]"
+    cast: Sequence[SeriesSchema | MovieSchema]
 
 
 class Person(APIModel):
     id: int
     name: str
-    also_known_as: Optional[list[str]]
-    biography: Optional[str]
-    birth_day: Optional[date]
-    death_day: Optional[date]
-    role: Optional[str]
-    credits: Optional[PersonCredits]
-    picture_url: Optional[AnyHttpUrl]
+    also_known_as: list[str] | None
+    biography: str | None
+    birth_day: date | None
+    death_day: date | None
+    role: str | None
+    credits: PersonCredits | None
+    picture_url: AnyHttpUrl | None
 
 
-class Credits(APIModel):
-    cast: list[Person]
-    crew: list[Person]
+class Credits(BaseModel):
+    cast: Sequence[Person]
+    crew: Sequence[Person]
 
 
-class Company(APIModel):
+class Company(BaseModel):
     name: str
 
 
-class Video(APIModel):
-    video_url: Optional[AnyHttpUrl]
+class Video(BaseModel):
+    video_url: AnyHttpUrl | None
 
 
 class Genre(APIModel):
@@ -55,27 +62,27 @@ class Genre(APIModel):
 
 
 class MediaSchema(APIModel, ABC):
-    tmdb_id: Optional[int]
-    imdb_id: Optional[str]
-    tvdb_id: Optional[int]
+    tmdb_id: int | None
+    imdb_id: str | None
+    tvdb_id: int | None
     title: str
-    summary: Optional[str]
-    release_date: Optional[date]
-    status: Optional[str]
-    poster_url: Optional[str]
-    art_url: Optional[str]
-    rating: Optional[float]
-    duration: Optional[int]
-    genres: Optional[list[Genre]]
-    studios: Optional[list[Company]]
-    credits: Optional[Credits]
-    trailers: Optional[list[Video]]
+    summary: str | None
+    release_date: date | None
+    status: str | None
+    poster_url: str | None
+    art_url: str | None
+    rating: float | None
+    duration: int | None
+    genres: Sequence[Genre] | None
+    studios: Sequence[Company] | None
+    credits: Credits | None
+    trailers: Sequence[Video] | None
     media_servers_info: list[MediaServerInfo] = []
 
 
 class MovieSchema(MediaSchema):
     media_type: MediaType = Field(default=MediaType.movie, const=True)
-    requests: list = []
+    requests: Sequence[MovieRequestSchema] = []
 
 
 class EpisodeSchema(MediaSchema):
@@ -84,19 +91,16 @@ class EpisodeSchema(MediaSchema):
 
 class SeasonSchema(MediaSchema):
     season_number: int
-    episodes: Optional[list[EpisodeSchema]]
+    episodes: Sequence[EpisodeSchema] | None
 
 
 class SeriesSchema(MediaSchema):
-    number_of_seasons: Optional[int]
-    seasons: Optional[list[SeasonSchema]]
+    number_of_seasons: int | None
+    seasons: Sequence[SeasonSchema] | None
     media_type: MediaType = Field(default=MediaType.series, const=True)
-    series_type: Optional[SeriesType]
-    requests: list = []
+    series_type: SeriesType | None
+    requests: Sequence[SeriesRequestSchema] = []
 
 
-class MediaSearchResult(PaginatedResult):
-    results: list[Union[SeriesSchema, MovieSchema]]
-
-
-PersonCredits.update_forward_refs()
+class MediaSearchResponse(PaginatedResponse):
+    items: Sequence[SeriesSchema | MovieSchema]

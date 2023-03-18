@@ -1,82 +1,30 @@
 import asyncio
-from datetime import datetime
-from typing import Dict, Optional
+from typing import Any
 
 from fastapi import HTTPException
-from pydantic import Field
 from pydantic.tools import parse_obj_as
 
 from server.core import utils
 from server.core.http_client import HttpClient
+from server.core.logger import logger
 from server.models.media import SeriesType
 from server.models.requests import SeriesRequest
 from server.models.settings import SonarrSetting
-from server.schemas.core import APIModel
 from server.schemas.settings import SonarrInstanceInfo
+from server.schemas.sonarr import SonarrAddOptions, SonarrEpisode, SonarrSeries
 
 
-###################################
-# Schemas                         #
-###################################
-class SonarrAddOptions(APIModel):
-    ignore_episodes_with_files: bool = Field(alias="ignoreEpisodesWithFiles")
-    ignore_episodes_without_files: bool = Field(alias="ignoreEpisodesWithoutFiles")
-    search_for_missing_episodes: bool = Field(alias="searchForMissingEpisodes")
-
-
-class SonarrEpisode(APIModel):
-    id: int
-    episode_number: int = Field(alias="episodeNumber")
-    season_number: int = Field(alias="seasonNumber")
-    monitored: bool = Field(alias="monitored")
-    has_file: bool = Field(alias="hasFile")
-
-
-class SonarrSeason(APIModel):
-    season_number: int = Field(alias="seasonNumber")
-    monitored: bool = Field(alias="monitored")
-    episode_file_count: Optional[int] = Field(alias="episodeFileCount")
-    total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")
-
-
-class SonarrSeries(APIModel):
-    id: Optional[int] = Field(alias="id")
-    tvdb_id: int = Field(alias="tvdbId")
-    title: str = Field(alias="title")
-    images: list[dict] = Field(alias="images")
-    seasons: list[SonarrSeason] = Field(alias="seasons")
-    year: int = Field(alias="year")
-    path: Optional[str] = Field(alias="path")
-    profile_id: Optional[int] = Field(alias="profileId")
-    root_folder_path: Optional[str] = Field(alias="rootFolderPath")
-    quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
-    language_profile_id: Optional[int] = Field(alias="languageProfileId")
-    monitored: bool = Field(alias="monitored")
-    series_type: str = Field(alias="seriesType")
-    title_slug: str = Field(alias="titleSlug")
-    genres: list[str] = Field(alias="genres")
-    tags: list[str] = Field(alias="tags")
-    added: datetime = Field(alias="added")
-    episode_file_count: Optional[int] = Field(alias="episodeFileCount")
-    total_episode_count: Optional[int] = Field(alias="totalEpisodeCount")
-    add_options: Optional[SonarrAddOptions] = Field(alias="addOptions")
-
-
-###################################
-# API calls                       #
-###################################
 def make_url(
     *,
     api_key: str,
     host: str,
-    port: int,
+    port: int | None,
     ssl: bool,
-    version: int = 2,
+    version: int | None = None,
     resource_path: str,
-    queries: dict = None,
+    queries: dict[str, Any] | None = None,
 ) -> str:
     queries = queries or {}
-    version = version if version == 3 else None
     return utils.make_url(
         "%s://%s%s/api%s%s"
         % (
@@ -91,8 +39,12 @@ def make_url(
 
 
 async def check_instance_status(
-    api_key: str, host: str, port: int, ssl: bool, version: int = None
-) -> Optional[Dict]:
+    api_key: str,
+    host: str,
+    port: int | None,
+    ssl: bool,
+    version: int | None = None,
+) -> dict[str, Any] | None:
     url = make_url(
         api_key=api_key,
         host=host,
@@ -102,18 +54,20 @@ async def check_instance_status(
         resource_path="/system/status",
     )
     try:
-        resp = await HttpClient.request("GET", url)
+        resp = await HttpClient.get(url)
     except HTTPException:
         return None
     return resp
 
 
 async def get_instance_info(
-    api_key: str, host: str, port: int, ssl: bool, version: int = None
-) -> Optional[SonarrInstanceInfo]:
-    test = await check_instance_status(
-        api_key=api_key, host=host, port=port, ssl=ssl, version=version
-    )
+    api_key: str,
+    host: str,
+    port: int | None,
+    ssl: bool,
+    version: int | None = None,
+) -> SonarrInstanceInfo | None:
+    test = await check_instance_status(api_key=api_key, host=host, port=port, ssl=ssl, version=version)
     if not test:
         return None
 
@@ -144,19 +98,15 @@ async def get_instance_info(
             resource_path="/languageprofile",
         )
         language_profiles = [
-            {"id": profile["id"], "name": profile["name"]}
-            for profile in await HttpClient.request("GET", language_profile_url)
+            {"id": profile["id"], "name": profile["name"]} for profile in await HttpClient.get(language_profile_url)
         ]
     else:
-        quality_profile_url = make_url(
-            api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/profile"
-        )
+        quality_profile_url = make_url(api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/profile")
         language_profiles = None
 
-    root_folders = [folder["path"] for folder in await HttpClient.request("GET", root_folder_url)]
+    root_folders = [folder["path"] for folder in await HttpClient.get(root_folder_url)]
     quality_profiles = [
-        {"id": profile["id"], "name": profile["name"]}
-        for profile in await HttpClient.request("GET", quality_profile_url)
+        {"id": profile["id"], "name": profile["name"]} for profile in await HttpClient.get(quality_profile_url)
     ]
     return SonarrInstanceInfo(
         version=version,
@@ -166,10 +116,7 @@ async def get_instance_info(
     )
 
 
-async def lookup(
-    setting: SonarrSetting,
-    tvdb_id: int,
-) -> Optional[SonarrSeries]:
+async def lookup(setting: SonarrSetting, tvdb_id: int) -> SonarrSeries | None:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -179,13 +126,13 @@ async def lookup(
         resource_path="/series/lookup",
         queries={"term": f"tvdb:{tvdb_id}"},
     )
-    lookup_result = await HttpClient.request("GET", url)
-    if not isinstance(lookup_result, list):
+    lookup_result = await HttpClient.get(url)
+    if not isinstance(lookup_result, list) or len(lookup_result) == 0:
         return None
     return SonarrSeries.parse_obj(lookup_result[0])
 
 
-async def get_series(setting: SonarrSetting, series_id: int) -> Optional[SonarrSeries]:
+async def get_series(setting: SonarrSetting, series_id: int) -> SonarrSeries | None:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -195,7 +142,7 @@ async def get_series(setting: SonarrSetting, series_id: int) -> Optional[SonarrS
         resource_path=f"/series/{series_id}",
     )
     try:
-        resp = await HttpClient.request("GET", url)
+        resp = await HttpClient.get(url)
     except HTTPException:
         return None
     return SonarrSeries.parse_obj(resp)
@@ -210,9 +157,7 @@ async def add_series(setting: SonarrSetting, series: SonarrSeries) -> SonarrSeri
         version=setting.version,
         resource_path="/series",
     )
-    resp = await HttpClient.request(
-        "POST", url, data=series.json(by_alias=True, exclude_none=True)
-    )
+    resp = await HttpClient.request("POST", url, data=series.json(by_alias=True, exclude_none=True))
     return SonarrSeries.parse_obj(resp)
 
 
@@ -239,7 +184,7 @@ async def get_episodes(setting: SonarrSetting, series_id: int) -> list[SonarrEpi
         resource_path="/episode",
         queries={"seriesId": series_id},
     )
-    resp = await HttpClient.request("GET", url)
+    resp = await HttpClient.get(url)
     return parse_obj_as(list[SonarrEpisode], resp)
 
 
@@ -252,17 +197,22 @@ async def update_episode(setting: SonarrSetting, episode: SonarrEpisode) -> Sona
         version=setting.version,
         resource_path=f"/episode/{episode.id}",
     )
-    resp = await HttpClient.request(
-        "PUT", url, data=episode.json(by_alias=True, exclude_none=True)
-    )
+    resp = await HttpClient.request("PUT", url, data=episode.json(by_alias=True, exclude_none=True))
     return SonarrEpisode.parse_obj(resp)
 
 
-async def send_request(request: SeriesRequest):
-    setting: SonarrSetting = request.selected_provider
+async def send_request(request: SeriesRequest) -> None:
+    setting = SonarrSetting(**request.selected_provider.dict())
+
+    if request.media.tvdb_id is None:
+        logger.warning("series request was not sent because tvdb_id is None for %s", request.media.title)
+        return
+
     series = await lookup(setting, request.media.tvdb_id)
     if series is None:
+        logger.warning("series request was not sent because series was not found for %s", request.media.title)
         return
+
     if series.id is None:  # series is not added to sonarr yet.
         root_folder_path = request.root_folder or setting.root_folder
         quality_profile_id = request.quality_profile_id or setting.quality_profile_id
@@ -284,30 +234,43 @@ async def send_request(request: SeriesRequest):
             season.monitored = False
         series = await add_series(setting, series)
         # Wait for Sonarr to precess the newly added series
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
+
     else:
         series = await get_series(setting, series.id)
         if series is None:
+            logger.warning(
+                "series request was not sent because the series '%s' was not found on Sonarr for",
+                request.media.title,
+            )
             return
-    # request seasons is empty so we are requesting all the series
-    if not request.seasons:
+
+    if not request.season_requests:  # Requested seasons list is empty, so we are requesting all the series
         for season in series.seasons:
             season.monitored = True
         await update_series(setting, series)
-    else:
-        episodes = await get_episodes(setting, series.id)
-        for req_season in request.seasons:
-            season = next(s for s in series.seasons if s.season_number == req_season.season_number)
-            if not req_season.episodes:
-                season.monitored = True
-                continue
-            for req_episode in req_season.episodes:
-                episode = next(
-                    e
-                    for e in episodes
-                    if e.season_number == req_season.season_number
-                    and e.episode_number == req_episode.episode_number
-                )
-                episode.monitored = True
-                await update_episode(setting, episode)
-        await update_series(setting, series)
+        return
+
+    if not series.id:
+        logger.warning(
+            "episodes request was not sent because the series '%s' was not found on Sonarr",
+            request.media.title,
+        )
+        return
+
+    episodes = await get_episodes(setting, series.id)
+    for req_season in request.season_requests:
+        season = next(s for s in series.seasons if s.season_number == req_season.season_number)
+        if not req_season.episode_requests:
+            season.monitored = True
+            continue
+        for req_episode in req_season.episode_requests:
+            episode = next(
+                e
+                for e in episodes
+                if e.season_number == req_season.season_number and e.episode_number == req_episode.episode_number
+            )
+            episode.monitored = True
+            await update_episode(setting, episode)
+
+    await update_series(setting, series)
