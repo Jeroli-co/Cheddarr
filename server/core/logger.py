@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 import logging
 import logging.config
 import logging.handlers
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import loguru
 
-from server.core.config import Config
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from server.core.config import Config
 
 
 class InterceptHandler(logging.Handler):
@@ -67,6 +72,7 @@ class Logger:
     @classmethod
     def customize_logging(cls, filepath: Path, level: str, rotation: str, retention: str) -> loguru.Logger:
         loguru.logger.remove()
+        loguru.logger.configure(patcher=cls.patcher)
         loguru.logger.add(
             sys.stdout,
             enqueue=True,
@@ -96,13 +102,13 @@ class Logger:
             *logging.root.manager.loggerDict.keys(),
         ]:
             _logger = logging.getLogger(_log)
-            if "access" in _logger.name and not _logger.handlers:
-                _logger.handlers = []
-                continue
-            _logger.propagate = False
             _logger.handlers = [InterceptHandler()]
 
         return loguru.logger
 
-
-logger: loguru.Logger
+    @classmethod  # https://github.com/Delgan/loguru/issues/504#issuecomment-917365972
+    def patcher(cls, record: loguru.Record) -> None:
+        exception = record["exception"]
+        if exception is not None:
+            fixed = Exception(str(exception.value))
+            record["exception"] = exception._replace(value=fixed)

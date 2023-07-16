@@ -48,6 +48,7 @@ instance.interceptors.response.use(
     if (
       !response.config.url?.startsWith(routes.SIGN_IN.url()) &&
       !response.config.url?.startsWith(routes.CONFIRM_PLEX_SIGNIN.url) &&
+      !response.config.url?.startsWith(routes.SIGN_UP.url) &&
       response.data
     ) {
       response.data = humps.camelizeKeys(response.data);
@@ -56,6 +57,7 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
+    console.log(error);
     return Promise.reject(error);
   }
 );

@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-import re
 from abc import ABC
-from typing import TYPE_CHECKING, Any
+from collections.abc import Sequence
+from datetime import date
+from typing import Annotated, Any
 
-from pydantic import AnyHttpUrl, Field, root_validator, validator
+from pydantic import AliasChoices, AliasPath, BeforeValidator, Field, field_validator
+from pydantic_core.core_schema import FieldValidationInfo
 
-from server.models.media import MediaType, SeriesType
 from server.schemas.media import (
     Company,
     Credits,
     EpisodeSchema,
     Genre,
-    MediaSchema,
+    MediaSchemaBase,
     MovieSchema,
     Person,
     PersonCredits,
@@ -20,11 +21,6 @@ from server.schemas.media import (
     SeriesSchema,
     Video,
 )
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from server.schemas.base import Date
 
 ###################################
 # Constants                       #
@@ -38,60 +34,30 @@ TMDB_ART_SIZE = "w1280"
 ###################################
 # Validators                      #
 ###################################
-def get_image_url(cls, v, field):
-    if v is None:
-        return None
-    if field.alias == "poster_path":
-        return f"{TMDB_IMAGES_URL}/{TMDB_POSTER_SIZE}/{v}"
-    if field.alias == "backdrop_path":
-        return f"{TMDB_IMAGES_URL}/{TMDB_ART_SIZE}/{v}"
-    if field.alias == "profile_path":
-        return f"{TMDB_IMAGES_URL}/{TMDB_PROFILE_SIZE}/{v}"
-    return None
-
-
-def set_tmdb_movie_info(cls, values):
-    values["media_type"] = MediaType.movie
-    values["videos"] = [
-        video
-        for video in values.get("videos", {}).get("results", [])
-        if video["type"] == "Trailer" and video["site"] == "YouTube"
-    ]
-    return values
-
-
-def set_tmdb_series_info(cls, values):
-    values["media_type"] = MediaType.series
-    values["series_type"] = SeriesType.standard
-    anime_pattern = re.compile("(?i)anim(e|ation)")
-    for genre in values.get("genres", []):
-        if anime_pattern.match(genre["name"]):
-            values["series_type"] = SeriesType.anime
-            break
-    values["videos"] = [
-        video
-        for video in values.get("videos", {}).get("results", [])
-        if video["type"] == "Trailer" and video["site"] == "YouTube"
-    ]
-    return values
+TmdbDate = Annotated[
+    date | None,
+    BeforeValidator(lambda v: None if v is not None and not isinstance(v, date) and len(v) == 0 else v),
+]
+TmdbPoster = Annotated[str | None, BeforeValidator(lambda v: f"{TMDB_IMAGES_URL}/{TMDB_POSTER_SIZE}/{v}")]
+TmdbArt = Annotated[str | None, BeforeValidator(lambda v: f"{TMDB_IMAGES_URL}/{TMDB_ART_SIZE}/{v}")]
+TmdbPicture = Annotated[str | None, BeforeValidator(lambda v: f"{TMDB_IMAGES_URL}/{TMDB_PROFILE_SIZE}/{v}")]
 
 
 ###################################
 # Schemas                         #
 ###################################
 class TmdbPersonCredits(PersonCredits):
-    cast: Sequence[TmdbSeries | TmdbMovie]
+    cast: Sequence[TmdbSeries | TmdbMovie] = Field(alias="cast")
 
 
 class TmdbPerson(Person):
-    name: str = Field(alias="name", pre=True)
-    also_known_as: list[str] | None = Field(alias="also_known_as")
-    biography: str | None = Field(alias="biography")
-    birth_day: Date | None = Field(alias="birthday")
-    death_day: Date | None = Field(alias="deathday")
-    credits: TmdbPersonCredits | None = Field(alias="combined_credits")
-    picture_url: AnyHttpUrl | None = Field(alias="profile_path")
-    _picture_validator = validator("picture_url", allow_reuse=True, pre=True)(get_image_url)
+    name: str = Field(alias="name", mode="before")
+    also_known_as: list[str] | None = Field(alias="also_known_as", default=None)
+    biography: str | None = Field(alias="biography", default=None)
+    birth_day: TmdbDate = Field(alias="birthday", default=None)
+    death_day: TmdbDate = Field(alias="deathday", default=None)
+    credits: TmdbPersonCredits | None = Field(alias="credits", default=None)
+    picture_url: TmdbPicture = Field(alias="profile_path")
 
 
 class TmdbCast(TmdbPerson):
@@ -108,67 +74,65 @@ class TmdbCredits(Credits):
 
 
 class TmdbCompany(Company):
-    name: str
+    name: str = Field(alias="name")
+
+
+class TmdbGenre(Genre):
+    name: str = Field(alias="name")
 
 
 class TmdbVideo(Video):
-    key: str = Field(alias="key")
     type: str = Field(alias="type")
     site: str = Field(alias="site")
-    video_url: AnyHttpUrl | None
+    key: str = Field(alias="key")
+    video_url: str | None = None
 
-    @classmethod
-    @validator("key", pre=True)
-    def get_video_url(cls, key: str, values: dict[str, Any]) -> str:
-        values["video_url"] = f"https://www.youtube.com/watch?v={key}"
+    @field_validator("key")
+    def get_video_url(cls, key: str, info: FieldValidationInfo) -> str:
+        if info.data.get("site") == "YouTube" and info.data.get("type") == "Trailer":
+            info.data["video_url"] = f"https://www.youtube.com/watch?v={key}"
         return key
 
 
-class TmdbMedia(MediaSchema, ABC):
+class TmdbMedia(MediaSchemaBase, ABC):
     tmdb_id: int = Field(alias="id")
+    tvdb_id: int | None = Field(validation_alias=AliasPath("external_ids", "tvdb_id"), default=None)
+    imdb_id: str | None = Field(validation_alias=AliasPath("external_ids", "imdb_id"), default=None)
     external_ids: dict[str, Any] | None = Field(alias="external_ids", default={})
-    title: str = Field(alias="name")
     summary: str | None = Field(alias="overview")
-    genres: Sequence[Genre] | None = Field(alias="genres")
-    status: str | None = Field(alias="status")
-    rating: float | None = Field(alias="vote_average")
-    poster_url: AnyHttpUrl | None = Field(alias="poster_path")
-    art_url: AnyHttpUrl | None = Field(alias="backdrop_path")
-    credits: TmdbCredits | None = Field(alias="credits")
-    trailers: Sequence[TmdbVideo] | None = Field(alias="videos")
-    _poster_validator = validator("poster_url", allow_reuse=True, pre=True)(get_image_url)
-    _art_validator = validator("art_url", allow_reuse=True, pre=True)(get_image_url)
-
-    @classmethod
-    @root_validator(pre=True)
-    def get_external_ids(cls, values: dict[str, Any]) -> dict[str, str | int]:
-        values["tvdb_id"] = values.get("external_ids", {}).get("tvdb_id")
-        values["imdb_id"] = values.get("external_ids", {}).get("imdb_id")
-        return values
+    poster_url: TmdbPoster = Field(validation_alias=AliasChoices("poster_path", "still_path"))
+    art_url: TmdbArt = Field(alias="backdrop_path", default=None)
+    genres: Sequence[TmdbGenre] | None = Field(alias="genres", default=None)
+    status: str | None = Field(alias="status", default=None)
+    rating: float | None = Field(alias="vote_average", default=None)
+    credits: TmdbCredits | None = Field(alias="credits", default=None)
+    trailers: Sequence[TmdbVideo] | None = Field(validation_alias=AliasPath("videos", "results"), default=None)
 
 
 class TmdbMovie(TmdbMedia, MovieSchema):
-    duration: int | None = Field(alias="runtime")
-    studios: Sequence[TmdbCompany] | None = Field(alias="production_companies")
-    release_date: Date | None = Field(alias="release_date")
-    _movie_validator = root_validator(allow_reuse=True, pre=True)(set_tmdb_movie_info)
+    title: str = Field(alias="title")
+    release_date: TmdbDate = Field(alias="release_date")
+    duration: int | None = Field(alias="runtime", default=None)
+    studios: Sequence[TmdbCompany] | None = Field(alias="production_companies", default=None)
 
 
 class TmdbEpisode(TmdbMedia, EpisodeSchema):
+    title: str = Field(alias="name")
     episode_number: int = Field(alias="episode_number")
-    release_date: Date | None = Field(alias="air_date")
+    release_date: TmdbDate = Field(alias="air_date")
 
 
 class TmdbSeason(TmdbMedia, SeasonSchema):
+    title: str = Field(alias="name")
     season_number: int = Field(alias="season_number")
-    episodes: Sequence[TmdbEpisode] | None = Field(alias="episodes")
-    release_date: Date | None = Field(alias="air_date")
+    release_date: TmdbDate = Field(alias="air_date")
+    episodes: Sequence[TmdbEpisode] | None = Field(alias="episodes", default=None)
 
 
 class TmdbSeries(TmdbMedia, SeriesSchema):
-    number_of_seasons: int | None = Field(alias="number_of_seasons")
-    seasons: Sequence[TmdbSeason] | None = Field(alias="seasons")
-    studios: Sequence[TmdbCompany] | None = Field(alias="networks")
-    release_date: Date | None = Field(alias="first_air_date")
-    credits: TmdbCredits | None = Field(alias="aggregate_credits")
-    _series_validator = root_validator(allow_reuse=True, pre=True)(set_tmdb_series_info)
+    title: str = Field(alias="name")
+    release_date: TmdbDate = Field(alias="first_air_date")
+    number_of_seasons: int | None = Field(alias="number_of_seasons", default=None)
+    seasons: Sequence[TmdbSeason] | None = Field(alias="seasons", default=None)
+    studios: Sequence[TmdbCompany] | None = Field(alias="networks", default=None)
+    credits: TmdbCredits | None = Field(alias="credits", default=None)

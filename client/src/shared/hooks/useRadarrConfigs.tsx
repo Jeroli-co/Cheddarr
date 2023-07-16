@@ -83,7 +83,7 @@ export const useRadarrConfigs = () => {
 
   const deleteRadarrConfig = (id: string) => {
     return remove(APIRoutes.DELETE_RADARR_CONFIG(id)).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         const configs = radarrConfigs.data;
         if (configs) {
           const index = configs.findIndex((c) => c.id === id);

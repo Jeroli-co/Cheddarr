@@ -6,23 +6,24 @@ from typing import Literal
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
-from server.core.config import Config, get_config
+from server.api.dependencies import AppConfig
 from server.core.scheduler import scheduler
 from server.models.users import UserRole
-from server.schemas.system import Job, Log, LogResponse, PublicConfig
+from server.schemas.base import PaginatedResponse
+from server.schemas.system import Job, Log, PublicConfig
 
 router = APIRouter()
 
 
 @router.get(
     "/logs",
-    response_model=LogResponse,
+    response_model=PaginatedResponse[Log],
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_config)) -> LogResponse:
+def get_logs(page: int = 1, per_page: int = 50, *, config: AppConfig) -> PaginatedResponse[Log]:
     logs = []
     with Path(config.logs_folder / config.logs_filename).open() as logfile:
         lines = json.loads("[" + logfile.read().replace("\n", ",").rstrip(",") + "]")
@@ -30,21 +31,21 @@ def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_con
         end = page * per_page
         total_results = math.ceil(len(lines))
         total_pages = math.ceil(total_results / per_page)
-        for line in lines[start:end]:
-            logs.append(
-                Log(
-                    time=line["record"]["time"]["repr"],
-                    level=line["record"]["level"]["name"],
-                    process=line["record"]["name"],
-                    message=line["text"],
-                ),
+        logs = [
+            Log(
+                time=line["record"]["time"]["repr"],
+                level=line["record"]["level"]["name"],
+                process=line["record"]["name"],
+                message=line["text"],
             )
+            for line in lines[start:end]
+        ]
 
-    return LogResponse(
+    return PaginatedResponse[Log](
         page=page,
         total=total_results,
         pages=total_pages,
-        items=logs,
+        results=logs,
     )
 
 
@@ -92,8 +93,8 @@ def modify_job(
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def get_server_config(config: Config = Depends(get_config)) -> PublicConfig:
-    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))
+def get_server_config(config: AppConfig) -> PublicConfig:
+    return PublicConfig(**config.model_dump(include=set(PublicConfig.model_fields.keys())))
 
 
 @router.patch(
@@ -104,6 +105,6 @@ def get_server_config(config: Config = Depends(get_config)) -> PublicConfig:
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def update_server_config(config_in: PublicConfig, config: Config = Depends(get_config)) -> PublicConfig:
-    config.update(**config_in.dict())
-    return PublicConfig(**config.dict(include=set(PublicConfig.__fields__.keys())))
+def update_server_config(config_in: PublicConfig, config: AppConfig) -> PublicConfig:
+    config.update(**config_in.model_dump())
+    return PublicConfig(**config.model_dump(include=set(PublicConfig.model_fields.keys())))

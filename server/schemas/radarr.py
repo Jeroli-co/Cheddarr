@@ -1,21 +1,22 @@
-from pydantic import Field
+from __future__ import annotations
 
-from server.schemas.base import APIModel
-
-
-class RadarrAddOptions(APIModel):
-    search_for_movie: bool = Field(alias="searchForMovie")
+from pydantic import BaseModel, Field
 
 
-class RadarrMovie(APIModel):
-    id: int | None
-    tmdb_id: int = Field(alias="tmdbId")
-    title: str = Field(alias="title")
-    title_slug: str = Field(alias="titleSlug")
-    year: int = Field(alias="year")
-    quality_profile_id: int | None = Field(alias="qualityProfileId")
-    root_folder_path: str | None = Field(alias="rootFolderPath")
-    monitored: bool = Field(alias="monitored")
-    images: list[dict[str, str]] = Field(alias="images")
-    has_file: bool = Field(alias="hasFile")
-    add_options: RadarrAddOptions | None = Field(alias="addOptions")
+class RadarrAddOptions(BaseModel):
+    search_for_movie: bool = Field(serialization_alias="searchForMovie")
+
+
+class RadarrMovie(BaseModel):
+    id: int | None = None
+    tmdb_id: int = Field(serialization_alias="tmdbId")
+    title: str = Field(serialization_alias="title")
+    title_slug: str = Field(serialization_alias="titleSlug")
+    year: int = Field(serialization_alias="year")
+    quality_profile_id: int | None = Field(serialization_alias="qualityProfileId")
+    root_folder_path: str | None = Field(serialization_alias="rootFolderPath")
+    tags: list[int] = Field(serialization_alias="tags")
+    monitored: bool = Field(serialization_alias="monitored")
+    images: list[dict[str, str]] = Field(serialization_alias="images")
+    has_file: bool = Field(serialization_alias="hasFile")
+    add_options: RadarrAddOptions | None = Field(serialization_alias="addOptions")

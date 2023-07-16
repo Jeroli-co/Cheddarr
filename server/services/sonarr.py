@@ -2,13 +2,13 @@ import asyncio
 from typing import Any
 
 from fastapi import HTTPException
-from pydantic.tools import parse_obj_as
+from loguru import logger
+from pydantic import TypeAdapter
 
 from server.core import utils
 from server.core.http_client import HttpClient
-from server.core.logger import logger
 from server.models.media import SeriesType
-from server.models.requests import SeriesRequest
+from server.models.requests import MediaRequest
 from server.models.settings import SonarrSetting
 from server.schemas.settings import SonarrInstanceInfo
 from server.schemas.sonarr import SonarrAddOptions, SonarrEpisode, SonarrSeries
@@ -26,8 +26,7 @@ def make_url(
 ) -> str:
     queries = queries or {}
     return utils.make_url(
-        "%s://%s%s/api%s%s"
-        % (
+        "{}://{}{}/api{}{}".format(
             "https" if ssl else "http",
             host,
             f":{port}" if port else "",
@@ -67,8 +66,7 @@ async def get_instance_info(
     ssl: bool,
     version: int | None = None,
 ) -> SonarrInstanceInfo | None:
-    test = await check_instance_status(api_key=api_key, host=host, port=port, ssl=ssl, version=version)
-    if not test:
+    if not await check_instance_status(api_key=api_key, host=host, port=port, ssl=ssl, version=version):
         return None
 
     root_folder_url = make_url(
@@ -80,39 +78,35 @@ async def get_instance_info(
         resource_path="/rootFolder",
     )
 
-    if version == 3:
-        quality_profile_url = make_url(
-            api_key=api_key,
-            host=host,
-            port=port,
-            ssl=ssl,
-            version=3,
-            resource_path="/qualityprofile",
-        )
-        language_profile_url = make_url(
-            api_key=api_key,
-            host=host,
-            port=port,
-            ssl=ssl,
-            version=3,
-            resource_path="/languageprofile",
-        )
-        language_profiles = [
-            {"id": profile["id"], "name": profile["name"]} for profile in await HttpClient.get(language_profile_url)
-        ]
-    else:
-        quality_profile_url = make_url(api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/profile")
-        language_profiles = None
+    quality_profile_url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        version=version,
+        resource_path="/qualityprofile",
+    )
+
+    tags_url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        version=3,
+        resource_path="/tag",
+    )
 
     root_folders = [folder["path"] for folder in await HttpClient.get(root_folder_url)]
     quality_profiles = [
         {"id": profile["id"], "name": profile["name"]} for profile in await HttpClient.get(quality_profile_url)
     ]
+    tags = [{"id": tag["id"], "name": tag["label"]} for tag in await HttpClient.get(tags_url)]
+
     return SonarrInstanceInfo(
         version=version,
         quality_profiles=quality_profiles,
-        language_profiles=language_profiles,
         root_folders=root_folders,
+        tags=tags,
     )
 
 
@@ -129,7 +123,7 @@ async def lookup(setting: SonarrSetting, tvdb_id: int) -> SonarrSeries | None:
     lookup_result = await HttpClient.get(url)
     if not isinstance(lookup_result, list) or len(lookup_result) == 0:
         return None
-    return SonarrSeries.parse_obj(lookup_result[0])
+    return SonarrSeries.model_validate(lookup_result[0])
 
 
 async def get_series(setting: SonarrSetting, series_id: int) -> SonarrSeries | None:
@@ -145,7 +139,7 @@ async def get_series(setting: SonarrSetting, series_id: int) -> SonarrSeries | N
         resp = await HttpClient.get(url)
     except HTTPException:
         return None
-    return SonarrSeries.parse_obj(resp)
+    return SonarrSeries.model_validate(resp)
 
 
 async def add_series(setting: SonarrSetting, series: SonarrSeries) -> SonarrSeries:
@@ -157,8 +151,8 @@ async def add_series(setting: SonarrSetting, series: SonarrSeries) -> SonarrSeri
         version=setting.version,
         resource_path="/series",
     )
-    resp = await HttpClient.request("POST", url, data=series.json(by_alias=True, exclude_none=True))
-    return SonarrSeries.parse_obj(resp)
+    resp = await HttpClient.post(url, data=series.model_dump_json(by_alias=True, exclude_none=True))
+    return SonarrSeries.model_validate(resp)
 
 
 async def update_series(setting: SonarrSetting, series: SonarrSeries) -> SonarrSeries:
@@ -170,8 +164,8 @@ async def update_series(setting: SonarrSetting, series: SonarrSeries) -> SonarrS
         version=setting.version,
         resource_path="/series",
     )
-    resp = await HttpClient.request("PUT", url, data=series.json(by_alias=True, exclude_none=True))
-    return SonarrSeries.parse_obj(resp)
+    resp = await HttpClient.put(url, data=series.model_dump(by_alias=True, exclude_none=True))
+    return SonarrSeries.model_validate(resp)
 
 
 async def get_episodes(setting: SonarrSetting, series_id: int) -> list[SonarrEpisode]:
@@ -185,7 +179,7 @@ async def get_episodes(setting: SonarrSetting, series_id: int) -> list[SonarrEpi
         queries={"seriesId": series_id},
     )
     resp = await HttpClient.get(url)
-    return parse_obj_as(list[SonarrEpisode], resp)
+    return TypeAdapter(list[SonarrEpisode]).validate_json(resp)
 
 
 async def update_episode(setting: SonarrSetting, episode: SonarrEpisode) -> SonarrEpisode:
@@ -197,11 +191,11 @@ async def update_episode(setting: SonarrSetting, episode: SonarrEpisode) -> Sona
         version=setting.version,
         resource_path=f"/episode/{episode.id}",
     )
-    resp = await HttpClient.request("PUT", url, data=episode.json(by_alias=True, exclude_none=True))
-    return SonarrEpisode.parse_obj(resp)
+    resp = await HttpClient.put(url, data=episode.json(by_alias=True, exclude_none=True))
+    return SonarrEpisode.model_validate(resp)
 
 
-async def send_request(request: SeriesRequest) -> None:
+async def send_request(request: MediaRequest) -> None:
     setting = SonarrSetting(**request.selected_provider.dict())
 
     if request.media.tvdb_id is None:
@@ -216,15 +210,12 @@ async def send_request(request: SeriesRequest) -> None:
     if series.id is None:  # series is not added to sonarr yet.
         root_folder_path = request.root_folder or setting.root_folder
         quality_profile_id = request.quality_profile_id or setting.quality_profile_id
-        language_profile_id = request.language_profile_id or setting.language_profile_id
         if series.series_type == SeriesType.anime:
             root_folder_path = setting.anime_root_folder or root_folder_path
             quality_profile_id = setting.anime_quality_profile_id or quality_profile_id
-            language_profile_id = setting.anime_language_profile_id or language_profile_id
         series.root_folder_path = root_folder_path
         series.quality_profile_id = quality_profile_id
-        if setting.version == 3:
-            series.language_profile_id = language_profile_id
+        series.tags = request.tags or setting.tags or []
         series.add_options = SonarrAddOptions(
             ignore_episodes_with_files=True,
             ignore_episodes_without_files=False,

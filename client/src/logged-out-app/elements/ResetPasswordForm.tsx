@@ -29,7 +29,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
 
   const onSubmit = handleSubmit((data) => {
     post(APIRoutes.RESET_PASSWORD(token), data).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         pushSuccess("Password has been reset");
       } else {
         pushDanger("Cannot reset password");

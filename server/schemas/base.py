@@ -1,42 +1,30 @@
-from datetime import date
-from typing import Any
+from __future__ import annotations
 
-from pydantic import BaseModel
+import dataclasses
+from collections.abc import Sequence
+from typing import Any, Generic, TypeVar
+
+from pydantic import BaseModel, ConfigDict
 
 from server.repositories.base import ModelType
 
 
 class APIModel(BaseModel):
-    class Config:
-        orm_mode = True
-        allow_population_by_field_name = True
-        smart_union = True
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     def to_orm(self, orm_model: type[ModelType]) -> ModelType:
-        return orm_model(**self.dict(include=vars(orm_model).keys()))
+        return orm_model(**self.model_dump(include={f.name for f in dataclasses.fields(orm_model) if f.init}))
 
 
-class Date(date):
-    @classmethod
-    def __get_validators__(cls) -> Any:
-        yield cls.validate
+SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
-    @classmethod
-    def validate(cls, v: Any) -> Any:
-        if v == "":
-            return None
-        return v
+
+class PaginatedResponse(BaseModel, Generic[SchemaType]):
+    page: int | None
+    pages: int | None
+    total: int | None
+    results: Sequence[SchemaType]
 
 
 class ResponseMessage(BaseModel):
-    detail: str
-
-
-class PaginatedResponse(BaseModel):
-    class Config:
-        smart_union = True
-
-    page: int = 1
-    pages: int | None
-    total: int | None
-    items: Any
+    detail: Any = None

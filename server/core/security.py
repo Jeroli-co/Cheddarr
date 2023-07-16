@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
 import jwt
-from itsdangerous import BadSignature, URLSafeTimedSerializer
+from itsdangerous import BadSignature, URLSafeSerializer
 from passlib import pwd
 
 from server.core.config import get_config
@@ -11,7 +11,7 @@ from server.schemas.auth import AccessTokenPayload
 
 
 def create_jwt_access_token(payload: AccessTokenPayload, expires_delta: timedelta | None = None) -> str:
-    to_encode = payload.dict()
+    to_encode = payload.model_dump()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
@@ -24,22 +24,22 @@ def get_random_password() -> str:
     return pwd.genword(entropy=56)
 
 
-def generate_token(data: Any) -> str:
-    serializer = URLSafeTimedSerializer(get_config().secret_key)
+def generate_token(data: dict[str, Any]) -> str:
+    serializer = URLSafeSerializer(get_config().secret_key)
     return str(serializer.dumps(data))
 
 
-def confirm_token(token: str) -> Any:
-    serializer = URLSafeTimedSerializer(get_config().secret_key)
+def confirm_token(token: str) -> dict[str, Any] | None:
+    serializer = URLSafeSerializer(get_config().secret_key)
     try:
-        data = serializer.loads(token, return_timestamp=True)
+        data = serializer.loads(token)
     except BadSignature:
         return None
 
     return data
 
 
-async def check_permissions(user_roles: int, permissions: Sequence[int], options: Literal["and", "or"] = "and") -> bool:
+def check_permissions(user_roles: int, permissions: Sequence[int], options: Literal["and", "or"] = "and") -> bool:
     from server.models.users import UserRole
 
     if user_roles & UserRole.admin:

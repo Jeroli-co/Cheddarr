@@ -149,7 +149,6 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
         <InputField>
           <label>Version</label>
           <select name="version" ref={register}>
-            <option value={2}>2</option>
             <option value={3}>3</option>
           </select>
         </InputField>

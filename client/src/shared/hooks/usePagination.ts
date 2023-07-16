@@ -30,9 +30,8 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
     const defaultValue: IPaginated<T> = {
       page: data.data && data.data.page ? data.data.page : 0,
       results: [],
-      totalPages: data.data && data.data.totalPages ? data.data.totalPages : 0,
-      totalResults:
-        data.data && data.data.totalResults ? data.data.totalResults : 0,
+      pages: data.data && data.data.pages ? data.data.pages : 0,
+      total: data.data && data.data.total ? data.data.total : 0,
     };
     setData({ ...DefaultAsyncCall, data: defaultValue });
   };
@@ -46,8 +45,8 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
       data &&
       data.data &&
       data.data.page &&
-      data.data.totalPages &&
-      data.data.page >= data.data.totalPages
+      data.data.pages &&
+      data.data.page >= data.data.pages
     );
   };
 
@@ -55,12 +54,12 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
     if (data.data && loadDirection) {
       if (loadDirection === "prev") {
         if (data.data.page <= 1) {
-          return data.data.totalPages;
+          return data.data.pages;
         } else {
           return data.data.page - 1;
         }
       } else if (loadDirection === "next") {
-        if (data.data.page === data.data.totalPages) {
+        if (data.data.page === data.data.pages) {
           return 1;
         } else {
           return data.data.page + 1;
@@ -85,7 +84,7 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
 
   const loadPrev = () => {
     let isNewPageLoaded = true;
-    const totalPage = data.data && data.data.totalPages;
+    const totalPage = data.data && data.data.pages;
     if (totalPage && totalPage > 1) {
       if (!loadDirection || loadDirection === "next") {
         setLoadDirection("prev");
@@ -102,7 +101,7 @@ export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
 
   const loadNext = () => {
     let isNewPageLoaded = true;
-    const totalPage = data.data && data.data.totalPages;
+    const totalPage = data.data && data.data.pages;
     if (totalPage && totalPage > 1) {
       if (!loadDirection || loadDirection === "prev") {
         setLoadDirection("next");

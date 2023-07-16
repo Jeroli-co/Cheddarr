@@ -1,5 +1,3 @@
-import pathlib
-import sys
 from logging.config import fileConfig
 
 from alembic import context
@@ -18,8 +16,6 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 
 from server import models  # noqa
 from server.database.base import Base  # noqa
@@ -28,7 +24,6 @@ target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
 
@@ -56,7 +51,7 @@ def run_migrations_offline():
         literal_binds=True,
         compare_type=True,
         dialect_opts={"paramstyle": "named"},
-        render_as_batch=True
+        render_as_batch=True,
     )
 
     with context.begin_transaction():
@@ -83,7 +78,7 @@ def run_migrations_online():
             connection=connection,
             target_metadata=target_metadata,
             compare_type=True,
-            render_as_batch=True
+            render_as_batch=True,
         )
 
         with context.begin_transaction():

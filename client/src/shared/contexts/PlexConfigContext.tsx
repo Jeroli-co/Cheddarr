@@ -103,7 +103,7 @@ export default function PlexConfigContextProvider(props: any) {
 
   const deleteConfig = (id: string) => {
     return remove(APIRoutes.DELETE_PLEX_CONFIG(id)).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         if (configs.data) {
           let configurations = configs.data.filter((c) => c.id !== id);
           setConfigs({ ...configs, data: configurations });

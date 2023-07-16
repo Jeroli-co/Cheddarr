@@ -1,17 +1,15 @@
-from typing import TYPE_CHECKING, Any
+from __future__ import annotations
+
+from typing import Any
 
 import sqlalchemy as sa
+from pydantic import BaseModel
 
 from server.models.settings import (
     MediaProviderSetting,
-    PlexSetting,
-    RadarrSetting,
-    SonarrSetting,
+    MediaServerSetting,
 )
 from server.repositories.base import BaseRepository
-
-if TYPE_CHECKING:
-    from pydantic import BaseModel
 
 
 class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
@@ -44,19 +42,5 @@ class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
         return db_obj
 
 
-class PlexSettingRepository(BaseRepository[PlexSetting]):
-    """Repository for PlexSetting model."""
-
-    ...
-
-
-class RadarrSettingRepository(BaseRepository[RadarrSetting]):
-    """Repository for RadarrSetting model."""
-
-    ...
-
-
-class SonarrSettingRepository(BaseRepository[SonarrSetting]):
-    """Repository for SonarrSetting model."""
-
+class MediaServerSettingRepository(BaseRepository[MediaServerSetting]):
     ...

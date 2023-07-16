@@ -1,5 +1,5 @@
 from collections.abc import AsyncGenerator, Callable, Sequence
-from typing import Literal
+from typing import Annotated, Literal
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.core.config import get_config
+from server.core.config import Config, get_config
 from server.models.base import ModelType
 from server.models.users import User, UserRole
 from server.repositories.base import BaseRepository
@@ -41,12 +41,12 @@ def get_repository(
 
 
 def get_service(service_type: type[BaseService]) -> Callable[[], BaseService]:
-    deps = [
-        Depends(get_service(dep)) if issubclass(dep, BaseService) else Depends(get_repository(dep))
-        for dep in service_type.get_dependencies()
-    ]
+    def _get_service(session: AsyncSession = Depends(get_db)) -> BaseService:
+        deps = [
+            get_service(dep)() if issubclass(dep, BaseService) else get_repository(dep)(session)
+            for dep in service_type.get_dependencies()
+        ]
 
-    def _get_service() -> BaseService:
         return service_type(*deps)
 
     return _get_service
@@ -62,11 +62,11 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, get_config().secret_key, algorithms=get_config().signing_algorithm)
-        token_data = AccessTokenPayload.parse_obj(payload)
+        payload = jwt.decode(token, get_config().secret_key, algorithms=[get_config().signing_algorithm])
+        token_data = AccessTokenPayload.model_validate(payload)
     except (jwt.InvalidTokenError, ValidationError):
         raise credentials_exception
-    user = await user_repository.find_by(id=int(token_data.sub), confirmed=True).one()
+    user = await user_repository.find_by(id=token_data.sub, confirmed=True).one()
     if user is None:
         raise credentials_exception
 
@@ -84,3 +84,7 @@ def has_user_permissions(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough privileges.")
 
     return _has_permissions
+
+
+AppConfig = Annotated[Config, Depends(get_config)]
+CurrentUser = Annotated[User, Depends(get_current_user)]

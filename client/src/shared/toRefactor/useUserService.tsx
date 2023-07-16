@@ -51,7 +51,7 @@ export const useUserService = () => {
 
   const deleteUser = (id: number) => {
     return remove(APIRoutes.USER_BY_ID(id)).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         pushSuccess("User deleted");
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));

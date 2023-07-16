@@ -25,13 +25,11 @@ def cli(ctx: Context, debug: bool) -> None:
 
 
 @cli.command("init-db")
-@click.pass_context
-async def init_db(ctx: Context) -> None:
+async def init_db() -> None:
     """Initialize the database."""
-    debug = ctx.obj["DEBUG"]
     from server.database.init_db import init_db
 
-    await init_db(debug)
+    await init_db()
     click.echo("Database initialized.")
 
 

@@ -27,26 +27,15 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
   const { getSonarrInstanceInfo } = useSonarrConfigs();
   const [usePort, setUsePort] = useState<boolean>(false);
 
-  const {
-    register,
-    getValues,
-    errors,
-    reset,
-    setValue,
-    watch,
-  } = useFormContext<ISonarrConfig>();
-
-  const versionSelected = watch("version");
+  const { register, getValues, errors, reset, setValue } = useFormContext<
+    ISonarrConfig
+  >();
 
   const getInstanceInfo = (data: IProviderSettingsBase, withAlert: boolean) => {
     if (data.port === "") {
       data.port = null;
     }
     getSonarrInstanceInfo(data, withAlert).then((res) => setInstanceInfo(res));
-  };
-
-  const isVersionThree = () => {
-    return versionSelected && versionSelected.toString().startsWith("3");
   };
 
   useEffect(() => {
@@ -64,6 +53,7 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
         ...getValues(),
         ...instanceInfo.data,
         enabled: props.config ? props.config.enabled : true,
+        tags: props.config ? props.config.tags : [],
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,7 +149,6 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
       <InputField>
         <label>Version</label>
         <select name="version" ref={register}>
-          <option value={2}>2</option>
           <option value={3}>3</option>
         </select>
       </InputField>
@@ -232,34 +221,17 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
             </select>
           </InputField>
 
-          {isVersionThree() && (
-            <>
-              <InputField>
-                <label>Default Language Profile</label>
-                <select name="languageProfileId" ref={register}>
-                  {instanceInfo.data &&
-                    instanceInfo.data.languageProfiles &&
-                    instanceInfo.data.languageProfiles.map((l, index) => (
-                      <option key={index} value={l.id}>
-                        {l.name}
-                      </option>
-                    ))}
-                </select>
-              </InputField>
-              <InputField>
-                <label>Default Language Profile (Anime)</label>
-                <select name="animeLanguageProfileId" ref={register}>
-                  {instanceInfo.data &&
-                    instanceInfo.data.languageProfiles &&
-                    instanceInfo.data.languageProfiles.map((l, index) => (
-                      <option key={index} value={l.id}>
-                        {l.name}
-                      </option>
-                    ))}
-                </select>
-              </InputField>
-            </>
-          )}
+          <InputField>
+            <label> Default Tags</label>
+            <select name="tags" ref={register} multiple>
+              {instanceInfo.data &&
+                instanceInfo.data.tags.map((t, index) => (
+                  <option key={index} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+            </select>
+          </InputField>
         </div>
       )}
     </>

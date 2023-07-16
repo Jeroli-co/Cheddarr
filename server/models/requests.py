@@ -1,27 +1,24 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    Enum as DBEnum,
-)
-from sqlalchemy import (
+    Enum,
     ForeignKey,
     Text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from server.models.base import Model, Timestamp, intpk
-from server.models.media import MediaType
+from server.models.base import Model, Timestamp
+from server.models.media import Media, MediaType
 
 if TYPE_CHECKING:
-    from .media import Media
-    from .settings import MediaProviderSetting
-    from .users import User
+    from server.models.settings import MediaProviderSetting
+    from server.models.users import User
 
 
-class RequestStatus(str, Enum):
+class RequestStatus(StrEnum):
     pending = "pending"
     approved = "approved"
     refused = "refused"
@@ -29,46 +26,61 @@ class RequestStatus(str, Enum):
 
 
 class MediaRequest(Model, Timestamp):
-    id: Mapped[intpk]
-    media_type: Mapped[MediaType] = mapped_column(DBEnum(MediaType))
-    status: Mapped[RequestStatus] = mapped_column(DBEnum(RequestStatus), default=RequestStatus.pending)
-    comment: Mapped[str | None] = mapped_column(Text)
-    root_folder: Mapped[str | None]
-    quality_profile_id: Mapped[int | None]
-    language_profile_id: Mapped[int | None]
-    selected_provider_id: Mapped[int | None] = mapped_column(ForeignKey("media_provider_setting.id"))
-    selected_provider: Mapped[MediaProviderSetting] = relationship(lazy="joined")
-    requesting_user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
-    requesting_user: Mapped[User] = relationship(lazy="joined", foreign_keys=[requesting_user_id], repr=True)
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    media_type: Mapped[MediaType] = mapped_column(Enum(MediaType))
     media_id: Mapped[int] = mapped_column(ForeignKey("media.id"))
-    media: Mapped[Media] = relationship(lazy="joined", repr=True)
-
+    requesting_user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
+    selected_provider_id: Mapped[int | None] = mapped_column(ForeignKey("media_provider_setting.id"), default=None)
+    comment: Mapped[str | None] = mapped_column(Text, default=None)
+    root_folder: Mapped[str | None] = mapped_column(default=None)
+    quality_profile_id: Mapped[int | None] = mapped_column(default=None)
+    _tags: Mapped[str | None] = mapped_column(default=None, name="tags")
+    status: Mapped[RequestStatus] = mapped_column(Enum(RequestStatus), default=RequestStatus.pending)
+    selected_provider: Mapped[MediaProviderSetting] = relationship(lazy="joined", init=False)
+    requesting_user: Mapped[User] = relationship(
+        lazy="joined",
+        foreign_keys=[requesting_user_id],
+        init=False,
+        repr=True,
+    )
+    media: Mapped[Media] = relationship(lazy="joined", init=False, repr=True)
     season_requests: Mapped[list[SeasonRequest]] = relationship(
-        primaryjoin="and_(MediaRequest.id == SeasonRequest.series_request_id,"
-        f" MediaRequest.media_type == {MediaType.series})",
         cascade="all,delete,delete-orphan",
         lazy="selectin",
-        back_populates="series_request",
+        back_populates="media_request",
+        init=False,
+        default_factory=list,
     )
+
+    @property
+    def tags(self) -> list[str]:
+        if self._tags is None:
+            return []
+        return self._tags.split(",")
+
+    @tags.setter
+    def tags(self, value: list[int]) -> None:
+        self._tags = ",".join(str(v) for v in value)
 
 
 class SeasonRequest(Model):
-    id: Mapped[intpk]
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
     season_number: Mapped[int] = mapped_column(repr=True)
-    series_request_id: Mapped[int] = mapped_column(ForeignKey("media_request.id", ondelete="CASCADE"))
-    series_request: Mapped[MediaRequest] = relationship(back_populates="season_requests")
-    status: Mapped[RequestStatus] = mapped_column(DBEnum(RequestStatus), default=RequestStatus.pending)
+    series_request_id: Mapped[int] = mapped_column(ForeignKey("media_request.id", ondelete="CASCADE"), init=False)
+    media_request: Mapped[MediaRequest] = relationship(lazy="selectin", back_populates="season_requests", init=False)
     episode_requests: Mapped[list[EpisodeRequest]] = relationship(
         cascade="all,delete,delete-orphan",
         lazy="selectin",
         back_populates="season_request",
-        repr=True,
+        init=False,
+        default_factory=list,
     )
+    status: Mapped[RequestStatus] = mapped_column(Enum(RequestStatus), default=RequestStatus.pending)
 
 
 class EpisodeRequest(Model):
-    id: Mapped[intpk]
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
     episode_number: Mapped[int] = mapped_column(repr=True)
-    season_request_id: Mapped[int] = mapped_column(ForeignKey("season_request.id", ondelete="CASCADE"))
-    season_request: Mapped[SeasonRequest] = relationship(back_populates="episode_requests")
-    status: Mapped[RequestStatus] = mapped_column(DBEnum(RequestStatus), default=RequestStatus.pending)
+    season_request_id: Mapped[int] = mapped_column(ForeignKey("season_request.id", ondelete="CASCADE"), init=False)
+    season_request: Mapped[SeasonRequest] = relationship(lazy="selectin", back_populates="episode_requests", init=False)
+    status: Mapped[RequestStatus] = mapped_column(Enum(RequestStatus), default=RequestStatus.pending)

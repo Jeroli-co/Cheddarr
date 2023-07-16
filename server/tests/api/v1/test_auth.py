@@ -1,9 +1,10 @@
 from async_asgi_testclient import TestClient
+from fastapi import status
 
 from server.tests.utils import Dataset
 
 
-async def test_signup_ok(client: TestClient):
+async def test_signup_ok(client: TestClient) -> None:
     resp = await client.post(
         client.application.url_path_for("signup"),
         json={
@@ -12,10 +13,10 @@ async def test_signup_ok(client: TestClient):
             "email": "test@test.com",
         },
     )
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
 
 
-async def test_signup_user_conflict(client: TestClient):
+async def test_signup_user_conflict(client: TestClient) -> None:
     resp = await client.post(
         client.application.url_path_for("signup"),
         json={
@@ -24,46 +25,35 @@ async def test_signup_user_conflict(client: TestClient):
             "email": Dataset.users[0].email,
         },
     )
-    assert resp.status_code == 409
+    assert resp.status_code == status.HTTP_409_CONFLICT
 
-async def test_signup_with_invite(db: AsyncSession, client: AsyncClient):
-    resp = await client.post(
-        client.app.url_path_for("invite_user"),
-        json={"email": "test@test.com", "max_uses": 1},
-    )
 
-    assert resp.status_code == 201
-    invite_link = resp.json()["detail"]
+async def test_signup_with_invite(client: TestClient) -> None:
+    signup_data = {
+        "username": "UsernameTest",
+        "password": "Test_password1",
+        "email": "email@test.com",
+    }
 
-    resp = await client.get(invite_link)
-    assert resp.status_code == 202
-    invitation_code = resp.json()["detail"]["id"]
+    invitation = {"invitation_token": Dataset.invitations[0].data}
 
     resp = await client.post(
-        client.app.url_path_for("signup"),
-        params={"invitation_code": invitation_code},
-        json={
-            "username": "UsernameTest",
-            "password": "Test_password1",
-            "email": "test@test.com",
-        },
+        client.application.url_path_for("signup"),
+        query_string=invitation,
+        json=signup_data,
     )
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
 
     resp = await client.post(
-        client.app.url_path_for("signup"),
-        params={"invitation_code": invitation_code},
-        json={
-            "username": "UsernameTest",
-            "password": "Test_password1",
-            "email": "test@test.com",
-        },
+        client.application.url_path_for("signup"),
+        query_string=invitation,
+        json=signup_data,
     )
 
-    assert resp.status_code == 403
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-async def test_signin_with_email(client: TestClient):
+async def test_signin_with_email(client: TestClient) -> None:
     resp = await client.post(
         client.application.url_path_for("signin"),
         form={
@@ -71,10 +61,10 @@ async def test_signin_with_email(client: TestClient):
             "password": "password1",
         },
     )
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
 
 
-async def test_signin_with_username(client: TestClient):
+async def test_signin_with_username(client: TestClient) -> None:
     resp = await client.post(
         client.application.url_path_for("signin"),
         form={
@@ -82,10 +72,10 @@ async def test_signin_with_username(client: TestClient):
             "password": "password1",
         },
     )
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
 
 
-async def test_signin_wrong_username_password(client: TestClient):
+async def test_signin_wrong_username_password(client: TestClient) -> None:
     resp = await client.post(
         client.application.url_path_for("signin"),
         form={
@@ -93,10 +83,10 @@ async def test_signin_wrong_username_password(client: TestClient):
             "password": "wrong_password",
         },
     )
-    assert resp.status_code == 401
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-async def test_signin_unconfirmed_user(client: TestClient):
+async def test_signin_unconfirmed_user(client: TestClient) -> None:
     resp = await client.post(
         client.application.url_path_for("signin"),
         form={
@@ -104,4 +94,4 @@ async def test_signin_unconfirmed_user(client: TestClient):
             "password": "password4",
         },
     )
-    assert resp.status_code == 401
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
