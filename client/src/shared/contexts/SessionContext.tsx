@@ -44,21 +44,27 @@ export const SessionContextProvider = (props: any) => {
           .get<IEncodedToken>(APIRoutes.CONFIRM_PLEX_SIGN_IN(location.search))
           .then(
             (res) => {
-              if (res.status === 200) {
+              if (res.status === 200 || (res.status === 201 && res.data)) {
                 initSession(res.data);
                 let redirectURI = res.headers["redirect-uri"];
                 if (redirectURI && redirectURI.length > 0) {
                   history.push(redirectURI);
                 }
-              } else if (res.status === 201) {
+              }
+              if (res.status === 201) {
                 pushSuccess("Account created");
                 setSession({ ...session, isLoading: false });
                 history.push(routes.SIGN_IN.url(""));
               }
             },
             (error) => {
-              if (error.status) {
-                pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(error.status));
+              console.error(error.status);
+              if (error.response && error.response.status) {
+                pushDanger(
+                  ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+                );
+                setSession({ ...session, isLoading: false });
+                history.push(routes.SIGN_IN.url(""));
               }
             }
           );

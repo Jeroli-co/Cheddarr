@@ -83,7 +83,7 @@ export const useSonarrConfigs = () => {
 
   const deleteSonarrConfig = (id: string) => {
     remove(APIRoutes.DELETE_SONARR_CONFIG(id)).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         let configs = sonarrConfigs.data;
         if (configs) {
           let index = configs.findIndex((c) => c.id === id);

@@ -149,7 +149,6 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
         <InputField>
           <label>Version</label>
           <select name="version" ref={register}>
-            <option value={2}>2</option>
             <option value={3}>3</option>
           </select>
         </InputField>
@@ -195,6 +194,17 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
                   {p.name}
                 </option>
               ))}
+            </select>
+          </InputField>
+          <InputField>
+            <label> Default Tags</label>
+            <select name="tags" ref={register} multiple>
+              {instanceInfo.data &&
+                instanceInfo.data.tags.map((t, index) => (
+                  <option key={index} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
             </select>
           </InputField>
         </div>

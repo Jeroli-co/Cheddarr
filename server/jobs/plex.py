@@ -14,13 +14,14 @@ from server.models.media import (
     MediaServerSeason,
     MediaType,
 )
+from server.models.settings import ExternalServiceName
 from server.repositories.media import (
     MediaRepository,
     MediaServerEpisodeRepository,
     MediaServerMediaRepository,
     MediaServerSeasonRepository,
 )
-from server.repositories.settings import PlexSettingRepository
+from server.repositories.settings import MediaServerSettingRepository
 from server.services import plex, tmdb
 
 
@@ -33,12 +34,13 @@ from server.services import plex, tmdb
 )
 async def sync_plex_servers_libraries(server_id: str | None = None) -> None:
     async with Session() as db_session:
-        plex_setting_repo = PlexSettingRepository(db_session)
+        setting_repo = MediaServerSettingRepository(db_session)
 
         if server_id is not None:
-            plex_settings = await plex_setting_repo.find_by(server_id=server_id).all()
+            plex_settings = await setting_repo.find_by(server_id=server_id, service_name=ExternalServiceName.plex).all()
         else:
-            plex_settings = await plex_setting_repo.find_by().all()
+            plex_settings = await setting_repo.find_by(service_name=ExternalServiceName.plex).all()
+
         for setting in plex_settings:
             server = await plex.get_server(
                 base_url=setting.host,
@@ -55,7 +57,7 @@ async def sync_plex_servers_libraries(server_id: str | None = None) -> None:
                 await process_plex_media_list(
                     library_media,
                     setting.server_id,
-                    section.id,
+                    section.library_id,
                     db_session,
                 )
 
@@ -69,12 +71,13 @@ async def sync_plex_servers_libraries(server_id: str | None = None) -> None:
 )
 async def sync_plex_servers_recently_added(server_id: str | None = None) -> None:
     async with Session() as db_session:
-        plex_setting_repo = PlexSettingRepository(db_session)
+        setting_repo = MediaServerSettingRepository(db_session)
 
         if server_id is not None:
-            plex_settings = await plex_setting_repo.find_by(server_id=server_id).all()
+            plex_settings = await setting_repo.find_by(server_id=server_id, service_name=ExternalServiceName.plex).all()
         else:
-            plex_settings = await plex_setting_repo.find_by().all()
+            plex_settings = await setting_repo.find_by(service_name=ExternalServiceName.plex).all()
+
         for setting in plex_settings:
             server = await plex.get_server(
                 base_url=setting.host,
@@ -91,7 +94,7 @@ async def sync_plex_servers_recently_added(server_id: str | None = None) -> None
                 await process_plex_media_list(
                     recent_library_media,
                     setting.server_id,
-                    section.id,
+                    section.library_id,
                     db_session,
                 )
 
@@ -99,7 +102,7 @@ async def sync_plex_servers_recently_added(server_id: str | None = None) -> None
 async def process_plex_media_list(
     plex_media_list: list[plex_video.Video],
     server_id: str,
-    library_id: int,
+    library_id: str,
     db_session: AsyncSession,
 ) -> None:
     media_repo = MediaRepository(db_session)
@@ -155,7 +158,7 @@ async def process_plex_media_list(
 
 async def process_plex_media(
     server_id: str,
-    library_id: int,
+    library_id: str,
     plex_media: plex_video.Movie | plex_video.Show,
     *,
     media_repo: MediaRepository,
@@ -181,7 +184,7 @@ async def process_plex_media(
             server_id=server_id,
             server_library_id=library_id,
             media=media,
-            external_id=plex_media.ratingKey,
+            external_id=str(plex_media.ratingKey),
             added_at=plex_media.addedAt,
         )
         await server_media_repo.save(server_media)
@@ -191,7 +194,7 @@ async def process_plex_media(
 
 async def process_plex_series(
     server_id: str,
-    library_id: int,
+    library_id: str,
     plex_media: plex_video.Movie | plex_video.Show,
     *,
     media_repo: MediaRepository,
@@ -227,7 +230,7 @@ async def process_plex_series(
 
 async def process_plex_season(
     server_id: str,
-    library_id: int,
+    library_id: str,
     plex_season: plex_video.Season,
     *,
     server_series: MediaServerMedia | None = None,
@@ -236,13 +239,13 @@ async def process_plex_season(
     server_season_repo: MediaServerSeasonRepository,
 ) -> MediaServerSeason | None:
     season = await server_season_repo.find_by(
-        external_id=plex_season.ratingKey,
+        external_id=str(plex_season.ratingKey),
         server_id=server_id,
     ).one()
     if season is None:
         season = MediaServerSeason(
             season_number=plex_season.seasonNumber,
-            external_id=plex_season.ratingKey,
+            external_id=str(plex_season.ratingKey),
             added_at=plex_season.addedAt,
             server_id=server_id,
         )
@@ -264,7 +267,7 @@ async def process_plex_season(
 
 async def process_plex_season_and_episodes(
     server_id: str,
-    library_id: int,
+    library_id: str,
     plex_season: plex_video.Season,
     *,
     server_series: MediaServerMedia | None = None,
@@ -303,7 +306,7 @@ async def process_plex_season_and_episodes(
 
 async def process_plex_episode(
     server_id: str,
-    library_id: int,
+    library_id: str,
     plex_episode: plex_video.Episode,
     *,
     server_series: MediaServerMedia | None = None,
@@ -314,13 +317,13 @@ async def process_plex_episode(
     server_episode_repo: MediaServerEpisodeRepository,
 ) -> MediaServerEpisode | None:
     episode = await server_episode_repo.find_by(
-        external_id=plex_episode.ratingKey,
+        external_id=str(plex_episode.ratingKey),
         server_id=server_id,
     ).one()
     if episode is None:
         episode = MediaServerEpisode(
             episode_number=plex_episode.index,
-            external_id=plex_episode.ratingKey,
+            external_id=str(plex_episode.ratingKey),
             added_at=plex_episode.addedAt,
             server_id=server_id,
         )

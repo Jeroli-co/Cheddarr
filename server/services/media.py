@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 
 from server.models.media import MediaType
 from server.repositories.media import (
@@ -9,9 +9,9 @@ from server.repositories.media import (
     MediaServerSeasonRepository,
 )
 from server.repositories.requests import MediaRequestRepository
+from server.schemas.base import PaginatedResponse
 from server.schemas.media import (
     EpisodeSchema,
-    MediaSearchResponse,
     MovieSchema,
     SeasonSchema,
     SeriesSchema,
@@ -48,22 +48,33 @@ class MediaService(BaseService):
         media_type: MediaType,
         page: int,
         per_page: int,
-    ) -> MediaSearchResponse:
+    ) -> PaginatedResponse[MovieSchema] | PaginatedResponse[SeriesSchema]:
         servers_recent_media_list = await self.server_media_repo.find_recently_added(media_type=media_type).paginate(
             page=page,
             per_page=per_page,
         )
 
-        recent_media_list = []
+        recent_movies_list, recent_series_list = [], []
         for server_media in servers_recent_media_list:
-            server_media.media.media_servers_info = [PlexMediaInfo(**server_media.dict())]
-            recent_media_list.append(server_media.media)
+            server_media.media.media_servers_info = [PlexMediaInfo.model_validate(server_media.dict())]
+            if media_type == MediaType.series:
+                recent_series_list.append(SeriesSchema.model_validate(server_media.media))
+            else:
+                recent_movies_list.append(MovieSchema.model_validate(server_media.media))
 
-        return MediaSearchResponse(
+        if media_type == MediaType.movie:
+            return PaginatedResponse[MovieSchema](
+                page=servers_recent_media_list.page,
+                pages=servers_recent_media_list.pages,
+                total=servers_recent_media_list.total,
+                results=recent_movies_list,
+            )
+
+        return PaginatedResponse[SeriesSchema](
             page=servers_recent_media_list.page,
             pages=servers_recent_media_list.pages,
             total=servers_recent_media_list.total,
-            items=recent_media_list,
+            results=recent_series_list,
         )
 
     async def set_media_db_info(self, media: MovieSchema | SeriesSchema, current_user_id: int | None = None) -> None:
@@ -72,7 +83,7 @@ class MediaService(BaseService):
             imdb_id=media.imdb_id,
             tvdb_id=media.tvdb_id,
         ).all()
-        media.media_servers_info = [PlexMediaInfo(**server_media.dict()) for server_media in db_media_list]
+        media.media_servers_info = [PlexMediaInfo.model_validate(server_media.dict()) for server_media in db_media_list]
 
         if current_user_id is not None:
             requests = await self.request_repo.find_by_tmdb_id(
@@ -80,9 +91,9 @@ class MediaService(BaseService):
                 tmdb_id=media.tmdb_id,
             ).all()
             if isinstance(media, MovieSchema):
-                media.requests = parse_obj_as(list[MovieRequestSchema], requests)
+                media.requests = TypeAdapter(list[MovieRequestSchema]).validate_python(requests)
             elif isinstance(media, SeriesSchema):
-                media.requests = parse_obj_as(list[SeriesRequestSchema], requests)
+                media.requests = TypeAdapter(list[SeriesRequestSchema]).validate_python(requests)
 
     async def set_season_db_info(self, season: SeasonSchema, **external_ids: Any) -> None:
         db_seasons_list = await self.server_season_repo.find_by_external_id_and_season_number(
@@ -90,7 +101,9 @@ class MediaService(BaseService):
             **external_ids,
         ).all()
         if db_seasons_list is not None:
-            season.media_servers_info = [PlexMediaInfo(**server_media.dict()) for server_media in db_seasons_list]
+            season.media_servers_info = [
+                PlexMediaInfo.model_validate(server_media.dict()) for server_media in db_seasons_list
+            ]
 
     async def set_episode_db_info(
         self,
@@ -104,4 +117,6 @@ class MediaService(BaseService):
             episode_number=episode.episode_number,
         ).all()
         if db_episodes_list is not None:
-            episode.media_servers_info = [PlexMediaInfo(**server_media.dict()) for server_media in db_episodes_list]
+            episode.media_servers_info = [
+                PlexMediaInfo.model_validate(server_media.dict()) for server_media in db_episodes_list
+            ]

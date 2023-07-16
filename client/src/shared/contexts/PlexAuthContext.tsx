@@ -47,7 +47,7 @@ export default function PlexAuthContextProvider(props: any) {
                   {
                     key: res2.data.id,
                     code: res2.data.code,
-                    redirect_uri: redirectURI ? redirectURI : "",
+                    redirect_uri: redirectURI ?? "",
                     user_id: user?.id,
                   },
                   {

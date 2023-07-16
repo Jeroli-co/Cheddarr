@@ -11,7 +11,6 @@ export interface ISonarrConfig extends IProviderSettingsBase {
   readonly animeRootFolder: string | null;
   readonly qualityProfileId: number;
   readonly animeQualityProfileId: string | null;
-  readonly languageProfileId: number | null;
-  readonly animeLanguageProfileId: number | null;
   readonly version: number;
+  readonly tags: number[];
 }

@@ -66,7 +66,7 @@ export const NotificationsServicesContextProvider = (props: any) => {
 
   const deleteEmailConfig = () => {
     remove(APIRoutes.DELETE_EMAIL_SETTINGS).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         pushSuccess("SMTP Server config deleted");
         setEmailConfig({ ...DefaultAsyncCall, isLoading: false });
       } else {

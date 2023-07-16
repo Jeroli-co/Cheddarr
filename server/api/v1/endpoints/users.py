@@ -2,6 +2,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
 from pydantic import EmailStr
 
 from server.api import dependencies as deps
+from server.api.dependencies import CurrentUser
 from server.core import utils
 from server.core.scheduler import scheduler
 from server.core.security import check_permissions
@@ -12,10 +13,10 @@ from server.repositories.users import (
     TokenRepository,
     UserRepository,
 )
+from server.schemas.base import PaginatedResponse
 from server.schemas.users import (
     UserProfile,
     UserSchema,
-    UserSearchResponse,
     UserUpdate,
 )
 
@@ -34,17 +35,18 @@ current_user_router = APIRouter()
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.manage_users])),
     ],
-    response_model=UserSearchResponse,
+    response_model=PaginatedResponse[UserProfile],
 )
 async def get_users(
     page: int = 1,
     per_page: int = 10,
     confirmed: bool | None = True,
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-) -> UserSearchResponse:
-    users = await user_repo.find_by(page=page, per_page=per_page, confirmed=confirmed).paginate()
+) -> PaginatedResponse[UserProfile]:
+    users = await user_repo.find_by(confirmed=confirmed).paginate(page=page, per_page=per_page)
 
-    return UserSearchResponse(page=users.page, total=users.total, pages=users.pages, items=users.items)
+    return PaginatedResponse[UserProfile](page=users.page, total=users.total, pages=users.pages, results=users.items)
 
 
 @users_router.get(
@@ -57,6 +59,7 @@ async def get_users(
 )
 async def get_user_by_id(
     user_id: int,
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ) -> User:
     user = await user_repo.find_by(id=user_id).one()
@@ -69,7 +72,8 @@ async def get_user_by_id(
 @users_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     user_id: int,
-    current_user: User = Depends(deps.get_current_user),
+    *,
+    current_user: CurrentUser,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ) -> None:
     if current_user.id != user_id and not check_permissions(current_user.roles, [UserRole.admin]):
@@ -96,7 +100,8 @@ async def delete_user(
 async def update_user(
     user_id: int,
     user_in: UserUpdate,
-    current_user: User = Depends(deps.get_current_user),
+    *,
+    current_user: CurrentUser,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
 ) -> User:
     if current_user.id != user_id and not check_permissions(current_user.roles, [UserRole.admin]):
@@ -148,33 +153,19 @@ async def update_user(
     return user
 
 
-@users_router.get(
-    "/search",
-    response_model=UserSearchResponse,
-    dependencies=[Depends(deps.get_current_user)],
-)
-async def search_users(
-    value: str,
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-) -> UserSearchResponse:
-    search = await user_repo.search_by("username", value).paginate()
-
-    return UserSearchResponse(page=search.page, total=search.total, pages=search.pages, items=search.items)
-
-
 ##########################################
 # Current User                           #
 ##########################################
 
 
 @current_user_router.get("", response_model=UserSchema)
-async def get_current_user(current_user: User = Depends(deps.get_current_user)) -> User:
+async def get_current_user(current_user: CurrentUser) -> User:
     return current_user
 
 
 @current_user_router.put(
     "/password",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_202_ACCEPTED,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
@@ -183,6 +174,7 @@ async def get_current_user(current_user: User = Depends(deps.get_current_user)) 
 async def reset_password(
     request: Request,
     email: EmailStr = Body(..., embed=True),
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
@@ -223,6 +215,7 @@ async def reset_password(
 )
 async def check_reset_password(
     token: str,
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
 ) -> None:
@@ -252,6 +245,7 @@ async def check_reset_password(
 async def confirm_reset_password(
     token: str,
     password: str = Body(..., embed=True),
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
 ) -> None:

@@ -101,7 +101,7 @@ export const UsersPending = () => {
       </Container>
       <PaginationArrows
         currentPage={data.data?.page}
-        totalPages={data.data?.totalPages}
+        totalPages={data.data?.pages}
         onLoadPrev={() => loadPrev()}
         onLoadNext={() => loadNext()}
       />

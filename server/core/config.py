@@ -4,26 +4,21 @@ from typing import Any
 from uuid import uuid4
 
 from cachetools.func import lru_cache
-from pydantic import (
-    AnyHttpUrl,
-    BaseModel,
-    BaseSettings,
-    DirectoryPath,
-    parse_file_as,
-    parse_obj_as,
-)
+from pydantic import AnyHttpUrl, BaseModel, DirectoryPath
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class CustomConfig(BaseSettings, validate_all=True, validate_assignment=True, extra="forbid"):
-    server_domain: str | None
-    enable_https: bool | None
-    server_port: int | None
-    secret_key: str | None
-    client_id: str | None
-    log_level: str | None
-    tz: str | None
-    default_roles: int | None
-    tmdb_api_key: str | None
+class CustomConfig(BaseSettings):
+    model_config = SettingsConfigDict(validate_assignment=True, extra="forbid")
+    server_domain: str | None = None
+    enable_https: bool | None = None
+    server_port: int | None = None
+    secret_key: str | None = None
+    client_id: str | None = None
+    log_level: str | None = None
+    tz: str | None = None
+    default_roles: int | None = None
+    tmdb_api_key: str | None = None
 
 
 class Config(BaseModel):
@@ -54,9 +49,9 @@ class Config(BaseModel):
     ##########################################################################
     # external services                                                      #
     ##########################################################################
-    plex_token_url: AnyHttpUrl = parse_obj_as(AnyHttpUrl, "https://plex.tv/api/v2/pins/")
-    plex_authorize_url: AnyHttpUrl = parse_obj_as(AnyHttpUrl, "https://app.plex.tv/auth#/")
-    plex_user_resource_url: AnyHttpUrl = parse_obj_as(AnyHttpUrl, "https://plex.tv/api/v2/user/")
+    plex_token_url: AnyHttpUrl = AnyHttpUrl("https://plex.tv/api/v2/pins/")
+    plex_authorize_url: AnyHttpUrl = AnyHttpUrl("https://app.plex.tv/auth#/")
+    plex_user_resource_url: AnyHttpUrl = AnyHttpUrl("https://plex.tv/api/v2/user/")
     tmdb_api_key: str = "cd210007bbc918ea3995df599405935b"
 
     ##########################################################################
@@ -80,35 +75,34 @@ class Config(BaseModel):
     ##########################################################################
 
     def setup(self) -> None:
-        for k, v in CustomConfig().dict(exclude_none=True, exclude_unset=True).items():
+        for k, v in CustomConfig().model_dump(exclude_none=True, exclude_unset=True).items():
             setattr(self, k, v)
         self.db_folder.mkdir(parents=True, exist_ok=True)
         self.logs_folder.mkdir(parents=True, exist_ok=True)
         for k, v in self.read_file().items():
             setattr(self, k, v)
-        try:
-            self.write_file()
-        except OSError:
-            raise
+        self.write_file()
 
     def read_file(self) -> dict[str, Any]:
         if not Path(self.config_filename).is_file() or Path(self.config_filename).stat().st_size == 0:
             return {}
-        return parse_file_as(type_=CustomConfig, path=self.config_filename).dict(exclude_none=True, exclude_unset=True)
+        with Path.open(self.config_filename, "r") as f:
+            config = f.read()
+
+        return CustomConfig.model_validate_json(config).model_dump(exclude_none=True, exclude_unset=True)
 
     def write_file(self) -> None:
         with Path(self.config_filename).open("w+") as config_file:
             config_file.write(
-                self.json(
-                    include=CustomConfig.__fields__.keys(),
+                self.model_dump_json(
+                    include=set(CustomConfig.model_fields.keys()),
                     indent=2,
-                    sort_keys=True,
                 ),
             )
 
     def update(self, **config_kwargs: Any) -> None:
         for field_k, field_v in config_kwargs.items():
-            if field_k in self.__fields__ and field_v is not None:
+            if field_k in self.model_fields and field_v is not None:
                 setattr(self, field_k, field_v)
         self.write_file()
         get_config.cache_clear()  # type: ignore

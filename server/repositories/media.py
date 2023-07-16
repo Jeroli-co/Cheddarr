@@ -1,6 +1,7 @@
-from typing import TYPE_CHECKING, Any
+from __future__ import annotations
 
 import sqlalchemy as sa
+from sqlalchemy.sql.elements import ColumnElement
 
 from server.models.media import (
     Media,
@@ -10,9 +11,6 @@ from server.models.media import (
     MediaType,
 )
 from server.repositories.base import BaseRepository, Select
-
-if TYPE_CHECKING:
-    from sqlalchemy.sql.elements import ColumnElement
 
 
 class MediaRepository(BaseRepository[Media]):
@@ -24,7 +22,7 @@ class MediaRepository(BaseRepository[Media]):
         tvdb_id: int | None = None,
         imdb_id: str | None = None,
     ) -> Select[Media]:
-        filters = external_ids_filter(self.model, imdb_id, tmdb_id, tvdb_id)
+        filters = external_ids_filter(imdb_id, tmdb_id, tvdb_id)
         statement = sa.select(self.model).where(filters)
         return self.select(statement)
 
@@ -38,7 +36,7 @@ class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
         tvdb_id: int | None = None,
         imdb_id: str | None = None,
     ) -> Select[MediaServerMedia]:
-        statement = sa.select(self.model).join(Media).where(external_ids_filter(self.model, imdb_id, tmdb_id, tvdb_id))
+        statement = sa.select(self.model).join(Media).where(external_ids_filter(imdb_id, tmdb_id, tvdb_id))
         return self.select(statement)
 
     def find_recently_added(self, media_type: MediaType) -> Select[MediaServerMedia]:
@@ -66,7 +64,7 @@ class MediaServerSeasonRepository(BaseRepository[MediaServerSeason]):
             .join(MediaServerMedia)
             .join(Media)
             .where(self.model.season_number == season_number)
-            .where(external_ids_filter(self.model, imdb_id, tmdb_id, tvdb_id))
+            .where(external_ids_filter(imdb_id, tmdb_id, tvdb_id))
         )
         return self.select(statement)
 
@@ -89,22 +87,21 @@ class MediaServerEpisodeRepository(BaseRepository[MediaServerEpisode]):
             .join(Media)
             .where(MediaServerSeason.season_number == season_number)
             .where(self.model.episode_number == episode_number)
-            .where(sa.or_(external_ids_filter(self.model, imdb_id, tmdb_id, tvdb_id)))
+            .where(sa.or_(external_ids_filter(imdb_id, tmdb_id, tvdb_id)))
         )
         return self.select(statement)
 
 
 def external_ids_filter(
-    model: Any,
     imdb_id: str | None = None,
     tmdb_id: int | None = None,
     tvdb_id: int | None = None,
-) -> ColumnElement["bool"]:
+) -> ColumnElement[bool]:
     filter = []
     if tmdb_id is not None:
-        filter.append(model.tmdb_id == tmdb_id)
+        filter.append(Media.tmdb_id == tmdb_id)
     elif imdb_id is not None:
-        filter.append(model.imdb_id == imdb_id)
+        filter.append(Media.imdb_id == imdb_id)
     elif tvdb_id is not None:
-        filter.append(model.tvdb_id == tvdb_id)
+        filter.append(Media.tvdb_id == tvdb_id)
     return sa.or_(*filter)

@@ -94,7 +94,7 @@ export const RequestsContextProvider = (props: any) => {
 
   const deleteRequest = (mediaType: MediaTypes, requestId: number) => {
     remove(updateUrl(mediaType, requestId)).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         deleteReceivedRequest(requestId);
         deleteSentRequest(requestId);
         pushSuccess("Request deleted");

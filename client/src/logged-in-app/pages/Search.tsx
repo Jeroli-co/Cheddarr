@@ -75,7 +75,7 @@ export const Search = () => {
       // @ts-ignore
       pageRef.current = {
         page: mediaPage.data?.page,
-        totalPages: mediaPage.data?.totalPages,
+        totalPages: mediaPage.data?.pages,
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

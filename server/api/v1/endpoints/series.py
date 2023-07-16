@@ -1,10 +1,13 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
 from server.api import dependencies as deps
+from server.api.dependencies import CurrentUser
 from server.models.media import MediaType
-from server.models.users import User
-from server.schemas.media import EpisodeSchema, MediaSearchResponse, SeasonSchema, SeriesSchema
+from server.schemas.base import PaginatedResponse
+from server.schemas.media import EpisodeSchema, SeasonSchema, SeriesSchema
 from server.services import tmdb
 from server.services.media import MediaService
 
@@ -13,7 +16,6 @@ router = APIRouter()
 
 @router.get(
     "/{tmdb_id:int}",
-    response_model=SeriesSchema,
     response_model_exclude={"requests": {"__all__": {"media"}}},
     response_model_exclude_none=True,
     responses={
@@ -22,7 +24,8 @@ router = APIRouter()
 )
 async def get_series(
     tmdb_id: int,
-    current_user: User = Depends(deps.get_current_user),
+    *,
+    current_user: CurrentUser,
     media_service: MediaService = Depends(deps.get_service(MediaService)),
 ) -> SeriesSchema:
     series = await tmdb.get_tmdb_series(tmdb_id)
@@ -40,7 +43,6 @@ async def get_series(
 @router.get(
     "/{tmdb_id:int}/seasons/{season_number}",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=SeasonSchema,
     response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No season found"},
@@ -49,6 +51,7 @@ async def get_series(
 async def get_season(
     tmdb_id: int,
     season_number: int,
+    *,
     media_service: MediaService = Depends(deps.get_service(MediaService)),
 ) -> SeasonSchema:
     season = await tmdb.get_tmdb_season(tmdb_id, season_number)
@@ -66,7 +69,6 @@ async def get_season(
 @router.get(
     "/{tmdb_id:int}/seasons/{season_number}/episodes/{episode_number}",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=EpisodeSchema,
     response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No episode found"},
@@ -76,6 +78,7 @@ async def get_episode(
     tmdb_id: int,
     season_number: int,
     episode_number: int,
+    *,
     media_service: MediaService = Depends(deps.get_service(MediaService)),
 ) -> EpisodeSchema:
     episode = await tmdb.get_tmdb_episode(tmdb_id, season_number, episode_number)
@@ -90,29 +93,30 @@ async def get_episode(
 @router.get(
     "/recent",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=MediaSearchResponse,
+    response_model=PaginatedResponse[SeriesSchema],
     response_model_exclude_none=True,
 )
 async def get_recently_added_series(
     page: int = 1,
     per_page: int = 10,
+    *,
     media_service: MediaService = Depends(deps.get_service(MediaService)),
-) -> MediaSearchResponse:
+) -> PaginatedResponse[Any]:
     return await media_service.get_recently_added_media(MediaType.series, page, per_page)
 
 
 @router.get(
     "/popular",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=MediaSearchResponse,
     response_model_exclude_none=True,
 )
 async def get_popular_series(
     page: int = 1,
+    *,
     media_service: MediaService = Depends(deps.get_service(MediaService)),
-) -> MediaSearchResponse:
+) -> PaginatedResponse[SeriesSchema]:
     popular_series = await tmdb.get_tmdb_popular_series(page=page)
-    for series in popular_series.items:
+    for series in popular_series.results:
         await media_service.set_media_db_info(series)
 
     return popular_series
@@ -121,16 +125,16 @@ async def get_popular_series(
 @router.get(
     "/{tmdb_id:int}/similar",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=MediaSearchResponse,
     response_model_exclude_none=True,
 )
 async def get_similar_series(
     tmdb_id: int,
     page: int = 1,
+    *,
     media_service: MediaService = Depends(deps.get_service(MediaService)),
-) -> MediaSearchResponse:
+) -> PaginatedResponse[SeriesSchema]:
     similar_series = await tmdb.get_tmdb_similar_series(tmdb_id=tmdb_id, page=page)
-    for series in similar_series.items:
+    for series in similar_series.results:
         await media_service.set_media_db_info(series)
 
     return similar_series
@@ -139,16 +143,16 @@ async def get_similar_series(
 @router.get(
     "/{tmdb_id:int}/recommended",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=MediaSearchResponse,
     response_model_exclude_none=True,
 )
 async def get_recommended_series(
     tmdb_id: int,
     page: int = 1,
+    *,
     media_service: MediaService = Depends(deps.get_service(MediaService)),
-) -> MediaSearchResponse:
+) -> PaginatedResponse[SeriesSchema]:
     recommended_series = await tmdb.get_tmdb_recommended_series(tmdb_id=tmdb_id, page=page)
-    for series in recommended_series.items:
+    for series in recommended_series.results:
         await media_service.set_media_db_info(series)
 
     return recommended_series
@@ -157,20 +161,20 @@ async def get_recommended_series(
 @router.get(
     "/discover",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=MediaSearchResponse,
     response_model_exclude_none=True,
 )
 async def get_series_discover(
     genre_id: int | None = None,
     page: int = 1,
+    *,
     media_service: MediaService = Depends(deps.get_service(MediaService)),
-) -> MediaSearchResponse:
+) -> PaginatedResponse[SeriesSchema]:
     series_discover = await tmdb.get_tmdb_series_discover(
         genre_id=genre_id,
         page=page,
     )
 
-    for series in series_discover.items:
+    for series in series_discover.results:
         await media_service.set_media_db_info(series)
 
     return series_discover

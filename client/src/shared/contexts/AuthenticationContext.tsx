@@ -9,12 +9,11 @@ import { useAlert } from "./AlertContext";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { APIRoutes } from "../enums/APIRoutes";
-import { IUser } from "../models/IUser";
 
 interface IAuthenticationContextInterface {
   readonly signUp: (
     data: ISignUpFormData
-  ) => Promise<IAsyncCall<IUser> | IAsyncCall<null>>;
+  ) => Promise<IAsyncCall | IAsyncCall<null>>;
   readonly signIn: (
     data: ISignInFormData,
     redirectURI?: string
@@ -22,7 +21,7 @@ interface IAuthenticationContextInterface {
 }
 
 const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
-  signUp(_: ISignUpFormData): Promise<IAsyncCall<IUser> | IAsyncCall<null>> {
+  signUp(_: ISignUpFormData): Promise<IAsyncCall | IAsyncCall<null>> {
     return Promise.resolve(DefaultAsyncCall);
   },
   signIn(): Promise<IAsyncCall | IAsyncCall<null>> {
@@ -41,33 +40,35 @@ export default function AuthenticationContextProvider(props: any) {
   const { pushSuccess, pushDanger } = useAlert();
 
   const signUp = async (data: ISignUpFormData) => {
-    return await post<IUser>(APIRoutes.SIGN_UP, data).then((res) => {
-      if (res.status === 201) {
-        pushSuccess("Account created");
+    const res = await post<IEncodedToken>(APIRoutes.SIGN_UP, data);
+    if (res.status === 201) {
+      pushSuccess("Account created");
+      history.push("/");
+      if (res.data) {
+        initSession(res.data);
       }
-      return res;
-    });
+    }
+    return res;
   };
 
-  const signIn = (data: ISignInFormData, redirectURI?: string) => {
+  const signIn = async (data: ISignInFormData, redirectURI?: string) => {
     const fd = new FormData();
     fd.append("username", data.username);
     fd.append("password", data.password);
-    return post<IEncodedToken>(APIRoutes.SIGN_IN, fd).then((res) => {
-      if (res.data && res.status === 200) {
-        initSession(res.data);
-        if (redirectURI) {
-          history.push(redirectURI);
-        }
-      } else if (res.status === 401) {
-        pushDanger("Wrong credentials");
-      } else if (res.status === 400) {
-        pushDanger("Account needs to be confirmed");
-      } else {
-        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
+    const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, fd);
+    if (res.data && res.status === 200) {
+      initSession(res.data);
+      if (redirectURI) {
+        history.push(redirectURI);
       }
-      return res;
-    });
+    } else if (res.status === 401) {
+      pushDanger("Wrong credentials");
+    } else if (res.status === 400) {
+      pushDanger("Account needs to be confirmed");
+    } else {
+      pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
+    }
+    return res;
   };
 
   return (

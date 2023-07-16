@@ -12,10 +12,11 @@ class EngineMaker:
 
     @classmethod
     def get_async_engine(
-        cls, uri: str = get_config().db_uri, debug: bool = get_config().log_level == "DEBUG"
+        cls,
+        uri: str = get_config().db_uri,
     ) -> AsyncEngine:
         if cls.engine is None:
-            cls.engine = create_async_engine(uri, connect_args={"check_same_thread": False}, echo=debug)
+            cls.engine = create_async_engine(uri, connect_args={"check_same_thread": False})
 
             @event.listens_for(cls.engine.sync_engine, "connect")
             def set_sqlite_pragma(dbapi_connection, connection_record) -> None:  # noqa

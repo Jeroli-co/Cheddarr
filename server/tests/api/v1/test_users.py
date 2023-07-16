@@ -21,12 +21,8 @@ async def test_get_user_by_id(client: TestClient):
     assert resp.status_code == 200
 
     current_user = resp.json()
-    assert current_user["id"] == Dataset.users[1].id
-    assert current_user["email"] == Dataset.users[1].email
     assert current_user["username"] == Dataset.users[1].username
     assert current_user["avatar"] == Dataset.users[1].avatar
-    assert current_user["confirmed"] == Dataset.users[1].confirmed
-    assert current_user["roles"] == Dataset.users[1].roles
 
 
 async def test_get_user_by_id_not_existing(client: TestClient):
@@ -36,7 +32,7 @@ async def test_get_user_by_id_not_existing(client: TestClient):
 
 async def test_delete_user(client: TestClient):
     resp = await client.delete(client.application.url_path_for("delete_user", user_id=Dataset.users[1].id))
-    assert resp.status_code == 200
+    assert resp.status_code == 204
 
 
 async def test_update_username(client: TestClient):

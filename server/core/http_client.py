@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+from json import JSONDecodeError
 from typing import Any
 
 import httpx
@@ -34,10 +35,15 @@ class HttpClient:
         client = cls.get_http_client()
 
         async def _call() -> Any:
-            resp = await client.request(method, url, params=params, headers=headers, data=data)
+            resp = await client.request(
+                method, url, params=params, headers={**(headers or {}), "Content-Type": "application/json"}, data=data
+            )
             if status.HTTP_200_OK < resp.status_code >= status.HTTP_400_BAD_REQUEST:
                 raise HTTPException(resp.status_code, resp.text)
-            return resp.json()
+            try:
+                return resp.json()
+            except JSONDecodeError:
+                return None
 
         try:
             return await _call()

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from collections.abc import Sequence
 from math import ceil
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, get_args, get_origin
 
@@ -40,14 +41,13 @@ class BaseRepository(ABC, Generic[ModelType]):
                 cls._type_arg = type_arg
                 return
 
-    @classmethod
-    def get_model(cls) -> type[ModelType]:
+    def get_model(self) -> type[ModelType]:
         """Get the model class from the type argument."""
-        if cls._type_arg is None:
-            raise AttributeError(f"{cls.__name__} is generic; type argument unspecified")
-        if cls._type_arg.__mapper_args__.get("polymorphic_abstract"):
-            raise ValueError(f"{cls._type_arg.__name__} is an abstract model")
-        return cls._type_arg
+
+        if self._type_arg is None:
+            raise AttributeError(f"{self.__class__.__name__} is generic; type argument unspecified")
+
+        return self._type_arg
 
     async def save(self, db_obj: ModelType) -> ModelType:
         """Persist an object to the database
@@ -56,6 +56,7 @@ class BaseRepository(ABC, Generic[ModelType]):
         """
         self.session.add(db_obj)
         await self.session.commit()
+
         return db_obj
 
     async def update(
@@ -70,12 +71,14 @@ class BaseRepository(ABC, Generic[ModelType]):
         :return: The updated object
         """
         obj_data = jsonable_encoder(db_obj)
-        update_data = obj_in if isinstance(obj_in, dict) else obj_in.dict(exclude_unset=True)
+        update_data = obj_in if isinstance(obj_in, dict) else obj_in.model_dump(exclude_unset=True)
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
-
+            elif field.startswith("_"):
+                setattr(db_obj, field[1:], update_data[field[1:]])
         await self.save(db_obj)
+
         return db_obj
 
     async def remove(self, db_obj: ModelType) -> None:
@@ -97,18 +100,10 @@ class BaseRepository(ABC, Generic[ModelType]):
         """Find an object by its attributes
 
         :param filters: The attributes to filter by
-        :return: A `.Find` object
+        :return: A `.Select` object
         """
         statement = sa.select(self.model).filter_by(**filters)
-        return self.select(statement)
 
-    def search_by(self, field: str, value: str) -> Select[ModelType]:
-        """Search for objects containing a value in a field
-
-        :param field: The field to search in
-        :param value: The value to search for
-        """
-        statement = sa.select(self.model).where(getattr(self.model, field).contains(value))
         return self.select(statement)
 
     async def count(self, **filters: Any) -> int:
@@ -117,8 +112,9 @@ class BaseRepository(ABC, Generic[ModelType]):
         :param filters: The attributes to filter by
         """
         result = await self.session.execute(
-            sa.select(self.model).filter_by(**filters).with_only_columns(sa.func.count()),
+            sa.select(sa.func.count()).select_from(self.model).filter_by(**filters),
         )
+
         return result.scalar_one()
 
 
@@ -154,6 +150,7 @@ class Select(Generic[ModelType]):
             per_page=per_page,
             max_per_page=max_per_page,
         )
+
         return await p.query()
 
 
@@ -193,7 +190,7 @@ class Pagination(Generic[ModelType]):
 
         self.per_page: int = per_page
 
-        self.items: list[ModelType] = []
+        self.items: Sequence[ModelType] = []
 
         self.total: int | None = None
 
@@ -222,6 +219,7 @@ class Pagination(Generic[ModelType]):
             self.total = len(self.items)
         else:
             self.total = await self._query_count()
+
         return self
 
     @property
@@ -232,11 +230,13 @@ class Pagination(Generic[ModelType]):
     async def _query_items(self) -> list[ModelType]:
         """Execute the query to get the items on the current page."""
         statement = self._select.limit(self.per_page).offset(self._query_offset)
+
         return list(await self._session.scalars(statement))
 
     async def _query_count(self) -> int | None:
         """Execute the query to get the total number of items."""
         statement = self._select.with_only_columns(sa.func.count())
+
         return await self._session.scalar(statement)
 
     @property
@@ -251,6 +251,7 @@ class Pagination(Generic[ModelType]):
     def last(self) -> int:
         """The number of the last item on the page, starting from 1, inclusive, or 0 if there are no items."""
         first = self.first
+
         return max(first, first + len(self.items) - 1)
 
     @property
@@ -283,6 +284,7 @@ class Pagination(Generic[ModelType]):
             per_page=self.per_page,
         )
         p.total = self.total
+
         return p
 
     @property
@@ -307,6 +309,7 @@ class Pagination(Generic[ModelType]):
             per_page=self.per_page,
         )
         p.total = self.total
+
         return p
 
     def iter_pages(

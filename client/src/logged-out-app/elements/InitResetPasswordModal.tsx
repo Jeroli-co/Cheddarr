@@ -27,7 +27,7 @@ const InitResetPasswordModal = ({
 
   const onSubmit = handleSubmit((data) => {
     put(APIRoutes.INIT_RESET_PASSWORD, data).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 202) {
         pushSuccess("Reset password initiate, check your email");
         closeModal();
       } else if (res.status === 404) {

@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from server.core import utils
 from server.core.http_client import HttpClient
-from server.models.requests import MovieRequest
+from server.models.requests import MediaRequest
 from server.models.settings import RadarrSetting
 from server.schemas.radarr import RadarrAddOptions, RadarrMovie
 from server.schemas.settings import RadarrInstanceInfo
@@ -22,8 +22,7 @@ def make_url(
 ) -> str:
     queries = queries or {}
     return utils.make_url(
-        "%s://%s%s/api%s%s"
-        % (
+        "{}://{}{}/api{}{}".format(
             "https" if ssl else "http",
             host,
             f":{port}" if port else "",
@@ -63,8 +62,7 @@ async def get_instance_info(
     ssl: bool,
     version: int | None = None,
 ) -> RadarrInstanceInfo | None:
-    test = await check_instance_status(api_key=api_key, host=host, port=port, ssl=ssl, version=version)
-    if not test:
+    if not await check_instance_status(api_key=api_key, host=host, port=port, ssl=ssl, version=version):
         return None
 
     root_folders_url = make_url(
@@ -76,32 +74,35 @@ async def get_instance_info(
         resource_path="/rootFolder",
     )
 
-    if version == 3:
-        quality_profiles_url = make_url(
-            api_key=api_key,
-            host=host,
-            port=port,
-            ssl=ssl,
-            version=3,
-            resource_path="/qualityprofile",
-        )
-    else:
-        quality_profiles_url = make_url(
-            api_key=api_key,
-            host=host,
-            port=port,
-            ssl=ssl,
-            resource_path="/profile",
-        )
+    quality_profiles_url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        version=3,
+        resource_path="/qualityprofile",
+    )
+
+    tags_url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        version=3,
+        resource_path="/tag",
+    )
 
     root_folders = [folder["path"] for folder in await HttpClient.get(root_folders_url)]
     quality_profiles = [
         {"id": profile["id"], "name": profile["name"]} for profile in await HttpClient.get(quality_profiles_url)
     ]
+    tags = [{"id": tag["id"], "name": tag["label"]} for tag in await HttpClient.get(tags_url)]
+
     return RadarrInstanceInfo(
         version=version,
         root_folders=root_folders,
         quality_profiles=quality_profiles,
+        tags=tags,
     )
 
 
@@ -118,7 +119,7 @@ async def lookup(setting: RadarrSetting, tmdb_id: int | None = None, imdb_id: st
     lookup_result = await HttpClient.get(url)
     if not isinstance(lookup_result, list) or len(lookup_result) == 0:
         return None
-    return RadarrMovie.parse_obj(lookup_result[0])
+    return RadarrMovie.model_validate(lookup_result[0])
 
 
 async def add_movie(setting: RadarrSetting, movie: RadarrMovie) -> RadarrMovie:
@@ -130,11 +131,11 @@ async def add_movie(setting: RadarrSetting, movie: RadarrMovie) -> RadarrMovie:
         version=setting.version,
         resource_path="/movie",
     )
-    resp = await HttpClient.request("POST", url, data=movie.json(by_alias=True, exclude_none=True))
-    return RadarrMovie.parse_obj(resp)
+    resp = await HttpClient.post(url, data=movie.model_dump_json(by_alias=True, exclude_none=True))
+    return RadarrMovie.model_validate(resp)
 
 
-async def send_request(request: MovieRequest) -> None:
+async def send_request(request: MediaRequest) -> None:
     setting = RadarrSetting(**request.selected_provider.dict())
     movie = await lookup(
         setting,
@@ -145,6 +146,7 @@ async def send_request(request: MovieRequest) -> None:
         return
     movie.root_folder_path = request.root_folder or setting.root_folder
     movie.quality_profile_id = request.quality_profile_id or setting.quality_profile_id
+    movie.tags = [int(tag) for tag in request.tags] or [int(tag) for tag in setting.tags] or []
     movie.monitored = True
-    movie.add_options = RadarrAddOptions(search_for_movie=True)
+    movie.add_options = RadarrAddOptions(searchForMovie=True)
     await add_movie(setting, movie)

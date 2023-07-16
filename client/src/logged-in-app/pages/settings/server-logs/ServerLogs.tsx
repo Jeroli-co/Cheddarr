@@ -109,7 +109,7 @@ export const ServerLogs = () => {
         ))}
       <PaginationArrows
         currentPage={logs.data?.page}
-        totalPages={logs.data?.totalPages}
+        totalPages={logs.data?.pages}
         onLoadPrev={() => loadPrev()}
         onLoadNext={() => loadNext()}
         onLoadPage={loadPage}

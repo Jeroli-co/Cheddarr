@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 import sqlalchemy as sa
@@ -19,9 +21,6 @@ class MediaRequestRepository(BaseRepository[MediaRequest]):
         **filters: Any,
     ) -> Select[MediaRequest]:
         statement = (
-            sa.select(self.model)
-            .join(Media)
-            .filter_by(**filters)
-            .where(external_ids_filter(self.model, imdb_id, tmdb_id, tvdb_id))
+            sa.select(self.model).filter_by(**filters).join(Media).where(external_ids_filter(imdb_id, tmdb_id, tvdb_id))
         )
         return self.select(statement)

@@ -13,6 +13,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
 from server.api import dependencies as deps
+from server.api.dependencies import AppConfig
 from server.core import security, utils
 from server.core.config import Config, get_config
 from server.core.scheduler import scheduler
@@ -22,7 +23,8 @@ from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import TokenRepository, UserRepository
 from server.schemas.auth import AccessToken, AccessTokenPayload, Invitation, PlexAuthorizeSignin
 from server.schemas.base import ResponseMessage
-from server.schemas.users import UserCreate, UserSchema
+from server.schemas.users import UserCreate
+from server.services import plex
 
 router = APIRouter()
 
@@ -30,7 +32,6 @@ router = APIRouter()
 @router.post(
     "/sign-up",
     status_code=status.HTTP_201_CREATED,
-    response_model=UserSchema,
     responses={
         status.HTTP_403_FORBIDDEN: {"description": "Sign-up disabled or invalid invitation"},
         status.HTTP_409_CONFLICT: {"description": "Email or username not available"},
@@ -38,26 +39,26 @@ router = APIRouter()
 )
 async def signup(
     user_in: UserCreate,
-    invitation_code: str | None = None,
+    invitation_token: str | None = None,
+    *,
+    config: AppConfig,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
-    config: Config = Depends(get_config),
-) -> User:
-    if not config.signup_enabled and invitation_code is None:
+) -> AccessToken | None:
+    first_user = await user_repo.count() == 0
+    confirmed = first_user or invitation_token is not None
+
+    if not first_user and not config.signup_enabled and invitation_token is None:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "The sign-up is disabled.")
 
-    if invitation_code is not None:
-        invitation = await token_repo.find_by(id=invitation_code).one()
-        if (
-            invitation is None
-            or invitation.is_expired
-            or (invitation.max_uses is not None and invitation.max_uses == 0)
-        ):
-            raise HTTPException(status.HTTP_403_FORBIDDEN, "This invitation is not valid or has expired.")
-
-        token_payload = Token.unsign(invitation.data)
+    if invitation_token is not None:
+        token_payload = Token.unsign(invitation_token)
         if token_payload is None:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "This invitation is not valid.")
+
+        invitation = await token_repo.find_by(id=token_payload["id"]).one()
+        if invitation is None or invitation.is_expired:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "This invitation is not valid or has expired.")
 
         if user_in.email != token_payload["email"]:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "Invalid user information.")
@@ -78,14 +79,22 @@ async def signup(
         raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
     user = user_in.to_orm(User)
 
-    # First signed-up user
-    if await user_repo.count() == 0:
+    if first_user:
         user.roles = UserRole.admin
+    if confirmed:
         user.confirmed = True
 
     await user_repo.save(user)
 
-    return user
+    if confirmed:
+        access_token = security.create_jwt_access_token(AccessTokenPayload(sub=user.id))
+
+        return AccessToken(
+            access_token=access_token,
+            token_type="Bearer",
+        )
+
+    return None
 
 
 @router.get(
@@ -99,6 +108,7 @@ async def signup(
 )
 async def check_sign_up_invitation(
     token: str,
+    *,
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
 ) -> ResponseMessage:
     data = Token.unsign(token)
@@ -128,17 +138,18 @@ async def check_sign_up_invitation(
 async def invite_user(
     request: Request,
     invitation: Invitation,
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(deps.get_repository(NotificationAgentRepository)),
 ) -> ResponseMessage:
     token = Token(
-        data=invitation.email,
+        data=invitation.model_dump(include={"email"}),
         max_uses=invitation.max_uses,
         max_age=invitation.max_age,
     )
     await token_repo.save(token)
-    invitation_link = request.url_for("check_invite_user", token=token.data)
+    invitation_link = request.url_for("check_sign_up_invitation", token=token.data)
 
     if invitation.email is not None:
         if await user_repo.find_by_email(invitation.email).one() is not None:
@@ -164,7 +175,6 @@ async def invite_user(
 
 @router.post(
     "/sign-in",
-    response_model=AccessToken,
     responses={
         status.HTTP_401_UNAUTHORIZED: {"description": "Wrong credentials or account needs to be confirmed "},
         status.HTTP_403_FORBIDDEN: {"description": "Local accounts disabled"},
@@ -172,8 +182,9 @@ async def invite_user(
 )
 async def signin(
     form: OAuth2PasswordRequestForm = Depends(),
+    *,
+    config: AppConfig,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    config: Config = Depends(get_config),
 ) -> AccessToken:
     if not config.local_account_enabled:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Local accounts are disabled.")
@@ -191,22 +202,20 @@ async def signin(
             "This account needs to be confirmed.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    payload = AccessTokenPayload(sub=str(user.id))
-    access_token = security.create_jwt_access_token(payload)
-    token = AccessToken(
-        access_token=access_token,
-        token_type="Bearer",
-    )
 
     await user_repo.save(user)
 
-    return token
+    access_token = security.create_jwt_access_token(AccessTokenPayload(sub=user.id))
+    return AccessToken(
+        access_token=access_token,
+        token_type="Bearer",
+    )
 
 
 @router.get("/sign-in/plex")
 async def start_signin_plex(config: Config = Depends(get_config)) -> str:
     return utils.make_url(
-        config.plex_token_url,
+        str(config.plex_token_url),
         queries_dict={
             "strong": "true",
             "X-Plex-Product": "Cheddarr",
@@ -219,20 +228,14 @@ async def start_signin_plex(config: Config = Depends(get_config)) -> str:
 async def authorize_signin_plex(
     request: Request,
     auth_data: PlexAuthorizeSignin,
-    config: Config = Depends(get_config),
+    *,
+    config: AppConfig,
 ) -> RedirectResponse:
     forward_url = re.sub("/api/v[0-9]+", "", str(request.url_for("confirm_signin_plex")))
-    token = Token(
-        data={
-            "key": auth_data.key,
-            "code": auth_data.code,
-            "redirect_uri": auth_data.redirect_uri,
-            "user_id": auth_data.user_id,
-        },
-    )
+    token = Token(data=auth_data.model_dump())
     authorize_url = (
         utils.make_url(
-            config.plex_authorize_url,
+            str(config.plex_authorize_url),
             queries_dict={
                 "context[device][product]": "Cheddarr",
                 "clientID": config.client_id,
@@ -249,29 +252,31 @@ async def authorize_signin_plex(
 
 @router.get(
     "/sign-in/plex/confirm",
-    response_model=AccessToken,
     responses={
+        status.HTTP_200_OK: {"model": AccessToken, "description": "User logged in"},
+        status.HTTP_201_CREATED: {"model": AccessToken | None, "description": "User created"},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Account needs to be confirmed "},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Plex authorization error"},
-        status.HTTP_201_CREATED: {"model": UserSchema, "description": "User created"},
     },
 )
 async def confirm_signin_plex(
     token: str,
     response: Response,
+    *,
+    config: AppConfig,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-    config: Config = Depends(get_config),
 ) -> AccessToken | None:
     payload = Token.unsign(token)
     if payload is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid token.")
 
-    state = payload.get("key")
-    code = payload.get("code")
+    key = payload["key"]
+    code = payload["code"]
     redirect_uri = payload.get("redirect_uri", "")
     user_id = payload.get("user_id", None)
 
     try:
-        plex_user = await get_plex_user(config, state, code)
+        plex_user = await plex.get_user(config, key, code)
     except HTTPException as e:
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -300,20 +305,22 @@ async def confirm_signin_plex(
                 plex_api_key=plex_user.api_key,
                 avatar=plex_user.thumb,
             )
+
+            response.status_code = status.HTTP_201_CREATED
+            response.headers["redirect-uri"] = redirect_uri
+
             # First signed-up user
             if await user_repo.count() == 0:
                 user.roles = UserRole.admin
                 user.confirmed = True
+            else:
+                await user_repo.save(user)
 
-            await user_repo.save(user)
-
-            response.status_code = status.HTTP_201_CREATED
-            response.headers["redirect-uri"] = redirect_uri
-            return None
+                return None
 
     if not user.confirmed:
         raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
             "This account needs to be confirmed.",
             headers={"WWW-Authenticate": "Bearer"},
         )
@@ -328,8 +335,7 @@ async def confirm_signin_plex(
 
     await user_repo.save(user)
 
-    payload = AccessTokenPayload(sub=str(user.id))
-    access_token = security.create_jwt_access_token(payload)
+    access_token = security.create_jwt_access_token(AccessTokenPayload(sub=user.id))
     response.headers["redirect-uri"] = redirect_uri
 
     return AccessToken(access_token=access_token, token_type="bearer")

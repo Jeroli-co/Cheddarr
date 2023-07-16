@@ -133,7 +133,7 @@ export const UsersConfirmed = () => {
       {data.data && data.data.results && data.data.results.length > 1 && (
         <PaginationArrows
           currentPage={data.data?.page}
-          totalPages={data.data?.totalPages}
+          totalPages={data.data?.pages}
           onLoadPrev={() => loadPrev()}
           onLoadNext={() => loadNext()}
         />

@@ -5,10 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from server.api import (
     dependencies as deps,
 )
+from server.api.dependencies import CurrentUser
 from server.models.notifications import Agent, NotificationAgent
-from server.models.users import User
 from server.repositories.notifications import NotificationAgentRepository, NotificationRepository
-from server.schemas.notifications import EmailAgentSchema, NotificationsResponse
+from server.schemas.base import PaginatedResponse
+from server.schemas.notifications import EmailAgentSchema, NotificationSchema
 
 router = APIRouter()
 
@@ -19,19 +20,23 @@ router = APIRouter()
 
 @router.get(
     "",
-    response_model=NotificationsResponse,
+    response_model=PaginatedResponse[NotificationSchema],
 )
-async def get_all_notifications(
-    current_user: User = Depends(deps.get_current_user),
+async def get_notifications(
+    page: int = 1,
+    per_page: int = 20,
+    *,
+    current_user: CurrentUser,
     notification_repository: NotificationRepository = Depends(deps.get_repository(NotificationRepository)),
 ) -> Any:
-    return await notification_repository.find_by(user_id=current_user.id).paginate()
+    return await notification_repository.find_by(user_id=current_user.id).paginate(page=page, per_page=per_page)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_notification(
     id: int,
-    current_user: User = Depends(deps.get_current_user),
+    *,
+    current_user: CurrentUser,
     notification_repository: NotificationRepository = Depends(deps.get_repository(NotificationRepository)),
 ) -> None:
     notification = await notification_repository.find_by(id=id).one()
@@ -46,7 +51,7 @@ async def delete_notification(
 
 @router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_notifications(
-    current_user: User = Depends(deps.get_current_user),
+    current_user: CurrentUser,
     notification_repository: NotificationRepository = Depends(deps.get_repository(NotificationRepository)),
 ) -> None:
     await notification_repository.remove_all_by_user_id(current_user.id)
@@ -59,7 +64,7 @@ async def delete_all_notifications(
 
 @router.get(
     "/agents/email",
-    response_model=EmailAgentSchema,
+    response_model=EmailAgentSchema | None,
     dependencies=[Depends(deps.get_current_user)],
 )
 async def get_email_agent(

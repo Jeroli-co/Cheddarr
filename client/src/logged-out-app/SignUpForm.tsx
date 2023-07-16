@@ -17,23 +17,16 @@ import { Row } from "../shared/components/layout/Row";
 import { InputField } from "../shared/components/inputs/InputField";
 import { HelpDanger } from "../shared/components/Help";
 import { CenteredContent } from "../shared/components/layout/CenteredContent";
-import { IUser } from "../shared/models/IUser";
+import { useSession } from "../shared/contexts/SessionContext";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();
   const { signUp } = useAuthentication();
   const { signInWithPlex } = usePlexAuth();
-  const [user, setUser] = useState<IUser | null>(null);
 
   const onSubmit = (data: ISignUpFormData) => {
-    signUp(data).then((res) => {
-      if (res.data) setUser(res.data);
-    });
+    signUp(data);
   };
-
-  if (user) {
-    return <Redirect to={routes.SIGN_IN.url()} />;
-  }
 
   return (
     <div>
