@@ -15,8 +15,9 @@ router = APIRouter()
         status.HTTP_404_NOT_FOUND: {"description": "Person not found"},
     },
 )
-async def get_person(tmdb_person_id):
+async def get_person(tmdb_person_id: int) -> Person:
     person = await tmdb.get_tmdb_person(tmdb_person_id)
     if person is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Person not found.")
+
     return person

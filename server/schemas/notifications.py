@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from typing import Any
 
 from server.schemas.users import UserSchema
-from .core import APIModel
+
+from .base import APIModel
 
 
 class NotificationSchema(APIModel):
@@ -12,7 +15,7 @@ class NotificationSchema(APIModel):
 
 class NotificationAgentSchema(APIModel):
     enabled: bool
-    settings: Any
+    settings: Any = None
 
 
 class EmailAgentSettings(APIModel):

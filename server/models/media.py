@@ -1,113 +1,68 @@
-from enum import Enum
+from __future__ import annotations
 
-from sqlalchemy import (
-    Column,
-    Date,
-    Enum as DBEnum,
-    ForeignKey,
-    Integer,
-    String,
-    UniqueConstraint,
-)
-from sqlalchemy.orm import backref, declared_attr, Mapped, relationship
+from datetime import datetime
+from enum import StrEnum
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Enum, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import Mapped, declarative_mixin, declared_attr, mapped_column, relationship
 
 from server.models.base import Model
-from server.models.settings import MediaServerSetting
+
+if TYPE_CHECKING:
+    from server.models.settings import MediaServerSetting
 
 
-class MediaType(str, Enum):
+class MediaType(StrEnum):
     movie = "movies"
     series = "series"
 
 
-class SeriesType(str, Enum):
+class SeriesType(StrEnum):
     anime = "anime"
     standard = "standard"
 
 
 class Media(Model):
-    __repr_props__ = ("title", "media_type", "tmdb_id", "imdb_id", "tvdb_id")
     __table_args__ = (
         UniqueConstraint("tmdb_id", "media_type"),
         UniqueConstraint("imdb_id", "media_type"),
         UniqueConstraint("tvdb_id", "media_type"),
     )
 
-    id = Column(Integer, primary_key=True)
-    tmdb_id = Column(Integer)
-    imdb_id = Column(String)
-    tvdb_id = Column(Integer)
-    title = Column(String, nullable=False)
-    media_type = Column(DBEnum(MediaType), nullable=False)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    id: Mapped[int] = mapped_column(primary_key=True, init=False, default=None)
+    tmdb_id: Mapped[int | None] = mapped_column(repr=True)
+    imdb_id: Mapped[str | None] = mapped_column(repr=True)
+    tvdb_id: Mapped[int | None] = mapped_column(repr=True)
+    title: Mapped[str] = mapped_column(repr=True)
+    media_type: Mapped[MediaType] = mapped_column(Enum(MediaType), repr=True)
 
 
-class MediaServerContent(object):
-    __table_args__ = (UniqueConstraint("external_id", "server_id"),)
-
-    id = Column(Integer, primary_key=True)
-    external_id = Column(String, nullable=False)
-    added_at = Column(Date)
+@declarative_mixin
+class MediaServerContent:
+    id: Mapped[int] = mapped_column(primary_key=True, init=False, default=None)
+    server_id: Mapped[str] = mapped_column(ForeignKey("media_server_setting.server_id"))
+    external_id: Mapped[str] = mapped_column(unique=True)
+    added_at: Mapped[datetime | None] = mapped_column()
 
     @declared_attr
-    def server_id(cls) -> Mapped[int]:
-        return Column(ForeignKey("mediaserversetting.server_id"), nullable=False)
+    def server(self) -> Mapped[MediaServerSetting]:
+        return relationship(lazy="selectin", innerjoin=True, repr=True, init=False)
 
 
 class MediaServerMedia(Model, MediaServerContent):
-    __repr_props__ = ("media", "server")
-
-    media_id: int = Column(ForeignKey("media.id"), nullable=False)
-    server_library_id: int = Column(ForeignKey("mediaserverlibrary.id"))
-    media: Media = relationship(
-        "Media",
-        lazy="joined",
-        innerjoin=True,
-        backref=backref("media_servers", lazy="selectin", cascade="all,delete,delete-orphan"),
-    )
-    server: "MediaServerSetting" = relationship(
-        "MediaServerSetting",
-        lazy="joined",
-        innerjoin=True,
-        backref=backref("server_media", cascade="all,delete,delete-orphan"),
-    )
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    server_library_id: Mapped[str] = mapped_column(ForeignKey("media_server_library.id", ondelete="CASCADE"))
+    media_id: Mapped[int] = mapped_column(ForeignKey("media.id", ondelete="CASCADE"))
+    media: Mapped[Media] = relationship(lazy="selectin", innerjoin=True, repr=True)
 
 
 class MediaServerSeason(Model, MediaServerContent):
-    __repr_props__ = ("season_number",)
-
-    season_number = Column(Integer, nullable=False)
-    server_media_id: int = Column(ForeignKey("mediaservermedia.id"), nullable=False)
-    server_media: MediaServerMedia = relationship(
-        "MediaServerMedia",
-        lazy="joined",
-        innerjoin=True,
-        backref=backref("seasons", cascade="all,delete,delete-orphan"),
-    )
-    episodes: list["MediaServerEpisode"] = relationship(
-        "MediaServerEpisode",
-        lazy="selectin",
-        back_populates="season",
-        cascade="all,delete,delete-orphan",
-    )
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    season_number: Mapped[int] = mapped_column(repr=True)
+    server_media_id: Mapped[int] = mapped_column(ForeignKey("media_server_media.id", ondelete="CASCADE"), init=False)
+    server_media: Mapped[MediaServerMedia] = relationship(lazy="selectin", innerjoin=True, init=False)
 
 
 class MediaServerEpisode(Model, MediaServerContent):
-    __repr_props__ = ("episode_number",)
-
-    episode_number = Column(Integer, nullable=False)
-    season_id: int = Column(ForeignKey("mediaserverseason.id"), nullable=False)
-    season: MediaServerSeason = relationship(
-        "MediaServerSeason", lazy="joined", innerjoin=True, back_populates="episodes"
-    )
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    episode_number: Mapped[int] = mapped_column(repr=True)
+    season_id: Mapped[int] = mapped_column(ForeignKey("media_server_season.id", ondelete="CASCADE"), init=False)
+    season: Mapped[MediaServerSeason] = relationship(lazy="selectin", innerjoin=True, init=False)

@@ -1,75 +1,51 @@
-from datetime import datetime, timedelta
-from typing import Literal
+from collections.abc import Sequence
+from datetime import datetime, timedelta, timezone
+from typing import Any, Literal
 
 import jwt
-from itsdangerous import URLSafeSerializer, URLSafeTimedSerializer
+from itsdangerous import BadSignature, URLSafeSerializer
 from passlib import pwd
-from passlib.context import CryptContext
 
 from server.core.config import get_config
-from server.schemas.auth import TokenPayload
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from server.schemas.auth import AccessTokenPayload
 
 
-def create_jwt_access_token(payload: TokenPayload, expires_delta: timedelta = None) -> str:
-    to_encode = payload.dict()
+def create_jwt_access_token(payload: AccessTokenPayload, expires_delta: timedelta | None = None) -> str:
+    to_encode = payload.model_dump()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=get_config().access_token_expire_minutes)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=get_config().access_token_expire_minutes)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(
-        to_encode, get_config().secret_key, algorithm=get_config().signing_algorithm
-    )
-    return encoded_jwt
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return jwt.encode(to_encode, get_config().secret_key, algorithm=get_config().signing_algorithm)
 
 
 def get_random_password() -> str:
     return pwd.genword(entropy=56)
 
 
-def generate_token(data):
+def generate_token(data: dict[str, Any]) -> str:
     serializer = URLSafeSerializer(get_config().secret_key)
-    return serializer.dumps(data)
+    return str(serializer.dumps(data))
 
 
-def confirm_token(data):
+def confirm_token(token: str) -> dict[str, Any] | None:
     serializer = URLSafeSerializer(get_config().secret_key)
-    return serializer.loads(data)
-
-
-def generate_timed_token(data):
-    serializer = URLSafeTimedSerializer(get_config().secret_key)
-    return serializer.dumps(data)
-
-
-def confirm_timed_token(token: str, expiration_minutes: int):
-    serializer = URLSafeTimedSerializer(get_config().secret_key)
     try:
-        data = serializer.loads(token, max_age=expiration_minutes * 60)
-    except Exception:
-        raise Exception
+        data = serializer.loads(token)
+    except BadSignature:
+        return None
+
     return data
 
 
-def check_permissions(
-    user_roles: int, permissions: list, options: Literal["and", "or"] = "and"
-) -> bool:
+def check_permissions(user_roles: int, permissions: Sequence[int], options: Literal["and", "or"] = "and") -> bool:
     from server.models.users import UserRole
 
     if user_roles & UserRole.admin:
         return True
-    elif options == "and":
+    if options == "and":
         return all(user_roles & permission for permission in permissions)
-    elif options == "or":
+    if options == "or":
         return any(user_roles & permission for permission in permissions)
     return False

@@ -1,31 +1,35 @@
-import json
 import secrets
 from pathlib import Path
-from typing import Optional
+from typing import Any
 from uuid import uuid4
 
-import tzlocal
 from cachetools.func import lru_cache
-from pydantic import (
-    AnyHttpUrl,
-    BaseSettings,
-    create_model,
-    DirectoryPath,
-)
+from pydantic import AnyHttpUrl, BaseModel, DirectoryPath
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Config(BaseSettings):
+class CustomConfig(BaseSettings):
+    model_config = SettingsConfigDict(validate_assignment=True, extra="forbid")
+    server_domain: str | None = None
+    enable_https: bool | None = None
+    server_port: int | None = None
+    secret_key: str | None = None
+    client_id: str | None = None
+    log_level: str | None = None
+    tz: str | None = None
+    default_roles: int | None = None
+    tmdb_api_key: str | None = None
 
+
+class Config(BaseModel):
     ##########################################################################
     # server                                                                 #
     ##########################################################################
-    api_prefix: str = "/api"
     server_domain: str = "localhost"
     server_port: int = 9090
-    server_host: str = f"http://{server_domain}:{server_port}"
+    server_host: str = f"http://{server_domain}"
     log_level: str = "INFO"
-    tz: str = str(tzlocal.get_localzone())
-    testing: bool = False
+    tz: str = "UTC"
 
     ##########################################################################
     # folders/files                                                          #
@@ -45,9 +49,9 @@ class Config(BaseSettings):
     ##########################################################################
     # external services                                                      #
     ##########################################################################
-    plex_token_url: AnyHttpUrl = "https://plex.tv/api/v2/pins/"
-    plex_authorize_url: AnyHttpUrl = "https://app.plex.tv/auth#/"
-    plex_user_resource_url: AnyHttpUrl = "https://plex.tv/api/v2/user/"
+    plex_token_url: AnyHttpUrl = AnyHttpUrl("https://plex.tv/api/v2/pins/")
+    plex_authorize_url: AnyHttpUrl = AnyHttpUrl("https://app.plex.tv/auth#/")
+    plex_user_resource_url: AnyHttpUrl = AnyHttpUrl("https://plex.tv/api/v2/user/")
     tmdb_api_key: str = "cd210007bbc918ea3995df599405935b"
 
     ##########################################################################
@@ -57,7 +61,7 @@ class Config(BaseSettings):
     secret_key: str = secrets.token_urlsafe(32)
     signing_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 3
-    backend_cors_origin: list[AnyHttpUrl] = [server_host]
+    backend_cors_origin: list[str] = [str(server_host)]
     default_roles: int = 4
     signup_enabled: bool = True
     local_account_enabled: bool = True
@@ -66,78 +70,53 @@ class Config(BaseSettings):
     # database                                                               #
     ##########################################################################
     db_filename: str = "cheddarr.sqlite"
-    db_url: str = "sqlite+aiosqlite:///" + str(db_folder / db_filename)
+    db_uri: str = "sqlite+aiosqlite:///" + str(db_folder / db_filename)
 
     ##########################################################################
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if not self.testing:
-            self.db_folder.mkdir(parents=True, exist_ok=True)
-            self.logs_folder.mkdir(parents=True, exist_ok=True)
-            self.setup()
 
-    def setup(self):
-        try:
-            for k, v in self.read_file():
-                setattr(self, k, v)
-        except FileNotFoundError:
-            pass
-        try:
-            self.write_file()
-        except OSError:
-            raise
-
-    def read_file(self) -> dict:
-        with open(self.config_filename, "r") as config_file:
-            config = json.load(config_file)
-            return config.items()
-
-    def update(self, **config_kwargs):
-        for field_k, field_v in config_kwargs.items():
-            if field_k in self.__fields__ and field_v is not None:
-                setattr(self, field_k, field_v)
+    def setup(self) -> None:
+        for k, v in CustomConfig().model_dump(exclude_none=True, exclude_unset=True).items():
+            setattr(self, k, v)
+        self.db_folder.mkdir(parents=True, exist_ok=True)
+        self.logs_folder.mkdir(parents=True, exist_ok=True)
+        for k, v in self.read_file().items():
+            setattr(self, k, v)
         self.write_file()
-        get_config.cache_clear()
 
-    def write_file(self):
-        with open(self.config_filename, "w+") as config_file:
-            json.dump(
-                {
-                    item: getattr(self, item)
-                    for item in self.__fields__
-                    if item in self.__public_fields__
-                },
-                config_file,
-                indent=2,
-                sort_keys=True,
+    def read_file(self) -> dict[str, Any]:
+        if not Path(self.config_filename).is_file() or Path(self.config_filename).stat().st_size == 0:
+            return {}
+        with Path.open(self.config_filename, "r") as f:
+            config = f.read()
+
+        return CustomConfig.model_validate_json(config).model_dump(exclude_none=True, exclude_unset=True)
+
+    def write_file(self) -> None:
+        with Path(self.config_filename).open("w+") as config_file:
+            config_file.write(
+                self.model_dump_json(
+                    include=set(CustomConfig.model_fields.keys()),
+                    indent=2,
+                ),
             )
 
-    @classmethod
-    @lru_cache()
-    def public_model(cls):
-        public_fields = {
-            key: (Optional[cls.__fields__.get(key).type_], None) for key in cls.__public_fields__
-        }
-        return create_model("PublicConfig", **public_fields)
+    def update(self, **config_kwargs: Any) -> None:
+        for field_k, field_v in config_kwargs.items():
+            if field_k in self.model_fields and field_v is not None:
+                setattr(self, field_k, field_v)
+        self.write_file()
+        get_config.cache_clear()  # type: ignore
 
-    __public_fields__ = {
-        "secret_key",
-        "client_id",
-        "log_level",
-        "default_roles",
-        "signup_enabled",
-        "local_account_enabled",
-    }
+
+class TestConfig(Config):
+    db_uri: str = "sqlite+aiosqlite://"
+    secret_key: str = "test"
 
 
 @lru_cache()
-def get_config():
+def get_config() -> Config:
     return Config()
 
 
-public_config_model = Config.public_model()
-
-
-def get_public_config():
-    get_config.cache_clear()
-    return public_config_model(**get_config().dict())
+def get_test_config() -> TestConfig:
+    return TestConfig()

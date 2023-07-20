@@ -39,7 +39,7 @@ export const EditPlexSettingsModal = (props: EditPlexSettingsModalProps) => {
 
   const onDeletePlexConfig = () => {
     deleteConfig(props.plexSettings.id).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         props.closeModal();
       }
     });

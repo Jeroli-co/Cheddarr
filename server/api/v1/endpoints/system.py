@@ -1,48 +1,50 @@
 import json
 import math
+from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from server.api import dependencies as deps
-from server.core.config import Config, get_config, get_public_config, public_config_model
+from server.api.dependencies import AppConfig
 from server.core.scheduler import scheduler
 from server.models.users import UserRole
-from server.schemas.system import Job, Log, LogResult
+from server.schemas.base import PaginatedResponse
+from server.schemas.system import Job, Log, PublicConfig
 
 router = APIRouter()
 
 
 @router.get(
     "/logs",
-    response_model=LogResult,
+    response_model=PaginatedResponse[Log],
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_config)):
+def get_logs(page: int = 1, per_page: int = 50, *, config: AppConfig) -> PaginatedResponse[Log]:
     logs = []
-    with open(config.logs_folder / config.logs_filename) as logfile:
+    with Path(config.logs_folder / config.logs_filename).open() as logfile:
         lines = json.loads("[" + logfile.read().replace("\n", ",").rstrip(",") + "]")
         start = (page - 1) * per_page
         end = page * per_page
         total_results = math.ceil(len(lines))
         total_pages = math.ceil(total_results / per_page)
-        for line in lines[start:end]:
-            logs.append(
-                Log(
-                    time=line["record"]["time"]["repr"],
-                    level=line["record"]["level"]["name"],
-                    process=line["record"]["name"],
-                    message=line["text"],
-                )
+        logs = [
+            Log(
+                time=line["record"]["time"]["repr"],
+                level=line["record"]["level"]["name"],
+                process=line["record"]["name"],
+                message=line["text"],
             )
+            for line in lines[start:end]
+        ]
 
-    return LogResult(
+    return PaginatedResponse[Log](
         page=page,
-        total_results=total_results,
-        total_pages=total_pages,
+        total=total_results,
+        pages=total_pages,
         results=logs,
     )
 
@@ -55,11 +57,8 @@ def get_logs(page: int = 1, per_page: int = 50, config: Config = Depends(get_con
         Depends(deps.has_user_permissions([UserRole.manage_settings])),
     ],
 )
-def get_jobs():
-    return [
-        Job(id=job.id, name=job.name, next_run_time=job.next_run_time)
-        for job in scheduler.get_jobs()
-    ]
+def get_jobs() -> list[Job]:
+    return [Job(id=job.id, name=job.name, next_run_time=job.next_run_time) for job in scheduler.get_jobs()]
 
 
 @router.patch(
@@ -73,7 +72,7 @@ def get_jobs():
 def modify_job(
     job_id: str,
     action: Literal["run", "pause", "resume"] = Body(..., embed=True),
-):
+) -> Job:
     job = scheduler.get_job(job_id)
     if job is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This job does not exist.")
@@ -88,24 +87,24 @@ def modify_job(
 
 @router.get(
     "/config",
-    response_model=public_config_model,
+    response_model=PublicConfig,
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def get_server_config(config: get_public_config = Depends()):
-    return config
+def get_server_config(config: AppConfig) -> PublicConfig:
+    return PublicConfig(**config.model_dump(include=set(PublicConfig.model_fields.keys())))
 
 
 @router.patch(
     "/config",
-    response_model=public_config_model,
+    response_model=PublicConfig,
     dependencies=[
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.admin])),
     ],
 )
-def update_server_config(config_in: public_config_model, config: get_config = Depends()):
-    config.update(**config_in.dict())
-    return config
+def update_server_config(config_in: PublicConfig, config: AppConfig) -> PublicConfig:
+    config.update(**config_in.model_dump())
+    return PublicConfig(**config.model_dump(include=set(PublicConfig.model_fields.keys())))

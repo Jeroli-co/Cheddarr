@@ -1,28 +1,25 @@
-from enum import Enum
+from __future__ import annotations
 
-from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, JSON, Text
+from enum import StrEnum
+
+from sqlalchemy import JSON, Enum, ForeignKey, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from server.models.base import Model, Timestamp
 
 
-class Agent(str, Enum):
+class Agent(StrEnum):
     email = "email"
 
 
 class NotificationAgent(Model):
-    name = Column(DBEnum(Agent), primary_key=True)
-    enabled = Column(Boolean, default=True)
-    settings = Column(JSON)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    name: Mapped[Agent] = mapped_column(Enum(Agent), primary_key=True, repr=True)
+    enabled: Mapped[bool] = mapped_column(default=True, repr=True)
+    settings = mapped_column(JSON)
 
 
 class Notification(Model, Timestamp):
-    id = Column(Integer, primary_key=True)
-    message = Column(Text, nullable=False)
-    read = Column(Boolean, nullable=False, default=False)
-    user_id: int = Column(ForeignKey("user.id"), nullable=False)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    id: Mapped[int] = mapped_column(primary_key=True, init=False, default=None)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
+    message: Mapped[str] = mapped_column(Text)
+    read: Mapped[bool] = mapped_column(default=False)

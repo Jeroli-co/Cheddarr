@@ -1,55 +1,28 @@
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import HTTPException
-from pydantic import Field
 
 from server.core import utils
 from server.core.http_client import HttpClient
-from server.models.requests import MovieRequest
+from server.models.requests import MediaRequest
 from server.models.settings import RadarrSetting
-from server.schemas.core import APIModel
+from server.schemas.radarr import RadarrAddOptions, RadarrMovie
 from server.schemas.settings import RadarrInstanceInfo
 
 
-###################################
-# Schemas                         #
-###################################
-class RadarrAddOptions(APIModel):
-    search_for_movie: bool = Field(alias="searchForMovie")
-
-
-class RadarrMovie(APIModel):
-    id: Optional[int]
-    tmdb_id: int = Field(alias="tmdbId")
-    title: str = Field(alias="title")
-    title_slug: str = Field(alias="titleSlug")
-    year: int = Field(alias="year")
-    quality_profile_id: Optional[int] = Field(alias="qualityProfileId")
-    root_folder_path: Optional[str] = Field(alias="rootFolderPath")
-    monitored: bool = Field(alias="monitored")
-    images: list[dict] = Field(alias="images")
-    has_file: bool = Field(alias="hasFile")
-    add_options: Optional[RadarrAddOptions] = Field(alias="addOptions")
-
-
-###################################
-# API calls                       #
-###################################
 def make_url(
     *,
     api_key: str,
     host: str,
-    port: int,
+    port: int | None,
     ssl: bool,
-    version: int = 2,
+    version: int | None = None,
     resource_path: str,
-    queries: dict = None,
+    queries: dict[str, Any] | None = None,
 ) -> str:
     queries = queries or {}
-    version = version if version == 3 else None
     return utils.make_url(
-        "%s://%s%s/api%s%s"
-        % (
+        "{}://{}{}/api{}{}".format(
             "https" if ssl else "http",
             host,
             f":{port}" if port else "",
@@ -61,8 +34,12 @@ def make_url(
 
 
 async def check_instance_status(
-    api_key: str, host: str, port: int, ssl: bool, version: int = None
-) -> Optional[dict[str, Any]]:
+    api_key: str,
+    host: str,
+    port: int | None,
+    ssl: bool,
+    version: int | None = None,
+) -> dict[str, Any] | None:
     url = make_url(
         api_key=api_key,
         host=host,
@@ -72,20 +49,20 @@ async def check_instance_status(
         resource_path="/system/status",
     )
     try:
-        resp = await HttpClient.request("GET", url)
+        resp = await HttpClient.get(url)
     except HTTPException:
         return None
     return resp
 
 
 async def get_instance_info(
-    api_key: str, host: str, port: int, ssl: bool, version: int = None
-) -> Optional[RadarrInstanceInfo]:
-
-    test = await check_instance_status(
-        api_key=api_key, host=host, port=port, ssl=ssl, version=version
-    )
-    if not test:
+    api_key: str,
+    host: str,
+    port: int | None,
+    ssl: bool,
+    version: int | None = None,
+) -> RadarrInstanceInfo | None:
+    if not await check_instance_status(api_key=api_key, host=host, port=port, ssl=ssl, version=version):
         return None
 
     root_folders_url = make_url(
@@ -97,31 +74,39 @@ async def get_instance_info(
         resource_path="/rootFolder",
     )
 
-    if version == 3:
-        quality_profiles_url = make_url(
-            api_key=api_key,
-            host=host,
-            port=port,
-            ssl=ssl,
-            version=3,
-            resource_path="/qualityprofile",
-        )
-    else:
-        quality_profiles_url = make_url(
-            api_key=api_key, host=host, port=port, ssl=ssl, resource_path="/profile"
-        )
+    quality_profiles_url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        version=3,
+        resource_path="/qualityprofile",
+    )
 
-    root_folders = [folder["path"] for folder in await HttpClient.request("GET", root_folders_url)]
+    tags_url = make_url(
+        api_key=api_key,
+        host=host,
+        port=port,
+        ssl=ssl,
+        version=3,
+        resource_path="/tag",
+    )
+
+    root_folders = [folder["path"] for folder in await HttpClient.get(root_folders_url)]
     quality_profiles = [
-        {"id": profile["id"], "name": profile["name"]}
-        for profile in await HttpClient.request("GET", quality_profiles_url)
+        {"id": profile["id"], "name": profile["name"]} for profile in await HttpClient.get(quality_profiles_url)
     ]
+    tags = [{"id": tag["id"], "name": tag["label"]} for tag in await HttpClient.get(tags_url)]
+
     return RadarrInstanceInfo(
-        version=version, root_folders=root_folders, quality_profiles=quality_profiles
+        version=version,
+        root_folders=root_folders,
+        quality_profiles=quality_profiles,
+        tags=tags,
     )
 
 
-async def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> Optional[RadarrMovie]:
+async def lookup(setting: RadarrSetting, tmdb_id: int | None = None, imdb_id: str | None = None) -> RadarrMovie | None:
     url = make_url(
         api_key=setting.api_key,
         host=setting.host,
@@ -129,13 +114,12 @@ async def lookup(setting: RadarrSetting, tmdb_id: int, title: str) -> Optional[R
         ssl=setting.ssl,
         version=setting.version,
         resource_path="/movie/lookup",
-        queries={"term": title},
+        queries={"term": f"tmdb:{tmdb_id}" if tmdb_id else f"imdb:{imdb_id}"},
     )
-    lookup_result = await HttpClient.request("GET", url)
-    if not isinstance(lookup_result, list):
+    lookup_result = await HttpClient.get(url)
+    if not isinstance(lookup_result, list) or len(lookup_result) == 0:
         return None
-    movie = next(res for res in lookup_result if res["tmdbId"] == tmdb_id)
-    return RadarrMovie.parse_obj(movie)
+    return RadarrMovie.model_validate(lookup_result[0])
 
 
 async def add_movie(setting: RadarrSetting, movie: RadarrMovie) -> RadarrMovie:
@@ -147,17 +131,22 @@ async def add_movie(setting: RadarrSetting, movie: RadarrMovie) -> RadarrMovie:
         version=setting.version,
         resource_path="/movie",
     )
-    resp = await HttpClient.request("POST", url, data=movie.json(by_alias=True, exclude_none=True))
-    return RadarrMovie.parse_obj(resp)
+    resp = await HttpClient.post(url, data=movie.model_dump_json(by_alias=True, exclude_none=True))
+    return RadarrMovie.model_validate(resp)
 
 
-async def send_request(request: MovieRequest):
-    setting = request.selected_provider
-    movie = await lookup(setting, tmdb_id=request.media.tmdb_id, title=request.media.title)
+async def send_request(request: MediaRequest) -> None:
+    setting = RadarrSetting(**request.selected_provider.dict())
+    movie = await lookup(
+        setting,
+        tmdb_id=request.media.tmdb_id,
+        imdb_id=request.media.imdb_id,
+    )
     if movie is None or movie.id is not None:
         return
     movie.root_folder_path = request.root_folder or setting.root_folder
     movie.quality_profile_id = request.quality_profile_id or setting.quality_profile_id
+    movie.tags = [int(tag) for tag in request.tags] or [int(tag) for tag in setting.tags] or []
     movie.monitored = True
-    movie.add_options = RadarrAddOptions(search_for_movie=True)
+    movie.add_options = RadarrAddOptions(searchForMovie=True)
     await add_movie(setting, movie)

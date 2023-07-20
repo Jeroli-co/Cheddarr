@@ -2,38 +2,39 @@ from server.core.scheduler import scheduler
 from server.database.session import Session
 from server.models.media import MediaType
 from server.models.requests import RequestStatus
+from server.models.settings import SonarrSetting
 from server.repositories.requests import MediaRequestRepository
 from server.services import sonarr
 
 
-@scheduler.scheduled_job(
-    "interval", id="sonarr-sync", name="Sonarr Sync", coalesce=True, minutes=10
-)
-async def sonarr_sync():
+@scheduler.scheduled_job("interval", id="sonarr-sync", name="Sonarr Sync", coalesce=True, minutes=10)
+async def sonarr_sync() -> None:
     async with Session() as db_session:
         media_request_repo = MediaRequestRepository(db_session)
-        requests = await media_request_repo.find_all_by(
-            status=RequestStatus.approved, media_type=MediaType.series
-        )
+        requests = await media_request_repo.find_by(status=RequestStatus.approved, media_type=MediaType.series).all()
         for request in requests:
-            setting = request.selected_provider
+            setting = SonarrSetting(**request.selected_provider.dict())
+
+            if request.media.tvdb_id is None:
+                continue
+
             series_lookup = await sonarr.lookup(setting, tvdb_id=request.media.tvdb_id)
             if series_lookup is None:
                 continue
+
             if series_lookup.id is None:
                 request.status = RequestStatus.refused
                 await media_request_repo.save(request)
                 continue
 
             series = await sonarr.get_series(setting, series_lookup.id)
-            if series is None:
+            if series is None or series.id is None:
                 continue
+
             req_seasons_available = 0
             for req_season in request.seasons:
                 if not req_season.episodes:
-                    matched_season = next(
-                        s for s in series.seasons if s.season_number == req_season.season_number
-                    )
+                    matched_season = next(s for s in series.seasons if s.season_number == req_season.season_number)
                     if matched_season.episode_file_count == matched_season.total_episode_count:
                         req_season.status = RequestStatus.available
                         req_seasons_available += 1
@@ -55,4 +56,5 @@ async def sonarr_sync():
                         req_seasons_available += 1
             if req_seasons_available == len(request.seasons):
                 request.status = RequestStatus.available
+
             await media_request_repo.save(request)

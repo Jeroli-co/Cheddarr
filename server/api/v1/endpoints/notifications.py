@@ -1,12 +1,14 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from server.api import (
     dependencies as deps,
 )
+from server.api.dependencies import CurrentUser
 from server.models.notifications import Agent, NotificationAgent
-from server.models.users import User
 from server.repositories.notifications import NotificationAgentRepository, NotificationRepository
-from server.schemas.core import ResponseMessage
+from server.schemas.base import PaginatedResponse
 from server.schemas.notifications import EmailAgentSchema, NotificationSchema
 
 router = APIRouter()
@@ -18,52 +20,41 @@ router = APIRouter()
 
 @router.get(
     "",
-    response_model=list[NotificationSchema],
+    response_model=PaginatedResponse[NotificationSchema],
 )
-async def get_all_notifications(
-    current_user: User = Depends(deps.get_current_user),
-    notification_repository: NotificationRepository = Depends(
-        deps.get_repository(NotificationRepository)
-    ),
-):
-    user_notifications = await notification_repository.find_all_by(user_id=current_user.id)
-    return user_notifications
+async def get_notifications(
+    page: int = 1,
+    per_page: int = 20,
+    *,
+    current_user: CurrentUser,
+    notification_repository: NotificationRepository = Depends(deps.get_repository(NotificationRepository)),
+) -> Any:
+    return await notification_repository.find_by(user_id=current_user.id).paginate(page=page, per_page=per_page)
 
 
-@router.delete(
-    "/{id}",
-    response_model=ResponseMessage,
-    responses={
-        status.HTTP_403_FORBIDDEN: {"description": "Notification not belonging to user"},
-        status.HTTP_404_NOT_FOUND: {"description": "Notification not found"},
-    },
-)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_notification(
     id: int,
-    current_user: User = Depends(deps.get_current_user),
-    notification_repository: NotificationRepository = Depends(
-        deps.get_repository(NotificationRepository)
-    ),
-):
-    notification = await notification_repository.find_by(id=id)
+    *,
+    current_user: CurrentUser,
+    notification_repository: NotificationRepository = Depends(deps.get_repository(NotificationRepository)),
+) -> None:
+    notification = await notification_repository.find_by(id=id).one()
     if notification is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Notification not found")
+
     if notification.user_id != current_user.id:
         raise HTTPException(status.HTTP_403_FORBIDDEN)
+
     await notification_repository.remove(notification)
-    return {"detail": "Notification deleted"}
 
 
-@router.delete("", response_model=ResponseMessage)
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_notifications(
-    current_user: User = Depends(deps.get_current_user),
-    notification_repository: NotificationRepository = Depends(
-        deps.get_repository(NotificationRepository)
-    ),
-):
-    notifications = await notification_repository.find_all_by(user_id=current_user.id)
-    await notification_repository.remove(notifications)
-    return {"detail": "Notifications deleted"}
+    current_user: CurrentUser,
+    notification_repository: NotificationRepository = Depends(deps.get_repository(NotificationRepository)),
+) -> None:
+    await notification_repository.remove_all_by_user_id(current_user.id)
 
 
 ##########################################
@@ -73,16 +64,13 @@ async def delete_all_notifications(
 
 @router.get(
     "/agents/email",
-    response_model=EmailAgentSchema,
+    response_model=EmailAgentSchema | None,
     dependencies=[Depends(deps.get_current_user)],
 )
 async def get_email_agent(
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
-):
-    agent = await notif_agent_repo.find_by(name=Agent.email)
-    return agent
+    notif_agent_repo: NotificationAgentRepository = Depends(deps.get_repository(NotificationAgentRepository)),
+) -> Any:
+    return await notif_agent_repo.find_by(name=Agent.email).one()
 
 
 @router.put(
@@ -90,13 +78,11 @@ async def get_email_agent(
     response_model=EmailAgentSchema,
     dependencies=[Depends(deps.get_current_user)],
 )
-async def update_email_agent(
+async def upsert_email_agent(
     agent_in: EmailAgentSchema,
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
-):
-    agent = await notif_agent_repo.find_by(name=Agent.email)
+    notif_agent_repo: NotificationAgentRepository = Depends(deps.get_repository(NotificationAgentRepository)),
+) -> Any:
+    agent = await notif_agent_repo.find_by(name=Agent.email).one()
     if agent is None:
         agent = agent_in.to_orm(NotificationAgent)
         agent.name = Agent.email
@@ -110,18 +96,16 @@ async def update_email_agent(
 @router.delete(
     "/agents/email",
     dependencies=[Depends(deps.get_current_user)],
-    response_model=ResponseMessage,
+    status_code=status.HTTP_204_NO_CONTENT,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "No email agent"},
     },
 )
 async def delete_email_agent(
-    notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
-    ),
-):
-    agent = await notif_agent_repo.find_by(name=Agent.email)
+    notif_agent_repo: NotificationAgentRepository = Depends(deps.get_repository(NotificationAgentRepository)),
+) -> None:
+    agent = await notif_agent_repo.find_by(name=Agent.email).one()
     if agent is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No email agent is configured.")
+
     await notif_agent_repo.remove(agent)
-    return {"detail": "Email agent deleted."}

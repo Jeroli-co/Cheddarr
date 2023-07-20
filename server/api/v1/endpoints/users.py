@@ -1,23 +1,22 @@
-from typing import Optional
-
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
 from pydantic import EmailStr
 
 from server.api import dependencies as deps
-from server.core import security, utils
+from server.api.dependencies import CurrentUser
+from server.core import utils
 from server.core.scheduler import scheduler
 from server.core.security import check_permissions
 from server.models.notifications import Agent
-from server.models.users import Token, TokenType, User, UserRole
+from server.models.users import Token, User, UserRole
 from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import (
     TokenRepository,
     UserRepository,
 )
-from server.schemas.core import ResponseMessage
+from server.schemas.base import PaginatedResponse
 from server.schemas.users import (
+    UserProfile,
     UserSchema,
-    UserSearchResult,
     UserUpdate,
 )
 
@@ -36,53 +35,58 @@ current_user_router = APIRouter()
         Depends(deps.get_current_user),
         Depends(deps.has_user_permissions([UserRole.manage_users])),
     ],
-    response_model=UserSearchResult,
+    response_model=PaginatedResponse[UserProfile],
 )
 async def get_users(
     page: int = 1,
     per_page: int = 10,
-    confirmed: Optional[bool] = True,
+    confirmed: bool | None = True,
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    users, total_results, total_pages = await user_repo.find_all_by(
-        page=page, per_page=per_page, confirmed=confirmed
-    )
-    return UserSearchResult(
-        page=page, total_results=total_results, total_pages=total_pages, results=users
-    )
+) -> PaginatedResponse[UserProfile]:
+    users = await user_repo.find_by(confirmed=confirmed).paginate(page=page, per_page=per_page)
+
+    return PaginatedResponse[UserProfile](page=users.page, total=users.total, pages=users.pages, results=users.items)
 
 
 @users_router.get(
     "/{user_id}",
     dependencies=([Depends(deps.get_current_user)]),
-    response_model=UserSchema,
+    response_model=UserProfile,
     responses={
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
     },
 )
 async def get_user_by_id(
     user_id: int,
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    user = await user_repo.find_by(id=user_id)
+) -> User:
+    user = await user_repo.find_by(id=user_id).one()
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with this id exists.")
+
     return user
 
 
-@users_router.delete("/{user_id}", response_model=ResponseMessage)
+@users_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     user_id: int,
-    current_user: User = Depends(deps.get_current_user),
+    *,
+    current_user: CurrentUser,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
+) -> None:
     if current_user.id != user_id and not check_permissions(current_user.roles, [UserRole.admin]):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Not enough privileges to update the user.")
-    user = await user_repo.find_by(id=user_id)
+
+    user = await user_repo.find_by(id=user_id).one()
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found.")
+
+    if check_permissions(user.roles, [UserRole.admin]) and await user_repo.count(roles=UserRole.admin) == 1:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot delete last admin user.")
+
     await user_repo.remove(user)
-    return {"detail": "User deleted."}
 
 
 @users_router.patch(
@@ -96,15 +100,19 @@ async def delete_user(
 async def update_user(
     user_id: int,
     user_in: UserUpdate,
-    current_user: User = Depends(deps.get_current_user),
+    *,
+    current_user: CurrentUser,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
+) -> User:
     if current_user.id != user_id and not check_permissions(current_user.roles, [UserRole.admin]):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Not enough privileges to update the user.")
-    user = await user_repo.find_by(id=user_id)
+
+    user = await user_repo.find_by(id=user_id).one()
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found.")
 
     if user_in.username is not None:
-        if await user_repo.find_by_username(user_in.username):
+        if await user_repo.find_by_username(user_in.username).one():
             raise HTTPException(status.HTTP_409_CONFLICT, "This username is already taken.")
         user.username = user_in.username
 
@@ -115,22 +123,21 @@ async def update_user(
                 "Missing old password to change to a new password.",
             )
 
-        if not security.verify_password(user_in.old_password, user.password):
+        if not user.verify_password(user_in.old_password):
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The passwords don't match.")
         user.password = user_in.password
 
     if user_in.email is not None:
-        if await user_repo.find_by_email(user_in.email):
+        if await user_repo.find_by_email(user_in.email).one():
             raise HTTPException(status.HTTP_409_CONFLICT, "This email is already taken.")
 
-        else:
-            user.email = user_in.email
+        user.email = user_in.email
 
     if user_in.roles is not None:
+        if user.id == current_user.id:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Cannot change user's own roles.")
         if not check_permissions(current_user.roles, [UserRole.admin]):
-            raise HTTPException(
-                status.HTTP_403_FORBIDDEN, "Not enough privileges to change the user's roles."
-            )
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Not enough privileges to change the user's roles.")
         user.roles = user_in.roles
 
     if user_in.confirmed is not None:
@@ -142,20 +149,8 @@ async def update_user(
         user.confirmed = user_in.confirmed
 
     await user_repo.save(user)
+
     return user
-
-
-@users_router.get(
-    "/search",
-    response_model=list[UserSchema],
-    dependencies=[Depends(deps.get_current_user)],
-)
-async def search_users(
-    value: str,
-    user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    search = await user_repo.search_by("username", value)
-    return search
 
 
 ##########################################
@@ -164,13 +159,13 @@ async def search_users(
 
 
 @current_user_router.get("", response_model=UserSchema)
-async def get_current_user(current_user: User = Depends(deps.get_current_user)):
+async def get_current_user(current_user: CurrentUser) -> User:
     return current_user
 
 
 @current_user_router.put(
     "/password",
-    response_model=ResponseMessage,
+    status_code=status.HTTP_202_ACCEPTED,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
@@ -179,90 +174,94 @@ async def get_current_user(current_user: User = Depends(deps.get_current_user)):
 async def reset_password(
     request: Request,
     email: EmailStr = Body(..., embed=True),
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
     notif_agent_repo: NotificationAgentRepository = Depends(
-        deps.get_repository(NotificationAgentRepository)
+        deps.get_repository(NotificationAgentRepository),
     ),
-):
-    email_agent = await notif_agent_repo.find_by(name=Agent.email)
+) -> None:
+    email_agent = await notif_agent_repo.find_by(name=Agent.email).one()
     if email_agent is None or not email_agent.enabled:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled")
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled.")
 
-    email = email
-    user = await user_repo.find_by_email(email)
+    user = await user_repo.find_by_email(email).one()
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user registered with this email.")
 
-    token = Token(dict(email=user.email), timed=True, type=TokenType.reset_password)
+    token = Token(data={"email": user.email})
     await token_repo.save(token)
 
     scheduler.add_job(
         utils.send_email,
-        kwargs=dict(
-            email_options=email_agent.settings,
-            to_email=email,
-            subject="Reset your password",
-            html_template_name="email/reset_password_instructions.html",
-            environment=dict(
-                reset_url=request.url_for("check_reset_password", token=token.signed_data)
-            ),
-        ),
+        kwargs={
+            "email_settings": email_agent.settings,
+            "to_email": email,
+            "subject": "Reset your password",
+            "html_template_name": "email/reset_password_instructions.html",
+            "environment": {"reset_url": request.url_for("check_reset_password", token=token)},
+        },
     )
-    return {"detail": "Reset instructions sent."}
 
 
 @current_user_router.get(
     "/password/{token}",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=ResponseMessage,
     responses={
+        status.HTTP_403_FORBIDDEN: {"description": "Invalid reset link"},
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
-        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
+        status.HTTP_410_GONE: {"description": "Nonexistent or expired reset request"},
     },
 )
 async def check_reset_password(
     token: str,
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
-):
-    try:
-        data = Token.time_unsign(token)
-    except Exception:
-        raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
+    token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
+) -> None:
+    payload = Token.unsign(token)
+    if payload is None:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "The reset link is invalid.")
 
-    user = await user_repo.find_by_email(data["email"])
+    reset = await token_repo.find_by(id=payload["id"]).one()
+    if reset is None or reset.is_expired:
+        raise HTTPException(status.HTTP_410_GONE, "This reset request does not exist or has expired.")
+
+    user = await user_repo.find_by_email(payload["email"]).one()
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
-
-    return {"detail": "Able to reset."}
 
 
 @current_user_router.post(
     "/password/{token}",
-    response_model=ResponseMessage,
+    status_code=status.HTTP_204_NO_CONTENT,
     responses={
         status.HTTP_400_BAD_REQUEST: {"description": "No email agent"},
+        status.HTTP_403_FORBIDDEN: {"description": "Invalid reset link"},
         status.HTTP_404_NOT_FOUND: {"description": "User not found"},
-        status.HTTP_410_GONE: {"description": "Invalid or expired link"},
+        status.HTTP_410_GONE: {"description": "Nonexistent or expired reset request"},
     },
 )
 async def confirm_reset_password(
     token: str,
     password: str = Body(..., embed=True),
+    *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
-):
-    try:
-        data = Token.time_unsign(token)
-    except Exception:
-        raise HTTPException(status.HTTP_410_GONE, "The reset link is invalid or has expired.")
+) -> None:
+    payload = Token.unsign(token)
+    if payload is None:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "The reset link is invalid.")
 
-    user = await user_repo.find_by_email(data["email"])
+    reset = await token_repo.find_by(id=payload["id"]).one()
+    if reset is None or reset.is_expired:
+        raise HTTPException(status.HTTP_410_GONE, "This reset request does not exist or has expired.")
+
+    user = await user_repo.find_by_email(payload["email"]).one()
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
 
     user.password = password
-    await user_repo.save(user)
-    await token_repo.remove_by(id=data["id"])
 
-    return {"detail": "Password reset."}
+    await user_repo.save(user)
+    await token_repo.remove(reset)

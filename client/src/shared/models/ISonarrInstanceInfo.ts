@@ -1,12 +1,8 @@
 import { IQualityProfile } from "./IQualityProfile";
-
-interface ILanguageProfile {
-  readonly id: number;
-  readonly name: string;
-}
+import { ITag } from "./ITag";
 
 export interface ISonarrInstanceInfo {
   readonly rootFolders: string[];
   readonly qualityProfiles: IQualityProfile[];
-  readonly languageProfiles: ILanguageProfile[];
+  readonly tags: ITag[];
 }

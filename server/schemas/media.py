@@ -1,102 +1,98 @@
+from __future__ import annotations
+
 from abc import ABC
-from datetime import date
-from typing import Optional, Union
+from collections.abc import Sequence
+from datetime import date, datetime
+from typing import Annotated, Any, Literal
 
-from pydantic import AnyHttpUrl, Field
+from pydantic import BaseModel, Field
 
-from server.models.media import MediaType, SeriesType
-from .core import APIModel, PaginatedResult
-
-
-###########################################
-# Base                                    #
-###########################################
+from server.models.media import MediaType
+from server.schemas.base import APIModel
 
 
-class MediaServerInfo(APIModel):
+class MediaServerInfo(BaseModel):
     external_id: str
-    added_at: date
+    added_at: datetime
     server_id: str
-    web_url: Optional[AnyHttpUrl]
+    web_url: str | None = None
 
 
-class PersonCredits(APIModel):
-    cast: "list[Union[SeriesSchema, MovieSchema]]"
+class PersonCredits(BaseModel):
+    cast: Sequence[SeriesSchema | MovieSchema]
 
 
-class Person(APIModel):
+class Person(BaseModel):
     id: int
     name: str
-    also_known_as: Optional[list[str]]
-    biography: Optional[str]
-    birth_day: Optional[date]
-    death_day: Optional[date]
-    role: Optional[str]
-    credits: Optional[PersonCredits]
-    picture_url: Optional[AnyHttpUrl]
+    also_known_as: list[str] | None = None
+    biography: str | None = None
+    birth_day: date | None = None
+    death_day: date | None = None
+    role: str | None = None
+    credits: PersonCredits | None = None
+    picture_url: str | None = None
 
 
-class Credits(APIModel):
-    cast: list[Person]
-    crew: list[Person]
+class Credits(BaseModel):
+    cast: Sequence[Person]
+    crew: Sequence[Person]
 
 
-class Company(APIModel):
+class Company(BaseModel):
     name: str
 
 
-class Video(APIModel):
-    video_url: Optional[AnyHttpUrl]
+class Video(BaseModel):
+    video_url: str | None = None
 
 
-class Genre(APIModel):
+class Genre(BaseModel):
     id: int
     name: str
 
 
-class MediaSchema(APIModel, ABC):
-    tmdb_id: Optional[int]
-    imdb_id: Optional[str]
-    tvdb_id: Optional[int]
+class MediaSchemaBase(APIModel, ABC):
+    tmdb_id: int | None = None
+    imdb_id: str | None = None
+    tvdb_id: int | None = None
     title: str
-    summary: Optional[str]
-    release_date: Optional[date]
-    status: Optional[str]
-    poster_url: Optional[str]
-    art_url: Optional[str]
-    rating: Optional[float]
-    duration: Optional[int]
-    genres: Optional[list[Genre]]
-    studios: Optional[list[Company]]
-    credits: Optional[Credits]
-    trailers: Optional[list[Video]]
+    summary: str | None = None
+    release_date: date | None = None
+    status: str | None = None
+    poster_url: str | None = None
+    art_url: str | None = None
+    rating: float | None = None
+    duration: int | None = None
+    genres: Sequence[Genre] | None = None
+    studios: Sequence[Company] | None = None
+    credits: Credits | None = None
+    trailers: Sequence[Video] | None = None
     media_servers_info: list[MediaServerInfo] = []
 
 
-class MovieSchema(MediaSchema):
-    media_type: MediaType = Field(default=MediaType.movie, const=True)
-    requests: list = []
+class MovieSchema(MediaSchemaBase):
+    requests: Sequence[Any] = []  # FIXME: This is a hack to get around circular imports
+    media_type: Literal[MediaType.movie] = Field(MediaType.movie, init_var=False)
 
 
-class EpisodeSchema(MediaSchema):
+class EpisodeSchema(MediaSchemaBase):
     episode_number: int
 
 
-class SeasonSchema(MediaSchema):
+class SeasonSchema(MediaSchemaBase):
     season_number: int
-    episodes: Optional[list[EpisodeSchema]]
+    episodes: Sequence[EpisodeSchema] | None = None
 
 
-class SeriesSchema(MediaSchema):
-    number_of_seasons: Optional[int]
-    seasons: Optional[list[SeasonSchema]]
-    media_type: MediaType = Field(default=MediaType.series, const=True)
-    series_type: Optional[SeriesType]
-    requests: list = []
+class SeriesSchema(MediaSchemaBase):
+    number_of_seasons: int | None = None
+    seasons: Sequence[SeasonSchema] | None = None
+    requests: Sequence[Any] = []  # FIXME: This is a hack to get around circular imports
+    media_type: Literal[MediaType.series] = Field(MediaType.series, init_var=False)
 
 
-class MediaSearchResult(PaginatedResult):
-    results: list[Union[SeriesSchema, MovieSchema]]
+MediaSchema = Annotated[SeriesSchema | MovieSchema, Field(discriminator="media_type")]
 
 
-PersonCredits.update_forward_refs()
+Person.model_rebuild()

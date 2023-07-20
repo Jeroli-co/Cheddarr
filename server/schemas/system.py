@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
-from server.schemas.core import PaginatedResult
+
+class PublicConfig(BaseModel):
+    log_level: str | None = None
+    default_roles: int | None = None
 
 
 class Log(BaseModel):
@@ -13,11 +17,7 @@ class Log(BaseModel):
     message: str
 
 
-class LogResult(PaginatedResult):
-    results: list[Log]
-
-
 class Job(BaseModel):
     id: str
     name: str
-    next_run_time: Optional[datetime]
+    next_run_time: datetime | None = None

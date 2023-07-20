@@ -1,30 +1,34 @@
-from typing import Optional
+from __future__ import annotations
+
+from abc import ABC
+from typing import Any
 
 from server.models.settings import MediaProviderType
-from .core import APIModel
+from server.schemas.base import APIModel
 
 
-class ExternalServiceSettingBase(APIModel):
+class ExternalServiceSettingBase(APIModel, ABC):
     host: str
-    port: Optional[int]
+    port: int | None = None
     ssl: bool
     api_key: str
-    name: Optional[str]
-    enabled: Optional[bool] = True
-    version: Optional[int]
+    name: str | None = None
+    enabled: bool | None = True
+    version: int | None = None
 
 
-class MediaServerSettingBase(ExternalServiceSettingBase):
+class MediaServerSettingBase(ExternalServiceSettingBase, ABC):
     server_id: str
     server_name: str
 
 
-class MediaProviderSettingBase(ExternalServiceSettingBase):
-    provider_type: Optional[MediaProviderType]
+class MediaProviderSettingBase(ExternalServiceSettingBase, ABC):
+    provider_type: MediaProviderType | None = None
     root_folder: str
     quality_profile_id: int
     version: int
-    is_default: Optional[bool] = False
+    is_default: bool | None = False
+    tags: list[int] | None = None
 
 
 #####################################
@@ -37,7 +41,7 @@ class PlexServer(MediaServerSettingBase):
 
 
 class PlexLibrarySection(APIModel):
-    library_id: int
+    library_id: str
     name: str
     enabled: bool = True
 
@@ -57,8 +61,9 @@ class PlexSettingCreateUpdate(MediaServerSettingBase):
 
 class RadarrInstanceInfo(APIModel):
     root_folders: list[str]
-    quality_profiles: list[dict]
-    version: int
+    quality_profiles: list[dict[str, Any]]
+    version: int | None = None
+    tags: list[dict[str, Any]]
 
 
 class RadarrSettingSchema(MediaProviderSettingBase):
@@ -76,21 +81,19 @@ class RadarrSettingCreateUpdate(MediaProviderSettingBase):
 
 class SonarrInstanceInfo(APIModel):
     root_folders: list[str]
-    quality_profiles: list[dict]
-    language_profiles: Optional[list[dict]]
-    version: int
+    quality_profiles: list[dict[str, Any]]
+    version: int | None = None
+    tags: list[dict[str, Any]]
 
 
 class SonarrSettingSchema(MediaProviderSettingBase):
     id: str
-    anime_root_folder: Optional[str]
-    anime_quality_profile_id: Optional[int]
-    language_profile_id: Optional[int]
-    anime_language_profile_id: Optional[int]
+    anime_root_folder: str | None = None
+    anime_quality_profile_id: int | None = None
+    anime_tags: list[int] | None = None
 
 
 class SonarrSettingCreateUpdate(MediaProviderSettingBase):
-    anime_root_folder: Optional[str]
-    anime_quality_profile_id: Optional[int]
-    language_profile_id: Optional[int]
-    anime_language_profile_id: Optional[int]
+    anime_root_folder: str | None = None
+    anime_quality_profile_id: int | None = None
+    anime_tags: list[int] | None = None

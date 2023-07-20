@@ -1,18 +1,9 @@
 #!/usr/bin/env python
-import asyncio
-import functools
 from pathlib import Path
 
-import click
-
-
-def make_sync(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        return asyncio.run(func(*args, **kwargs))
-
-    return wrapper
-
+import asyncclick as click
+from asgiref.sync import sync_to_async
+from asyncclick import Context
 
 """USAGE:
 python cheddarr.py [OPTIONS] COMMAND
@@ -29,13 +20,12 @@ python cheddarr.py [OPTIONS] COMMAND
     is_flag=True,
 )
 @click.pass_context
-def cli(ctx, debug):
+def cli(ctx: Context, debug: bool) -> None:
     ctx.obj["DEBUG"] = debug
 
 
 @cli.command("init-db")
-@make_sync
-async def init_db():
+async def init_db() -> None:
     """Initialize the database."""
     from server.database.init_db import init_db
 
@@ -44,19 +34,20 @@ async def init_db():
 
 
 @cli.command("test")
-def test():
+async def test() -> None:
     """Run the tests."""
     import pytest
 
-    rv = pytest.main(["./server/tests", "--verbose"])
-    exit(rv)
+    await sync_to_async(pytest.main)(["./server/tests", "--verbose"])
 
 
 @cli.command("run")
 @click.pass_context
-def run(ctx):
+def run(ctx: Context) -> None:
     """Run the application."""
     import uvicorn
+
+    from server.core.config import get_config
 
     debug = ctx.obj["DEBUG"]
     if not debug:
@@ -64,12 +55,12 @@ def run(ctx):
         from alembic.config import Config
 
         upgrade(Config(str(Path.cwd() / "server/alembic.ini")), "head")
+
     uvicorn.run(
         "server.main:app",
-        host="0.0.0.0",
-        port=9090,
+        host=get_config().server_domain,
+        port=get_config().server_port,
         reload=debug,
-        debug=debug,
         access_log=debug,
     )
 

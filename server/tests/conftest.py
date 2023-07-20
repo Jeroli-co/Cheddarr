@@ -1,94 +1,121 @@
-import os
-from typing import Iterator
+import asyncio
+from collections.abc import AsyncGenerator
 
+import jwt
 import pytest
+from async_asgi_testclient import TestClient
 from fastapi import FastAPI
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from .utils import datasets, user_authentication_headers
+from server.core.config import get_test_config
 
-os.environ["TESTING"] = "true"
-
-url = "sqlite+aiosqlite://"
-engine = create_async_engine(url, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+from .utils import Dataset
 
 
-# Override dependency and db fixture
-async def get_test_db():
-    session = TestingSessionLocal()
+@pytest.fixture(scope="session")
+def test_config():
+    return get_test_config()
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="session")
+async def db_engine(event_loop, test_config):
+    from server.database.base import Base
+
+    engine = create_async_engine(test_config.db_uri, connect_args={"check_same_thread": False})
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        await setup_database(conn)
+
+    try:
+        yield engine
+    finally:
+        await drop_database(test_config.db_uri)
+        await engine.dispose()
+
+
+@pytest.fixture()
+async def db_session(db_engine):
+    connection = await db_engine.connect()
+    trans = await connection.begin()
+    session = async_sessionmaker(connection, expire_on_commit=False)()
+
     try:
         yield session
     finally:
         await session.close()
+        await trans.rollback()
+        await connection.close()
 
 
-db = pytest.fixture(get_test_db, scope="function")
+async def setup_database(connection):
+    async with async_sessionmaker(bind=connection, expire_on_commit=False)() as session:
+        session.add_all(Dataset.users)
+        session.add_all(Dataset.invitations)
+        session.add_all(Dataset.series)
+        session.add_all(Dataset.movies)
+        session.add_all(Dataset.series_requests)
+        session.add_all(Dataset.movies_requests)
+        await session.commit()
+
+
+async def drop_database(uri):
+    from server.database.base import Base
+
+    engine = create_async_engine(uri, connect_args={"check_same_thread": False})
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
 
 def app_v1() -> FastAPI:
-    from server.api.v1.router import application
-    from server.api.dependencies import get_db
+    from server.api.v1.router import application as app_
 
-    application.dependency_overrides[get_db] = get_test_db
-
-    return application
+    return app_
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def get_app():
     return {"v1": app_v1}
 
 
-@pytest.fixture(scope="function")
-async def setup(db):
-    from server.models.media import Media
-    from server.models.requests import MovieRequest, SeriesRequest
-    from server.models.users import User
-    from server.database.base import Base
-
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
-
-    user1 = User(**datasets["users"][0])
-    user2 = User(**datasets["users"][1])
-    user3 = User(**datasets["users"][2])
-    db.add_all((user1, user2, user3))
-    series1 = Media(**datasets["series"][0])
-    series2 = Media(**datasets["series"][1])
-    movie1 = Media(**datasets["movies"][0])
-    movie2 = Media(**datasets["movies"][1])
-    db.add_all((movie1, movie2, series1, series2))
-    series_request1 = SeriesRequest(**datasets["series_requests"][0])
-    series_request2 = SeriesRequest(**datasets["series_requests"][1])
-    movie_request1 = MovieRequest(**datasets["movies_requests"][0])
-    movie_request2 = MovieRequest(**datasets["movies_requests"][1])
-    db.add_all((series_request1, series_request2, movie_request1, movie_request2))
-    await db.commit()
-
-
 @pytest.fixture(params=["v1"])
-async def client(request, get_app, setup) -> Iterator[AsyncClient]:
-    app = get_app[request.param]()
-    async with AsyncClient(app=app, base_url="http://test") as c:
-        c.headers = await user_authentication_headers(
-            client=c,
-            email=datasets["users"][0]["email"],
-            password=datasets["users"][0]["password"],
-        )
-        setattr(c, "app", app)
+async def client(request, get_app, db_session) -> AsyncGenerator[TestClient, None]:
+    from server.api.dependencies import get_db
+    from server.core.config import get_config
+
+    app_ = get_app[request.param]()
+    app_.dependency_overrides[get_db] = lambda: (yield db_session)
+    app_.dependency_overrides[get_config] = get_test_config
+
+    async with TestClient(application=app_) as c:
+        c.headers = {
+            "Authorization": f"Bearer {jwt.encode({'sub':Dataset.users[0].id }, get_test_config().secret_key)}",
+        }
         yield c
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session", autouse=True)
+def mock_config(session_mocker):
+    session_mocker.patch("server.core.config.get_config", get_test_config)
+
+
+@pytest.fixture()
 def mock_tmdb(mocker):
-    series = datasets["series"][0]
-    series["number_of_seasons"] = 7
-    series["series_type"] = "anime"
-    mocker.patch(
-        "server.services.search.get_tmdb_series",
-        return_value=series,
-    )
+    from server.schemas.media import SeriesSchema
+
+    def side_effect(id):
+        if id == Dataset.series[0].tmdb_id:
+            return SeriesSchema(**Dataset.series[0], number_of_seasons=7)
+        if id == Dataset.series[1].tmdb_id:
+            return SeriesSchema(**Dataset.series[1], number_of_seasons=7)
+        return None
+
+    mocker.patch("server.services.search.get_tmdb_series", side_effect=side_effect)

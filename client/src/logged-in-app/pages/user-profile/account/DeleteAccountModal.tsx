@@ -6,14 +6,15 @@ import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { Button, DangerButton } from "../../../../shared/components/Button";
 
 type DeleteAccountModalProps = {
+  id: number;
   closeModal: () => void;
 };
 
 const DeleteAccountModal = (props: DeleteAccountModalProps) => {
-  const { deleteAccount } = useUserService();
+  const { deleteUser } = useUserService();
 
-  const onSubmit = () => {
-    deleteAccount().then((res) => {
+  const onSubmit = (id: number) => {
+    deleteUser(id).then((res) => {
       if (res.status === 200) props.closeModal();
     });
   };
@@ -25,7 +26,7 @@ const DeleteAccountModal = (props: DeleteAccountModalProps) => {
       </header>
       <footer>
         <Buttons>
-          <DangerButton type="button" onClick={() => onSubmit()}>
+          <DangerButton type="button" onClick={() => onSubmit(props.id)}>
             Delete account
           </DangerButton>
           <Button type="button" onClick={() => props.closeModal()}>

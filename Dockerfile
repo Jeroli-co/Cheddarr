@@ -8,7 +8,7 @@ COPY /client ./client
 RUN cd client && yarn install && yarn cache clean && yarn build --production
 
 
-FROM python:3.9.5-slim
+FROM python:3.11.2-slim
 WORKDIR /app
 
 # Copy front build

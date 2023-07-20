@@ -1,12 +1,14 @@
-from typing import Any, Mapping, Optional
+from collections.abc import Mapping
+from json import JSONDecodeError
+from typing import Any
 
 import httpx
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from loguru import logger
 
 
 class HttpClient:
-    http_client: Optional[httpx.AsyncClient] = None
+    http_client: httpx.AsyncClient | None = None
 
     @classmethod
     def get_http_client(cls) -> httpx.AsyncClient:
@@ -26,17 +28,41 @@ class HttpClient:
         method: str,
         url: str,
         *,
-        params: Optional[Mapping[str, Any]] = None,
-        headers: Optional[Mapping[str, Any]] = None,
+        params: Mapping[str, Any] | None = None,
+        headers: Mapping[str, Any] | None = None,
         data: Any = None,
     ) -> Any:
         client = cls.get_http_client()
-        try:
-            resp = await client.request(method, url, params=params, headers=headers, data=data)
-            if 200 < resp.status_code > 300:
+
+        async def _call() -> Any:
+            resp = await client.request(
+                method, url, params=params, headers={**(headers or {}), "Content-Type": "application/json"}, data=data
+            )
+            if status.HTTP_200_OK < resp.status_code >= status.HTTP_400_BAD_REQUEST:
                 raise HTTPException(resp.status_code, resp.text)
-            json_result = resp.json()
-        except Exception as e:
-            logger.error(f"An error occurred when calling {url}: {str(e)}")
+            try:
+                return resp.json()
+            except JSONDecodeError:
+                return None
+
+        try:
+            return await _call()
+        except Exception:
+            logger.exception("An error occurred when calling %s", url)
             raise
-        return json_result
+
+    @classmethod
+    async def get(cls, url: str, **kwargs: Any) -> Any:
+        return await cls.request("GET", url, **kwargs)
+
+    @classmethod
+    async def post(cls, url: str, **kwargs: Any) -> Any:
+        return await cls.request("POST", url, **kwargs)
+
+    @classmethod
+    async def put(cls, url: str, **kwargs: Any) -> Any:
+        return await cls.request("PUT", url, **kwargs)
+
+    @classmethod
+    async def delete(cls, url: str, **kwargs: Any) -> Any:
+        return await cls.request("DELETE", url, **kwargs)

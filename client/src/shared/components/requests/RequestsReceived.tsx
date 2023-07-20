@@ -54,7 +54,7 @@ const RequestsReceived = () => {
         )}
       <RequestFooter
         currentPage={requestsReceived.data?.page}
-        totalPages={requestsReceived.data?.totalPages}
+        totalPages={requestsReceived.data?.pages}
         onLoadPrev={() => onLoadPrev(RequestTypes.INCOMING)}
         onLoadNext={() => onLoadNext(RequestTypes.INCOMING)}
       />

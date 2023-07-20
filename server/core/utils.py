@@ -1,8 +1,8 @@
-import os
 import re
 from os import listdir
 from pathlib import Path
 from random import choice
+from typing import Any
 from urllib.parse import urlencode
 
 import emails
@@ -13,19 +13,19 @@ from server.core.config import get_config
 
 
 def send_email(
-    email_options: dict,
+    email_settings: dict[str, Any],
     to_email: str,
     subject: str,
     html_template_name: str,
-    environment: dict = None,
-):
+    environment: dict[str, Any] | None = None,
+) -> None:
     environment = environment or {}
     for k, v in environment.items():
-        environment[k] = re.sub(f"{get_config().api_prefix}/v[0-9]+", "", v)
-    with open(Path(get_config().mail_templates_folder) / html_template_name) as f:
+        environment[k] = re.sub("/api/v[0-9]+", "", v)
+    with Path(get_config().mail_templates_folder / html_template_name).open() as f:
         template_str = f.read()
     message = emails.Message(
-        mail_from=(email_options["sender_name"], email_options["sender_address"]),
+        mail_from=(email_settings["sender_name"], email_settings["sender_address"]),
         subject=subject,
         html=JinjaTemplate(
             template_str,
@@ -34,12 +34,13 @@ def send_email(
     )
 
     smtp_options = {
-        "host": email_options["smtp_host"],
-        "port": email_options["smtp_port"],
-        "user": email_options["smtp_user"],
-        "password": email_options["smtp_password"],
-        "ssl": email_options["ssl"],
+        "host": email_settings["smtp_host"],
+        "port": email_settings["smtp_port"],
+        "user": email_settings["smtp_user"],
+        "password": email_settings["smtp_password"],
+        "ssl": email_settings["ssl"],
     }
+
     message.send(
         to=to_email,
         render=environment,
@@ -47,13 +48,19 @@ def send_email(
     )
 
 
-def get_random_avatar():
-    profile_images_path = os.path.join(get_config().images_folder, "users")
+def get_random_avatar() -> str:
+    profile_images_path = get_config().images_folder / "users"
     avatar = choice(listdir(profile_images_path))
     return f"/images/users/{avatar}"
 
 
-def make_url(url: str, queries_dict: dict = None):
+def make_url(url: str, queries_dict: dict[str, Any] | None = None) -> str:
     queries_dict = queries_dict or {}
     parameters = urlencode(queries_dict)
     return url + "?" + parameters
+
+
+def camel_to_snake_case(name: str) -> str:
+    """Convert a ``CamelCase`` name to ``snake_case``."""
+    name = re.sub(r"((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))", r"_\1", name)
+    return name.lower().lstrip("_")

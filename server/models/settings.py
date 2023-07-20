@@ -1,101 +1,112 @@
-from enum import Enum
+from __future__ import annotations
+
+from enum import StrEnum
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Column, Enum as DBEnum, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Enum, ForeignKey
+from sqlalchemy.orm import Mapped, declarative_mixin, mapped_column, relationship
 
-from server.models.base import mapper_args, Model
+from server.models.base import Model, mapper_args
 
 
-class ExternalServiceName(str, Enum):
+class ExternalServiceName(StrEnum):
     plex = "Plex"
     radarr = "Radarr"
     sonarr = "Sonarr"
 
 
-class ExternalServiceSetting(object):
-    def default_name(context):
-        return context.get_current_parameters()["service_name"]
-
-    id = Column(String, default=lambda: uuid4().hex, primary_key=True)
-    api_key = Column(String, nullable=False)
-    host = Column(String, nullable=False)
-    port = Column(Integer)
-    ssl = Column(Boolean, default=False)
-    enabled = Column(Boolean, default=True)
-    service_name = Column(String)
-    name = Column(String, default=default_name)
-
-
-class MediaServerSetting(Model, ExternalServiceSetting):
-    __mapper_args__ = mapper_args({"polymorphic_on": "service_name", "with_polymorphic": "*"})
-
-    server_id = Column(String, primary_key=True)
-    server_name = Column(String)
-    libraries: list["MediaServerLibrary"] = relationship(
-        "MediaServerLibrary", lazy="selectin", cascade="all,delete,delete-orphan"
-    )
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class MediaServerLibrary(Model):
-    __repr_props__ = ("name",)
-
-    id = Column(Integer, primary_key=True)
-    library_id = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-    setting_id: int = Column(ForeignKey("mediaserversetting.id"))
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class PlexSetting(MediaServerSetting):
-    __tablename__ = None
-    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.plex})
-    __repr_props__ = ("host", "port", "ssl", "server_name", "name")
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class MediaProviderType(str, Enum):
+class MediaProviderType(StrEnum):
     movie_provider = "movies_provider"
     series_provider = "series_provider"
 
 
-class MediaProviderSetting(Model, ExternalServiceSetting):
-    __mapper_args__ = mapper_args({"polymorphic_on": "service_name", "with_polymorphic": "*"})
+@declarative_mixin
+class ExternalServiceSetting:
+    @staticmethod
+    def default_name(context) -> str:
+        return context.get_current_parameters()["service_name"]
 
-    provider_type = Column(DBEnum(MediaProviderType), nullable=False)
-    root_folder = Column(String, nullable=False)
-    quality_profile_id = Column(Integer)
-    language_profile_id = Column(Integer)
-    version = Column(Integer)
-    is_default = Column(Boolean, default=False)
+    id: Mapped[str] = mapped_column(primary_key=True, init=False, default_factory=lambda: uuid4().hex)
+    api_key: Mapped[str] = mapped_column()
+    service_name: Mapped[str] = mapped_column(repr=True, init=False)
+    host: Mapped[str] = mapped_column(repr=True)
+    port: Mapped[int | None] = mapped_column(repr=True)
+    name: Mapped[str] = mapped_column(insert_default=default_name)
+    ssl: Mapped[bool] = mapped_column(insert_default=False, repr=True)
+    enabled: Mapped[bool] = mapped_column(insert_default=True, repr=True)
+
+
+class MediaServerLibrary(Model):
+    id: Mapped[int] = mapped_column(primary_key=True, init=False, default=None)
+    setting_id: Mapped[int] = mapped_column(ForeignKey("media_server_setting.id", ondelete="CASCADE"), init=False)
+    library_id: Mapped[str]
+    name: Mapped[str] = mapped_column(repr=True)
+
+
+class MediaServerSetting(Model, ExternalServiceSetting):
+    __mapper_args__ = mapper_args({"polymorphic_abstract": True, "polymorphic_on": "service_name"})
+
+    server_id: Mapped[str] = mapped_column(unique=True)
+    server_name: Mapped[str] = mapped_column(repr=True)
+    libraries: Mapped[list[MediaServerLibrary]] = relationship(
+        lazy="selectin",
+        cascade="all,delete,delete-orphan",
+        passive_deletes=True,
+        init=False,
+    )
+
+
+class PlexSetting(MediaServerSetting):
+    __tablename__ = None  # Single table inheritance with `.MediaServerSetting`
+    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.plex, "polymorphic_load": "inline"})
+
+
+class MediaProviderSetting(Model, ExternalServiceSetting):
+    __mapper_args__ = mapper_args({"polymorphic_abstract": True, "polymorphic_on": "service_name"})
+
+    provider_type: Mapped[MediaProviderType] = mapped_column(Enum(MediaProviderType), init=False)
+    root_folder: Mapped[str]
+    quality_profile_id: Mapped[int | None]
+    version: Mapped[int | None]
+    is_default: Mapped[bool] = mapped_column(default=False)
+    _tags: Mapped[str | None] = mapped_column(default=None, name="tags")
+
+    @property
+    def tags(self) -> list[str]:
+        if self._tags is None:
+            return []
+        return self._tags.split(",")
+
+    @tags.setter
+    def tags(self, value: list[int]) -> None:
+        self._tags = ",".join(str(v) for v in value)
 
 
 class RadarrSetting(MediaProviderSetting):
-    __tablename__ = None
-    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.radarr})
-    __repr_props__ = ("host", "port", "ssl", "version", "name")
+    __tablename__ = None  # Single table inheritance with `.MediaProviderSetting`
+    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.radarr, "polymorphic_load": "inline"})
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __post_init__(self) -> None:
         self.provider_type = MediaProviderType.movie_provider
 
 
 class SonarrSetting(MediaProviderSetting):
-    __tablename__ = None
-    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.sonarr})
-    __repr_props__ = ("host", "port", "ssl", "version", "name")
+    __tablename__ = None  # Single table inheritance with `.MediaProviderSetting`
+    __mapper_args__ = mapper_args({"polymorphic_identity": ExternalServiceName.sonarr, "polymorphic_load": "inline"})
 
-    anime_root_folder = Column(String(128))
-    anime_quality_profile_id = Column(Integer)
-    anime_language_profile_id = Column(Integer)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __post_init__(self) -> None:
         self.provider_type = MediaProviderType.series_provider
+
+    anime_root_folder: Mapped[str | None] = mapped_column(default=None)
+    anime_quality_profile_id: Mapped[int | None] = mapped_column(default=None)
+    _anime_tags: Mapped[str | None] = mapped_column(default=None, name="anime_tags")
+
+    @property
+    def anime_tags(self) -> list[str]:
+        if self._anime_tags is None:
+            return []
+        return self._anime_tags.split(",")
+
+    @anime_tags.setter
+    def anime_tags(self, value: list[int]) -> None:
+        self._anime_tags = ",".join(str(v) for v in value)

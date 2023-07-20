@@ -3,7 +3,6 @@ import { useAlert } from "../contexts/AlertContext";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { useSession } from "../contexts/SessionContext";
 import { APIRoutes } from "../enums/APIRoutes";
-import { routes } from "../../router/routes";
 import { useHistory } from "react-router";
 import { IUser } from "../models/IUser";
 
@@ -52,21 +51,8 @@ export const useUserService = () => {
 
   const deleteUser = (id: number) => {
     return remove(APIRoutes.USER_BY_ID(id)).then((res) => {
-      if (res.status === 200) {
+      if (res.status === 204) {
         pushSuccess("User deleted");
-      } else {
-        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
-      }
-      return res;
-    });
-  };
-
-  const deleteAccount = () => {
-    return remove(APIRoutes.USER).then((res) => {
-      if (res.status === 200) {
-        pushSuccess("Account deleted");
-        invalidSession();
-        history.push(routes.SIGN_IN.url());
       } else {
         pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
       }
@@ -77,7 +63,6 @@ export const useUserService = () => {
   return {
     getUserById,
     updateUserById,
-    deleteAccount,
     deleteUser,
   };
 };

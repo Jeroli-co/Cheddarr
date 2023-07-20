@@ -1,28 +1,27 @@
-from typing import Any, Union
+from __future__ import annotations
 
+from typing import Any
+
+import sqlalchemy as sa
 from pydantic import BaseModel
-from sqlalchemy import update
 
 from server.models.settings import (
     MediaProviderSetting,
     MediaServerSetting,
-    PlexSetting,
-    RadarrSetting,
-    SonarrSetting,
 )
 from server.repositories.base import BaseRepository
 
 
 class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
+    """Repository for MediaProviderSetting model."""
+
     async def save(self, db_obj: MediaProviderSetting) -> MediaProviderSetting:
         await super().save(db_obj)
         if db_obj.is_default:
             await self.session.execute(
-                update(self.model)
-                .where(
-                    self.model.provider_type == db_obj.provider_type, self.model.id != db_obj.id
-                )
-                .values(is_default=False)
+                sa.update(self.model)
+                .where(self.model.provider_type == db_obj.provider_type, self.model.id != db_obj.id)
+                .values(is_default=False),
             )
             db_obj.is_default = True
             await super().save(db_obj)
@@ -31,15 +30,12 @@ class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
     async def update(
         self,
         db_obj: MediaProviderSetting,
-        obj_in: Union[BaseModel, dict[str, Any]],
+        obj_in: BaseModel | dict[str, Any],
     ) -> MediaProviderSetting:
-
-        db_obj = await super().update(db_obj, obj_in)
+        await super().update(db_obj, obj_in)
         if db_obj.is_default:
             await self.session.execute(
-                update(self.model)
-                .where(self.model.provider_type == db_obj.provider_type)
-                .values(is_default=False)
+                sa.update(self.model).where(self.model.provider_type == db_obj.provider_type).values(is_default=False),
             )
             db_obj.is_default = True
             await super().save(db_obj)
@@ -47,16 +43,4 @@ class MediaProviderSettingRepository(BaseRepository[MediaProviderSetting]):
 
 
 class MediaServerSettingRepository(BaseRepository[MediaServerSetting]):
-    ...
-
-
-class PlexSettingRepository(MediaServerSettingRepository, BaseRepository[PlexSetting]):
-    ...
-
-
-class RadarrSettingRepository(MediaProviderSettingRepository, BaseRepository[RadarrSetting]):
-    ...
-
-
-class SonarrSettingRepository(MediaProviderSettingRepository, BaseRepository[SonarrSetting]):
     ...

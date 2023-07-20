@@ -1,6 +1,7 @@
-from typing import Optional, Tuple
+from __future__ import annotations
 
-from sqlalchemy import desc, or_, select
+import sqlalchemy as sa
+from sqlalchemy.sql.elements import ColumnElement
 
 from server.models.media import (
     Media,
@@ -9,106 +10,98 @@ from server.models.media import (
     MediaServerSeason,
     MediaType,
 )
-from server.repositories.base import BaseRepository
+from server.repositories.base import BaseRepository, Select
 
 
 class MediaRepository(BaseRepository[Media]):
-    async def find_by_external_id(
-        self, tmdb_id: int = None, tvdb_id: int = None, imdb_id=None
-    ) -> Optional[Media]:
-        filters = []
-        if tmdb_id is not None:
-            filters.append(self.model.tmdb_id == tmdb_id)
-        elif imdb_id is not None:
-            filters.append(self.model.imdb_id == imdb_id)
-        elif tvdb_id is not None:
-            filters.append(self.model.tvdb_id == tvdb_id)
+    """Repository for Media model."""
 
-        result = await self.execute(select(self.model).where(or_(*filters)))
-        return result.scalar_one_or_none()
+    def find_by_external_id(
+        self,
+        tmdb_id: int | None = None,
+        tvdb_id: int | None = None,
+        imdb_id: str | None = None,
+    ) -> Select[Media]:
+        filters = external_ids_filter(imdb_id, tmdb_id, tvdb_id)
+        statement = sa.select(self.model).where(filters)
+        return self.select(statement)
 
 
 class MediaServerMediaRepository(BaseRepository[MediaServerMedia]):
-    async def find_by_media_external_id(
+    """Repository for MediaServerMedia model."""
+
+    def find_by_media_external_id(
         self,
-        tmdb_id: int = None,
-        tvdb_id: int = None,
-        imdb_id=None,
-    ) -> list[MediaServerMedia]:
-        query = select(self.model).join(Media)
-        if tmdb_id is not None:
-            query = query.where(Media.tmdb_id == tmdb_id)
-        elif imdb_id is not None:
-            query = query.where(Media.imdb_id == imdb_id)
-        elif tvdb_id is not None:
-            query = query.where(Media.tvdb_id == tvdb_id)
+        tmdb_id: int | None = None,
+        tvdb_id: int | None = None,
+        imdb_id: str | None = None,
+    ) -> Select[MediaServerMedia]:
+        statement = sa.select(self.model).join(Media).where(external_ids_filter(imdb_id, tmdb_id, tvdb_id))
+        return self.select(statement)
 
-        result = await self.execute(query)
-        return result.scalars().all()
-
-    async def find_all_recently_added(
-        self, media_type: MediaType, page: int = None, per_page: int = None
-    ) -> Tuple[list[MediaServerMedia], Optional[int], Optional[int]]:
-        query = (
-            select(self.model)
+    def find_recently_added(self, media_type: MediaType) -> Select[MediaServerMedia]:
+        statement = (
+            sa.select(self.model)
             .join(Media)
             .where(Media.media_type == media_type)
-            .order_by(desc(self.model.added_at))
+            .order_by(sa.desc(self.model.added_at))
         )
-        if page is not None:
-            return await self.paginate(query, per_page, page)
-        result = await self.execute(query)
-        return result.scalars().all()
+        return self.select(statement)
 
 
 class MediaServerSeasonRepository(BaseRepository[MediaServerSeason]):
-    async def find_by_external_id_and_season_number(
+    """Repository for MediaServerSeason model."""
+
+    def find_by_external_id_and_season_number(
         self,
         season_number: int,
-        tmdb_id: int = None,
-        tvdb_id: int = None,
-        imdb_id=None,
-    ) -> list[MediaServerSeason]:
-        query = (
-            select(self.model)
+        tmdb_id: int | None = None,
+        tvdb_id: int | None = None,
+        imdb_id: str | None = None,
+    ) -> Select[MediaServerSeason]:
+        statement = (
+            sa.select(self.model)
             .join(MediaServerMedia)
             .join(Media)
             .where(self.model.season_number == season_number)
+            .where(external_ids_filter(imdb_id, tmdb_id, tvdb_id))
         )
-        if tmdb_id is not None:
-            query = query.where(Media.tmdb_id == tmdb_id)
-        if imdb_id is not None:
-            query = query.where(Media.imdb_id == imdb_id)
-        if tvdb_id is not None:
-            query = query.where(Media.tvdb_id == tvdb_id)
-
-        result = await self.execute(query)
-        return result.scalars().all()
+        return self.select(statement)
 
 
 class MediaServerEpisodeRepository(BaseRepository[MediaServerEpisode]):
-    async def find_by_external_id_and_season_number_and_episode_number(
+    """Repository for MediaServerEpisode model."""
+
+    def find_by_external_id_and_season_number_and_episode_number(
         self,
         season_number: int,
         episode_number: int,
-        tmdb_id: int = None,
-        tvdb_id: int = None,
-        imdb_id=None,
-    ) -> list[MediaServerEpisode]:
-        query = (
-            select(self.model)
+        tmdb_id: int | None = None,
+        tvdb_id: int | None = None,
+        imdb_id: str | None = None,
+    ) -> Select[MediaServerEpisode]:
+        statement = (
+            sa.select(self.model)
             .join(MediaServerSeason)
             .join(MediaServerMedia)
             .join(Media)
             .where(MediaServerSeason.season_number == season_number)
             .where(self.model.episode_number == episode_number)
+            .where(sa.or_(external_ids_filter(imdb_id, tmdb_id, tvdb_id)))
         )
-        if tmdb_id is not None:
-            query = query.where(Media.tmdb_id == tmdb_id)
-        if imdb_id is not None:
-            query = query.where(Media.imdb_id == imdb_id)
-        if tvdb_id is not None:
-            query = query.where(Media.tvdb_id == tvdb_id)
+        return self.select(statement)
 
-        result = await self.execute(query)
-        return result.scalars().all()
+
+def external_ids_filter(
+    imdb_id: str | None = None,
+    tmdb_id: int | None = None,
+    tvdb_id: int | None = None,
+) -> ColumnElement[bool]:
+    filter = []
+    if tmdb_id is not None:
+        filter.append(Media.tmdb_id == tmdb_id)
+    elif imdb_id is not None:
+        filter.append(Media.imdb_id == imdb_id)
+    elif tvdb_id is not None:
+        filter.append(Media.tvdb_id == tvdb_id)
+    return sa.or_(*filter)

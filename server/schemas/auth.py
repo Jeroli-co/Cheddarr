@@ -1,8 +1,8 @@
-from typing import Optional
+from __future__ import annotations
 
 from pydantic import BaseModel, EmailStr, PositiveInt
 
-from .core import APIModel
+from .base import APIModel
 
 
 class AccessToken(BaseModel):
@@ -10,22 +10,23 @@ class AccessToken(BaseModel):
     token_type: str
 
 
-class TokenPayload(BaseModel):
-    sub: str
+class AccessTokenPayload(BaseModel):
+    sub: int
 
 
 class EmailConfirm(APIModel):
     email: EmailStr
-    old_email: Optional[EmailStr]
+    old_email: EmailStr | None = None
 
 
 class PlexAuthorizeSignin(APIModel):
-    key: str
+    key: int
     code: str
     redirect_uri: str = ""
-    user_id: Optional[int]
+    user_id: int | None = None
 
 
 class Invitation(APIModel):
-    email: Optional[EmailStr]
-    max_uses: Optional[PositiveInt]
+    email: EmailStr | None = None
+    max_uses: PositiveInt | None = None
+    max_age: PositiveInt | None = None

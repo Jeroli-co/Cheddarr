@@ -1,26 +1,24 @@
-from enum import Enum
+from __future__ import annotations
+
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    Column,
-    Enum as DBEnum,
+    Enum,
     ForeignKey,
-    Integer,
-    String,
     Text,
 )
-from sqlalchemy.orm import declared_attr, Mapped, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from server.models.media import MediaType
-from .base import mapper_args, Model, Timestamp
+from server.models.base import Model, Timestamp
+from server.models.media import Media, MediaType
 
 if TYPE_CHECKING:
-    from .media import Media
-    from .settings import MediaProviderSetting
-    from .users import User
+    from server.models.settings import MediaProviderSetting
+    from server.models.users import User
 
 
-class RequestStatus(str, Enum):
+class RequestStatus(StrEnum):
     pending = "pending"
     approved = "approved"
     refused = "refused"
@@ -28,85 +26,61 @@ class RequestStatus(str, Enum):
 
 
 class MediaRequest(Model, Timestamp):
-    __mapper_args__ = mapper_args({"polymorphic_on": "media_type", "with_polymorphic": "*"})
-
-    id = Column(Integer, primary_key=True)
-    media_type = Column(DBEnum(MediaType), nullable=False)
-    status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
-    comment = Column(Text)
-    root_folder = Column(String)
-    quality_profile_id = Column(Integer)
-    language_profile_id = Column(Integer)
-
-    @declared_attr
-    def selected_provider_id(cls) -> Mapped[int]:
-        return Column(ForeignKey("mediaprovidersetting.id"))
-
-    @declared_attr
-    def selected_provider(cls) -> Mapped["MediaProviderSetting"]:
-        return relationship("MediaProviderSetting", lazy="joined")
-
-    @declared_attr
-    def requesting_user_id(cls) -> Mapped[int]:
-        return Column(ForeignKey("user.id"), nullable=False)
-
-    @declared_attr
-    def requesting_user(cls) -> Mapped["User"]:
-        return relationship("User", lazy="joined", foreign_keys=cls.requesting_user_id)
-
-    @declared_attr
-    def media_id(cls) -> Mapped[int]:
-        return Column(ForeignKey("media.id"), nullable=False)
-
-    @declared_attr
-    def media(cls) -> Mapped["Media"]:
-        return relationship("Media", lazy="joined")
-
-
-class MovieRequest(MediaRequest):
-    __tablename__ = None
-    __mapper_args__ = mapper_args({"polymorphic_identity": MediaType.movie})
-    __repr_props__ = ("media", "requested_user", "requesting_user")
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class SeriesRequest(MediaRequest):
-    __tablename__ = None
-    __mapper_args__ = mapper_args({"polymorphic_identity": MediaType.series})
-    __repr_props__ = ("media", "requested_user", "requesting_user")
-
-    seasons: list["SeasonRequest"] = relationship(
-        "SeasonRequest", cascade="all,delete,delete-orphan", lazy="selectin", backref="request"
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    media_type: Mapped[MediaType] = mapped_column(Enum(MediaType))
+    media_id: Mapped[int] = mapped_column(ForeignKey("media.id"))
+    requesting_user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
+    selected_provider_id: Mapped[int | None] = mapped_column(ForeignKey("media_provider_setting.id"), default=None)
+    comment: Mapped[str | None] = mapped_column(Text, default=None)
+    root_folder: Mapped[str | None] = mapped_column(default=None)
+    quality_profile_id: Mapped[int | None] = mapped_column(default=None)
+    _tags: Mapped[str | None] = mapped_column(default=None, name="tags")
+    status: Mapped[RequestStatus] = mapped_column(Enum(RequestStatus), default=RequestStatus.pending)
+    selected_provider: Mapped[MediaProviderSetting] = relationship(lazy="joined", init=False)
+    requesting_user: Mapped[User] = relationship(
+        lazy="joined",
+        foreign_keys=[requesting_user_id],
+        init=False,
+        repr=True,
+    )
+    media: Mapped[Media] = relationship(lazy="joined", init=False, repr=True)
+    season_requests: Mapped[list[SeasonRequest]] = relationship(
+        cascade="all,delete,delete-orphan",
+        lazy="selectin",
+        back_populates="media_request",
+        init=False,
+        default_factory=list,
     )
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    @property
+    def tags(self) -> list[str]:
+        if self._tags is None:
+            return []
+        return self._tags.split(",")
+
+    @tags.setter
+    def tags(self, value: list[int]) -> None:
+        self._tags = ",".join(str(v) for v in value)
 
 
 class SeasonRequest(Model):
-    __repr_props__ = ("season_number", "episodes")
-
-    id = Column(Integer, primary_key=True)
-    season_number = Column(Integer, nullable=False)
-    series_request_id: int = Column(ForeignKey("mediarequest.id"), nullable=False)
-    status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
-    episodes: list["EpisodeRequest"] = relationship(
-        "EpisodeRequest", cascade="all,delete,delete-orphan", lazy="selectin", backref="season"
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    season_number: Mapped[int] = mapped_column(repr=True)
+    series_request_id: Mapped[int] = mapped_column(ForeignKey("media_request.id", ondelete="CASCADE"), init=False)
+    media_request: Mapped[MediaRequest] = relationship(lazy="selectin", back_populates="season_requests", init=False)
+    episode_requests: Mapped[list[EpisodeRequest]] = relationship(
+        cascade="all,delete,delete-orphan",
+        lazy="selectin",
+        back_populates="season_request",
+        init=False,
+        default_factory=list,
     )
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    status: Mapped[RequestStatus] = mapped_column(Enum(RequestStatus), default=RequestStatus.pending)
 
 
 class EpisodeRequest(Model):
-    __repr_props__ = ("episode_number", "available")
-
-    id = Column(Integer, primary_key=True)
-    episode_number = Column(Integer, nullable=False)
-    season_request_id: int = Column(ForeignKey("seasonrequest.id"), nullable=False)
-    status = Column(DBEnum(RequestStatus), nullable=False, default=RequestStatus.pending)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    episode_number: Mapped[int] = mapped_column(repr=True)
+    season_request_id: Mapped[int] = mapped_column(ForeignKey("season_request.id", ondelete="CASCADE"), init=False)
+    season_request: Mapped[SeasonRequest] = relationship(lazy="selectin", back_populates="episode_requests", init=False)
+    status: Mapped[RequestStatus] = mapped_column(Enum(RequestStatus), default=RequestStatus.pending)
