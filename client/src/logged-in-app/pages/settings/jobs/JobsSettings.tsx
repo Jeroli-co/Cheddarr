@@ -1,4 +1,3 @@
-import React from "react";
 import { useJobs } from "../../../../shared/hooks/useJobs";
 import styled from "styled-components";
 import { Spinner } from "../../../../shared/components/Spinner";
@@ -77,7 +76,7 @@ export const JobsSettings = () => {
                         j.id,
                         j.nextRunTime
                           ? JobActionsEnum.PAUSE
-                          : JobActionsEnum.RESUME
+                          : JobActionsEnum.RESUME,
                       )
                     }
                   >
@@ -94,3 +93,5 @@ export const JobsSettings = () => {
     </>
   );
 };
+
+export default JobsSettings;

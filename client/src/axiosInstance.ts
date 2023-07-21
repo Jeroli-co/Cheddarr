@@ -1,7 +1,6 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 import { routes } from "./router/routes";
-import humps from "humps";
+import * as humps from "humps";
 
 const JSON_TYPE = "application/json";
 const FORM_URL_ENCODED_TYPE = "application/x-www-form-urlencoded";
@@ -18,13 +17,13 @@ instance.defaults.headers.patch["Content-Type"] = JSON_TYPE;
 
 instance.interceptors.request.use(
   (request) => {
-    const tokenType = Cookies.get("token_type");
-    const accessToken = Cookies.get("access_token");
+    const tokenType = localStorage.getItem("token_type");
+    const accessToken = localStorage.getItem("access_token");
 
     if (tokenType && accessToken) {
       request.headers.common["Authorization"] = tokenType.concat(
         " ",
-        accessToken
+        accessToken,
       );
     }
 
@@ -40,7 +39,7 @@ instance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 instance.interceptors.response.use(
@@ -59,7 +58,7 @@ instance.interceptors.response.use(
   (error) => {
     console.log(error);
     return Promise.reject(error);
-  }
+  },
 );
 
 export { instance };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { H1 } from "../../../../shared/components/Titles";
 import { Row } from "../../../../shared/components/layout/Row";
 import { usePlexConfig } from "../../../../shared/contexts/PlexConfigContext";
@@ -10,10 +10,8 @@ import { PrimaryDivider } from "../../../../shared/components/Divider";
 import { MediaServersInfo } from "./MediaServersInfo";
 
 export const MediaServersSettings = () => {
-  const [
-    isPickMediaServersTypeModalOpen,
-    setIsPickMediaServersTypeModalOpen,
-  ] = useState(false);
+  const [isPickMediaServersTypeModalOpen, setIsPickMediaServersTypeModalOpen] =
+    useState(false);
   const { configs: plexSettingsList } = usePlexConfig();
 
   return (
@@ -43,3 +41,5 @@ export const MediaServersSettings = () => {
     </div>
   );
 };
+
+export default MediaServersSettings;

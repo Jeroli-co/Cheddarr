@@ -1,4 +1,3 @@
-import React from "react";
 import { Spinner } from "../Spinner";
 import { useRequestsContext } from "../../contexts/RequestsContext";
 import {
@@ -63,3 +62,5 @@ const RequestsReceived = () => {
 };
 
 export { RequestsReceived };
+
+export default RequestsReceived;

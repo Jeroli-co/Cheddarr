@@ -7,7 +7,7 @@ import { NavbarMobile } from "./navbar/NavbarMobile";
 import { Navbar } from "./navbar/Navbar";
 import { SidebarMenuMobile } from "./sidebarMenu/SidebarMenuMobile";
 import { Footer } from "../shared/components/Footer";
-const SwitchRoutes = React.lazy(() => import("../router/SwitchRoutes"));
+import {UserRouter} from "../router/new-router/UserRouter";
 
 const Layout = styled.div`
   margin: 0;
@@ -55,7 +55,7 @@ const PageLayoutMobile = styled(PageLayoutContainer)<PageLayoutProps>`
   STATIC_STYLES.SEARCH_BAR_HEIGHT}px;
 `;
 
-export const LoggedInApp = () => {
+export default () => {
   const { width } = useWindowSize();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -70,7 +70,7 @@ export const LoggedInApp = () => {
         <SidebarMenuMobile isOpen={isOpen} toggle={toggle} />
         <NavbarMobile toggle={toggle} />
         <PageLayoutMobile isSidebarOpen={isOpen}>
-          <SwitchRoutes />
+          <UserRouter />
         </PageLayoutMobile>
         <Footer />
       </Layout>
@@ -81,7 +81,7 @@ export const LoggedInApp = () => {
         <SidebarMenu isOpen={isOpen} toggle={toggle} />
         <Navbar isSidebarOpen={isOpen} />{" "}
         <PageLayout isSidebarOpen={isOpen}>
-          <SwitchRoutes />
+          <UserRouter />
         </PageLayout>
         <Footer />
       </Layout>

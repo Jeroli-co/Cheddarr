@@ -1,17 +1,19 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { UserDropdown } from "./components/user-dropdown/UserDropdown";
 import styled from "styled-components";
 import { GitHubButton } from "../../shared/components/GithubButton";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Spin } from "../../shared/components/animations/Animations";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 import { useSession } from "../../shared/contexts/SessionContext";
 import { NavbarContainer, NavbarUserAvatar } from "./NavbarCommon";
 import { SearchBar } from "./components/search-bar/SearchBar";
 
-const cheddarrPreLogo = require("../../assets/cheddarr-pre.svg");
-const cheddarrMinLogo = require("../../assets/cheddarr-min.svg");
-const cheddarrPostLogo = require("../../assets/cheddarr-post.svg");
+/*
+const cheddarrPreLogo = require("../../assets/cheddarr-pre.svg") as string;
+const cheddarrMinLogo = require("../../assets/cheddarr-min.svg") as string;
+const cheddarrPostLogo = require("../../assets/cheddarr-post.svg") as string;
+*/
 
 const Container = styled(NavbarContainer)<{ isSidebarOpen: boolean }>`
   width: calc(
@@ -63,7 +65,7 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
   const {
     session: { user },
   } = useSession();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -71,10 +73,11 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
 
   return (
     <Container className="noselect" isSidebarOpen={isSidebarOpen}>
-      <NavbarAppLogo onClick={() => history.push("/")}>
-        <img src={cheddarrPreLogo} alt="Chedarr" />
-        <img id="cheddarrMinLogo" src={cheddarrMinLogo} alt="Chedarr" />
-        <img src={cheddarrPostLogo} alt="Chedarr" />
+      <NavbarAppLogo onClick={() => navigate("/")}>
+        {/*<img src={cheddarrPreLogo} alt="Chedarr"/>
+          <img id="cheddarrMinLogo" src={cheddarrMinLogo} alt="Chedarr"/>
+      <img src={cheddarrPostLogo} alt="Chedarr"/>
+      */}
       </NavbarAppLogo>
       <SearchBar />
       <GitHubButton />

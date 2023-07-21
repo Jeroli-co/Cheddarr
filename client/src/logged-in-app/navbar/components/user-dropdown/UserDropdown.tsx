@@ -1,11 +1,10 @@
-import React, { useRef } from "react";
-import { RefObject } from "react";
+import { RefObject, useRef } from "react";
 import { routes } from "../../../../router/routes";
 import { faSignOutAlt, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { useSession } from "../../../../shared/contexts/SessionContext";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 import { useOutsideAlerter } from "../../../../shared/hooks/useOutsideAlerter";
 import { Icon } from "../../../../shared/components/Icon";
 
@@ -63,18 +62,18 @@ const UserDropdown = ({
   const { invalidSession } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useOutsideAlerter([dropdownRef, avatarRef], () => hideDropdown());
 
   function logout() {
     invalidSession();
-    history.push(routes.SIGN_IN.url());
+    navigate(routes.SIGN_IN.url());
   }
 
   return (
     <Container isVisible={isVisible} ref={dropdownRef}>
-      <Item onClick={() => history.push(routes.PROFILE.url())}>
+      <Item onClick={() => navigate(routes.PROFILE.url())}>
         <DropdownMenuItemIcon>
           <Icon icon={faUserCircle} />
         </DropdownMenuItemIcon>
@@ -90,4 +89,4 @@ const UserDropdown = ({
   );
 };
 
-export { UserDropdown };
+export {UserDropdown};

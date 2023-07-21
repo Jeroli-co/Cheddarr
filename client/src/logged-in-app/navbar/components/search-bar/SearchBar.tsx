@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import { SearchDropdownType } from "./SearchDropdownType";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 import { routes } from "../../../../router/routes";
 import { SearchFilters } from "../../../../shared/enums/SearchFilters";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
@@ -92,7 +92,7 @@ export const SearchBar = () => {
     SearchFilters.ALL
   );
   const [searchValue, setSearchValue] = useState("");
-  const history = useHistory();
+  const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
 
@@ -109,12 +109,12 @@ export const SearchBar = () => {
 
   useEffect(() => {
     if (!isEmpty(searchValue)) {
-      history.push(routes.SEARCH.url(searchType, searchValue));
+      navigate(routes.SEARCH.url(searchType, searchValue));
     } else if (
       location.pathname.startsWith("/search") &&
       isEmpty(searchValue)
     ) {
-      history.push(routes.HOME.url);
+      navigate(routes.HOME.url);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchType, searchValue]);

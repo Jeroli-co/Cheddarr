@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { H1 } from "../../../../shared/components/Titles";
 import { Row } from "../../../../shared/components/layout/Row";
 import { PickMediaProviderTypeModal } from "./PickMediaProviderTypeModal";
@@ -53,3 +53,5 @@ export const MediaProvidersSettings = () => {
     </div>
   );
 };
+
+export default MediaProvidersSettings;

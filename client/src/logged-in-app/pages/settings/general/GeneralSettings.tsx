@@ -1,4 +1,3 @@
-import React from "react";
 import { useRoleGuard } from "../../../../shared/hooks/useRoleGuard";
 import { Roles } from "../../../../shared/enums/Roles";
 import { H2, H3 } from "../../../../shared/components/Titles";
@@ -57,3 +56,5 @@ export const GeneralSettings = () => {
     </>
   );
 };
+
+export default GeneralSettings;

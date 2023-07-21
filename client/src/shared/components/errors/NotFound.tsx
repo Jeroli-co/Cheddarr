@@ -1,6 +1,6 @@
 import React from "react";
 
-const NotFound = () => {
+export const NotFound = () => {
   return (
     <div
       className="hero is-primary is-bold is-fullheight-with-navbar"
@@ -17,4 +17,4 @@ const NotFound = () => {
   );
 };
 
-export { NotFound };
+export default NotFound
