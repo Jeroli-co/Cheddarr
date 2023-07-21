@@ -12,6 +12,11 @@ type MovieParams = {
 
 export const Movie = () => {
   const { id } = useParams<MovieParams>();
+  
+  if (!id) {
+    throw new Error('Movie needs an ID')
+  }
+  
   const movie = useMovie(id);
 
   if (movie.isLoading) {
@@ -32,3 +37,5 @@ export const Movie = () => {
     </>
   );
 };
+
+export default Movie

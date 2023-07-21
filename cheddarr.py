@@ -54,7 +54,7 @@ def run(ctx: Context) -> None:
         from alembic.command import upgrade
         from alembic.config import Config
 
-        upgrade(Config(str(Path.cwd() / "server/alembic.ini")), "head")
+        # upgrade(Config(str(Path.cwd() / "server/alembic.ini")), "head")
 
     uvicorn.run(
         "server.main:app",

@@ -50,3 +50,5 @@ export const UsersSettings = () => {
     </>
   );
 };
+
+export default UsersSettings

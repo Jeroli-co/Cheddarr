@@ -1,7 +1,6 @@
-import React from "react";
 import { IUser } from "../models/IUser";
 import styled from "styled-components";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { routes } from "../../router/routes";
 
 const Container = styled.div`
@@ -21,9 +20,9 @@ type UserSmallCardProps = {
 };
 
 export const UserSmallCard = ({ user }: UserSmallCardProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   return (
-    <Container onClick={() => history.push(routes.PROFILE.url(user.id))}>
+    <Container onClick={() => navigate(routes.PROFILE.url(user.id))}>
       <Image src={user.avatar} alt="User" />
       <div>{user.username}</div>
     </Container>

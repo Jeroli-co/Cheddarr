@@ -36,3 +36,5 @@ const ResetPassword = () => {
 };
 
 export { ResetPassword };
+
+export default ResetPassword

@@ -1,4 +1,3 @@
-import React from "react";
 import { Spinner } from "../Spinner";
 import {
   RequestFooter,
@@ -51,3 +50,5 @@ const RequestsSent = () => {
 };
 
 export { RequestsSent };
+
+export default RequestsSent;

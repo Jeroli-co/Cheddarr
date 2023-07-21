@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useSession } from "../../shared/contexts/SessionContext";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 import { UserDropdown } from "./components/user-dropdown/UserDropdown";
 import styled, { css } from "styled-components";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
@@ -10,7 +10,7 @@ import { Row } from "../../shared/components/layout/Row";
 import { NavbarContainer, NavbarUserAvatar } from "./NavbarCommon";
 import { SearchBar } from "./components/search-bar/SearchBar";
 
-const cheddarrLogo = require("../../assets/cheddarr.svg");
+// const logo = require("../../assets/cheddarr.svg") as string;
 
 const Item = styled.div<{ width?: string }>`
   width: ${STATIC_STYLES.NAVBAR_HEIGHT}px;
@@ -38,7 +38,7 @@ export const NavbarMobile = ({ toggle }: NavbarMobileProps) => {
   const {
     session: { user },
   } = useSession();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -51,11 +51,7 @@ export const NavbarMobile = ({ toggle }: NavbarMobileProps) => {
           <Icon icon={faBars} />
         </Item>
         <Item width="120px">
-          <img
-            src={cheddarrLogo}
-            alt="Cheddarr"
-            onClick={() => history.push("/")}
-          />
+          {/*<img src={logo} alt="Logo" onClick={() => navigate("/")} />*/}
         </Item>
         {user && (
           <Item>

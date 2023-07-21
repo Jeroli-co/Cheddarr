@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FullWidthTag } from "../../../../shared/components/FullWidthTag";
 import { H1 } from "../../../../shared/components/Titles";
 import { Row } from "../../../../shared/components/layout/Row";
@@ -44,3 +44,5 @@ export const NotificationsServicesSettings = () => {
     </div>
   );
 };
+
+export default NotificationsServicesSettings;

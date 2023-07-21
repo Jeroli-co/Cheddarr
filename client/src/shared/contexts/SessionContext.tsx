@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import { createContext, useContext, useEffect, useState } from "react";
 import { ISession, SessionDefaultImpl } from "../models/ISession";
 import { IEncodedToken } from "../models/IEncodedToken";
 import { routes } from "../../router/routes";
@@ -7,7 +6,7 @@ import { instance } from "../../axiosInstance";
 import { APIRoutes } from "../enums/APIRoutes";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { useLocation } from "react-router-dom";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 import { useAlert } from "./AlertContext";
 import { useAPI } from "../hooks/useAPI";
 import { IUser } from "../models/IUser";
@@ -27,13 +26,13 @@ const SessionContextDefaultImpl: ISessionContextInterface = {
 };
 
 const SessionContext = createContext<ISessionContextInterface>(
-  SessionContextDefaultImpl
+  SessionContextDefaultImpl,
 );
 
 export const SessionContextProvider = (props: any) => {
   const [session, setSession] = useState(SessionDefaultImpl);
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { pushDanger, pushSuccess } = useAlert();
   const { get } = useAPI();
 
@@ -48,25 +47,25 @@ export const SessionContextProvider = (props: any) => {
                 initSession(res.data);
                 let redirectURI = res.headers["redirect-uri"];
                 if (redirectURI && redirectURI.length > 0) {
-                  history.push(redirectURI);
+                  navigate(redirectURI);
                 }
               }
               if (res.status === 201) {
                 pushSuccess("Account created");
                 setSession({ ...session, isLoading: false });
-                history.push(routes.SIGN_IN.url(""));
+                navigate(routes.SIGN_IN.url(""));
               }
             },
             (error) => {
               console.error(error.status);
               if (error.response && error.response.status) {
                 pushDanger(
-                  ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status)
+                  ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status),
                 );
                 setSession({ ...session, isLoading: false });
-                history.push(routes.SIGN_IN.url(""));
+                navigate(routes.SIGN_IN.url(""));
               }
-            }
+            },
           );
       } else {
         const encodedSession = getEncodedSession();
@@ -94,8 +93,8 @@ export const SessionContextProvider = (props: any) => {
   }, [session.isAuthenticated]);
 
   const getEncodedSession = (): IEncodedToken | null => {
-    const tokenType = Cookies.get("token_type");
-    const accessToken = Cookies.get("access_token");
+    const tokenType = localStorage.getItem("token_type");
+    const accessToken = localStorage.getItem("access_token");
     if (tokenType !== undefined && accessToken !== undefined) {
       return {
         access_token: accessToken,
@@ -107,8 +106,8 @@ export const SessionContextProvider = (props: any) => {
   };
 
   const initSession = (encodedToken: IEncodedToken) => {
-    Cookies.set("token_type", encodedToken.token_type);
-    Cookies.set("access_token", encodedToken.access_token);
+    localStorage.setItem("token_type", encodedToken.token_type);
+    localStorage.setItem("access_token", encodedToken.access_token);
     setSession({
       isAuthenticated: true,
       user: null,
@@ -117,8 +116,8 @@ export const SessionContextProvider = (props: any) => {
   };
 
   const invalidSession = () => {
-    Cookies.remove("token_type");
-    Cookies.remove("access_token");
+    localStorage.removeItem("token_type");
+    localStorage.removeItem("access_token");
     setSession({
       ...SessionDefaultImpl,
       isLoading: false,

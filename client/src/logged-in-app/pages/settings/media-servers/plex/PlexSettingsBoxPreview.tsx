@@ -4,11 +4,11 @@ import { EditPlexSettingsModal } from "./EditPlexSettingsModal";
 import { ItemBox } from "../../../../../shared/components/ItemBox";
 import { isEmpty } from "../../../../../utils/strings";
 
-type PlexSettingsBoxPreview = {
+type PlexSettingsBoxPreviewProps = {
   plexSettings: IMediaServerConfig;
 };
 
-export const PlexSettingsBoxPreview = (props: PlexSettingsBoxPreview) => {
+export const PlexSettingsBoxPreview = (props: PlexSettingsBoxPreviewProps) => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   return (
     <>

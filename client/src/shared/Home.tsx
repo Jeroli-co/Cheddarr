@@ -1,7 +1,7 @@
 import React from "react";
 import { useSession } from "./contexts/SessionContext";
 import { default as LoggedInHome } from "../logged-in-app/pages/Home";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { routes } from "../router/routes";
 
 export const Home = () => {
@@ -12,6 +12,8 @@ export const Home = () => {
   if (isAuthenticated) {
     return <LoggedInHome />;
   } else {
-    return <Redirect to={routes.SIGN_IN.url()} />;
+    return <Navigate to={routes.SIGN_IN.url()} />;
   }
 };
+
+export default Home
