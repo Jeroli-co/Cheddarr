@@ -1,5 +1,5 @@
 import { instance } from "../../axiosInstance";
-import { AxiosError, AxiosResponse } from "axios";
+import {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 import {
   createErrorAsyncCall,
   createSuccessAsyncCall,
@@ -7,21 +7,21 @@ import {
 import { useSession } from "../contexts/SessionContext";
 import { useLocation } from "react-router-dom";
 import { routes } from "../../router/routes";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 
 export const useAPI = () => {
   const { invalidSession } = useSession();
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleError = (error: AxiosError) => {
     if (error.response && error.response.status === 401) {
       invalidSession();
-      history.push(routes.SIGN_IN.url(location.pathname));
+      navigate(routes.SIGN_IN.url(location.pathname));
     }
   };
 
-  function get<T>(url: string, headers: Object = {}) {
+  function get<T>(url: string, headers: AxiosRequestConfig = {}) {
     return instance.get<T>(url, headers).then(
       (response: AxiosResponse<T>) => {
         return createSuccessAsyncCall<T>(response);
@@ -33,7 +33,7 @@ export const useAPI = () => {
     );
   }
 
-  function post<T = any>(url: string, body: Object = {}, headers: Object = {}) {
+  function post<T = any>(url: string, body: Object = {}, headers: AxiosRequestConfig = {}) {
     return instance.post<T>(url, body, headers).then(
       (response: AxiosResponse<T>) => {
         return createSuccessAsyncCall<T>(response);
@@ -45,7 +45,7 @@ export const useAPI = () => {
     );
   }
 
-  function put<T = any>(url: string, body: Object = {}, headers: Object = {}) {
+  function put<T = any>(url: string, body: Object = {}, headers: AxiosRequestConfig = {}) {
     return instance.put<T>(url, body, headers).then(
       (response: AxiosResponse<T>) => {
         return createSuccessAsyncCall<T>(response);
@@ -60,7 +60,7 @@ export const useAPI = () => {
   function patch<T = any>(
     url: string,
     body: Object = {},
-    headers: Object = {}
+    headers: AxiosRequestConfig = {}
   ) {
     return instance.patch<T>(url, body, headers).then(
       (response: AxiosResponse<T>) => {
@@ -73,7 +73,7 @@ export const useAPI = () => {
     );
   }
 
-  function remove<T = any>(url: string, headers: Object = {}) {
+  function remove<T = any>(url: string, headers: AxiosRequestConfig = {}) {
     return instance.delete<T>(url, headers).then(
       (response: AxiosResponse<T>) => {
         return createSuccessAsyncCall<T>(response);

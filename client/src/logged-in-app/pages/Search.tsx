@@ -98,3 +98,5 @@ export const Search = () => {
     </Container>
   );
 };
+
+export default Search

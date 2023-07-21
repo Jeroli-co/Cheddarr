@@ -1,12 +1,8 @@
-import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
-import { routes } from "../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../shared/enums/FormDefaultValidators";
-import { ISignUpFormData } from "../shared/models/ISignUpFormData";
 import { useAuthentication } from "../shared/contexts/AuthenticationContext";
-import { Redirect } from "react-router";
 import { PrimaryHero } from "../shared/components/layout/Hero";
 import { PlexButton } from "../shared/components/PlexButton";
 import { SecondaryButton } from "../shared/components/Button";
@@ -17,16 +13,63 @@ import { Row } from "../shared/components/layout/Row";
 import { InputField } from "../shared/components/inputs/InputField";
 import { HelpDanger } from "../shared/components/Help";
 import { CenteredContent } from "../shared/components/layout/CenteredContent";
-import { useSession } from "../shared/contexts/SessionContext";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const signUpSchema = z
+  .object({
+    username: z
+      .string({ required_error: "Username required" })
+      .trim()
+      .min(FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value, {
+        message: `Must be at least ${FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value} characters long`,
+      })
+      .max(FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value, {
+        message: `Must be maximum ${FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value} characters long`,
+      })
+      .regex(FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value, {
+        message: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message,
+      }),
+    password: z
+      .string({ required_error: "Password required" })
+      .trim()
+      .regex(FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value, {
+        message: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message,
+      }),
+    passwordConfirmation: z
+      .string({ required_error: "Confirmation required" })
+      .trim()
+      .regex(FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value, {
+        message: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message,
+      }),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: "Passwords don't match",
+    path: ["confirm"],
+  });
+
+export type SignUpFormData = z.infer<typeof signUpSchema>;
 
 const SignUpForm = () => {
-  const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpFormData>({
+    mode: "onSubmit",
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      passwordConfirmation: "",
+    },
+  });
   const { signUp } = useAuthentication();
   const { signInWithPlex } = usePlexAuth();
 
-  const onSubmit = (data: ISignUpFormData) => {
+  const onSubmit = handleSubmit((data) => {
     signUp(data);
-  };
+  });
 
   return (
     <div>
@@ -35,21 +78,15 @@ const SignUpForm = () => {
 
       <div className="columns is-mobile is-centered">
         <div className="column is-one-quarter-desktop is-half-tablet is-three-quarters-mobile">
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={onSubmit}>
             {/* USERNAME */}
             <InputField withIcon>
               <label>Username</label>
               <div className="with-left-icon">
                 <input
-                  name="username"
                   type="text"
                   placeholder="Username"
-                  ref={register({
-                    required: true,
-                    minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
-                    maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
-                    pattern: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value,
-                  })}
+                  {...register("username")}
                 />
                 <span className="icon">
                   <FontAwesomeIcon icon={faUser} />
@@ -82,13 +119,9 @@ const SignUpForm = () => {
               <label>Password</label>
               <div className="with-left-icon">
                 <input
-                  name="password"
                   type="password"
                   placeholder="Strong password"
-                  ref={register({
-                    required: true,
-                    pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
-                  })}
+                  {...register("password")}
                 />
                 <span className="icon">
                   <FontAwesomeIcon icon={faKey} />
@@ -111,15 +144,9 @@ const SignUpForm = () => {
               <label>Confirm password</label>
               <div className="with-left-icon">
                 <input
-                  name="passwordConfirmation"
                   type="password"
                   placeholder="Confirm password"
-                  ref={register({
-                    required: true,
-                    validate: (value) => {
-                      return value === watch("password");
-                    },
-                  })}
+                  {...register("passwordConfirmation")}
                 />
                 <span className="icon">
                   <FontAwesomeIcon icon={faKey} />
@@ -170,3 +197,5 @@ const SignUpForm = () => {
 };
 
 export { SignUpForm };
+
+export default SignUpForm;

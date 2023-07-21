@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { MediaTypes } from "../../enums/MediaTypes";
 import {
   compareRequestCreationDateAsc,
@@ -32,7 +32,7 @@ import { RequestTypes } from "../../enums/RequestTypes";
 import { Tooltiped } from "../Tooltiped";
 import { DangerTag, MediaTag, SuccessTag, WarningTag } from "../Tag";
 import { useMedia } from "../../hooks/useMedia";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { routes } from "../../../router/routes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
@@ -46,6 +46,7 @@ export const ScrollingTable = styled.div`
   scroll-behavior: smooth;
   -ms-overflow-style: none; /* IE 11 */
   scrollbar-width: none; /* Firefox 64 */
+
   ::-webkit-scrollbar {
     display: none;
   }
@@ -405,15 +406,15 @@ const RequestImageAndTitle = ({
   type,
   posterUrl,
 }: RequestImageAndTitleProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const poster = useImage(posterUrl);
   return (
     <RequestTitleContainer
       onClick={() =>
-        history.push(
+        navigate(
           type === MediaTypes.MOVIES
             ? routes.MOVIE.url(id.toString())
-            : routes.SERIES.url(id.toString())
+            : routes.SERIES.url(id.toString()),
         )
       }
     >
@@ -482,7 +483,7 @@ export const RequestLayout = ({
         request.media.mediaType,
         providerId,
         request.id,
-        requestStatus
+        requestStatus,
       );
     }
   };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
@@ -17,6 +17,15 @@ import { HelpDanger, HelpLink } from "../shared/components/Help";
 import { Icon } from "../shared/components/Icon";
 import { InitResetPasswordModal } from "./elements/InitResetPasswordModal";
 import { CenteredContent } from "../shared/components/layout/CenteredContent";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const signInSchema = z.object({
+  username: z.string({ required_error: "Username required" }).trim(),
+  password: z.string({ required_error: "Password required" }).trim(),
+});
+
+export type SignInFormData = z.infer<typeof signInSchema>;
 
 function useRedirectURI() {
   const query = new URLSearchParams(useLocation().search);
@@ -26,11 +35,23 @@ function useRedirectURI() {
 export const SignInForm = () => {
   const { signIn } = useAuthentication();
   const { signInWithPlex } = usePlexAuth();
-  const { register, handleSubmit, errors } = useForm<ISignInFormData>();
   const redirectURI = useRedirectURI();
   const [isInitPasswordModalOpen, setIsInitPasswordModalOpen] = useState(false);
 
-  const cheddarrLogo = require("../assets/cheddarr.svg");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInFormData>({
+    mode: "onSubmit",
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
+
+  // const cheddarrLogo = require("../assets/cheddarr.svg") as string;
 
   const onSubmit = handleSubmit((data) => {
     redirectURI ? signIn(data, redirectURI) : signIn(data);
@@ -43,7 +64,14 @@ export const SignInForm = () => {
   return (
     <div>
       <PrimaryHero>
-        <img id="cheddarrLogo" src={cheddarrLogo} alt="Chedarr" width="350px" />
+        {
+          <img
+            id="cheddarrLogo"
+            src={"../assets/cheddarr.svg"}
+            alt="Chedarr"
+            width="350px"
+          />
+        }
       </PrimaryHero>
 
       <br />
@@ -60,14 +88,9 @@ export const SignInForm = () => {
               <label>Username or email</label>
               <div className="with-left-icon">
                 <input
-                  name="username"
                   type="text"
                   placeholder="Username or email"
-                  ref={register({
-                    required: true,
-                    minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
-                    maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
-                  })}
+                  {...register("username")}
                 />
                 <span className="icon">
                   <Icon icon={faUser} />
@@ -94,12 +117,9 @@ export const SignInForm = () => {
               <label>Password</label>
               <div className="with-left-icon">
                 <input
-                  name="password"
                   type="password"
                   placeholder="Password"
-                  ref={register({
-                    required: true,
-                  })}
+                  {...register("password")}
                 />
                 <span className="icon">
                   <Icon icon={faKey} />
@@ -148,3 +168,5 @@ export const SignInForm = () => {
     </div>
   );
 };
+
+export default SignInForm;

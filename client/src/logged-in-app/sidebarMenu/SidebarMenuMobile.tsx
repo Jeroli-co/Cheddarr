@@ -9,7 +9,7 @@ import {
   faRegistered,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { routes } from "../../router/routes";
 import { useWindowSize } from "../../shared/hooks/useWindowSize";
 import {
@@ -32,15 +32,15 @@ const Container = styled(SidebarMenuContainer)<{ isOpen: boolean }>`
 `;
 
 export const SidebarMenuMobile = ({ isOpen, toggle }: SidebarMenuProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { width } = useWindowSize();
   const location = useLocation();
   const {
     session: { user },
   } = useSession();
 
-  const navigate = (route: string) => {
-    history.push(route);
+  const navigateTo = (route: string) => {
+    navigate(route);
     if (width <= STATIC_STYLES.TABLET_MAX_WIDTH && isOpen) {
       toggle();
     }
@@ -55,7 +55,7 @@ export const SidebarMenuMobile = ({ isOpen, toggle }: SidebarMenuProps) => {
       </SidebarMenuElement>
 
       <SidebarMenuElement
-        onClick={() => navigate(routes.HOME.url)}
+        onClick={() => navigateTo(routes.HOME.url)}
         isActive={location.pathname === routes.HOME.url}
       >
         <SidebarMenuElementIcon>
@@ -67,7 +67,7 @@ export const SidebarMenuMobile = ({ isOpen, toggle }: SidebarMenuProps) => {
       {user &&
         checkRole(user.roles, [Roles.REQUEST, Roles.MANAGE_REQUEST], true) && (
           <SidebarMenuElement
-            onClick={() => navigate(routes.REQUESTS.url)}
+            onClick={() => navigateTo(routes.REQUESTS.url)}
             isActive={location.pathname.startsWith(routes.REQUESTS.url)}
           >
             <SidebarMenuElementIcon>
@@ -79,7 +79,7 @@ export const SidebarMenuMobile = ({ isOpen, toggle }: SidebarMenuProps) => {
 
       {user && checkRole(user.roles, [Roles.MANAGE_USERS]) && (
         <SidebarMenuElement
-          onClick={() => navigate(routes.USERS.url)}
+          onClick={() => navigateTo(routes.USERS.url)}
           isActive={location.pathname === routes.USERS.url}
         >
           <SidebarMenuElementIcon>
@@ -91,7 +91,7 @@ export const SidebarMenuMobile = ({ isOpen, toggle }: SidebarMenuProps) => {
 
       {user && checkRole(user.roles, [Roles.MANAGE_SETTINGS]) && (
         <SidebarMenuElement
-          onClick={() => navigate(routes.SETTINGS.url)}
+          onClick={() => navigateTo(routes.SETTINGS.url)}
           isActive={location.pathname.startsWith(routes.SETTINGS.url)}
         >
           <SidebarMenuElementIcon>

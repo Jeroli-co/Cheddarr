@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import {
   DangerIconButton,
@@ -15,7 +15,7 @@ import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { PaginationArrows } from "../../../../shared/components/PaginationArrows";
 import { DeleteDataModal } from "../../../../shared/components/DeleteDataModal";
 import { useSession } from "../../../../shared/contexts/SessionContext";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { routes } from "../../../../router/routes";
 import { UserSmallCard } from "../../../../shared/components/UserSmallCard";
 
@@ -33,9 +33,11 @@ const Header = styled.div`
     flex: 1 1 0;
     display: flex;
     align-items: center;
+
     &:not(:first-child) {
       justify-content: center;
     }
+
     &:last-child {
       justify-content: flex-end;
     }
@@ -56,9 +58,11 @@ const Item = styled.div`
     flex: 1 1 0;
     display: flex;
     align-items: center;
+
     &:not(:first-child) {
       justify-content: center;
     }
+
     &:last-child {
       justify-content: flex-end;
     }
@@ -70,7 +74,7 @@ export const UsersConfirmed = () => {
   const {
     session: { user },
   } = useSession();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [deleteUserModalState, setDeleteUserModalState] = useState<{
     isOpen: boolean;
@@ -79,11 +83,11 @@ export const UsersConfirmed = () => {
 
   const { data, loadPrev, loadNext, deleteData } = usePagination<IUser>(
     APIRoutes.USERS(true),
-    true
+    true,
   );
 
   const onUserEditClick = (clickedUser: IUser) => {
-    history.push(routes.PROFILE.url(clickedUser.id.toString(10)));
+    navigate(routes.PROFILE.url(clickedUser.id.toString(10)));
     // setEditUserModalState({ isOpen: true, user: user });
   };
 
@@ -146,7 +150,7 @@ export const UsersConfirmed = () => {
           actionLabel={"Confirm"}
           action={() =>
             onDeleteUser(
-              deleteUserModalState.user ? deleteUserModalState.user.id : -1
+              deleteUserModalState.user ? deleteUserModalState.user.id : -1,
             )
           }
           title={`Are you sure you want to delete ${deleteUserModalState.user.username}`}

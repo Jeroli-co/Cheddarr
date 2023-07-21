@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRoleGuard } from "../../../../shared/hooks/useRoleGuard";
 import { Roles } from "../../../../shared/enums/Roles";
 import { usePagination } from "../../../../shared/hooks/usePagination";
@@ -87,10 +87,12 @@ const LogComponent = ({ log }: LogComponentProps) => {
 export const ServerLogs = () => {
   useRoleGuard([Roles.ADMIN]);
 
-  const { data: logs, loadNext, loadPrev, loadPage } = usePagination<ILog>(
-    APIRoutes.LOGS,
-    false
-  );
+  const {
+    data: logs,
+    loadNext,
+    loadPrev,
+    loadPage,
+  } = usePagination<ILog>(APIRoutes.LOGS, false);
 
   if (logs.isLoading) {
     return <Spinner />;
@@ -117,3 +119,5 @@ export const ServerLogs = () => {
     </Container>
   );
 };
+
+export default ServerLogs;

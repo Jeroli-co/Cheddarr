@@ -1,5 +1,5 @@
 import { useSession } from "../contexts/SessionContext";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { checkRole } from "../../utils/roles";
 import { Roles } from "../enums/Roles";
 import { routes } from "../../router/routes";
@@ -10,11 +10,11 @@ export const useRoleGuard = (neededRoles: Roles[], hasOne?: boolean) => {
     session: { user },
   } = useSession();
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user && !checkRole(user.roles, neededRoles, hasOne)) {
-      history.push(routes.HOME.url);
+      navigate(routes.HOME.url);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import { MediaTypes } from "../../enums/MediaTypes";
 import { MediaTag, SuccessIconTag } from "../Tag";
@@ -14,7 +14,7 @@ import { PlayButton } from "../Button";
 import { Icon } from "../Icon";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
-import { useHistory, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { routes } from "../../../router/routes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
@@ -107,7 +107,7 @@ type MediaPreviewCardProps = {
 
 export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
   const [fullyLoadedMedia, setFullyLoadedMedia] = useState<IMedia | null>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const poster = useImage(fullyLoadedMedia && fullyLoadedMedia.posterUrl);
   const { get } = useAPI();
@@ -186,7 +186,7 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
       : null;
 
     if (uri) {
-      history.push(uri);
+      navigate(uri);
     }
   };
 

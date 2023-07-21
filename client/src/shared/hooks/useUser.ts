@@ -5,7 +5,7 @@ import { useSession } from "../contexts/SessionContext";
 import { useUserService } from "../toRefactor/useUserService";
 import { checkRole } from "../../utils/roles";
 import { Roles } from "../enums/Roles";
-import { useHistory } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import { routes } from "../../router/routes";
 
 export const useUser = (id?: string) => {
@@ -16,7 +16,7 @@ export const useUser = (id?: string) => {
     session: { user },
   } = useSession();
   const { getUserById } = useUserService();
-  const history = useHistory();
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (
@@ -33,7 +33,7 @@ export const useUser = (id?: string) => {
     } else if (user && id === undefined) {
       setCurrentUser({ isLoading: false, data: user, status: 200 });
     } else {
-      history.push(routes.PROFILE.url());
+      navigate(routes.PROFILE.url());
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

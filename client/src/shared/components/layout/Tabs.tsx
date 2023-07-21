@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
-import { useHistory } from "react-router-dom";
 import { Tab } from "../../contexts/TabsContext";
+import {useNavigate} from "react-router";
 
 export const TabsStyle = styled.div`
   overflow: hidden;
@@ -56,7 +56,7 @@ type TabsProps = {
 };
 
 export const Tabs = ({ tabs, activeTab, url }: TabsProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   return (
     <TabsStyle>
       <TabSide />
@@ -64,7 +64,7 @@ export const Tabs = ({ tabs, activeTab, url }: TabsProps) => {
         return (
           <TabStyle
             isActive={activeTab.uri === tab.uri}
-            onClick={() => history.push(url + "/" + tab.uri.toLowerCase())}
+            onClick={() => navigate(url + "/" + tab.uri.toLowerCase())}
             key={index}
           >
             {tab.label}

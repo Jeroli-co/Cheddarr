@@ -19,6 +19,11 @@ type SeriesParams = {
 
 export const Series = () => {
   const { id, seasonNumber, episodeNumber } = useParams<SeriesParams>();
+  
+  if (!id) {
+    throw new Error('Series needs an ID')
+  }
+  
   const series = useSeries(id);
 
   if (series.isLoading) {
@@ -60,3 +65,5 @@ export const Series = () => {
     </>
   );
 };
+
+export default Series
