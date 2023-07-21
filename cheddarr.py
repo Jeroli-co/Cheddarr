@@ -60,7 +60,7 @@ async def run(ctx: Context) -> None:
 
     server_config = uvicorn.Config(
         app="server.main:app",
-        host=get_config().server_domain,
+        host="0.0.0.0",
         port=get_config().server_port,
         reload=debug,
         access_log=debug,

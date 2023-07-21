@@ -10,6 +10,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class CustomConfig(BaseSettings):
     model_config = SettingsConfigDict(validate_assignment=True, extra="forbid")
+
     server_domain: str | None = None
     enable_https: bool | None = None
     server_port: int | None = None
@@ -18,7 +19,8 @@ class CustomConfig(BaseSettings):
     log_level: str | None = None
     tz: str | None = None
     default_roles: int | None = None
-    tmdb_api_key: str | None = None
+    signup_enabled: bool | None = None
+    local_account_enabled: bool | None = None
 
 
 class Config(BaseModel):
