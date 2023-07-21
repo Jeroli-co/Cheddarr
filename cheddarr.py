@@ -20,7 +20,7 @@ python cheddarr.py [OPTIONS] COMMAND
     is_flag=True,
 )
 @click.pass_context
-def cli(ctx: Context, debug: bool) -> None:
+async def cli(ctx: Context, debug: bool) -> None:
     ctx.obj["DEBUG"] = debug
 
 
@@ -43,26 +43,30 @@ async def test() -> None:
 
 @cli.command("run")
 @click.pass_context
-def run(ctx: Context) -> None:
+async def run(ctx: Context) -> None:
     """Run the application."""
     import uvicorn
 
     from server.core.config import get_config
 
+    app_config = get_config()
+    app_config.setup()
+
     debug = ctx.obj["DEBUG"]
     if not debug:
-        from alembic.command import upgrade
-        from alembic.config import Config
+        from asyncio import subprocess
 
-        upgrade(Config(str(Path.cwd() / "server/alembic.ini")), "head")
+        await subprocess.create_subprocess_exec("alembic", "upgrade", "head", cwd=str(Path.cwd() / "server/database"))
 
-    uvicorn.run(
-        "server.main:app",
+    server_config = uvicorn.Config(
+        app="server.main:app",
         host=get_config().server_domain,
         port=get_config().server_port,
         reload=debug,
         access_log=debug,
     )
+
+    await uvicorn.Server(server_config).serve()
 
 
 if __name__ == "__main__":

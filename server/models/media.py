@@ -5,7 +5,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Enum, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import Mapped, declarative_mixin, declared_attr, mapped_column, relationship
+from sqlalchemy.orm import Mapped, MappedAsDataclass, declarative_mixin, declared_attr, mapped_column, relationship
 
 from server.models.base import Model
 
@@ -39,7 +39,7 @@ class Media(Model):
 
 
 @declarative_mixin
-class MediaServerContent:
+class MediaServerContent(MappedAsDataclass):
     id: Mapped[int] = mapped_column(primary_key=True, init=False, default=None)
     server_id: Mapped[str] = mapped_column(ForeignKey("media_server_setting.server_id"))
     external_id: Mapped[str] = mapped_column(unique=True)
