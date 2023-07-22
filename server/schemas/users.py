@@ -1,18 +1,23 @@
 from __future__ import annotations
 
 from datetime import datetime
-from pathlib import Path
+from typing import Annotated
 
-from pydantic import AnyHttpUrl, EmailStr
+from pydantic import AnyHttpUrl, BeforeValidator, EmailStr
 
 from .base import APIModel
+from server.core.config import get_config
+
+UserAvatar = Annotated[
+    AnyHttpUrl | None, BeforeValidator(lambda v: f"{get_config().server_host}{v}" if v.startswith("/images") else v)
+]
 
 
 class UserSchema(APIModel):
     username: str
     email: EmailStr | None = None
     id: int
-    avatar: Path | AnyHttpUrl | None = None
+    avatar: UserAvatar = None
     confirmed: bool
     roles: int
     created_at: datetime
@@ -21,7 +26,7 @@ class UserSchema(APIModel):
 
 class UserProfile(APIModel):
     username: str
-    avatar: Path | AnyHttpUrl | None = None
+    avatar: UserAvatar = None
 
 
 class UserCreate(APIModel):

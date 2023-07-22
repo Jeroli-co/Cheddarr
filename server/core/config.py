@@ -12,8 +12,8 @@ class CustomConfig(BaseSettings):
     model_config = SettingsConfigDict(validate_assignment=True, extra="forbid")
 
     server_domain: str | None = None
-    enable_https: bool | None = None
     server_port: int | None = None
+    enable_https: bool | None = None
     secret_key: str | None = None
     client_id: str | None = None
     log_level: str | None = None
@@ -29,7 +29,8 @@ class Config(BaseModel):
     ##########################################################################
     server_domain: str = "localhost"
     server_port: int = 9090
-    server_host: str = f"http://{server_domain}"
+    enable_https: bool = False
+    server_host: str = f"{'https' if enable_https else 'http'}://{server_domain}:{server_port}"
     log_level: str = "INFO"
     tz: str = "UTC"
 
