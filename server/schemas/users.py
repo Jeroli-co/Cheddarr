@@ -10,7 +10,8 @@ from server.core.config import get_config
 from .base import APIModel
 
 UserAvatar = Annotated[
-    str | None, BeforeValidator(lambda v: f"{get_config().server_host}{v}" if v.startswith("/images") else v)
+    str | None,
+    BeforeValidator(lambda v: f"{get_config().server_host}{v}" if v.startswith("/images") else v),
 ]
 
 

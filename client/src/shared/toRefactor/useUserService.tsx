@@ -3,7 +3,6 @@ import { useAlert } from "../contexts/AlertContext";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { useSession } from "../contexts/SessionContext";
 import { APIRoutes } from "../enums/APIRoutes";
-import { useHistory } from "react-router";
 import { IUser } from "../models/IUser";
 
 export interface IChangePasswordModel {
@@ -18,9 +17,7 @@ export const useUserService = () => {
   const {
     session: { user },
     updateUser,
-    invalidSession,
   } = useSession();
-  const history = useHistory();
 
   const getUserById = (id: number) => {
     return get<IUser>(APIRoutes.USER_BY_ID(id)).then((res) => res);

@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faKey, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
-import { routes } from "../router/routes";
 import { FORM_DEFAULT_VALIDATOR } from "../shared/enums/FormDefaultValidators";
 import { ISignUpFormData } from "../shared/models/ISignUpFormData";
 import { useAuthentication } from "../shared/contexts/AuthenticationContext";
-import { Redirect } from "react-router";
 import { PrimaryHero } from "../shared/components/layout/Hero";
 import { PlexButton } from "../shared/components/PlexButton";
 import { SecondaryButton } from "../shared/components/Button";
@@ -17,7 +15,6 @@ import { Row } from "../shared/components/layout/Row";
 import { InputField } from "../shared/components/inputs/InputField";
 import { HelpDanger } from "../shared/components/Help";
 import { CenteredContent } from "../shared/components/layout/CenteredContent";
-import { useSession } from "../shared/contexts/SessionContext";
 
 const SignUpForm = () => {
   const { register, handleSubmit, errors, watch } = useForm<ISignUpFormData>();

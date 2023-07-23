@@ -355,7 +355,7 @@ async def find_guids(media: plex_video.Movie | plex_video.Show) -> tuple[int | N
         guids = [media.guid]
         if hasattr(media, "guids") and media.guids is not None:
             guids.extend(guid.id for guid in media.guids)
-    except Exception:
+    except Exception:  # noqa: BLE001
         return None, None, None
 
     def find_guid(regex: str) -> Any:
@@ -382,7 +382,7 @@ async def find_guids(media: plex_video.Movie | plex_video.Show) -> tuple[int | N
                 return None, None, None
         if isinstance(media, plex_video.Show) and tvdb_id is None:
             tvdb_id = (await tmdb.find_external_ids_from_tmdb_id(tmdb_id)).get("tvdb_id")
-    except Exception:
+    except Exception:  # noqa: BLE001
         return None, None, None
 
     return tmdb_id, imdb_id, tvdb_id

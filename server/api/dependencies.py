@@ -65,7 +65,7 @@ async def get_current_user(
         payload = jwt.decode(token, get_config().secret_key, algorithms=[get_config().signing_algorithm])
         token_data = AccessTokenPayload.model_validate(payload)
     except (jwt.InvalidTokenError, ValidationError):
-        raise credentials_exception
+        raise credentials_exception from None
     user = await user_repository.find_by(id=token_data.sub, confirmed=True).one()
     if user is None:
         raise credentials_exception

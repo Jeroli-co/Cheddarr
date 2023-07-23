@@ -14,8 +14,8 @@ from server.repositories.users import (
 )
 from server.schemas.base import PaginatedResponse
 from server.schemas.users import (
-    PasswordResetCreate,
     PasswordResetConfirm,
+    PasswordResetCreate,
     UserProfile,
     UserSchema,
     UserUpdate,

@@ -4,6 +4,7 @@ from enum import StrEnum
 from uuid import uuid4
 
 from sqlalchemy import Enum, ForeignKey
+from sqlalchemy.engine.default import DefaultExecutionContext
 from sqlalchemy.orm import Mapped, MappedAsDataclass, declarative_mixin, mapped_column, relationship
 
 from server.models.base import Model, mapper_args
@@ -23,7 +24,7 @@ class MediaProviderType(StrEnum):
 @declarative_mixin
 class ExternalServiceSetting(MappedAsDataclass):
     @staticmethod
-    def default_name(context) -> str:
+    def default_name(context: DefaultExecutionContext) -> str:
         return context.get_current_parameters()["service_name"]
 
     id: Mapped[str] = mapped_column(primary_key=True, init=False, default_factory=lambda: uuid4().hex)
