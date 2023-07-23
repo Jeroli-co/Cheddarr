@@ -13,9 +13,9 @@ class Agent(StrEnum):
 
 
 class NotificationAgent(Model):
-    name: Mapped[Agent] = mapped_column(Enum(Agent), primary_key=True, repr=True)
+    name: Mapped[Agent] = mapped_column(Enum(Agent), primary_key=True, repr=True, init=False)
+    settings: Mapped[JSON] = mapped_column(JSON)
     enabled: Mapped[bool] = mapped_column(default=True, repr=True)
-    settings = mapped_column(JSON)
 
 
 class Notification(Model, Timestamp):

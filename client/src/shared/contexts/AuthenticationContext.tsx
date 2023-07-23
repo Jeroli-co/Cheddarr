@@ -52,10 +52,7 @@ export default function AuthenticationContextProvider(props: any) {
   };
 
   const signIn = async (data: ISignInFormData, redirectURI?: string) => {
-    const fd = new FormData();
-    fd.append("username", data.username);
-    fd.append("password", data.password);
-    const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, fd);
+    const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, data);
     if (res.data && res.status === 200) {
       initSession(res.data);
       if (redirectURI) {

@@ -9,6 +9,7 @@ import { PrimaryButton } from "../../shared/components/Button";
 import { Icon } from "../../shared/components/Icon";
 import { HelpDanger } from "../../shared/components/Help";
 import { InputField } from "../../shared/components/inputs/InputField";
+import { useHistory } from "react-router";
 
 type ResetPasswordFormProps = {
   token: string;
@@ -26,11 +27,13 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
   >();
   const { post } = useAPI();
   const { pushSuccess, pushDanger } = useAlert();
+  const history = useHistory();
 
   const onSubmit = handleSubmit((data) => {
     post(APIRoutes.RESET_PASSWORD(token), data).then((res) => {
       if (res.status === 204) {
         pushSuccess("Password has been reset");
+        history.push("/");
       } else {
         pushDanger("Cannot reset password");
       }

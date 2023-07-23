@@ -4,7 +4,7 @@ from typing import Any
 from uuid import uuid4
 
 from cachetools.func import lru_cache
-from pydantic import AnyHttpUrl, BaseModel, DirectoryPath
+from pydantic import BaseModel, DirectoryPath, HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -52,9 +52,9 @@ class Config(BaseModel):
     ##########################################################################
     # external services                                                      #
     ##########################################################################
-    plex_token_url: AnyHttpUrl = AnyHttpUrl("https://plex.tv/api/v2/pins/")
-    plex_authorize_url: AnyHttpUrl = AnyHttpUrl("https://app.plex.tv/auth#/")
-    plex_user_resource_url: AnyHttpUrl = AnyHttpUrl("https://plex.tv/api/v2/user/")
+    plex_token_url: HttpUrl = HttpUrl("https://plex.tv/api/v2/pins/")
+    plex_authorize_url: HttpUrl = HttpUrl("https://app.plex.tv/auth#/")
+    plex_user_resource_url: HttpUrl = HttpUrl("https://plex.tv/api/v2/user/")
     tmdb_api_key: str = "cd210007bbc918ea3995df599405935b"
 
     ##########################################################################
