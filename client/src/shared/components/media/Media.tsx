@@ -14,7 +14,7 @@ import { Row } from "../layout/Row";
 import { Icon } from "../Icon";
 import { faFilm } from "@fortawesome/free-solid-svg-icons";
 import { Buttons } from "../layout/Buttons";
-import { MediaCarouselWidget } from "./MediaCarouselWidget";
+import { MediaSlider } from "../../../components/MediaSlider";
 import { APIRoutes } from "../../enums/APIRoutes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
@@ -322,13 +322,13 @@ export const Media = (props: MediaProps) => {
       <PrimaryDivider />
 
       {isMovie(props.media) && (
-        <MediaCarouselWidget
+        <MediaSlider
           title="Recommended"
           url={APIRoutes.GET_RECOMMENDED_MOVIES(props.media.tmdbId)}
         />
       )}
       {isSeries(props.media) && (
-        <MediaCarouselWidget
+        <MediaSlider
           title="Recommended"
           url={APIRoutes.GET_RECOMMENDED_SERIES(props.media.tmdbId)}
         />
@@ -337,13 +337,13 @@ export const Media = (props: MediaProps) => {
       <PrimaryDivider />
 
       {isMovie(props.media) && (
-        <MediaCarouselWidget
+        <MediaSlider
           title="Similar"
           url={APIRoutes.GET_SIMILAR_MOVIES(props.media.tmdbId)}
         />
       )}
       {isSeries(props.media) && (
-        <MediaCarouselWidget
+        <MediaSlider
           title="Similar"
           url={APIRoutes.GET_SIMILAR_SERIES(props.media.tmdbId)}
         />

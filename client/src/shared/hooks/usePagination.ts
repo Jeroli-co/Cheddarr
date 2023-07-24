@@ -1,163 +1,75 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { IPaginated } from "../models/IPaginated";
 import { useAPI } from "./useAPI";
-import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
+import { useQuery, useQueryClient } from "react-query";
+import hoursToMilliseconds from "date-fns/hoursToMilliseconds";
 
-export const usePagination = <T = any>(url: string, infiniteLoad: boolean) => {
-  const [data, setData] = useState<IAsyncCall<IPaginated<T> | null>>(
-    DefaultAsyncCall
-  );
-  const [loadDirection, setLoadDirection] = useState<"prev" | "next" | null>(
-    null
-  );
+const useData = <T>(url: string) => {
   const { get } = useAPI();
 
-  useEffect(() => {
-    if (loadDirection) {
-      triggerDataLoading();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadDirection]);
-
-  useEffect(() => {
-    if (data.isLoading) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.isLoading]);
-
-  const triggerDataLoading = () => {
-    const defaultValue: IPaginated<T> = {
-      page: data.data && data.data.page ? data.data.page : 0,
-      results: [],
-      pages: data.data && data.data.pages ? data.data.pages : 0,
-      total: data.data && data.data.total ? data.data.total : 0,
-    };
-    setData({ ...DefaultAsyncCall, data: defaultValue });
-  };
-
-  const isFirstPage = () => {
-    return data && data.data && data.data.page && data.data.page <= 1;
-  };
-
-  const isLastPage = () => {
-    return (
-      data &&
-      data.data &&
-      data.data.page &&
-      data.data.pages &&
-      data.data.page >= data.data.pages
-    );
-  };
-
-  const getPageToLoad = () => {
-    if (data.data && loadDirection) {
-      if (loadDirection === "prev") {
-        if (data.data.page <= 1) {
-          return data.data.pages;
-        } else {
-          return data.data.page - 1;
-        }
-      } else if (loadDirection === "next") {
-        if (data.data.page === data.data.pages) {
-          return 1;
-        } else {
-          return data.data.page + 1;
-        }
-      }
-    }
-    return 1;
-  };
-
-  const fetchData = (pageNumber?: number) => {
-    const page = pageNumber ? pageNumber : getPageToLoad();
-    let urlWithPageQuery =
-      url + ((url.includes("?") ? "&" : "?") + "page=" + page);
-    get<IPaginated<T>>(urlWithPageQuery).then((res) => {
+  const fetchData = () => {
+    return get<IPaginated<T>>(url).then((res) => {
       if (res.status === 200 && res.data) {
-        setData(res);
+        return res.data;
       } else {
-        setData({ ...DefaultAsyncCall, isLoading: false });
+        return undefined;
       }
     });
   };
 
+  const { data, isLoading } = useQuery<IPaginated<T>>([url], fetchData, {
+    staleTime: hoursToMilliseconds(24),
+  });
+
+  return {
+    data,
+    isLoading,
+  };
+};
+
+export const usePagination = <T = any>(
+  queryPath: string,
+  infiniteLoad: boolean,
+) => {
+  const queryClient = useQueryClient();
+
+  const [page, setPage] = useState(1);
+
+  const { data, isLoading } = useData<T>(queryPath + `?page=${page}`);
   const loadPrev = () => {
-    let isNewPageLoaded = true;
-    const totalPage = data.data && data.data.pages;
-    if (totalPage && totalPage > 1) {
-      if (!loadDirection || loadDirection === "next") {
-        setLoadDirection("prev");
-      } else {
-        if (!isFirstPage() || infiniteLoad) {
-          triggerDataLoading();
-        } else {
-          isNewPageLoaded = false;
-        }
-      }
-    }
-    return isNewPageLoaded;
+    const getPrevPage = () => {
+      if (!data) return 1;
+      return data.page > 1 ? data.page - 1 : data?.pages;
+    };
+
+    setPage(getPrevPage());
   };
 
   const loadNext = () => {
-    let isNewPageLoaded = true;
-    const totalPage = data.data && data.data.pages;
-    if (totalPage && totalPage > 1) {
-      if (!loadDirection || loadDirection === "prev") {
-        setLoadDirection("next");
-      } else {
-        if (!isLastPage() || infiniteLoad) {
-          triggerDataLoading();
-        } else {
-          isNewPageLoaded = false;
-        }
-      }
-    }
-    return isNewPageLoaded;
+    const getNextPage = () => {
+      if (!data) return 1;
+      return data.page < data?.pages ? data.page + 1 : 1;
+    };
+
+    setPage(getNextPage());
   };
 
-  const updateData = (
-    findElement: (e: T) => boolean,
-    updateElement: (e: T) => void
-  ) => {
-    if (data.data) {
-      let dataTmp = data.data.results;
-      const index = dataTmp.findIndex((e) => findElement(e));
-      if (index !== -1) {
-        updateElement(dataTmp[index]);
-        setData({ ...data, data: { ...data.data, results: dataTmp } });
-      }
-    }
+  const invalidate = () => {
+    queryClient.invalidateQueries("todos");
   };
-
-  const deleteData = (pred: (e: T) => boolean) => {
-    if (data.data) {
-      let dataTmp = data.data.results;
-      const index = dataTmp.findIndex((e) => pred(e));
-      if (index !== -1) {
-        dataTmp.splice(index, 1);
-        setData({ ...data, data: { ...data.data, results: dataTmp } });
-      }
-    }
-  };
-
   const sortData = (compare: (first: T, second: T) => number) => {
-    if (data.data) {
-      let dataTmp = data.data.results;
-      dataTmp.sort(compare);
-      setData({ ...data, data: { ...data.data, results: dataTmp } });
-    }
+    return data.results.sort(compare);
   };
 
   return {
     data,
     loadPrev,
     loadNext,
-    loadPage: fetchData,
-    updateData,
-    deleteData,
+    updateData: invalidate,
+    deleteData: invalidate,
     sortData,
-    isFirstPage,
-    isLastPage,
+    isFirstPage: page === 1,
+    isLastPage: page === data?.pages,
+    isLoading,
   };
 };

@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import { PrimaryRoundedButton } from "./Button";
-import { routes } from "../../router/routes";
+import { routes } from "../../routes";
 
 export const SignInButton = () => {
   const navigate = useNavigate();

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { H1 } from "../../../shared/components/Titles";
-import { Row } from "../../../shared/components/layout/Row";
-import { AddItemBox, SpinnerItemBox } from "../../../shared/components/ItemBox";
-import { useSonarrConfigsContext } from "../../../shared/contexts/SonarrConfigContext";
-import { useRadarrConfigsContext } from "../../../shared/contexts/RadarrConfigsContext";
-import { RadarrSettingsBoxPreview } from "../../../logged-in-app/pages/settings/media-providers/radarr/RadarrSettingsBoxPreview";
-import { SonarrSettingsBoxPreview } from "../../../logged-in-app/pages/settings/media-providers/sonarr/SonarrSettingsBoxPreview";
-import { PickMediaProviderTypeModal } from "../../../logged-in-app/pages/settings/media-providers/PickMediaProviderTypeModal";
+import { H1 } from "../../shared/components/Titles";
+import { Row } from "../../shared/components/layout/Row";
+import { AddItemBox, SpinnerItemBox } from "../../shared/components/ItemBox";
+import { useSonarrConfigsContext } from "../../shared/contexts/SonarrConfigContext";
+import { useRadarrConfigsContext } from "../../shared/contexts/RadarrConfigsContext";
+import { RadarrSettingsBoxPreview } from "../../logged-in-app/pages/settings/media-providers/radarr/RadarrSettingsBoxPreview";
+import { SonarrSettingsBoxPreview } from "../../logged-in-app/pages/settings/media-providers/sonarr/SonarrSettingsBoxPreview";
+import { PickMediaProviderTypeModal } from "../../logged-in-app/pages/settings/media-providers/PickMediaProviderTypeModal";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {

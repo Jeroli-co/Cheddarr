@@ -4,6 +4,7 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
 import "./index.css";
+import "swiper/css/bundle";
 
 const root = createRoot(document.getElementById("root") as HTMLElement);
 root.render(

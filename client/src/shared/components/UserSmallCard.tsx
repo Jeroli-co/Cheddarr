@@ -1,7 +1,7 @@
 import { IUser } from "../models/IUser";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { routes } from "../../router/routes";
+import { routes } from "../../routes";
 
 const Container = styled.div`
   display: flex;

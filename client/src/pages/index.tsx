@@ -1,17 +1,14 @@
 import * as React from "react";
 import styled, { css } from "styled-components";
-import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
-import { SidebarMenu } from "../../logged-in-app/sidebarMenu/SidebarMenu";
-import { useWindowSize } from "../../shared/hooks/useWindowSize";
-import { NavbarMobile } from "../../logged-in-app/navbar/NavbarMobile";
-import { Navbar } from "../../logged-in-app/navbar/Navbar";
-import { SidebarMenuMobile } from "../../logged-in-app/sidebarMenu/SidebarMenuMobile";
-import { Footer } from "../../shared/components/Footer";
+import { STATIC_STYLES } from "../shared/enums/StaticStyles";
+import { SidebarMenu } from "../logged-in-app/sidebarMenu/SidebarMenu";
+import { useWindowSize } from "../shared/hooks/useWindowSize";
+import { NavbarMobile } from "../logged-in-app/navbar/NavbarMobile";
+import { Navbar } from "../logged-in-app/navbar/Navbar";
+import { SidebarMenuMobile } from "../logged-in-app/sidebarMenu/SidebarMenuMobile";
+import { Footer } from "../shared/components/Footer";
 import { useState } from "react";
-import { useSession } from "../../shared/contexts/SessionContext";
-import { Navigate } from "react-router";
-import { routes } from "../../router/routes";
-import { PageLoader } from "../../shared/components/PageLoader";
+import { PageLoader } from "../shared/components/PageLoader";
 
 const Layout = styled.div`
   margin: 0;
@@ -59,24 +56,17 @@ const PageLayoutMobile = styled(PageLayoutContainer)<PageLayoutProps>`
   STATIC_STYLES.SEARCH_BAR_HEIGHT}px;
 `;
 
-const IndexRouter = React.lazy(() => import("./router"));
+const Router = React.lazy(() => import("./router"));
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const { width } = useWindowSize();
-  const {
-    session: { isAuthenticated },
-  } = useSession();
 
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => {
     setIsOpen(!isOpen);
   };
-
-  if (!isAuthenticated) {
-    return <Navigate to={routes.SIGN_IN.url()} />;
-  }
 
   return (
     <React.Suspense fallback={<PageLoader />}>
@@ -85,7 +75,7 @@ export default () => {
           <SidebarMenuMobile isOpen={isOpen} toggle={toggle} />
           <NavbarMobile toggle={toggle} />
           <PageLayoutMobile isSidebarOpen={isOpen}>
-            <IndexRouter />
+            <Router />
           </PageLayoutMobile>
           <Footer />
         </Layout>
@@ -94,7 +84,7 @@ export default () => {
           <SidebarMenu isOpen={isOpen} toggle={toggle} />
           <Navbar isSidebarOpen={isOpen} />{" "}
           <PageLayout isSidebarOpen={isOpen}>
-            <IndexRouter />
+            <Router />
           </PageLayout>
           <Footer />
         </Layout>

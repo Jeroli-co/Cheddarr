@@ -1,11 +1,11 @@
 import * as React from "react";
-import { H1 } from "../../../shared/components/Titles";
-import { useRoleGuard } from "../../../shared/hooks/useRoleGuard";
-import { Roles } from "../../../shared/enums/Roles";
-import { PageLoader } from "../../../shared/components/PageLoader";
+import { H1 } from "../../shared/components/Titles";
+import { useRoleGuard } from "../../shared/hooks/useRoleGuard";
+import { Roles } from "../../shared/enums/Roles";
+import { PageLoader } from "../../shared/components/PageLoader";
 import { Navigate, Route, Routes } from "react-router";
-import { routes } from "../../../router/routes";
-import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
+import { routes } from "../../routes";
+import { TabsContextProvider } from "../../shared/contexts/TabsContext";
 
 const ConfirmedUsersPage = React.lazy(() => import("./confirmed"));
 const PendingUsersPage = React.lazy(() => import("./pending"));

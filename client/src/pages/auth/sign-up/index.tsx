@@ -8,7 +8,7 @@ import { Input } from "../../../shared/components/forms/inputs/Input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Layout from "../layout";
-import { routes } from "../../../router/routes";
+import { routes } from "../../../routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router";
 import { Title } from "../../../elements/Title";

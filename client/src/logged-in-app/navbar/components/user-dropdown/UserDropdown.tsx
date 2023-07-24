@@ -1,5 +1,5 @@
 import { RefObject, useRef } from "react";
-import { routes } from "../../../../router/routes";
+import { routes } from "../../../../routes";
 import { faSignOutAlt, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { useSession } from "../../../../shared/contexts/SessionContext";

@@ -1,19 +1,19 @@
-import { Spinner } from "../../../shared/components/Spinner";
-import { useRequestsContext } from "../../../shared/contexts/RequestsContext";
+import { Spinner } from "../../shared/components/Spinner";
+import { useRequestsContext } from "../../shared/contexts/RequestsContext";
 import {
   RequestFooter,
   RequestHeader,
   RequestLayout,
   ScrollingTable,
-} from "../../../shared/components/requests/RequestLayout";
-import { ComponentSizes } from "../../../shared/enums/ComponentSizes";
-import { CenteredContent } from "../../../shared/components/layout/CenteredContent";
-import { RequestTypes } from "../../../shared/enums/RequestTypes";
-import { useRadarrConfigs } from "../../../shared/hooks/useRadarrConfigs";
-import { useSonarrConfigs } from "../../../shared/hooks/useSonarrConfigs";
-import { IMediaRequest } from "../../../shared/models/IMediaRequest";
-import { MediaTypes } from "../../../shared/enums/MediaTypes";
-import { FullWidthTag } from "../../../shared/components/FullWidthTag";
+} from "../../shared/components/requests/RequestLayout";
+import { ComponentSizes } from "../../shared/enums/ComponentSizes";
+import { CenteredContent } from "../../shared/components/layout/CenteredContent";
+import { RequestTypes } from "../../shared/enums/RequestTypes";
+import { useRadarrConfigs } from "../../shared/hooks/useRadarrConfigs";
+import { useSonarrConfigs } from "../../shared/hooks/useSonarrConfigs";
+import { IMediaRequest } from "../../shared/models/IMediaRequest";
+import { MediaTypes } from "../../shared/enums/MediaTypes";
+import { FullWidthTag } from "../../shared/components/FullWidthTag";
 
 const Received = () => {
   const { requestsReceived, onLoadPrev, onLoadNext } = useRequestsContext();

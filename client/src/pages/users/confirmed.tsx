@@ -1,23 +1,23 @@
 import { useState } from "react";
-import { Buttons } from "../../../shared/components/layout/Buttons";
+import { Buttons } from "../../shared/components/layout/Buttons";
 import {
   DangerIconButton,
   PrimaryIconButton,
-} from "../../../shared/components/Button";
-import { Icon } from "../../../shared/components/Icon";
+} from "../../shared/components/Button";
+import { Icon } from "../../shared/components/Icon";
 import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { IUser } from "../../../shared/models/IUser";
-import { usePagination } from "../../../shared/hooks/usePagination";
-import { APIRoutes } from "../../../shared/enums/APIRoutes";
-import { Spinner } from "../../../shared/components/Spinner";
+import { IUser } from "../../shared/models/IUser";
+import { usePagination } from "../../shared/hooks/usePagination";
+import { APIRoutes } from "../../shared/enums/APIRoutes";
+import { Spinner } from "../../shared/components/Spinner";
 import styled from "styled-components";
-import { useUserService } from "../../../shared/toRefactor/useUserService";
-import { PaginationArrows } from "../../../shared/components/PaginationArrows";
-import { DeleteDataModal } from "../../../shared/components/DeleteDataModal";
-import { useSession } from "../../../shared/contexts/SessionContext";
+import { useUserService } from "../../shared/toRefactor/useUserService";
+import { PaginationArrows } from "../../shared/components/PaginationArrows";
+import { DeleteDataModal } from "../../shared/components/DeleteDataModal";
+import { useSession } from "../../shared/contexts/SessionContext";
 import { useNavigate } from "react-router-dom";
-import { routes } from "../../../router/routes";
-import { UserSmallCard } from "../../../shared/components/UserSmallCard";
+import { routes } from "../../routes";
+import { UserSmallCard } from "../../shared/components/UserSmallCard";
 
 const Header = styled.div`
   background: ${(props) => props.theme.primaryLight};

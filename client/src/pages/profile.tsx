@@ -1,18 +1,17 @@
-import * as React from "react";
 import styled from "styled-components";
-import { SwitchErrors } from "../../shared/components/errors/SwitchErrors";
-import { Spinner } from "../../shared/components/Spinner";
-import { UpdateProfile } from "../../logged-in-app/pages/user-profile/account/UpdateProfile";
-import { H1, H2 } from "../../shared/components/Titles";
-import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
-import { PrimaryDivider } from "../../shared/components/Divider";
+import { SwitchErrors } from "../shared/components/errors/SwitchErrors";
+import { Spinner } from "../shared/components/Spinner";
+import { UpdateProfile } from "../logged-in-app/pages/user-profile/account/UpdateProfile";
+import { H1, H2 } from "../shared/components/Titles";
+import { STATIC_STYLES } from "../shared/enums/StaticStyles";
+import { PrimaryDivider } from "../shared/components/Divider";
 import { useParams } from "react-router";
-import { useUser } from "../../shared/hooks/useUser";
-import { Roles } from "../../shared/enums/Roles";
-import { useUserService } from "../../shared/toRefactor/useUserService";
-import { RolesTree } from "../../shared/components/RolesTree";
-import { checkRole } from "../../utils/roles";
-import { useSession } from "../../shared/contexts/SessionContext";
+import { useUser } from "../shared/hooks/useUser";
+import { Roles } from "../shared/enums/Roles";
+import { useUserService } from "../shared/toRefactor/useUserService";
+import { RolesTree } from "../shared/components/RolesTree";
+import { checkRole } from "../utils/roles";
+import { useSession } from "../shared/contexts/SessionContext";
 
 const SubContainer = styled.div`
   display: flex;

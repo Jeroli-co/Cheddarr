@@ -1,21 +1,21 @@
 import * as React from "react";
 import { useState } from "react";
-import { usePagination } from "../../../shared/hooks/usePagination";
-import { IUser } from "../../../shared/models/IUser";
-import { APIRoutes } from "../../../shared/enums/APIRoutes";
-import { Spinner } from "../../../shared/components/Spinner";
-import { Buttons } from "../../../shared/components/layout/Buttons";
+import { usePagination } from "../../shared/hooks/usePagination";
+import { IUser } from "../../shared/models/IUser";
+import { APIRoutes } from "../../shared/enums/APIRoutes";
+import { Spinner } from "../../shared/components/Spinner";
+import { Buttons } from "../../shared/components/layout/Buttons";
 import {
   DangerIconButton,
   SuccessIconButton,
-} from "../../../shared/components/Button";
-import { Icon } from "../../../shared/components/Icon";
+} from "../../shared/components/Button";
+import { Icon } from "../../shared/components/Icon";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
-import { DeleteDataModal } from "../../../shared/components/DeleteDataModal";
-import { useUserService } from "../../../shared/toRefactor/useUserService";
-import { PaginationArrows } from "../../../shared/components/PaginationArrows";
-import { UserSmallCard } from "../../../shared/components/UserSmallCard";
+import { DeleteDataModal } from "../../shared/components/DeleteDataModal";
+import { useUserService } from "../../shared/toRefactor/useUserService";
+import { PaginationArrows } from "../../shared/components/PaginationArrows";
+import { UserSmallCard } from "../../shared/components/UserSmallCard";
 
 const Header = styled.div`
   background: ${(props) => props.theme.primaryLight};

@@ -15,7 +15,7 @@ import { Icon } from "../Icon";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { STATIC_STYLES } from "../../enums/StaticStyles";
 import { useLocation, useNavigate } from "react-router-dom";
-import { routes } from "../../../router/routes";
+import { routes } from "../../../routes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
 import { RequestButton } from "../requests/RequestButton";

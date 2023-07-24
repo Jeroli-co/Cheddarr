@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { useRoleGuard } from "../../../shared/hooks/useRoleGuard";
-import { Roles } from "../../../shared/enums/Roles";
-import { usePagination } from "../../../shared/hooks/usePagination";
-import { APIRoutes } from "../../../shared/enums/APIRoutes";
-import { ILog } from "../../../shared/models/ILog";
-import { Spinner } from "../../../shared/components/Spinner";
-import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
+import { useRoleGuard } from "../../shared/hooks/useRoleGuard";
+import { Roles } from "../../shared/enums/Roles";
+import { usePagination } from "../../shared/hooks/usePagination";
+import { APIRoutes } from "../../shared/enums/APIRoutes";
+import { ILog } from "../../shared/models/ILog";
+import { Spinner } from "../../shared/components/Spinner";
+import { SwitchErrors } from "../../shared/components/errors/SwitchErrors";
 import styled from "styled-components";
-import { LogLevels } from "../../../shared/enums/LogLevels";
-import { PaginationArrows } from "../../../shared/components/PaginationArrows";
+import { LogLevels } from "../../shared/enums/LogLevels";
+import { PaginationArrows } from "../../shared/components/PaginationArrows";
 
 const Container = styled.div`
   padding: 20px;

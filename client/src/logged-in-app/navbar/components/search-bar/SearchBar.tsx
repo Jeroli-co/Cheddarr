@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import styled, { css } from "styled-components";
 import { SearchDropdownType } from "./SearchDropdownType";
 import { useNavigate } from "react-router";
-import { routes } from "../../../../router/routes";
+import { routes } from "../../../../routes";
 import { SearchFilters } from "../../../../shared/enums/SearchFilters";
 import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
 import { isEmpty } from "../../../../utils/strings";
@@ -89,7 +89,7 @@ const Container = styled.div<{
 export const SearchBar = () => {
   const [isInputFocus, setIsInputFocus] = useState(false);
   const [searchType, setSearchType] = useState<SearchFilters>(
-    SearchFilters.ALL
+    SearchFilters.ALL,
   );
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();

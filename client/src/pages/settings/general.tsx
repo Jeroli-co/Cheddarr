@@ -1,15 +1,15 @@
-import { useRoleGuard } from "../../../shared/hooks/useRoleGuard";
-import { Roles } from "../../../shared/enums/Roles";
-import { H2, H3 } from "../../../shared/components/Titles";
+import { useRoleGuard } from "../../shared/hooks/useRoleGuard";
+import { Roles } from "../../shared/enums/Roles";
+import { H2, H3 } from "../../shared/components/Titles";
 import {
   PrimaryDivider,
   PrimaryLightDivider,
-} from "../../../shared/components/Divider";
-import { useConfig } from "../../../shared/hooks/useConfig";
-import { RolesTree } from "../../../shared/components/RolesTree";
-import { useAlert } from "../../../shared/contexts/AlertContext";
-import { ManageLogLevels } from "../../../shared/components/ManageLogLevels";
-import { LogLevels } from "../../../shared/enums/LogLevels";
+} from "../../shared/components/Divider";
+import { useConfig } from "../../shared/hooks/useConfig";
+import { RolesTree } from "../../shared/components/RolesTree";
+import { useAlert } from "../../shared/contexts/AlertContext";
+import { ManageLogLevels } from "../../shared/components/ManageLogLevels";
+import { LogLevels } from "../../shared/enums/LogLevels";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {

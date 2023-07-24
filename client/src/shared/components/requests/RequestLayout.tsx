@@ -33,7 +33,7 @@ import { Tooltiped } from "../Tooltiped";
 import { DangerTag, MediaTag, SuccessTag, WarningTag } from "../Tag";
 import { useMedia } from "../../hooks/useMedia";
 import { useNavigate } from "react-router-dom";
-import { routes } from "../../../router/routes";
+import { routes } from "../../../routes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
 import { Buttons } from "../layout/Buttons";

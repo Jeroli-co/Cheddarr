@@ -1,16 +1,16 @@
 import * as React from "react";
 import { Navigate, Route, Routes } from "react-router";
-import { routes } from "../../../router/routes";
-import { TabsContextProvider } from "../../../shared/contexts/TabsContext";
-import { SonarrConfigsContextProvider } from "../../../shared/contexts/SonarrConfigContext";
-import { RadarrConfigsContextProvider } from "../../../shared/contexts/RadarrConfigsContext";
-import { NotificationsServicesContextProvider } from "../../../shared/contexts/NotificationsServicesContext";
-import { useRoleGuard } from "../../../shared/hooks/useRoleGuard";
-import { Roles } from "../../../shared/enums/Roles";
-import { useSession } from "../../../shared/contexts/SessionContext";
-import { checkRole } from "../../../utils/roles";
+import { routes } from "../../routes";
+import { TabsContextProvider } from "../../shared/contexts/TabsContext";
+import { SonarrConfigsContextProvider } from "../../shared/contexts/SonarrConfigContext";
+import { RadarrConfigsContextProvider } from "../../shared/contexts/RadarrConfigsContext";
+import { NotificationsServicesContextProvider } from "../../shared/contexts/NotificationsServicesContext";
+import { useRoleGuard } from "../../shared/hooks/useRoleGuard";
+import { Roles } from "../../shared/enums/Roles";
+import { useSession } from "../../shared/contexts/SessionContext";
+import { checkRole } from "../../utils/roles";
 import { useEffect, useState } from "react";
-import { PageLoader } from "../../../shared/components/PageLoader";
+import { PageLoader } from "../../shared/components/PageLoader";
 
 const MediaServersPage = React.lazy(() => import("./media-servers"));
 const MediaProvidersPage = React.lazy(() => import("./media-providers"));

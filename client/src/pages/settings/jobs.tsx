@@ -1,21 +1,21 @@
-import { useJobs } from "../../../shared/hooks/useJobs";
+import { useJobs } from "../../shared/hooks/useJobs";
 import styled from "styled-components";
-import { Spinner } from "../../../shared/components/Spinner";
-import { SwitchErrors } from "../../../shared/components/errors/SwitchErrors";
-import { Buttons } from "../../../shared/components/layout/Buttons";
-import { PrimaryButton } from "../../../shared/components/Button";
-import { Icon } from "../../../shared/components/Icon";
+import { Spinner } from "../../shared/components/Spinner";
+import { SwitchErrors } from "../../shared/components/errors/SwitchErrors";
+import { Buttons } from "../../shared/components/layout/Buttons";
+import { PrimaryButton } from "../../shared/components/Button";
+import { Icon } from "../../shared/components/Icon";
 import {
   faPause,
   faPlayCircle,
   faSync,
 } from "@fortawesome/free-solid-svg-icons";
-import { Tooltiped } from "../../../shared/components/Tooltiped";
-import { JobActionsEnum } from "../../../shared/models/IJob";
-import { PrimaryLightDivider } from "../../../shared/components/Divider";
-import { H1 } from "../../../shared/components/Titles";
-import { useRoleGuard } from "../../../shared/hooks/useRoleGuard";
-import { Roles } from "../../../shared/enums/Roles";
+import { Tooltiped } from "../../shared/components/Tooltiped";
+import { JobActionsEnum } from "../../shared/models/IJob";
+import { PrimaryLightDivider } from "../../shared/components/Divider";
+import { H1 } from "../../shared/components/Titles";
+import { useRoleGuard } from "../../shared/hooks/useRoleGuard";
+import { Roles } from "../../shared/enums/Roles";
 
 const JobContainer = styled.div`
   display: flex;

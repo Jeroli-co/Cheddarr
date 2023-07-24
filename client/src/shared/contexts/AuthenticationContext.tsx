@@ -9,7 +9,7 @@ import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { APIRoutes } from "../enums/APIRoutes";
 import { SignUpFormData } from "../../pages/auth/sign-up";
 import { SignInFormData } from "../../pages/auth/sign-in";
-import { routes } from "../../router/routes";
+import { routes } from "../../routes";
 
 interface IAuthenticationContextInterface {
   readonly signUp: (

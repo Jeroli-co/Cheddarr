@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { ISession, SessionDefaultImpl } from "../models/ISession";
 import { IEncodedToken } from "../models/IEncodedToken";
-import { routes } from "../../router/routes";
+import { routes } from "../../routes";
 import { instance } from "../../axiosInstance";
 import { APIRoutes } from "../enums/APIRoutes";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";

@@ -11,7 +11,7 @@ import Layout from "../layout";
 import { Title } from "../../../elements/Title";
 import { Input } from "../../../shared/components/forms/inputs/Input";
 import { Button } from "../../../elements/Button";
-import { routes } from "../../../router/routes";
+import { routes } from "../../../routes";
 import { useNavigate } from "react-router";
 import { InitResetPasswordModal } from "../../../components/InitResetPasswordModal";
 

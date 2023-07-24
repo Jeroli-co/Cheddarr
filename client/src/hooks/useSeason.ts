@@ -5,12 +5,12 @@ import { useAlert } from "../shared/contexts/AlertContext";
 import { useQuery } from "react-query";
 import hoursToMilliseconds from "date-fns/hoursToMilliseconds";
 
-export const useSeason = (seriesId: string, seasonNumber: number) => {
+export const useSeason = (seriesID: string, seasonNumber: number) => {
   const { get } = useAPI();
   const { pushDanger } = useAlert();
 
   const fetchSeason = () => {
-    return get<ISeason>(APIRoutes.GET_SEASON(seriesId, seasonNumber)).then(
+    return get<ISeason>(APIRoutes.GET_SEASON(seriesID, seasonNumber)).then(
       (res) => {
         if (res.status !== 200) {
           pushDanger("Cannot get season");
@@ -23,7 +23,7 @@ export const useSeason = (seriesId: string, seasonNumber: number) => {
   };
 
   const { data, isLoading } = useQuery<ISeason>(
-    ["season", seriesId, seasonNumber],
+    ["season", seriesID, seasonNumber],
     fetchSeason,
     {
       staleTime: hoursToMilliseconds(24),

@@ -6,7 +6,7 @@ import {
 } from "../models/IAsyncCall";
 import { useSession } from "../contexts/SessionContext";
 import { useLocation } from "react-router-dom";
-import { routes } from "../../router/routes";
+import { routes } from "../../routes";
 import { useNavigate } from "react-router";
 
 export const useAPI = () => {

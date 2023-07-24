@@ -2,7 +2,7 @@ import { useSession } from "../contexts/SessionContext";
 import { useNavigate } from "react-router-dom";
 import { checkRole } from "../../utils/roles";
 import { Roles } from "../enums/Roles";
-import { routes } from "../../router/routes";
+import { routes } from "../../routes";
 import { useEffect } from "react";
 
 export const useRoleGuard = (neededRoles: Roles[], hasOne?: boolean) => {

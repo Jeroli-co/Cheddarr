@@ -10,7 +10,7 @@ import {
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import { routes } from "../../router/routes";
+import { routes } from "../../routes";
 import { useWindowSize } from "../../shared/hooks/useWindowSize";
 import {
   SidebarMenuContainer,

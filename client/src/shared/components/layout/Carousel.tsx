@@ -1,8 +1,8 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import styled, { css } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
-import smoothscroll from "smoothscroll-polyfill";
+import { polyfill } from "smoothscroll-polyfill";
 
 const CarouselStyle = styled.div`
   position: relative;
@@ -32,6 +32,7 @@ const CarouselItems = styled.div`
 
   -ms-overflow-style: none; /* IE 11 */
   scrollbar-width: none; /* Firefox 64 */
+
   ::-webkit-scrollbar {
     display: none;
   }
@@ -75,12 +76,12 @@ const PaginationButton = styled.button<PaginationButtonProps>`
 
 type CarouselProps = {
   children: any;
-  loadPrev?: () => boolean;
-  loadNext?: () => boolean;
+  loadPrev?: () => void;
+  loadNext?: () => void;
 };
 
 const Carousel = (props: CarouselProps) => {
-  smoothscroll.polyfill();
+  polyfill();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -89,8 +90,7 @@ const Carousel = (props: CarouselProps) => {
     if (scrollRef.current!.scrollLeft > 0) {
       scrollLeft = -((window.innerWidth + window.innerHeight) * 30) / 100;
     } else {
-      scrollLeft =
-        props.loadPrev !== undefined ? 0 : scrollRef.current!.scrollWidth;
+      scrollLeft = !!props.loadPrev ? 0 : scrollRef.current!.scrollWidth;
     }
 
     scrollRef.current!.scrollBy({
@@ -108,12 +108,15 @@ const Carousel = (props: CarouselProps) => {
     ) {
       scrollLeft = ((window.innerWidth + window.innerHeight) * 30) / 100;
     } else {
-      if (props.loadNext !== undefined) {
+      if (!!props.loadNext) {
+        scrollLeft = ((window.innerWidth + window.innerHeight) * 30) / 100;
+        /*
         if (props.loadNext()) {
           scrollLeft = ((window.innerWidth + window.innerHeight) * 30) / 100;
         } else {
           scrollLeft = -scrollRef.current!.scrollWidth;
         }
+        */
       } else {
         scrollLeft = -scrollRef.current!.scrollWidth;
       }

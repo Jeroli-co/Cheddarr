@@ -5,18 +5,17 @@ import { useSession } from "../contexts/SessionContext";
 import { useUserService } from "../toRefactor/useUserService";
 import { checkRole } from "../../utils/roles";
 import { Roles } from "../enums/Roles";
-import {useNavigate} from "react-router-dom";
-import { routes } from "../../router/routes";
+import { useNavigate } from "react-router-dom";
+import { routes } from "../../routes";
 
 export const useUser = (id?: string) => {
-  const [currentUser, setCurrentUser] = useState<IAsyncCall<IUser | null>>(
-    DefaultAsyncCall
-  );
+  const [currentUser, setCurrentUser] =
+    useState<IAsyncCall<IUser | null>>(DefaultAsyncCall);
   const {
     session: { user },
   } = useSession();
   const { getUserById } = useUserService();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (

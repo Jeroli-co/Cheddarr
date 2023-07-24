@@ -1,14 +1,14 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router";
-import { routes } from "../../../router/routes";
-import { Tab, TabsContextProvider } from "../../../shared/contexts/TabsContext";
-import { RequestsContextProvider } from "../../../shared/contexts/RequestsContext";
-import { useRoleGuard } from "../../../shared/hooks/useRoleGuard";
-import { Roles } from "../../../shared/enums/Roles";
-import { checkRole } from "../../../utils/roles";
-import { useSession } from "../../../shared/contexts/SessionContext";
-import { PageLoader } from "../../../shared/components/PageLoader";
+import { routes } from "../../routes";
+import { Tab, TabsContextProvider } from "../../shared/contexts/TabsContext";
+import { RequestsContextProvider } from "../../shared/contexts/RequestsContext";
+import { useRoleGuard } from "../../shared/hooks/useRoleGuard";
+import { Roles } from "../../shared/enums/Roles";
+import { checkRole } from "../../utils/roles";
+import { useSession } from "../../shared/contexts/SessionContext";
+import { PageLoader } from "../../shared/components/PageLoader";
 
 const SentPage = React.lazy(() => import("./sent"));
 const ReceivedPage = React.lazy(() => import("./received"));
