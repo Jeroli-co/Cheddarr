@@ -6,7 +6,7 @@ import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { Button, PrimaryButton } from "../../../../shared/components/Button";
 import { Modal } from "../../../../shared/components/layout/Modal";
 import { H2 } from "../../../../shared/components/Titles";
-import { InputField } from "../../../../shared/components/inputs/InputField";
+import { Input } from "../../../../shared/components/forms/inputs/Input";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { HelpDanger } from "../../../../shared/components/Help";
 import { Icon } from "../../../../shared/components/Icon";
@@ -34,7 +34,7 @@ const ChangeEmailModal = (props: ChangeEmailModalProps) => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <section>
-          <InputField withIcon>
+          <Input withIcon>
             <label>Email</label>
             <div className="with-left-icon">
               <input
@@ -51,7 +51,7 @@ const ChangeEmailModal = (props: ChangeEmailModalProps) => {
                 <Icon icon={faEnvelope} />
               </span>
             </div>
-          </InputField>
+          </Input>
           {errors["email"] && errors["email"].type === "required" && (
             <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
           )}

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { IMedia, isMovie, isOnServers, isSeries } from "../../models/IMedia";
 import { H1, H2 } from "../Titles";
@@ -30,11 +31,11 @@ const Background = styled.div<{ image: string }>`
   bottom: 0;
   width: 100%;
   background-image: linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0),
-          ${(props) => props.theme.primary}
-        ),
-        url('${(props) => props.image}');
+      to bottom,
+      rgba(0, 0, 0, 0),
+      ${(props) => props.theme.primary}
+    ),
+    url("${(props) => props.image}");
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;

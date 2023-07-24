@@ -38,7 +38,7 @@ import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
 import { Buttons } from "../layout/Buttons";
 import { IMediaProviderConfig } from "../../models/IMediaProviderConfig";
-import { InputField } from "../inputs/InputField";
+import { Input } from "../forms/inputs/Input";
 import { PaginationArrows } from "../PaginationArrows";
 
 export const ScrollingTable = styled.div`
@@ -527,7 +527,7 @@ export const RequestLayout = ({
             providers &&
             providers.length > 0 && (
               <>
-                <InputField>
+                <Input>
                   <select
                     value={providerId}
                     onChange={(e) => onProviderChange(e)}
@@ -538,7 +538,7 @@ export const RequestLayout = ({
                       </option>
                     ))}
                   </select>
-                </InputField>
+                </Input>
 
                 {providers.length === 0 && <p>No providers found</p>}
               </>

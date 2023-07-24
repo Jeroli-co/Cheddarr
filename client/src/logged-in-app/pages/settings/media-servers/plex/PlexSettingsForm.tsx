@@ -3,8 +3,8 @@ import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { useFormContext } from "react-hook-form";
 import { IMediaServerConfig } from "../../../../../shared/models/IMediaServerConfig";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
-import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
-import { InputField } from "../../../../../shared/components/inputs/InputField";
+import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
+import { Input } from "../../../../../shared/components/forms/inputs/Input";
 import { Help, HelpDanger } from "../../../../../shared/components/Help";
 import { Icon } from "../../../../../shared/components/Icon";
 import { isEmpty } from "../../../../../utils/strings";
@@ -14,9 +14,8 @@ type PlexSettingsFormProps = {
 };
 
 export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
-  const { register, errors, reset, setValue } = useFormContext<
-    IMediaServerConfig
-  >();
+  const { register, errors, reset, setValue } =
+    useFormContext<IMediaServerConfig>();
   const [usePort, setUsePort] = useState(false);
 
   useEffect(() => {
@@ -43,7 +42,7 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
   return (
     <>
       {/* Config name */}
-      <InputField>
+      <Input>
         <label>Config name</label>
         <input
           name="name"
@@ -52,10 +51,10 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
           defaultValue="Plex"
           ref={register}
         />
-      </InputField>
+      </Input>
 
       {/* Authentication token */}
-      <InputField>
+      <Input>
         <label>Authentication token</label>
         <input
           name="apiKey"
@@ -68,10 +67,10 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
         {errors.apiKey && errors.apiKey.type === "required" && (
           <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
         )}
-      </InputField>
+      </Input>
 
       {/* Hostname or IP address */}
-      <InputField>
+      <Input>
         <label>Hostname or IP Address</label>
         <input
           name="host"
@@ -88,10 +87,10 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
           <Icon icon={faExclamationCircle} /> Change this value with your domain
           name if you have one
         </Help>
-      </InputField>
+      </Input>
 
       {/* PORT */}
-      <InputField>
+      <Input>
         <label>
           Port{" "}
           <input
@@ -109,10 +108,10 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
           maxLength={99999}
           disabled={!usePort}
         />
-      </InputField>
+      </Input>
 
       {/* SERVER ID */}
-      <InputField>
+      <Input>
         <label>Server ID</label>
         <input
           name="serverId"
@@ -125,10 +124,10 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
         {errors.serverId && errors.serverId.type === "required" && (
           <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
         )}
-      </InputField>
+      </Input>
 
       {/* SERVER NAME */}
-      <InputField>
+      <Input>
         <label>Server name</label>
         <input
           name="serverName"
@@ -141,12 +140,12 @@ export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
         {errors.serverName && errors.serverName.type === "required" && (
           <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
         )}
-      </InputField>
+      </Input>
 
-      <InputField>
+      <Input>
         <label>SSL</label>
         <Checkbox name="ssl" register={register} round />
-      </InputField>
+      </Input>
     </>
   );
 };

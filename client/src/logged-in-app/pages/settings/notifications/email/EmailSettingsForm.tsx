@@ -9,8 +9,8 @@ import {
 import { IEmailConfig } from "../../../../../shared/models/IEmailConfig";
 import { INotificationsConfig } from "../../../../../shared/models/INotificationsConfig";
 import { Row } from "../../../../../shared/components/layout/Row";
-import { InputField } from "../../../../../shared/components/inputs/InputField";
-import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
+import { Input } from "../../../../../shared/components/forms/inputs/Input";
+import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
 import { Icon } from "../../../../../shared/components/Icon";
 
 type EmailSettingsFormProps = {
@@ -29,13 +29,13 @@ export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
 
   return (
     <>
-      <InputField isInline>
+      <Input isInline>
         <label>Enabled</label>
         <Checkbox name="enabled" register={register} />
-      </InputField>
+      </Input>
 
       <Row justifyContent="space-between" alignItems="center">
-        <InputField withIcon width="49%">
+        <Input withIcon width="49%">
           <label>Hostname</label>
           <div className="with-left-icon">
             <input
@@ -48,9 +48,9 @@ export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
               <Icon icon={faAt} />
             </span>
           </div>
-        </InputField>
+        </Input>
 
-        <InputField width="49%">
+        <Input width="49%">
           <label>Port</label>
           <input
             name="smtpPort"
@@ -59,10 +59,10 @@ export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
             ref={register({ minLength: 3, maxLength: 5 })}
             maxLength={65535}
           />
-        </InputField>
+        </Input>
       </Row>
 
-      <InputField withIcon>
+      <Input withIcon>
         <label>Username</label>
         <div className="with-left-icon">
           <input
@@ -75,9 +75,9 @@ export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
             <Icon icon={faUser} />
           </span>
         </div>
-      </InputField>
+      </Input>
 
-      <InputField withIcon>
+      <Input withIcon>
         <label>Password</label>
         <div className="with-left-icon">
           <input
@@ -90,9 +90,9 @@ export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
             <Icon icon={faKey} />
           </span>
         </div>
-      </InputField>
+      </Input>
 
-      <InputField withIcon>
+      <Input withIcon>
         <label>Sender address</label>
         <div className="with-left-icon">
           <input
@@ -105,9 +105,9 @@ export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
             <Icon icon={faEnvelope} />
           </span>
         </div>
-      </InputField>
+      </Input>
 
-      <InputField>
+      <Input>
         <label>Sender name</label>
         <input
           name="senderName"
@@ -115,14 +115,14 @@ export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
           ref={register}
           placeholder="Sender name"
         />
-      </InputField>
+      </Input>
 
       <br />
 
-      <InputField isInline={true}>
+      <Input isInline={true}>
         <label>SSL</label>
         <Checkbox name="ssl" register={register} round />
-      </InputField>
+      </Input>
     </>
   );
 };

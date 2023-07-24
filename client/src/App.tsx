@@ -1,3 +1,4 @@
+import * as React from "react";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { AlertContextProvider } from "./shared/contexts/AlertContext";
@@ -5,24 +6,32 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeContext } from "./shared/contexts/ThemeContext";
 import { SessionContextProvider } from "./shared/contexts/SessionContext";
 import PlexAuthContextProvider from "./shared/contexts/PlexAuthContext";
-import { MainRouter } from "./router/new-router/MainRouter";
+import { PageLoader } from "./shared/components/PageLoader";
+import { QueryClient, QueryClientProvider } from "react-query";
 
-export const App = () => {
+const queryClient = new QueryClient();
+
+const MainRouter = React.lazy(() => import("./pages/router"));
+
+// eslint-disable-next-line import/no-anonymous-default-export
+export default () => {
   config.autoAddCss = false;
 
   return (
-    <div className="App">
+    <QueryClientProvider client={queryClient}>
       <ThemeContext>
         <AlertContextProvider>
           <BrowserRouter>
             <SessionContextProvider>
               <PlexAuthContextProvider>
-                <MainRouter />
+                <React.Suspense fallback={<PageLoader />}>
+                  <MainRouter />
+                </React.Suspense>
               </PlexAuthContextProvider>
             </SessionContextProvider>
           </BrowserRouter>
         </AlertContextProvider>
       </ThemeContext>
-    </div>
+    </QueryClientProvider>
   );
 };

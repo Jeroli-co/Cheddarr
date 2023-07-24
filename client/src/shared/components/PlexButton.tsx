@@ -1,5 +1,6 @@
-import React from "react";
+import * as React from "react";
 import styled from "styled-components";
+
 const logo = require("../../assets/plex.png");
 
 const PlexButtonStyle = styled.button`
@@ -45,4 +46,4 @@ const PlexButton = ({ onClick, text }: PlexButtonProps) => {
   );
 };
 
-export { PlexButton };
+export {PlexButton};

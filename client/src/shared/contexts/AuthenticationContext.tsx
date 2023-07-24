@@ -1,5 +1,4 @@
-import React, { createContext, useContext } from "react";
-import { ISignInFormData } from "../models/ISignInFormData";
+import { createContext, useContext } from "react";
 import { useNavigate } from "react-router";
 import { useAPI } from "../hooks/useAPI";
 import { useSession } from "./SessionContext";
@@ -8,15 +7,17 @@ import { useAlert } from "./AlertContext";
 import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
 import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
 import { APIRoutes } from "../enums/APIRoutes";
-import {SignUpFormData} from "../../logged-out-app/SignUpForm";
+import { SignUpFormData } from "../../pages/auth/sign-up";
+import { SignInFormData } from "../../pages/auth/sign-in";
+import { routes } from "../../router/routes";
 
 interface IAuthenticationContextInterface {
   readonly signUp: (
-    data: SignUpFormData
+    data: SignUpFormData,
   ) => Promise<IAsyncCall | IAsyncCall<null>>;
   readonly signIn: (
-    data: ISignInFormData,
-    redirectURI?: string
+    data: SignInFormData,
+    redirectURI?: string,
   ) => Promise<IAsyncCall | IAsyncCall<null>>;
 }
 
@@ -30,7 +31,7 @@ const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
 };
 
 const AuthenticationContext = createContext<IAuthenticationContextInterface>(
-  AuthenticationContextDefaultImpl
+  AuthenticationContextDefaultImpl,
 );
 
 export default function AuthenticationContextProvider(props: any) {
@@ -51,16 +52,15 @@ export default function AuthenticationContextProvider(props: any) {
     return res;
   };
 
-  const signIn = async (data: ISignInFormData, redirectURI?: string) => {
+  const signIn = async (data: SignInFormData, redirectURI?: string) => {
     const fd = new FormData();
     fd.append("username", data.username);
     fd.append("password", data.password);
     const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, fd);
     if (res.data && res.status === 200) {
+      console.log(res.data);
       initSession(res.data);
-      if (redirectURI) {
-        navigate(redirectURI);
-      }
+      navigate(redirectURI ?? routes.HOME.url, { replace: true });
     } else if (res.status === 401) {
       pushDanger("Wrong credentials");
     } else if (res.status === 400) {

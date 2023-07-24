@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Row } from "../../../../../shared/components/layout/Row";
-import { InputField } from "../../../../../shared/components/inputs/InputField";
-import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
+import { Input } from "../../../../../shared/components/forms/inputs/Input";
+import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
 import { HelpDanger } from "../../../../../shared/components/Help";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
 import { PrimaryButton } from "../../../../../shared/components/Button";
@@ -21,12 +21,10 @@ type RadarrSettingsFormProps = {
 };
 
 export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
-  const [instanceInfo, setInstanceInfo] = useState<
-    IAsyncCall<IRadarrInstanceInfo | null>
-  >(DefaultAsyncCall);
-  const { register, errors, reset, getValues, setValue } = useFormContext<
-    IRadarrConfig
-  >();
+  const [instanceInfo, setInstanceInfo] =
+    useState<IAsyncCall<IRadarrInstanceInfo | null>>(DefaultAsyncCall);
+  const { register, errors, reset, getValues, setValue } =
+    useFormContext<IRadarrConfig>();
   const [usePort, setUsePort] = useState(false);
   const { getRadarrInstanceInfo } = useRadarrConfigsContext();
 
@@ -71,17 +69,17 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
       {instanceInfo.data && (
         <>
           <Row alignItems="center">
-            <InputField isInline>
+            <Input isInline>
               <label>Enabled</label>
               <Checkbox name="enabled" register={register} />
-            </InputField>
-            <InputField isInline>
+            </Input>
+            <Input isInline>
               <label>Default</label>
               <Checkbox name="isDefault" register={register} />
-            </InputField>
+            </Input>
           </Row>
           <br />
-          <InputField>
+          <Input>
             <label>Config name</label>
             <input
               name="name"
@@ -90,11 +88,11 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
               defaultValue="Radarr"
               ref={register}
             />
-          </InputField>
+          </Input>
         </>
       )}
       <div>
-        <InputField>
+        <Input>
           <label>API Key</label>
           <input
             name="apiKey"
@@ -107,10 +105,10 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
           {errors.apiKey && errors.apiKey.type === "required" && (
             <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
           )}
-        </InputField>
+        </Input>
 
         <Row justifyContent="space-between" alignItems="center">
-          <InputField width="49%">
+          <Input width="49%">
             <label>Hostname or IP Address</label>
             <input
               name="host"
@@ -123,9 +121,9 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
             {errors.host && errors.host.type === "required" && (
               <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
             )}
-          </InputField>
+          </Input>
 
-          <InputField width="49%">
+          <Input width="49%">
             <label>
               Port{" "}
               <input
@@ -143,22 +141,22 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
               maxLength={99999}
               disabled={!usePort}
             />
-          </InputField>
+          </Input>
         </Row>
 
-        <InputField>
+        <Input>
           <label>Version</label>
           <select name="version" ref={register}>
             <option value={3}>3</option>
           </select>
-        </InputField>
+        </Input>
 
         <br />
 
-        <InputField isInline={true}>
+        <Input isInline={true}>
           <label>SSL</label>
           <Checkbox name="ssl" register={register} round />
-        </InputField>
+        </Input>
 
         <br />
 
@@ -174,7 +172,7 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
         <div>
           <PrimaryLightDivider />
 
-          <InputField>
+          <Input>
             <label>Default Root Folder</label>
             <select name="rootFolder" ref={register}>
               {instanceInfo.data &&
@@ -184,9 +182,9 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
                   </option>
                 ))}
             </select>
-          </InputField>
+          </Input>
 
-          <InputField>
+          <Input>
             <label>Default Quality Profile</label>
             <select name="qualityProfileId" ref={register}>
               {instanceInfo.data.qualityProfiles.map((p, index) => (
@@ -195,8 +193,8 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
                 </option>
               ))}
             </select>
-          </InputField>
-          <InputField>
+          </Input>
+          <Input>
             <label> Default Tags</label>
             <select name="tags" ref={register} multiple>
               {instanceInfo.data &&
@@ -206,7 +204,7 @@ export const RadarrSettingsForm = (props: RadarrSettingsFormProps) => {
                   </option>
                 ))}
             </select>
-          </InputField>
+          </Input>
         </div>
       )}
     </>

@@ -11,7 +11,7 @@ site = FastAPI(docs_url=None, redoc_url=None)
 site.mount("/images", StaticFiles(directory=str(get_config().images_folder)), name="images")
 site.mount(
     "/static",
-    StaticFiles(directory=str(get_config().react_static_folder)),
+    StaticFiles(directory=str(get_config().react_static_folder), check_dir=False),
     name="static",
 )
 site_templates = Jinja2Templates(str(get_config().react_build_folder))

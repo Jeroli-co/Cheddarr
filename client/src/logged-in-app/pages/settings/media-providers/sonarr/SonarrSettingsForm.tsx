@@ -8,8 +8,8 @@ import { ISonarrInstanceInfo } from "../../../../../shared/models/ISonarrInstanc
 import { useSonarrConfigs } from "../../../../../shared/hooks/useSonarrConfigs";
 import { ISonarrConfig } from "../../../../../shared/models/ISonarrConfig";
 import { IProviderSettingsBase } from "../../../../../shared/models/IProviderSettingsBase";
-import { InputField } from "../../../../../shared/components/inputs/InputField";
-import { Checkbox } from "../../../../../shared/components/inputs/Checkbox";
+import { Input } from "../../../../../shared/components/forms/inputs/Input";
+import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
 import { HelpDanger } from "../../../../../shared/components/Help";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
 import { PrimaryButton } from "../../../../../shared/components/Button";
@@ -21,15 +21,13 @@ type SonarrSettingsFormProps = {
 };
 
 export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
-  const [instanceInfo, setInstanceInfo] = useState<
-    IAsyncCall<ISonarrInstanceInfo | null>
-  >(DefaultAsyncCall);
+  const [instanceInfo, setInstanceInfo] =
+    useState<IAsyncCall<ISonarrInstanceInfo | null>>(DefaultAsyncCall);
   const { getSonarrInstanceInfo } = useSonarrConfigs();
   const [usePort, setUsePort] = useState<boolean>(false);
 
-  const { register, getValues, errors, reset, setValue } = useFormContext<
-    ISonarrConfig
-  >();
+  const { register, getValues, errors, reset, setValue } =
+    useFormContext<ISonarrConfig>();
 
   const getInstanceInfo = (data: IProviderSettingsBase, withAlert: boolean) => {
     if (data.port === "") {
@@ -71,17 +69,17 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
       {instanceInfo.data && (
         <>
           <Row alignItems="center">
-            <InputField isInline={true}>
+            <Input isInline={true}>
               <label>Enabled</label>
               <Checkbox name="enabled" register={register} />
-            </InputField>
-            <InputField isInline>
+            </Input>
+            <Input isInline>
               <label>Default</label>
               <Checkbox name="isDefault" register={register} />
-            </InputField>
+            </Input>
           </Row>
           <br />
-          <InputField>
+          <Input>
             <label>Config name</label>
             <input
               name="name"
@@ -90,11 +88,11 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
               defaultValue="Sonarr"
               ref={register}
             />
-          </InputField>
+          </Input>
         </>
       )}
       <br />
-      <InputField>
+      <Input>
         <label>API Key</label>
         <input
           name="apiKey"
@@ -107,10 +105,10 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
         {errors.apiKey && errors.apiKey.type === "required" && (
           <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
         )}
-      </InputField>
+      </Input>
 
       <Row justifyContent="space-between" alignItems="center">
-        <InputField width="49%">
+        <Input width="49%">
           <label>Hostname or IP Address</label>
           <input
             name="host"
@@ -123,9 +121,9 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
           {errors.host && errors.host.type === "required" && (
             <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
           )}
-        </InputField>
+        </Input>
 
-        <InputField width="49%">
+        <Input width="49%">
           <label>
             Port{" "}
             <input
@@ -143,22 +141,22 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
             maxLength={99999}
             disabled={!usePort}
           />
-        </InputField>
+        </Input>
       </Row>
 
-      <InputField>
+      <Input>
         <label>Version</label>
         <select name="version" ref={register}>
           <option value={3}>3</option>
         </select>
-      </InputField>
+      </Input>
 
       <br />
 
-      <InputField isInline>
+      <Input isInline>
         <label>SSL</label>
         <Checkbox name="ssl" register={register} round />
-      </InputField>
+      </Input>
 
       <br />
 
@@ -173,7 +171,7 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
         <div>
           <PrimaryLightDivider />
 
-          <InputField>
+          <Input>
             <label>Default Root Folder</label>
             <select name="rootFolder" ref={register}>
               {instanceInfo.data &&
@@ -183,9 +181,9 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
                   </option>
                 ))}
             </select>
-          </InputField>
+          </Input>
 
-          <InputField>
+          <Input>
             <label>Default Root Folder (Anime)</label>
             <select name="animeRootFolder" ref={register}>
               {instanceInfo.data &&
@@ -195,9 +193,9 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
                   </option>
                 ))}
             </select>
-          </InputField>
+          </Input>
 
-          <InputField>
+          <Input>
             <label>Default Quality Profile</label>
             <select name="qualityProfileId" ref={register}>
               {instanceInfo.data &&
@@ -207,9 +205,9 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
                   </option>
                 ))}
             </select>
-          </InputField>
+          </Input>
 
-          <InputField>
+          <Input>
             <label>Default Quality Profile (Anime)</label>
             <select name="animeQualityProfileId" ref={register}>
               {instanceInfo.data &&
@@ -219,9 +217,9 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
                   </option>
                 ))}
             </select>
-          </InputField>
+          </Input>
 
-          <InputField>
+          <Input>
             <label> Default Tags</label>
             <select name="tags" ref={register} multiple>
               {instanceInfo.data &&
@@ -231,8 +229,8 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
                   </option>
                 ))}
             </select>
-          </InputField>
-          <InputField>
+          </Input>
+          <Input>
             <label> Default Tags (Anime)</label>
             <select name="anime_tags" ref={register} multiple>
               {instanceInfo.data &&
@@ -242,7 +240,7 @@ export const SonarrSettingsForm = (props: SonarrSettingsFormProps) => {
                   </option>
                 ))}
             </select>
-          </InputField>
+          </Input>
         </div>
       )}
     </>

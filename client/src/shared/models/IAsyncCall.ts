@@ -13,7 +13,7 @@ export const DefaultAsyncCall: IAsyncCall<null> = {
 };
 
 export function createSuccessAsyncCall<T = any>(
-  response: AxiosResponse<T>
+  response: AxiosResponse<T>,
 ): IAsyncCall<T> {
   return {
     data: response.data,

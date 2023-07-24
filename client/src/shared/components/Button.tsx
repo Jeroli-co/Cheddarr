@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { ComponentSizes } from "../enums/ComponentSizes";
-import React from "react";
+import * as React from "react";
 import { Icon } from "./Icon";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
@@ -62,13 +62,11 @@ export const LinkButton = styled.a<ButtonStyleProps>`
     css`
       border: 1px solid ${props.borderColor};
     `}
-
   ${(props) =>
     props.width &&
     css`
       width: ${props.width};
     `}
-  
   .left-icon {
     padding-right: 10px;
   }
@@ -122,6 +120,7 @@ export const Button = styled.button<ButtonStyleProps>`
         return "1rem";
     }
   }};
+
   ${(props) =>
     props.borderColor &&
     css`
@@ -147,6 +146,7 @@ export const RoundedButton = styled(Button)`
 
 export const PrimaryLinkButton = styled(LinkButton)`
   background: ${(props) => props.theme.primaryLighter};
+
   &:hover {
     color: ${(props) => props.theme.primaryLight};
   }

@@ -1,5 +1,5 @@
 import { instance } from "../../axiosInstance";
-import {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
   createErrorAsyncCall,
   createSuccessAsyncCall,
@@ -11,13 +11,10 @@ import { useNavigate } from "react-router";
 
 export const useAPI = () => {
   const { invalidSession } = useSession();
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const handleError = (error: AxiosError) => {
     if (error.response && error.response.status === 401) {
       invalidSession();
-      navigate(routes.SIGN_IN.url(location.pathname));
     }
   };
 
@@ -29,11 +26,15 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error);
         return createErrorAsyncCall(error);
-      }
+      },
     );
   }
 
-  function post<T = any>(url: string, body: Object = {}, headers: AxiosRequestConfig = {}) {
+  function post<T = any>(
+    url: string,
+    body: Object = {},
+    headers: AxiosRequestConfig = {},
+  ) {
     return instance.post<T>(url, body, headers).then(
       (response: AxiosResponse<T>) => {
         return createSuccessAsyncCall<T>(response);
@@ -41,11 +42,15 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error);
         return createErrorAsyncCall(error);
-      }
+      },
     );
   }
 
-  function put<T = any>(url: string, body: Object = {}, headers: AxiosRequestConfig = {}) {
+  function put<T = any>(
+    url: string,
+    body: Object = {},
+    headers: AxiosRequestConfig = {},
+  ) {
     return instance.put<T>(url, body, headers).then(
       (response: AxiosResponse<T>) => {
         return createSuccessAsyncCall<T>(response);
@@ -53,14 +58,14 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error);
         return createErrorAsyncCall(error);
-      }
+      },
     );
   }
 
   function patch<T = any>(
     url: string,
     body: Object = {},
-    headers: AxiosRequestConfig = {}
+    headers: AxiosRequestConfig = {},
   ) {
     return instance.patch<T>(url, body, headers).then(
       (response: AxiosResponse<T>) => {
@@ -69,7 +74,7 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error);
         return createErrorAsyncCall(error);
-      }
+      },
     );
   }
 
@@ -81,7 +86,7 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error);
         return createErrorAsyncCall(error);
-      }
+      },
     );
   }
 

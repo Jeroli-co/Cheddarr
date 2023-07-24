@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { IEmailConfig } from "../../../../shared/models/IEmailConfig";
 import { SecondaryButton } from "../../../../shared/components/Button";
-import { InputField } from "../../../../shared/components/inputs/InputField";
+import { Input } from "../../../../shared/components/forms/inputs/Input";
 import { Icon } from "../../../../shared/components/Icon";
 import {
   faAt,
@@ -11,7 +11,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { H1 } from "../../../../shared/components/Titles";
-import { Checkbox } from "../../../../shared/components/inputs/Checkbox";
+import { Checkbox } from "../../../../shared/components/forms/inputs/Checkbox";
 import { Row } from "../../../../shared/components/layout/Row";
 import { useAPI } from "../../../../shared/hooks/useAPI";
 import { APIRoutes } from "../../../../shared/enums/APIRoutes";
@@ -51,14 +51,14 @@ export const EmailConfig = () => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Row justifyContent="space-between" alignItems="center">
         <H1>Email</H1>
-        <InputField isInline>
+        <Input isInline>
           <label>Enabled</label>
           <Checkbox name="enabled" register={register} />
-        </InputField>
+        </Input>
       </Row>
 
       <Row justifyContent="space-between" alignItems="center">
-        <InputField withIcon width="49%">
+        <Input withIcon width="49%">
           <label>Hostname</label>
           <div className="with-left-icon">
             <input
@@ -71,9 +71,9 @@ export const EmailConfig = () => {
               <Icon icon={faAt} />
             </span>
           </div>
-        </InputField>
+        </Input>
 
-        <InputField width="49%">
+        <Input width="49%">
           <label>Port</label>
           <input
             name="smtpPort"
@@ -83,11 +83,11 @@ export const EmailConfig = () => {
             minLength={1000}
             maxLength={99999}
           />
-        </InputField>
+        </Input>
       </Row>
 
       <Row justifyContent="space-between" alignItems="center">
-        <InputField withIcon width="49%">
+        <Input withIcon width="49%">
           <label>Username</label>
           <div className="with-left-icon">
             <input
@@ -100,9 +100,9 @@ export const EmailConfig = () => {
               <Icon icon={faUser} />
             </span>
           </div>
-        </InputField>
+        </Input>
 
-        <InputField withIcon width="49%">
+        <Input withIcon width="49%">
           <label>Password</label>
           <div className="with-left-icon">
             <input
@@ -115,10 +115,10 @@ export const EmailConfig = () => {
               <Icon icon={faKey} />
             </span>
           </div>
-        </InputField>
+        </Input>
       </Row>
 
-      <InputField withIcon>
+      <Input withIcon>
         <label>Sender address</label>
         <div className="with-left-icon">
           <input
@@ -131,9 +131,9 @@ export const EmailConfig = () => {
             <Icon icon={faEnvelope} />
           </span>
         </div>
-      </InputField>
+      </Input>
 
-      <InputField>
+      <Input>
         <label>Sender name</label>
         <input
           name="senderName"
@@ -141,14 +141,14 @@ export const EmailConfig = () => {
           ref={register}
           placeholder="Sender name"
         />
-      </InputField>
+      </Input>
 
       <br />
 
-      <InputField isInline={true}>
+      <Input isInline={true}>
         <label>SSL</label>
         <Checkbox name="ssl" register={register} round />
-      </InputField>
+      </Input>
 
       <br />
       <SecondaryButton type="submit">Save</SecondaryButton>

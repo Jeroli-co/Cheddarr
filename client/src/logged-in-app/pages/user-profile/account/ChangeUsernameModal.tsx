@@ -5,7 +5,7 @@ import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultVali
 import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { Modal } from "../../../../shared/components/layout/Modal";
 import { H2 } from "../../../../shared/components/Titles";
-import { InputField } from "../../../../shared/components/inputs/InputField";
+import { Input } from "../../../../shared/components/forms/inputs/Input";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { Button, PrimaryButton } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
@@ -34,7 +34,7 @@ const ChangeUsernameModal = (props: ChangeUsernameModalProps) => {
 
       <form onSubmit={onSubmit}>
         <section>
-          <InputField withIcon>
+          <Input withIcon>
             <label>New username</label>
             <div className="with-left-icon">
               <input
@@ -52,7 +52,7 @@ const ChangeUsernameModal = (props: ChangeUsernameModalProps) => {
                 <Icon icon={faUser} />
               </span>
             </div>
-          </InputField>
+          </Input>
           {errors["username"] && errors["username"].type === "required" && (
             <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
           )}
@@ -82,4 +82,4 @@ const ChangeUsernameModal = (props: ChangeUsernameModalProps) => {
   );
 };
 
-export { ChangeUsernameModal };
+export {ChangeUsernameModal};

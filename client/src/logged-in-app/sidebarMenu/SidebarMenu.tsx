@@ -8,7 +8,7 @@ import {
   faRegistered,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import * as React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { routes } from "../../router/routes";
 import { useWindowSize } from "../../shared/hooks/useWindowSize";

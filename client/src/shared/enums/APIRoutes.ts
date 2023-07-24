@@ -5,7 +5,7 @@ import { MediaServerTypes } from "./MediaServersTypes";
 
 export const APIRoutes = {
   // AUTH
-  CONFIRM_PLEX_SIGN_IN: (query: string) => "/sign-in/plex/confirm" + query,
+  CONFIRM_PLEX_SIGN_IN: (query?: string) => "/sign-in/plex/confirm" + query,
   SIGN_UP: "/sign-up",
   SIGN_IN: "/sign-in",
   INIT_PLEX_SIGN_IN: "/sign-in/plex",
@@ -23,7 +23,7 @@ export const APIRoutes = {
   // MEDIA SERVERS
   GET_MEDIA_SERVERS_LIBRARIES: (
     mediaServerType: MediaServerTypes,
-    serverId: string
+    serverId: string,
   ) => "/settings/" + mediaServerType + "/" + serverId + "/libraries",
 
   // PLEX

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { InputField } from "../inputs/InputField";
+import { Input } from "../forms/inputs/Input";
 import { RequestSeriesOptions } from "../../enums/RequestSeriesOptions";
 import { SeriesRequestSeasonsList } from "./SeriesRequestSeasonsList";
 import { ISeries } from "../../models/IMedia";
@@ -12,12 +12,12 @@ type RequestSeriesCardProps = {
 
 export const RequestSeriesCard = (props: RequestSeriesCardProps) => {
   const [seriesRequestScopeOptions, setSeriesRequestScopeOptions] = useState(
-    RequestSeriesOptions.ALL
+    RequestSeriesOptions.ALL,
   );
 
   return (
     <div>
-      <InputField isInline>
+      <Input isInline>
         <label>Request : </label>
         <select
           onChange={(e) =>
@@ -31,7 +31,7 @@ export const RequestSeriesCard = (props: RequestSeriesCardProps) => {
             {RequestSeriesOptions.SELECT}
           </option>
         </select>
-      </InputField>
+      </Input>
       {seriesRequestScopeOptions === RequestSeriesOptions.SELECT && (
         <div>
           <PrimaryLightDivider />

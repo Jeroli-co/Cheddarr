@@ -10,7 +10,7 @@ import { Button, PrimaryButton } from "../../../../shared/components/Button";
 import { Modal } from "../../../../shared/components/layout/Modal";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { H2 } from "../../../../shared/components/Titles";
-import { InputField } from "../../../../shared/components/inputs/InputField";
+import { Input } from "../../../../shared/components/forms/inputs/Input";
 import { Icon } from "../../../../shared/components/Icon";
 import { HelpDanger } from "../../../../shared/components/Help";
 import { useAlert } from "../../../../shared/contexts/AlertContext";
@@ -21,9 +21,8 @@ type ChangePasswordModalProps = {
 };
 
 const ChangePasswordModal = (props: ChangePasswordModalProps) => {
-  const { register, handleSubmit, errors, watch } = useForm<
-    IChangePasswordModel
-  >();
+  const { register, handleSubmit, errors, watch } =
+    useForm<IChangePasswordModel>();
   const { updateUserById } = useUserService();
   const { pushSuccess, pushDanger } = useAlert();
 
@@ -46,7 +45,7 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <section>
           {/* OLD PASSWORD */}
-          <InputField withIcon>
+          <Input withIcon>
             <label>Old password</label>
             <div className="with-left-icon">
               <input
@@ -62,7 +61,7 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
                 <Icon icon={faKey} />
               </span>
             </div>
-          </InputField>
+          </Input>
           {errors["oldPassword"] &&
             errors["oldPassword"].type === "required" && (
               <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
@@ -75,7 +74,7 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
             )}
 
           {/* NEW PASSWORD */}
-          <InputField withIcon>
+          <Input withIcon>
             <label>New password</label>
             <div className="with-left-icon">
               <input
@@ -91,7 +90,7 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
                 <Icon icon={faKey} />
               </span>
             </div>
-          </InputField>
+          </Input>
           {errors["newPassword"] &&
             errors["newPassword"].type === "required" && (
               <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
@@ -104,7 +103,7 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
             )}
 
           {/* CONFIRM NEW PASSWORD */}
-          <InputField withIcon>
+          <Input withIcon>
             <label>Confirm new password</label>
             <div className="with-left-icon">
               <input
@@ -122,7 +121,7 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
                 <Icon icon={faKey} />
               </span>
             </div>
-          </InputField>
+          </Input>
           {errors.passwordConfirmation &&
             errors.passwordConfirmation.type === "required" && (
               <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
@@ -147,4 +146,4 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
   );
 };
 
-export { ChangePasswordModal };
+export {ChangePasswordModal};

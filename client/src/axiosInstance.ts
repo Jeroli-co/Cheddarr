@@ -1,6 +1,6 @@
 import axios from "axios";
-import { routes } from "./router/routes";
 import * as humps from "humps";
+import { APIRoutes } from "./shared/enums/APIRoutes";
 
 const JSON_TYPE = "application/json";
 const FORM_URL_ENCODED_TYPE = "application/x-www-form-urlencoded";
@@ -21,15 +21,12 @@ instance.interceptors.request.use(
     const accessToken = localStorage.getItem("access_token");
 
     if (tokenType && accessToken) {
-      request.headers.common["Authorization"] = tokenType.concat(
-        " ",
-        accessToken,
-      );
+      request.headers["Authorization"] = tokenType.concat(" ", accessToken);
     }
 
-    if (request.url?.startsWith(routes.SIGN_IN.url())) {
-      request.headers.post["Content-Type"] = FORM_URL_ENCODED_TYPE;
-    } else if (!request.url?.startsWith(routes.CONFIRM_PLEX_SIGNIN.url)) {
+    if (request.url?.startsWith(APIRoutes.SIGN_IN)) {
+      request.headers["Content-Type"] = FORM_URL_ENCODED_TYPE;
+    } else if (!request.url?.startsWith(APIRoutes.CONFIRM_PLEX_SIGN_IN())) {
       if (request.data) {
         request.data = humps.decamelizeKeys(request.data);
       }
@@ -45,9 +42,9 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => {
     if (
-      !response.config.url?.startsWith(routes.SIGN_IN.url()) &&
-      !response.config.url?.startsWith(routes.CONFIRM_PLEX_SIGNIN.url) &&
-      !response.config.url?.startsWith(routes.SIGN_UP.url) &&
+      !response.config.url?.startsWith(APIRoutes.SIGN_IN) &&
+      !response.config.url?.startsWith(APIRoutes.CONFIRM_PLEX_SIGN_IN()) &&
+      !response.config.url?.startsWith(APIRoutes.SIGN_UP) &&
       response.data
     ) {
       response.data = humps.camelizeKeys(response.data);

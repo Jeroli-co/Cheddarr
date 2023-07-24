@@ -13,5 +13,5 @@ export const PrimaryHero = styled(Hero)`
   background: ${(props) => props.theme.primary};
   color: ${(props) => props.theme.secondary};
   font-size: 2em;
-  height: 20vh;
+  height: 200px;
 `;

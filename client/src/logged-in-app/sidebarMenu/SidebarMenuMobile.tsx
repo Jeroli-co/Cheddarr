@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import styled from "styled-components";
 import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
 import { Icon } from "../../shared/components/Icon";

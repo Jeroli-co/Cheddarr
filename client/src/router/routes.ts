@@ -6,7 +6,9 @@ export const routes = {
   /** AUTH **/
   SIGN_IN: {
     url: (redirectURI?: string) =>
-      redirectURI ? "/auth/sign-in?redirectURI=" + redirectURI : "/auth/sign-in",
+      redirectURI
+        ? "/auth/sign-in?redirectURI=" + redirectURI
+        : "/auth/sign-in",
   },
   CONFIRM_PLEX_SIGNIN: { url: "/auth/sign-in/plex/confirm" },
   SIGN_UP: { url: "/auth/sign-up" },
@@ -15,13 +17,13 @@ export const routes = {
   },
 
   /** USERS **/
-  USERS: { url: "/users"},
+  USERS: { url: "/users" },
   PROFILE: {
     url: (id?: number | string) => `/profile${id ? `/${id}` : ""}`,
   },
 
   /** SETTINGS **/
-  SETTINGS: { url: "/settings", },
+  SETTINGS: { url: "/settings" },
   SETTINGS_MEDIA_SERVERS: {
     url: "/settings/media-servers",
   },
@@ -29,7 +31,7 @@ export const routes = {
     url: "/settings/media-providers",
   },
   SETTINGS_NOTIFICATIONS: {
-    url: "/settings/notifications",
+    url: "/settings/notifications-services",
   },
   SETTINGS_JOBS: {
     url: "/settings/jobs",
@@ -42,8 +44,8 @@ export const routes = {
   },
 
   /** MEDIA **/
-  MOVIE: { url: (id: string) => "/movies/" + id, },
-  SERIES: { url: (id: string) => "/series/" + id, },
+  MOVIE: { url: (id: string) => "/movies/" + id },
+  SERIES: { url: (id: string) => "/series/" + id },
   SEASON: {
     url: (id: string, seasonNumber: string) =>
       "/series/" + id + "/seasons/" + seasonNumber,
@@ -77,4 +79,3 @@ export const routes = {
   /** OTHERS **/
   NOT_FOUND: { url: "/404" },
 };
-

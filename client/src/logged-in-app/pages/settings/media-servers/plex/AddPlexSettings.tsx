@@ -7,7 +7,7 @@ import { PlexSettingsForm } from "./PlexSettingsForm";
 import { IMediaServerConfig } from "../../../../../shared/models/IMediaServerConfig";
 import { LinkPlexAccount } from "../../../../../shared/components/LinkPlexAccount";
 import { useLocation } from "react-router-dom";
-import { InputField } from "../../../../../shared/components/inputs/InputField";
+import { Input } from "../../../../../shared/components/forms/inputs/Input";
 import { H3 } from "../../../../../shared/components/Titles";
 
 type AddPlexSettingsProps = {
@@ -17,10 +17,8 @@ type AddPlexSettingsProps = {
 export const AddPlexSettings = (props: AddPlexSettingsProps) => {
   const servers = usePlexServers();
   const [selectedServerName, setSelectedServerName] = useState<string>("");
-  const [
-    selectedServerConfig,
-    setSelectedServerConfig,
-  ] = useState<IMediaServerConfig | null>(null);
+  const [selectedServerConfig, setSelectedServerConfig] =
+    useState<IMediaServerConfig | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -51,7 +49,7 @@ export const AddPlexSettings = (props: AddPlexSettingsProps) => {
         {!servers.isLoading && servers.data && (
           <>
             <H3>Account servers</H3>
-            <InputField>
+            <Input>
               <select
                 value={selectedServerName}
                 onChange={(e) => setSelectedServerName(e.target.value)}
@@ -64,7 +62,7 @@ export const AddPlexSettings = (props: AddPlexSettingsProps) => {
                   );
                 })}
               </select>
-            </InputField>
+            </Input>
           </>
         )}
       </div>

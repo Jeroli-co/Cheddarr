@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import * as React from "react";
+import { useState } from "react";
 import { SeriesRequestEpisodesList } from "./SeriesRequestEpisodesList";
 import {
   faAngleDown,
@@ -14,10 +15,9 @@ import { OutlinePrimaryIconButton, PrimaryIconButton } from "../Button";
 import { Icon } from "../Icon";
 import { useSeriesRequestOptionsContext } from "../../contexts/SeriesRequestOptionsContext";
 import { ClosableTitle } from "../ClosableTitle";
-import { SwitchErrors } from "../errors/SwitchErrors";
 import { Row } from "../layout/Row";
 import { Buttons } from "../layout/Buttons";
-import { useSeries } from "../../hooks/useSeries";
+import { useSeries } from "../../../hooks/useSeries";
 
 type SeriesRequestSeasonsListProps = {
   series: ISeries;
@@ -30,18 +30,11 @@ const SeriesRequestSeasonsList = (props: SeriesRequestSeasonsListProps) => {
     number | null
   >(null);
 
-  const {
-    addSeason,
-    removeSeason,
-    isSeasonSelected,
-  } = useSeriesRequestOptionsContext();
+  const { addSeason, removeSeason, isSeasonSelected } =
+    useSeriesRequestOptionsContext();
 
   if (seriesDetails.isLoading) {
     return <Spinner size={ComponentSizes.LARGE} />;
-  }
-
-  if (seriesDetails.data === null) {
-    return <SwitchErrors status={seriesDetails.status} />;
   }
 
   return (
@@ -73,7 +66,7 @@ const SeriesRequestSeasonsList = (props: SeriesRequestSeasonsListProps) => {
                   setSeasonNumberSelected(
                     seasonNumberSelected !== season.seasonNumber
                       ? season.seasonNumber
-                      : null
+                      : null,
                   )
                 }
               >

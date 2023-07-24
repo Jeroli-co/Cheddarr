@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import styled, { keyframes } from "styled-components";
 
 const Pulse = () => {
@@ -11,7 +11,7 @@ const Pulse = () => {
     to {
       stroke-width: 0;
       stroke-opacity: 0;
-      transform: scale(2);    
+      transform: scale(2);
     }
   `;
 };
@@ -45,7 +45,16 @@ const Container = styled.div`
   }
 `;
 
-const PageLoader = () => {
+export const Loader = () => {
+  return (
+    <svg height="100px" width="100px">
+      <circle cx="50%" cy="50%" r="7px" />
+      <circle className="pulse" cx="50%" cy="50%" r="10px" />
+    </svg>
+  );
+};
+
+export const PageLoader = () => {
   return (
     <Container>
       <svg height="100px" width="100px">
@@ -56,6 +65,3 @@ const PageLoader = () => {
     </Container>
   );
 };
-
-export { PageLoader };
-

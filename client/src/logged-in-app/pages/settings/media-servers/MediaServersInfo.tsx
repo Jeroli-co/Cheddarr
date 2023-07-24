@@ -5,8 +5,8 @@ import { PrimaryIconButton } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 import { Spinner } from "../../../../shared/components/Spinner";
-import { InputField } from "../../../../shared/components/inputs/InputField";
-import { Checkbox } from "../../../../shared/components/inputs/Checkbox";
+import { Input } from "../../../../shared/components/forms/inputs/Input";
+import { Checkbox } from "../../../../shared/components/forms/inputs/Checkbox";
 import { IMediaServerConfig } from "../../../../shared/models/IMediaServerConfig";
 import { useMediaServerLibraries } from "../../../../shared/hooks/useMediaServerLibrariesService";
 import { PrimaryDivider } from "../../../../shared/components/Divider";
@@ -55,7 +55,7 @@ type MediaServerInfoProps = {
 const MediaServerInfo = (props: MediaServerInfoProps) => {
   const { libraries, updateLibrary } = useMediaServerLibraries(
     props.mediaServerType,
-    props.configId
+    props.configId,
   );
   const { patch } = useAPI();
   const { pushInfo, pushDanger } = useAlert();
@@ -90,14 +90,14 @@ const MediaServerInfo = (props: MediaServerInfoProps) => {
         {!libraries.isLoading &&
           libraries.data &&
           libraries.data.map((l, index) => (
-            <InputField isInline key={index}>
+            <Input isInline key={index}>
               <Checkbox
                 round
                 checked={l.enabled}
                 onChange={() => updateLibrary(l)}
               />
               <label>{l.name}</label>
-            </InputField>
+            </Input>
           ))}
       </Libraries>
     </Item>

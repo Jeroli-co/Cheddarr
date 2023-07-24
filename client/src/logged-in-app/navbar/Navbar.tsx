@@ -8,6 +8,7 @@ import { useNavigate } from "react-router";
 import { useSession } from "../../shared/contexts/SessionContext";
 import { NavbarContainer, NavbarUserAvatar } from "./NavbarCommon";
 import { SearchBar } from "./components/search-bar/SearchBar";
+import { cn } from "../../utils/strings";
 
 /*
 const cheddarrPreLogo = require("../../assets/cheddarr-pre.svg") as string;
@@ -72,12 +73,25 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
   };
 
   return (
-    <Container className="noselect" isSidebarOpen={isSidebarOpen}>
+    <nav
+      className={cn(
+        `w-[calc(100% - ${
+          isSidebarOpen
+            ? STATIC_STYLES.SIDEBAR_OPEN_WIDTH
+            : STATIC_STYLES.SIDEBAR_CLOSED_WIDTH
+        }px)]`,
+        `h-[${STATIC_STYLES.NAVBAR_HEIGHT}px]`,
+        "flex items-center fixed top-0 left-0 right-0 bg-primary-dark z-10",
+      )}
+    >
       <NavbarAppLogo onClick={() => navigate("/")}>
-        {/*<img src={cheddarrPreLogo} alt="Chedarr"/>
-          <img id="cheddarrMinLogo" src={cheddarrMinLogo} alt="Chedarr"/>
-      <img src={cheddarrPostLogo} alt="Chedarr"/>
-      */}
+        <img src="/assets/cheddarr-pre.svg" alt="Chedarr" />
+        <img
+          id="cheddarrMinLogo"
+          src="/assets/cheddarr-min.svg"
+          alt="Chedarr"
+        />
+        <img src="/assets/cheddarr-post.svg" alt="Chedarr" />
       </NavbarAppLogo>
       <SearchBar />
       <GitHubButton />
@@ -96,6 +110,6 @@ export const Navbar = ({ isSidebarOpen }: NavbarProps) => {
           />
         </>
       )}
-    </Container>
+    </nav>
   );
 };

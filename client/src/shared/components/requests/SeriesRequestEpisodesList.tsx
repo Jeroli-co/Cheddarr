@@ -1,7 +1,5 @@
-import React from "react";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useSeason } from "../../hooks/useSeason";
-import { SwitchErrors } from "../errors/SwitchErrors";
+import { useSeason } from "../../../hooks/useSeason";
 import { Spinner } from "../Spinner";
 import { useSeriesRequestOptionsContext } from "../../contexts/SeriesRequestOptionsContext";
 import { Row } from "../layout/Row";
@@ -17,11 +15,8 @@ type SeasonEpisodesProps = {
 
 export const SeriesRequestEpisodesList = (props: SeasonEpisodesProps) => {
   const season = useSeason(props.seriesId, props.seasonNumber);
-  const {
-    addEpisode,
-    removeEpisode,
-    isEpisodeSelected,
-  } = useSeriesRequestOptionsContext();
+  const { addEpisode, removeEpisode, isEpisodeSelected } =
+    useSeriesRequestOptionsContext();
 
   if (season.isLoading)
     return (
@@ -29,8 +24,6 @@ export const SeriesRequestEpisodesList = (props: SeasonEpisodesProps) => {
         <Spinner />
       </CenteredContent>
     );
-
-  if (season.data === null) return <SwitchErrors status={season.status} />;
 
   return (
     <>
@@ -42,7 +35,7 @@ export const SeriesRequestEpisodesList = (props: SeasonEpisodesProps) => {
               <Buttons>
                 {isEpisodeSelected(
                   props.seasonNumber,
-                  episode.episodeNumber
+                  episode.episodeNumber,
                 ) && (
                   <OutlinePrimaryIconButton
                     type="button"
@@ -55,7 +48,7 @@ export const SeriesRequestEpisodesList = (props: SeasonEpisodesProps) => {
                 )}
                 {!isEpisodeSelected(
                   props.seasonNumber,
-                  episode.episodeNumber
+                  episode.episodeNumber,
                 ) && (
                   <PrimaryIconButton
                     type="button"
