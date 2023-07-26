@@ -6,7 +6,7 @@ export interface IAsyncCall<T = any> {
   status: number;
 }
 
-export const DefaultAsyncCall: IAsyncCall<null> = {
+export const DefaultAsyncCall: IAsyncCall<undefined> = {
   data: null,
   isLoading: true,
   status: -1,

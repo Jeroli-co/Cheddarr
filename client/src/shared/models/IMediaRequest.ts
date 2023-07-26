@@ -6,8 +6,8 @@ export interface IMediaRequest {
   id: number;
   status: RequestStatus;
   requestingUser: IUser;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   media: IMedia;
 }
 
@@ -32,7 +32,7 @@ export const isSeriesRequest = (arg: any): arg is ISeriesRequest => {
 
 export const compareRequestDefault = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const statusFirst = first.status;
   const statusSecond = second.status;
@@ -56,7 +56,7 @@ export const compareRequestDefault = (
 
 export const compareRequestTitleDesc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const titleFirst = first.media.title;
   const titleSecond = second.media.title;
@@ -74,7 +74,7 @@ export const compareRequestTitleDesc = (
 
 export const compareRequestTitleAsc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const titleFirst = first.media.title;
   const titleSecond = second.media.title;
@@ -92,7 +92,7 @@ export const compareRequestTitleAsc = (
 
 export const compareRequestMediaTypeDesc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const typeFirst = first.media.mediaType;
   const typeSecond = second.media.mediaType;
@@ -110,7 +110,7 @@ export const compareRequestMediaTypeDesc = (
 
 export const compareRequestMediaTypeAsc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const typeFirst = first.media.mediaType;
   const typeSecond = second.media.mediaType;
@@ -128,7 +128,7 @@ export const compareRequestMediaTypeAsc = (
 
 export const compareRequestingUserDesc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const userFirst = first.requestingUser.username;
   const userSecond = second.requestingUser.username;
@@ -146,7 +146,7 @@ export const compareRequestingUserDesc = (
 
 export const compareRequestingUserAsc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const userFirst = first.requestingUser.username;
   const userSecond = second.requestingUser.username;
@@ -164,7 +164,7 @@ export const compareRequestingUserAsc = (
 
 export const compareRequestCreationDateDesc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const dateFirst = new Date(first.createdAt);
   const dateSecond = new Date(second.createdAt);
@@ -180,7 +180,7 @@ export const compareRequestCreationDateDesc = (
 
 export const compareRequestCreationDateAsc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const dateFirst = new Date(first.createdAt);
   const dateSecond = new Date(second.createdAt);
@@ -196,7 +196,7 @@ export const compareRequestCreationDateAsc = (
 
 export const compareRequestUpdatedDateDesc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const dateFirst = new Date(first.updatedAt);
   const dateSecond = new Date(second.updatedAt);
@@ -212,7 +212,7 @@ export const compareRequestUpdatedDateDesc = (
 
 export const compareRequestUpdatedDateAsc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const dateFirst = new Date(first.updatedAt);
   const dateSecond = new Date(second.updatedAt);
@@ -228,7 +228,7 @@ export const compareRequestUpdatedDateAsc = (
 
 export const compareRequestStatusDesc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const statusFirst = first.status;
   const statusSecond = second.status;
@@ -246,7 +246,7 @@ export const compareRequestStatusDesc = (
 
 export const compareRequestStatusAsc = (
   first: IMediaRequest,
-  second: IMediaRequest
+  second: IMediaRequest,
 ) => {
   const statusFirst = first.status;
   const statusSecond = second.status;

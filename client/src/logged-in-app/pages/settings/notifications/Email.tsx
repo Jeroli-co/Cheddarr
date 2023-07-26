@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { IEmailConfig } from "../../../../shared/models/IEmailConfig";
 import { SecondaryButton } from "../../../../shared/components/Button";
-import { Input } from "../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../elements/Input";
 import { Icon } from "../../../../shared/components/Icon";
 import {
   faAt,

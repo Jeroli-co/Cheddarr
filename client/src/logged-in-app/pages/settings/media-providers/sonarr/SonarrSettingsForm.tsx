@@ -8,7 +8,7 @@ import { ISonarrInstanceInfo } from "../../../../../shared/models/ISonarrInstanc
 import { useSonarrConfigs } from "../../../../../shared/hooks/useSonarrConfigs";
 import { ISonarrConfig } from "../../../../../shared/models/ISonarrConfig";
 import { IProviderSettingsBase } from "../../../../../shared/models/IProviderSettingsBase";
-import { Input } from "../../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../../elements/Input";
 import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
 import { HelpDanger } from "../../../../../shared/components/Help";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";

@@ -5,7 +5,7 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { Button } from "./Button";
+import { Button } from "./button/Button";
 
 type SliderContainerStartProps = {
   headerElement?: React.ReactNode;
@@ -34,7 +34,7 @@ const SliderContainerStart = ({ headerElement }: SliderContainerStartProps) => {
         </div>
       </div>
 
-      <div className="w-full h-0.5 rounded-full my-3 bg-primary-dark" />
+      <div className="w-full h-0.5 rounded-full my-3 bg-primary-light" />
     </div>
   );
 };

@@ -12,36 +12,32 @@ import { RequestTypes } from "../../shared/enums/RequestTypes";
 import { FullWidthTag } from "../../shared/components/FullWidthTag";
 
 const Sent = () => {
-  const { requestsSent, onLoadPrev, onLoadNext } = useRequestsContext();
+  const { requestsSent, onLoadPrev, onLoadNext, isLoading } =
+    useRequestsContext();
 
   return (
     <ScrollingTable>
       <br />
       <RequestHeader requestType={RequestTypes.OUTGOING} />
-      {requestsSent.isLoading && (
+      {isLoading && (
         <CenteredContent height="100px">
           <Spinner size={ComponentSizes.LARGE} />
         </CenteredContent>
       )}
-      {!requestsSent.isLoading &&
-        requestsSent.data &&
-        requestsSent.data.results &&
-        requestsSent.data.results.map((request, index) => (
+      {!isLoading &&
+        requestsSent?.results?.map((request, index) => (
           <RequestLayout
             key={index}
             request={request}
             requestType={RequestTypes.OUTGOING}
           />
         ))}
-      {!requestsSent.isLoading &&
-        requestsSent.data &&
-        requestsSent.data.results &&
-        requestsSent.data.results.length === 0 && (
-          <FullWidthTag>No requests sent</FullWidthTag>
-        )}
+      {!isLoading && requestsSent?.results?.length === 0 && (
+        <FullWidthTag>No requests sent</FullWidthTag>
+      )}
       <RequestFooter
-        currentPage={requestsSent.data?.page}
-        totalPages={requestsSent.data?.pages}
+        currentPage={requestsSent?.page}
+        totalPages={requestsSent?.pages}
         onLoadPrev={() => onLoadPrev(RequestTypes.OUTGOING)}
         onLoadNext={() => onLoadNext(RequestTypes.OUTGOING)}
       />
@@ -49,6 +45,6 @@ const Sent = () => {
   );
 };
 
-export {Sent};
+export { Sent };
 
 export default Sent;

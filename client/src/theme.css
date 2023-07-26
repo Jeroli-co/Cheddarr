@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "AtkinsonHyperlegible";
+    font-weight: 400;
+    src: url("./fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");
+  }
+
+  @font-face {
+    font-family: "AtkinsonHyperlegible";
+    font-weight: 400;
+    font-style: italic;
+    src: url("./fonts/AtkinsonHyperlegible-Italic.ttf") format("truetype");
+  }
+
+  @font-face {
+    font-family: "AtkinsonHyperlegible";
+    font-weight: 700;
+    src: url("./fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");
+  }
+
+  @font-face {
+    font-family: "AtkinsonHyperlegible";
+    font-weight: 700;
+    font-style: italic;
+    src: url("./fonts/AtkinsonHyperlegible-BoldItalic.ttf") format("truetype");
+  }
+
+  :root {
+    --black: hsl(214, 24%, 0%);
+    --grey-light: hsl(0, 0%, 84%);
+    --grey: hsl(0, 0%, 64%);
+    --white: hsl(214, 24%, 100%);
+
+    --primary-lighter: hsl(244, 32%, 95%);
+    --primary-light: hsl(244, 32%, 75%);
+    --primary: hsl(244, 32%, 50%);
+    --primary-dark: hsl(244, 32%, 25%);
+    --primary-darker: hsl(244, 32%, 5%);
+
+    --secondary-lighter: hsl(25, 100%, 95%);
+    --secondary-light: hsl(25, 100%, 75%);
+    --secondary: hsl(25, 100%, 50%);
+    --secondary-dark: hsl(25, 100%, 25%);
+    --secondary-darker: hsl(25, 100%, 5%);
+
+    --tertiary: hsl(44, 97%, 65%);
+
+    --success: hsl(129, 30%, 52%);
+
+    --danger-light: hsl(0, 91%, 75%);
+    --danger: hsl(0, 91%, 50%);
+
+    --warning-light: hsl(38, 91%, 75%);
+    --warning: hsl(38, 91%, 50%);
+
+    --movie: hsl(223, 81%, 62%);
+    --series: hsl(259, 50%, 50%);
+    --season: hsl(17, 71%, 51%);
+    --episode: hsl(174, 78%, 32%);
+
+    --plex: hsl(216, 6%, 17%);
+  }
+}

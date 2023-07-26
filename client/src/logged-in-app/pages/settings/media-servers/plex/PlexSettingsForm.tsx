@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { IMediaServerConfig } from "../../../../../shared/models/IMediaServerConfig";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
 import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
-import { Input } from "../../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../../elements/Input";
 import { Help, HelpDanger } from "../../../../../shared/components/Help";
 import { Icon } from "../../../../../shared/components/Icon";
 import { isEmpty } from "../../../../../utils/strings";

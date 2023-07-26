@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input } from "../forms/inputs/Input";
+import { Input } from "../../../elements/Input";
 import { RequestSeriesOptions } from "../../enums/RequestSeriesOptions";
 import { SeriesRequestSeasonsList } from "./SeriesRequestSeasonsList";
 import { ISeries } from "../../models/IMedia";

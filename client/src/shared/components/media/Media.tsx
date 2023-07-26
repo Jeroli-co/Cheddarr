@@ -314,8 +314,10 @@ export const Media = (props: MediaProps) => {
         props.media.credits.cast.length > 0 && (
           <>
             <PrimaryDivider />
-            <H2>Actors</H2>
-            <MediaPersonCarousel personList={props.media.credits.cast} />
+            <MediaPersonCarousel
+              title="Actors"
+              personList={props.media.credits.cast}
+            />
           </>
         )}
 

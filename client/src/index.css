@@ -1,97 +1,32 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+* {
+  box-sizing: border-box;
+  font-feature-settings: "lnum";
+}
 
-@layer base {
-  @font-face {
-    font-family: "AtkinsonHyperlegible";
-    font-weight: 400;
-    src: url("./fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");
-  }
+html,
+body,
+#root {
+  @apply w-full h-full m-0;
+}
 
-  @font-face {
-    font-family: "AtkinsonHyperlegible";
-    font-weight: 400;
-    font-style: italic;
-    src: url("./fonts/AtkinsonHyperlegible-Italic.ttf") format("truetype");
-  }
+body {
+  @apply bg-primary-darker font-body text-opacity-90 text-primary-lighter;
+}
 
-  @font-face {
-    font-family: "AtkinsonHyperlegible";
-    font-weight: 700;
-    src: url("./fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");
-  }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
-  @font-face {
-    font-family: "AtkinsonHyperlegible";
-    font-weight: 700;
-    font-style: italic;
-    src: url("./fonts/AtkinsonHyperlegible-BoldItalic.ttf") format("truetype");
-  }
+::-webkit-scrollbar-track {
+  @apply bg-primary-light;
+}
 
-  :root {
-    --black: hsl(214, 24%, 0%);
-    --grey: hsl(34, 11%, 59%);
-    --white: hsl(214, 24%, 100%);
+::-webkit-scrollbar-thumb {
+  @apply bg-primary;
+  @apply rounded;
+}
 
-    --primary-lighter: hsl(244, 32%, 28%);
-    --primary-light: hsl(244, 32%, 23%);
-    --primary: hsl(244, 32%, 18%);
-    --primary-dark: hsl(244, 32%, 13%);
-
-    --secondary-lighter: hsl(25, 100%, 73%);
-    --secondary-light: hsl(25, 100%, 63%);
-    --secondary: hsl(25, 100%, 53%);
-    --secondary-dark: hsl(25, 100%, 33%);
-
-    --tertiary: hsl(44, 97%, 65%);
-
-    --success: hsl(129, 30%, 52%);
-
-    --danger: hsl(0, 91%, 49%);
-    --danger-light: hsl(0, 91%, 59%);
-
-    --warning: hsl(38, 91%, 49%);
-    --warning-light: hsl(38, 91%, 59%);
-
-    --movie: hsl(223, 81%, 62%);
-    --series: hsl(259, 50%, 50%);
-    --season: hsl(17, 71%, 51%);
-    --episode: hsl(174, 78%, 32%);
-
-    --plex: hsl(216, 6%, 17%);
-  }
-
-  * {
-    box-sizing: border-box;
-    font-feature-settings: "lnum";
-  }
-
-  html,
-  body,
-  #root {
-    @apply w-full h-full m-0;
-  }
-
-  body {
-    @apply bg-primary font-body text-opacity-90 text-white;
-  }
-
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-primary-light;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-primary-dark;
-    @apply rounded;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply cursor-pointer bg-primary-lighter;
-  }
+::-webkit-scrollbar-thumb:hover {
+  @apply cursor-pointer bg-primary-dark;
 }

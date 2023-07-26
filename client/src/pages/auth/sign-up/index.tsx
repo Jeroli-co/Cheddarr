@@ -4,7 +4,7 @@ import { FORM_DEFAULT_VALIDATOR } from "../../../shared/enums/FormDefaultValidat
 import { useAuthentication } from "../../../shared/contexts/AuthenticationContext";
 import { PrimaryDivider } from "../../../shared/components/Divider";
 import { usePlexAuth } from "../../../shared/contexts/PlexAuthContext";
-import { Input } from "../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../elements/Input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Layout from "../layout";
@@ -12,7 +12,7 @@ import { routes } from "../../../routes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router";
 import { Title } from "../../../elements/Title";
-import { Button } from "../../../elements/Button";
+import { Button } from "../../../elements/button/Button";
 
 const signUpSchema = z
   .object({

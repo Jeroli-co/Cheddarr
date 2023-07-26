@@ -27,10 +27,7 @@ const useData = <T>(url: string) => {
   };
 };
 
-export const usePagination = <T = any>(
-  queryPath: string,
-  infiniteLoad: boolean,
-) => {
+export const usePagination = <T = any>(queryPath: string) => {
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
@@ -68,6 +65,7 @@ export const usePagination = <T = any>(
     updateData: invalidate,
     deleteData: invalidate,
     sortData,
+    invalidate,
     isFirstPage: page === 1,
     isLastPage: page === data?.pages,
     isLoading,

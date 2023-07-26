@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
-import { cn } from "../utils/strings";
-import { Loader } from "../shared/components/PageLoader";
+import { cn } from "../../utils/strings";
+import { Loader } from "../../shared/components/PageLoader";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 tracking-tight",
@@ -117,3 +117,5 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   },
 );
+
+Button.displayName = "Button";

@@ -7,7 +7,7 @@ import { PlexSettingsForm } from "./PlexSettingsForm";
 import { IMediaServerConfig } from "../../../../../shared/models/IMediaServerConfig";
 import { LinkPlexAccount } from "../../../../../shared/components/LinkPlexAccount";
 import { useLocation } from "react-router-dom";
-import { Input } from "../../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../../elements/Input";
 import { H3 } from "../../../../../shared/components/Titles";
 
 type AddPlexSettingsProps = {

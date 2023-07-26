@@ -1,40 +1,14 @@
 import { RequestTypes } from "../enums/RequestTypes";
 import { IMediaRequest } from "../models/IMediaRequest";
-import { RequestStatus } from "../enums/RequestStatus";
 import { APIRoutes } from "../enums/APIRoutes";
 import { usePagination } from "./usePagination";
 
 export const useRequests = (requestsType: RequestTypes) => {
-  const {
-    data,
-    loadPrev,
-    loadNext,
-    updateData,
-    deleteData,
-    sortData,
-  } = usePagination<IMediaRequest>(APIRoutes.GET_REQUESTS(requestsType), true);
-
-  const updateRequest = (requestId: number, requestStatus: RequestStatus) => {
-    const findRequest = (r: IMediaRequest) => {
-      return r.id === requestId;
-    };
-    const updateRequest = (r: IMediaRequest) => {
-      r.status = requestStatus;
-    };
-    if (requestsType === RequestTypes.INCOMING) {
-      updateData(findRequest, updateRequest);
-    }
-  };
-
-  const deleteRequest = (requestId: number) => {
-    const findRequest = (r: IMediaRequest) => {
-      return r.id === requestId;
-    };
-    deleteData(findRequest);
-  };
+  const { data, loadPrev, loadNext, invalidate, sortData, isLoading } =
+    usePagination<IMediaRequest>(APIRoutes.GET_REQUESTS(requestsType));
 
   const sortRequests = (
-    compare: (first: IMediaRequest, second: IMediaRequest) => number
+    compare: (first: IMediaRequest, second: IMediaRequest) => number,
   ) => {
     sortData(compare);
   };
@@ -43,8 +17,9 @@ export const useRequests = (requestsType: RequestTypes) => {
     data,
     loadPrev,
     loadNext,
-    updateRequest,
-    deleteRequest,
+    updateRequest: invalidate,
+    deleteRequest: invalidate,
     sortRequests,
+    isLoading,
   };
 };

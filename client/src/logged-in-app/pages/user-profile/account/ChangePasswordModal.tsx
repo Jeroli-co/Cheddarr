@@ -10,7 +10,7 @@ import { Button, PrimaryButton } from "../../../../shared/components/Button";
 import { Modal } from "../../../../shared/components/layout/Modal";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { H2 } from "../../../../shared/components/Titles";
-import { Input } from "../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../elements/Input";
 import { Icon } from "../../../../shared/components/Icon";
 import { HelpDanger } from "../../../../shared/components/Help";
 import { useAlert } from "../../../../shared/contexts/AlertContext";
@@ -146,4 +146,4 @@ const ChangePasswordModal = (props: ChangePasswordModalProps) => {
   );
 };
 
-export {ChangePasswordModal};
+export { ChangePasswordModal };

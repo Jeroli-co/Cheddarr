@@ -8,7 +8,7 @@ import { useAlert } from "../shared/contexts/AlertContext";
 import { PrimaryButton } from "../shared/components/Button";
 import { Icon } from "../shared/components/Icon";
 import { HelpDanger } from "../shared/components/Help";
-import { Input } from "../shared/components/forms/inputs/Input";
+import { Input } from "../elements/Input";
 
 type ResetPasswordFormProps = {
   token: string;

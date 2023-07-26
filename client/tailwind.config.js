@@ -12,11 +12,13 @@ module.exports = {
       "primary-light": "var(--primary-light)",
       primary: "var(--primary)",
       "primary-dark": "var(--primary-dark)",
+      "primary-darker": "var(--primary-darker)",
 
       "secondary-lighter": "var(--secondary)",
       "secondary-light": "var(--secondary)",
       secondary: "var(--secondary)",
-      "secondary-dark": "var(--secondary)",
+      "secondary-dark": "var(--secondary-dark)",
+      "secondary-darker": "var(--secondary-darker)",
 
       tertiary: "var(--tertiary)",
 

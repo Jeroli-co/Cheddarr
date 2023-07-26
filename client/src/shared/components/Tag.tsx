@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import { MediaTypes } from "../enums/MediaTypes";
 import {
@@ -70,20 +69,14 @@ type MediaTagProps = {
   type?: MediaTypes;
 };
 
-export const MediaTag = (props: MediaTagProps) => {
-  if (
-    (props.type && props.type === MediaTypes.MOVIES) ||
-    isMovie(props.media)
-  ) {
+export const MediaTag = ({ media, type }: MediaTagProps) => {
+  if (type === MediaTypes.MOVIES || isMovie(media)) {
     return <MovieTag>Movie</MovieTag>;
-  } else if (
-    (props.type && props.type === MediaTypes.SERIES) ||
-    isSeries(props.media)
-  ) {
+  } else if (type === MediaTypes.SERIES || isSeries(media)) {
     return <SeriesTag>Series</SeriesTag>;
-  } else if (isSeason(props.media)) {
+  } else if (isSeason(media)) {
     return <SeasonTag>Season</SeasonTag>;
-  } else if (isEpisode(props.media)) {
+  } else if (isEpisode(media)) {
     return <EpisodeTag>Episode</EpisodeTag>;
   } else {
     return <></>;

@@ -6,7 +6,7 @@ import { useAPI } from "../shared/hooks/useAPI";
 import { APIRoutes } from "../shared/enums/APIRoutes";
 import { useAlert } from "../shared/contexts/AlertContext";
 import { Modal } from "../shared/components/layout/Modal";
-import { Input } from "../shared/components/forms/inputs/Input";
+import { Input } from "../elements/Input";
 import { Button, PrimaryButton } from "../shared/components/Button";
 import { Icon } from "../shared/components/Icon";
 import { Buttons } from "../shared/components/layout/Buttons";

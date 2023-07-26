@@ -14,53 +14,50 @@ import { useSonarrConfigs } from "../../shared/hooks/useSonarrConfigs";
 import { IMediaRequest } from "../../shared/models/IMediaRequest";
 import { MediaTypes } from "../../shared/enums/MediaTypes";
 import { FullWidthTag } from "../../shared/components/FullWidthTag";
+import { TestTable } from "../../elements/Table";
 
-const Received = () => {
-  const { requestsReceived, onLoadPrev, onLoadNext } = useRequestsContext();
+// eslint-disable-next-line import/no-anonymous-default-export
+export default () => {
+  const { requestsReceived, onLoadPrev, onLoadNext, isLoading } =
+    useRequestsContext();
   const { radarrConfigs } = useRadarrConfigs();
   const { sonarrConfigs } = useSonarrConfigs();
 
   const providers = (request: IMediaRequest) =>
     request.media.mediaType === MediaTypes.MOVIES
-      ? radarrConfigs.data
-      : sonarrConfigs.data;
+      ? radarrConfigs
+      : sonarrConfigs;
 
   return (
-    <ScrollingTable>
-      <br />
-      <RequestHeader requestType={RequestTypes.INCOMING} />
-      {requestsReceived.isLoading && (
-        <CenteredContent height="100px">
-          <Spinner size={ComponentSizes.LARGE} />
-        </CenteredContent>
-      )}
-      {!requestsReceived.isLoading &&
-        requestsReceived.data &&
-        requestsReceived.data.results &&
-        requestsReceived.data.results.map((r, index) => (
-          <RequestLayout
-            providers={providers(r)}
-            key={index}
-            request={r}
-            requestType={RequestTypes.INCOMING}
-          />
-        ))}
-      {!requestsReceived.isLoading &&
-        requestsReceived.data &&
-        requestsReceived.data.results &&
-        requestsReceived.data.results.length === 0 && (
+    <>
+      <TestTable />
+
+      <ScrollingTable>
+        <RequestHeader requestType={RequestTypes.INCOMING} />
+        {isLoading && (
+          <CenteredContent height="100px">
+            <Spinner size={ComponentSizes.LARGE} />
+          </CenteredContent>
+        )}
+        {!isLoading &&
+          requestsReceived?.results?.map((r, index) => (
+            <RequestLayout
+              providers={providers(r)}
+              key={index}
+              request={r}
+              requestType={RequestTypes.INCOMING}
+            />
+          ))}
+        {!isLoading && requestsReceived?.results?.length === 0 && (
           <FullWidthTag>No requests received</FullWidthTag>
         )}
-      <RequestFooter
-        currentPage={requestsReceived.data?.page}
-        totalPages={requestsReceived.data?.pages}
-        onLoadPrev={() => onLoadPrev(RequestTypes.INCOMING)}
-        onLoadNext={() => onLoadNext(RequestTypes.INCOMING)}
-      />
-    </ScrollingTable>
+        <RequestFooter
+          currentPage={requestsReceived?.page}
+          totalPages={requestsReceived?.pages}
+          onLoadPrev={() => onLoadPrev(RequestTypes.INCOMING)}
+          onLoadNext={() => onLoadNext(RequestTypes.INCOMING)}
+        />
+      </ScrollingTable>
+    </>
   );
 };
-
-export {Received};
-
-export default Received;

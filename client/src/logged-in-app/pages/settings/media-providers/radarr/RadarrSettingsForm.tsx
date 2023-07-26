@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Row } from "../../../../../shared/components/layout/Row";
-import { Input } from "../../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../../elements/Input";
 import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
 import { HelpDanger } from "../../../../../shared/components/Help";
 import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";

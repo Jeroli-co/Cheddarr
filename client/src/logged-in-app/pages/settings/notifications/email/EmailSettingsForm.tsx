@@ -9,7 +9,7 @@ import {
 import { IEmailConfig } from "../../../../../shared/models/IEmailConfig";
 import { INotificationsConfig } from "../../../../../shared/models/INotificationsConfig";
 import { Row } from "../../../../../shared/components/layout/Row";
-import { Input } from "../../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../../elements/Input";
 import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
 import { Icon } from "../../../../../shared/components/Icon";
 

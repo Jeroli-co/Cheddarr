@@ -1,0 +1,12 @@
+{
+  "ignorePatterns": [
+    "!**/*",
+    "node_modules/**/*",
+    ".storybook/dist/**/*",
+    "tailwind.config.js",
+    "tailwind.colors.js"
+  ],
+  "extends": [
+    "plugin:storybook/recommended"
+  ]
+}

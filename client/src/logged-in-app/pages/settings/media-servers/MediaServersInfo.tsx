@@ -5,7 +5,7 @@ import { PrimaryIconButton } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 import { Spinner } from "../../../../shared/components/Spinner";
-import { Input } from "../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../elements/Input";
 import { Checkbox } from "../../../../shared/components/forms/inputs/Checkbox";
 import { IMediaServerConfig } from "../../../../shared/models/IMediaServerConfig";
 import { useMediaServerLibraries } from "../../../../shared/hooks/useMediaServerLibrariesService";

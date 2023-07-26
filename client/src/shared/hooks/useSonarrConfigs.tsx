@@ -1,35 +1,51 @@
-import { useEffect, useState } from "react";
-import { IAsyncCall } from "../models/IAsyncCall";
 import { useAPI } from "./useAPI";
 import { APIRoutes } from "../enums/APIRoutes";
 import { IProviderSettingsBase } from "../models/IProviderSettingsBase";
 import { ISonarrInstanceInfo } from "../models/ISonarrInstanceInfo";
 import { ISonarrConfig } from "../models/ISonarrConfig";
 import { useAlert } from "../contexts/AlertContext";
+import { useQuery, useQueryClient } from "react-query";
+import hoursToMilliseconds from "date-fns/hoursToMilliseconds";
 
-export const useSonarrConfigs = () => {
-  const [sonarrConfigs, setSonarrConfigs] = useState<
-    IAsyncCall<ISonarrConfig[] | null>
-  >({ data: [], status: -1, isLoading: true });
+const useData = () => {
+  const { get } = useAPI();
 
-  const { get, post, put, remove } = useAPI();
-
-  const { pushSuccess, pushDanger } = useAlert();
-
-  useEffect(() => {
-    get<ISonarrConfig[]>(APIRoutes.GET_SONARR_CONFIG).then((res) => {
-      if (res.data) setSonarrConfigs(res);
+  const fetchData = () => {
+    return get<ISonarrConfig[]>(APIRoutes.GET_SONARR_CONFIG).then((res) => {
+      if (res.status !== 200) {
+        return undefined;
+      } else {
+        return res.data;
+      }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
+
+  const { data, isLoading } = useQuery<ISonarrConfig[]>(
+    [APIRoutes.GET_RADARR_CONFIG],
+    fetchData,
+    {
+      staleTime: hoursToMilliseconds(1),
+    },
+  );
+
+  return {
+    data,
+    isLoading,
+  };
+};
+export const useSonarrConfigs = () => {
+  const { post, put, remove } = useAPI();
+  const { data, isLoading } = useData();
+  const queryClient = useQueryClient();
+  const { pushSuccess, pushDanger } = useAlert();
 
   const getSonarrInstanceInfo = (
     config: IProviderSettingsBase,
-    withAlert: boolean
+    withAlert: boolean,
   ) => {
     return post<ISonarrInstanceInfo>(
       APIRoutes.GET_SONARR_INSTANCE_INFO,
-      config
+      config,
     ).then((res) => {
       if (res.status === 200) {
         if (withAlert) {
@@ -46,17 +62,12 @@ export const useSonarrConfigs = () => {
     return post<ISonarrConfig>(APIRoutes.CREATE_SONARR_CONFIG, config).then(
       (res) => {
         if (res.status === 201 && res.data) {
-          let configs = sonarrConfigs.data;
-          if (configs) {
-            configs.push(res.data);
-            setSonarrConfigs({ ...sonarrConfigs, data: configs });
-            pushSuccess("Configuration created");
-          }
+          queryClient.invalidateQueries(APIRoutes.GET_SONARR_INSTANCE_INFO);
         } else {
           pushDanger("Cannot create configuration");
         }
         return res;
-      }
+      },
     );
   };
 
@@ -64,35 +75,19 @@ export const useSonarrConfigs = () => {
     return put<ISonarrConfig>(APIRoutes.UPDATE_SONARR_CONFIG(id), config).then(
       (res) => {
         if (res.status === 200 && res.data) {
-          let configs = sonarrConfigs.data;
-          if (configs) {
-            let index = configs.findIndex((c) => c.id === id);
-            if (index !== -1) {
-              configs.splice(index, 1, res.data);
-              setSonarrConfigs({ ...sonarrConfigs, data: configs });
-              pushSuccess("Configuration updated");
-            }
-          }
+          queryClient.invalidateQueries(APIRoutes.GET_SONARR_INSTANCE_INFO);
         } else {
           pushDanger("Cannot update configuration");
         }
         return res;
-      }
+      },
     );
   };
 
   const deleteSonarrConfig = (id: string) => {
     remove(APIRoutes.DELETE_SONARR_CONFIG(id)).then((res) => {
       if (res.status === 204) {
-        let configs = sonarrConfigs.data;
-        if (configs) {
-          let index = configs.findIndex((c) => c.id === id);
-          if (index !== -1) {
-            configs.splice(index, 1);
-            setSonarrConfigs({ ...sonarrConfigs, data: configs });
-            pushSuccess("Configuration deleted");
-          }
-        }
+        queryClient.invalidateQueries(APIRoutes.GET_SONARR_INSTANCE_INFO);
       } else {
         pushDanger("Cannot delete configuration");
       }
@@ -100,7 +95,8 @@ export const useSonarrConfigs = () => {
   };
 
   return {
-    sonarrConfigs,
+    sonarrConfigs: data,
+    isLoading,
     getSonarrInstanceInfo,
     createSonarrConfig,
     updateSonarrConfig,

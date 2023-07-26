@@ -5,7 +5,7 @@ import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultVali
 import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { Modal } from "../../../../shared/components/layout/Modal";
 import { H2 } from "../../../../shared/components/Titles";
-import { Input } from "../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../elements/Input";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { Button, PrimaryButton } from "../../../../shared/components/Button";
 import { Icon } from "../../../../shared/components/Icon";
@@ -82,4 +82,4 @@ const ChangeUsernameModal = (props: ChangeUsernameModalProps) => {
   );
 };
 
-export {ChangeUsernameModal};
+export { ChangeUsernameModal };

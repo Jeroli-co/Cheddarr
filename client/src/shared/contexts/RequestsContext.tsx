@@ -1,5 +1,4 @@
-import React, { createContext, useContext } from "react";
-import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
+import { createContext, useContext } from "react";
 import { IMediaRequest } from "../models/IMediaRequest";
 import { useRequests } from "../hooks/useRequests";
 import { RequestTypes } from "../enums/RequestTypes";
@@ -11,35 +10,37 @@ import { IPaginated } from "../models/IPaginated";
 import { MediaTypes } from "../enums/MediaTypes";
 
 interface RequestsContextInterface {
-  requestsReceived: IAsyncCall<IPaginated<IMediaRequest> | null>;
-  requestsSent: IAsyncCall<IPaginated<IMediaRequest> | null>;
+  requestsReceived: IPaginated<IMediaRequest>;
+  requestsSent: IPaginated<IMediaRequest>;
   updateRequest: (
     mediaType: MediaTypes,
     providerId: string,
     requestId: number,
-    requestStatus: RequestStatus
+    requestStatus: RequestStatus,
   ) => void;
   deleteRequest: (mediaType: MediaTypes, requestId: number) => void;
   sortRequests: (
     requestType: RequestTypes,
-    compare: (first: IMediaRequest, second: IMediaRequest) => number
+    compare: (first: IMediaRequest, second: IMediaRequest) => number,
   ) => void;
   onLoadPrev: (requestType: RequestTypes) => void;
   onLoadNext: (requestType: RequestTypes) => void;
+  isLoading: boolean;
 }
 
 export const RequestsContextDefaultImpl: RequestsContextInterface = {
-  requestsReceived: DefaultAsyncCall,
-  requestsSent: DefaultAsyncCall,
+  requestsReceived: undefined,
+  requestsSent: undefined,
   updateRequest(): void {},
   deleteRequest(): void {},
   sortRequests(): void {},
   onLoadNext(): void {},
   onLoadPrev(): void {},
+  isLoading: false,
 };
 
 export const RequestsContext = createContext<RequestsContextInterface>(
-  RequestsContextDefaultImpl
+  RequestsContextDefaultImpl,
 );
 
 export const useRequestsContext = () => useContext(RequestsContext);
@@ -54,6 +55,7 @@ export const RequestsContextProvider = (props: any) => {
     sortRequests: sortRequestReceived,
     loadPrev: loadPrevRequestReceived,
     loadNext: loadNextRequestReceived,
+    isLoading: isRequestsReceivedLoading,
   } = useRequests(RequestTypes.INCOMING);
 
   const {
@@ -63,6 +65,7 @@ export const RequestsContextProvider = (props: any) => {
     sortRequests: sortRequestSent,
     loadPrev: loadPrevRequestSent,
     loadNext: loadNextRequestSent,
+    isLoading: isRequestsSentLoading,
   } = useRequests(RequestTypes.OUTGOING);
 
   const { pushSuccess, pushDanger } = useAlert();
@@ -76,15 +79,15 @@ export const RequestsContextProvider = (props: any) => {
     mediaType: MediaTypes,
     providerId: string,
     requestId: number,
-    requestStatus: RequestStatus
+    requestStatus: RequestStatus,
   ) => {
     patch<IMediaRequest>(updateUrl(mediaType, requestId), {
       status: requestStatus,
       providerId: providerId,
     }).then((res) => {
       if (res.status === 200) {
-        updateReceivedRequest(requestId, requestStatus);
-        updateSentRequest(requestId, requestStatus);
+        updateReceivedRequest();
+        updateSentRequest();
         pushSuccess("Request " + requestStatus);
       } else {
         pushDanger("Internal error, try again later...");
@@ -95,8 +98,8 @@ export const RequestsContextProvider = (props: any) => {
   const deleteRequest = (mediaType: MediaTypes, requestId: number) => {
     remove(updateUrl(mediaType, requestId)).then((res) => {
       if (res.status === 204) {
-        deleteReceivedRequest(requestId);
-        deleteSentRequest(requestId);
+        deleteReceivedRequest();
+        deleteSentRequest();
         pushSuccess("Request deleted");
       } else {
         pushDanger("Error deleting request");
@@ -106,7 +109,7 @@ export const RequestsContextProvider = (props: any) => {
 
   const sortRequests = (
     requestType: RequestTypes,
-    compare: (first: IMediaRequest, second: IMediaRequest) => number
+    compare: (first: IMediaRequest, second: IMediaRequest) => number,
   ) => {
     if (requestType === RequestTypes.INCOMING) {
       sortRequestReceived(compare);
@@ -141,6 +144,7 @@ export const RequestsContextProvider = (props: any) => {
         sortRequests,
         onLoadPrev,
         onLoadNext,
+        isLoading: isRequestsSentLoading || isRequestsReceivedLoading,
       }}
     >
       {props.children}

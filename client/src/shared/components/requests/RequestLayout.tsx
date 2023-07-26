@@ -31,14 +31,14 @@ import { useRequestsContext } from "../../contexts/RequestsContext";
 import { RequestTypes } from "../../enums/RequestTypes";
 import { Tooltiped } from "../Tooltiped";
 import { DangerTag, MediaTag, SuccessTag, WarningTag } from "../Tag";
-import { useMedia } from "../../hooks/useMedia";
+import { useMedia } from "../../../hooks/useMedia";
 import { useNavigate } from "react-router-dom";
 import { routes } from "../../../routes";
 import { useImage } from "../../hooks/useImage";
 import { Image } from "../Image";
 import { Buttons } from "../layout/Buttons";
 import { IMediaProviderConfig } from "../../models/IMediaProviderConfig";
-import { Input } from "../forms/inputs/Input";
+import { Input } from "../../../elements/Input";
 import { PaginationArrows } from "../PaginationArrows";
 
 export const ScrollingTable = styled.div`
@@ -389,10 +389,6 @@ const RequestMediaPoster = styled(Image)`
   border-radius: 6px;
 `;
 
-const RequestMediaTitle = styled.p`
-  font-size: 1.2em;
-`;
-
 type RequestImageAndTitleProps = {
   id: string;
   title: string;
@@ -400,7 +396,7 @@ type RequestImageAndTitleProps = {
   posterUrl?: string;
 };
 
-const RequestImageAndTitle = ({
+export const RequestImageAndTitle = ({
   id,
   title,
   type,
@@ -426,7 +422,7 @@ const RequestImageAndTitle = ({
         height="90px"
         cursor="pointer"
       />
-      <RequestMediaTitle>{title}</RequestMediaTitle>
+      <span>{title}</span>
     </RequestTitleContainer>
   );
 };

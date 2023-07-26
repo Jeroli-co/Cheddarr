@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.32",
-    "@fortawesome/free-brands-svg-icons": "^5.15.1",
-    "@fortawesome/free-regular-svg-icons": "^5.15.1",
-    "@fortawesome/free-solid-svg-icons": "^5.15.1",
-    "@fortawesome/react-fontawesome": "^0.1.14",
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-brands-svg-icons": "^6.4.0",
+    "@fortawesome/free-regular-svg-icons": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@hookform/resolvers": "^3.1.1",
     "@radix-ui/react-slot": "^1.0.2",
+    "@tanstack/react-table": "^8.9.3",
     "axios": "^1.4.0",
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.3.2",
@@ -35,12 +36,15 @@
     "start": "react-scripts start",
     "build": "cross-env INLINE_RUNTIME_CHUNK=false && react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:storybook/recommended"
     ]
   },
   "browserslist": {
@@ -56,6 +60,15 @@
     ]
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "7.1.1",
+    "@storybook/addon-interactions": "7.1.1",
+    "@storybook/addon-links": "7.1.1",
+    "@storybook/addon-onboarding": "1.0.8",
+    "@storybook/blocks": "7.1.1",
+    "@storybook/preset-create-react-app": "7.1.1",
+    "@storybook/react": "7.1.1",
+    "@storybook/react-webpack5": "7.1.1",
+    "@storybook/testing-library": "0.2.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
@@ -70,8 +83,13 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/smoothscroll-polyfill": "^0.3.1",
     "@types/styled-components": "^5.1.26",
+    "babel-plugin-named-exports-order": "0.0.2",
+    "eslint-plugin-storybook": "^0.6.13",
     "prettier": "3.0.0",
-    "tailwindcss": "^3.3.3"
+    "prop-types": "15.8.1",
+    "storybook": "7.1.1",
+    "tailwindcss": "^3.3.3",
+    "webpack": "5.88.2"
   },
   "proxy": "http://localhost:9090"
 }

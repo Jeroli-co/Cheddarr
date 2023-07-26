@@ -15,11 +15,11 @@ export default () => {
     <AuthenticationContextProvider>
       <React.Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path="sign-in/plex/confirm" element={<PageLoader />} />
           <Route path="sign-in" element={<SignInPage />} />
+          <Route path="sign-in/plex/confirm" element={<PageLoader />} />
           <Route path="sign-up" element={<SignUpPage />} />
           <Route path="password/:token" element={<ResetPassword />} />
-          <Route index element={<Navigate to="sign=in" />} />
+          <Route index element={<Navigate to="sign-in" />} />
         </Routes>
       </React.Suspense>
     </AuthenticationContextProvider>

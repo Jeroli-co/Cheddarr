@@ -6,7 +6,7 @@ import { useUserService } from "../../../../shared/toRefactor/useUserService";
 import { Button, PrimaryButton } from "../../../../shared/components/Button";
 import { Modal } from "../../../../shared/components/layout/Modal";
 import { H2 } from "../../../../shared/components/Titles";
-import { Input } from "../../../../shared/components/forms/inputs/Input";
+import { Input } from "../../../../elements/Input";
 import { Buttons } from "../../../../shared/components/layout/Buttons";
 import { HelpDanger } from "../../../../shared/components/Help";
 import { Icon } from "../../../../shared/components/Icon";
