@@ -36,7 +36,7 @@ const buttonVariants = cva(
         color: "secondary",
         variant: "contained",
         className:
-          "border-primary-lighter bg-primary-dark hover:border-primary-light hover:bg-primary",
+          "border-primary bg-primary text-primary-lighter hover:border-primary-dark hover:bg-primary-dark hover:text-primary-light",
       },
       {
         color: "plex",

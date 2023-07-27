@@ -1,25 +1,13 @@
 import { RequestTypes } from "../enums/RequestTypes";
 import { IMediaRequest } from "../models/IMediaRequest";
 import { APIRoutes } from "../enums/APIRoutes";
-import { usePagination } from "./usePagination";
+import { PaginationHookProps, usePagination } from "./usePagination";
 
-export const useRequests = (requestsType: RequestTypes) => {
-  const { data, loadPrev, loadNext, invalidate, sortData, isLoading } =
-    usePagination<IMediaRequest>(APIRoutes.GET_REQUESTS(requestsType));
-
-  const sortRequests = (
-    compare: (first: IMediaRequest, second: IMediaRequest) => number,
-  ) => {
-    sortData(compare);
-  };
-
-  return {
-    data,
-    loadPrev,
-    loadNext,
-    updateRequest: invalidate,
-    deleteRequest: invalidate,
-    sortRequests,
-    isLoading,
-  };
+const useRequests = (
+  requestsType: RequestTypes,
+): PaginationHookProps<IMediaRequest> => {
+  return usePagination<IMediaRequest>(APIRoutes.GET_REQUESTS(requestsType));
 };
+
+export const useIncomingRequest = () => useRequests(RequestTypes.INCOMING);
+export const useOutgoingRequest = () => useRequests(RequestTypes.OUTGOING);

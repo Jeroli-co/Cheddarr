@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { routes } from "../../routes";
 import { Tab, TabsContextProvider } from "../../shared/contexts/TabsContext";
-import { RequestsContextProvider } from "../../shared/contexts/RequestsContext";
 import { useRoleGuard } from "../../shared/hooks/useRoleGuard";
 import { Roles } from "../../shared/enums/Roles";
 import { checkRole } from "../../utils/roles";
@@ -40,19 +39,17 @@ export default () => {
 
   return (
     <TabsContextProvider tabs={tabs} url={routes.REQUESTS.url}>
-      <RequestsContextProvider>
-        <React.Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route index element={<Navigate to="./received" />} />
-            {user && checkRole(user.roles, [Roles.MANAGE_REQUEST]) && (
-              <Route path="received" element={<ReceivedPage />} />
-            )}
-            {user && checkRole(user.roles, [Roles.REQUEST]) && (
-              <Route path="sent" element={<SentPage />} />
-            )}
-          </Routes>
-        </React.Suspense>
-      </RequestsContextProvider>
+      <React.Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route index element={<Navigate to="./received" />} />
+          {user && checkRole(user.roles, [Roles.MANAGE_REQUEST]) && (
+            <Route path="received" element={<ReceivedPage />} />
+          )}
+          {user && checkRole(user.roles, [Roles.REQUEST]) && (
+            <Route path="sent" element={<SentPage />} />
+          )}
+        </Routes>
+      </React.Suspense>
     </TabsContextProvider>
   );
 };

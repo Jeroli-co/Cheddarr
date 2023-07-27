@@ -1,60 +1,72 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IPaginated } from "../models/IPaginated";
 import { useAPI } from "./useAPI";
 import { useQuery, useQueryClient } from "react-query";
 import hoursToMilliseconds from "date-fns/hoursToMilliseconds";
 
-const useData = <T>(url: string) => {
-  const { get } = useAPI();
+export type PaginationHookProps<TData> = {
+  data: IPaginated<TData>;
 
-  const fetchData = () => {
-    return get<IPaginated<T>>(url).then((res) => {
-      if (res.status === 200 && res.data) {
-        return res.data;
-      } else {
-        return undefined;
-      }
-    });
-  };
+  loadPrev: () => void;
+  loadNext: () => void;
+  isFirstPage: boolean;
+  isLastPage: boolean;
 
-  const { data, isLoading } = useQuery<IPaginated<T>>([url], fetchData, {
-    staleTime: hoursToMilliseconds(24),
-  });
+  isLoading: boolean;
+  isFetching: boolean;
 
-  return {
-    data,
-    isLoading,
-  };
+  updateData: () => void;
+  deleteData: () => void;
+  invalidate: () => void;
+
+  sortData: (compare: (first: TData, second: TData) => number) => TData[];
 };
 
-export const usePagination = <T = any>(queryPath: string) => {
+export const usePagination = <TData>(
+  query: string,
+): PaginationHookProps<TData> => {
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useData<T>(queryPath + `?page=${page}`);
-  const loadPrev = () => {
-    const getPrevPage = () => {
-      if (!data) return 1;
-      return data.page > 1 ? data.page - 1 : data?.pages;
-    };
+  const { get } = useAPI();
 
-    setPage(getPrevPage());
+  const fetchData = (page) => {
+    return get<IPaginated<TData>>(query + `?page=${page}`).then(
+      (res) => res.data,
+    );
+  };
+
+  const { data, ...useQueryResult } = useQuery(
+    [query, page],
+    () => fetchData(page),
+    {
+      keepPreviousData: true,
+      staleTime: hoursToMilliseconds(24),
+    },
+  );
+
+  const hasMore = (p?: IPaginated<TData>) => p && p.page < p.pages;
+
+  useEffect(() => {
+    if (hasMore(data)) {
+      queryClient.prefetchQuery([query, page + 1], () => fetchData(page + 1));
+    }
+  }, [data, page, queryClient]);
+
+  const loadPrev = () => {
+    setPage((old) => Math.max(old - 1, 1));
   };
 
   const loadNext = () => {
-    const getNextPage = () => {
-      if (!data) return 1;
-      return data.page < data?.pages ? data.page + 1 : 1;
-    };
-
-    setPage(getNextPage());
+    setPage((old) => (hasMore(data) ? old + 1 : old));
   };
 
-  const invalidate = () => {
-    queryClient.invalidateQueries("todos");
+  const refetch = () => {
+    queryClient.invalidateQueries(query);
   };
-  const sortData = (compare: (first: T, second: T) => number) => {
+
+  const sortData = (compare: (first: TData, second: TData) => number) => {
     return data.results.sort(compare);
   };
 
@@ -62,12 +74,12 @@ export const usePagination = <T = any>(queryPath: string) => {
     data,
     loadPrev,
     loadNext,
-    updateData: invalidate,
-    deleteData: invalidate,
+    updateData: refetch,
+    deleteData: refetch,
     sortData,
-    invalidate,
+    invalidate: refetch,
     isFirstPage: page === 1,
     isLastPage: page === data?.pages,
-    isLoading,
+    ...useQueryResult,
   };
 };
