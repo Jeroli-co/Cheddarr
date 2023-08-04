@@ -2,10 +2,8 @@ import { useState } from 'react'
 import { useRoleGuard } from '../../shared/hooks/useRoleGuard'
 import { Roles } from '../../shared/enums/Roles'
 import { usePagination } from '../../hooks/usePagination'
-import { APIRoutes } from '../../shared/enums/APIRoutes'
 import { ILog } from '../../shared/models/ILog'
 import { Spinner } from '../../shared/components/Spinner'
-import { SwitchErrors } from '../../shared/components/errors/SwitchErrors'
 import styled from 'styled-components'
 import { LogLevels } from '../../shared/enums/LogLevels'
 import { PaginationArrows } from '../../shared/components/PaginationArrows'
@@ -84,27 +82,24 @@ const LogComponent = ({ log }: LogComponentProps) => {
 export default () => {
   useRoleGuard([Roles.ADMIN])
 
-  const { data: logs, loadNext, loadPrev, loadPage } = usePagination<ILog>(APIRoutes.LOGS, false)
+  const { data, isLoading, isFetching, loadNext, loadPrev } = usePagination<ILog>(
+    ['system', 'logs'],
+    '/system/logs'
+  )
 
-  if (logs.isLoading) {
+  if (isLoading || isFetching) {
     return <Spinner />
-  }
-
-  if (logs.data === null) {
-    return <SwitchErrors status={logs.status} />
   }
 
   return (
     <Container>
-      {logs.data &&
-        logs.data.results &&
-        logs.data.results.map((log, index) => <LogComponent log={log} key={index} />)}
+      {data?.results?.map((log, index) => <LogComponent log={log} key={index} />)}
       <PaginationArrows
-        currentPage={logs.data?.page}
-        totalPages={logs.data?.pages}
+        currentPage={data?.page}
+        totalPages={data?.pages}
         onLoadPrev={() => loadPrev()}
         onLoadNext={() => loadNext()}
-        onLoadPage={loadPage}
+        onLoadPage={() => {}}
       />
     </Container>
   )

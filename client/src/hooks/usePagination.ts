@@ -24,14 +24,21 @@ export type PaginationHookProps<TData> = {
 
 export const usePagination = <TData>(
   queryKeys: string[],
-  queryURL: string
+  queryURL: string,
+  querySearchParams?: Record<string, string>
 ): PaginationHookProps<TData> => {
   const queryClient = useQueryClient()
 
   const [page, setPage] = useState(1)
 
   const fetchData = (page: number) => {
-    return httpClient.get<IPaginated<TData>>(queryURL + `?page=${page}`).then((res) => res.data)
+    return httpClient
+      .get<IPaginated<TData>>(
+        `${queryURL}?page=${page}${
+          querySearchParams ?? `&${new URLSearchParams(querySearchParams).toString()}`
+        }`
+      )
+      .then((res) => res.data)
   }
 
   const { data, ...useQueryResult } = useQuery([...queryKeys, page], () => fetchData(page), {

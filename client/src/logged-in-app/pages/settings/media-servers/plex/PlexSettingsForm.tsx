@@ -9,12 +9,6 @@ import { useAlert } from '../../../../../shared/contexts/AlertContext'
 import { useQueryClient } from 'react-query'
 import { Button } from '../../../../../elements/button/Button'
 
-// type PlexServerLibrary = {
-//   libraryId: number
-//   name: string
-//   enabled: boolean
-// }
-
 const postPlexSettingsSchema = providerBaseSettingsSchema.merge(
   z.object({
     serverName: z.string({ required_error: 'Server name is required' }).trim(),

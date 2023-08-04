@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react'
+import styled from 'styled-components'
 
 const MediaBackgroundContainerStyle = styled.div`
   position: relative;
@@ -7,7 +7,7 @@ const MediaBackgroundContainerStyle = styled.div`
   max-width: 100%;
   min-height: 100vh;
   z-index: 0;
-`;
+`
 
 const MediaBackgroundStyle = styled.div`
   position: absolute;
@@ -16,7 +16,7 @@ const MediaBackgroundStyle = styled.div`
   width: 100%;
   height: 100%;
   z-index: -2;
-`;
+`
 
 const MediaBackgroundImage = styled.div<{ backgroundImage: string }>`
   position: absolute;
@@ -30,7 +30,7 @@ const MediaBackgroundImage = styled.div<{ backgroundImage: string }>`
   background-size: cover;
   opacity: 0.2;
   z-index: -1;
-`;
+`
 
 const MediaBackground = ({ image, children }: any) => {
   return (
@@ -39,7 +39,7 @@ const MediaBackground = ({ image, children }: any) => {
       <MediaBackgroundImage backgroundImage={image} />
       <MediaBackgroundStyle />
     </MediaBackgroundContainerStyle>
-  );
-};
+  )
+}
 
-export { MediaBackground };
+export { MediaBackground }

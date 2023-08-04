@@ -1,21 +1,20 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import styled, { css } from "styled-components";
-import { SearchDropdownType } from "./SearchDropdownType";
-import { useNavigate } from "react-router";
-import { routes } from "../../../../routes";
-import { SearchFilters } from "../../../../shared/enums/SearchFilters";
-import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
-import { isEmpty } from "../../../../utils/strings";
-import { useLocation } from "react-router-dom";
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import styled, { css } from 'styled-components'
+import { SearchDropdownType } from './SearchDropdownType'
+import { useNavigate } from 'react-router'
+import { routes } from '../../../../routes'
+import { SearchFilters } from '../../../../shared/enums/SearchFilters'
+import { STATIC_STYLES } from '../../../../shared/enums/StaticStyles'
+import { isEmpty } from '../../../../utils/strings'
+import { useLocation } from 'react-router-dom'
 
 const Container = styled.div<{
-  isInputFocus: boolean;
+  isInputFocus: boolean
 }>`
   @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
     display: flex;
     align-items: center;
     transition: 0.3s ease;
-    height: ${STATIC_STYLES.SEARCH_BAR_HEIGHT}px;
     width: 100%;
     background: ${(props) => props.theme.primaryLighter};
 
@@ -48,18 +47,13 @@ const Container = styled.div<{
   }
 
   @media screen and (min-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    position: absolute;
-    left: ${STATIC_STYLES.SIDEBAR_OPEN_WIDTH + 10}px;
-    right: ${STATIC_STYLES.SIDEBAR_OPEN_WIDTH + 10}px;
     display: flex;
     align-items: center;
     transition: 0.3s ease;
-    height: ${STATIC_STYLES.SEARCH_BAR_HEIGHT}px;
     user-select: none;
 
     .search-input {
-      width: 50%;
-      height: 100%;
+      width: 100%;
       border: 1px solid rgba(0, 0, 0, 0);
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
@@ -84,47 +78,39 @@ const Container = styled.div<{
         }
       `}
   }
-`;
+`
 
 export const SearchBar = () => {
-  const [isInputFocus, setIsInputFocus] = useState(false);
-  const [searchType, setSearchType] = useState<SearchFilters>(
-    SearchFilters.ALL,
-  );
-  const [searchValue, setSearchValue] = useState("");
-  const navigate = useNavigate();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const location = useLocation();
+  const [isInputFocus, setIsInputFocus] = useState(false)
+  const [searchType, setSearchType] = useState<SearchFilters>(SearchFilters.ALL)
+  const [searchValue, setSearchValue] = useState('')
+  const navigate = useNavigate()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const location = useLocation()
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-  };
+    setSearchValue(e.target.value)
+  }
 
   const onSearchTypeChange = (type: SearchFilters) => {
-    setSearchType(type);
+    setSearchType(type)
     if (inputRef && inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus()
     }
-  };
+  }
 
   useEffect(() => {
     if (!isEmpty(searchValue)) {
-      navigate(routes.SEARCH.url(searchType, searchValue));
-    } else if (
-      location.pathname.startsWith("/search") &&
-      isEmpty(searchValue)
-    ) {
-      navigate(routes.HOME.url);
+      navigate(routes.SEARCH.url(searchType, searchValue))
+    } else if (location.pathname.startsWith('/search') && isEmpty(searchValue)) {
+      navigate(routes.HOME.url)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchType, searchValue]);
+  }, [searchType, searchValue])
 
   return (
     <Container isInputFocus={isInputFocus}>
-      <SearchDropdownType
-        selectedOption={searchType}
-        onChange={onSearchTypeChange}
-      />
+      <SearchDropdownType selectedOption={searchType} onChange={onSearchTypeChange} />
       <input
         ref={inputRef}
         value={searchValue}
@@ -136,5 +122,5 @@ export const SearchBar = () => {
         placeholder="Search..."
       />
     </Container>
-  );
-};
+  )
+}

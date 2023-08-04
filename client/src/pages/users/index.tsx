@@ -1,23 +1,23 @@
-import * as React from "react";
-import { H1 } from "../../shared/components/Titles";
-import { useRoleGuard } from "../../shared/hooks/useRoleGuard";
-import { Roles } from "../../shared/enums/Roles";
-import { PageLoader } from "../../shared/components/PageLoader";
-import { Navigate, Route, Routes } from "react-router";
-import { routes } from "../../routes";
-import { TabsContextProvider } from "../../shared/contexts/TabsContext";
+import React from 'react'
+import { H1 } from '../../shared/components/Titles'
+import { useRoleGuard } from '../../shared/hooks/useRoleGuard'
+import { Roles } from '../../shared/enums/Roles'
+import { PageLoader } from '../../shared/components/PageLoader'
+import { Navigate, Route, Routes } from 'react-router'
+import { routes } from '../../routes'
+import { TabsContextProvider } from '../../shared/contexts/TabsContext'
 
-const ConfirmedUsersPage = React.lazy(() => import("./confirmed"));
-const PendingUsersPage = React.lazy(() => import("./pending"));
+const ConfirmedUsersPage = React.lazy(() => import('./confirmed'))
+const PendingUsersPage = React.lazy(() => import('./pending'))
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const tabs = [
-    { label: "Confirmed", uri: "confirmed" },
-    { label: "Pending", uri: "pending" },
-  ];
+    { label: 'Confirmed', uri: 'confirmed' },
+    { label: 'Pending', uri: 'pending' },
+  ]
 
-  useRoleGuard([Roles.MANAGE_USERS]);
+  useRoleGuard([Roles.MANAGE_USERS])
 
   return (
     <>
@@ -32,5 +32,5 @@ export default () => {
         </React.Suspense>
       </TabsContextProvider>
     </>
-  );
-};
+  )
+}

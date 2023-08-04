@@ -12,14 +12,17 @@ export const useConfig = () => {
 
   const { data } = useData<IConfig>(['system', 'config'], '/system/config')
 
-  const updateConfig = (payload: Partial<IConfig>) => {
+  const updateConfig = (
+    payload: Partial<IConfig>,
+    message?: { success?: string; error?: string }
+  ) => {
     return patch<IConfig>(APIRoutes.CONFIG, payload).then((res) => {
       if (res.status !== 200) {
-        pushDanger('Cannot update config')
+        pushDanger(message?.error ?? 'Cannot update config')
         return
       }
 
-      pushSuccess('Config updated')
+      pushSuccess(message?.success ?? 'Config updated')
       queryClient.invalidateQueries(['system', 'config'])
     })
   }

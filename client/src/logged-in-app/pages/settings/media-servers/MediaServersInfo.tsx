@@ -21,14 +21,14 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: ${(props) => props.theme.primaryLight};
+  background: ${({ theme }) => theme.primaryLight};
 `
 
 const Item = styled.div`
   padding: 20px;
-  border-left: 1px solid ${(props) => props.theme.primary};
-  border-right: 1px solid ${(props) => props.theme.primary};
-  border-bottom: 1px solid ${(props) => props.theme.primary};
+  border-left: 1px solid ${({ theme }) => theme.primary};
+  border-right: 1px solid ${({ theme }) => theme.primary};
+  border-bottom: 1px solid ${({ theme }) => theme.primary};
   border-bottom-right-radius: 6px;
   border-bottom-left-radius: 6px;
 `
@@ -36,7 +36,7 @@ const Item = styled.div`
 const ItemHeader = styled(Header)`
   border-bottom-right-radius: 6px;
   border-bottom-left-radius: 6px;
-  background: ${(props) => props.theme.primary};
+  background: ${({ theme }) => theme.primary};
 `
 
 const Libraries = styled.div`
@@ -50,10 +50,15 @@ type MediaServerInfoProps = {
   mediaServerType: MediaServerTypes
 }
 
-const MediaServerInfo = (props: MediaServerInfoProps) => {
-  const { libraries, updateLibrary } = useMediaServerLibraries(
-    props.mediaServerType,
-    props.configId
+const MediaServerInfo = ({
+  configId,
+  mediaServerType,
+  serverId,
+  serverName,
+}: MediaServerInfoProps) => {
+  const { libraries, updateLibrary, isLoading, isFetching } = useMediaServerLibraries(
+    configId,
+    mediaServerType
   )
   const { patch } = useAPI()
   const { pushInfo, pushDanger } = useAlert()
@@ -74,17 +79,18 @@ const MediaServerInfo = (props: MediaServerInfoProps) => {
   return (
     <Item>
       <ItemHeader>
-        <H2>{props.serverName}</H2>
-        <PrimaryIconButton type="button" onClick={() => fullSync(props.serverId)}>
+        <H2>{serverName}</H2>
+        <PrimaryIconButton type="button" onClick={() => fullSync(serverId)}>
           <Icon icon={faSync} />
         </PrimaryIconButton>
       </ItemHeader>
       <Libraries>
         <H3>Libraries</H3>
-        {libraries.isLoading && <Spinner />}
-        {!libraries.isLoading &&
-          libraries.data &&
-          libraries.data.map((l, index) => (
+        {isLoading || (isFetching && <Spinner />)}
+        {!isLoading &&
+          !isFetching &&
+          libraries &&
+          libraries.map((l, index) => (
             <Checkbox label={l.name} checked={l.enabled} onChange={() => updateLibrary(l)} />
           ))}
       </Libraries>

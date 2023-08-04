@@ -1,13 +1,13 @@
-import { IUser } from "./IUser";
+import { IUser } from './IUser'
 
 export interface ISession {
-  isAuthenticated: boolean;
-  user: IUser | null;
-  isLoading: boolean;
+  isAuthenticated: boolean
+  user?: IUser
+  isLoading: boolean
 }
 
 export const SessionDefaultImpl: ISession = {
   isAuthenticated: false,
-  user: null,
+  user: undefined,
   isLoading: true,
-};
+}

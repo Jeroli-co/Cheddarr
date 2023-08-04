@@ -1,7 +1,7 @@
-import React from "react";
-import styled, { css } from "styled-components";
-import { Tab } from "../../contexts/TabsContext";
-import {useNavigate} from "react-router";
+import React from 'react'
+import styled, { css } from 'styled-components'
+import { Tab } from '../../contexts/TabsContext'
+import { useNavigate } from 'react-router'
 
 export const TabsStyle = styled.div`
   overflow: hidden;
@@ -11,23 +11,19 @@ export const TabsStyle = styled.div`
   align-items: stretch;
   font-size: 1rem;
   white-space: nowrap;
-  margin-bottom: 10px;
-`;
+  margin-bottom: 20px;
+`
 
 export const TabSide = styled.div`
   border-bottom: 1px solid ${(props) => props.theme.primaryLighter};
   width: 100%;
-`;
+`
 
 export const TabStyle = styled.div<{ isActive: boolean }>`
-  border-top: 1px solid
-    ${(props) => (props.isActive ? props.theme.primaryLighter : "none")};
-  border-left: 1px solid
-    ${(props) => (props.isActive ? props.theme.primaryLighter : "none")};
-  border-right: 1px solid
-    ${(props) => (props.isActive ? props.theme.primaryLighter : "none")};
-  border-bottom: 1px solid
-    ${(props) => (props.isActive ? "none" : props.theme.primaryLighter)};
+  border-top: 1px solid ${(props) => (props.isActive ? props.theme.primaryLighter : 'none')};
+  border-left: 1px solid ${(props) => (props.isActive ? props.theme.primaryLighter : 'none')};
+  border-right: 1px solid ${(props) => (props.isActive ? props.theme.primaryLighter : 'none')};
+  border-bottom: 1px solid ${(props) => (props.isActive ? 'none' : props.theme.primaryLighter)};
 
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
@@ -47,16 +43,16 @@ export const TabStyle = styled.div<{ isActive: boolean }>`
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
   }
-`;
+`
 
 type TabsProps = {
-  tabs: Tab[];
-  activeTab: Tab;
-  url: string;
-};
+  tabs: Tab[]
+  activeTab: Tab
+  url: string
+}
 
 export const Tabs = ({ tabs, activeTab, url }: TabsProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   return (
     <TabsStyle>
       <TabSide />
@@ -64,14 +60,14 @@ export const Tabs = ({ tabs, activeTab, url }: TabsProps) => {
         return (
           <TabStyle
             isActive={activeTab.uri === tab.uri}
-            onClick={() => navigate(url + "/" + tab.uri.toLowerCase())}
+            onClick={() => navigate(url + '/' + tab.uri.toLowerCase())}
             key={index}
           >
             {tab.label}
           </TabStyle>
-        );
+        )
       })}
       <TabSide />
     </TabsStyle>
-  );
-};
+  )
+}

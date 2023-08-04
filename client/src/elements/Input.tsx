@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 
 const inputVariants = cva(
-  'w-full p-3 border border-primary rounded bg-primary-dark opacity-70 focus:opacity-100 outline-none'
+  'w-full px-3 py-2 md:py-3 border border-primary rounded bg-primary-dark opacity-70 focus:opacity-100 outline-none'
 )
 
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> &

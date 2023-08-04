@@ -18,6 +18,7 @@ import { UserSmallCard } from '../shared/components/UserSmallCard'
 import { Buttons } from '../shared/components/layout/Buttons'
 import { Tooltiped } from '../shared/components/Tooltiped'
 import { PaginationHookProps } from '../hooks/usePagination'
+import { Title } from '../elements/Title'
 
 const MediaTitleCell = ({ id, type }: { type: MediaTypes; id: string }) => {
   const { data, isLoading } = useMedia(type, id)
@@ -51,6 +52,7 @@ export const RequestTable = ({
 }) => {
   const { data: radarrSettings } = useRadarrSettings()
   const { data: sonarrSettings } = useSonarrSettings()
+
   const columns = useMemo<ColumnDef<IMediaRequest>[]>(
     () =>
       [
@@ -190,14 +192,32 @@ export const RequestTable = ({
     []
   )
 
+  const Head = () => {
+    return (
+      <>
+        <Title as="h1">
+          Requests {requestType === RequestTypes.INCOMING ? 'received' : 'sent'}
+        </Title>
+        <p className="mb-8">
+          {requestType === RequestTypes.INCOMING
+            ? 'Manage the incoming requests that has been made on this server.'
+            : 'See which request you have made on the server.'}
+        </p>
+      </>
+    )
+  }
+
   if (isLoading) return undefined
 
   return (
-    <Table
-      {...{
-        data: data?.results ?? [],
-        columns,
-      }}
-    />
+    <>
+      <Head />
+      <Table
+        {...{
+          data: data?.results ?? [],
+          columns,
+        }}
+      />
+    </>
   )
 }

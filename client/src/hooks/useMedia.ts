@@ -39,8 +39,8 @@ export const useSimilarMovies = (id: string) =>
 export const useRecentSeries = () => usePagination<ISeries>(['series', 'recent'], '/series/recent')
 export const usePopularSeries = () =>
   usePagination<ISeries>(['series', 'popular'], '/series/popular')
-export const useUpcomingSeries = () =>
-  usePagination<ISeries>(['series', 'upcoming'], '/series/upcoming')
+// export const useUpcomingSeries = () =>
+//   usePagination<ISeries>(['series', 'upcoming'], '/series/upcoming')
 export const useRecommendedSeries = (id: string) =>
   usePagination<ISeries>(['series', 'recommended', id], `/series/${id}/recommended`)
 export const useSimilarSeries = (id: string) =>

@@ -1,6 +1,6 @@
 * {
   box-sizing: border-box;
-  font-feature-settings: "lnum";
+  font-feature-settings: 'lnum';
 }
 
 html,

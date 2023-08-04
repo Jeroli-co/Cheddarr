@@ -18,5 +18,5 @@ export default () => {
 
   if (!data) return <p className="text-danger">Movie info not available</p>
 
-  return <Media media={data} />
+  return <Media data={data} />
 }

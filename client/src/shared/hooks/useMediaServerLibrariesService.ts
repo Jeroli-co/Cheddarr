@@ -1,55 +1,46 @@
-import { useAPI } from "./useAPI";
-import { APIRoutes } from "../enums/APIRoutes";
-import { useAlert } from "../contexts/AlertContext";
-import { IMediaServerLibrary } from "../models/IMediaServerConfig";
-import { useEffect, useState } from "react";
-import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
-import { MediaServerTypes } from "../enums/MediaServersTypes";
+import { useAlert } from '../contexts/AlertContext'
+import { IMediaServerLibrary } from '../models/IMediaServerConfig'
+import { MediaServerTypes } from '../enums/MediaServersTypes'
+import { useQueryClient } from 'react-query'
+import { useData } from '../../hooks/useData'
+import httpClient from '../../http-client'
+
+export type PlexServerLibrary = {
+  libraryId: number
+  name: string
+  enabled: boolean
+}
 
 export const useMediaServerLibraries = (
-  mediaServerType: MediaServerTypes,
-  configId: string
+  configId: string,
+  mediaServerType: MediaServerTypes = MediaServerTypes.PLEX
 ) => {
-  const { get, patch } = useAPI();
-  const { pushSuccess, pushDanger } = useAlert();
-  const [libraries, setLibraries] = useState<
-    IAsyncCall<IMediaServerLibrary[] | null>
-  >(DefaultAsyncCall);
+  const queryClient = useQueryClient()
+  const { pushSuccess, pushDanger } = useAlert()
 
-  useEffect(() => {
-    get<IMediaServerLibrary[]>(
-      APIRoutes.GET_MEDIA_SERVERS_LIBRARIES(mediaServerType, configId)
-    ).then((res) => {
-      if (res.status === 200) {
-        setLibraries(res);
-      } else {
-        setLibraries({ ...DefaultAsyncCall, isLoading: false });
-        pushDanger("Cannot sync libraries");
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    data: libraries,
+    isLoading,
+    isFetching,
+  } = useData<PlexServerLibrary[]>(
+    ['settings', mediaServerType, configId, 'libraries'],
+    `/settings/${mediaServerType}/${configId}/libraries`
+  )
 
   const updateLibrary = (library: IMediaServerLibrary) => {
-    library.enabled = !library.enabled;
-    patch(APIRoutes.GET_MEDIA_SERVERS_LIBRARIES(mediaServerType, configId), [
-      library,
-    ]).then((res) => {
-      if (res.status === 200) {
-        const libTmp = libraries.data;
-        if (libTmp) {
-          const index = libTmp.findIndex(
-            (l) => l.libraryId === library.libraryId
-          );
-          if (index !== -1) {
-            libTmp.splice(index, 1, library);
-            setLibraries({ ...libraries, data: [...libTmp] });
-          }
-          pushSuccess("Library " + library.name + " updated");
+    library.enabled = !library.enabled
+    httpClient
+      .patch(`/settings/${mediaServerType}/${configId}/libraries`, [library])
+      .then((res) => {
+        if (res.status !== 200) {
+          pushDanger('Cannot update library')
+          return
         }
-      }
-    });
-  };
 
-  return { libraries, updateLibrary };
-};
+        pushSuccess('Library ' + library.name + ' updated')
+        queryClient.invalidateQueries(['settings', mediaServerType, configId, 'libraries'])
+      })
+  }
+
+  return { libraries, updateLibrary, isLoading, isFetching }
+}

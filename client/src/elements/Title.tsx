@@ -5,9 +5,9 @@ import { cn } from '../utils/strings'
 const titleVariants = cva('', {
   variants: {
     as: {
-      h1: 'text-2xl md:text-3xl font-bold mb-14',
-      h2: 'text-xl md:text-2xl',
-      h3: 'text-lg md:text-xl',
+      h1: 'text-2xl md:text-3xl font-bold mb-8',
+      h2: 'text-xl md:text-2xl font-semibold mb-6',
+      h3: 'text-lg md:text-xl mb-4',
     },
     variant: {
       center: 'text-center',

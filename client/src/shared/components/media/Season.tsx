@@ -33,7 +33,7 @@ export const Season = (props: SeasonProps) => {
 
   return (
     <>
-      <Media mediaRef={seasonRef} media={data} />
+      <Media mediaRef={seasonRef} data={data} />
       <H2>Episodes</H2>
       <Row>
         {data &&

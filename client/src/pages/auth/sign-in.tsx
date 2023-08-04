@@ -6,14 +6,12 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAuthentication } from '../../shared/contexts/AuthenticationContext'
 import { usePlexAuth } from '../../shared/contexts/PlexAuthContext'
-import { PrimaryDivider } from '../../shared/components/Divider'
-import Layout from './layout'
+import { NewDivider } from '../../shared/components/Divider'
 import { Title } from '../../elements/Title'
 import { Input } from '../../elements/Input'
 import { Button } from '../../elements/button/Button'
-import { routes } from '../../routes'
-import { useNavigate } from 'react-router'
 import { InitResetPasswordModal } from '../../components/InitResetPasswordModal'
+import { Link } from 'react-router-dom'
 
 const signInSchema = z.object({
   username: z.string({ required_error: 'Username required' }).trim(),
@@ -33,7 +31,6 @@ export default () => {
   const { signInWithPlex } = usePlexAuth()
   const redirectURI = useRedirectURI()
   const [isInitPasswordModalOpen, setIsInitPasswordModalOpen] = useState(false)
-  const navigate = useNavigate()
 
   const {
     register,
@@ -58,61 +55,58 @@ export default () => {
 
   return (
     <>
-      <Layout>
-        <img src="/assets/cheddarr.svg" alt="logo" className="mb-14" />
+      <img src="/assets/cheddarr.svg" alt="logo" className="mb-8" />
 
-        <Title as="h1" variant="center">
-          Sign in to your account
-        </Title>
+      <Title as="h1" variant="center">
+        Sign in to your account
+      </Title>
 
-        <form onSubmit={onSubmit} className="flex flex-col gap-8">
-          <div className="space-y-3">
+      <form onSubmit={onSubmit} className="flex flex-col gap-8">
+        <div className="space-y-3">
+          <Input
+            icon={faUser}
+            label="Username or email"
+            type="text"
+            placeholder="Username or email"
+            error={errors.username?.message}
+            {...register('username')}
+          />
+
+          <div className="flex flex-col gap-1">
             <Input
-              icon={faUser}
-              label="Username or email"
-              type="text"
-              placeholder="Username or email"
-              error={errors.username?.message}
-              {...register('username')}
+              icon={faKey}
+              label="Password"
+              type="password"
+              placeholder="Password"
+              error={errors.password?.message}
+              {...register('password')}
             />
-
-            <div className="flex flex-col gap-1">
-              <Input
-                icon={faKey}
-                label="Password"
-                type="password"
-                placeholder="Password"
-                error={errors.password?.message}
-                {...register('password')}
-              />
-              <Button
-                variant="link"
-                className="place-self-end"
-                onClick={() => setIsInitPasswordModalOpen(true)}
-              >
-                Forgot your password ?
-              </Button>
-            </div>
+            <Button
+              variant="link"
+              className="place-self-start"
+              onClick={() => setIsInitPasswordModalOpen(true)}
+            >
+              Forgot your password ?
+            </Button>
           </div>
+        </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <p>Still not have an account ?</p>
-              <Button
-                color="secondary"
-                onClick={() => navigate(routes.SIGN_UP.url, { replace: true })}
-              >
+        <div className="flex items-center gap-3 justify-center md:justify-between">
+          <div className="flex items-center gap-2">
+            <p className="hidden md:block">Still not have an account ?</p>
+            <Button variant="link" asChild>
+              <Link to="/auth/sign-up" replace>
                 Sign up
-              </Button>
-            </div>
-
-            <Button color="primary" type="submit">
-              Sign in
+              </Link>
             </Button>
           </div>
 
-          <PrimaryDivider />
+          <Button type="submit">Sign in</Button>
+        </div>
 
+        <NewDivider />
+
+        <div className="flex flex-col items-center">
           <Title as="h2" variant="center">
             Authentication provider
           </Title>
@@ -121,8 +115,8 @@ export default () => {
             <img className="w-6 h-auto" src="/assets/plex.png" alt="Plex logo" />
             Sign in with Plex
           </Button>
-        </form>
-      </Layout>
+        </div>
+      </form>
 
       {isInitPasswordModalOpen && (
         <InitResetPasswordModal closeModal={() => setIsInitPasswordModalOpen(false)} />

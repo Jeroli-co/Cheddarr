@@ -1,46 +1,37 @@
-import * as React from "react";
-import { Swiper, SwiperProps, SwiperSlide, useSwiper } from "swiper/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
-import { Button } from "./button/Button";
+import * as React from 'react'
+import { Swiper, SwiperProps, SwiperSlide, useSwiper } from 'swiper/react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { Button } from './button/Button'
+import { NewDivider } from '../shared/components/Divider'
 
 type SliderContainerStartProps = {
-  headerElement?: React.ReactNode;
-};
+  headerElement?: React.ReactNode
+}
+
 const SliderContainerStart = ({ headerElement }: SliderContainerStartProps) => {
-  const swiper = useSwiper();
+  const swiper = useSwiper()
   return (
-    <div className="flex flex-col">
+    <div>
       <div className="flex items-center justify-between gap-3">
-        <>{headerElement}</>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="link"
-            className="p-2 aspect-square"
-            onClick={() => swiper.slidePrev()}
-          >
+        <div>{headerElement}</div>
+        <div className="flex items-center justify-self-end gap-1">
+          <Button variant="link" className="p-2 aspect-square" onClick={() => swiper.slidePrev()}>
             <FontAwesomeIcon icon={faChevronLeft} />
           </Button>
-          <Button
-            variant="link"
-            className="p-2 aspect-square"
-            onClick={() => swiper.slideNext()}
-          >
+          <Button variant="link" className="p-2 aspect-square" onClick={() => swiper.slideNext()}>
             <FontAwesomeIcon icon={faChevronRight} />
           </Button>
         </div>
       </div>
 
-      <div className="w-full h-0.5 rounded-full my-3 bg-primary-light" />
+      <NewDivider className="my-3" />
     </div>
-  );
-};
+  )
+}
 
 type SliderProps = React.HTMLAttributes<HTMLDivElement> &
-  SwiperProps & { headerElement?: React.ReactNode };
+  SwiperProps & { headerElement?: React.ReactNode }
 
 export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
   ({ children, headerElement, ...props }, ref) => {
@@ -53,6 +44,6 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
           <SliderContainerStart headerElement={headerElement} />
         </span>
       </Swiper>
-    );
-  },
-);
+    )
+  }
+)

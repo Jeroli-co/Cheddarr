@@ -1,4 +1,5 @@
-import styled from "styled-components";
+import styled from 'styled-components'
+import { cn } from '../../utils/strings'
 
 export const Divider = styled.div`
   width: 100%;
@@ -6,19 +7,19 @@ export const Divider = styled.div`
   margin-top: 20px;
   margin-bottom: 20px;
   border-top: 1px solid ${(props) => props.theme.color};
-`;
+`
 
 export const PrimaryDivider = styled(Divider)`
   border-top: 1px solid ${(props) => props.theme.primary};
-`;
+`
 
 export const PrimaryLightDivider = styled(Divider)`
   border-top: 1px solid ${(props) => props.theme.primaryLight};
-`;
+`
 
 export const SecondaryDivider = styled(Divider)`
   border-top: 1px solid ${(props) => props.theme.secondary};
-`;
+`
 
 export const VerticalDivider = styled.div`
   width: 0;
@@ -26,12 +27,16 @@ export const VerticalDivider = styled.div`
   margin-left: 20px;
   margin-right: 20px;
   border-left: 1px solid ${(props) => props.theme.color};
-`;
+`
 
 export const PrimaryVerticalDivider = styled(VerticalDivider)`
   border-left: 1px solid ${(props) => props.theme.primary};
-`;
+`
 
 export const SecondaryVerticalDivider = styled(VerticalDivider)`
   border-left: 1px solid ${(props) => props.theme.secondary};
-`;
+`
+
+export const NewDivider = ({ className }: { className?: string }) => (
+  <div className={cn('w-full h-[1px] bg-primary rounded-full', className)} />
+)

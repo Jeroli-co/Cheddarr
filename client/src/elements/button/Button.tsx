@@ -30,13 +30,13 @@ const buttonVariants = cva(
         color: 'primary',
         variant: 'contained',
         className:
-          'border-secondary-lighter bg-secondary-dark hover:border-secondary-light hover:bg-secondary',
+          'border-primary bg-primary text-primary-lighter hover:border-primary-dark hover:bg-primary-dark hover:text-primary-light',
       },
       {
         color: 'secondary',
         variant: 'contained',
         className:
-          'border-primary bg-primary text-primary-lighter hover:border-primary-dark hover:bg-primary-dark hover:text-primary-light',
+          'border-secondary-lighter bg-secondary-dark hover:border-secondary-light hover:bg-secondary',
       },
       {
         color: 'plex',
@@ -46,13 +46,13 @@ const buttonVariants = cva(
       {
         color: 'primary',
         variant: 'outlined',
-        className:
-          'border-secondary text-secondary hover:border-secondary-light hover:bg-secondary-lighter',
+        className: 'border-primary text-primary hover:bg-primary-light',
       },
       {
         color: 'secondary',
         variant: 'outlined',
-        className: 'border-primary text-primary hover:bg-primary-lighter',
+        className:
+          'border-secondary-lighter bg-secondary-dark hover:border-secondary-light hover:bg-secondary',
       },
       {
         color: 'primary',

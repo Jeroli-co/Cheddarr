@@ -1,85 +1,74 @@
-import React from "react";
-import { faUser } from "@fortawesome/free-regular-svg-icons";
-import { useForm } from "react-hook-form";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultValidators";
-import { useUserService } from "../../../../shared/toRefactor/useUserService";
-import { Modal } from "../../../../shared/components/layout/Modal";
-import { H2 } from "../../../../shared/components/Titles";
-import { Input } from "../../../../elements/Input";
-import { Buttons } from "../../../../shared/components/layout/Buttons";
-import { Button, PrimaryButton } from "../../../../shared/components/Button";
-import { Icon } from "../../../../shared/components/Icon";
-import { HelpDanger } from "../../../../shared/components/Help";
+import { useForm } from 'react-hook-form'
+import { Modal } from '../../../../shared/components/layout/Modal'
+import { H2 } from '../../../../shared/components/Titles'
+import { Input } from '../../../../elements/Input'
+import { Buttons } from '../../../../shared/components/layout/Buttons'
+import { Button, PrimaryButton } from '../../../../shared/components/Button'
+import httpClient from '../../../../http-client'
+import { IUser } from '../../../../shared/models/IUser'
+import { z } from 'zod'
+import { useQueryClient } from 'react-query'
+import { useAlert } from '../../../../shared/contexts/AlertContext'
+import { usernameValidator } from '../../../../pages/auth/sign-up'
+
+const changeUserUsernameSchema = z.object({
+  username: usernameValidator,
+})
+
+type ChangeUserUsernameFormData = z.infer<typeof changeUserUsernameSchema>
 
 type ChangeUsernameModalProps = {
-  closeModal: () => void;
-  id: number;
-};
+  id: number
+  closeModal: () => void
+}
 
-const ChangeUsernameModal = (props: ChangeUsernameModalProps) => {
-  const { register, handleSubmit, errors } = useForm<{ username: string }>();
-  const { updateUserById } = useUserService();
+const ChangeUsernameModal = ({ id, closeModal }: ChangeUsernameModalProps) => {
+  const queryClient = useQueryClient()
+  const { pushSuccess, pushDanger } = useAlert()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ChangeUserUsernameFormData>()
 
   const onSubmit = handleSubmit((data) => {
-    updateUserById(props.id, { username: data.username }).then((res) => {
-      if (res.status === 200) props.closeModal();
-    });
-  });
+    return httpClient.patch<IUser>(`/users${id}`, data).then((res) => {
+      if (res.status !== 200) {
+        pushDanger('Cannot change email')
+        return
+      }
+
+      pushSuccess('Email updated')
+      queryClient.invalidateQueries(['user'])
+
+      closeModal()
+    })
+  })
 
   return (
-    <Modal close={props.closeModal}>
+    <Modal close={closeModal}>
       <header>
         <H2>Change your username</H2>
       </header>
 
       <form onSubmit={onSubmit}>
-        <section>
-          <Input withIcon>
-            <label>New username</label>
-            <div className="with-left-icon">
-              <input
-                name="username"
-                type="text"
-                placeholder="Enter your new username"
-                ref={register({
-                  required: true,
-                  minLength: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value,
-                  maxLength: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value,
-                  pattern: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value,
-                })}
-              />
-              <span className="icon">
-                <Icon icon={faUser} />
-              </span>
-            </div>
-          </Input>
-          {errors["username"] && errors["username"].type === "required" && (
-            <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-          )}
-          {errors["username"] && errors["username"].type === "minLength" && (
-            <HelpDanger>{FORM_DEFAULT_VALIDATOR.MIN_LENGTH.message}</HelpDanger>
-          )}
-          {errors["username"] && errors["username"].type === "maxLength" && (
-            <HelpDanger>{FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message}</HelpDanger>
-          )}
-          {errors["username"] && errors["username"].type === "pattern" && (
-            <HelpDanger>
-              {FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message}
-            </HelpDanger>
-          )}
-        </section>
+        <Input
+          label="New username"
+          type="text"
+          error={errors.username?.message}
+          {...register('username')}
+        />
 
-        <footer>
-          <Buttons>
-            <PrimaryButton>Change username</PrimaryButton>
-            <Button type="button" onClick={() => props.closeModal()}>
-              Cancel
-            </Button>
-          </Buttons>
-        </footer>
+        <Buttons>
+          <PrimaryButton>Change username</PrimaryButton>
+          <Button type="button" onClick={() => closeModal()}>
+            Cancel
+          </Button>
+        </Buttons>
       </form>
     </Modal>
-  );
-};
+  )
+}
 
-export { ChangeUsernameModal };
+export { ChangeUsernameModal }

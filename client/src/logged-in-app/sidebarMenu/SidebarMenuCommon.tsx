@@ -1,16 +1,12 @@
-import styled, { css } from "styled-components";
-import { STATIC_STYLES } from "../../shared/enums/StaticStyles";
+import styled, { css } from 'styled-components'
+import { STATIC_STYLES } from '../../shared/enums/StaticStyles'
 
 export const SidebarMenuContainer = styled.aside<{ isOpen: boolean }>`
   background: ${(props) => props.theme.primaryLight};
   overflow: hidden;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
   height: 100%;
   transition: width ${STATIC_STYLES.SIDEBAR_TRANSITION_DURATION};
-`;
+`
 
 export const SidebarMenuElement = styled.div<{ isActive?: boolean }>`
   display: flex;
@@ -35,7 +31,7 @@ export const SidebarMenuElement = styled.div<{ isActive?: boolean }>`
         background: ${(props) => props.theme.secondary};
       `}
   }
-`;
+`
 
 export const SidebarMenuElementIcon = styled.span`
   margin: 0;
@@ -46,9 +42,9 @@ export const SidebarMenuElementIcon = styled.span`
   max-width: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
   height: ${STATIC_STYLES.SIDEBAR_CLOSED_WIDTH}px;
   font-size: 16px;
-`;
+`
 
 export type SidebarMenuProps = {
-  isOpen: boolean;
-  toggle: () => void;
-};
+  isOpen: boolean
+  toggle: () => void
+}

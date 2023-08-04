@@ -77,7 +77,7 @@ export const SessionContextProvider = (props: any) => {
     if (session.isAuthenticated) {
       get<IUser>(APIRoutes.USER).then((res) => {
         if (res.status === 200) {
-          setSession({ ...session, user: res.data })
+          setSession({ ...session, user: res.data ?? undefined })
         } else {
           invalidSession()
         }
@@ -87,8 +87,8 @@ export const SessionContextProvider = (props: any) => {
   }, [session.isAuthenticated])
 
   const getEncodedSession = (): IEncodedToken | null => {
-    const tokenType = localStorage.getItem('token_type')
-    const accessToken = localStorage.getItem('access_token')
+    const tokenType = localStorage.getItem('token_type') ?? undefined
+    const accessToken = localStorage.getItem('access_token') ?? undefined
     if (tokenType !== undefined && accessToken !== undefined) {
       return {
         access_token: accessToken,
@@ -104,7 +104,7 @@ export const SessionContextProvider = (props: any) => {
     localStorage.setItem('access_token', encodedToken.access_token)
     setSession({
       isAuthenticated: true,
-      user: null,
+      user: undefined,
       isLoading: false,
     })
   }

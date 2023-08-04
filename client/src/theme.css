@@ -4,32 +4,45 @@
 
 @layer base {
   @font-face {
-    font-family: "AtkinsonHyperlegible";
+    font-family: 'AtkinsonHyperlegible';
     font-weight: 400;
-    src: url("./fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");
+    src: url('./fonts/AtkinsonHyperlegible-Regular.ttf') format('truetype');
   }
 
   @font-face {
-    font-family: "AtkinsonHyperlegible";
+    font-family: 'AtkinsonHyperlegible';
     font-weight: 400;
     font-style: italic;
-    src: url("./fonts/AtkinsonHyperlegible-Italic.ttf") format("truetype");
+    src: url('./fonts/AtkinsonHyperlegible-Italic.ttf') format('truetype');
   }
 
   @font-face {
-    font-family: "AtkinsonHyperlegible";
+    font-family: 'AtkinsonHyperlegible';
     font-weight: 700;
-    src: url("./fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");
+    src: url('./fonts/AtkinsonHyperlegible-Bold.ttf') format('truetype');
   }
 
   @font-face {
-    font-family: "AtkinsonHyperlegible";
+    font-family: 'AtkinsonHyperlegible';
     font-weight: 700;
     font-style: italic;
-    src: url("./fonts/AtkinsonHyperlegible-BoldItalic.ttf") format("truetype");
+    src: url('./fonts/AtkinsonHyperlegible-BoldItalic.ttf') format('truetype');
   }
 
   :root {
+    --black-a1: hsla(0, 0%, 0%, 0.012);
+    --black-a2: hsla(0, 0%, 0%, 0.027);
+    --black-a3: hsla(0, 0%, 0%, 0.047);
+    --black-a4: hsla(0, 0%, 0%, 0.071);
+    --black-a5: hsla(0, 0%, 0%, 0.09);
+    --black-a6: hsla(0, 0%, 0%, 0.114);
+    --black-a7: hsla(0, 0%, 0%, 0.141);
+    --black-a8: hsla(0, 0%, 0%, 0.22);
+    --black-a9: hsla(0, 0%, 0%, 0.439);
+    --black-a10: hsla(0, 0%, 0%, 0.478);
+    --black-a11: hsla(0, 0%, 0%, 0.565);
+    --black-a12: hsla(0, 0%, 0%, 0.91);
+
     --black: hsl(214, 24%, 0%);
     --grey-light: hsl(0, 0%, 84%);
     --grey: hsl(0, 0%, 64%);

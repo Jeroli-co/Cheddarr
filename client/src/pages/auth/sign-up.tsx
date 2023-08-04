@@ -1,33 +1,26 @@
-import { faKey, faSignInAlt, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faKey, faUser } from '@fortawesome/free-solid-svg-icons'
 import { useForm } from 'react-hook-form'
 import { FORM_DEFAULT_VALIDATOR } from '../../shared/enums/FormDefaultValidators'
 import { useAuthentication } from '../../shared/contexts/AuthenticationContext'
-import { PrimaryDivider } from '../../shared/components/Divider'
+import { NewDivider } from '../../shared/components/Divider'
 import { usePlexAuth } from '../../shared/contexts/PlexAuthContext'
 import { Input } from '../../elements/Input'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import Layout from './layout'
-import { routes } from '../../routes'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useNavigate } from 'react-router'
 import { Title } from '../../elements/Title'
 import { Button } from '../../elements/button/Button'
+import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+
+export const usernameValidator = z
+  .string({ required_error: 'New username required' })
+  .min(3, { message: 'Min 3 characters long' })
+  .max(20, { message: 'Max 20 character long' })
+  .regex(/^[a-zA-Z0-9]+$/)
 
 const signUpSchema = z
   .object({
-    username: z
-      .string({ required_error: 'Username required' })
-      .trim()
-      .min(FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value, {
-        message: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.message,
-      })
-      .max(FORM_DEFAULT_VALIDATOR.MAX_LENGTH.value, {
-        message: FORM_DEFAULT_VALIDATOR.MAX_LENGTH.message,
-      })
-      .regex(FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.value, {
-        message: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message,
-      }),
+    username: usernameValidator,
     password: z
       .string({ required_error: 'Password required' })
       .trim()
@@ -49,6 +42,8 @@ export default () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
+    watch,
   } = useForm<SignUpFormData>({
     mode: 'onSubmit',
     resolver: zodResolver(signUpSchema),
@@ -60,76 +55,124 @@ export default () => {
   })
   const { signUp } = useAuthentication()
   const { signInWithPlex } = usePlexAuth()
-  const navigate = useNavigate()
 
-  const onSubmit = handleSubmit((data) => {
-    signUp(data)
+  const [isPasswordDisplayed, setIsPasswordDisplayed] = useState(false)
+
+  const watchUsername = watch('username')
+
+  const onSubmit = handleSubmit(async (data) => {
+    const res = await signUp(data)
+    const { status } = res
+    if (status === 409) {
+      setError('username', {
+        type: 'manual',
+        message: 'Username already taken',
+      })
+    }
   })
 
+  const validateUsername = () => {
+    const parsed = usernameValidator.safeParse(watchUsername)
+    if (!parsed.success) return
+    else setIsPasswordDisplayed(true)
+  }
+
+  const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      !isPasswordDisplayed ? validateUsername() : onSubmit()
+    }
+  }
+
+  useEffect(() => {
+    if (errors.username) {
+      setIsPasswordDisplayed(false)
+    }
+  }, [errors.username])
+
   return (
-    <Layout>
-      <img src="/assets/cheddarr.svg" alt="logo" className="mb-14" />
+    <>
+      <img src="/assets/cheddarr.svg" alt="logo" className="mb-8" />
 
       <Title as="h1" variant="center">
-        Create your account
+        {!isPasswordDisplayed ? 'Hi, Who are you ?' : `Welcome ${watchUsername} !`}
       </Title>
+
+      {isPasswordDisplayed && (
+        <Title as="h2" variant="center">
+          Create your password
+        </Title>
+      )}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-8">
         <div className="space-y-3">
-          <Input
-            icon={faUser}
-            label="Username"
-            type="text"
-            placeholder="Username"
-            error={errors.username?.message}
-            {...register('username')}
-          />
+          {!isPasswordDisplayed && (
+            <Input
+              icon={faUser}
+              label="Username"
+              type="text"
+              placeholder="Username"
+              error={errors.username?.message}
+              onKeyDown={handleKeydown}
+              {...register('username')}
+            />
+          )}
 
-          <Input
-            icon={faKey}
-            label="Password"
-            type="password"
-            placeholder="Strong password"
-            error={errors.password?.message}
-            {...register('password')}
-          />
+          {isPasswordDisplayed && (
+            <>
+              <Input
+                icon={faKey}
+                label="Password"
+                type="password"
+                placeholder="Strong password"
+                error={errors.password?.message}
+                onKeyDown={handleKeydown}
+                {...register('password')}
+              />
 
-          <Input
-            icon={faKey}
-            label="Confirm password"
-            type="password"
-            placeholder="Confirm password"
-            error={errors.passwordConfirmation?.message}
-            {...register('passwordConfirmation')}
-          />
+              <Input
+                icon={faKey}
+                label="Confirm password"
+                type="password"
+                placeholder="Confirm password"
+                error={errors.passwordConfirmation?.message}
+                onKeyDown={handleKeydown}
+                {...register('passwordConfirmation')}
+              />
+            </>
+          )}
         </div>
 
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <p>Already have an account ?</p>
-            <Button
-              color="secondary"
-              onClick={() => navigate(routes.SIGN_IN.url(), { replace: true })}
-            >
-              <FontAwesomeIcon icon={faSignInAlt} />
-              <span>Sign in</span>
+        <div className="flex items-center gap-3 justify-center md:justify-between">
+          <div className="flex items-center gap-2">
+            <p className="hidden md:block">Already have an account ?</p>
+            <Button variant="link" asChild>
+              <Link to="/auth/sign-in" replace>
+                Sign in
+              </Link>
             </Button>
           </div>
 
-          <Button type="submit">Sign up</Button>
+          {!isPasswordDisplayed && (
+            <Button type="button" onClick={() => validateUsername()}>
+              Next
+            </Button>
+          )}
+          {isPasswordDisplayed && <Button type="submit">Sign up</Button>}
         </div>
 
-        <PrimaryDivider />
+        <NewDivider />
 
-        <Title as="h2" variant="center">
-          Authentication provider
-        </Title>
+        <div className="flex flex-col items-center">
+          <Title as="h2" variant="center">
+            Authentication provider
+          </Title>
 
-        <Button color="plex" className="place-self-center" onClick={() => signInWithPlex()}>
-          <img className="w-6 h-auto" src="/assets/plex.png" alt="Plex logo" />
-          Sign up with plex
-        </Button>
+          <Button color="plex" className="place-self-center" onClick={() => signInWithPlex()}>
+            <img className="w-6 h-auto" src="/assets/plex.png" alt="Plex logo" />
+            Sign up with plex
+          </Button>
+        </div>
       </form>
-    </Layout>
+    </>
   )
 }

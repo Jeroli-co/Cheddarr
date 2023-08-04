@@ -1,149 +1,95 @@
-import React from "react";
-import { faKey } from "@fortawesome/free-solid-svg-icons";
-import { useForm } from "react-hook-form";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../shared/enums/FormDefaultValidators";
+import { faKey } from '@fortawesome/free-solid-svg-icons'
+import { useForm } from 'react-hook-form'
+import { Button } from '../../../../shared/components/Button'
+import { Modal } from '../../../../shared/components/layout/Modal'
+import { H2 } from '../../../../shared/components/Titles'
+import { Input } from '../../../../elements/Input'
+import { useAlert } from '../../../../shared/contexts/AlertContext'
+import { useQueryClient } from 'react-query'
 import {
-  IChangePasswordModel,
-  useUserService,
-} from "../../../../shared/toRefactor/useUserService";
-import { Button, PrimaryButton } from "../../../../shared/components/Button";
-import { Modal } from "../../../../shared/components/layout/Modal";
-import { Buttons } from "../../../../shared/components/layout/Buttons";
-import { H2 } from "../../../../shared/components/Titles";
-import { Input } from "../../../../elements/Input";
-import { Icon } from "../../../../shared/components/Icon";
-import { HelpDanger } from "../../../../shared/components/Help";
-import { useAlert } from "../../../../shared/contexts/AlertContext";
+  ResetPasswordFormData,
+  resetPasswordSchema,
+} from '../../../../components/ResetPasswordForm'
+import { zodResolver } from '@hookform/resolvers/zod'
+import httpClient from '../../../../http-client'
+import { IUser } from '../../../../shared/models/IUser'
 
 type ChangePasswordModalProps = {
-  closeModal: () => void;
-  id: number;
-};
+  id: number
+  closeModal: () => void
+}
 
-const ChangePasswordModal = (props: ChangePasswordModalProps) => {
-  const { register, handleSubmit, errors, watch } =
-    useForm<IChangePasswordModel>();
-  const { updateUserById } = useUserService();
-  const { pushSuccess, pushDanger } = useAlert();
+const ChangePasswordModal = ({ id, closeModal }: ChangePasswordModalProps) => {
+  const queryClient = useQueryClient()
+  const { pushSuccess, pushDanger } = useAlert()
 
-  const onSubmit = (data: IChangePasswordModel) => {
-    updateUserById(props.id, { ...data }).then((res) => {
-      if (res.status === 200) {
-        pushSuccess("Password changed");
-        props.closeModal();
-      } else {
-        pushDanger("Cannot update password");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ResetPasswordFormData>({
+    mode: 'onSubmit',
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      newPasswordConfirmation: '',
+    },
+  })
+
+  const onSubmit = handleSubmit((data: ResetPasswordFormData) => {
+    return httpClient.patch<IUser>(`/users${id}`, data).then((res) => {
+      if (res.status !== 200) {
+        pushDanger('Cannot change password')
+        return
       }
-    });
-  };
+
+      pushSuccess('Password updated')
+      queryClient.invalidateQueries(['user'])
+
+      closeModal()
+    })
+  })
 
   return (
-    <Modal close={props.closeModal}>
+    <Modal close={closeModal}>
       <header>
         <H2>Change your password</H2>
       </header>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <section>
-          {/* OLD PASSWORD */}
-          <Input withIcon>
-            <label>Old password</label>
-            <div className="with-left-icon">
-              <input
-                name="oldPassword"
-                type="password"
-                placeholder={"Enter your old password"}
-                ref={register({
-                  required: true,
-                  pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
-                })}
-              />
-              <span className="icon">
-                <Icon icon={faKey} />
-              </span>
-            </div>
-          </Input>
-          {errors["oldPassword"] &&
-            errors["oldPassword"].type === "required" && (
-              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-            )}
-          {errors["oldPassword"] &&
-            errors["oldPassword"].type === "pattern" && (
-              <HelpDanger>
-                {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
-              </HelpDanger>
-            )}
 
-          {/* NEW PASSWORD */}
-          <Input withIcon>
-            <label>New password</label>
-            <div className="with-left-icon">
-              <input
-                name="newPassword"
-                type="password"
-                placeholder="Enter a strong password"
-                ref={register({
-                  required: true,
-                  pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
-                })}
-              />
-              <span className="icon">
-                <Icon icon={faKey} />
-              </span>
-            </div>
-          </Input>
-          {errors["newPassword"] &&
-            errors["newPassword"].type === "required" && (
-              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-            )}
-          {errors["newPassword"] &&
-            errors["newPassword"].type === "pattern" && (
-              <HelpDanger>
-                {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
-              </HelpDanger>
-            )}
+      <form onSubmit={onSubmit}>
+        {/* NEW PASSWORD */}
+        <Input
+          icon={faKey}
+          label="Old password"
+          type="password"
+          placeholder="Enter your current password"
+          error={errors.oldPassword?.message}
+          {...register('oldPassword')}
+        />
 
-          {/* CONFIRM NEW PASSWORD */}
-          <Input withIcon>
-            <label>Confirm new password</label>
-            <div className="with-left-icon">
-              <input
-                name="passwordConfirmation"
-                type="password"
-                placeholder="Confirm your new password"
-                ref={register({
-                  required: true,
-                  validate: (value) => {
-                    return value === watch("newPassword");
-                  },
-                })}
-              />
-              <span className="icon">
-                <Icon icon={faKey} />
-              </span>
-            </div>
-          </Input>
-          {errors.passwordConfirmation &&
-            errors.passwordConfirmation.type === "required" && (
-              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-            )}
-          {errors.passwordConfirmation &&
-            errors.passwordConfirmation.type === "validate" && (
-              <HelpDanger>
-                {FORM_DEFAULT_VALIDATOR.WATCH_PASSWORD.message}
-              </HelpDanger>
-            )}
-        </section>
-        <footer>
-          <Buttons>
-            <PrimaryButton type="submit">Change password</PrimaryButton>
-            <Button type="button" onClick={() => props.closeModal()}>
-              Cancel
-            </Button>
-          </Buttons>
-        </footer>
+        <Input
+          icon={faKey}
+          label="New password"
+          type="password"
+          placeholder="Enter your new password"
+          error={errors.newPassword?.message}
+          {...register('newPassword')}
+        />
+
+        <Input
+          icon={faKey}
+          label="Password confirmation"
+          type="password"
+          placeholder="Confirm your new password"
+          error={errors.newPasswordConfirmation?.message}
+          {...register('newPasswordConfirmation')}
+        />
+
+        <Button type="submit">Reset password</Button>
       </form>
     </Modal>
-  );
-};
+  )
+}
 
-export { ChangePasswordModal };
+export { ChangePasswordModal }
