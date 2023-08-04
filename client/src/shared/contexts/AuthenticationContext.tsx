@@ -1,75 +1,73 @@
-import { createContext, useContext } from "react";
-import { useNavigate } from "react-router";
-import { useAPI } from "../hooks/useAPI";
-import { useSession } from "./SessionContext";
-import { IEncodedToken } from "../models/IEncodedToken";
-import { useAlert } from "./AlertContext";
-import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
-import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
-import { APIRoutes } from "../enums/APIRoutes";
-import { SignUpFormData } from "../../pages/auth/sign-up";
-import { SignInFormData } from "../../pages/auth/sign-in";
-import { routes } from "../../routes";
+import { createContext, useContext } from 'react'
+import { useNavigate } from 'react-router'
+import { useAPI } from '../hooks/useAPI'
+import { useSession } from './SessionContext'
+import { IEncodedToken } from '../models/IEncodedToken'
+import { useAlert } from './AlertContext'
+import { ERRORS_MESSAGE } from '../enums/ErrorsMessage'
+import { DefaultAsyncCall, IAsyncCall } from '../models/IAsyncCall'
+import { APIRoutes } from '../enums/APIRoutes'
+import { SignUpFormData } from '../../pages/auth/sign-up'
+import { SignInFormData } from '../../pages/auth/sign-in'
+import { routes } from '../../routes'
 
 interface IAuthenticationContextInterface {
-  readonly signUp: (
-    data: SignUpFormData,
-  ) => Promise<IAsyncCall | IAsyncCall<null>>;
+  readonly signUp: (data: SignUpFormData) => Promise<IAsyncCall | IAsyncCall<null>>
   readonly signIn: (
     data: SignInFormData,
-    redirectURI?: string,
-  ) => Promise<IAsyncCall | IAsyncCall<null>>;
+    redirectURI?: string
+  ) => Promise<IAsyncCall | IAsyncCall<null>>
 }
 
 const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
   signUp(_: SignUpFormData): Promise<IAsyncCall | IAsyncCall<null>> {
-    return Promise.resolve(DefaultAsyncCall);
+    return Promise.resolve(DefaultAsyncCall)
   },
   signIn(): Promise<IAsyncCall | IAsyncCall<null>> {
-    return Promise.resolve(DefaultAsyncCall);
+    return Promise.resolve(DefaultAsyncCall)
   },
-};
+}
 
 const AuthenticationContext = createContext<IAuthenticationContextInterface>(
-  AuthenticationContextDefaultImpl,
-);
+  AuthenticationContextDefaultImpl
+)
 
 export default function AuthenticationContextProvider(props: any) {
-  const navigate = useNavigate();
-  const { post } = useAPI();
-  const { initSession } = useSession();
-  const { pushSuccess, pushDanger } = useAlert();
+  const navigate = useNavigate()
+  const { post } = useAPI()
+  const { initSession } = useSession()
+  const { pushSuccess, pushDanger } = useAlert()
 
   const signUp = async (data: SignUpFormData) => {
-    const res = await post<IEncodedToken>(APIRoutes.SIGN_UP, data);
+    const res = await post<IEncodedToken>(APIRoutes.SIGN_UP, data)
     if (res.status === 201) {
-      pushSuccess("Account created");
-      navigate("/");
+      pushSuccess('Account created')
+      navigate('/')
       if (res.data) {
-        initSession(res.data);
+        initSession(res.data)
       }
     }
-    return res;
-  };
+    return res
+  }
 
   const signIn = async (data: SignInFormData, redirectURI?: string) => {
-    const fd = new FormData();
-    fd.append("username", data.username);
-    fd.append("password", data.password);
-    const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, fd);
+    const fd = new FormData()
+    fd.append('username', data.username)
+    fd.append('password', data.password)
+    const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, fd)
     if (res.data && res.status === 200) {
-      console.log(res.data);
-      initSession(res.data);
-      navigate(redirectURI ?? routes.HOME.url, { replace: true });
+      console.log(res.data)
+      initSession(res.data)
+      navigate(redirectURI ?? routes.HOME.url, { replace: true })
     } else if (res.status === 401) {
-      pushDanger("Wrong credentials");
+      pushDanger('Wrong credentials')
     } else if (res.status === 400) {
-      pushDanger("Account needs to be confirmed");
+      pushDanger('Account needs to be confirmed')
     } else {
-      pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
+      pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status))
     }
-    return res;
-  };
+    return res
+  }
 
   return (
     <AuthenticationContext.Provider
@@ -80,7 +78,7 @@ export default function AuthenticationContextProvider(props: any) {
     >
       {props.children}
     </AuthenticationContext.Provider>
-  );
+  )
 }
 
-export const useAuthentication = () => useContext(AuthenticationContext);
+export const useAuthentication = () => useContext(AuthenticationContext)

@@ -1,28 +1,23 @@
-import React, { useState } from "react";
-import { ISonarrConfig } from "../../../../../shared/models/ISonarrConfig";
-import { EditSonarrSettingsModal } from "./EditSonarrSettingsModal";
-import { ItemBox } from "../../../../../shared/components/ItemBox";
-import { isEmpty } from "../../../../../utils/strings";
+import { useState } from 'react'
+import { EditSonarrSettingsModal } from './EditSonarrSettingsModal'
+import { ItemBox } from '../../../../../shared/components/ItemBox'
+import { isEmpty } from '../../../../../utils/strings'
+import { SonarrSettings } from '../../../../../components/SonarrSettingsForm'
 
 type SonarrSettingsBoxPreviewProps = {
-  sonarrConfig: ISonarrConfig;
-};
+  data: SonarrSettings
+}
 
-export const SonarrSettingsBoxPreview = (
-  props: SonarrSettingsBoxPreviewProps
-) => {
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+export const SonarrSettingsBoxPreview = ({ data }: SonarrSettingsBoxPreviewProps) => {
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   return (
     <>
       <ItemBox onClick={() => setIsSettingsModalOpen(true)}>
-        {isEmpty(props.sonarrConfig.name) ? "Sonarr" : props.sonarrConfig.name}
+        {isEmpty(data.name) ? 'Sonarr' : data.name}
       </ItemBox>
       {isSettingsModalOpen && (
-        <EditSonarrSettingsModal
-          closeModal={() => setIsSettingsModalOpen(false)}
-          sonarrConfig={props.sonarrConfig}
-        />
+        <EditSonarrSettingsModal closeModal={() => setIsSettingsModalOpen(false)} data={data} />
       )}
     </>
-  );
-};
+  )
+}

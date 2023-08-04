@@ -1,45 +1,18 @@
-import { IMedia } from "../shared/models/IMedia";
-import { Slider } from "../elements/Slider";
-import { MediaPreviewCard } from "../shared/components/media/MediaPreviewCard";
-import { Title } from "../elements/Title";
-import { useAPI } from "../shared/hooks/useAPI";
-import { useQuery } from "react-query";
-import hoursToMilliseconds from "date-fns/hoursToMilliseconds";
-import { IPaginated } from "../shared/models/IPaginated";
-
-const useData = (url: string) => {
-  const { get } = useAPI();
-
-  const fetchData = () => {
-    return get<IPaginated<IMedia>>(url + "?page=1").then((res) => {
-      if (res.status === 200 && res.data) {
-        return res.data;
-      } else {
-        return undefined;
-      }
-    });
-  };
-
-  const { data, isLoading } = useQuery<IPaginated<IMedia>>([url], fetchData, {
-    staleTime: hoursToMilliseconds(24),
-  });
-
-  return {
-    data,
-    isLoading,
-  };
-};
+import { IMedia } from '../shared/models/IMedia'
+import { Slider } from '../elements/Slider'
+import { MediaPreviewCard } from '../shared/components/media/MediaPreviewCard'
+import { Title } from '../elements/Title'
+import { IPaginated } from '../shared/models/IPaginated'
+import { Spinner } from '../shared/components/Spinner'
 
 type MediaSliderProps = {
-  title: string;
-  url: string;
-  hasToGetFullMedia?: boolean;
-};
+  title: string
+  data?: IPaginated<IMedia>
+  isLoading?: boolean
+}
 
-export const MediaSlider = ({ title, url }: MediaSliderProps) => {
-  const { data } = useData(url);
-
-  if (!data?.results) return undefined;
+export const MediaSlider = ({ title, data, isLoading }: MediaSliderProps) => {
+  if (!data?.results) return <p>No results to show</p>
 
   return (
     <Slider
@@ -71,9 +44,8 @@ export const MediaSlider = ({ title, url }: MediaSliderProps) => {
         },
       }}
     >
-      {data?.results.map((m, index) => (
-        <MediaPreviewCard key={index} media={m} />
-      ))}
+      {isLoading && <Spinner />}
+      {!isLoading && data?.results.map((m, index) => <MediaPreviewCard key={index} media={m} />)}
     </Slider>
-  );
-};
+  )
+}

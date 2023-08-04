@@ -1,28 +1,28 @@
-import * as React from "react";
-import { cva, VariantProps } from "class-variance-authority";
-import { cn } from "../utils/strings";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import * as React from 'react'
+import { cva, VariantProps } from 'class-variance-authority'
+import { cn } from '../utils/strings'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { IconProp } from '@fortawesome/fontawesome-svg-core'
 
 const inputVariants = cva(
-  "w-full p-3 border border-primary rounded bg-primary-dark opacity-70 focus:opacity-100 outline-none",
-);
+  'w-full p-3 border border-primary rounded bg-primary-dark opacity-70 focus:opacity-100 outline-none'
+)
 
-type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> &
+type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> &
   VariantProps<typeof inputVariants> & {
-    label?: string;
-    type?: "text" | "password" | "email" | "number" | "search";
-    icon?: IconProp;
-    error?: string;
-  };
+    label?: string | React.ReactNode
+    type?: 'text' | 'password' | 'email' | 'number' | 'search'
+    icon?: IconProp
+    error?: string
+  }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, disabled, label, icon, error, ...props }, ref) => {
     return (
       <div className="space-y-1">
-        {label && <label>{label}</label>}
+        {label && typeof label === 'string' ? <label>{label}</label> : label}
 
-        <div className={cn(icon && "relative")}>
+        <div className={cn(icon && 'relative')}>
           {icon && (
             <FontAwesomeIcon
               icon={icon}
@@ -33,8 +33,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             className={cn(
               inputVariants({ className }),
-              disabled && "opacity-50 pointer-events-none",
-              icon && "pl-10",
+              disabled && 'opacity-50 pointer-events-none',
+              icon && 'pl-10'
             )}
             {...props}
           />
@@ -42,6 +42,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         {error && <div className="text-sm text-danger-light">{error}</div>}
       </div>
-    );
-  },
-);
+    )
+  }
+)

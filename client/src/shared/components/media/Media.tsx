@@ -1,47 +1,48 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
-import styled from "styled-components";
-import { IMedia, isMovie, isOnServers, isSeries } from "../../models/IMedia";
-import { H1, H2 } from "../Titles";
-import { minToHoursMinutes } from "../../../utils/media-utils";
-import { MediaRating } from "./MediaRating";
-import { MediaTag, SuccessTag, Tag } from "../Tag";
-import { MediaPersonCarousel } from "./MediaPersonCarousel";
-import { PlayButton, PrimaryLinkButton } from "../Button";
-import { STATIC_STYLES } from "../../enums/StaticStyles";
-import { PrimaryDivider } from "../Divider";
-import { Row } from "../layout/Row";
-import { Icon } from "../Icon";
-import { faFilm } from "@fortawesome/free-solid-svg-icons";
-import { Buttons } from "../layout/Buttons";
-import { MediaSlider } from "../../../components/MediaSlider";
-import { APIRoutes } from "../../enums/APIRoutes";
-import { useImage } from "../../hooks/useImage";
-import { Image } from "../Image";
-import { RequestButton } from "../requests/RequestButton";
+import { useEffect, useState } from 'react'
+import styled from 'styled-components'
+import { IMedia, isMovie, isOnServers, isSeries } from '../../models/IMedia'
+import { H1, H2 } from '../Titles'
+import { minToHoursMinutes } from '../../../utils/media-utils'
+import { MediaRating } from './MediaRating'
+import { MediaTag, SuccessTag, Tag } from '../Tag'
+import { MediaPersonCarousel } from './MediaPersonCarousel'
+import { PlayButton, PrimaryLinkButton } from '../Button'
+import { STATIC_STYLES } from '../../enums/StaticStyles'
+import { PrimaryDivider } from '../Divider'
+import { Row } from '../layout/Row'
+import { Icon } from '../Icon'
+import { faFilm } from '@fortawesome/free-solid-svg-icons'
+import { Buttons } from '../layout/Buttons'
+import { MediaSlider } from '../../../components/MediaSlider'
+import { useImage } from '../../hooks/useImage'
+import { Image } from '../Image'
+import { RequestButton } from '../requests/RequestButton'
+import { Spinner } from '../Spinner'
+import {
+  useRecommendedMovies,
+  useRecommendedSeries,
+  useSimilarMovies,
+  useSimilarSeries,
+} from '../../../hooks/useMedia'
 
 const BackgroundContainer = styled.div`
   position: relative;
   z-index: 0;
-`;
+`
 
 const Background = styled.div<{ image: string }>`
   position: absolute;
   top: 0;
   bottom: 0;
   width: 100%;
-  background-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0),
-      ${(props) => props.theme.primary}
-    ),
-    url("${(props) => props.image}");
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), ${(props) => props.theme.primary}),
+    url('${(props) => props.image}');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
   opacity: 0.2;
   z-index: -1;
-`;
+`
 
 const MediaHeader = styled.div`
   display: flex;
@@ -63,7 +64,7 @@ const MediaHeader = styled.div`
     flex-direction: column;
     align-items: center;
   }
-`;
+`
 
 const MediaHeaderInfo = styled.div`
   flex-grow: 3;
@@ -73,7 +74,7 @@ const MediaHeaderInfo = styled.div`
     justify-content: center;
     text-align: center;
   }
-`;
+`
 
 const MediaHeaderTags = styled.div`
   display: flex;
@@ -82,7 +83,7 @@ const MediaHeaderTags = styled.div`
   @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
     justify-content: center;
   }
-`;
+`
 
 const MediaHeaderSubInfo = styled.div`
   display: flex;
@@ -101,7 +102,7 @@ const MediaHeaderSubInfo = styled.div`
       display: none;
     }
   }
-`;
+`
 
 const MediaHeaderTitle = styled(H1)`
   font-weight: bold;
@@ -115,12 +116,12 @@ const MediaHeaderTitle = styled(H1)`
       display: none;
     }
   }
-`;
+`
 
 const MediaCrewInfo = styled.div`
   display: flex;
   flex-wrap: wrap;
-`;
+`
 
 const Bubble = styled.div`
   margin-top: 40px;
@@ -129,99 +130,110 @@ const Bubble = styled.div`
   @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
     width: 50%;
   }
-`;
+`
+
+const RecommendedMoviesSlider = ({ id }: { id: string }) => {
+  const { data, isLoading } = useRecommendedMovies(id)
+  return <MediaSlider title="Recommended" data={data} isLoading={isLoading} />
+}
+
+const RecommendedSeriesSlider = ({ id }: { id: string }) => {
+  const { data, isLoading } = useRecommendedSeries(id)
+  return <MediaSlider title="Recommended" data={data} isLoading={isLoading} />
+}
+
+const SimilarMoviesSlider = ({ id }: { id: string }) => {
+  const { data, isLoading } = useSimilarMovies(id)
+  return <MediaSlider title="Similar" data={data} isLoading={isLoading} />
+}
+
+const SimilarSeriesSlider = ({ id }: { id: string }) => {
+  const { data, isLoading } = useSimilarSeries(id)
+  return <MediaSlider title="Similar" data={data} isLoading={isLoading} />
+}
 
 type MediaProps = {
-  media: IMedia;
-  mediaRef?: any;
-};
+  data?: IMedia
+  mediaRef?: any
+  isLoading?: boolean
+}
 
-export const Media = (props: MediaProps) => {
-  const [studio, setStudio] = useState<string | null>(null);
-  const [directors, setDirectors] = useState<string[] | null>(null);
-  const [producers, setProducers] = useState<string[] | null>(null);
-  const [screenplay, setScreenplay] = useState<string[] | null>(null);
-  const poster = useImage(props.media.posterUrl);
+export const Media = ({ data, isLoading, mediaRef }: MediaProps) => {
+  const [studio, setStudio] = useState<string | null>(null)
+  const [directors, setDirectors] = useState<string[] | null>(null)
+  const [producers, setProducers] = useState<string[] | null>(null)
+  const [screenplay, setScreenplay] = useState<string[] | null>(null)
+  const poster = useImage(data?.posterUrl)
 
   useEffect(() => {
-    const directorsTmp: string[] = [];
-    const producersTmp: string[] = [];
-    const screenplayTmp: string[] = [];
-    if (props.media.studios && props.media.studios.length > 0) {
-      setStudio(props.media.studios[0].name);
+    const directorsTmp: string[] = []
+    const producersTmp: string[] = []
+    const screenplayTmp: string[] = []
+
+    if (data?.studios && data?.studios.length > 0) {
+      setStudio(data?.studios[0].name)
     }
-    if (props.media.credits && props.media.credits.crew) {
-      props.media.credits.crew.forEach((p) => {
-        if (p.role === "Director") {
-          directorsTmp.push(p.name);
-        } else if (p.role === "Producer") {
-          producersTmp.push(p.name);
-        } else if (p.role === "Screenplay") {
-          screenplayTmp.push(p.name);
+    if (data?.credits && data?.credits.crew) {
+      data?.credits.crew.forEach((p) => {
+        if (p.role === 'Director') {
+          directorsTmp.push(p.name)
+        } else if (p.role === 'Producer') {
+          producersTmp.push(p.name)
+        } else if (p.role === 'Screenplay') {
+          screenplayTmp.push(p.name)
         }
-      });
+      })
     }
-    setDirectors(directorsTmp);
-    setProducers(producersTmp);
-    setScreenplay(screenplayTmp);
-  }, [props.media]);
+    setDirectors(directorsTmp)
+    setProducers(producersTmp)
+    setScreenplay(screenplayTmp)
+  }, [data])
+
+  if (isLoading) return <Spinner />
 
   return (
-    <span ref={props.mediaRef}>
+    <span ref={mediaRef}>
       <BackgroundContainer>
-        {props.media.artUrl && <Background image={props.media.artUrl} />}
+        {data?.artUrl && <Background image={data?.artUrl} />}
         <MediaHeader>
           <span>
-            <Image
-              src={props.media.posterUrl}
-              loaded={poster.loaded}
-              alt="poster"
-              borderRadius="12px"
-            />
+            <Image src={data?.posterUrl} loaded={poster.loaded} alt="poster" borderRadius="12px" />
           </span>
           <span>
             <MediaHeaderInfo>
               <MediaHeaderTags>
-                <MediaTag media={props.media} />
-                {props.media.status && <Tag>{props.media.status}</Tag>}
-                {props.media.mediaServersInfo &&
-                  props.media.mediaServersInfo.length > 0 && (
-                    <SuccessTag>Available</SuccessTag>
-                  )}
+                <MediaTag media={data} />
+                {data?.status && <Tag>{data?.status}</Tag>}
+                {data?.mediaServersInfo && data?.mediaServersInfo.length > 0 && (
+                  <SuccessTag>Available</SuccessTag>
+                )}
               </MediaHeaderTags>
               <br />
               <MediaHeaderTitle>
-                {props.media.title + " "}
-                {props.media.releaseDate && (
-                  <span className="media-title-release-date">
-                    ({props.media.releaseDate})
-                  </span>
+                {data?.title + ' '}
+                {data?.releaseDate && (
+                  <span className="media-title-release-date">({data?.releaseDate})</span>
                 )}
               </MediaHeaderTitle>
               <MediaHeaderSubInfo>
-                {props.media.releaseDate && (
+                {data?.releaseDate && (
                   <>
-                    <p>{props.media.releaseDate}</p>
-                    {(props.media.duration || props.media.genres) && (
-                      <p className="pipe-separator">|</p>
-                    )}
+                    <p>{data?.releaseDate}</p>
+                    {(data?.duration || data?.genres) && <p className="pipe-separator">|</p>}
                   </>
                 )}
-                {props.media.duration && (
+                {data?.duration && (
                   <>
-                    <p>{minToHoursMinutes(props.media.duration)}</p>
-                    {props.media.genres && <p className="pipe-separator">|</p>}
+                    <p>{minToHoursMinutes(data?.duration)}</p>
+                    {data?.genres && <p className="pipe-separator">|</p>}
                   </>
                 )}
                 <p>
-                  {props.media.genres &&
-                    props.media.genres.map((genre, index) => (
+                  {data?.genres &&
+                    data?.genres.map((genre, index) => (
                       <span key={index}>
                         {genre.name}
-                        {props.media.genres &&
-                        index !== props.media.genres.length - 1
-                          ? ", "
-                          : ""}
+                        {data?.genres && index !== data?.genres.length - 1 ? ', ' : ''}
                       </span>
                     ))}
                 </p>
@@ -229,11 +241,11 @@ export const Media = (props: MediaProps) => {
               <br />
               <Row alignItems="center" wrap="nowrap">
                 <Row alignItems="center" wrap="nowrap">
-                  <MediaRating media={props.media} />
-                  {props.media.trailers && props.media.trailers.length > 0 && (
+                  <MediaRating data={data} />
+                  {data?.trailers && data?.trailers.length > 0 && (
                     <Buttons>
                       <PrimaryLinkButton
-                        href={props.media.trailers[0].videoUrl}
+                        href={data?.trailers[0].videoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -245,22 +257,15 @@ export const Media = (props: MediaProps) => {
                     </Buttons>
                   )}
                 </Row>
-                <Row
-                  justifyContent="flex-end"
-                  alignItems="center"
-                  wrap="nowrap"
-                >
+                <Row justifyContent="flex-end" alignItems="center" wrap="nowrap">
                   <Buttons>
-                    {((isMovie(props.media) && !isOnServers(props.media)) ||
-                      isSeries(props.media)) && (
-                      <RequestButton media={props.media} />
+                    {((isMovie(data) && !isOnServers(data)) || isSeries(data)) && (
+                      <RequestButton media={data} />
                     )}
-                    {props.media.mediaServersInfo &&
-                      props.media.mediaServersInfo.length > 0 &&
-                      props.media.mediaServersInfo[0].webUrl && (
-                        <PlayButton
-                          webUrl={props.media.mediaServersInfo[0].webUrl}
-                        />
+                    {data?.mediaServersInfo &&
+                      data?.mediaServersInfo.length > 0 &&
+                      data?.mediaServersInfo[0].webUrl && (
+                        <PlayButton webUrl={data?.mediaServersInfo[0].webUrl} />
                       )}
                   </Buttons>
                 </Row>
@@ -268,10 +273,10 @@ export const Media = (props: MediaProps) => {
             </MediaHeaderInfo>
           </span>
         </MediaHeader>
-        {props.media.summary && (
+        {data?.summary && (
           <>
             <H2>Overview</H2>
-            <p>{props.media.summary}</p>
+            <p>{data?.summary}</p>
           </>
         )}
       </BackgroundContainer>
@@ -309,47 +314,23 @@ export const Media = (props: MediaProps) => {
         )}
       </MediaCrewInfo>
 
-      {props.media.credits &&
-        props.media.credits.cast &&
-        props.media.credits.cast.length > 0 && (
-          <>
-            <PrimaryDivider />
-            <MediaPersonCarousel
-              title="Actors"
-              personList={props.media.credits.cast}
-            />
-          </>
-        )}
-
-      <PrimaryDivider />
-
-      {isMovie(props.media) && (
-        <MediaSlider
-          title="Recommended"
-          url={APIRoutes.GET_RECOMMENDED_MOVIES(props.media.tmdbId)}
-        />
-      )}
-      {isSeries(props.media) && (
-        <MediaSlider
-          title="Recommended"
-          url={APIRoutes.GET_RECOMMENDED_SERIES(props.media.tmdbId)}
-        />
+      {data?.credits && data?.credits.cast && data?.credits.cast.length > 0 && (
+        <>
+          <PrimaryDivider />
+          <MediaPersonCarousel title="Actors" personList={data?.credits.cast} />
+        </>
       )}
 
       <PrimaryDivider />
 
-      {isMovie(props.media) && (
-        <MediaSlider
-          title="Similar"
-          url={APIRoutes.GET_SIMILAR_MOVIES(props.media.tmdbId)}
-        />
-      )}
-      {isSeries(props.media) && (
-        <MediaSlider
-          title="Similar"
-          url={APIRoutes.GET_SIMILAR_SERIES(props.media.tmdbId)}
-        />
-      )}
+      {isMovie(data) && <RecommendedMoviesSlider id={data?.tmdbId} />}
+
+      {isSeries(data) && <RecommendedSeriesSlider id={data?.tmdbId} />}
+
+      <PrimaryDivider />
+
+      {isMovie(data) && <SimilarMoviesSlider id={data?.tmdbId} />}
+      {isSeries(data) && <SimilarSeriesSlider id={data?.tmdbId} />}
     </span>
-  );
-};
+  )
+}

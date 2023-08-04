@@ -1,43 +1,31 @@
-import { useEffect, useState } from "react";
-import { useAPI } from "./useAPI";
-import { useAlert } from "../contexts/AlertContext";
-import { IConfig } from "../models/IConfig";
-import { APIRoutes } from "../enums/APIRoutes";
-import { ERRORS_MESSAGE } from "../enums/ErrorsMessage";
-import { DefaultAsyncCall, IAsyncCall } from "../models/IAsyncCall";
+import { useAPI } from './useAPI'
+import { useAlert } from '../contexts/AlertContext'
+import { IConfig } from '../models/IConfig'
+import { APIRoutes } from '../enums/APIRoutes'
+import { useData } from '../../hooks/useData'
+import { useQueryClient } from 'react-query'
 
 export const useConfig = () => {
-  const [config, setConfig] = useState<IAsyncCall<IConfig | null>>(
-    DefaultAsyncCall
-  );
-  const { get, patch } = useAPI();
-  const { pushDanger } = useAlert();
+  const queryClient = useQueryClient()
+  const { patch } = useAPI()
+  const { pushDanger, pushSuccess } = useAlert()
 
-  useEffect(() => {
-    get<IConfig>(APIRoutes.CONFIG).then((res) => {
-      if (res.status === 200) {
-        setConfig(res);
-      } else {
-        pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(res.status));
-      }
-    });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { data } = useData<IConfig>(['system', 'config'], '/system/config')
 
   const updateConfig = (payload: Partial<IConfig>) => {
     return patch<IConfig>(APIRoutes.CONFIG, payload).then((res) => {
-      if (res.status === 200) {
-        setConfig(res);
-      } else {
-        pushDanger("Cannot update config");
+      if (res.status !== 200) {
+        pushDanger('Cannot update config')
+        return
       }
-      return res;
-    });
-  };
+
+      pushSuccess('Config updated')
+      queryClient.invalidateQueries(['system', 'config'])
+    })
+  }
 
   return {
-    config,
+    config: data,
     updateConfig,
-  };
-};
+  }
+}

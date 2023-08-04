@@ -1,10 +1,7 @@
-import React from "react";
-import styled from "styled-components";
-import {
-  getColorRating,
-  getRatingPercentage,
-} from "../../../utils/media-utils";
-import { IMedia } from "../../models/IMedia";
+import React from 'react'
+import styled from 'styled-components'
+import { getColorRating, getRatingPercentage } from '../../../utils/media-utils'
+import { IMedia } from '../../models/IMedia'
 
 const Container = styled.div<{ backgroundColor: string }>`
   display: flex;
@@ -14,7 +11,7 @@ const Container = styled.div<{ backgroundColor: string }>`
   width: 60px;
   height: 60px;
   background-color: ${(props) => props.backgroundColor};
-`;
+`
 
 const RatingValue = styled.div`
   display: flex;
@@ -24,26 +21,24 @@ const RatingValue = styled.div`
   width: 50px;
   height: 50px;
   background-color: ${(props) => props.theme.primary};
-`;
+`
 
 type MediaRatingProps = {
-  media: IMedia;
-};
+  data?: IMedia
+}
 
-const MediaRating = ({ media }: MediaRatingProps) => {
-  if (!media || !media.rating) return <div />;
+const MediaRating = ({ data }: MediaRatingProps) => {
+  if (!data?.rating) return undefined
 
   return (
     <Container
       data-tooltip="MediaRating"
-      style={{ cursor: "default" }}
-      backgroundColor={getColorRating(getRatingPercentage(media.rating))}
+      style={{ cursor: 'default' }}
+      backgroundColor={getColorRating(getRatingPercentage(data.rating))}
     >
-      <RatingValue className="">
-        {getRatingPercentage(media.rating) + "%"}
-      </RatingValue>
+      <RatingValue className="">{getRatingPercentage(data.rating) + '%'}</RatingValue>
     </Container>
-  );
-};
+  )
+}
 
-export { MediaRating };
+export { MediaRating }

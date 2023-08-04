@@ -1,23 +1,20 @@
-import { useState } from "react";
-import { Buttons } from "../../shared/components/layout/Buttons";
-import {
-  DangerIconButton,
-  PrimaryIconButton,
-} from "../../shared/components/Button";
-import { Icon } from "../../shared/components/Icon";
-import { faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { IUser } from "../../shared/models/IUser";
-import { usePagination } from "../../shared/hooks/usePagination";
-import { APIRoutes } from "../../shared/enums/APIRoutes";
-import { Spinner } from "../../shared/components/Spinner";
-import styled from "styled-components";
-import { useUserService } from "../../shared/toRefactor/useUserService";
-import { PaginationArrows } from "../../shared/components/PaginationArrows";
-import { DeleteDataModal } from "../../shared/components/DeleteDataModal";
-import { useSession } from "../../shared/contexts/SessionContext";
-import { useNavigate } from "react-router-dom";
-import { routes } from "../../routes";
-import { UserSmallCard } from "../../shared/components/UserSmallCard";
+import { useState } from 'react'
+import { Buttons } from '../../shared/components/layout/Buttons'
+import { DangerIconButton, PrimaryIconButton } from '../../shared/components/Button'
+import { Icon } from '../../shared/components/Icon'
+import { faEdit, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { IUser } from '../../shared/models/IUser'
+import { usePagination } from '../../hooks/usePagination'
+import { APIRoutes } from '../../shared/enums/APIRoutes'
+import { Spinner } from '../../shared/components/Spinner'
+import styled from 'styled-components'
+import { useUserService } from '../../shared/toRefactor/useUserService'
+import { PaginationArrows } from '../../shared/components/PaginationArrows'
+import { DeleteDataModal } from '../../shared/components/DeleteDataModal'
+import { useSession } from '../../shared/contexts/SessionContext'
+import { useNavigate } from 'react-router-dom'
+import { routes } from '../../routes'
+import { UserSmallCard } from '../../shared/components/UserSmallCard'
 
 const Header = styled.div`
   background: ${(props) => props.theme.primaryLight};
@@ -42,11 +39,11 @@ const Header = styled.div`
       justify-content: flex-end;
     }
   }
-`;
+`
 
 const Container = styled.div`
   background: ${(props) => props.theme.primary};
-`;
+`
 
 const Item = styled.div`
   display: flex;
@@ -67,45 +64,42 @@ const Item = styled.div`
       justify-content: flex-end;
     }
   }
-`;
+`
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const { deleteUser } = useUserService();
+  const { deleteUser } = useUserService()
   const {
     session: { user },
-  } = useSession();
-  const navigate = useNavigate();
+  } = useSession()
+  const navigate = useNavigate()
 
   const [deleteUserModalState, setDeleteUserModalState] = useState<{
-    isOpen: boolean;
-    user: IUser | null;
-  }>({ isOpen: false, user: null });
+    isOpen: boolean
+    user: IUser | null
+  }>({ isOpen: false, user: null })
 
-  const { data, loadPrev, loadNext, deleteData } = usePagination<IUser>(
-    APIRoutes.USERS(true),
-    true,
-  );
+  const { data, loadPrev, loadNext, deleteData } = usePagination<IUser>(APIRoutes.USERS(true), true)
 
   const onUserEditClick = (clickedUser: IUser) => {
-    navigate(routes.PROFILE.url(clickedUser.id.toString(10)));
+    navigate(routes.PROFILE.url(clickedUser.id.toString(10)))
     // setEditUserModalState({ isOpen: true, user: user });
-  };
+  }
 
   const onDeleteUserClick = (clickedUser: IUser) => {
-    setDeleteUserModalState({ isOpen: true, user: clickedUser });
-  };
+    setDeleteUserModalState({ isOpen: true, user: clickedUser })
+  }
 
   const onDeleteUser = (id: number) => {
     deleteUser(id).then((res) => {
       if (res.status === 200) {
-        deleteData((u) => u.id === id);
-        setDeleteUserModalState({ isOpen: false, user: null });
+        deleteData((u) => u.id === id)
+        setDeleteUserModalState({ isOpen: false, user: null })
       }
-    });
-  };
+    })
+  }
 
-  if (data.isLoading) return <Spinner />;
+  if (data.isLoading) return <Spinner />
 
   return (
     <>
@@ -145,19 +139,13 @@ export default () => {
       )}
       {deleteUserModalState.isOpen && deleteUserModalState.user && (
         <DeleteDataModal
-          closeModal={() =>
-            setDeleteUserModalState({ isOpen: false, user: null })
-          }
-          actionLabel={"Confirm"}
-          action={() =>
-            onDeleteUser(
-              deleteUserModalState.user ? deleteUserModalState.user.id : -1,
-            )
-          }
+          closeModal={() => setDeleteUserModalState({ isOpen: false, user: null })}
+          actionLabel={'Confirm'}
+          action={() => onDeleteUser(deleteUserModalState.user ? deleteUserModalState.user.id : -1)}
           title={`Are you sure you want to delete ${deleteUserModalState.user.username}`}
           description={`This operation will delete all information about the user ${deleteUserModalState.user.username} from this Cheddarr instance.`}
         />
       )}
     </>
-  );
-};
+  )
+}

@@ -1,128 +1,129 @@
-import React, { useEffect } from "react";
-import { useFormContext } from "react-hook-form";
-import {
-  faAt,
-  faEnvelope,
-  faKey,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import { IEmailConfig } from "../../../../../shared/models/IEmailConfig";
-import { INotificationsConfig } from "../../../../../shared/models/INotificationsConfig";
-import { Row } from "../../../../../shared/components/layout/Row";
-import { Input } from "../../../../../elements/Input";
-import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
-import { Icon } from "../../../../../shared/components/Icon";
+import { useForm } from 'react-hook-form'
+import { Input } from '../../../../../elements/Input'
+import { Checkbox } from '../../../../../elements/checkbox/Checkbox'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import httpClient from '../../../../../http-client'
+import { useAlert } from '../../../../../shared/contexts/AlertContext'
+import { useQueryClient } from 'react-query'
+import { Button } from '../../../../../elements/button/Button'
+
+const postEmailSettingsSchema = z.object({
+  enabled: z.boolean(),
+  smtpHost: z.string({ required_error: 'SMTP host is required' }).trim(),
+  smtpPort: z.number().int().min(1).max(65535),
+  smtpUser: z.string({ required_error: 'SMTP user is required' }).trim(),
+  smtpPassword: z.string({ required_error: 'SMTP password is required' }).trim(),
+  senderAddress: z.string({ required_error: 'Sender address is required' }).email().trim(),
+  senderName: z.string({ required_error: 'Sender name is required' }).trim(),
+  ssl: z.boolean(),
+})
+
+type PostEmailSettingsFormData = z.infer<typeof postEmailSettingsSchema>
+
+export type EmailSettings = PostEmailSettingsFormData & {
+  id: string
+}
 
 type EmailSettingsFormProps = {
-  config: INotificationsConfig | null;
-};
+  defaultSettings?: EmailSettings
+}
 
-export const EmailSettingsForm = (props: EmailSettingsFormProps) => {
-  const { register, reset } = useFormContext<IEmailConfig>();
+export const EmailSettingsForm = ({ defaultSettings }: EmailSettingsFormProps) => {
+  const queryClient = useQueryClient()
+  const { pushSuccess, pushDanger } = useAlert()
 
-  useEffect(() => {
-    if (props.config) {
-      reset({ enabled: props.config.enabled, ...props.config.settings });
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<PostEmailSettingsFormData>({
+    mode: 'onSubmit',
+    resolver: zodResolver(postEmailSettingsSchema),
+    defaultValues: { ...defaultSettings },
+  })
+
+  const deleteSettings = () => {
+    if (!defaultSettings) return
+
+    httpClient.delete(`/notifications/agents/email/${defaultSettings?.id}`).then((res) => {
+      if (res.status !== 200) {
+        pushDanger('Cannot delete configuration')
+        return
+      }
+
+      pushSuccess('Configuration deleted')
+      queryClient.invalidateQueries(['notifications/agents', 'email'])
+    })
+  }
+
+  const onSubmit = handleSubmit((data) => {
+    const settings = {
+      enabled: data.enabled,
+      settings: { ...data },
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return httpClient
+      .put<{ enabled: boolean; settings: PostEmailSettingsFormData }>(
+        '/notifications/agents/email',
+        settings
+      )
+      .then((res) => {
+        if (res.status !== 200) {
+          pushDanger('Failed to save SMTP Server config')
+          return
+        }
+
+        pushSuccess('SMTP Server config saved')
+        queryClient.invalidateQueries(['notifications/agents', 'email'])
+      })
+  })
 
   return (
-    <>
-      <Input isInline>
-        <label>Enabled</label>
-        <Checkbox name="enabled" register={register} />
-      </Input>
-
-      <Row justifyContent="space-between" alignItems="center">
-        <Input withIcon width="49%">
-          <label>Hostname</label>
-          <div className="with-left-icon">
-            <input
-              name="smtpHost"
-              type="text"
-              ref={register}
-              placeholder="Hostname"
-            />
-            <span className="icon">
-              <Icon icon={faAt} />
-            </span>
-          </div>
-        </Input>
-
-        <Input width="49%">
-          <label>Port</label>
-          <input
-            name="smtpPort"
-            type="number"
-            placeholder="Port"
-            ref={register({ minLength: 3, maxLength: 5 })}
-            maxLength={65535}
-          />
-        </Input>
-      </Row>
-
-      <Input withIcon>
-        <label>Username</label>
-        <div className="with-left-icon">
-          <input
-            name="smtpUser"
-            type="text"
-            ref={register}
-            placeholder="Username"
-          />
-          <span className="icon">
-            <Icon icon={faUser} />
-          </span>
-        </div>
-      </Input>
-
-      <Input withIcon>
-        <label>Password</label>
-        <div className="with-left-icon">
-          <input
-            name="smtpPassword"
-            type="password"
-            ref={register}
-            placeholder="Password"
-          />
-          <span className="icon">
-            <Icon icon={faKey} />
-          </span>
-        </div>
-      </Input>
-
-      <Input withIcon>
-        <label>Sender address</label>
-        <div className="with-left-icon">
-          <input
-            name="senderAddress"
-            type="email"
-            ref={register}
-            placeholder="Email"
-          />
-          <span className="icon">
-            <Icon icon={faEnvelope} />
-          </span>
-        </div>
-      </Input>
-
-      <Input>
-        <label>Sender name</label>
-        <input
-          name="senderName"
-          type="text"
-          ref={register}
-          placeholder="Sender name"
-        />
-      </Input>
-
-      <br />
-
-      <Input isInline={true}>
-        <label>SSL</label>
-        <Checkbox name="ssl" register={register} round />
-      </Input>
-    </>
-  );
-};
+    <form onSubmit={onSubmit}>
+      <Checkbox label="Enabled" {...register('enabled')} />
+      <Input
+        label="Hostname"
+        type="text"
+        error={errors.smtpHost?.message}
+        {...register('smtpHost')}
+      />
+      <Input
+        label="Port"
+        type="number"
+        error={errors.smtpPort?.message}
+        {...register('smtpPort')}
+      />
+      <Input
+        label="Username"
+        type="text"
+        error={errors.smtpUser?.message}
+        {...register('smtpUser')}
+      />
+      <Input
+        label="Password"
+        type="password"
+        error={errors.smtpPassword?.message}
+        {...register('smtpPassword')}
+      />
+      <Input
+        label="Sender address"
+        type="email"
+        error={errors.senderAddress?.message}
+        {...register('senderAddress')}
+      />
+      <Input
+        label="Sender name"
+        type="text"
+        error={errors.senderName?.message}
+        {...register('senderName')}
+      />
+      <Checkbox label="SSL" {...register('ssl')} />
+      {defaultSettings && (
+        <Button type="button" onClick={() => deleteSettings()}>
+          Delete
+        </Button>
+      )}
+      <Button type="submit">Save</Button>{' '}
+    </form>
+  )
+}

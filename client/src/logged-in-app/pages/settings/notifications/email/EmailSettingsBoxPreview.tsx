@@ -1,26 +1,21 @@
-import React, { useState } from "react";
-import { ItemBox } from "../../../../../shared/components/ItemBox";
-import { EditEmailSettingsModal } from "./EditEmailSettingsModal";
-import { INotificationsConfig } from "../../../../../shared/models/INotificationsConfig";
+import { useState } from 'react'
+import { ItemBox } from '../../../../../shared/components/ItemBox'
+import { EditEmailSettingsModal } from './EditEmailSettingsModal'
+import { EmailSettings } from './EmailSettingsForm'
 
 type EmailSettingsBoxPreviewProps = {
-  emailConfig: INotificationsConfig;
-};
+  data: EmailSettings
+}
 
-export const EmailSettingsBoxPreview = (
-  props: EmailSettingsBoxPreviewProps
-) => {
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+export const EmailSettingsBoxPreview = ({ data }: EmailSettingsBoxPreviewProps) => {
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
 
   return (
     <>
       <ItemBox onClick={() => setIsSettingsModalOpen(true)}>Email</ItemBox>
       {isSettingsModalOpen && (
-        <EditEmailSettingsModal
-          closeModal={() => setIsSettingsModalOpen(false)}
-          emailConfig={props.emailConfig}
-        />
+        <EditEmailSettingsModal closeModal={() => setIsSettingsModalOpen(false)} data={data} />
       )}
     </>
-  );
-};
+  )
+}

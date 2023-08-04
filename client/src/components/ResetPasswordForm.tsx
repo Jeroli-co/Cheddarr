@@ -1,116 +1,103 @@
-import React from "react";
-import { faKey } from "@fortawesome/free-solid-svg-icons";
-import { useForm } from "react-hook-form";
-import { FORM_DEFAULT_VALIDATOR } from "../shared/enums/FormDefaultValidators";
-import { useAPI } from "../shared/hooks/useAPI";
-import { APIRoutes } from "../shared/enums/APIRoutes";
-import { useAlert } from "../shared/contexts/AlertContext";
-import { PrimaryButton } from "../shared/components/Button";
-import { Icon } from "../shared/components/Icon";
-import { HelpDanger } from "../shared/components/Help";
-import { Input } from "../elements/Input";
+import React from 'react'
+import { faKey } from '@fortawesome/free-solid-svg-icons'
+import { useForm } from 'react-hook-form'
+import { FORM_DEFAULT_VALIDATOR } from '../shared/enums/FormDefaultValidators'
+import { useAPI } from '../shared/hooks/useAPI'
+import { APIRoutes } from '../shared/enums/APIRoutes'
+import { useAlert } from '../shared/contexts/AlertContext'
+import { Input } from '../elements/Input'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Button } from '../elements/button/Button'
+
+const resetPasswordSchema = z
+  .object({
+    oldPassword: z.string({ required_error: 'Old password required' }).trim(),
+    newPassword: z
+      .string({ required_error: 'New password required' })
+      .trim()
+      .regex(FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value, {
+        message: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message,
+      }),
+    newPasswordConfirmation: z.string({ required_error: 'Confirmation required' }).trim(),
+  })
+  .refine((data) => data.newPassword === data.newPasswordConfirmation, {
+    message: "Passwords don't match",
+    path: ['newPasswordConfirmation'],
+  })
+
+type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
 
 type ResetPasswordFormProps = {
-  token: string;
-};
-
-export interface IResetPasswordFormData {
-  oldPassword: string;
-  newPassword: string;
-  passwordConfirmation: string;
+  token: string
 }
 
 const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
-  const { register, handleSubmit, errors, watch } =
-    useForm<IResetPasswordFormData>();
-  const { post } = useAPI();
-  const { pushSuccess, pushDanger } = useAlert();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ResetPasswordFormData>({
+    mode: 'onSubmit',
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      newPasswordConfirmation: '',
+    },
+  })
+  const { post } = useAPI()
+  const { pushSuccess, pushDanger } = useAlert()
 
   const onSubmit = handleSubmit((data) => {
     post(APIRoutes.RESET_PASSWORD(token), data).then((res) => {
       if (res.status === 204) {
-        pushSuccess("Password has been reset");
+        pushSuccess('Password has been reset')
       } else {
-        pushDanger("Cannot reset password");
+        pushDanger('Cannot reset password')
       }
-    });
-  });
+    })
+  })
 
   return (
     <div>
       <div className="columns is-mobile is-centered">
         <div className="column is-one-third">
-          <form
-            id="reset-password-form"
-            className="PasswordForm"
-            onSubmit={onSubmit}
-          >
+          <form id="reset-password-form" className="PasswordForm" onSubmit={onSubmit}>
             {/* NEW PASSWORD */}
-            <Input withIcon>
-              <label className="label">New password</label>
-              <div className="with-icon-left">
-                <input
-                  name="password"
-                  type="password"
-                  placeholder="Enter a strong password"
-                  ref={register({
-                    required: true,
-                    pattern: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value,
-                  })}
-                />
-                <span className="icon">
-                  <Icon icon={faKey} />
-                </span>
-              </div>
-            </Input>
-            {errors.newPassword && errors.newPassword.type === "required" && (
-              <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-            )}
-            {errors.newPassword && errors.newPassword.type === "pattern" && (
-              <HelpDanger>
-                {FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message}
-              </HelpDanger>
-            )}
+            <Input
+              icon={faKey}
+              label="Old password"
+              type="password"
+              placeholder="Enter your current password"
+              error={errors.oldPassword?.message}
+              {...register('oldPassword')}
+            />
 
-            {/* CONFIRM NEW PASSWORD */}
-            <Input>
-              <label className="label">Confirm new password</label>
-              <div className="with-icon-left">
-                <input
-                  name="password-confirmation"
-                  type="password"
-                  placeholder="Enter the same password"
-                  ref={register({
-                    required: true,
-                    validate: (value) => {
-                      return value === watch("password");
-                    },
-                  })}
-                />
-                <span className="icon">
-                  <Icon icon={faKey} />
-                </span>
-              </div>
-            </Input>
-            {errors.passwordConfirmation &&
-              errors.passwordConfirmation.type === "required" && (
-                <HelpDanger>
-                  {FORM_DEFAULT_VALIDATOR.REQUIRED.message}
-                </HelpDanger>
-              )}
-            {errors.passwordConfirmation &&
-              errors.passwordConfirmation.type === "validate" && (
-                <HelpDanger>
-                  {FORM_DEFAULT_VALIDATOR.WATCH_PASSWORD.message}
-                </HelpDanger>
-              )}
+            <Input
+              icon={faKey}
+              label="New password"
+              type="password"
+              placeholder="Enter your new password"
+              error={errors.newPassword?.message}
+              {...register('newPassword')}
+            />
 
-            <PrimaryButton type="submit">Reset password</PrimaryButton>
+            <Input
+              icon={faKey}
+              label="Password confirmation"
+              type="password"
+              placeholder="Confirm your new password"
+              error={errors.newPasswordConfirmation?.message}
+              {...register('newPasswordConfirmation')}
+            />
+
+            <Button type="submit">Reset password</Button>
           </form>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export { ResetPasswordForm };
+export { ResetPasswordForm }

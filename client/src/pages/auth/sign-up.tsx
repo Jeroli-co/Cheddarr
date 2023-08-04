@@ -1,23 +1,23 @@
-import { faKey, faSignInAlt, faUser } from "@fortawesome/free-solid-svg-icons";
-import { useForm } from "react-hook-form";
-import { FORM_DEFAULT_VALIDATOR } from "../../../shared/enums/FormDefaultValidators";
-import { useAuthentication } from "../../../shared/contexts/AuthenticationContext";
-import { PrimaryDivider } from "../../../shared/components/Divider";
-import { usePlexAuth } from "../../../shared/contexts/PlexAuthContext";
-import { Input } from "../../../elements/Input";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Layout from "../layout";
-import { routes } from "../../../routes";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate } from "react-router";
-import { Title } from "../../../elements/Title";
-import { Button } from "../../../elements/button/Button";
+import { faKey, faSignInAlt, faUser } from '@fortawesome/free-solid-svg-icons'
+import { useForm } from 'react-hook-form'
+import { FORM_DEFAULT_VALIDATOR } from '../../shared/enums/FormDefaultValidators'
+import { useAuthentication } from '../../shared/contexts/AuthenticationContext'
+import { PrimaryDivider } from '../../shared/components/Divider'
+import { usePlexAuth } from '../../shared/contexts/PlexAuthContext'
+import { Input } from '../../elements/Input'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Layout from './layout'
+import { routes } from '../../routes'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useNavigate } from 'react-router'
+import { Title } from '../../elements/Title'
+import { Button } from '../../elements/button/Button'
 
 const signUpSchema = z
   .object({
     username: z
-      .string({ required_error: "Username required" })
+      .string({ required_error: 'Username required' })
       .trim()
       .min(FORM_DEFAULT_VALIDATOR.MIN_LENGTH.value, {
         message: FORM_DEFAULT_VALIDATOR.MIN_LENGTH.message,
@@ -29,21 +29,19 @@ const signUpSchema = z
         message: FORM_DEFAULT_VALIDATOR.USERNAME_PATTERN.message,
       }),
     password: z
-      .string({ required_error: "Password required" })
+      .string({ required_error: 'Password required' })
       .trim()
       .regex(FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.value, {
         message: FORM_DEFAULT_VALIDATOR.PASSWORD_PATTERN.message,
       }),
-    passwordConfirmation: z
-      .string({ required_error: "Confirmation required" })
-      .trim(),
+    passwordConfirmation: z.string({ required_error: 'Confirmation required' }).trim(),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
     message: "Passwords don't match",
-    path: ["passwordConfirmation"],
-  });
+    path: ['passwordConfirmation'],
+  })
 
-export type SignUpFormData = z.infer<typeof signUpSchema>;
+export type SignUpFormData = z.infer<typeof signUpSchema>
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
@@ -52,21 +50,21 @@ export default () => {
     handleSubmit,
     formState: { errors },
   } = useForm<SignUpFormData>({
-    mode: "onSubmit",
+    mode: 'onSubmit',
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      username: "",
-      password: "",
-      passwordConfirmation: "",
+      username: '',
+      password: '',
+      passwordConfirmation: '',
     },
-  });
-  const { signUp } = useAuthentication();
-  const { signInWithPlex } = usePlexAuth();
-  const navigate = useNavigate();
+  })
+  const { signUp } = useAuthentication()
+  const { signInWithPlex } = usePlexAuth()
+  const navigate = useNavigate()
 
   const onSubmit = handleSubmit((data) => {
-    signUp(data);
-  });
+    signUp(data)
+  })
 
   return (
     <Layout>
@@ -84,7 +82,7 @@ export default () => {
             type="text"
             placeholder="Username"
             error={errors.username?.message}
-            {...register("username")}
+            {...register('username')}
           />
 
           <Input
@@ -93,7 +91,7 @@ export default () => {
             type="password"
             placeholder="Strong password"
             error={errors.password?.message}
-            {...register("password")}
+            {...register('password')}
           />
 
           <Input
@@ -102,7 +100,7 @@ export default () => {
             type="password"
             placeholder="Confirm password"
             error={errors.passwordConfirmation?.message}
-            {...register("passwordConfirmation")}
+            {...register('passwordConfirmation')}
           />
         </div>
 
@@ -127,15 +125,11 @@ export default () => {
           Authentication provider
         </Title>
 
-        <Button
-          color="plex"
-          className="place-self-center"
-          onClick={() => signInWithPlex()}
-        >
+        <Button color="plex" className="place-self-center" onClick={() => signInWithPlex()}>
           <img className="w-6 h-auto" src="/assets/plex.png" alt="Plex logo" />
           Sign up with plex
         </Button>
       </form>
     </Layout>
-  );
-};
+  )
+}

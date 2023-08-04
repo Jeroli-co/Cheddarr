@@ -1,29 +1,24 @@
-import React, { useState } from "react";
-import { IRadarrConfig } from "../../../../../shared/models/IRadarrConfig";
-import { EditRadarrSettingsModal } from "./EditRadarrSettingsModal";
-import { ItemBox } from "../../../../../shared/components/ItemBox";
-import { isEmpty } from "../../../../../utils/strings";
+import { useState } from 'react'
+import { EditRadarrSettingsModal } from './EditRadarrSettingsModal'
+import { ItemBox } from '../../../../../shared/components/ItemBox'
+import { isEmpty } from '../../../../../utils/strings'
+import { RadarrSettings } from '../../../../../components/RadarrSettingsForm'
 
 type RadarrSettingsBoxPreviewProps = {
-  radarrConfig: IRadarrConfig;
-};
+  data: RadarrSettings
+}
 
-export const RadarrSettingsBoxPreview = (
-  props: RadarrSettingsBoxPreviewProps
-) => {
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+export const RadarrSettingsBoxPreview = ({ data }: RadarrSettingsBoxPreviewProps) => {
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
 
   return (
     <>
       <ItemBox onClick={() => setIsSettingsModalOpen(true)}>
-        {isEmpty(props.radarrConfig.name) ? "Radarr" : props.radarrConfig.name}
+        {isEmpty(data.name) ? 'Radarr' : data.name}
       </ItemBox>
       {isSettingsModalOpen && (
-        <EditRadarrSettingsModal
-          closeModal={() => setIsSettingsModalOpen(false)}
-          radarrConfig={props.radarrConfig}
-        />
+        <EditRadarrSettingsModal closeModal={() => setIsSettingsModalOpen(false)} data={data} />
       )}
     </>
-  );
-};
+  )
+}

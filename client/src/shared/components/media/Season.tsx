@@ -1,34 +1,34 @@
-import { useEffect, useRef } from "react";
-import { useSeason } from "../../../hooks/useSeason";
-import { Media } from "./Media";
-import { Spinner } from "../Spinner";
-import { H2 } from "../Titles";
-import { Row } from "../layout/Row";
-import { MediaPreviewCard } from "./MediaPreviewCard";
-import { Episode } from "../../../components/Episode";
+import { useEffect, useRef } from 'react'
+import { Media } from './Media'
+import { Spinner } from '../Spinner'
+import { H2 } from '../Titles'
+import { Row } from '../layout/Row'
+import { MediaPreviewCard } from './MediaPreviewCard'
+import { Episode } from '../../../components/Episode'
+import { useSeason } from '../../../hooks/useMedia'
 
 type SeasonProps = {
-  seriesId: string;
-  seasonNumber: number;
-  episodeNumber?: number;
-};
+  seriesId: string
+  seasonNumber: number
+  episodeNumber?: number
+}
 
 export const Season = (props: SeasonProps) => {
-  const { data, isLoading } = useSeason(props.seriesId, props.seasonNumber);
-  const seasonRef = useRef<HTMLSpanElement>(null);
+  const { data, isLoading } = useSeason(props.seriesId, props.seasonNumber)
+  const seasonRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     if (seasonRef.current) {
       seasonRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "nearest",
-      });
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      })
     }
-  }, [data]);
+  }, [data])
 
   if (isLoading) {
-    return <Spinner />;
+    return <Spinner />
   }
 
   return (
@@ -52,5 +52,5 @@ export const Season = (props: SeasonProps) => {
         </>
       )}
     </>
-  );
-};
+  )
+}

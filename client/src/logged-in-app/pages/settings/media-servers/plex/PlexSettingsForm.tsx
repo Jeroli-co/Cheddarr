@@ -1,151 +1,149 @@
-import React, { useEffect, useState } from "react";
-import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
-import { useFormContext } from "react-hook-form";
-import { IMediaServerConfig } from "../../../../../shared/models/IMediaServerConfig";
-import { FORM_DEFAULT_VALIDATOR } from "../../../../../shared/enums/FormDefaultValidators";
-import { Checkbox } from "../../../../../shared/components/forms/inputs/Checkbox";
-import { Input } from "../../../../../elements/Input";
-import { Help, HelpDanger } from "../../../../../shared/components/Help";
-import { Icon } from "../../../../../shared/components/Icon";
-import { isEmpty } from "../../../../../utils/strings";
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Input } from '../../../../../elements/Input'
+import { providerBaseSettingsSchema } from '../../../../../components/RadarrSettingsForm'
+import { z } from 'zod'
+import { Checkbox } from '../../../../../elements/checkbox/Checkbox'
+import httpClient from '../../../../../http-client'
+import { useAlert } from '../../../../../shared/contexts/AlertContext'
+import { useQueryClient } from 'react-query'
+import { Button } from '../../../../../elements/button/Button'
+
+// type PlexServerLibrary = {
+//   libraryId: number
+//   name: string
+//   enabled: boolean
+// }
+
+const postPlexSettingsSchema = providerBaseSettingsSchema.merge(
+  z.object({
+    serverName: z.string({ required_error: 'Server name is required' }).trim(),
+    serverId: z.string({ required_error: 'Server ID is required' }).trim(),
+    libraries: z.array(z.number()),
+  })
+)
+
+type PostPlexSettingsFormData = z.infer<typeof postPlexSettingsSchema>
+
+export type PlexSettings = PostPlexSettingsFormData & {
+  id: string
+}
 
 type PlexSettingsFormProps = {
-  config: IMediaServerConfig | null;
-};
+  defaultSettings?: PlexSettings
+}
 
-export const PlexSettingsForm = (props: PlexSettingsFormProps) => {
-  const { register, errors, reset, setValue } =
-    useFormContext<IMediaServerConfig>();
-  const [usePort, setUsePort] = useState(false);
+export const PlexSettingsForm = ({ defaultSettings }: PlexSettingsFormProps) => {
+  const queryClient = useQueryClient()
+  const { pushSuccess, pushDanger } = useAlert()
+  const [isPortNeeded, setIsPortNeeded] = useState(!!defaultSettings?.port)
 
-  useEffect(() => {
-    if (props.config) {
-      reset({
-        ...props.config,
-        name:
-          !props.config.name || isEmpty(props.config.name)
-            ? "Plex"
-            : props.config.name,
-      });
-      setUsePort(props.config.port !== null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.config]);
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<PostPlexSettingsFormData>()
 
-  useEffect(() => {
-    if (!usePort) {
-      setValue("port", "");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usePort]);
+  const deleteSettings = () => {
+    if (!defaultSettings) return
+
+    httpClient.delete(`/settings/plex/${defaultSettings.id}`).then((res) => {
+      if (res.status !== 204) {
+        pushDanger('Cannot delete config')
+        return
+      }
+
+      pushSuccess('Configuration deleted')
+      queryClient.invalidateQueries(['settings', 'plex'])
+    })
+  }
+
+  const onSubmitCreate = handleSubmit((data) => {
+    return httpClient.post<PostPlexSettingsFormData>('/settings/plex', data).then((res) => {
+      if (res.status === 409) {
+        pushDanger('Config already added')
+        return
+      }
+
+      if (res.status !== 201) {
+        pushDanger('Cannot create config')
+        return
+      }
+
+      pushSuccess('Configuration created')
+      queryClient.invalidateQueries(['settings', 'plex'])
+    })
+  })
+
+  const onSubmitEdit = handleSubmit((data) => {
+    if (!defaultSettings) return
+
+    return httpClient
+      .put<PostPlexSettingsFormData>(`/settings/plex/${defaultSettings.id}`, data)
+      .then((res) => {
+        if (res.status !== 200) {
+          pushDanger('Cannot update config')
+          return
+        }
+
+        pushSuccess('Configuration updated')
+        queryClient.invalidateQueries(['settings', 'plex'])
+      })
+  })
 
   return (
-    <>
-      {/* Config name */}
-      <Input>
-        <label>Config name</label>
-        <input
-          name="name"
-          type="text"
-          placeholder="Name"
-          defaultValue="Plex"
-          ref={register}
-        />
-      </Input>
+    <form onSubmit={defaultSettings ? onSubmitEdit : onSubmitCreate}>
+      <Input label="Config name" type="text" error={errors.name?.message} {...register('name')} />
 
-      {/* Authentication token */}
-      <Input>
-        <label>Authentication token</label>
-        <input
-          name="apiKey"
-          type="text"
-          placeholder="API Key"
-          ref={register({
-            required: true,
-          })}
-        />
-        {errors.apiKey && errors.apiKey.type === "required" && (
-          <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-        )}
-      </Input>
+      <Input
+        label="Authentication token"
+        type="text"
+        error={errors.apiKey?.message}
+        {...register('apiKey')}
+      />
 
-      {/* Hostname or IP address */}
-      <Input>
-        <label>Hostname or IP Address</label>
-        <input
-          name="host"
-          type="text"
-          placeholder="Hostname or IP"
-          ref={register({
-            required: true,
-          })}
-        />
-        {errors.host && errors.host.type === "required" && (
-          <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-        )}
-        <Help>
-          <Icon icon={faExclamationCircle} /> Change this value with your domain
-          name if you have one
-        </Help>
-      </Input>
+      <Input
+        label="Hostname or IP Address"
+        type="text"
+        error={errors.host?.message}
+        {...register('host')}
+      />
 
-      {/* PORT */}
-      <Input>
-        <label>
-          Port{" "}
-          <input
-            type="checkbox"
-            checked={usePort}
-            onChange={() => setUsePort(!usePort)}
-          />
-        </label>
-        <input
-          name="port"
-          type="number"
-          placeholder="Port"
-          ref={register({ minLength: 4, maxLength: 5 })}
-          minLength={1000}
-          maxLength={99999}
-          disabled={!usePort}
-        />
-      </Input>
+      <Input
+        label={
+          <label>
+            Port <Checkbox checked={isPortNeeded} onChange={() => setIsPortNeeded(!isPortNeeded)} />
+          </label>
+        }
+        type="number"
+        placeholder="34000"
+        error={errors.port?.message}
+        disabled={!isPortNeeded}
+        {...register('port')}
+      />
 
-      {/* SERVER ID */}
-      <Input>
-        <label>Server ID</label>
-        <input
-          name="serverId"
-          type="text"
-          placeholder="Server ID"
-          ref={register({
-            required: true,
-          })}
-        />
-        {errors.serverId && errors.serverId.type === "required" && (
-          <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-        )}
-      </Input>
+      <Input
+        label="Server ID"
+        type="text"
+        error={errors.serverId?.message}
+        {...register('serverId')}
+      />
 
-      {/* SERVER NAME */}
-      <Input>
-        <label>Server name</label>
-        <input
-          name="serverName"
-          type="text"
-          placeholder="Server name"
-          ref={register({
-            required: true,
-          })}
-        />
-        {errors.serverName && errors.serverName.type === "required" && (
-          <HelpDanger>{FORM_DEFAULT_VALIDATOR.REQUIRED.message}</HelpDanger>
-        )}
-      </Input>
+      <Input
+        label="Server name"
+        type="text"
+        error={errors.serverName?.message}
+        {...register('serverName')}
+      />
 
-      <Input>
-        <label>SSL</label>
-        <Checkbox name="ssl" register={register} round />
-      </Input>
-    </>
-  );
-};
+      <Checkbox label="SSL" {...register('ssl')} />
+
+      {defaultSettings && (
+        <Button type="button" onClick={() => deleteSettings()}>
+          Delete
+        </Button>
+      )}
+      <Button type="submit">Save</Button>
+    </form>
+  )
+}

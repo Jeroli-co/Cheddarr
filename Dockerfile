@@ -28,4 +28,3 @@ COPY cheddarr.py .
 
 EXPOSE 9090
 ENTRYPOINT ["python", "cheddarr.py", "run"]
-

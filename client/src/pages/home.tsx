@@ -1,39 +1,57 @@
-import { usePlexConfig } from "../shared/contexts/PlexConfigContext";
-import { MediaSlider } from "../components/MediaSlider";
-import { APIRoutes } from "../shared/enums/APIRoutes";
-import { MediaTypes } from "../shared/enums/MediaTypes";
+import { MediaSlider } from '../components/MediaSlider'
+import {
+  useRecentMovies,
+  useRecentSeries,
+  usePopularMovies,
+  usePopularSeries,
+  useUpcomingMovies,
+  useUpcomingSeries,
+} from '../hooks/useMedia'
+import { useData } from '../hooks/useData'
+import { PlexSettings } from '../logged-in-app/pages/settings/media-servers/plex/PlexSettingsForm'
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const { configs } = usePlexConfig();
+  const { data: plexSettings, isLoading: isPlexSettingsLoading } = useData<PlexSettings[]>(
+    ['settings', 'plex'],
+    '/settings/plex'
+  )
+
+  const { data: recentMovies, isLoading: isRecentMoviesLoading } = useRecentMovies()
+  const { data: recentSeries, isLoading: isRecentSeriesLoading } = useRecentSeries()
+  const { data: popularMovies, isLoading: isPopularMoviesLoading } = usePopularMovies()
+  const { data: popularSeries, isLoading: isPopularSeriesLoading } = usePopularSeries()
+  const { data: upcomingMovies, isLoading: isUpcomingMoviesLoading } = useUpcomingMovies()
+  const { data: upcomingSeries, isLoading: isUpcomingSeriesLoading } = useUpcomingSeries()
+
   return (
     <>
-      {!configs.isLoading && configs.data && configs.data.length > 0 && (
+      {!isPlexSettingsLoading && plexSettings?.length && (
         <>
           <MediaSlider
             title="Movies recently added"
-            url={APIRoutes.GET_MEDIA_RECENTLY_ADDED(MediaTypes.MOVIES)}
-            hasToGetFullMedia
+            data={recentMovies}
+            isLoading={isRecentMoviesLoading}
           />
           <MediaSlider
             title="Series recently added"
-            url={APIRoutes.GET_MEDIA_RECENTLY_ADDED(MediaTypes.SERIES)}
-            hasToGetFullMedia
+            data={recentSeries}
+            isLoading={isRecentSeriesLoading}
           />
         </>
       )}
-      <MediaSlider
-        title="Popular movies"
-        url={APIRoutes.GET_MEDIA_POPULAR(MediaTypes.MOVIES)}
-      />
-      <MediaSlider
-        title="Popular series"
-        url={APIRoutes.GET_MEDIA_POPULAR(MediaTypes.SERIES)}
-      />
+      <MediaSlider title="Popular movies" data={popularMovies} isLoading={isPopularMoviesLoading} />
+      <MediaSlider title="Popular series" data={popularSeries} isLoading={isPopularSeriesLoading} />
       <MediaSlider
         title="Upcoming movies"
-        url={APIRoutes.GET_MEDIA_UPCOMING(MediaTypes.MOVIES)}
+        data={upcomingMovies}
+        isLoading={isUpcomingMoviesLoading}
+      />
+      <MediaSlider
+        title="Upcoming series"
+        data={upcomingSeries}
+        isLoading={isUpcomingSeriesLoading}
       />
     </>
-  );
-};
+  )
+}
