@@ -5,7 +5,7 @@ WORKDIR /app
 COPY /client ./client
 
 # Install frontend dependencies and build
-RUN cd client && yarn install && yarn cache clean && yarn build --production
+RUN cd client && pnpm install && pnpm cache clean && pnpm build --production
 
 
 FROM python:3.11.2-slim

@@ -96,7 +96,7 @@ export default () => {
       {data?.results?.map((log, index) => <LogComponent log={log} key={index} />)}
       <PaginationArrows
         currentPage={data?.page}
-        totalPages={data?.pages}
+        totalPages={data?.totalPages}
         onLoadPrev={() => loadPrev()}
         onLoadNext={() => loadNext()}
         onLoadPage={() => {}}

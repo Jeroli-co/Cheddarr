@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { faKey, faUser } from '@fortawesome/free-solid-svg-icons'
 import { useForm } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAuthentication } from '../../shared/contexts/AuthenticationContext'
@@ -11,7 +11,6 @@ import { Title } from '../../elements/Title'
 import { Input } from '../../elements/Input'
 import { Button } from '../../elements/button/Button'
 import { InitResetPasswordModal } from '../../components/InitResetPasswordModal'
-import { Link } from 'react-router-dom'
 
 const signInSchema = z.object({
   username: z.string({ required_error: 'Username required' }).trim(),
@@ -69,6 +68,7 @@ export default () => {
             type="text"
             placeholder="Username or email"
             error={errors.username?.message}
+            autoComplete="email"
             {...register('username')}
           />
 
@@ -79,13 +79,10 @@ export default () => {
               type="password"
               placeholder="Password"
               error={errors.password?.message}
+              autoComplete="current-password"
               {...register('password')}
             />
-            <Button
-              variant="link"
-              className="place-self-start"
-              onClick={() => setIsInitPasswordModalOpen(true)}
-            >
+            <Button variant="link" className="place-self-start" onClick={() => setIsInitPasswordModalOpen(true)}>
               Forgot your password ?
             </Button>
           </div>
@@ -118,9 +115,7 @@ export default () => {
         </div>
       </form>
 
-      {isInitPasswordModalOpen && (
-        <InitResetPasswordModal closeModal={() => setIsInitPasswordModalOpen(false)} />
-      )}
+      {isInitPasswordModalOpen && <InitResetPasswordModal closeModal={() => setIsInitPasswordModalOpen(false)} />}
     </>
   )
 }

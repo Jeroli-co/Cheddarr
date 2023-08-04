@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import {
-  ProviderQualityProfile,
-  ProviderTag,
-  postMediaProviderSettingsSchema,
-} from './RadarrSettingsForm'
+import { ProviderQualityProfile, ProviderTag, postMediaProviderSettingsSchema } from './RadarrSettingsForm'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from 'react-query'
 import { useAlert } from '../shared/contexts/AlertContext'
-import httpClient from '../http-client'
+import httpClient from '../utils/http-client'
 import { Checkbox } from '../elements/checkbox/Checkbox'
 import { Input } from '../elements/Input'
 import { Button } from '../elements/button/Button'
@@ -20,7 +16,7 @@ const postSonarrSettingsSchema = postMediaProviderSettingsSchema.merge(
     animeRootFolder: z.string({ required_error: 'Anime root folder is required' }).trim(),
     animeQualityProfileId: z.string({ required_error: 'Anime quality profile is required' }).trim(),
     animeTags: z.array(z.string()),
-  })
+  }),
 )
 
 type PostSonarrSettingsFormData = z.infer<typeof postSonarrSettingsSchema>
@@ -61,17 +57,15 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
   })
 
   const testInstanceConnection = async () => {
-    httpClient
-      .post<SonarrInstanceInfo>('/settings/sonarr/instance-info', getValues())
-      .then((res) => {
-        if (res.status === 200) {
-          pushSuccess('Successful connection')
-        } else if (res.status !== 200) {
-          pushDanger('Cannot get instance info')
-        }
+    httpClient.post<SonarrInstanceInfo>('/settings/sonarr/instance-info', getValues()).then((res) => {
+      if (res.status === 200) {
+        pushSuccess('Successful connection')
+      } else if (res.status !== 200) {
+        pushDanger('Cannot get instance info')
+      }
 
-        setInstanceInfo(res.data)
-      })
+      setInstanceInfo(res.data)
+    })
   }
 
   const deleteSettings = () => {
@@ -91,17 +85,15 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
   const onSubmitEdit = handleSubmit(async (data) => {
     if (!defaultSettings) return
 
-    await httpClient
-      .put<SonarrSettings>(`/settings/sonarr${defaultSettings.id}`, data)
-      .then((res) => {
-        if (res.status !== 200) {
-          pushDanger('Cannot update configuration')
-          return undefined
-        }
+    await httpClient.put<SonarrSettings>(`/settings/sonarr${defaultSettings.id}`, data).then((res) => {
+      if (res.status !== 200) {
+        pushDanger('Cannot update configuration')
+        return undefined
+      }
 
-        pushSuccess('Configuration updated')
-        queryClient.invalidateQueries(['settings', 'sonarr'])
-      })
+      pushSuccess('Configuration updated')
+      queryClient.invalidateQueries(['settings', 'sonarr'])
+    })
   })
 
   const onSubmitCreate = handleSubmit(async (data) => {
@@ -152,12 +144,7 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
         error={errors.apiKey?.message}
       />
 
-      <Input
-        label="Hostname or IP Address"
-        type="text"
-        error={errors.host?.message}
-        {...register('host')}
-      />
+      <Input label="Hostname or IP Address" type="text" error={errors.host?.message} {...register('host')} />
 
       <Input
         label={

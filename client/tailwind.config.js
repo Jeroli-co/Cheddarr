@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     colors: {
       transparent: 'transparent',
@@ -64,6 +64,7 @@ module.exports = {
       modal: 200,
       'modal-overlay': 201,
       'modal-content': 202,
+      dropdown: 202,
     },
     extend: {
       fontFamily: {
@@ -87,5 +88,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('@headlessui/tailwindcss')({ prefix: 'hlui' })],
 }

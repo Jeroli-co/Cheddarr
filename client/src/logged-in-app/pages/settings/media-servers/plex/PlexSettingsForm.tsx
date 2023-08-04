@@ -4,7 +4,7 @@ import { Input } from '../../../../../elements/Input'
 import { providerBaseSettingsSchema } from '../../../../../components/RadarrSettingsForm'
 import { z } from 'zod'
 import { Checkbox } from '../../../../../elements/checkbox/Checkbox'
-import httpClient from '../../../../../http-client'
+import httpClient from '../../../../../utils/http-client'
 import { useAlert } from '../../../../../shared/contexts/AlertContext'
 import { useQueryClient } from 'react-query'
 import { Button } from '../../../../../elements/button/Button'
@@ -14,7 +14,7 @@ const postPlexSettingsSchema = providerBaseSettingsSchema.merge(
     serverName: z.string({ required_error: 'Server name is required' }).trim(),
     serverId: z.string({ required_error: 'Server ID is required' }).trim(),
     libraries: z.array(z.number()),
-  })
+  }),
 )
 
 type PostPlexSettingsFormData = z.infer<typeof postPlexSettingsSchema>
@@ -72,36 +72,24 @@ export const PlexSettingsForm = ({ defaultSettings }: PlexSettingsFormProps) => 
   const onSubmitEdit = handleSubmit((data) => {
     if (!defaultSettings) return
 
-    return httpClient
-      .put<PostPlexSettingsFormData>(`/settings/plex/${defaultSettings.id}`, data)
-      .then((res) => {
-        if (res.status !== 200) {
-          pushDanger('Cannot update config')
-          return
-        }
+    return httpClient.put<PostPlexSettingsFormData>(`/settings/plex/${defaultSettings.id}`, data).then((res) => {
+      if (res.status !== 200) {
+        pushDanger('Cannot update config')
+        return
+      }
 
-        pushSuccess('Configuration updated')
-        queryClient.invalidateQueries(['settings', 'plex'])
-      })
+      pushSuccess('Configuration updated')
+      queryClient.invalidateQueries(['settings', 'plex'])
+    })
   })
 
   return (
     <form onSubmit={defaultSettings ? onSubmitEdit : onSubmitCreate}>
       <Input label="Config name" type="text" error={errors.name?.message} {...register('name')} />
 
-      <Input
-        label="Authentication token"
-        type="text"
-        error={errors.apiKey?.message}
-        {...register('apiKey')}
-      />
+      <Input label="Authentication token" type="text" error={errors.apiKey?.message} {...register('apiKey')} />
 
-      <Input
-        label="Hostname or IP Address"
-        type="text"
-        error={errors.host?.message}
-        {...register('host')}
-      />
+      <Input label="Hostname or IP Address" type="text" error={errors.host?.message} {...register('host')} />
 
       <Input
         label={
@@ -116,19 +104,9 @@ export const PlexSettingsForm = ({ defaultSettings }: PlexSettingsFormProps) => 
         {...register('port')}
       />
 
-      <Input
-        label="Server ID"
-        type="text"
-        error={errors.serverId?.message}
-        {...register('serverId')}
-      />
+      <Input label="Server ID" type="text" error={errors.serverId?.message} {...register('serverId')} />
 
-      <Input
-        label="Server name"
-        type="text"
-        error={errors.serverName?.message}
-        {...register('serverName')}
-      />
+      <Input label="Server name" type="text" error={errors.serverName?.message} {...register('serverName')} />
 
       <Checkbox label="SSL" {...register('ssl')} />
 

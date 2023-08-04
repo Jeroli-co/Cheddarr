@@ -3,7 +3,7 @@ import { Input } from '../../../../../elements/Input'
 import { Checkbox } from '../../../../../elements/checkbox/Checkbox'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import httpClient from '../../../../../http-client'
+import httpClient from '../../../../../utils/http-client'
 import { useAlert } from '../../../../../shared/contexts/AlertContext'
 import { useQueryClient } from 'react-query'
 import { Button } from '../../../../../elements/button/Button'
@@ -63,10 +63,7 @@ export const EmailSettingsForm = ({ defaultSettings }: EmailSettingsFormProps) =
       settings: { ...data },
     }
     return httpClient
-      .put<{ enabled: boolean; settings: PostEmailSettingsFormData }>(
-        '/notifications/agents/email',
-        settings
-      )
+      .put<{ enabled: boolean; settings: PostEmailSettingsFormData }>('/notifications/agents/email', settings)
       .then((res) => {
         if (res.status !== 200) {
           pushDanger('Failed to save SMTP Server config')
@@ -81,42 +78,12 @@ export const EmailSettingsForm = ({ defaultSettings }: EmailSettingsFormProps) =
   return (
     <form onSubmit={onSubmit}>
       <Checkbox label="Enabled" {...register('enabled')} />
-      <Input
-        label="Hostname"
-        type="text"
-        error={errors.smtpHost?.message}
-        {...register('smtpHost')}
-      />
-      <Input
-        label="Port"
-        type="number"
-        error={errors.smtpPort?.message}
-        {...register('smtpPort')}
-      />
-      <Input
-        label="Username"
-        type="text"
-        error={errors.smtpUser?.message}
-        {...register('smtpUser')}
-      />
-      <Input
-        label="Password"
-        type="password"
-        error={errors.smtpPassword?.message}
-        {...register('smtpPassword')}
-      />
-      <Input
-        label="Sender address"
-        type="email"
-        error={errors.senderAddress?.message}
-        {...register('senderAddress')}
-      />
-      <Input
-        label="Sender name"
-        type="text"
-        error={errors.senderName?.message}
-        {...register('senderName')}
-      />
+      <Input label="Hostname" type="text" error={errors.smtpHost?.message} {...register('smtpHost')} />
+      <Input label="Port" type="number" error={errors.smtpPort?.message} {...register('smtpPort')} />
+      <Input label="Username" type="text" error={errors.smtpUser?.message} {...register('smtpUser')} />
+      <Input label="Password" type="password" error={errors.smtpPassword?.message} {...register('smtpPassword')} />
+      <Input label="Sender address" type="email" error={errors.senderAddress?.message} {...register('senderAddress')} />
+      <Input label="Sender name" type="text" error={errors.senderName?.message} {...register('senderName')} />
       <Checkbox label="SSL" {...register('ssl')} />
       {defaultSettings && (
         <Button type="button" onClick={() => deleteSettings()}>

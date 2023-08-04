@@ -1,63 +1,9 @@
 import { MouseEvent, useRef, useState } from 'react'
-import styled from 'styled-components'
 import { useOutsideAlerter } from '../shared/hooks/useOutsideAlerter'
 import { SearchFilters } from '../shared/enums/SearchFilters'
 import { uppercaseFirstLetter } from '../utils/strings'
-import { STATIC_STYLES } from '../shared/enums/StaticStyles'
 import { MediaTag } from '../shared/components/Tag'
 import { MediaTypes } from '../shared/enums/MediaTypes'
-
-const Container = styled.div<{ isActive: boolean }>`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: ${(props) => props.theme.primaryLight};
-  cursor: pointer;
-  transition: 0.3s ease;
-  height: 100%;
-  min-width: 100px;
-  max-width: 100px;
-
-  @media screen and (min-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: ${(props) => (!props.isActive ? '3px' : 'none')};
-  }
-`
-
-const ActiveItem = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-`
-
-const Items = styled.div`
-  position: absolute;
-  top: 100%;
-  background-color: ${(props) => props.theme.primaryLight};
-  width: 100%;
-
-  @media screen and (min-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
-    border-bottom-left-radius: 3px;
-    border-bottom-right-radius: 3px;
-  }
-`
-
-const Item = styled.div`
-  width: 100%;
-  padding: 5px 15px;
-  display: flex;
-  justify-content: center;
-
-  &:hover {
-    background: ${(props) => props.theme.primaryLighter};
-  }
-
-  &:last-child {
-    border-radius: 0 0 3px 3px;
-  }
-`
 
 type SearchDropdownTypeProps = {
   selectedOption: SearchFilters
@@ -81,24 +27,24 @@ const SearchDropdownType = ({ selectedOption, onChange }: SearchDropdownTypeProp
   }
 
   return (
-    <Container ref={dropdownRef} isActive={isOpen} onClick={onDropdownClick}>
-      <ActiveItem>
+    <div ref={dropdownRef} onClick={onDropdownClick}>
+      <div>
         {selectedOption === SearchFilters.MOVIES && <MediaTag type={MediaTypes.MOVIES} />}
         {selectedOption === SearchFilters.SERIES && <MediaTag type={MediaTypes.SERIES} />}
         {selectedOption === SearchFilters.ALL && uppercaseFirstLetter(selectedOption)}
-      </ActiveItem>
-      <Items>
+      </div>
+      <div>
         {isOpen &&
           Object.values(SearchFilters).map(
             (st, index) =>
               st !== selectedOption && (
-                <Item key={index} onClick={(e) => onOptionClick(e, st)}>
+                <div key={index} onClick={(e) => onOptionClick(e, st)}>
                   {uppercaseFirstLetter(st)}
-                </Item>
+                </div>
               )
           )}
-      </Items>
-    </Container>
+      </div>
+    </div>
   )
 }
 

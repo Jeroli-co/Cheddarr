@@ -1,1 +1,6 @@
-!.storybook
+node_modules/**/*
+dist/
+.prettierrc
+.prettierignore
+.eslintrc
+env.d.ts

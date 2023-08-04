@@ -9,13 +9,7 @@ type ModalProps = {
   onClose: () => void
 }
 
-
-
-export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
-  isOpen,
-  onClose,
-  children,
-}) => {
+export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({ isOpen, onClose, children }) => {
   return (
     <Transition appear show={isOpen} as={React.Fragment}>
       <Dialog as="div" className="z-modal" onClose={() => onClose()}>
@@ -44,11 +38,7 @@ export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
         >
           <Dialog.Panel className="w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-modal-content">
             {children}
-            <Button
-              variant="link"
-              className="fixed top-2 right-3 text-2xl text-primary-dark"
-              onClick={() => onClose()}
-            >
+            <Button variant="link" className="fixed top-2 right-2 text-2xl text-primary-dark" onClick={() => onClose()}>
               <Icon icon={faClose} />
             </Button>
           </Dialog.Panel>

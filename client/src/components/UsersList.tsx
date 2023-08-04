@@ -4,7 +4,7 @@ import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router'
 import styled from 'styled-components'
 import { usePagination } from '../hooks/usePagination'
-import httpClient from '../http-client'
+import httpClient from '../utils/http-client'
 import { routes } from '../routes'
 import { DeleteDataModal } from '../shared/components/DeleteDataModal'
 import { Icon } from '../shared/components/Icon'
@@ -80,7 +80,7 @@ export const UsersList = ({ confirmed }: { confirmed?: boolean }) => {
   const { data, isLoading, isFetching, loadPrev, loadNext } = usePagination<IUser>(
     ['users', confirmed ? 'confirmed' : 'pending'],
     `/users`,
-    confirmed ? { confirmed: 'true' } : undefined
+    confirmed ? new URLSearchParams({ confirmed: 'true' }).toString() : undefined,
   )
 
   const [deleteUserModalState, setDeleteUserModalState] = useState<{
@@ -134,12 +134,7 @@ export const UsersList = ({ confirmed }: { confirmed?: boolean }) => {
                         <Icon icon={faCheck} />
                       </Button>
                     )}
-                    <Button
-                      variant="outlined"
-                      color="danger"
-                      mode="square"
-                      onClick={() => onDeleteUserClick(u)}
-                    >
+                    <Button variant="outlined" color="danger" mode="square" onClick={() => onDeleteUserClick(u)}>
                       <Icon icon={faTimes} />
                     </Button>
                   </Buttons>
@@ -152,7 +147,7 @@ export const UsersList = ({ confirmed }: { confirmed?: boolean }) => {
       {(data?.results?.length ?? 0) > 1 && (
         <PaginationArrows
           currentPage={data?.page}
-          totalPages={data?.pages}
+          totalPages={data?.totalPages}
           onLoadPrev={() => loadPrev()}
           onLoadNext={() => loadNext()}
         />

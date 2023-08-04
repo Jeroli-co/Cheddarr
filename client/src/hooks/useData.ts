@@ -1,12 +1,8 @@
 import { UseQueryOptions, useQuery } from 'react-query'
-import httpClient from '../http-client'
+import httpClient from '../utils/http-client'
 import hoursToMilliseconds from 'date-fns/hoursToMilliseconds'
 
-export const useData = <TData>(
-  queryKey: string[],
-  url: string,
-  options?: UseQueryOptions<TData>
-) => {
+export const useData = <TData>(queryKey: string[], url: string, options?: UseQueryOptions<TData>) => {
   const fetchData = () => {
     return httpClient.get<TData>(url).then((res) => res.data)
   }

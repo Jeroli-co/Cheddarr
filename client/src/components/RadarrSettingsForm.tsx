@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAlert } from '../shared/contexts/AlertContext'
-import httpClient from '../http-client'
+import httpClient from '../utils/http-client'
 import { Button } from '../elements/button/Button'
 import { useQueryClient } from 'react-query'
 import { Checkbox } from '../elements/checkbox/Checkbox'
@@ -31,7 +31,7 @@ export const providerBaseSettingsSchema = providerBaseNetworkSettingsSchema.merg
   z.object({
     name: z.string({ required_error: 'Name is required' }).trim(),
     enabled: z.boolean(),
-  })
+  }),
 )
 
 // type ProviderBaseSettings = z.infer<typeof providerSettingsSchema>
@@ -42,13 +42,13 @@ export const postMediaProviderSettingsSchema = providerBaseSettingsSchema.merge(
     rootFolder: z.string({ required_error: 'Root folder is required' }).trim(),
     qualityProfileId: z.number({ required_error: 'Quality profile is required' }),
     tags: z.array(z.string()),
-  })
+  }),
 )
 
 const postRadarrSettingsSchema = postMediaProviderSettingsSchema.merge(
   z.object({
     providerType: z.literal('movies_provider'),
-  })
+  }),
 )
 
 type PostRadarrSettingsFormData = z.infer<typeof postRadarrSettingsSchema>
@@ -87,17 +87,15 @@ export const RadarrSettingsForm = ({ defaultSettings }: RadarrSettingsFormProps)
   })
 
   const testInstanceConnection = async () => {
-    httpClient
-      .post<RadarrInstanceInfo>('/settings/radarr/instance-info', getValues())
-      .then((res) => {
-        if (res.status === 200) {
-          pushSuccess('Successful connection')
-        } else if (res.status !== 200) {
-          pushDanger('Cannot get instance info')
-        }
+    httpClient.post<RadarrInstanceInfo>('/settings/radarr/instance-info', getValues()).then((res) => {
+      if (res.status === 200) {
+        pushSuccess('Successful connection')
+      } else if (res.status !== 200) {
+        pushDanger('Cannot get instance info')
+      }
 
-        setInstanceInfo(res.data)
-      })
+      setInstanceInfo(res.data)
+    })
   }
 
   const deleteSettings = () => {
@@ -117,17 +115,15 @@ export const RadarrSettingsForm = ({ defaultSettings }: RadarrSettingsFormProps)
   const onSubmitEdit = handleSubmit(async (data) => {
     if (!defaultSettings) return
 
-    await httpClient
-      .put<RadarrSettings>(`/settings/radarr${defaultSettings.id}`, data)
-      .then((res) => {
-        if (res.status !== 200) {
-          pushDanger('Cannot update configuration')
-          return
-        }
+    await httpClient.put<RadarrSettings>(`/settings/radarr${defaultSettings.id}`, data).then((res) => {
+      if (res.status !== 200) {
+        pushDanger('Cannot update configuration')
+        return
+      }
 
-        pushSuccess('Configuration updated')
-        queryClient.invalidateQueries(['settings', 'radarr'])
-      })
+      pushSuccess('Configuration updated')
+      queryClient.invalidateQueries(['settings', 'radarr'])
+    })
   })
 
   const onSubmitCreate = handleSubmit(async (data) => {
@@ -178,12 +174,7 @@ export const RadarrSettingsForm = ({ defaultSettings }: RadarrSettingsFormProps)
         error={errors.apiKey?.message}
       />
 
-      <Input
-        label="Hostname or IP Address"
-        type="text"
-        error={errors.host?.message}
-        {...register('host')}
-      />
+      <Input label="Hostname or IP Address" type="text" error={errors.host?.message} {...register('host')} />
 
       <Input
         label={

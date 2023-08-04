@@ -1,126 +1,41 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
-import styled, { css } from 'styled-components'
-import { SearchDropdownType } from './SearchDropdownType'
+import { ChangeEventHandler, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { routes } from '../routes'
-import { SearchFilters } from '../shared/enums/SearchFilters'
-import { STATIC_STYLES } from '../shared/enums/StaticStyles'
-import { isEmpty } from '../utils/strings'
-import { useLocation } from 'react-router-dom'
-
-const Container = styled.div<{
-  isInputFocus: boolean
-}>`
-  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    display: flex;
-    align-items: center;
-    transition: 0.3s ease;
-    width: 100%;
-    background: ${(props) => props.theme.primaryLighter};
-
-    .search-input {
-      width: 100%;
-      height: 100%;
-      border: 1px solid rgba(0, 0, 0, 0);
-      background-color: ${(props) => props.theme.primaryLight};
-      color: black;
-      opacity: 0.5;
-      transition: opacity 0.5s ease;
-      color: ${(props) => props.theme.white};
-
-      text-indent: 25px;
-      outline: none;
-      border-radius: 0;
-
-      ::placeholder {
-        color: ${(props) => props.theme.white};
-      }
-    }
-
-    ${({ isInputFocus }) =>
-      isInputFocus &&
-      css`
-        .search-input {
-          opacity: 1;
-        }
-      `}
-  }
-
-  @media screen and (min-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    display: flex;
-    align-items: center;
-    transition: 0.3s ease;
-    user-select: none;
-
-    .search-input {
-      width: 100%;
-      border: 1px solid rgba(0, 0, 0, 0);
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px;
-      background-color: ${(props) => props.theme.primaryLight};
-      transition: width 0.5s ease;
-      color: ${(props) => props.theme.white};
-      opacity: 0.5;
-      text-indent: 25px;
-      outline: none;
-
-      ::placeholder {
-        color: ${(props) => props.theme.white};
-      }
-    }
-
-    ${({ isInputFocus }) =>
-      isInputFocus &&
-      css`
-        .search-input {
-          opacity: 1;
-          width: 100%;
-        }
-      `}
-  }
-`
+import { Input } from '../elements/Input'
+import debounce from 'lodash.debounce'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 export const SearchBar = () => {
-  const [isInputFocus, setIsInputFocus] = useState(false)
-  const [searchType, setSearchType] = useState<SearchFilters>(SearchFilters.ALL)
-  const [searchValue, setSearchValue] = useState('')
   const navigate = useNavigate()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const location = useLocation()
 
-  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value)
+  const [value, setValue] = useState('')
+
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setValue(e.target.value)
   }
 
-  const onSearchTypeChange = (type: SearchFilters) => {
-    setSearchType(type)
-    if (inputRef && inputRef.current) {
-      inputRef.current.focus()
-    }
-  }
+  const debouncedResults = useMemo(() => {
+    return debounce(handleChange, 300)
+  }, [])
 
   useEffect(() => {
-    if (!isEmpty(searchValue)) {
-      navigate(routes.SEARCH.url(searchType, searchValue))
-    } else if (location.pathname.startsWith('/search') && isEmpty(searchValue)) {
-      navigate(routes.HOME.url)
+    return () => {
+      debouncedResults.cancel()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchType, searchValue])
+  })
+
+  useEffect(() => {
+    if (value.trim().length) navigate(`/search?value=${value}`)
+  }, [value])
 
   return (
-    <Container isInputFocus={isInputFocus}>
-      <SearchDropdownType selectedOption={searchType} onChange={onSearchTypeChange} />
-      <input
-        ref={inputRef}
-        value={searchValue}
-        onChange={onInputChange}
-        onFocus={() => setIsInputFocus(true)}
-        onBlur={() => setIsInputFocus(false)}
-        className="search-input"
+    <div className="w-full">
+      <Input
         type="text"
-        placeholder="Search..."
+        onChange={debouncedResults}
+        placeholder="Search for movies, series, actors, studio..."
+        className="w-full md:w-1/3 focus:w-full transition-width duration-300 ease-in-out"
+        icon={faSearch}
       />
-    </Container>
+    </div>
   )
 }

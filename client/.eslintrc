@@ -1,0 +1,77 @@
+{
+  "ignorePatterns": ["!**/*", "node_modules/**/*", ".storybook/dist/**/*", "tailwind.config.js"],
+  "extends": [
+    // By extending from a plugin config, we can get recommended rules without having to add them manually.
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:import/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:storybook/recommended",
+    // This disables the formatting rules in ESLint that Prettier is going to be responsible for handling.
+    // Make sure it's always the last config, so it gets the chance to override other configs.
+    "eslint-config-prettier",
+    "prettier"
+  ],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {
+        "import/prefer-default-export": 0,
+        "react/jsx-props-no-spreading": 0,
+        "react/require-default-props": 0,
+        "react/react-in-jsx-scope": 0,
+        "react/prop-types": 0,
+        "react/display-name": 0,
+        "react/jsx-filename-extension": [
+          2,
+          {
+            "extensions": [".js", ".jsx", ".ts", ".tsx"]
+          }
+        ],
+        "react/no-unescaped-entities": [
+          "error",
+          {
+            "forbid": [">", "}"]
+          }
+        ],
+        "react/function-component-definition": [
+          "error",
+          {
+            "namedComponents": "arrow-function",
+            "unnamedComponents": "arrow-function"
+          }
+        ],
+        "react/no-unstable-nested-components": [
+          "error",
+          {
+            "allowAsProps": true
+          }
+        ]
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {}
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "rules": {}
+    }
+  ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    // Tells eslint how to resolve imports
+    "import/resolver": {
+      "node": {
+        "paths": ["src"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
+  "rules": {
+    // Add your own rules here to override ones from the extended configs.
+  }
+}

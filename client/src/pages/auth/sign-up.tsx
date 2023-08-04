@@ -113,6 +113,7 @@ export default () => {
               placeholder="Username"
               error={errors.username?.message}
               onKeyDown={handleKeydown}
+              autoComplete="email"
               {...register('username')}
             />
           )}
@@ -126,6 +127,7 @@ export default () => {
                 placeholder="Strong password"
                 error={errors.password?.message}
                 onKeyDown={handleKeydown}
+                autoComplete="off"
                 {...register('password')}
               />
 
@@ -136,6 +138,7 @@ export default () => {
                 placeholder="Confirm password"
                 error={errors.passwordConfirmation?.message}
                 onKeyDown={handleKeydown}
+                autoComplete="off"
                 {...register('passwordConfirmation')}
               />
             </>

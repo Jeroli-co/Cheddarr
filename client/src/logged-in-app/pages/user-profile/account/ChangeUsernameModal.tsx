@@ -4,7 +4,7 @@ import { H2 } from '../../../../shared/components/Titles'
 import { Input } from '../../../../elements/Input'
 import { Buttons } from '../../../../shared/components/layout/Buttons'
 import { Button, PrimaryButton } from '../../../../shared/components/Button'
-import httpClient from '../../../../http-client'
+import httpClient from '../../../../utils/http-client'
 import { IUser } from '../../../../shared/models/IUser'
 import { z } from 'zod'
 import { useQueryClient } from 'react-query'
@@ -53,12 +53,7 @@ const ChangeUsernameModal = ({ id, closeModal }: ChangeUsernameModalProps) => {
       </header>
 
       <form onSubmit={onSubmit}>
-        <Input
-          label="New username"
-          type="text"
-          error={errors.username?.message}
-          {...register('username')}
-        />
+        <Input label="New username" type="text" error={errors.username?.message} {...register('username')} />
 
         <Buttons>
           <PrimaryButton>Change username</PrimaryButton>

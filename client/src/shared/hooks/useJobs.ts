@@ -1,7 +1,7 @@
 import { IJob, JobActionsEnum } from '../models/IJob'
 import { useAlert } from '../contexts/AlertContext'
 import { useData } from '../../hooks/useData'
-import httpClient from '../../http-client'
+import httpClient from '../../utils/http-client'
 import { useQueryClient } from 'react-query'
 
 export const useJobs = () => {

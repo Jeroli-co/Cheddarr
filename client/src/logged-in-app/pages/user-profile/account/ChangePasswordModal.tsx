@@ -6,12 +6,9 @@ import { H2 } from '../../../../shared/components/Titles'
 import { Input } from '../../../../elements/Input'
 import { useAlert } from '../../../../shared/contexts/AlertContext'
 import { useQueryClient } from 'react-query'
-import {
-  ResetPasswordFormData,
-  resetPasswordSchema,
-} from '../../../../components/ResetPasswordForm'
+import { ResetPasswordFormData, resetPasswordSchema } from '../../../../components/ResetPasswordForm'
 import { zodResolver } from '@hookform/resolvers/zod'
-import httpClient from '../../../../http-client'
+import httpClient from '../../../../utils/http-client'
 import { IUser } from '../../../../shared/models/IUser'
 
 type ChangePasswordModalProps = {

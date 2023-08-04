@@ -1,6 +1,6 @@
 name: CI
 
-on: [push,pull_request]
+on: [push, pull_request]
 
 jobs:
   ci:
@@ -11,26 +11,26 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Build Node
-      run: |
-        cd client
-        yarn install
-        yarn run build --if-present
-        yarn test
-      env:
-        CI: true
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Python Poetry Action
-      uses: abatilo/actions-poetry@v2.1.0
-    - name: Poetry install
-      run: poetry install
-    - name: Test with pytest
-      run: poetry run python -m pytest -v
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build Node
+        run: |
+          cd client
+          pnpm install
+          pnpm run build --if-present
+          pnpm test
+        env:
+          CI: true
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Python Poetry Action
+        uses: abatilo/actions-poetry@v2.1.0
+      - name: Poetry install
+        run: poetry install
+      - name: Test with pytest
+        run: poetry run python -m pytest -v

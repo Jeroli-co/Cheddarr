@@ -1,6 +1,7 @@
 import React from 'react'
 import { PageLoader } from '../shared/components/PageLoader'
-import { Link, LinkProps } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import type { LinkProps } from 'react-router-dom'
 import {
   faCog,
   faHome,
@@ -30,12 +31,7 @@ const CheddarrLogoLink = () => {
       </div>
 
       <div className="w-8">
-        <img
-          className="w-full h-auto"
-          id="cheddarrMinLogo"
-          src="/assets/cheddarr-min.svg"
-          alt="Chedarr"
-        />
+        <img className="w-full h-auto" id="cheddarrMinLogo" src="/assets/cheddarr-min.svg" alt="Chedarr" />
       </div>
 
       <div className="w-12">
@@ -45,40 +41,38 @@ const CheddarrLogoLink = () => {
   )
 }
 
-const Sidebar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => {
-  const SidebarLink: React.FC<React.PropsWithChildren<LinkProps>> = ({
-    to,
+const SidebarLink: React.FC<React.PropsWithChildren<LinkProps>> = ({ to, className, children, ...props }) => {
+  const classNames = cn(
+    'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
     className,
-    children,
-    ...props
-  }) => {
-    const classNames = cn(
-      'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
-      className
-    )
+  )
 
-    return (
-      <Link to={to} className={classNames} {...props}>
-        {children}
-      </Link>
-    )
-  }
+  return (
+    <Link to={to} className={classNames} {...props}>
+      {children}
+    </Link>
+  )
+}
 
-  const SidebarButton: React.FC<
-    React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>
-  > = ({ type = 'button', className, children, ...props }) => {
-    const classNames = cn(
-      'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
-      className
-    )
+const SidebarButton: React.FC<React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>> = ({
+  type = 'button',
+  className,
+  children,
+  ...props
+}) => {
+  const classNames = cn(
+    'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
+    className,
+  )
 
-    return (
-      <button type={type} className={classNames} {...props}>
-        {children}
-      </button>
-    )
-  }
+  return (
+    <button type={type} className={classNames} {...props}>
+      {children}
+    </button>
+  )
+}
 
+const Sidebar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => {
   return (
     <nav className="w-[200px] fixed h-full overflow-auto border-r border-primary-dark hidden md:flex flex-col items-center justify-between">
       <div className="p-4">
@@ -118,11 +112,7 @@ const Sidebar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => 
           <div className="p-4">
             <SidebarLink to="/profile" className="flex items-center gap-3">
               <div className="w-12">
-                <img
-                  src={user?.avatar}
-                  alt="User"
-                  className="rounded-full aspect-square w-full h-auto"
-                />
+                <img src={user?.avatar} alt="User" className="rounded-full aspect-square w-full h-auto" />
               </div>
               <span className="font-bold">{user?.username}</span>
             </SidebarLink>
@@ -144,74 +134,68 @@ const Sidebar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => 
   )
 }
 
+const BottombarLink: React.FC<React.PropsWithChildren<LinkProps>> = ({ to, className, children, ...props }) => {
+  const classNames = cn(
+    'w-full h-full flex items-center justify-center text-primary-dark hover:text-primary-darker transition-colors ease-in duration-200',
+    className,
+  )
+
+  return (
+    <Link to={to} className={classNames} {...props}>
+      {children}
+    </Link>
+  )
+}
+
+const BottombarButton: React.FC<React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>> = ({
+  type = 'button',
+  className,
+  children,
+  ...props
+}) => {
+  const classNames = cn(
+    'w-full h-full flex items-center justify-center text-primary-dark hover:text-primary-darker transition-colors ease-in duration-200',
+    className,
+  )
+
+  return (
+    <button type={type} className={classNames} {...props}>
+      {children}
+    </button>
+  )
+}
+
+const BottombarExtendedLink: React.FC<React.PropsWithChildren<LinkProps>> = ({ to, className, children, ...props }) => {
+  const classNames = cn(
+    'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
+    className,
+  )
+
+  return (
+    <Link to={to} className={classNames} {...props}>
+      {children}
+    </Link>
+  )
+}
+
+const BottombarExtendedButton: React.FC<
+  React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>
+  // eslint-disable-next-line react/prop-types
+> = ({ type = 'button', className, children, ...props }) => {
+  const classNames = cn(
+    'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
+    className,
+  )
+
+  return (
+    <button type={type} className={classNames} {...props}>
+      {children}
+    </button>
+  )
+}
+
 const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => {
   const [open, setOpen] = React.useState(false)
-
-  const BottombarLink: React.FC<React.PropsWithChildren<LinkProps>> = ({
-    to,
-    className,
-    children,
-    ...props
-  }) => {
-    const classNames = cn(
-      'w-full h-full flex items-center justify-center text-primary-dark hover:text-primary-darker transition-colors ease-in duration-200',
-      className
-    )
-
-    return (
-      <Link to={to} className={classNames} {...props}>
-        {children}
-      </Link>
-    )
-  }
-
-  const BottombarButton: React.FC<
-    React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>
-  > = ({ type = 'button', className, children, ...props }) => {
-    const classNames = cn(
-      'w-full h-full flex items-center justify-center text-primary-dark hover:text-primary-darker transition-colors ease-in duration-200',
-      className
-    )
-
-    return (
-      <button type={type} className={classNames} {...props}>
-        {children}
-      </button>
-    )
-  }
-
-  const BottombarExtendedLink: React.FC<React.PropsWithChildren<LinkProps>> = ({
-    to,
-    className,
-    children,
-    ...props
-  }) => {
-    const classNames = cn(
-      'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
-      className
-    )
-
-    return (
-      <Link to={to} className={classNames} {...props}>
-        {children}
-      </Link>
-    )
-  }
-
-  const BottombarExtendedButton: React.FC<
-    React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>
-  > = ({ type = 'button', className, children, ...props }) => {
-    const classNames = cn(
-      'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
-      className
-    )
-
-    return (
-      <button type={type} className={classNames} {...props}>
-        {children}
-      </button>
-    )
-  }
 
   return (
     <>
@@ -225,9 +209,9 @@ const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) =
             <Icon icon={faHome} />
           </BottombarLink>
 
-          <BottombarButton>
+          <BottombarLink to="/search">
             <Icon icon={faSearch} />
-          </BottombarButton>
+          </BottombarLink>
         </div>
       </nav>
 
@@ -256,11 +240,7 @@ const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) =
               )}
 
               {user && checkRole(user.roles, [Roles.MANAGE_USERS]) && (
-                <BottombarExtendedLink
-                  to="/users"
-                  className="flex items-center gap-2"
-                  onClick={() => setOpen(false)}
-                >
+                <BottombarExtendedLink to="/users" className="flex items-center gap-2" onClick={() => setOpen(false)}>
                   <Icon icon={faUsers} />
                   <span>Users</span>
                 </BottombarExtendedLink>
@@ -286,17 +266,9 @@ const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) =
             </BottombarExtendedButton>
             <NewDivider className="my-3" />
             <div className="flex items-center justify-between">
-              <BottombarExtendedLink
-                to="/profile"
-                className="flex items-center gap-3"
-                onClick={() => setOpen(false)}
-              >
+              <BottombarExtendedLink to="/profile" className="flex items-center gap-3" onClick={() => setOpen(false)}>
                 <div className="w-12">
-                  <img
-                    src={user?.avatar}
-                    alt="User"
-                    className="rounded-full aspect-square w-full h-auto"
-                  />
+                  <img src={user?.avatar} alt="User" className="rounded-full aspect-square w-full h-auto" />
                 </div>
                 <span className="font-bold">{user?.username}</span>
               </BottombarExtendedLink>
@@ -313,7 +285,9 @@ const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) =
 const Navbar = () => {
   return (
     <nav className="w-full hidden md:flex items-center justify-between gap-3 p-4">
-      <SearchBar />
+      <div className="w-full">
+        <SearchBar />
+      </div>
       <GithubLink />
     </nav>
   )
@@ -321,7 +295,6 @@ const Navbar = () => {
 
 const Router = React.lazy(() => import('./router'))
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const {
     session: { user },

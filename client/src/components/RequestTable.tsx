@@ -1,6 +1,5 @@
 import { MediaTypes } from '../shared/enums/MediaTypes'
 import { useMedia } from '../hooks/useMedia'
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { IMediaRequest } from '../shared/models/IMediaRequest'
 import { RequestTypes } from '../shared/enums/RequestTypes'
 import { useRadarrSettings, useSonarrSettings } from '../hooks/useProvidersSettings'
@@ -19,6 +18,7 @@ import { Buttons } from '../shared/components/layout/Buttons'
 import { Tooltiped } from '../shared/components/Tooltiped'
 import { PaginationHookProps } from '../hooks/usePagination'
 import { Title } from '../elements/Title'
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 
 const MediaTitleCell = ({ id, type }: { type: MediaTypes; id: string }) => {
   const { data, isLoading } = useMedia(type, id)
@@ -35,6 +35,19 @@ const MediaTitleCell = ({ id, type }: { type: MediaTypes; id: string }) => {
       </div>
       <div>{title}</div>
     </div>
+  )
+}
+
+const Head = ({ requestType }: { requestType: RequestTypes }) => {
+  return (
+    <>
+      <Title as="h1">Requests {requestType === RequestTypes.INCOMING ? 'received' : 'sent'}</Title>
+      <p className="mb-8">
+        {requestType === RequestTypes.INCOMING
+          ? 'Manage the incoming requests that has been made on this server.'
+          : 'See which request you have made on the server.'}
+      </p>
+    </>
   )
 }
 
@@ -97,14 +110,11 @@ export const RequestTable = ({
           cell: (info) => {
             const status = info.getValue()
 
-            if (status === RequestStatus.PENDING)
-              return <WarningTag>{status.toUpperCase()}</WarningTag>
+            if (status === RequestStatus.PENDING) return <WarningTag>{status.toUpperCase()}</WarningTag>
 
-            if (status === RequestStatus.REFUSED)
-              return <DangerTag>{status.toUpperCase()}</DangerTag>
+            if (status === RequestStatus.REFUSED) return <DangerTag>{status.toUpperCase()}</DangerTag>
 
-            if (status === RequestStatus.APPROVED)
-              return <SuccessTag>{status.toUpperCase()}</SuccessTag>
+            if (status === RequestStatus.APPROVED) return <SuccessTag>{status.toUpperCase()}</SuccessTag>
 
             return undefined
           },
@@ -145,16 +155,23 @@ export const RequestTable = ({
 
                     {status === RequestStatus.PENDING && (
                       <Buttons>
-                        <SuccessButton
-                          onClick={() => /*onUpdateRequest(RequestStatus.APPROVED)*/ {}}
+                        <Button
+                          color="success"
+                          mode="square"
+                          size="sm"
+                          onClick={() => /*onUpdateRequest(RequestStatus.APPROVED)*/ ({})}
                         >
                           <Icon icon={faCheck} />
-                        </SuccessButton>
-                        <DangerIconButton
-                          onClick={() => /*onUpdateRequest(RequestStatus.REFUSED)*/ {}}
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="danger"
+                          mode="square"
+                          size="sm"
+                          onClick={() => /*onUpdateRequest(RequestStatus.REFUSED)*/ ({})}
                         >
                           <Icon icon={faTimes} />
-                        </DangerIconButton>
+                        </Button>
                       </Buttons>
                     )}
                   </div>
@@ -162,7 +179,7 @@ export const RequestTable = ({
               },
               header: 'Provider',
               footer: (info) => info.column.id,
-            }
+            },
           ),
         requestType === RequestTypes.OUTGOING &&
           columnHelper.accessor((row) => row.status, {
@@ -175,11 +192,15 @@ export const RequestTable = ({
               return (
                 <div className="flex items-center gap-3">
                   <Tooltiped text="Delete request">
-                    <DangerIconButton
+                    <Button
+                      variant="outlined"
+                      color="danger"
+                      mode="square"
+                      size="sm"
                       onClick={() => /*deleteRequest(request.media.mediaType, request.id)*/ {}}
                     >
                       <Icon icon={faTimes} />
-                    </DangerIconButton>
+                    </Button>
                   </Tooltiped>
                 </div>
               )
@@ -188,36 +209,15 @@ export const RequestTable = ({
             footer: (info) => info.column.id,
           }),
       ].filter((c) => !!c) as ColumnDef<IMediaRequest>[],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
-
-  const Head = () => {
-    return (
-      <>
-        <Title as="h1">
-          Requests {requestType === RequestTypes.INCOMING ? 'received' : 'sent'}
-        </Title>
-        <p className="mb-8">
-          {requestType === RequestTypes.INCOMING
-            ? 'Manage the incoming requests that has been made on this server.'
-            : 'See which request you have made on the server.'}
-        </p>
-      </>
-    )
-  }
 
   if (isLoading) return undefined
 
   return (
     <>
-      <Head />
-      <Table
-        {...{
-          data: data?.results ?? [],
-          columns,
-        }}
-      />
+      <Head requestType={requestType} />
+      <Table data={data?.results ?? []} columns={columns} />
     </>
   )
 }

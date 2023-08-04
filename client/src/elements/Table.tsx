@@ -1,26 +1,12 @@
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
+import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
 
-export const Table = <TData,>({
-  data,
-  columns,
-}: {
-  data: TData[]
-  columns: ColumnDef<TData>[]
-}) => {
+export const Table = <TData,>({ data, columns }: { data: TData[]; columns: ColumnDef<TData>[] }) => {
   const table = useReactTable({
     data,
     columns,
-    // Pipeline
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    //
-    debugTable: true,
+    // debugTable: true,
   })
 
   return (
@@ -38,7 +24,9 @@ export const Table = <TData,>({
                       className="px-5 py-3 bg-primary-dark first:rounded-tl last:rounded-tr"
                     >
                       {header.isPlaceholder ? null : (
-                        <div>{flexRender(header.column.columnDef.header, header.getContext())}</div>
+                        <div className="flex justify-center items-center">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </div>
                       )}
                     </th>
                   )
@@ -53,7 +41,9 @@ export const Table = <TData,>({
                   {row.getVisibleCells().map((cell) => {
                     return (
                       <td key={cell.id} className="px-5 py-5">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        <div className="flex justify-center items-center">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </div>
                       </td>
                     )
                   })}
@@ -85,10 +75,7 @@ export const Table = <TData,>({
             {'>'}
           </button>
 
-          <button
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
+          <button onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>
             {'>>'}
           </button>
 

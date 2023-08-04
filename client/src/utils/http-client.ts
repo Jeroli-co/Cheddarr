@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as humps from 'humps'
-import { APIRoutes } from './shared/enums/APIRoutes'
+import { APIRoutes } from '../shared/enums/APIRoutes'
 
 const JSON_TYPE = 'application/json'
 const FORM_URL_ENCODED_TYPE = 'application/x-www-form-urlencoded'
@@ -36,7 +36,7 @@ httpClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error)
-  }
+  },
 )
 
 httpClient.interceptors.response.use(
@@ -55,7 +55,7 @@ httpClient.interceptors.response.use(
   (error) => {
     console.log(error)
     return Promise.reject(error)
-  }
+  },
 )
 
 export { httpClient as instance }

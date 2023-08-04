@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react'
 import { APIRoutes } from '../enums/APIRoutes'
-import { instance } from '../../http-client'
+import { instance } from '../../utils/http-client'
 import { ERRORS_MESSAGE } from '../enums/ErrorsMessage'
 import { useAPI } from '../hooks/useAPI'
 import { useAlert } from './AlertContext'
@@ -54,7 +54,7 @@ export default function PlexAuthContextProvider(props: any) {
                       Pragma: 'no-cache',
                       Expires: '0',
                     },
-                  }
+                  },
                 )
                 .then(
                   (res3) => {
@@ -64,14 +64,14 @@ export default function PlexAuthContextProvider(props: any) {
                     if (error.response && error.response.status) {
                       pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status))
                     }
-                  }
+                  },
                 )
             },
             (error) => {
               if (error.response && error.response.status) {
                 pushDanger(ERRORS_MESSAGE.UNHANDLED_STATUS(error.response.status))
               }
-            }
+            },
           )
       }
     })

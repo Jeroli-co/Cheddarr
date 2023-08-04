@@ -6,7 +6,7 @@ import { Input } from '../elements/Input'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '../elements/button/Button'
-import httpClient from '../http-client'
+import httpClient from '../utils/http-client'
 
 export const resetPasswordSchema = z
   .object({
@@ -66,6 +66,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
         type="password"
         placeholder="Enter your current password"
         error={errors.oldPassword?.message}
+        autoComplete="current-password"
         {...register('oldPassword')}
       />
 
@@ -75,6 +76,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
         type="password"
         placeholder="Enter your new password"
         error={errors.newPassword?.message}
+        autoComplete="off"
         {...register('newPassword')}
       />
 
@@ -84,6 +86,7 @@ const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
         type="password"
         placeholder="Confirm your new password"
         error={errors.newPasswordConfirmation?.message}
+        autoComplete="off"
         {...register('newPasswordConfirmation')}
       />
 

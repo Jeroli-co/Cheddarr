@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { ISession, SessionDefaultImpl } from '../models/ISession'
 import { IEncodedToken } from '../models/IEncodedToken'
 import { routes } from '../../routes'
-import { instance } from '../../http-client'
+import { instance } from '../../utils/http-client'
 import { APIRoutes } from '../enums/APIRoutes'
 import { ERRORS_MESSAGE } from '../enums/ErrorsMessage'
 import { useLocation } from 'react-router-dom'
@@ -59,7 +59,7 @@ export const SessionContextProvider = (props: any) => {
               setSession({ ...session, isLoading: false })
               navigate(routes.SIGN_IN.url(''))
             }
-          }
+          },
         )
       } else {
         const encodedSession = getEncodedSession()

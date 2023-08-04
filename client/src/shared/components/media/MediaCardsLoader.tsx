@@ -1,6 +1,6 @@
-import React from "react";
-import styled, { keyframes } from "styled-components";
-import { MediaPreviewCardContainer } from "./MediaPreviewCard";
+import React from 'react'
+import styled, { keyframes } from 'styled-components'
+import { MediaPreviewCardContainer } from './MediaPreviewCard'
 
 const Shine = () => {
   return keyframes`
@@ -9,12 +9,12 @@ const Shine = () => {
   }
   100% {
     filter: brightness(200%);
-  }`;
-};
+  }`
+}
 
 const MediaLoadingCardContainer = styled(MediaPreviewCardContainer)<{
-  index: number;
-  n: number;
+  index: number
+  n: number
 }>`
   background: ${(props) => props.theme.primary};
   animation: 1s ease infinite running;
@@ -30,29 +30,21 @@ const MediaLoadingCardContainer = styled(MediaPreviewCardContainer)<{
     animation: ${Shine} 0.5s alternate infinite linear;
     animation-delay: ${(props) => props.index / props.n}s;
   }
-`;
+`
 
 type MediaCardsLoaderProps = {
-  n: number;
-  refIndex?: number;
-};
+  n: number
+  refIndex?: number
+}
 
-export const MediaCardsLoader = React.forwardRef<
-  HTMLDivElement,
-  MediaCardsLoaderProps
->((props, ref) => {
+export const MediaCardsLoader = React.forwardRef<HTMLDivElement, MediaCardsLoaderProps>((props, ref) => {
   return (
     <>
       {[...Array(props.n)].map((_, index) => (
-        <MediaLoadingCardContainer
-          ref={ref}
-          key={index}
-          index={index}
-          n={props.n}
-        >
+        <MediaLoadingCardContainer className="max-w-[200px]" ref={ref} key={index} index={index} n={props.n}>
           <svg viewBox="0 0 2 3" />
         </MediaLoadingCardContainer>
       ))}
     </>
-  );
-});
+  )
+})

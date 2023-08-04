@@ -19,7 +19,7 @@ const buttonVariants = cva(
         contained: '',
         outlined: 'bg-transparent',
         text: 'border-transparent bg-transparent',
-        link: 'min-h-0 min-w-0 whitespace-normal border-0 p-0 text-inherit hover:underline focus-visible:underline',
+        link: '',
       },
       size: {
         sm: 'min-h-[32px] min-w-[32px] px-3 py-1.5 text-sm',
@@ -77,6 +77,11 @@ const buttonVariants = cva(
         className: 'border-danger text-danger hover:bg-danger-light',
       },
       {
+        color: 'primary',
+        variant: 'text',
+        className: 'border-transparent text-primary-lighter ring-primary hover:bg-primary-dark',
+      },
+      {
         mode: 'square',
         size: 'sm',
         className: 'px-1.5',
@@ -91,6 +96,11 @@ const buttonVariants = cva(
         size: 'lg',
         className: 'px-3',
       },
+      {
+        variant: 'link',
+        className:
+          'min-h-0 min-w-0 whitespace-normal border-0 p-0 text-inherit hover:underline focus-visible:underline',
+      },
     ],
     defaultVariants: {
       color: 'primary',
@@ -98,7 +108,7 @@ const buttonVariants = cva(
       size: 'md',
       mode: 'normal',
     },
-  }
+  },
 )
 
 type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'> &
@@ -122,7 +132,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       type = 'button',
       ...props
     },
-    ref
+    ref,
   ) => {
     const Comp = asChild ? Slot : 'button'
     return (
@@ -131,7 +141,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           buttonVariants({ color, variant, size, mode, className }),
           (loading || disabled) && 'pointer-events-none',
-          disabled && 'opacity-50'
+          disabled && 'opacity-50',
         )}
         disabled={loading || disabled}
         type={type}
@@ -140,7 +150,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {loading ? <Loader /*size={loaderSize}*/ /> : children}
       </Comp>
     )
-  }
+  },
 )
 
 Button.displayName = 'Button'

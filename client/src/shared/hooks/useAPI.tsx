@@ -1,4 +1,4 @@
-import { instance } from '../../http-client'
+import { instance } from '../../utils/http-client'
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { createErrorAsyncCall, createSuccessAsyncCall } from '../models/IAsyncCall'
 import { useSession } from '../contexts/SessionContext'
@@ -20,7 +20,7 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error)
         return createErrorAsyncCall(error)
-      }
+      },
     )
   }
 
@@ -32,7 +32,7 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error)
         return createErrorAsyncCall(error)
-      }
+      },
     )
   }
 
@@ -44,7 +44,7 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error)
         return createErrorAsyncCall(error)
-      }
+      },
     )
   }
 
@@ -56,7 +56,7 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error)
         return createErrorAsyncCall(error)
-      }
+      },
     )
   }
 
@@ -68,7 +68,7 @@ export const useAPI = () => {
       (error: AxiosError) => {
         handleError(error)
         return createErrorAsyncCall(error)
-      }
+      },
     )
   }
 

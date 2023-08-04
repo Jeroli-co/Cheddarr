@@ -1,27 +1,19 @@
-import { useEffect, useState } from "react";
-import styled, { css } from "styled-components";
-import { MediaTypes } from "../../enums/MediaTypes";
-import { MediaTag, SuccessIconTag } from "../Tag";
-import {
-  IMedia,
-  isEpisode,
-  isMovie,
-  isOnServers,
-  isSeason,
-  isSeries,
-} from "../../models/IMedia";
-import { PlayButton } from "../Button";
-import { Icon } from "../Icon";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { STATIC_STYLES } from "../../enums/StaticStyles";
-import { useLocation, useNavigate } from "react-router-dom";
-import { routes } from "../../../routes";
-import { useImage } from "../../hooks/useImage";
-import { Image } from "../Image";
-import { RequestButton } from "../requests/RequestButton";
-import { APIRoutes } from "../../enums/APIRoutes";
-import { useAPI } from "../../hooks/useAPI";
-import { isEmpty } from "../../../utils/strings";
+import { useEffect, useState } from 'react'
+import styled, { css } from 'styled-components'
+import { MediaTypes } from '../../enums/MediaTypes'
+import { MediaTag, SuccessIconTag } from '../Tag'
+import { IMedia, isEpisode, isMovie, isOnServers, isSeason, isSeries } from '../../models/IMedia'
+import { PlayButton } from '../Button'
+import { Icon } from '../Icon'
+import { faCheck } from '@fortawesome/free-solid-svg-icons'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { routes } from '../../../routes'
+import { useImage } from '../../hooks/useImage'
+import { Image } from '../Image'
+import { RequestButton } from '../requests/RequestButton'
+import { APIRoutes } from '../../enums/APIRoutes'
+import { useAPI } from '../../hooks/useAPI'
+import { isEmpty } from '../../../utils/strings'
 
 export const MediaPreviewCardContainer = styled.div`
   position: relative;
@@ -29,24 +21,16 @@ export const MediaPreviewCardContainer = styled.div`
   margin: 5px;
   border-radius: 12px;
 
-  @media screen and (max-width: ${STATIC_STYLES.TABLET_MAX_WIDTH}px) {
-    flex: 0 0 calc(25% - 10px);
-  }
-
-  @media screen and (max-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
-    flex: 0 0 45%;
-  }
-
   .media-poster {
     display: block;
     width: 100%;
     height: 100%;
     border-radius: 12px;
   }
-`;
+`
 
 const Container = styled(MediaPreviewCardContainer)<{
-  hasPoster: boolean;
+  hasPoster: boolean
 }>`
   cursor: pointer;
 
@@ -89,7 +73,7 @@ const Container = styled(MediaPreviewCardContainer)<{
         border: 1px solid black;
       }
     `}
-`;
+`
 
 const HeadContainer = styled.div`
   position: absolute;
@@ -99,79 +83,76 @@ const HeadContainer = styled.div`
   top: 0;
   left: 0;
   right: 0;
-`;
+`
 
 type MediaPreviewCardProps = {
-  media: IMedia;
-};
+  media: IMedia
+}
 
 export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
-  const [fullyLoadedMedia, setFullyLoadedMedia] = useState<IMedia | null>(null);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const poster = useImage(fullyLoadedMedia && fullyLoadedMedia.posterUrl);
-  const { get } = useAPI();
+  const [fullyLoadedMedia, setFullyLoadedMedia] = useState<IMedia | null>(null)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const poster = useImage(fullyLoadedMedia && fullyLoadedMedia.posterUrl)
+  const { get } = useAPI()
 
   useEffect(() => {
     if (!media.posterUrl || isEmpty(media.posterUrl)) {
       if (media.mediaType === MediaTypes.MOVIES) {
         get<IMedia>(APIRoutes.GET_MOVIE(media.tmdbId)).then((r) => {
           if (r.data) {
-            setFullyLoadedMedia(r.data);
+            setFullyLoadedMedia(r.data)
           }
-        });
+        })
       } else if (media.mediaType === MediaTypes.SERIES) {
         get<IMedia>(APIRoutes.GET_SERIES(media.tmdbId)).then((r) => {
           if (r.data) {
-            setFullyLoadedMedia(r.data);
+            setFullyLoadedMedia(r.data)
           }
-        });
+        })
       }
     } else {
-      setFullyLoadedMedia(media);
+      setFullyLoadedMedia(media)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [media]);
+  }, [media])
 
   const onCardClick = () => {
     const getSeasonUrl = () => {
-      let url = null;
+      let url = null
       if (isSeason(fullyLoadedMedia)) {
-        const splitUrl = location.pathname.split("/");
+        const splitUrl = location.pathname.split('/')
         if (splitUrl.length > 3) {
-          const index = splitUrl.findIndex((s) => s === MediaTypes.SEASONS);
+          const index = splitUrl.findIndex((s) => s === MediaTypes.SEASONS)
           if (index !== -1 && index + 1 < splitUrl.length) {
-            splitUrl[index + 1] = fullyLoadedMedia.seasonNumber.toString();
+            splitUrl[index + 1] = fullyLoadedMedia.seasonNumber.toString()
             if (index + 1 < splitUrl.length - 1) {
-              splitUrl.splice(index + 2, splitUrl.length - index + 1);
+              splitUrl.splice(index + 2, splitUrl.length - index + 1)
             }
-            url = splitUrl.join("/");
+            url = splitUrl.join('/')
           }
         } else {
-          url =
-            splitUrl.join("/") + "/seasons/" + fullyLoadedMedia.seasonNumber;
+          url = splitUrl.join('/') + '/seasons/' + fullyLoadedMedia.seasonNumber
         }
       }
-      return url;
-    };
+      return url
+    }
 
     const getEpisodeUrl = () => {
-      let url = null;
+      let url = null
       if (isEpisode(fullyLoadedMedia)) {
-        const splitUrl = location.pathname.split("/");
+        const splitUrl = location.pathname.split('/')
         if (splitUrl.length > 5) {
-          const index = splitUrl.findIndex((s) => s === MediaTypes.EPISODES);
+          const index = splitUrl.findIndex((s) => s === MediaTypes.EPISODES)
           if (index !== -1 && index + 1 < splitUrl.length) {
-            splitUrl[index + 1] = fullyLoadedMedia.episodeNumber.toString();
-            url = splitUrl.join("/");
+            splitUrl[index + 1] = fullyLoadedMedia.episodeNumber.toString()
+            url = splitUrl.join('/')
           }
         } else {
-          url =
-            splitUrl.join("/") + "/episodes/" + fullyLoadedMedia.episodeNumber;
+          url = splitUrl.join('/') + '/episodes/' + fullyLoadedMedia.episodeNumber
         }
       }
-      return url;
-    };
+      return url
+    }
 
     const uri = fullyLoadedMedia
       ? fullyLoadedMedia.mediaType === MediaTypes.MOVIES
@@ -183,30 +164,22 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
         : isEpisode(fullyLoadedMedia)
         ? getEpisodeUrl()
         : null
-      : null;
+      : null
 
     if (uri) {
-      navigate(uri);
+      navigate(uri)
     }
-  };
+  }
 
   if (!fullyLoadedMedia) {
-    return <div />;
+    return <div />
   }
 
   return (
     <>
-      <Container
-        hasPoster={!!fullyLoadedMedia.posterUrl}
-        onClick={() => onCardClick()}
-      >
+      <Container hasPoster={!!fullyLoadedMedia.posterUrl} onClick={() => onCardClick()}>
         {fullyLoadedMedia.posterUrl && (
-          <Image
-            className="media-poster"
-            src={fullyLoadedMedia.posterUrl}
-            alt=""
-            loaded={poster.loaded}
-          />
+          <Image className="media-poster" src={fullyLoadedMedia.posterUrl} alt="" loaded={poster.loaded} />
         )}
         {!fullyLoadedMedia.posterUrl && <svg viewBox="0 0 2 3" />}
 
@@ -221,24 +194,22 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
 
         <div className="media-hover-info">
           <p>{fullyLoadedMedia.title}</p>
-          {fullyLoadedMedia.releaseDate && (
-            <p>{new Date(fullyLoadedMedia.releaseDate).getFullYear()}</p>
-          )}
-          {((isMovie(fullyLoadedMedia) && !isOnServers(fullyLoadedMedia)) ||
-            isSeries(fullyLoadedMedia)) && (
+
+          {fullyLoadedMedia.releaseDate && <p>{new Date(fullyLoadedMedia.releaseDate).getFullYear()}</p>}
+
+          {((isMovie(fullyLoadedMedia) && !isOnServers(fullyLoadedMedia)) || isSeries(fullyLoadedMedia)) && (
             <RequestButton media={fullyLoadedMedia} />
           )}
+
           {isOnServers(fullyLoadedMedia) &&
             (isMovie(fullyLoadedMedia) || isEpisode(fullyLoadedMedia)) &&
             fullyLoadedMedia.mediaServersInfo &&
             fullyLoadedMedia.mediaServersInfo.length > 0 &&
             fullyLoadedMedia.mediaServersInfo[0].webUrl && (
-              <PlayButton
-                webUrl={fullyLoadedMedia.mediaServersInfo[0].webUrl}
-              />
+              <PlayButton webUrl={fullyLoadedMedia.mediaServersInfo[0].webUrl} />
             )}
         </div>
       </Container>
     </>
-  );
-};
+  )
+}
