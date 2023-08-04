@@ -1,11 +1,11 @@
-import React, { MouseEvent, useRef, useState } from "react";
-import styled from "styled-components";
-import { useOutsideAlerter } from "../../../../shared/hooks/useOutsideAlerter";
-import { SearchFilters } from "../../../../shared/enums/SearchFilters";
-import { uppercaseFirstLetter } from "../../../../utils/strings";
-import { STATIC_STYLES } from "../../../../shared/enums/StaticStyles";
-import { MediaTag } from "../../../../shared/components/Tag";
-import { MediaTypes } from "../../../../shared/enums/MediaTypes";
+import { MouseEvent, useRef, useState } from 'react'
+import styled from 'styled-components'
+import { useOutsideAlerter } from '../shared/hooks/useOutsideAlerter'
+import { SearchFilters } from '../shared/enums/SearchFilters'
+import { uppercaseFirstLetter } from '../utils/strings'
+import { STATIC_STYLES } from '../shared/enums/StaticStyles'
+import { MediaTag } from '../shared/components/Tag'
+import { MediaTypes } from '../shared/enums/MediaTypes'
 
 const Container = styled.div<{ isActive: boolean }>`
   position: relative;
@@ -22,15 +22,15 @@ const Container = styled.div<{ isActive: boolean }>`
 
   @media screen and (min-width: ${STATIC_STYLES.MOBILE_MAX_WIDTH}px) {
     border-top-left-radius: 3px;
-    border-bottom-left-radius: ${(props) => (!props.isActive ? "3px" : "none")};
+    border-bottom-left-radius: ${(props) => (!props.isActive ? '3px' : 'none')};
   }
-`;
+`
 
 const ActiveItem = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
-`;
+`
 
 const Items = styled.div`
   position: absolute;
@@ -42,7 +42,7 @@ const Items = styled.div`
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
   }
-`;
+`
 
 const Item = styled.div`
   width: 100%;
@@ -57,43 +57,35 @@ const Item = styled.div`
   &:last-child {
     border-radius: 0 0 3px 3px;
   }
-`;
+`
 
 type SearchDropdownTypeProps = {
-  selectedOption: SearchFilters;
-  onChange: (type: SearchFilters) => void;
-};
+  selectedOption: SearchFilters
+  onChange: (type: SearchFilters) => void
+}
 
-const SearchDropdownType = ({
-  selectedOption,
-  onChange,
-}: SearchDropdownTypeProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  useOutsideAlerter([dropdownRef], () => setIsOpen(false));
+const SearchDropdownType = ({ selectedOption, onChange }: SearchDropdownTypeProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef(null)
+  useOutsideAlerter([dropdownRef], () => setIsOpen(false))
 
   const onDropdownClick = (e: MouseEvent) => {
-    setIsOpen(!isOpen);
-    e.preventDefault();
-  };
+    setIsOpen(!isOpen)
+    e.preventDefault()
+  }
 
   const onOptionClick = (e: MouseEvent, value: SearchFilters) => {
-    setIsOpen(false);
-    onChange(value);
-    e.preventDefault();
-  };
+    setIsOpen(false)
+    onChange(value)
+    e.preventDefault()
+  }
 
   return (
     <Container ref={dropdownRef} isActive={isOpen} onClick={onDropdownClick}>
       <ActiveItem>
-        {selectedOption === SearchFilters.MOVIES && (
-          <MediaTag type={MediaTypes.MOVIES} />
-        )}
-        {selectedOption === SearchFilters.SERIES && (
-          <MediaTag type={MediaTypes.SERIES} />
-        )}
-        {selectedOption === SearchFilters.ALL &&
-          uppercaseFirstLetter(selectedOption)}
+        {selectedOption === SearchFilters.MOVIES && <MediaTag type={MediaTypes.MOVIES} />}
+        {selectedOption === SearchFilters.SERIES && <MediaTag type={MediaTypes.SERIES} />}
+        {selectedOption === SearchFilters.ALL && uppercaseFirstLetter(selectedOption)}
       </ActiveItem>
       <Items>
         {isOpen &&
@@ -107,7 +99,7 @@ const SearchDropdownType = ({
           )}
       </Items>
     </Container>
-  );
-};
+  )
+}
 
-export { SearchDropdownType };
+export { SearchDropdownType }

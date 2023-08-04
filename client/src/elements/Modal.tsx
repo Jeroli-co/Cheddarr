@@ -1,55 +1,59 @@
 import React from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { Dialog, Transition } from '@headlessui/react'
 import { Icon } from '../shared/components/Icon'
 import { faClose } from '@fortawesome/free-solid-svg-icons'
-import { cn } from '../utils/strings'
+import { Button } from './button/Button'
 
-type ModalContentProps = React.PropsWithChildren<
-  DialogPrimitive.DialogContentProps & { onClose?: () => void }
->
+type ModalProps = {
+  isOpen: boolean
+  onClose: () => void
+}
 
-export const ModalContent = React.forwardRef<HTMLDivElement, ModalContentProps>(
-  ({ children, onClose, className, ...props }, forwardedRef) => (
-    <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0" />
-      <DialogPrimitive.Content
-        className={cn(
-          'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 z-modal',
-          className
-        )}
-        {...props}
-        ref={forwardedRef}
-      >
-        {children}
-        {!!onClose && (
-          <DialogPrimitive.Close
-            className="fixed top-2 right-3 text-2xl text-primary-dark"
-            onClick={() => onClose()}
-          >
-            <Icon icon={faClose} />
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
-    </DialogPrimitive.Portal>
+
+
+export const Modal: React.FC<React.PropsWithChildren<ModalProps>> = ({
+  isOpen,
+  onClose,
+  children,
+}) => {
+  return (
+    <Transition appear show={isOpen} as={React.Fragment}>
+      <Dialog as="div" className="z-modal" onClose={() => onClose()}>
+        {/* Overlay */}
+        <Transition.Child
+          as={React.Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black-alpha-9 z-modal-overlay" />
+        </Transition.Child>
+
+        {/* Content */}
+        <Transition.Child
+          as={React.Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0 scale-95"
+          enterTo="opacity-100 scale-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100 scale-100"
+          leaveTo="opacity-0 scale-95"
+        >
+          <Dialog.Panel className="w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-modal-content">
+            {children}
+            <Button
+              variant="link"
+              className="fixed top-2 right-3 text-2xl text-primary-dark"
+              onClick={() => onClose()}
+            >
+              <Icon icon={faClose} />
+            </Button>
+          </Dialog.Panel>
+        </Transition.Child>
+      </Dialog>
+    </Transition>
   )
-)
-
-type ModalTriggerProps = React.PropsWithChildren<DialogPrimitive.DialogTriggerProps>
-
-export const ModalTrigger = React.forwardRef<HTMLButtonElement, ModalTriggerProps>(
-  ({ children, className, ...props }, forwardedRef) => (
-    <DialogPrimitive.Trigger
-      ref={forwardedRef}
-      className={cn('cursor-pointer', className)}
-      asChild
-      {...props}
-    >
-      {children}
-    </DialogPrimitive.Trigger>
-  )
-)
-
-export const Modal = DialogPrimitive.Root
-export const ModalTitle = DialogPrimitive.Title
-export const ModalDescription = DialogPrimitive.Description
-export const ModalClose = DialogPrimitive.Close
+}

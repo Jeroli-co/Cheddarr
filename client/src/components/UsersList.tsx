@@ -1,4 +1,4 @@
-import { faEdit, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faEdit, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router'
@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import { usePagination } from '../hooks/usePagination'
 import httpClient from '../http-client'
 import { routes } from '../routes'
-import { PrimaryIconButton, DangerIconButton } from '../shared/components/Button'
 import { DeleteDataModal } from '../shared/components/DeleteDataModal'
 import { Icon } from '../shared/components/Icon'
 import { PaginationArrows } from '../shared/components/PaginationArrows'
@@ -16,6 +15,7 @@ import { Buttons } from '../shared/components/layout/Buttons'
 import { useAlert } from '../shared/contexts/AlertContext'
 import { useSession } from '../shared/contexts/SessionContext'
 import { IUser } from '../shared/models/IUser'
+import { Button } from '../elements/button/Button'
 
 const Header = styled.div`
   background: ${(props) => props.theme.primaryLight};
@@ -77,15 +77,16 @@ export const UsersList = ({ confirmed }: { confirmed?: boolean }) => {
   } = useSession()
   const navigate = useNavigate()
 
+  const { data, isLoading, isFetching, loadPrev, loadNext } = usePagination<IUser>(
+    ['users', confirmed ? 'confirmed' : 'pending'],
+    `/users`,
+    confirmed ? { confirmed: 'true' } : undefined
+  )
+
   const [deleteUserModalState, setDeleteUserModalState] = useState<{
     isOpen: boolean
     user: IUser | null
   }>({ isOpen: false, user: null })
-
-  const { data, isLoading, isFetching, loadPrev, loadNext } = usePagination<IUser>(
-    ['users'],
-    `/users${confirmed ? '?confirmed=true' : ''}`
-  )
 
   const onUserEditClick = (clickedUser: IUser) => {
     navigate(routes.PROFILE.url(clickedUser.id.toString(10)))
@@ -124,12 +125,23 @@ export const UsersList = ({ confirmed }: { confirmed?: boolean }) => {
                 <UserSmallCard user={u} />
                 <span>
                   <Buttons>
-                    <PrimaryIconButton onClick={() => onUserEditClick(u)}>
-                      <Icon icon={faEdit} />
-                    </PrimaryIconButton>
-                    <DangerIconButton onClick={() => onDeleteUserClick(u)}>
+                    {confirmed ? (
+                      <Button mode="square" onClick={() => onUserEditClick(u)}>
+                        <Icon icon={faEdit} />
+                      </Button>
+                    ) : (
+                      <Button mode="square" color="success" onClick={() => onUserEditClick(u)}>
+                        <Icon icon={faCheck} />
+                      </Button>
+                    )}
+                    <Button
+                      variant="outlined"
+                      color="danger"
+                      mode="square"
+                      onClick={() => onDeleteUserClick(u)}
+                    >
                       <Icon icon={faTimes} />
-                    </DangerIconButton>
+                    </Button>
                   </Buttons>
                 </span>
               </Item>

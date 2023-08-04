@@ -1,5 +1,4 @@
 import React from 'react'
-import { H1 } from '../../shared/components/Titles'
 import { useRoleGuard } from '../../shared/hooks/useRoleGuard'
 import { Roles } from '../../shared/enums/Roles'
 import { PageLoader } from '../../shared/components/PageLoader'
@@ -21,7 +20,6 @@ export default () => {
 
   return (
     <>
-      <H1>Manage users</H1>
       <TabsContextProvider tabs={tabs} url={routes.USERS.url}>
         <React.Suspense fallback={<PageLoader />}>
           <Routes>

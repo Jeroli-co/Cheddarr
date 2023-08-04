@@ -22,7 +22,7 @@ export const useUser = (id?: string) => {
 
   const { data, isLoading, isFetching } = useData<IUser>(
     ['users', id ?? user.id.toString()],
-    `/users/${id}`
+    `/users/${id ?? user.id}`
   )
 
   const updateUser = (user: IUser) => {

@@ -29,18 +29,25 @@ module.exports = {
       'primary-dark': 'var(--primary-dark)',
       'primary-darker': 'var(--primary-darker)',
 
-      'secondary-lighter': 'var(--secondary)',
-      'secondary-light': 'var(--secondary)',
+      'secondary-lighter': 'var(--secondary-lighter)',
+      'secondary-light': 'var(--secondary-light)',
       secondary: 'var(--secondary)',
       'secondary-dark': 'var(--secondary-dark)',
       'secondary-darker': 'var(--secondary-darker)',
 
       tertiary: 'var(--tertiary)',
 
+      'success-lighter': 'var(--success-lighter)',
+      'success-light': 'var(--success-light)',
       success: 'var(--success)',
+      'success-dark': 'var(--success-dark)',
+      'success-darker': 'var(--success-darker)',
 
-      danger: 'var(--danger)',
+      'danger-lighter': 'var(--danger-lighter)',
       'danger-light': 'var(--danger-light)',
+      danger: 'var(--danger)',
+      'danger-dark': 'var(--danger-dark)',
+      'danger-darker': 'var(--danger-darker)',
 
       warning: 'var(--warning)',
       'warning-light': 'var(--warning-light)',
@@ -55,6 +62,8 @@ module.exports = {
     zIndex: {
       nav: 100,
       modal: 200,
+      'modal-overlay': 201,
+      'modal-content': 202,
     },
     extend: {
       fontFamily: {

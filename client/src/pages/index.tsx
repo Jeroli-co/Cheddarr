@@ -1,5 +1,4 @@
 import React from 'react'
-import { Navbar } from '../logged-in-app/navbar/Navbar'
 import { PageLoader } from '../shared/components/PageLoader'
 import { Link, LinkProps } from 'react-router-dom'
 import {
@@ -17,10 +16,11 @@ import { checkRole } from '../utils/roles'
 import { Roles } from '../shared/enums/Roles'
 import { cn } from '../utils/strings'
 import { NewDivider } from '../shared/components/Divider'
-import { Modal, ModalContent, ModalTitle, ModalTrigger } from '../elements/Modal'
 import { Title } from '../elements/Title'
 import { IUser } from '../shared/models/IUser'
 import { GithubLink } from '../components/GithubLink'
+import { Modal } from '../elements/Modal'
+import { SearchBar } from '../logged-in-app/SearchBar'
 
 const CheddarrLogoLink = () => {
   return (
@@ -73,7 +73,7 @@ const Sidebar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => 
     )
 
     return (
-      <button type="button" className={classNames} {...props}>
+      <button type={type} className={classNames} {...props}>
         {children}
       </button>
     )
@@ -144,108 +144,7 @@ const Sidebar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => 
   )
 }
 
-export const BottombarExtendedModal: React.FC<{
-  user?: IUser
-  open: boolean
-  triggerElement: React.ReactNode
-  onClose: () => void
-}> = ({ user, triggerElement, onClose, ...props }) => {
-  const BottombarExtendedLink: React.FC<React.PropsWithChildren<LinkProps>> = ({
-    to,
-    className,
-    children,
-    ...props
-  }) => {
-    const classNames = cn(
-      'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
-      className
-    )
-
-    return (
-      <Link to={to} className={classNames} {...props}>
-        {children}
-      </Link>
-    )
-  }
-
-  return (
-    <Modal {...props}>
-      <ModalTrigger>{triggerElement}</ModalTrigger>
-      <ModalContent className="w-full h-full bg-primary-darker animate-slide-b-t" onClose={onClose}>
-        <div className="h-full flex flex-col justify-between">
-          <div className="flex flex-col">
-            <ModalTitle className="place-self-center">
-              <Title as="h1">
-                <CheddarrLogoLink />
-              </Title>
-            </ModalTitle>
-
-            <div className="flex flex-col gap-3">
-              <BottombarExtendedLink to="/" onClick={() => onClose()}>
-                <Icon icon={faHome} />
-                <span>Dashboard</span>
-              </BottombarExtendedLink>
-
-              {user && checkRole(user.roles, [Roles.REQUEST, Roles.MANAGE_REQUEST], true) && (
-                <BottombarExtendedLink
-                  to="/requests"
-                  className="flex items-center gap-2"
-                  onClick={() => onClose()}
-                >
-                  <Icon icon={faRegistered} />
-                  <span>Requests</span>
-                </BottombarExtendedLink>
-              )}
-
-              {user && checkRole(user.roles, [Roles.MANAGE_USERS]) && (
-                <BottombarExtendedLink
-                  to="/users"
-                  className="flex items-center gap-2"
-                  onClick={() => onClose()}
-                >
-                  <Icon icon={faUsers} />
-                  <span>Users</span>
-                </BottombarExtendedLink>
-              )}
-
-              {user && checkRole(user.roles, [Roles.MANAGE_SETTINGS]) && (
-                <BottombarExtendedLink
-                  to="/settings"
-                  className="flex items-center gap-2"
-                  onClick={() => onClose()}
-                >
-                  <Icon icon={faCog} />
-                  <span>Settings</span>
-                </BottombarExtendedLink>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <BottombarExtendedLink
-              to="/profile"
-              className="flex items-center gap-3"
-              onClick={() => onClose()}
-            >
-              <div className="w-12">
-                <img
-                  src={user?.avatar}
-                  alt="User"
-                  className="rounded-full aspect-square w-full h-auto"
-                />
-              </div>
-              <span className="font-bold">{user?.username}</span>
-            </BottombarExtendedLink>
-
-            <GithubLink />
-          </div>
-        </div>
-      </ModalContent>
-    </Modal>
-  )
-}
-
-const Bottombar = ({ user }: { user?: IUser }) => {
+const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => {
   const [open, setOpen] = React.useState(false)
 
   const BottombarLink: React.FC<React.PropsWithChildren<LinkProps>> = ({
@@ -275,34 +174,147 @@ const Bottombar = ({ user }: { user?: IUser }) => {
     )
 
     return (
-      <button type="button" className={classNames} {...props}>
+      <button type={type} className={classNames} {...props}>
+        {children}
+      </button>
+    )
+  }
+
+  const BottombarExtendedLink: React.FC<React.PropsWithChildren<LinkProps>> = ({
+    to,
+    className,
+    children,
+    ...props
+  }) => {
+    const classNames = cn(
+      'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
+      className
+    )
+
+    return (
+      <Link to={to} className={classNames} {...props}>
+        {children}
+      </Link>
+    )
+  }
+
+  const BottombarExtendedButton: React.FC<
+    React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>
+  > = ({ type = 'button', className, children, ...props }) => {
+    const classNames = cn(
+      'flex items-center gap-2 px-1 py-1.5 hover:bg-primary-light hover:text-primary-darker rounded-full transition-bg transition-text ease-in duration-200 hover:pl-3',
+      className
+    )
+
+    return (
+      <button type={type} className={classNames} {...props}>
         {children}
       </button>
     )
   }
 
   return (
-    <nav className="w-full h-[60px] fixed bottom-0 md:hidden z-nav px-2">
-      <div className="w-full h-full grid grid-cols-3 items-center bg-primary-light rounded-t-xl border-2 border-primary-dark">
-        <BottombarExtendedModal
-          user={user}
-          open={open}
-          onClose={() => setOpen(false)}
-          triggerElement={
-            <BottombarButton onClick={() => setOpen(true)}>
-              <Icon icon={faNavicon} />
-            </BottombarButton>
-          }
-        />
+    <>
+      <nav className="w-full h-[60px] fixed bottom-0 md:hidden z-nav px-2">
+        <div className="w-full h-full grid grid-cols-3 items-center bg-primary-light rounded-t-xl border-2 border-primary-dark">
+          <BottombarButton onClick={() => setOpen(true)}>
+            <Icon icon={faNavicon} />
+          </BottombarButton>
 
-        <BottombarLink to="/" className="border-x border-x-primary-dark">
-          <Icon icon={faHome} />
-        </BottombarLink>
+          <BottombarLink to="/" className="border-x border-x-primary-dark">
+            <Icon icon={faHome} />
+          </BottombarLink>
 
-        <BottombarButton>
-          <Icon icon={faSearch} />
-        </BottombarButton>
-      </div>
+          <BottombarButton>
+            <Icon icon={faSearch} />
+          </BottombarButton>
+        </div>
+      </nav>
+
+      <Modal isOpen={open} onClose={() => setOpen(false)}>
+        <div className="w-full h-full flex flex-col justify-between bg-primary-darker p-4">
+          <div className="flex flex-col">
+            <Title as="h1" className="place-self-center">
+              <CheddarrLogoLink />
+            </Title>
+
+            <div className="flex flex-col gap-3">
+              <BottombarExtendedLink to="/" onClick={() => setOpen(false)}>
+                <Icon icon={faHome} />
+                <span>Dashboard</span>
+              </BottombarExtendedLink>
+
+              {user && checkRole(user.roles, [Roles.REQUEST, Roles.MANAGE_REQUEST], true) && (
+                <BottombarExtendedLink
+                  to="/requests"
+                  className="flex items-center gap-2"
+                  onClick={() => setOpen(false)}
+                >
+                  <Icon icon={faRegistered} />
+                  <span>Requests</span>
+                </BottombarExtendedLink>
+              )}
+
+              {user && checkRole(user.roles, [Roles.MANAGE_USERS]) && (
+                <BottombarExtendedLink
+                  to="/users"
+                  className="flex items-center gap-2"
+                  onClick={() => setOpen(false)}
+                >
+                  <Icon icon={faUsers} />
+                  <span>Users</span>
+                </BottombarExtendedLink>
+              )}
+
+              {user && checkRole(user.roles, [Roles.MANAGE_SETTINGS]) && (
+                <BottombarExtendedLink
+                  to="/settings"
+                  className="flex items-center gap-2"
+                  onClick={() => setOpen(false)}
+                >
+                  <Icon icon={faCog} />
+                  <span>Settings</span>
+                </BottombarExtendedLink>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <BottombarExtendedButton onClick={() => onLogout()}>
+              <Icon icon={faSignOutAlt} />
+              <span>Sign out</span>
+            </BottombarExtendedButton>
+            <NewDivider className="my-3" />
+            <div className="flex items-center justify-between">
+              <BottombarExtendedLink
+                to="/profile"
+                className="flex items-center gap-3"
+                onClick={() => setOpen(false)}
+              >
+                <div className="w-12">
+                  <img
+                    src={user?.avatar}
+                    alt="User"
+                    className="rounded-full aspect-square w-full h-auto"
+                  />
+                </div>
+                <span className="font-bold">{user?.username}</span>
+              </BottombarExtendedLink>
+
+              <GithubLink />
+            </div>
+          </div>
+        </div>
+      </Modal>
+    </>
+  )
+}
+
+const Navbar = () => {
+  return (
+    <nav className="w-full hidden md:flex items-center justify-between gap-3 p-4">
+      <SearchBar />
+      <GithubLink />
     </nav>
   )
 }
@@ -327,7 +339,7 @@ export default () => {
           </React.Suspense>
         </div>
       </div>
-      <Bottombar user={user} />
+      <Bottombar user={user} onLogout={() => invalidSession()} />
     </>
   )
 }

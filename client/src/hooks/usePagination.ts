@@ -35,7 +35,7 @@ export const usePagination = <TData>(
     return httpClient
       .get<IPaginated<TData>>(
         `${queryURL}?page=${page}${
-          querySearchParams ?? `&${new URLSearchParams(querySearchParams).toString()}`
+          querySearchParams ? `&${new URLSearchParams(querySearchParams).toString()}` : ''
         }`
       )
       .then((res) => res.data)

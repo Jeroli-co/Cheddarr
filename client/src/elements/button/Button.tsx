@@ -11,18 +11,24 @@ const buttonVariants = cva(
       color: {
         primary: '',
         secondary: '',
+        success: '',
+        danger: '',
         plex: '',
       },
       variant: {
         contained: '',
         outlined: 'bg-transparent',
         text: 'border-transparent bg-transparent',
-        link: '',
+        link: 'min-h-0 min-w-0 whitespace-normal border-0 p-0 text-inherit hover:underline focus-visible:underline',
       },
       size: {
         sm: 'min-h-[32px] min-w-[32px] px-3 py-1.5 text-sm',
         md: 'min-h-[44px] min-w-[44px] px-6 py-2',
         lg: 'min-h-[72px] min-w-[72px] px-8 py-3 text-lg',
+      },
+      mode: {
+        normal: '',
+        square: '',
       },
     },
     compoundVariants: [
@@ -36,7 +42,19 @@ const buttonVariants = cva(
         color: 'secondary',
         variant: 'contained',
         className:
-          'border-secondary-lighter bg-secondary-dark hover:border-secondary-light hover:bg-secondary',
+          'border-secondary bg-secondary text-secondary-lighter hover:border-secondary-dark hover:bg-secondary-dark hover:text-secondary-light',
+      },
+      {
+        color: 'success',
+        variant: 'contained',
+        className:
+          'border-success bg-success text-success-lighter hover:border-success-dark hover:bg-success-dark hover:text-success-light',
+      },
+      {
+        color: 'danger',
+        variant: 'contained',
+        className:
+          'border-danger bg-danger text-danger-lighter hover:border-danger-dark hover:bg-danger-dark hover:text-danger-light',
       },
       {
         color: 'plex',
@@ -51,24 +69,34 @@ const buttonVariants = cva(
       {
         color: 'secondary',
         variant: 'outlined',
-        className:
-          'border-secondary-lighter bg-secondary-dark hover:border-secondary-light hover:bg-secondary',
+        className: 'border-secondary text-secondary hover:bg-secondary-light',
       },
       {
-        color: 'primary',
-        variant: 'text',
-        className: 'border-transparent text-primary-950 ring-primary-500 hover:bg-primary-100',
+        color: 'danger',
+        variant: 'outlined',
+        className: 'border-danger text-danger hover:bg-danger-light',
       },
       {
-        variant: 'link',
-        className:
-          'min-h-0 min-w-0 whitespace-normal border-0 p-0 text-inherit hover:underline focus-visible:underline',
+        mode: 'square',
+        size: 'sm',
+        className: 'px-1.5',
+      },
+      {
+        mode: 'square',
+        size: 'md',
+        className: 'px-2',
+      },
+      {
+        mode: 'square',
+        size: 'lg',
+        className: 'px-3',
       },
     ],
     defaultVariants: {
       color: 'primary',
       variant: 'contained',
       size: 'md',
+      mode: 'normal',
     },
   }
 )
@@ -85,6 +113,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       color = 'primary',
       variant = 'contained',
       size = 'md',
+      mode = 'normal',
       asChild,
       loading,
       disabled,
@@ -100,7 +129,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         className={cn(
-          buttonVariants({ color, variant, size, className }),
+          buttonVariants({ color, variant, size, mode, className }),
           (loading || disabled) && 'pointer-events-none',
           disabled && 'opacity-50'
         )}

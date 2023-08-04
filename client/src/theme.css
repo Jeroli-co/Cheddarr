@@ -62,10 +62,17 @@
 
     --tertiary: hsl(44, 97%, 65%);
 
-    --success: hsl(129, 30%, 52%);
+    --success-lighter: hsl(129, 30%, 95%);
+    --success-light: hsl(129, 30%, 75%);
+    --success: hsl(129, 30%, 50%);
+    --success-dark: hsl(129, 30%, 25%);
+    --success-darker: hsl(129, 30%, 5%);
 
+    --danger-lighter: hsl(0, 91%, 95%);
     --danger-light: hsl(0, 91%, 75%);
     --danger: hsl(0, 91%, 50%);
+    --danger-dark: hsl(0, 91%, 25%);
+    --danger-darker: hsl(0, 91%, 5%);
 
     --warning-light: hsl(38, 91%, 75%);
     --warning: hsl(38, 91%, 50%);
