@@ -79,8 +79,8 @@ class MediaProviderSetting(Model, ExternalServiceSetting):
         return self._tags.split(",")
 
     @tags.setter
-    def tags(self, value: list[int]) -> None:
-        self._tags = ",".join(str(v) for v in value)
+    def tags(self, value: list[str]) -> None:
+        self._tags = ",".join(v for v in value)
 
 
 class RadarrSetting(MediaProviderSetting):
@@ -109,5 +109,5 @@ class SonarrSetting(MediaProviderSetting):
         return self._anime_tags.split(",")
 
     @anime_tags.setter
-    def anime_tags(self, value: list[int]) -> None:
-        self._anime_tags = ",".join(str(v) for v in value)
+    def anime_tags(self, value: list[str]) -> None:
+        self._anime_tags = ",".join(v for v in value)

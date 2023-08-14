@@ -28,7 +28,7 @@ class MediaProviderSettingBase(ExternalServiceSettingBase, ABC):
     quality_profile_id: int
     version: int
     is_default: bool | None = False
-    tags: list[int] | None = None
+    tags: list[str] | None = None
 
 
 #####################################
@@ -90,10 +90,10 @@ class SonarrSettingSchema(MediaProviderSettingBase):
     id: str
     anime_root_folder: str | None = None
     anime_quality_profile_id: int | None = None
-    anime_tags: list[int] | None = None
+    anime_tags: list[str] | None = None
 
 
 class SonarrSettingCreateUpdate(MediaProviderSettingBase):
     anime_root_folder: str | None = None
     anime_quality_profile_id: int | None = None
-    anime_tags: list[int] | None = None
+    anime_tags: list[str] | None = None
