@@ -1,40 +1,83 @@
 import { useState } from 'react'
-import { H1 } from '../../shared/components/Titles'
-import { Row } from '../../shared/components/layout/Row'
-import { AddItemBox, SpinnerItemBox } from '../../shared/components/ItemBox'
-import { RadarrSettingsBoxPreview } from '../../logged-in-app/pages/settings/media-providers/radarr/RadarrSettingsBoxPreview'
-import { SonarrSettingsBoxPreview } from '../../logged-in-app/pages/settings/media-providers/sonarr/SonarrSettingsBoxPreview'
-import { PickMediaProviderTypeModal } from '../../logged-in-app/pages/settings/media-providers/PickMediaProviderTypeModal'
+import { PickMediaProviderTypeModal } from '../../components/PickMediaProviderTypeModal'
 import { useRadarrSettings, useSonarrSettings } from '../../hooks/useProvidersSettings'
+import { Title } from '../../elements/Title'
+import { SettingsPreviewCard } from '../../components/ConfigPreviewCard'
+import { Icon } from '../../shared/components/Icon'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { Spinner } from '../../shared/components/Spinner'
+import { MediaProviderEnum, MediaProviderSettings } from '../../schemas/media-servers'
+import { EditMediaProviderSettingsModal } from '../../components/EditMediaProviderSettingsModal'
+
+type MediaProviderSettingsPreviewCardProps = {
+  type: MediaProviderEnum
+  data: MediaProviderSettings
+}
+
+const MediaProviderSettingsPreviewCard = ({ data, type }: MediaProviderSettingsPreviewCardProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  return (
+    <>
+      <SettingsPreviewCard onClick={() => setIsOpen(true)}>{data?.name}</SettingsPreviewCard>
+      <EditMediaProviderSettingsModal type={type} isOpen={isOpen} onClose={() => setIsOpen(false)} data={data} />
+    </>
+  )
+}
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const [isPickMediaProvidersTypeModalOpen, setIsPickMediaProvidersTypeModalOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
-  const { data: radarrSettings, isLoading: isRadarrSettingsLoading } = useRadarrSettings()
-  const { data: sonarrSettings, isLoading: isSonarrSettingsLoading } = useSonarrSettings()
+  const {
+    data: radarrSettings,
+    isLoading: isRadarrSettingsLoading,
+    isFetching: isRadarrSettingsFetching,
+  } = useRadarrSettings()
+
+  const {
+    data: sonarrSettings,
+    isLoading: isSonarrSettingsLoading,
+    isFetching: isSonarrSettingsFetching,
+  } = useSonarrSettings()
 
   return (
-    <div>
-      <H1>Configure your media providers</H1>
-      <Row>
-        <AddItemBox onClick={() => setIsPickMediaProvidersTypeModalOpen(true)} />
-        {isRadarrSettingsLoading && <SpinnerItemBox />}
-        {!isRadarrSettingsLoading &&
-          radarrSettings?.map((config, index) => {
-            return <RadarrSettingsBoxPreview key={index} data={config} />
-          })}
-        {isSonarrSettingsLoading && <SpinnerItemBox />}
-        {!isSonarrSettingsLoading &&
-          sonarrSettings?.map((config, index) => {
-            return <SonarrSettingsBoxPreview key={index} data={config} />
-          })}
-      </Row>
-      {isPickMediaProvidersTypeModalOpen && (
-        <PickMediaProviderTypeModal
-          closeModal={() => setIsPickMediaProvidersTypeModalOpen(false)}
-        />
-      )}
-    </div>
+    <>
+      <Title as="h1">Configure your media providers</Title>
+
+      <div className="space-y-8">
+        <p>Link your Radarr and Sonarr instance to your Cheddarr server.</p>
+
+        <SettingsPreviewCard onClick={() => setIsOpen(true)} className="w-full">
+          <Icon icon={faPlus} size="xl" />
+        </SettingsPreviewCard>
+
+        <div>
+          <Title as="h2">Current configurations</Title>
+
+          {(isRadarrSettingsLoading ||
+            isRadarrSettingsFetching ||
+            isSonarrSettingsLoading ||
+            isSonarrSettingsFetching) && (
+            <SettingsPreviewCard className="border-0">
+              <Spinner size="sm" />
+            </SettingsPreviewCard>
+          )}
+
+          <div className="flex items-center gap-3">
+            {!isRadarrSettingsLoading &&
+              radarrSettings?.map((config, index) => (
+                <MediaProviderSettingsPreviewCard type={MediaProviderEnum.RADARR} key={index} data={config} />
+              ))}
+
+            {!isSonarrSettingsLoading &&
+              sonarrSettings?.map((config, index) => (
+                <MediaProviderSettingsPreviewCard type={MediaProviderEnum.SONARR} key={index} data={config} />
+              ))}
+          </div>
+        </div>
+      </div>
+
+      <PickMediaProviderTypeModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </>
   )
 }

@@ -2,7 +2,7 @@ import { faKey, faUser } from '@fortawesome/free-solid-svg-icons'
 import { useForm } from 'react-hook-form'
 import { FORM_DEFAULT_VALIDATOR } from '../../shared/enums/FormDefaultValidators'
 import { useAuthentication } from '../../shared/contexts/AuthenticationContext'
-import { NewDivider } from '../../shared/components/Divider'
+import { Divider } from '../../shared/components/Divider'
 import { usePlexAuth } from '../../shared/contexts/PlexAuthContext'
 import { Input } from '../../elements/Input'
 import { z } from 'zod'
@@ -163,7 +163,7 @@ export default () => {
           {isPasswordDisplayed && <Button type="submit">Sign up</Button>}
         </div>
 
-        <NewDivider />
+        <Divider />
 
         <div className="flex flex-col items-center">
           <Title as="h2" variant="center">

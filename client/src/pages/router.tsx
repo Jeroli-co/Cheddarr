@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { PageLoader } from '../shared/components/PageLoader'
+import { PageLoaderModal } from '../shared/components/PageLoaderModal'
 import { Navigate } from 'react-router'
 
 const HomePage = React.lazy(() => import('./home'))
@@ -16,7 +16,7 @@ const NotFoundPage = React.lazy(() => import('../shared/components/errors/NotFou
 // eslint-disable-next-line import/no-anonymous-default-export, react/display-name
 export default () => {
   return (
-    <React.Suspense fallback={<PageLoader />}>
+    <React.Suspense fallback={<PageLoaderModal />}>
       <Routes>
         <Route index element={<Navigate to="/home" />} />
         <Route path="home" element={<HomePage />} />

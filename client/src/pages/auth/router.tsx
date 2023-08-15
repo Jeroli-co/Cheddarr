@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Route, Routes, Navigate } from 'react-router'
 import AuthenticationContextProvider from '../../shared/contexts/AuthenticationContext'
-import { PageLoader } from '../../shared/components/PageLoader'
+import { PageLoaderModal } from '../../shared/components/PageLoaderModal'
 import Layout from './layout'
 
 const SignInPage = React.lazy(() => import('./sign-in'))
@@ -12,11 +12,11 @@ const ResetPasswordPage = React.lazy(() => import('../../components/ResetPasswor
 export default () => {
   return (
     <AuthenticationContextProvider>
-      <React.Suspense fallback={<PageLoader />}>
+      <React.Suspense fallback={<PageLoaderModal />}>
         <Layout>
           <Routes>
             <Route path="sign-in" element={<SignInPage />} />
-            <Route path="sign-in/plex/confirm" element={<PageLoader />} />
+            <Route path="sign-in/plex/confirm" element={<PageLoaderModal />} />
             <Route path="sign-up" element={<SignUpPage />} />
             <Route path="password/:token" element={<ResetPasswordPage />} />
             <Route index element={<Navigate to="sign-in" />} />

@@ -17,26 +17,6 @@ export const PrimaryLightDivider = styled(Divider)`
   border-top: 1px solid ${(props) => props.theme.primaryLight};
 `
 
-export const SecondaryDivider = styled(Divider)`
-  border-top: 1px solid ${(props) => props.theme.secondary};
-`
-
-export const VerticalDivider = styled.div`
-  width: 0;
-  height: 100%;
-  margin-left: 20px;
-  margin-right: 20px;
-  border-left: 1px solid ${(props) => props.theme.color};
-`
-
-export const PrimaryVerticalDivider = styled(VerticalDivider)`
-  border-left: 1px solid ${(props) => props.theme.primary};
-`
-
-export const SecondaryVerticalDivider = styled(VerticalDivider)`
-  border-left: 1px solid ${(props) => props.theme.secondary};
-`
-
 export const NewDivider = ({ className }: { className?: string }) => (
-  <div className={cn('w-full h-[1px] bg-primary rounded-full', className)} />
+  <div className={cn('w-full h-[1px] bg-primary-lighter rounded-full', className)} />
 )

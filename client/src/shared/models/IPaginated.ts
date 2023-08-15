@@ -1,6 +1,6 @@
-export interface IPaginated<T = any> {
+export interface IPaginated<TData> {
   page: number
-  totalPages: number
-  results: T[]
-  totalResults: number
+  pages: number
+  results: TData[]
+  total: number
 }

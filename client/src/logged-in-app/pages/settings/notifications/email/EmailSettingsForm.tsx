@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { Input } from '../../../../../elements/Input'
-import { Checkbox } from '../../../../../elements/checkbox/Checkbox'
+import { Checkbox } from '../../../../../elements/Checkbox'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import httpClient from '../../../../../utils/http-client'

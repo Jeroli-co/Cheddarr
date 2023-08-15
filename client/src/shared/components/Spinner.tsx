@@ -1,35 +1,39 @@
-import * as React from "react";
-import styled from "styled-components";
-import { ComponentSizes } from "../enums/ComponentSizes";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { type VariantProps, cva } from 'class-variance-authority'
+import React from 'react'
 
-const SpinnerStyle = styled.div`
-  color: ${(props) => props.theme.white};
-`;
+const spinnerVariants = cva('', {
+  variants: {
+    size: {
+      sm: '',
+      md: '',
+      lg: '',
+    },
+  },
+  compoundVariants: [],
+  defaultVariants: {
+    size: 'md',
+  },
+})
 
-type SpinnerProps = {
-  size?: ComponentSizes;
-};
+type SpinnerProps = React.HTMLAttributes<SVGSVGElement> & VariantProps<typeof spinnerVariants>
 
-export const Spinner = (props: SpinnerProps) => {
-  const getSize = () => {
-    switch (props.size) {
-      case ComponentSizes.SMALL:
-        return "xs";
-      case ComponentSizes.MEDIUM:
-        return "sm";
-      case ComponentSizes.LARGE:
-        return "lg";
-      case ComponentSizes.XLARGE:
-        return "2x";
-      default:
-        return "lg";
+export const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(({ size = 'md' }, ref) => {
+  const sizeToFaSize = (s: typeof size) => {
+    switch (s) {
+      case 'sm':
+        return '1x'
+      case 'md':
+        return '2x'
+      case 'lg':
+        return '3x'
     }
-  };
-  return (
-    <SpinnerStyle>
-      <FontAwesomeIcon icon={faSpinner} pulse size={getSize()} />
-    </SpinnerStyle>
-  );
-};
+  }
+
+  const faSize = sizeToFaSize(size)
+
+  return <FontAwesomeIcon ref={ref} icon={faSpinner} pulse size={faSize} />
+})
+
+Spinner.displayName = 'Spinner'

@@ -82,10 +82,7 @@ const LogComponent = ({ log }: LogComponentProps) => {
 export default () => {
   useRoleGuard([Roles.ADMIN])
 
-  const { data, isLoading, isFetching, loadNext, loadPrev } = usePagination<ILog>(
-    ['system', 'logs'],
-    '/system/logs'
-  )
+  const { data, isLoading, isFetching, loadNext, loadPrev } = usePagination<ILog>(['system', 'logs'], '/system/logs')
 
   if (isLoading || isFetching) {
     return <Spinner />
@@ -96,7 +93,7 @@ export default () => {
       {data?.results?.map((log, index) => <LogComponent log={log} key={index} />)}
       <PaginationArrows
         currentPage={data?.page}
-        totalPages={data?.totalPages}
+        totalPages={data?.pages}
         onLoadPrev={() => loadPrev()}
         onLoadNext={() => loadNext()}
         onLoadPage={() => {}}

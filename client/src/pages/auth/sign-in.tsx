@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAuthentication } from '../../shared/contexts/AuthenticationContext'
 import { usePlexAuth } from '../../shared/contexts/PlexAuthContext'
-import { NewDivider } from '../../shared/components/Divider'
+import { Divider } from '../../shared/components/Divider'
 import { Title } from '../../elements/Title'
 import { Input } from '../../elements/Input'
 import { Button } from '../../elements/button/Button'
@@ -101,7 +101,7 @@ export default () => {
           <Button type="submit">Sign in</Button>
         </div>
 
-        <NewDivider />
+        <Divider />
 
         <div className="flex flex-col items-center">
           <Title as="h2" variant="center">

@@ -1,6 +1,8 @@
 client/node_modules
-client/build
+client/dist
 client/.prettierignore
 client/.prettierrc
+client/.eslintrc
+client/.eslintignore
 .dockerignore
 Dockerfile

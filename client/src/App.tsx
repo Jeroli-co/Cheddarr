@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeContext } from './shared/contexts/ThemeContext'
 import { SessionContextProvider } from './shared/contexts/SessionContext'
 import PlexAuthContextProvider from './shared/contexts/PlexAuthContext'
-import { PageLoader } from './shared/components/PageLoader'
+import { PageLoaderModal } from './shared/components/PageLoaderModal'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import 'swiper/css'
 
@@ -25,7 +25,7 @@ export default () => {
           <BrowserRouter>
             <SessionContextProvider>
               <PlexAuthContextProvider>
-                <React.Suspense fallback={<PageLoader />}>
+                <React.Suspense fallback={<PageLoaderModal />}>
                   <MainRouter />
                 </React.Suspense>
               </PlexAuthContextProvider>

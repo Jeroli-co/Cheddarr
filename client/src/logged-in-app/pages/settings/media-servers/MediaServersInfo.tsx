@@ -11,8 +11,8 @@ import { IJob, JobActionsEnum } from '../../../../shared/models/IJob'
 import { APIRoutes } from '../../../../shared/enums/APIRoutes'
 import { useAPI } from '../../../../shared/hooks/useAPI'
 import { useAlert } from '../../../../shared/contexts/AlertContext'
-import { Checkbox } from '../../../../elements/checkbox/Checkbox'
-import { PlexSettings } from './plex/PlexSettingsForm'
+import { Checkbox } from '../../../../elements/Checkbox'
+import { PlexSettings } from '../../../../schemas/media-servers'
 
 const Header = styled.div`
   border-top-left-radius: 6px;
@@ -50,16 +50,8 @@ type MediaServerInfoProps = {
   mediaServerType: MediaServerTypes
 }
 
-const MediaServerInfo = ({
-  configId,
-  mediaServerType,
-  serverId,
-  serverName,
-}: MediaServerInfoProps) => {
-  const { libraries, updateLibrary, isLoading, isFetching } = useMediaServerLibraries(
-    configId,
-    mediaServerType
-  )
+const MediaServerInfo = ({ configId, mediaServerType, serverId, serverName }: MediaServerInfoProps) => {
+  const { libraries, updateLibrary, isLoading, isFetching } = useMediaServerLibraries(configId, mediaServerType)
   const { patch } = useAPI()
   const { pushInfo, pushDanger } = useAlert()
 
@@ -90,8 +82,8 @@ const MediaServerInfo = ({
         {!isLoading &&
           !isFetching &&
           libraries &&
-          libraries.map((l, index) => (
-            <Checkbox label={l.name} checked={l.enabled} onChange={() => updateLibrary(l)} />
+          libraries.map((l) => (
+            <Checkbox key={l.name} label={l.name} checked={l.enabled} onChange={() => updateLibrary(l)} />
           ))}
       </Libraries>
     </Item>
@@ -114,7 +106,7 @@ export const MediaServersInfo = ({ data }: MediaServersInfoProps) => {
           <MediaServerInfo
             key={index}
             configId={c.id}
-            serverName={c.name}
+            serverName={c.name ?? 'Unknown'}
             serverId={c.serverId}
             mediaServerType={MediaServerTypes.PLEX}
           />

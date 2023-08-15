@@ -65,6 +65,7 @@ module.exports = {
       'modal-overlay': 201,
       'modal-content': 202,
       dropdown: 202,
+      alert: 300,
     },
     extend: {
       fontFamily: {

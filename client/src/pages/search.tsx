@@ -1,4 +1,3 @@
-import { SearchFilters } from '../shared/enums/SearchFilters'
 import { MediaPreviewCard } from '../shared/components/media/MediaPreviewCard'
 import { IMedia } from '../shared/models/IMedia'
 import { MediaCardsLoader } from '../shared/components/media/MediaCardsLoader'
@@ -10,14 +9,26 @@ import { SearchBar } from '../logged-in-app/SearchBar'
 export default () => {
   const [searchParams] = useSearchParams()
 
-  const type = searchParams.get('type') || SearchFilters.ALL
-  const value = searchParams.get('value') || ''
+  const type = searchParams.get('type') ?? undefined
+  const value = searchParams.get('value') ?? undefined
+
+  const queryKeys = ['search', type, value].filter((e) => !!e) as string[]
+
+  let querySearchParams = {}
+
+  if (type) {
+    querySearchParams = { ...querySearchParams, type }
+  }
+
+  if (value) {
+    querySearchParams = { ...querySearchParams, value }
+  }
 
   const { data, isLoading, isFetching, ...rest } = usePagination<IMedia>(
-    ['search', type, value],
+    queryKeys,
     '/search',
-    new URLSearchParams({ type, value }).toString(),
-    { enabled: value.trim().length > 0 },
+    new URLSearchParams(querySearchParams).toString(),
+    { enabled: !!value && value.trim().length > 0 },
   )
 
   return (

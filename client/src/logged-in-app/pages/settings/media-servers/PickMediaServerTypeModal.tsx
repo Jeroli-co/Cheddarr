@@ -1,30 +1,26 @@
 import { useState } from 'react'
-import { Modal } from '../../../../shared/components/layout/Modal'
 import { H2 } from '../../../../shared/components/Titles'
 import { Buttons } from '../../../../shared/components/layout/Buttons'
 import { Button } from '../../../../shared/components/Button'
 import { MediaServerTypes } from '../../../../shared/enums/MediaServersTypes'
 import { ItemBox } from '../../../../shared/components/ItemBox'
 import { PlexSettingsForm } from './plex/PlexSettingsForm'
+import { Modal, ModalProps } from '../../../../elements/modal/Modal'
 
-type PickMediaServerTypeModalProps = {
-  closeModal: () => void
-}
+type PickMediaServerTypeModalProps = ModalProps
 
-export const PickMediaServerTypeModal = (props: PickMediaServerTypeModalProps) => {
+export const PickMediaServerTypeModal = ({ onClose, ...props }: PickMediaServerTypeModalProps) => {
   const [mediaServersTypePick, setMediaServersTypePick] = useState<MediaServerTypes | null>(null)
 
   const closeModal = () => {
     setMediaServersTypePick(null)
-    props.closeModal()
+    onClose()
   }
 
   return (
-    <Modal close={() => closeModal()}>
+    <Modal onClose={() => closeModal()} {...props}>
       <header>
-        {mediaServersTypePick && mediaServersTypePick === MediaServerTypes.PLEX && (
-          <H2>Add a Plex media server</H2>
-        )}
+        {mediaServersTypePick && mediaServersTypePick === MediaServerTypes.PLEX && <H2>Add a Plex media server</H2>}
         {!mediaServersTypePick && <H2>Choose a media server type</H2>}
       </header>
 

@@ -1,11 +1,34 @@
-import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
+import {
+  type ColumnDef,
+  flexRender,
+  // eslint-disable-next-line import/named
+  getCoreRowModel,
+  // eslint-disable-next-line import/named
+  getPaginationRowModel,
+  useReactTable,
+  createColumnHelper,
+} from '@tanstack/react-table'
+import { Pagination } from './Pagination'
+import { PaginationHookProps } from '../hooks/usePagination'
 
-export const Table = <TData,>({ data, columns }: { data: TData[]; columns: ColumnDef<TData>[] }) => {
+export const createTableColumns = <TData,>() => createColumnHelper<TData>()
+
+export type TableColumn<TData> = ColumnDef<TData>
+
+export type TableColumns<TData> = TableColumn<TData>[]
+
+type TableProps<TData> = {
+  columns: TableColumns<TData>
+} & PaginationHookProps<TData>
+
+export const Table = <TData,>({ columns, data, ...props }: TableProps<TData>) => {
   const table = useReactTable({
-    data,
+    data: data?.results ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    pageCount: data?.pages,
+    manualPagination: true,
     // debugTable: true,
   })
 
@@ -37,13 +60,11 @@ export const Table = <TData,>({ data, columns }: { data: TData[]; columns: Colum
           <tbody>
             {table.getRowModel().rows.map((row) => {
               return (
-                <tr key={row.id} className="even:bg-primary">
+                <tr key={row.id} className="even:bg-primary-dark">
                   {row.getVisibleCells().map((cell) => {
                     return (
                       <td key={cell.id} className="px-5 py-5">
-                        <div className="flex justify-center items-center">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </div>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     )
                   })}
@@ -54,67 +75,7 @@ export const Table = <TData,>({ data, columns }: { data: TData[]; columns: Colum
         </table>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="flex items-center gap-3 md:col-start-2 place-self-center">
-          <button onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>
-            {'<<'}
-          </button>
-
-          <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            {'<'}
-          </button>
-
-          <span className="flex items-center gap-1">
-            <div>Page</div>
-            <strong>
-              {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-            </strong>
-          </span>
-
-          <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            {'>'}
-          </button>
-
-          <button onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>
-            {'>>'}
-          </button>
-
-          {/*
-            <span className="flex items-center gap-1">
-              | Go to page:
-              <Input
-                type="number"
-                label="Go to page"
-                defaultValue={table.getState().pagination.pageIndex + 1}
-                onChange={(e) => {
-                  const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                  table.setPageIndex(page);
-                }}
-              />
-            </span>
-          */}
-        </div>
-
-        <div className="place-self-end">
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => {
-              table.setPageSize(Number(e.target.value))
-            }}
-          >
-            {[10, 20, 40, 80, 160].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                Show {pageSize}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/*
-        <div>{table.getRowModel().rows.length} Rows</div>
-        <pre>{JSON.stringify(table.getState().pagination, null, 2)}</pre>
-        */}
-      </div>
+      <Pagination data={data} {...props} />
     </div>
   )
 }

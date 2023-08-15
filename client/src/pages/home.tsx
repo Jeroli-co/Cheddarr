@@ -7,9 +7,9 @@ import {
   useUpcomingMovies,
 } from '../hooks/useMedia'
 import { useData } from '../hooks/useData'
-import { PlexSettings } from '../logged-in-app/pages/settings/media-servers/plex/PlexSettingsForm'
 import { Title } from '../elements/Title'
 import { useSession } from '../shared/contexts/SessionContext'
+import { PlexSettings } from '../schemas/media-servers'
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
@@ -18,7 +18,7 @@ export default () => {
   } = useSession()
   const { data: plexSettings, isLoading: isPlexSettingsLoading } = useData<PlexSettings[]>(
     ['settings', 'plex'],
-    '/settings/plex'
+    '/settings/plex',
   )
 
   const { data: recentMovies, isLoading: isRecentMoviesLoading } = useRecentMovies()

@@ -41,7 +41,7 @@ export const usePagination = <TData, TError = unknown>(
 
   const [paginationState, setPaginationState] = useState({
     page: firstPage,
-    perPage: 20,
+    perPage: 10,
   })
 
   const paginatedQueryKeys = [...queryKeys, paginationState.page, paginationState.perPage]
@@ -63,10 +63,10 @@ export const usePagination = <TData, TError = unknown>(
   )
 
   const isFirstPage = paginationState.page === firstPage
-  const lastPage = data?.totalPages ?? firstPage
+  const lastPage = data?.pages ?? firstPage
   const isLastPage = paginationState.page === lastPage
 
-  const hasMore = (p?: IPaginated<TData>) => p && p.page < p.totalPages
+  const hasMore = (p?: IPaginated<TData>) => p && p.page < p.pages
 
   useEffect(() => {
     if (!isLastPage) {

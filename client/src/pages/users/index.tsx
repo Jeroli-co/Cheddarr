@@ -1,17 +1,16 @@
 import React from 'react'
 import { useRoleGuard } from '../../shared/hooks/useRoleGuard'
 import { Roles } from '../../shared/enums/Roles'
-import { PageLoader } from '../../shared/components/PageLoader'
+import { PageLoaderModal } from '../../shared/components/PageLoaderModal'
 import { Navigate, Route, Routes } from 'react-router'
-import { routes } from '../../routes'
-import { TabsContextProvider } from '../../shared/contexts/TabsContext'
+import { Tabs, TabsConfig } from '../../elements/Tabs'
 
 const ConfirmedUsersPage = React.lazy(() => import('./confirmed'))
 const PendingUsersPage = React.lazy(() => import('./pending'))
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  const tabs = [
+  const tabs: TabsConfig = [
     { label: 'Confirmed', uri: 'confirmed' },
     { label: 'Pending', uri: 'pending' },
   ]
@@ -19,16 +18,14 @@ export default () => {
   useRoleGuard([Roles.MANAGE_USERS])
 
   return (
-    <>
-      <TabsContextProvider tabs={tabs} url={routes.USERS.url}>
-        <React.Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route index element={<Navigate to="./confirmed" />} />
-            <Route path="confirmed" element={<ConfirmedUsersPage />} />
-            <Route path="pending" element={<PendingUsersPage />} />
-          </Routes>
-        </React.Suspense>
-      </TabsContextProvider>
-    </>
+    <Tabs config={tabs}>
+      <React.Suspense fallback={<PageLoaderModal />}>
+        <Routes>
+          <Route index element={<Navigate to="./confirmed" />} />
+          <Route path="confirmed" element={<ConfirmedUsersPage />} />
+          <Route path="pending" element={<PendingUsersPage />} />
+        </Routes>
+      </React.Suspense>
+    </Tabs>
   )
 }

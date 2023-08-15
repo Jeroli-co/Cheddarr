@@ -1,6 +1,13 @@
-import { UsersList } from '../../components/UsersList'
+import { UsersTable } from '../../components/UsersTable'
+import { usePagination } from '../../hooks/usePagination'
+import { IUser } from '../../shared/models/IUser'
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
-  return <UsersList />
+  const pagination = usePagination<IUser>(
+    ['users', 'pending'],
+    `/users`,
+    new URLSearchParams({ confirmed: 'false' }).toString(),
+  )
+
+  return <UsersTable confirmed={false} {...pagination} />
 }

@@ -177,9 +177,9 @@ export const MediaPreviewCard = ({ media }: MediaPreviewCardProps) => {
 
   return (
     <>
-      <Container hasPoster={!!fullyLoadedMedia.posterUrl} onClick={() => onCardClick()}>
+      <Container hasPoster={!!fullyLoadedMedia?.posterUrl} onClick={() => onCardClick()}>
         {fullyLoadedMedia.posterUrl && (
-          <Image className="media-poster" src={fullyLoadedMedia.posterUrl} alt="" loaded={poster.loaded} />
+          <Image className="media-poster" src={fullyLoadedMedia.posterUrl} alt="" loaded={!!poster?.loaded} />
         )}
         {!fullyLoadedMedia.posterUrl && <svg viewBox="0 0 2 3" />}
 

@@ -1,5 +1,5 @@
 export enum SearchFilters {
-  ALL = "all",
-  MOVIES = "movies",
-  SERIES = "series",
+  PEOPLE = 'people',
+  MOVIES = 'movies',
+  SERIES = 'series',
 }

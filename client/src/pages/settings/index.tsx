@@ -1,13 +1,11 @@
-import * as React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
-import { routes } from '../../routes'
-import { TabsContextProvider } from '../../shared/contexts/TabsContext'
 import { useRoleGuard } from '../../shared/hooks/useRoleGuard'
 import { Roles } from '../../shared/enums/Roles'
 import { useSession } from '../../shared/contexts/SessionContext'
 import { checkRole } from '../../utils/roles'
-import { useEffect, useState } from 'react'
-import { PageLoader } from '../../shared/components/PageLoader'
+import { PageLoaderModal } from '../../shared/components/PageLoaderModal'
+import { Tabs, TabsConfig } from '../../elements/Tabs'
 
 const MediaServersPage = React.lazy(() => import('./media-servers'))
 const MediaProvidersPage = React.lazy(() => import('./media-providers'))
@@ -24,7 +22,7 @@ export default () => {
 
   useRoleGuard([Roles.MANAGE_SETTINGS])
 
-  const [tabs, setTabs] = useState([
+  const [tabs, setTabs] = useState<TabsConfig>([
     { label: 'Media servers', uri: 'media-servers' },
     { label: 'Media providers', uri: 'media-providers' },
   ])
@@ -39,12 +37,11 @@ export default () => {
         { label: 'Logs', uri: 'logs' },
       ])
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   return (
-    <TabsContextProvider tabs={tabs} url={routes.SETTINGS.url}>
-      <React.Suspense fallback={<PageLoader />}>
+    <Tabs config={tabs}>
+      <React.Suspense fallback={<PageLoaderModal />}>
         <Routes>
           <Route index element={<Navigate to="./media-servers" />} />
           <Route path="media-servers" element={<MediaServersPage />} />
@@ -52,15 +49,11 @@ export default () => {
           {user && checkRole(user.roles, [Roles.ADMIN]) && (
             <Route path="notifications-services" element={<NotificationsServicesPage />} />
           )}
-          {user && checkRole(user.roles, [Roles.ADMIN]) && (
-            <Route path="jobs" element={<JobsPage />} />
-          )}
-          {user && checkRole(user.roles, [Roles.ADMIN]) && (
-            <Route path="general" element={<GeneralPage />} />
-          )}
+          {user && checkRole(user.roles, [Roles.ADMIN]) && <Route path="jobs" element={<JobsPage />} />}
+          {user && checkRole(user.roles, [Roles.ADMIN]) && <Route path="general" element={<GeneralPage />} />}
           {user && checkRole(user.roles, [Roles.ADMIN]) && <Route path="logs" element={<Logs />} />}
         </Routes>
       </React.Suspense>
-    </TabsContextProvider>
+    </Tabs>
   )
 }

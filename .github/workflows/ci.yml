@@ -19,8 +19,8 @@ jobs:
       - name: Build Node
         run: |
           cd client
-          pnpm install
-          pnpm run build --if-present
+          pnpm install --frozen-lockfile --prod
+          pnpm build --if-present
           pnpm test
         env:
           CI: true

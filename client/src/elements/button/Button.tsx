@@ -1,8 +1,8 @@
-import * as React from 'react'
+import React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { cn } from '../../utils/strings'
-import { Loader } from '../../shared/components/PageLoader'
+import { Spinner } from '../../shared/components/Spinner'
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 tracking-tight',
@@ -114,7 +114,7 @@ const buttonVariants = cva(
 type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
-    loading?: boolean
+    isLoading?: boolean
   }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -125,7 +125,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size = 'md',
       mode = 'normal',
       asChild,
-      loading,
+      isLoading: loading,
       disabled,
       className,
       children,
@@ -147,7 +147,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         {...props}
       >
-        {loading ? <Loader /*size={loaderSize}*/ /> : children}
+        {loading ? <Spinner size={size} /> : children}
       </Comp>
     )
   },

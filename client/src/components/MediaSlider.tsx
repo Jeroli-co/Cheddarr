@@ -4,7 +4,7 @@ import { MediaPreviewCard } from '../shared/components/media/MediaPreviewCard'
 import { Title } from '../elements/Title'
 import { IPaginated } from '../shared/models/IPaginated'
 import { Spinner } from '../shared/components/Spinner'
-import { NewDivider } from '../shared/components/Divider'
+import { Divider } from '../shared/components/Divider'
 
 type MediaSliderProps = {
   title: string
@@ -28,7 +28,7 @@ export const MediaSlider = ({ title, description, data, isLoading }: MediaSlider
       {isLoading && (
         <>
           <Head />
-          <NewDivider className="my-3" />
+          <Divider className="my-3" />
           <Spinner />
         </>
       )}

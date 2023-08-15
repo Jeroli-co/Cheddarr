@@ -3,7 +3,7 @@ import { Swiper, SwiperProps, SwiperSlide, useSwiper } from 'swiper/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import { Button } from './button/Button'
-import { NewDivider } from '../shared/components/Divider'
+import { Divider } from '../shared/components/Divider'
 
 type SliderContainerStartProps = {
   headerElement?: React.ReactNode
@@ -25,25 +25,22 @@ const SliderContainerStart = ({ headerElement }: SliderContainerStartProps) => {
         </div>
       </div>
 
-      <NewDivider className="my-3" />
+      <Divider className="my-3" />
     </div>
   )
 }
 
-type SliderProps = React.HTMLAttributes<HTMLDivElement> &
-  SwiperProps & { headerElement?: React.ReactNode }
+type SliderProps = React.HTMLAttributes<HTMLDivElement> & SwiperProps & { headerElement?: React.ReactNode }
 
-export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
-  ({ children, headerElement, ...props }, ref) => {
-    return (
-      <Swiper {...props}>
-        {React.Children.map(children, (c) => (
-          <SwiperSlide>{c}</SwiperSlide>
-        ))}
-        <span slot="container-start">
-          <SliderContainerStart headerElement={headerElement} />
-        </span>
-      </Swiper>
-    )
-  }
-)
+export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(({ children, headerElement, ...props }, ref) => {
+  return (
+    <Swiper {...props}>
+      {React.Children.map(children, (c) => (
+        <SwiperSlide>{c}</SwiperSlide>
+      ))}
+      <span slot="container-start">
+        <SliderContainerStart headerElement={headerElement} />
+      </span>
+    </Swiper>
+  )
+})

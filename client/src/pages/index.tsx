@@ -1,5 +1,5 @@
-import React from 'react'
-import { PageLoader } from '../shared/components/PageLoader'
+import React, { useState } from 'react'
+import { PageLoaderModal } from '../shared/components/PageLoaderModal'
 import { Link } from 'react-router-dom'
 import type { LinkProps } from 'react-router-dom'
 import {
@@ -16,11 +16,11 @@ import { useSession } from '../shared/contexts/SessionContext'
 import { checkRole } from '../utils/roles'
 import { Roles } from '../shared/enums/Roles'
 import { cn } from '../utils/strings'
-import { NewDivider } from '../shared/components/Divider'
+import { Divider } from '../shared/components/Divider'
 import { Title } from '../elements/Title'
 import { IUser } from '../shared/models/IUser'
 import { GithubLink } from '../components/GithubLink'
-import { Modal } from '../elements/Modal'
+import { Modal } from '../elements/modal/Modal'
 import { SearchBar } from '../logged-in-app/SearchBar'
 
 const CheddarrLogoLink = () => {
@@ -118,7 +118,7 @@ const Sidebar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => 
             </SidebarLink>
           </div>
 
-          <NewDivider className="w-full" />
+          <Divider className="w-full" />
 
           <div className="p-4">
             <div className="flex flex-col gap-3">
@@ -195,7 +195,7 @@ const BottombarExtendedButton: React.FC<
 }
 
 const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) => {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
 
   return (
     <>
@@ -215,7 +215,7 @@ const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) =
         </div>
       </nav>
 
-      <Modal isOpen={open} onClose={() => setOpen(false)}>
+      <Modal isOpen={open} onClose={() => setOpen(false)} variant="fullScreen">
         <div className="w-full h-full flex flex-col justify-between bg-primary-darker p-4">
           <div className="flex flex-col">
             <Title as="h1" className="place-self-center">
@@ -264,7 +264,7 @@ const Bottombar = ({ user, onLogout }: { user?: IUser; onLogout: () => void }) =
               <Icon icon={faSignOutAlt} />
               <span>Sign out</span>
             </BottombarExtendedButton>
-            <NewDivider className="my-3" />
+            <Divider className="my-3" />
             <div className="flex items-center justify-between">
               <BottombarExtendedLink to="/profile" className="flex items-center gap-3" onClick={() => setOpen(false)}>
                 <div className="w-12">
@@ -307,7 +307,7 @@ export default () => {
       <div className="pb-[60px] md:mb-0 md:ml-[200px]">
         <Navbar />
         <div className="p-4">
-          <React.Suspense fallback={<PageLoader />}>
+          <React.Suspense fallback={<PageLoaderModal />}>
             <Router />
           </React.Suspense>
         </div>

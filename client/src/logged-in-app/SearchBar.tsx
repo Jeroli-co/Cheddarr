@@ -28,14 +28,12 @@ export const SearchBar = () => {
   }, [value])
 
   return (
-    <div className="w-full">
-      <Input
-        type="text"
-        onChange={debouncedResults}
-        placeholder="Search for movies, series, actors, studio..."
-        className="w-full md:w-1/3 focus:w-full transition-width duration-300 ease-in-out"
-        icon={faSearch}
-      />
-    </div>
+    <Input
+      type="text"
+      onChange={debouncedResults}
+      placeholder="Search for movies, series, actors, studio..."
+      className="w-full max-w-[450px] transition-width duration-300 ease-in-out"
+      icon={faSearch}
+    />
   )
 }

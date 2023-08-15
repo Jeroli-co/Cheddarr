@@ -3,7 +3,6 @@ import { SeriesRequestEpisodesList } from './SeriesRequestEpisodesList'
 import { faAngleDown, faAngleRight, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { PrimaryLightDivider } from '../Divider'
 import { Spinner } from '../Spinner'
-import { ComponentSizes } from '../../enums/ComponentSizes'
 import { ISeries } from '../../models/IMedia'
 import { OutlinePrimaryIconButton, PrimaryIconButton } from '../Button'
 import { Icon } from '../Icon'
@@ -25,7 +24,7 @@ const SeriesRequestSeasonsList = (props: SeriesRequestSeasonsListProps) => {
   const { addSeason, removeSeason, isSeasonSelected } = useSeriesRequestOptionsContext()
 
   if (isLoading) {
-    return <Spinner size={ComponentSizes.LARGE} />
+    return <Spinner size="lg" />
   }
 
   return (
@@ -35,10 +34,7 @@ const SeriesRequestSeasonsList = (props: SeriesRequestSeasonsListProps) => {
           <Row alignItems="center" wrap="nowrap">
             <Buttons>
               {isSeasonSelected(season.seasonNumber) && (
-                <OutlinePrimaryIconButton
-                  type="button"
-                  onClick={() => removeSeason(season.seasonNumber)}
-                >
+                <OutlinePrimaryIconButton type="button" onClick={() => removeSeason(season.seasonNumber)}>
                   <Icon icon={faMinus} />
                 </OutlinePrimaryIconButton>
               )}
@@ -50,9 +46,7 @@ const SeriesRequestSeasonsList = (props: SeriesRequestSeasonsListProps) => {
             </Buttons>
             <ClosableTitle
               onClick={() =>
-                setSeasonNumberSelected(
-                  seasonNumberSelected !== season.seasonNumber ? season.seasonNumber : null
-                )
+                setSeasonNumberSelected(seasonNumberSelected !== season.seasonNumber ? season.seasonNumber : null)
               }
             >
               <p>Season {season.seasonNumber}</p>
@@ -65,10 +59,7 @@ const SeriesRequestSeasonsList = (props: SeriesRequestSeasonsListProps) => {
           {seasonNumberSelected !== null && season.seasonNumber === seasonNumberSelected && (
             <>
               <PrimaryLightDivider />
-              <SeriesRequestEpisodesList
-                seriesId={props.series.tmdbId}
-                seasonNumber={seasonNumberSelected}
-              />
+              <SeriesRequestEpisodesList seriesId={props.series.tmdbId} seasonNumber={seasonNumberSelected} />
             </>
           )}
           <PrimaryLightDivider />

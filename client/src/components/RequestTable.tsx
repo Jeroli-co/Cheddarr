@@ -9,16 +9,18 @@ import { formatLocalDate } from '../utils/date'
 import { RequestStatus } from '../shared/enums/RequestStatus'
 import { Button } from '../elements/button/Button'
 import { Link } from 'react-router-dom'
-import { DangerIconButton, SuccessButton } from '../shared/components/Button'
 import { Icon } from '../shared/components/Icon'
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { Table } from '../elements/Table'
+import { Table, TableColumns, createTableColumns } from '../elements/Table'
 import { UserSmallCard } from '../shared/components/UserSmallCard'
 import { Buttons } from '../shared/components/layout/Buttons'
 import { Tooltiped } from '../shared/components/Tooltiped'
 import { PaginationHookProps } from '../hooks/usePagination'
 import { Title } from '../elements/Title'
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
+import { type ColumnDef } from '@tanstack/react-table'
+import { Spinner } from '../shared/components/Spinner'
+import httpClient from '../utils/http-client'
+import { useAlert } from '../shared/contexts/AlertContext'
 
 const MediaTitleCell = ({ id, type }: { type: MediaTypes; id: string }) => {
   const { data, isLoading } = useMedia(type, id)
@@ -51,22 +53,37 @@ const Head = ({ requestType }: { requestType: RequestTypes }) => {
   )
 }
 
-const columnHelper = createColumnHelper<IMediaRequest>()
+const columnHelper = createTableColumns<IMediaRequest>()
+
 export const RequestTable = ({
   requestType,
   isLoading,
-  loadPrev,
-  loadNext,
-  isFirstPage,
-  isLastPage,
+  isFetching,
   data,
+  invalidate,
+  ...props
 }: PaginationHookProps<IMediaRequest> & {
   requestType: RequestTypes
 }) => {
   const { data: radarrSettings } = useRadarrSettings()
   const { data: sonarrSettings } = useSonarrSettings()
+  const { pushSuccess, pushDanger } = useAlert()
 
-  const columns = useMemo<ColumnDef<IMediaRequest>[]>(
+  const deleteRequest = async (mediaType: MediaTypes, id: number) => {
+    try {
+      const res = await httpClient.delete(`/requests/${mediaType}/${id}`)
+      if (res.status === 204) {
+        invalidate()
+        pushSuccess('Request deleted')
+      } else {
+        pushDanger('Failed to delete request')
+      }
+    } catch (e) {
+      pushDanger('Failed to delete request')
+    }
+  }
+
+  const columns = useMemo<TableColumns<IMediaRequest>>(
     () =>
       [
         requestType === RequestTypes.INCOMING
@@ -182,12 +199,12 @@ export const RequestTable = ({
             },
           ),
         requestType === RequestTypes.OUTGOING &&
-          columnHelper.accessor((row) => row.status, {
+          columnHelper.accessor((row) => row, {
             id: 'actions',
             cell: (info) => {
-              const status = info.getValue()
+              const request = info.getValue()
 
-              if (status !== RequestStatus.PENDING) return undefined
+              if (request.status !== RequestStatus.PENDING) return undefined
 
               return (
                 <div className="flex items-center gap-3">
@@ -197,7 +214,7 @@ export const RequestTable = ({
                       color="danger"
                       mode="square"
                       size="sm"
-                      onClick={() => /*deleteRequest(request.media.mediaType, request.id)*/ {}}
+                      onClick={() => deleteRequest(request.media.mediaType, request.id)}
                     >
                       <Icon icon={faTimes} />
                     </Button>
@@ -212,12 +229,26 @@ export const RequestTable = ({
     [],
   )
 
-  if (isLoading) return undefined
-
   return (
     <>
       <Head requestType={requestType} />
-      <Table data={data?.results ?? []} columns={columns} />
+
+      {(isLoading || isFetching) && <Spinner size="lg" />}
+
+      {!(isLoading || isFetching) && (data?.results.length ?? 0) > 0 && (
+        <Table
+          columns={columns}
+          data={data}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          invalidate={invalidate}
+          {...props}
+        />
+      )}
+
+      {!(isLoading || isFetching) && (data?.results.length ?? 0) === 0 && (
+        <p className="font-bold">No requests to display</p>
+      )}
     </>
   )
 }

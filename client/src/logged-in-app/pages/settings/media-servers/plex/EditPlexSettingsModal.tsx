@@ -1,6 +1,7 @@
+import { PlexSettings } from '../../../../../schemas/media-servers'
 import { Modal } from '../../../../../shared/components/layout/Modal'
 import { H2 } from '../../../../../shared/components/Titles'
-import { PlexSettings, PlexSettingsForm } from './PlexSettingsForm'
+import { PlexSettingsForm } from './PlexSettingsForm'
 
 export type EditPlexSettingsModalProps = {
   closeModal: () => void
