@@ -62,7 +62,7 @@ class PlexSettingCreateUpdate(MediaServerSettingBase):
 class RadarrInstanceInfo(APIModel):
     root_folders: list[str]
     quality_profiles: list[dict[str, Any]]
-    version: int | None = None
+    version: int
     tags: list[dict[str, Any]]
 
 
@@ -82,7 +82,7 @@ class RadarrSettingCreateUpdate(MediaProviderSettingBase):
 class SonarrInstanceInfo(APIModel):
     root_folders: list[str]
     quality_profiles: list[dict[str, Any]]
-    version: int | None = None
+    version: int
     tags: list[dict[str, Any]]
 
 
