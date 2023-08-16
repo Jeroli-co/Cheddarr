@@ -1,11 +1,10 @@
 import { useRoleGuard } from '../../shared/hooks/useRoleGuard'
 import { Roles } from '../../shared/enums/Roles'
-import { H2, H3 } from '../../shared/components/Titles'
-import { PrimaryDivider, PrimaryLightDivider } from '../../shared/components/Divider'
 import { useConfig } from '../../shared/hooks/useConfig'
-import { RolesTree } from '../../shared/components/RolesTree'
-import { ManageLogLevels } from '../../shared/components/ManageLogLevels'
+import { RolesTree } from '../../components/RolesTree'
+import { ManageLogLevels } from '../../components/ManageLogLevels'
 import { LogLevels } from '../../shared/enums/LogLevels'
+import { Title } from '../../elements/Title'
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
@@ -23,18 +22,17 @@ export default () => {
 
   return (
     <>
-      <H2>Users</H2>
-      <PrimaryLightDivider />
-      <H3>Default user roles</H3>
-      {config?.defaultRoles && (
-        <RolesTree defaultValue={config.defaultRoles} onSave={onDefaultRolesSave} />
-      )}
-      <PrimaryDivider />
-      <H2>General</H2>
-      <PrimaryLightDivider />
-      {config?.logLevel && (
-        <ManageLogLevels defaultValue={config.logLevel} onSave={onLogLevelSave} />
-      )}{' '}
+      <Title as="h1">Manage users</Title>
+      <Title as="h2">Default user roles</Title>
+
+      <div className="flex flex-col gap-8">
+        {config?.defaultRoles && <RolesTree defaultValue={config.defaultRoles} onSave={onDefaultRolesSave} />}
+
+        <div>
+          <Title as="h2">General</Title>
+          {config?.logLevel && <ManageLogLevels defaultValue={config.logLevel} onSave={onLogLevelSave} />}
+        </div>
+      </div>
     </>
   )
 }

@@ -8,7 +8,7 @@ import { useParams } from 'react-router'
 import { useUser } from '../shared/hooks/useUser'
 import { Roles } from '../shared/enums/Roles'
 import { useUserService } from '../shared/toRefactor/useUserService'
-import { RolesTree } from '../shared/components/RolesTree'
+import { RolesTree } from '../components/RolesTree'
 import { checkRole } from '../utils/roles'
 import { useSession } from '../shared/contexts/SessionContext'
 
@@ -59,13 +59,11 @@ export default () => {
 
   const onRoleChange = (role: Roles) => {
     if (profileOwner?.id) {
-      updateUserById(profileOwner.id, { roles: role }, 'Cannot update roles', 'Roles updated').then(
-        (res) => {
-          if (res.status === 200 && res.data) {
-            updateUser(res.data)
-          }
+      updateUserById(profileOwner.id, { roles: role }, 'Cannot update roles', 'Roles updated').then((res) => {
+        if (res.status === 200 && res.data) {
+          updateUser(res.data)
         }
-      )
+      })
     }
   }
 
@@ -85,9 +83,7 @@ export default () => {
             {user &&
               profileOwner &&
               profileOwner.roles &&
-              checkRole(user.roles, [Roles.ADMIN, Roles.MANAGE_USERS], true) && (
-                <p>{profileOwner.email}</p>
-              )}
+              checkRole(user.roles, [Roles.ADMIN, Roles.MANAGE_USERS], true) && <p>{profileOwner.email}</p>}
           </InfosContainer>
           <div>
             {user &&
