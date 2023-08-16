@@ -1,37 +1,78 @@
 import { useState } from 'react'
-import { AddItemBox, SpinnerItemBox } from '../../shared/components/ItemBox'
-import { EmailSettingsBoxPreview } from '../../logged-in-app/pages/settings/notifications/email/EmailSettingsBoxPreview'
-import { PickNotificationsServiceTypeModal } from '../../logged-in-app/pages/settings/notifications/PickNotificationsServiceTypeModal'
+import { PickNotificationsServiceTypeModal } from '../../components/PickNotificationsServiceTypeModal'
 import { useRoleGuard } from '../../shared/hooks/useRoleGuard'
 import { Roles } from '../../shared/enums/Roles'
 import { useData } from '../../hooks/useData'
-import { EmailSettings } from '../../logged-in-app/pages/settings/notifications/email/EmailSettingsForm'
 import { Info } from '../../elements/Info'
 import { Title } from '../../elements/Title'
+import { SettingsPreviewCard } from '../../components/ConfigPreviewCard'
+import { Icon } from '../../shared/components/Icon'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { Spinner } from '../../shared/components/Spinner'
+import {
+  EmailSettings,
+  NotificationsServiceEnum,
+  NotificationsServiceSettings,
+} from '../../schemas/notifications-services'
+import { EditNotificationsServiceSettingsModal } from '../../components/EditNotificationsServiceSettingsModal'
 
-// eslint-disable-next-line import/no-anonymous-default-export
+type NotificationsServiceSettingsPreviewCardProps = {
+  type: NotificationsServiceEnum
+  data: NotificationsServiceSettings
+}
+
+const NotificationsServiceSettingsPreviewCard = ({ data, type }: NotificationsServiceSettingsPreviewCardProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <>
+      <SettingsPreviewCard onClick={() => setIsOpen(true)}>{type}</SettingsPreviewCard>
+      <EditNotificationsServiceSettingsModal type={type} isOpen={isOpen} onClose={() => setIsOpen(false)} data={data} />
+    </>
+  )
+}
+
 export default () => {
-  const [isPickNotificationsServicesTypeModalOpen, setIsPickNotificationsServicesTypeModalOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
-  const { data, isLoading } = useData<EmailSettings>(['notifications/agents', 'email'], '/notifications/agents/email')
+  const { data, isLoading, isFetching } = useData<EmailSettings>(
+    ['notifications/agents', 'email'],
+    '/notifications/agents/email',
+  )
 
   useRoleGuard([Roles.ADMIN])
 
   return (
-    <div>
-      <Info>More notifications systems are coming soon</Info>
+    <>
+      <Title as="h1">Configure your notifications services</Title>
 
-      <Title as="h1">Configure your notifications service</Title>
+      <div className="space-y-8">
+        <Info>More notifications systems are coming soon</Info>
 
-      <AddItemBox onClick={() => setIsPickNotificationsServicesTypeModalOpen(true)} />
+        <p>Link your notifications services to your Cheddarr server.</p>
 
-      {isLoading && <SpinnerItemBox />}
+        <SettingsPreviewCard onClick={() => setIsOpen(true)} className="w-full">
+          <Icon icon={faPlus} size="xl" />
+        </SettingsPreviewCard>
 
-      {!isLoading && data && <EmailSettingsBoxPreview data={data} />}
+        <div>
+          <Title as="h2">Current configurations</Title>
 
-      {isPickNotificationsServicesTypeModalOpen && (
-        <PickNotificationsServiceTypeModal closeModal={() => setIsPickNotificationsServicesTypeModalOpen(false)} />
-      )}
-    </div>
+          {(isLoading || isFetching) && (
+            <SettingsPreviewCard className="border-0">
+              <Spinner size="sm" />
+            </SettingsPreviewCard>
+          )}
+
+          {!isLoading && data && (
+            <NotificationsServiceSettingsPreviewCard type={NotificationsServiceEnum.EMAIL} data={data} />
+          )}
+
+          {!isLoading && !data && <p>You have no notifications service configured</p>}
+        </div>
+      </div>
+
+      <PickNotificationsServiceTypeModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </>
   )
 }

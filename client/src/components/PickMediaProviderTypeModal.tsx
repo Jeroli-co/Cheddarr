@@ -68,14 +68,7 @@ export const PickMediaProviderTypeModal: React.FC<PickMediaProvidersTypeModalPro
     mutationFn: (data: FormDataType) => httpClient.post<MediaProviderSettings>(`/settings/${type}`, data),
     onSuccess: () => {
       pushSuccess('Configuration created')
-      switch (type) {
-        case MediaProviderEnum.RADARR:
-          queryClient.invalidateQueries(['settings', 'radarr'])
-          break
-        case MediaProviderEnum.SONARR:
-          queryClient.invalidateQueries(['settings', 'sonarr'])
-          break
-      }
+      queryClient.invalidateQueries(['settings', type])
       onClose()
     },
     onError: () => {

@@ -1,38 +1,46 @@
-import React, { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from 'react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { MediaServerEnum, MediaServerSettings, postPlexSettingsSchema } from '../schemas/media-servers'
+import {
+  NotificationsServiceEnum,
+  NotificationsServiceSettings,
+  postNotificationsServiceSettingsSchema,
+} from '../schemas/notifications-services'
+import { Modal, ModalProps } from '../elements/modal/Modal'
 import { useAlert } from '../shared/contexts/AlertContext'
 import httpClient from '../utils/http-client'
+import { useEffect, useMemo, useState } from 'react'
+import { Button } from '../elements/button/Button'
 import { SettingsPreviewCard } from './ConfigPreviewCard'
 import { Spinner } from '../shared/components/Spinner'
-import { Modal, ModalProps } from '../elements/modal/Modal'
-import { Button } from '../elements/button/Button'
-import { PlexSettingsForm } from './PlexSettingsForm'
+import { EmailSettingsForm } from './EmailSettingsForm'
 
-const getModalTitle = (mediaServerType?: MediaServerEnum) => {
-  switch (mediaServerType) {
-    case MediaServerEnum.PLEX:
-      return 'Add Plex configuration'
+const getModalTitle = (notificationsServiceType?: NotificationsServiceEnum) => {
+  switch (notificationsServiceType) {
+    case NotificationsServiceEnum.EMAIL:
+      return 'Add email smtp server'
     default:
-      return 'Choose a media server'
+      return 'Choose a notifications service'
   }
 }
 
-type PickMediaServersTypeModalProps = ModalProps
+type PickNotificationsServiceTypeModalProps = ModalProps
 
-export const PickMediaServerTypeModal: React.FC<PickMediaServersTypeModalProps> = ({ isOpen, onClose, ...props }) => {
+export const PickNotificationsServiceTypeModal: React.FC<PickNotificationsServiceTypeModalProps> = ({
+  isOpen,
+  onClose,
+  ...props
+}) => {
   const queryClient = useQueryClient()
   const { pushDanger, pushSuccess } = useAlert()
 
-  const [type, setType] = useState<MediaServerEnum>()
+  const [type, setType] = useState<NotificationsServiceEnum>()
 
   const resolverSchema = useMemo(() => {
     switch (type) {
-      case MediaServerEnum.PLEX:
-        return postPlexSettingsSchema
+      case NotificationsServiceEnum.EMAIL:
+        return postNotificationsServiceSettingsSchema
       default:
         return z.object({})
     }
@@ -48,10 +56,14 @@ export const PickMediaServerTypeModal: React.FC<PickMediaServersTypeModalProps> 
   const modalTitle = getModalTitle(type)
 
   const createConfigMutation = useMutation({
-    mutationFn: (data: FormDataType) => httpClient.post<MediaServerSettings>(`/settings/${type}`, data),
+    mutationFn: (data: FormDataType) => httpClient.post<NotificationsServiceSettings>(`/settings/${type}`, data),
     onSuccess: () => {
       pushSuccess('Configuration created')
-      queryClient.invalidateQueries(['settings', type])
+      switch (type) {
+        case NotificationsServiceEnum.EMAIL:
+          queryClient.invalidateQueries(['settings', 'plex'])
+          break
+      }
       onClose()
     },
     onError: () => {
@@ -87,12 +99,12 @@ export const PickMediaServerTypeModal: React.FC<PickMediaServersTypeModalProps> 
         {!type && (
           <>
             <div className="grid grid-cols-1 gap-3">
-              <SettingsPreviewCard onClick={() => setType(MediaServerEnum.PLEX)}>Plex</SettingsPreviewCard>
+              <SettingsPreviewCard onClick={() => setType(NotificationsServiceEnum.EMAIL)}>Email</SettingsPreviewCard>
             </div>
           </>
         )}
 
-        {!createConfigMutation.isLoading && type === MediaServerEnum.PLEX && <PlexSettingsForm />}
+        {!createConfigMutation.isLoading && type === NotificationsServiceEnum.EMAIL && <EmailSettingsForm />}
 
         {createConfigMutation.isLoading && <Spinner />}
       </Modal>

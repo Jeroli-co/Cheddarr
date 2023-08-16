@@ -111,6 +111,8 @@ export default () => {
       <div className="space-y-8">
         <Info>More media servers will be supported soon</Info>
 
+        <p>Link your Plex instance to your Cheddarr server.</p>
+
         <SettingsPreviewCard onClick={() => setIsOpen(true)} className="w-full">
           <Icon icon={faPlus} size="xl" />
         </SettingsPreviewCard>
