@@ -16,6 +16,7 @@ type MediaProviderSettingsPreviewCardProps = {
 
 const MediaProviderSettingsPreviewCard = ({ data, type }: MediaProviderSettingsPreviewCardProps) => {
   const [isOpen, setIsOpen] = useState(false)
+
   return (
     <>
       <SettingsPreviewCard onClick={() => setIsOpen(true)}>{data?.name}</SettingsPreviewCard>

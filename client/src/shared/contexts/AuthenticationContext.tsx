@@ -13,14 +13,11 @@ import { routes } from '../../routes'
 
 interface IAuthenticationContextInterface {
   readonly signUp: (data: SignUpFormData) => Promise<IAsyncCall | IAsyncCall<null>>
-  readonly signIn: (
-    data: SignInFormData,
-    redirectURI?: string
-  ) => Promise<IAsyncCall | IAsyncCall<null>>
+  readonly signIn: (data: SignInFormData, redirectURI?: string) => Promise<IAsyncCall | IAsyncCall<null>>
 }
 
 const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
-  signUp(_: SignUpFormData): Promise<IAsyncCall | IAsyncCall<null>> {
+  signUp(): Promise<IAsyncCall | IAsyncCall<null>> {
     return Promise.resolve(DefaultAsyncCall)
   },
   signIn(): Promise<IAsyncCall | IAsyncCall<null>> {
@@ -28,11 +25,10 @@ const AuthenticationContextDefaultImpl: IAuthenticationContextInterface = {
   },
 }
 
-const AuthenticationContext = createContext<IAuthenticationContextInterface>(
-  AuthenticationContextDefaultImpl
-)
+const AuthenticationContext = createContext<IAuthenticationContextInterface>(AuthenticationContextDefaultImpl)
 
-export default function AuthenticationContextProvider(props: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default (props: any) => {
   const navigate = useNavigate()
   const { post } = useAPI()
   const { initSession } = useSession()
@@ -56,7 +52,6 @@ export default function AuthenticationContextProvider(props: any) {
     fd.append('password', data.password)
     const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, fd)
     if (res.data && res.status === 200) {
-      console.log(res.data)
       initSession(res.data)
       navigate(redirectURI ?? routes.HOME.url, { replace: true })
     } else if (res.status === 401) {

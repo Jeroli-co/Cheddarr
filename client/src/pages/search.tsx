@@ -4,7 +4,7 @@ import { MediaCardsLoader } from '../shared/components/media/MediaCardsLoader'
 import { usePagination } from '../hooks/usePagination'
 import { useSearchParams } from 'react-router-dom'
 import { Pagination } from '../elements/Pagination'
-import { SearchBar } from '../logged-in-app/SearchBar'
+import { SearchBar } from '../components/SearchBar'
 
 export default () => {
   const [searchParams] = useSearchParams()

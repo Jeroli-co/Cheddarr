@@ -1,7 +1,6 @@
 import axios from 'axios'
 import * as humps from 'humps'
 import { APIRoutes } from '../shared/enums/APIRoutes'
-import { replaceNullWithUndefined } from './objects'
 
 const JSON_TYPE = 'application/json'
 const FORM_URL_ENCODED_TYPE = 'application/x-www-form-urlencoded'
@@ -50,7 +49,6 @@ httpClient.interceptors.response.use(
       response.data
     ) {
       response.data = humps.camelizeKeys(response.data)
-      response.data = replaceNullWithUndefined(response.data)
     }
 
     return response

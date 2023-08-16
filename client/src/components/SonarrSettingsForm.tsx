@@ -9,12 +9,14 @@ import httpClient from '../utils/http-client'
 import { ControlledCheckbox } from '../elements/Checkbox'
 import { Switch } from '../elements/Switch'
 import { NewDivider } from '../shared/components/Divider'
+import { cn } from '../utils/strings'
 
 type SonarrSettingsFormProps = {
   defaultSettings?: SonarrSettings
+  className?: string
 }
 
-export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps) => {
+export const SonarrSettingsForm = ({ defaultSettings, className }: SonarrSettingsFormProps) => {
   const { pushDanger, pushSuccess } = useAlert()
 
   const [isPortNeeded, setIsPortNeeded] = useState(!!defaultSettings?.port)
@@ -50,10 +52,10 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
       if (defaultAnimeQualityProfileID) setValue('animeQualityProfileId', defaultAnimeQualityProfileID)
 
       const defaultTag = data.tags?.map((tag) => tag.id)
-      if (defaultTag.length) setValue('tags', defaultTag)
+      if (defaultTag?.length) setValue('tags', defaultTag)
 
       const defaultAnimeTag = data.animeTags?.map((tag) => tag.id)
-      if (defaultAnimeTag.length) setValue('animeTags', defaultAnimeTag)
+      if (defaultAnimeTag?.length) setValue('animeTags', defaultAnimeTag)
 
       if (!defaultSettings) pushSuccess('Successful connection')
     },
@@ -68,7 +70,7 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
   }, [])
 
   return (
-    <div className="space-y-6">
+    <div className={cn('space-y-6', className)}>
       {defaultSettings && (
         <>
           <ControlledCheckbox label="Enabled" name="enabled" />
@@ -100,7 +102,7 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
         {isPortNeeded && (
           <Input
             type="number"
-            placeholder="7878"
+            placeholder="8989"
             error={errors.port?.message}
             disabled={!isPortNeeded}
             {...register('port')}
@@ -143,16 +145,20 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
             </select>
           </div>
 
-          <div>
-            <label htmlFor="animeRootFolder">Default Root Folder (Anime)</label>
-            <select id="animeRootFolder" {...register('animeRootFolder')}>
-              {instanceInfoMutation.data.animeRootFolders.map((rf, index) => (
-                <option key={index} value={rf}>
-                  {rf}
-                </option>
-              ))}
-            </select>
-          </div>
+          {(instanceInfoMutation.data.animeRootFolders?.length ?? 0) > 0 ? (
+            <div className="flex flex-col gap-3">
+              <label htmlFor="animeRootFolder">Default Root Folder (Anime)</label>
+              <select id="animeRootFolder" {...register('animeRootFolder')}>
+                {instanceInfoMutation.data.animeRootFolders?.map((rf, index) => (
+                  <option key={index} value={rf}>
+                    {rf}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <p className="text-warning">Define anime root folders to add them to your configurations</p>
+          )}
 
           <div className="flex flex-col gap-3">
             <label htmlFor="qualityProfileId">Default Quality Profile</label>
@@ -172,29 +178,33 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
             />
           </div>
 
-          <div className="flex flex-col gap-3">
-            <label htmlFor="animeQualityProfileId">Default Quality Profile</label>
-            <Controller
-              name="animeQualityProfileId"
-              render={({ field: { onChange, ...rest } }) => {
-                return (
-                  <select id="animeQualityProfileId" onChange={(e) => onChange(parseInt(e.target.value))} {...rest}>
-                    {instanceInfoMutation.data.animeQualityProfiles.map((p, index) => (
-                      <option key={index} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                )
-              }}
-            />
-          </div>
+          {(instanceInfoMutation.data.animeQualityProfiles?.length ?? 0) > 0 ? (
+            <div className="flex flex-col gap-3">
+              <label htmlFor="animeQualityProfileId">Default Quality Profile (Anime)</label>
+              <Controller
+                name="animeQualityProfileId"
+                render={({ field: { onChange, ...rest } }) => {
+                  return (
+                    <select id="animeQualityProfileId" onChange={(e) => onChange(parseInt(e.target.value))} {...rest}>
+                      {instanceInfoMutation.data.animeQualityProfiles?.map((p, index) => (
+                        <option key={index} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  )
+                }}
+              />
+            </div>
+          ) : (
+            <p className="text-warning">Define anime quality profiles to add them to your configurations</p>
+          )}
 
-          {instanceInfoMutation.data.tags.length > 0 ? (
+          {(instanceInfoMutation.data.tags?.length ?? 0) > 0 ? (
             <div className="flex flex-col gap-3">
               <label htmlFor="tags">Default Tags</label>
               <select id="tags" multiple {...register('tags')}>
-                {instanceInfoMutation.data.tags.map((t, index) => (
+                {instanceInfoMutation.data.tags?.map((t, index) => (
                   <option key={index} value={t.id}>
                     {t.name}
                   </option>
@@ -205,11 +215,11 @@ export const SonarrSettingsForm = ({ defaultSettings }: SonarrSettingsFormProps)
             <p className="text-warning">Define tags to add them to your configurations</p>
           )}
 
-          {instanceInfoMutation.data.animeTags.length > 0 ? (
+          {(instanceInfoMutation.data.animeTags?.length ?? 0) > 0 ? (
             <div className="flex flex-col gap-3">
               <label htmlFor="animeTags">Default Tags</label>
               <select id="animeTags" multiple {...register('animeTags')}>
-                {instanceInfoMutation.data.animeTags.map((t, index) => (
+                {instanceInfoMutation.data.animeTags?.map((t, index) => (
                   <option key={index} value={t.id}>
                     {t.name}
                   </option>

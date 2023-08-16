@@ -77,7 +77,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 
               {title && <ModalTitle as="h2">{title}</ModalTitle>}
 
-              <div className="p-4 overflow-y-auto">{children}</div>
+              <div className="relative p-4 overflow-y-auto">{children}</div>
 
               {(Footer || hasCloseFooterButton) && (
                 <div className="flex items-center gap-3 p-4 border-t">

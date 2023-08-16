@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 // # Media servers
+export enum MediaServerEnum {
+  PLEX = 'plex',
+}
+
 const postMediaServerSettingsSchema = z.object({
   // Required fields
   host: z.string().min(1, { message: 'Host is required' }).trim(),
@@ -8,10 +12,10 @@ const postMediaServerSettingsSchema = z.object({
   ssl: z.boolean(),
 
   // Optional fields
-  port: z.number().int().min(1).max(65535).optional(),
+  port: z.number().int().optional().nullable(),
   name: z.string().trim().optional(),
   enabled: z.boolean().optional(),
-  version: z.number().int().optional(),
+  version: z.number().int().optional().nullable(),
 })
 
 // ## Plex
@@ -48,7 +52,7 @@ export type ProviderTag = {
 type MediaProviderInstanceInfo = {
   rootFolders: string[]
   qualityProfiles: ProviderQualityProfile[]
-  tags: ProviderTag[]
+  tags?: ProviderTag[]
 }
 
 const postMediaProviderSettingsSchema = postMediaServerSettingsSchema.merge(
@@ -60,12 +64,8 @@ const postMediaProviderSettingsSchema = postMediaServerSettingsSchema.merge(
 
     // Optional fields
     isDefault: z.boolean().optional(),
-    providerType: z
-      .enum(['movies_provider', 'series_provider'], {
-        invalid_type_error: 'Invalid provider type',
-      })
-      .optional(),
-    tags: z.array(z.number()).optional(),
+    providerType: z.enum(['movies_provider', 'series_provider']).optional(),
+    tags: z.array(z.number()).optional().nullable(),
   }),
 )
 
@@ -82,19 +82,17 @@ export type RadarrSettings = PostRadarrSettings & {
 
 // ### Sonarr
 export type SonarrInstanceInfo = MediaProviderInstanceInfo & {
-  animeRootFolders: string[]
-  animeQualityProfiles: ProviderQualityProfile[]
-  animeTags: ProviderTag[]
+  animeRootFolders?: string[]
+  animeQualityProfiles?: ProviderQualityProfile[]
+  animeTags?: ProviderTag[]
 }
 
 export const postSonarrSettingsSchema = postMediaProviderSettingsSchema.merge(
   z.object({
-    // Required fields
-    animeRootFolder: z.string().min(1, { message: 'Anime root folder is required' }).trim(),
-    animeQualityProfileId: z.number().int().min(0, { message: 'Anime quality profile is required' }),
-
     // Optional fields
-    animeTags: z.array(z.number()).optional(),
+    animeRootFolder: z.string().trim().optional().nullable(),
+    animeQualityProfileId: z.number().int().optional().nullable(),
+    animeTags: z.array(z.number()).optional().nullable(),
   }),
 )
 
@@ -108,3 +106,6 @@ export type SonarrSettings = PostSonarrSettings & {
 
 export type PostMediaProviderSettings = PostRadarrSettings | PostSonarrSettings
 export type MediaProviderSettings = RadarrSettings | SonarrSettings
+
+export type PostMediaServerSettings = PostPlexSettings
+export type MediaServerSettings = PlexSettings

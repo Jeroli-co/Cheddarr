@@ -11,7 +11,9 @@ export const SettingsPreviewCard: React.FC<React.PropsWithChildren<React.ButtonH
       className={cn(
         'h-full p-6',
         'border-4 border-primary rounded-lg',
-        'transition-colors hover:bg-primary-dark',
+        'transition-colors',
+        onClick && 'hover:bg-primary-dark',
+        !onClick && 'cursor-default',
         className,
       )}
       onClick={onClick}

@@ -1,48 +1,42 @@
-import { useMemo } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from 'react-query'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '../elements/button/Button'
-import { ModalProps, Modal } from '../elements/modal/Modal'
-import { useAlert } from '../shared/contexts/AlertContext'
-import httpClient from '../utils/http-client'
+import { Modal, ModalProps } from '../elements/modal/Modal'
 import {
-  MediaProviderEnum,
-  MediaProviderSettings,
-  PostRadarrSettings,
-  PostSonarrSettings,
-  RadarrSettings,
-  SonarrSettings,
-  postRadarrSettingsSchema,
-  postSonarrSettingsSchema,
+  MediaServerEnum,
+  MediaServerSettings,
+  PlexSettings,
+  PostPlexSettings,
+  postPlexSettingsSchema,
 } from '../schemas/media-servers'
+import { useAlert } from '../shared/contexts/AlertContext'
+import { useMemo } from 'react'
 import { z } from 'zod'
-import { RadarrSettingsForm } from './RadarrSettingsForm'
-import { SonarrSettingsForm } from './SonarrSettingsForm'
+import { FormProvider, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import httpClient from '../utils/http-client'
+import { Button } from '../elements/button/Button'
 import { Spinner } from '../shared/components/Spinner'
+import { PlexSettingsForm } from './PlexSettingsForm'
 import { cn } from '../utils/strings'
 
-type EditMediaProviderSettingsModalProps<TData extends MediaProviderSettings> = ModalProps & {
-  type: MediaProviderEnum
+type EditMediaServerSettingsModalProps<TData extends MediaServerSettings> = ModalProps & {
+  type: MediaServerEnum
   data: TData
 }
 
-export const EditMediaProviderSettingsModal = <TData extends MediaProviderSettings>({
+export const EditMediaServerSettingsModal = <TData extends MediaServerSettings>({
   isOpen,
   onClose,
   type,
   data,
   ...props
-}: EditMediaProviderSettingsModalProps<TData>) => {
+}: EditMediaServerSettingsModalProps<TData>) => {
   const queryClient = useQueryClient()
   const { pushDanger, pushSuccess } = useAlert()
 
   const resolverSchema = useMemo(() => {
     switch (type) {
-      case MediaProviderEnum.RADARR:
-        return postRadarrSettingsSchema
-      case MediaProviderEnum.SONARR:
-        return postSonarrSettingsSchema
+      case MediaServerEnum.PLEX:
+        return postPlexSettingsSchema
     }
   }, [type])
 
@@ -50,10 +44,8 @@ export const EditMediaProviderSettingsModal = <TData extends MediaProviderSettin
 
   const defaultValues = useMemo(() => {
     switch (type) {
-      case MediaProviderEnum.RADARR:
-        return data as PostRadarrSettings
-      case MediaProviderEnum.SONARR:
-        return data as PostSonarrSettings
+      case MediaServerEnum.PLEX:
+        return data as PostPlexSettings
     }
   }, [type])
 
@@ -121,15 +113,9 @@ export const EditMediaProviderSettingsModal = <TData extends MediaProviderSettin
           <Spinner className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
         )}
 
-        {type === MediaProviderEnum.RADARR && (
-          <RadarrSettingsForm
-            defaultSettings={data as RadarrSettings}
-            className={cn(updateConfigMutation.isLoading && 'invisible')}
-          />
-        )}
-        {type === MediaProviderEnum.SONARR && (
-          <SonarrSettingsForm
-            defaultSettings={data as SonarrSettings}
+        {type === MediaServerEnum.PLEX && (
+          <PlexSettingsForm
+            defaultSettings={data as PlexSettings}
             className={cn(updateConfigMutation.isLoading && 'invisible')}
           />
         )}

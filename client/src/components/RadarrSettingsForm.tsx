@@ -9,12 +9,14 @@ import { ControlledCheckbox } from '../elements/Checkbox'
 import { Switch } from '../elements/Switch'
 import { NewDivider } from '../shared/components/Divider'
 import { PostRadarrSettings, RadarrInstanceInfo, RadarrSettings } from '../schemas/media-servers'
+import { cn } from '../utils/strings'
 
 type RadarrSettingsFormProps = {
   defaultSettings?: RadarrSettings
+  className?: string
 }
 
-export const RadarrSettingsForm = ({ defaultSettings }: RadarrSettingsFormProps) => {
+export const RadarrSettingsForm = ({ defaultSettings, className }: RadarrSettingsFormProps) => {
   const { pushDanger, pushSuccess } = useAlert()
 
   const [isPortNeeded, setIsPortNeeded] = useState(!!defaultSettings?.port)
@@ -44,7 +46,7 @@ export const RadarrSettingsForm = ({ defaultSettings }: RadarrSettingsFormProps)
       if (defaultQualityProfileID) setValue('qualityProfileId', defaultQualityProfileID)
 
       const defaultTag = data.tags?.map((tag) => tag.id)
-      if (defaultTag.length) setValue('tags', defaultTag)
+      if (defaultTag?.length) setValue('tags', defaultTag)
 
       if (!defaultSettings) pushSuccess('Successful connection')
     },
@@ -59,7 +61,7 @@ export const RadarrSettingsForm = ({ defaultSettings }: RadarrSettingsFormProps)
   }, [])
 
   return (
-    <div className="space-y-6">
+    <div className={cn('space-y-6', className)}>
       {defaultSettings && (
         <>
           <ControlledCheckbox label="Enabled" name="enabled" />
@@ -160,11 +162,11 @@ export const RadarrSettingsForm = ({ defaultSettings }: RadarrSettingsFormProps)
             <p className="text-warning">Define quality profiles to add them to your configurations</p>
           )}
 
-          {instanceInfoMutation.data.tags.length > 0 ? (
+          {(instanceInfoMutation.data.tags?.length ?? 0) > 0 ? (
             <div className="flex flex-col gap-3">
               <label htmlFor="tags">Default Tags</label>
               <select id="tags" multiple {...register('tags')}>
-                {instanceInfoMutation.data.tags.map((t, index) => (
+                {instanceInfoMutation.data.tags?.map((t, index) => (
                   <option key={index} value={t.id}>
                     {t.name}
                   </option>

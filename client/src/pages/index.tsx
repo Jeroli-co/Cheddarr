@@ -21,7 +21,7 @@ import { Title } from '../elements/Title'
 import { IUser } from '../shared/models/IUser'
 import { GithubLink } from '../components/GithubLink'
 import { Modal } from '../elements/modal/Modal'
-import { SearchBar } from '../logged-in-app/SearchBar'
+import { SearchBar } from '../components/SearchBar'
 
 const CheddarrLogoLink = () => {
   return (

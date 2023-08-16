@@ -57,21 +57,17 @@ export const PickMediaProviderTypeModal: React.FC<PickMediaProvidersTypeModalPro
   const { handleSubmit, formState, reset, getValues, ...form } = useForm<FormDataType>({
     mode: 'onBlur',
     resolver: zodResolver(resolverSchema),
+    defaultValues: {
+      version: 3,
+    },
   })
 
   const modalTitle = getModalTitle(type)
-
-  const closeModal = () => {
-    reset()
-    onClose()
-  }
 
   const createConfigMutation = useMutation({
     mutationFn: (data: FormDataType) => httpClient.post<MediaProviderSettings>(`/settings/${type}`, data),
     onSuccess: () => {
       pushSuccess('Configuration created')
-      closeModal()
-
       switch (type) {
         case MediaProviderEnum.RADARR:
           queryClient.invalidateQueries(['settings', 'radarr'])
@@ -80,9 +76,9 @@ export const PickMediaProviderTypeModal: React.FC<PickMediaProvidersTypeModalPro
           queryClient.invalidateQueries(['settings', 'sonarr'])
           break
       }
+      onClose()
     },
-    onError: (err) => {
-      console.log(err)
+    onError: () => {
       pushDanger('Cannot create configuration')
     },
   })
@@ -100,7 +96,7 @@ export const PickMediaProviderTypeModal: React.FC<PickMediaProvidersTypeModalPro
       <Modal
         title={modalTitle}
         isOpen={isOpen}
-        onClose={closeModal}
+        onClose={onClose}
         hasCloseFooterButton={true}
         onSubmit={onSubmit}
         Footer={
