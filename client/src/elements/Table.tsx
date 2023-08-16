@@ -1,9 +1,7 @@
 import {
   type ColumnDef,
   flexRender,
-  // eslint-disable-next-line import/named
   getCoreRowModel,
-  // eslint-disable-next-line import/named
   getPaginationRowModel,
   useReactTable,
   createColumnHelper,
@@ -64,7 +62,9 @@ export const Table = <TData,>({ columns, data, ...props }: TableProps<TData>) =>
                   {row.getVisibleCells().map((cell) => {
                     return (
                       <td key={cell.id} className="px-5 py-5">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        <div className="flex items-center justify-center">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </div>
                       </td>
                     )
                   })}

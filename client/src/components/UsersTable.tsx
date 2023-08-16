@@ -72,7 +72,7 @@ export const UsersTable = ({
           cell: (info) => {
             const user = info.getValue()
             return (
-              <Buttons className="justify-center">
+              <Buttons>
                 {confirmed ? (
                   // Cant work because user.id is undefined
                   <Button mode="square" onClick={() => navigate(`/profile/${user.id}`)}>
@@ -104,8 +104,6 @@ export const UsersTable = ({
 
   return (
     <>
-      <div className="text-xl text-danger">Cant 't work because user.id is null</div>
-
       <Head confirmed={confirmed} />
 
       {(isLoading || isFetching) && <Spinner size="lg" />}
