@@ -88,7 +88,7 @@ class TmdbVideo(Video):
     video_url: str | None = None
 
     @field_validator("key")
-    def get_video_url(cls, key: str, info: FieldValidationInfo) -> str:
+    def get_video_url(cls, key: str, info: FieldValidationInfo) -> str:  # noqa: N805
         if info.data.get("site") == "YouTube" and info.data.get("type") == "Trailer":
             info.data["video_url"] = f"https://www.youtube.com/watch?v={key}"
         return key

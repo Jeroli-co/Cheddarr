@@ -4,7 +4,7 @@ from typing import Any
 from uuid import uuid4
 
 from cachetools.func import lru_cache
-from pydantic import AnyHttpUrl, BaseModel, DirectoryPath
+from pydantic import BaseModel, DirectoryPath, HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,8 +12,8 @@ class CustomConfig(BaseSettings):
     model_config = SettingsConfigDict(validate_assignment=True, extra="forbid")
 
     server_domain: str | None = None
-    enable_https: bool | None = None
     server_port: int | None = None
+    enable_https: bool | None = None
     secret_key: str | None = None
     client_id: str | None = None
     log_level: str | None = None
@@ -29,7 +29,8 @@ class Config(BaseModel):
     ##########################################################################
     server_domain: str = "localhost"
     server_port: int = 9090
-    server_host: str = f"http://{server_domain}"
+    enable_https: bool = False
+    server_host: str = f"{'https' if enable_https else 'http'}://{server_domain}:{server_port}"
     log_level: str = "INFO"
     tz: str = "UTC"
 
@@ -51,9 +52,9 @@ class Config(BaseModel):
     ##########################################################################
     # external services                                                      #
     ##########################################################################
-    plex_token_url: AnyHttpUrl = AnyHttpUrl("https://plex.tv/api/v2/pins/")
-    plex_authorize_url: AnyHttpUrl = AnyHttpUrl("https://app.plex.tv/auth#/")
-    plex_user_resource_url: AnyHttpUrl = AnyHttpUrl("https://plex.tv/api/v2/user/")
+    plex_token_url: HttpUrl = HttpUrl("https://plex.tv/api/v2/pins/")
+    plex_authorize_url: HttpUrl = HttpUrl("https://app.plex.tv/auth#/")
+    plex_user_resource_url: HttpUrl = HttpUrl("https://plex.tv/api/v2/user/")
     tmdb_api_key: str = "cd210007bbc918ea3995df599405935b"
 
     ##########################################################################

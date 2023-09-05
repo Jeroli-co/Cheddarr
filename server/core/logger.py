@@ -48,7 +48,10 @@ class LogLevelFilter:
 
 
 class Formatter:
-    fmt = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>{extra[padding]} | <level>{message}</level>\n{exception}"
+    fmt = (
+        "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>{extra["
+        "padding]} | <level>{message}</level>\n{exception}"
+    )
     padding = 0
 
     @classmethod

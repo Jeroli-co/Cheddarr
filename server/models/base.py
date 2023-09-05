@@ -21,7 +21,7 @@ class Model(MappedAsDataclass, Base):
 
     @classmethod
     @declared_attr.directive
-    def __tablename__(cls):
+    def __tablename__(cls):  # noqa: ANN206
         return camel_to_snake_case(cls.__name__).lower()
 
     def dict(self) -> dict[Any, Any]:

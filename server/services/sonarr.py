@@ -20,7 +20,7 @@ def make_url(
     host: str,
     port: int | None,
     ssl: bool,
-    version: int | None = None,
+    version: int | None = 3,
     resource_path: str,
     queries: dict[str, Any] | None = None,
 ) -> str:
@@ -42,7 +42,7 @@ async def check_instance_status(
     host: str,
     port: int | None,
     ssl: bool,
-    version: int | None = None,
+    version: int | None = 3,
 ) -> dict[str, Any] | None:
     url = make_url(
         api_key=api_key,
@@ -64,7 +64,7 @@ async def get_instance_info(
     host: str,
     port: int | None,
     ssl: bool,
-    version: int | None = None,
+    version: int | None = 3,
 ) -> SonarrInstanceInfo | None:
     if not await check_instance_status(api_key=api_key, host=host, port=port, ssl=ssl, version=version):
         return None

@@ -49,7 +49,7 @@ async def multi_search(
             await tmdb.search_tmdb_media(value, page),
         )
 
-    if type == SearchType.movie or type == SearchType.series:
+    if type in (SearchType.movie, SearchType.series):
         for media in results.results:
             if isinstance(media, SeriesSchema | MovieSchema):
                 await media_service.set_media_db_info(media)

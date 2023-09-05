@@ -72,7 +72,7 @@ class MediaSchemaBase(APIModel, ABC):
 
 
 class MovieSchema(MediaSchemaBase):
-    requests: Sequence[Any] = []  # FIXME: This is a hack to get around circular imports
+    requests: Sequence[Any] = []  # TODO: This is a hack to get around circular imports, fix this
     media_type: Literal[MediaType.movie] = Field(MediaType.movie, init_var=False)
 
 
@@ -88,7 +88,7 @@ class SeasonSchema(MediaSchemaBase):
 class SeriesSchema(MediaSchemaBase):
     number_of_seasons: int | None = None
     seasons: Sequence[SeasonSchema] | None = None
-    requests: Sequence[Any] = []  # FIXME: This is a hack to get around circular imports
+    requests: Sequence[Any] = []  # TODO: This is a hack to get around circular imports, fix this
     media_type: Literal[MediaType.series] = Field(MediaType.series, init_var=False)
 
 

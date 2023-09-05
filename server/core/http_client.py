@@ -36,7 +36,11 @@ class HttpClient:
 
         async def _call() -> Any:
             resp = await client.request(
-                method, url, params=params, headers={**(headers or {}), "Content-Type": "application/json"}, data=data
+                method,
+                url,
+                params=params,
+                headers={**(headers or {}), "Content-Type": "application/json"},
+                data=data,
             )
             if status.HTTP_200_OK < resp.status_code >= status.HTTP_400_BAD_REQUEST:
                 raise HTTPException(resp.status_code, resp.text)

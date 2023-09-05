@@ -155,7 +155,7 @@ async def update_movie_request(
     media_request_repo: MediaRequestRepository = Depends(deps.get_repository(MediaRequestRepository)),
     media_provider_repo: MediaProviderSettingRepository = Depends(deps.get_repository(MediaProviderSettingRepository)),
 ) -> MediaRequest:
-    if request_update.status != RequestStatus.approved and request_update.status != RequestStatus.refused:
+    if request_update.status not in (RequestStatus.approved, RequestStatus.refused):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             "Request status can only be updated to approved or refused.",
@@ -323,7 +323,7 @@ async def update_series_request(
     media_provider_repo: MediaProviderSettingRepository = Depends(deps.get_repository(MediaProviderSettingRepository)),
     request_service: RequestService = Depends(deps.get_service(RequestService)),
 ) -> Any:
-    if request_update.status != RequestStatus.approved and request_update.status != RequestStatus.refused:
+    if request_update.status not in (RequestStatus.approved, RequestStatus.refused):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             "Request status can only be updated to approved or refused.",

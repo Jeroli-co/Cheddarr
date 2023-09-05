@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
-from pydantic import EmailStr
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from server.api import dependencies as deps
 from server.api.dependencies import CurrentUser
@@ -15,6 +14,8 @@ from server.repositories.users import (
 )
 from server.schemas.base import PaginatedResponse
 from server.schemas.users import (
+    PasswordResetConfirm,
+    PasswordResetCreate,
     UserProfile,
     UserSchema,
     UserUpdate,
@@ -123,9 +124,9 @@ async def update_user(
                 "Missing old password to change to a new password.",
             )
 
-        if not user.verify_password(user_in.old_password):
+        if not user.verify_password(user_in.old_password.get_secret_value()):
             raise HTTPException(status.HTTP_401_UNAUTHORIZED, "The passwords don't match.")
-        user.password = user_in.password
+        user.password = user_in.password.get_secret_value()
 
     if user_in.email is not None:
         if await user_repo.find_by_email(user_in.email).one():
@@ -173,7 +174,7 @@ async def get_current_user(current_user: CurrentUser) -> User:
 )
 async def reset_password(
     request: Request,
-    email: EmailStr = Body(..., embed=True),
+    form: PasswordResetCreate,
     *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
@@ -185,9 +186,9 @@ async def reset_password(
     if email_agent is None or not email_agent.enabled:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "No email agent is enabled.")
 
-    user = await user_repo.find_by_email(email).one()
+    user = await user_repo.find_by_email(form.email).one()
     if user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No user registered with this email.")
+        return
 
     token = Token(data={"email": user.email})
     await token_repo.save(token)
@@ -196,10 +197,10 @@ async def reset_password(
         utils.send_email,
         kwargs={
             "email_settings": email_agent.settings,
-            "to_email": email,
+            "to_email": form.email,
             "subject": "Reset your password",
             "html_template_name": "email/reset_password_instructions.html",
-            "environment": {"reset_url": request.url_for("check_reset_password", token=token)},
+            "environment": {"reset_url": str(request.url_for("check_reset_password", token=token.data))},
         },
     )
 
@@ -244,7 +245,7 @@ async def check_reset_password(
 )
 async def confirm_reset_password(
     token: str,
-    password: str = Body(..., embed=True),
+    form: PasswordResetConfirm,
     *,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
     token_repo: TokenRepository = Depends(deps.get_repository(TokenRepository)),
@@ -261,7 +262,7 @@ async def confirm_reset_password(
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No user with with this email was found.")
 
-    user.password = password
+    user.password = form.password.get_secret_value()
 
     await user_repo.save(user)
     await token_repo.remove(reset)

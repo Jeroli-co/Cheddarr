@@ -8,6 +8,7 @@ jobs:
       matrix:
         node-version: [16.x]
         python-version: [3.11.x]
+        poetry-version: [1.5.1]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -19,9 +20,9 @@ jobs:
       - name: Build Node
         run: |
           cd client
-          pnpm install --frozen-lockfile --prod
-          pnpm build --if-present
-          pnpm test
+          yarn install
+          yarn run build --if-present
+          yarn test
         env:
           CI: true
       - name: Set up Python
@@ -29,7 +30,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Python Poetry Action
-        uses: abatilo/actions-poetry@v2.1.0
+        uses: abatilo/actions-poetry@v2.1.6
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
       - name: Poetry install
         run: poetry install
       - name: Test with pytest

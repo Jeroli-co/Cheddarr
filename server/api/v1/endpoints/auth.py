@@ -10,7 +10,6 @@ from fastapi import (
     status,
 )
 from fastapi.responses import RedirectResponse
-from fastapi.security import OAuth2PasswordRequestForm
 
 from server.api import dependencies as deps
 from server.api.dependencies import AppConfig
@@ -23,7 +22,7 @@ from server.repositories.notifications import NotificationAgentRepository
 from server.repositories.users import TokenRepository, UserRepository
 from server.schemas.auth import AccessToken, AccessTokenPayload, Invitation, PlexAuthorizeSignin
 from server.schemas.base import ResponseMessage
-from server.schemas.users import UserCreate
+from server.schemas.users import UserCreate, UserLogin
 from server.services import plex
 
 router = APIRouter()
@@ -149,7 +148,7 @@ async def invite_user(
         max_age=invitation.max_age,
     )
     await token_repo.save(token)
-    invitation_link = request.url_for("check_sign_up_invitation", token=token.data)
+    invitation_link = str(request.url_for("check_sign_up_invitation", token=token.data))
 
     if invitation.email is not None:
         if await user_repo.find_by_email(invitation.email).one() is not None:
@@ -170,7 +169,7 @@ async def invite_user(
                 },
             )
 
-    return ResponseMessage(detail=str(invitation_link))
+    return ResponseMessage(detail=invitation_link)
 
 
 @router.post(
@@ -181,7 +180,7 @@ async def invite_user(
     },
 )
 async def signin(
-    form: OAuth2PasswordRequestForm = Depends(),
+    form: UserLogin,
     *,
     config: AppConfig,
     user_repo: UserRepository = Depends(deps.get_repository(UserRepository)),
@@ -189,7 +188,7 @@ async def signin(
     if not config.local_account_enabled:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Local accounts are disabled.")
     user = await user_repo.find_by_username_or_email(form.username).one()
-    if user is None or not user.verify_password(form.password):
+    if user is None or not user.verify_password(form.password.get_secret_value()):
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Wrong username/email or password.",
@@ -231,8 +230,6 @@ async def authorize_signin_plex(
     *,
     config: AppConfig,
 ) -> RedirectResponse:
-    forward_url = re.sub("/api/v[0-9]+", "", str(request.url_for("confirm_signin_plex")))
-    token = Token(data=auth_data.model_dump())
     authorize_url = (
         utils.make_url(
             str(config.plex_authorize_url),
@@ -240,11 +237,11 @@ async def authorize_signin_plex(
                 "context[device][product]": "Cheddarr",
                 "clientID": config.client_id,
                 "code": auth_data.code,
-                "forwardUrl": forward_url,
+                "forwardUrl": re.sub("/api/v[0-9]+", "", str(request.url_for("confirm_signin_plex"))),
             },
         )
         + "?token="
-        + token.data
+        + Token(data=auth_data.model_dump()).data
     )
 
     return RedirectResponse(url=authorize_url, status_code=200)

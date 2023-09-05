@@ -57,7 +57,8 @@ asyncio_mode = "auto"
 [tool.ruff]
 select = ["ALL"]
 ignore = [
-    "A", "D", "S", "EM", "PGH",  "FBT", "ANN101", "ANN102", "ANN401", "B008", "PLR0913", "RUF012",  "TCH001", "TCH002", "TCH003", "TRY003"
+    "A", "D", "S", "EM", "PGH",  "FBT", "FIX", "ANN101", "ANN102", "ANN401", "B008", "PLR0913", "PLR2004", "RUF012",
+    "TCH001", "TCH002", "TCH003", "TRY003", "C901", "PLR0912", "TD002", "TD003"
 ]
 extend-exclude = ["server/database/migrations", "server/tests/conftest.py"]
 line-length = 120
