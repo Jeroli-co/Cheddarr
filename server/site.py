@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 from server.core.config import get_config
 
 site = FastAPI(docs_url=None, redoc_url=None)
-site.mount("/images", StaticFiles(directory=str(get_config().images_folder)), name="images")
+#site.mount("/images", StaticFiles(directory=str(get_config().react_build_folder)), name="images")
 site.mount(
     "/static",
     StaticFiles(directory=str(get_config().react_static_folder), check_dir=False),

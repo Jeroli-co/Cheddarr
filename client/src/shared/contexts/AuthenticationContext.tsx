@@ -47,10 +47,7 @@ export default (props: any) => {
   }
 
   const signIn = async (data: SignInFormData, redirectURI?: string) => {
-    const fd = new FormData()
-    fd.append('username', data.username)
-    fd.append('password', data.password)
-    const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, fd)
+    const res = await post<IEncodedToken>(APIRoutes.SIGN_IN, { ...data })
     if (res.data && res.status === 200) {
       initSession(res.data)
       navigate(redirectURI ?? routes.HOME.url, { replace: true })
