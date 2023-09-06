@@ -52,7 +52,7 @@ class MediaServerContent(MappedAsDataclass):
 
 class MediaServerMedia(Model, MediaServerContent):
     server_library_id: Mapped[str] = mapped_column(ForeignKey("media_server_library.id", ondelete="CASCADE"))
-    media_id: Mapped[int] = mapped_column(ForeignKey("media.id", ondelete="CASCADE"))
+    media_id: Mapped[int] = mapped_column(ForeignKey("media.id", ondelete="CASCADE"), init=False)
     media: Mapped[Media] = relationship(lazy="selectin", innerjoin=True, repr=True)
 
 
